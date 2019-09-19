@@ -1,0 +1,405 @@
+ type Movement = enum { Turn_Right, Turn_Left, Move_Forward, Stop };
+type Direction = enum { North, South, East, West };
+type Action = enum { Camera, Weapon, Land, None };
+type Position_Impl = struct { x : int; y : int };
+type TaskStatus = enum { Successful, Aborted, InProgress, Started };
+type Task_Impl = struct { waypoint : Position_Impl; action : Action; status : TaskStatus };
+type MotorCommand = enum { IncreaseX, DecreaseX, IncreaseY, DecreaseY, IncreaseYaw, DecreaseYaw, NoChange };
+type UAVState = enum { s_RETURN_TO_LAUNCH, s_AUTO_FLIGHT_MODE, s_MANUAL_FLIGHT_MODE };
+type YawAngle = enum { Y_0, Y_90, Y_180, Y_270 };
+type Tasks_Impl = struct { task1 : Task_Impl; task2 : Task_Impl; task3 : Task_Impl };
+type ATE6Type = enum { RC_Abnormal, RC_Normal };
+type ATE7Type = enum { Inadequate, Adequate };
+
+const INITIAL_BATTERY_LEVEL : int = 100;
+const BATTERY_LEVEL_THRESHOLD : int = 20;
+const BATTERY_CONSUMPTION_LOWER_BOUND : int = 1;
+const BATTERY_CONSUMPTION_UPPER_BOUND : int = 4;
+const RC_RECEIVER_TOLERANCE_LEVEL : int = 1;
+const LAUNCH_POS : Position_Impl = Position_Impl { x = 0; y = 0 };
+const LAUNCH_DIR : Direction = North;
+const PILOT_TARGET_POSITION : Position_Impl = Position_Impl { x = 2; y = 2 };
+const c_North : Direction = North;
+const c_East : Direction = East;
+const c_West : Direction = West;
+const c_South : Direction = South;
+const c_Y_0 : YawAngle = Y_0;
+const c_Y_90 : YawAngle = Y_90;
+const c_Y_180 : YawAngle = Y_180;
+const c_Y_270 : YawAngle = Y_270;
+const c_IncreaseX : MotorCommand = IncreaseX;
+const c_IncreaseY : MotorCommand = IncreaseY;
+const c_DecreaseX : MotorCommand = DecreaseX;
+const c_DecreaseY : MotorCommand = DecreaseY;
+const c_IncreaseYaw : MotorCommand = IncreaseYaw;
+const c_DecreaseYaw : MotorCommand = DecreaseYaw;
+const c_Move_Forward : Movement = Move_Forward;
+const c_Turn_Left : Movement = Turn_Left;
+const c_Stop : Movement = Stop;
+const c_None : Action = None;
+const c_Camera : Action = Camera;
+
+
+node duration
+  (p : bool)
+returns
+  (r : int);
+let
+  r = if not p then 1 else 0 -> if not p then pre r + 1 else 0;
+tel
+
+node is_equal
+  (pos1 : Position_Impl;
+  pos2 : Position_Impl)
+returns
+  (z : bool);
+let
+  z = pos1.x = pos2.x and pos1.y = pos2.y;
+tel
+
+node yaw2dir
+  (yaw : YawAngle)
+returns
+  (dir : Direction);
+let
+  dir = if yaw = c_Y_0 then c_North else if yaw = c_Y_90 then c_East else if yaw = c_Y_180 then c_South else c_West;
+tel
+
+node set_task_status
+  (curr_task : Task_Impl;
+  new_status : TaskStatus)
+returns
+  (new_task : Task_Impl);
+let
+  new_task = Task_Impl { waypoint = curr_task.waypoint; action = curr_task.action; status = new_status };
+tel
+
+node LocationSource_Pos
+  (cmd : MotorCommand)
+returns
+  (GPS_pos : Position_Impl);
+var
+  nextPos : Position_Impl;
+  x : int;
+  y : int;
+let
+  GPS_pos = LAUNCH_POS -> pre nextPos;
+  x = if cmd = c_IncreaseX then GPS_pos.x + 1 else if cmd = c_DecreaseX then GPS_pos.x - 1 else GPS_pos.x;
+  y = if cmd = c_IncreaseY then GPS_pos.y + 1 else if cmd = c_DecreaseY then GPS_pos.y - 1 else GPS_pos.y;
+  nextPos = Position_Impl { x = x; y = y };
+tel
+
+node LocationSource_Dir
+  (cmd : MotorCommand)
+returns
+  (GPS_dir : Direction);
+var
+  nextDir : Direction;
+  yaw : YawAngle;
+let
+  GPS_dir = LAUNCH_DIR -> pre nextDir;
+  yaw = if cmd = c_IncreaseYaw then c_Y_90 -> if pre yaw = c_Y_0 then c_Y_90 else if pre yaw = c_Y_90 then c_Y_180 else if pre yaw = c_Y_180 then c_Y_270 else c_Y_0 else if cmd = c_DecreaseYaw then c_Y_270 -> if pre yaw = c_Y_0 then c_Y_270 else if pre yaw = c_Y_90 then c_Y_0 else if pre yaw = c_Y_180 then c_Y_90 else c_Y_180 else c_Y_0 -> pre yaw;
+  nextDir = yaw2dir(yaw);
+tel
+
+node RemoteOperatorController_Move
+  ()
+returns
+  (move : Movement);
+let
+  move = c_Move_Forward -> pre c_Move_Forward -> pre c_Turn_Left -> pre c_Move_Forward -> pre c_Move_Forward -> pre c_Stop;
+tel
+
+node RemoteOperatorController_payloadCMD
+  ()
+returns
+  (payloadCMD : Action);
+let
+  payloadCMD = c_None -> pre c_None -> pre c_None -> pre c_None -> pre c_None -> pre c_Camera -> pre c_None;
+tel
+
+node sofar
+  (a : bool)
+returns
+  (b : bool);
+let
+  b = a -> a and pre b;
+tel
+
+node imported Actuators
+  (cmd : MotorCommand;
+  payloadCmdFC : Action;
+  mstate : UAVState;
+  payloadCmdRC : Action)
+returns
+  (battery_level : int;
+  payload_performed : bool);
+(*@contract
+  var payloadCMD : Action = if mstate = s_MANUAL_FLIGHT_MODE then payloadCmdRC else payloadCmdFC;
+  var prev_battery_level : int = INITIAL_BATTERY_LEVEL -> pre battery_level;
+  var battery4pos_consumed : bool = cmd = IncreaseY or cmd = IncreaseX or cmd = DecreaseY or cmd = DecreaseX or cmd = NoChange;
+  var battery4dir_consumed : bool = cmd = IncreaseYaw or cmd = DecreaseYaw;
+  var battery_consumed : bool = battery4pos_consumed or battery4dir_consumed or payload_performed;
+  var battery_level_diff : int = prev_battery_level - battery_level;
+  guarantee "payload_performed_Def" payload_performed = (payloadCMD <> None and cmd = NoChange);
+  guarantee "battery_level_Def1" not battery_consumed => battery_level_diff = 0;
+  guarantee "battery_level_Def2" battery_consumed => BATTERY_CONSUMPTION_LOWER_BOUND <= battery_level_diff and battery_level_diff <= BATTERY_CONSUMPTION_UPPER_BOUND;
+*)
+
+node imported BatteryHealthCheck
+  (battery_level : int)
+returns
+  (ATE7 : ATE7Type);
+(*@contract
+  var next_ATE7 : ATE7Type = if battery_level < BATTERY_LEVEL_THRESHOLD then Adequate else Inadequate;
+  guarantee "ATE7_Def" ATE7 = (Adequate -> pre next_ATE7);
+*)
+
+node imported DME_VOR
+  (location_source_pos : Position_Impl;
+  location_source_dir : Direction)
+returns
+  (pos : Position_Impl;
+  dir : Direction);
+(*@contract
+  guarantee "pos_Def" pos = location_source_pos;
+  guarantee "dir_Def" dir = location_source_dir;
+*)
+
+node imported FlightController
+  (dest_reached : bool;
+  payload_performed : bool;
+  tasks : Tasks_Impl;
+  mstate : UAVState)
+returns
+  (payloadCmd : Action;
+  waypoint : Position_Impl);
+(*@contract
+  var curr_dest_reached : bool = false -> pre dest_reached;
+  var curr_payload_performed : bool = false -> pre payload_performed;
+  var task1 : Task_Impl = tasks.task1 -> pre upd_task1;
+  var task2 : Task_Impl = tasks.task2 -> pre upd_task2;
+  var task3 : Task_Impl = tasks.task3 -> pre upd_task3;
+  var s_auto_task1_started : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Started and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task1_inprogress : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = InProgress and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task1_successful : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = InProgress and curr_dest_reached and curr_payload_performed;
+  var s_auto_task1_aborted : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = InProgress and curr_dest_reached and not curr_payload_performed;
+  var s_auto_task2_started : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = Started and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task2_inprogress : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = InProgress and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task2_successful : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = InProgress and curr_dest_reached and curr_payload_performed;
+  var s_auto_task2_aborted : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = InProgress and curr_dest_reached and not curr_payload_performed;
+  var s_auto_task3_started : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = Successful and task3.status = Started and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task3_inprogress : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = Successful and task3.status = InProgress and not curr_dest_reached or not curr_payload_performed;
+  var s_auto_task3_successful : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = Successful and task3.status = InProgress and curr_dest_reached and curr_payload_performed;
+  var s_auto_task3_aborted : bool = mstate = s_AUTO_FLIGHT_MODE and task1.status = Successful and task2.status = Successful and task3.status = InProgress and curr_dest_reached and not curr_payload_performed;
+  var s_return_when_task1 : bool = mstate = s_RETURN_TO_LAUNCH and task1.status = InProgress;
+  var s_return_when_task2 : bool = mstate = s_RETURN_TO_LAUNCH and task2.status = InProgress;
+  var s_return_when_task3 : bool = mstate = s_RETURN_TO_LAUNCH and task3.status = InProgress;
+  var s_manual_mode : bool = mstate = s_MANUAL_FLIGHT_MODE;
+  var upd_task1 : Task_Impl = if s_auto_task1_started then set_task_status(task1, InProgress) else if s_auto_task1_successful then set_task_status(task1, Successful) else if s_auto_task1_inprogress or s_auto_task2_started or s_auto_task2_inprogress or s_auto_task2_successful or s_auto_task2_aborted or s_auto_task3_started or s_auto_task3_inprogress or s_auto_task3_successful or s_auto_task3_aborted or mstate = s_RETURN_TO_LAUNCH and not (task1.status = InProgress) or s_manual_mode then task1 else set_task_status(task1, Aborted);
+  var upd_task2 : Task_Impl = if s_auto_task2_started then set_task_status(task2, InProgress) else if s_auto_task2_successful then set_task_status(task2, Successful) else if s_auto_task2_inprogress or s_auto_task1_started or s_auto_task1_inprogress or s_auto_task1_successful or s_auto_task1_aborted or s_auto_task3_started or s_auto_task3_inprogress or s_auto_task3_successful or s_auto_task3_aborted or mstate = s_RETURN_TO_LAUNCH and not (task2.status = InProgress) or s_manual_mode then task2 else set_task_status(task2, Aborted);
+  var upd_task3 : Task_Impl = if s_auto_task3_started then set_task_status(task3, InProgress) else if s_auto_task3_successful then set_task_status(task3, Successful) else if s_auto_task3_inprogress or s_auto_task1_started or s_auto_task1_inprogress or s_auto_task1_successful or s_auto_task1_aborted or s_auto_task2_started or s_auto_task2_inprogress or s_auto_task2_successful or s_auto_task2_aborted or mstate = s_RETURN_TO_LAUNCH and not (task3.status = InProgress) or s_manual_mode then task3 else set_task_status(task3, Aborted);
+  guarantee "waypoint_Def" waypoint = if s_auto_task1_started or s_auto_task1_inprogress or s_auto_task1_successful or s_auto_task1_aborted then task1.waypoint else if s_auto_task2_started or s_auto_task2_inprogress or s_auto_task2_successful or s_auto_task2_aborted then task2.waypoint else if s_auto_task3_started or s_auto_task3_inprogress or s_auto_task3_successful or s_auto_task3_aborted then task3.waypoint else if mstate = s_RETURN_TO_LAUNCH then LAUNCH_POS else LAUNCH_POS -> pre waypoint;
+  guarantee "payloadCMD_Def" payloadCmd = if mstate = s_AUTO_FLIGHT_MODE and curr_dest_reached and not curr_payload_performed then if task1.status = Started or task1.status = InProgress then task1.action else if task1.status = Successful and task2.status = Started or task2.status = InProgress then task2.action else if task1.status = Successful and task2.status = Successful and task3.status = Started or task3.status = InProgress then task3.action else None else None;
+*)
+
+node imported GPS
+  (location_source_pos : Position_Impl;
+  location_source_dir : Direction)
+returns
+  (pos : Position_Impl;
+  dir : Direction);
+(*@contract
+  guarantee "pos_Def" pos = location_source_pos;
+  guarantee "dir_Def" dir = location_source_dir;
+*)
+
+node imported IRU
+  (location_source_pos : Position_Impl;
+  location_source_dir : Direction)
+returns
+  (pos : Position_Impl;
+  dir : Direction);
+(*@contract
+  guarantee "pos_Def" pos = location_source_pos;
+  guarantee "dir_Def" dir = location_source_dir;
+*)
+
+node imported MissionPlanner
+  ()
+returns
+  (tasks : Tasks_Impl);
+(*@contract
+  var t1 : Task_Impl = Task_Impl { waypoint = Position_Impl { x = 1; y = 1 }; action = Camera; status = Started };
+  var t2 : Task_Impl = Task_Impl { waypoint = Position_Impl { x = 1; y = 2 }; action = Weapon; status = Started };
+  var t3 : Task_Impl = Task_Impl { waypoint = Position_Impl { x = 2; y = 2 }; action = Land; status = Started };
+  guarantee "tasks_Def" tasks = Tasks_Impl { task1 = t1; task2 = t2; task3 = t3 };
+*)
+
+node imported Mixer
+  (mstate : UAVState;
+  moveRC : Movement;
+  moveNav : Movement;
+  currentDir : Direction)
+returns
+  (cmd : MotorCommand);
+(*@contract
+  var move : Movement = if mstate = s_MANUAL_FLIGHT_MODE then moveRC else moveNav;
+  guarantee "cmd_Def" cmd = if move = Move_Forward and currentDir = North then IncreaseY else if move = Move_Forward and currentDir = South then DecreaseY else if move = Move_Forward and currentDir = East then IncreaseX else if move = Move_Forward and currentDir = West then DecreaseX else if move = Turn_Right and currentDir = North then IncreaseYaw else if move = Turn_Right and currentDir = East then IncreaseYaw else if move = Turn_Right and currentDir = South then IncreaseYaw else if move = Turn_Right and currentDir = West then IncreaseYaw else if move = Turn_Left and currentDir = North then DecreaseYaw else if move = Turn_Left and currentDir = West then DecreaseYaw else if move = Turn_Left and currentDir = South then DecreaseYaw else if move = Turn_Left and currentDir = East then DecreaseYaw else NoChange;
+*)
+
+node imported Navigator
+  (currentPos : Position_Impl;
+  waypoint : Position_Impl;
+  currentDir : Direction)
+returns
+  (move : Movement;
+  dest_reached : bool);
+(*@contract
+  guarantee "move_Def" move = if currentDir = North and waypoint.y < currentPos.y then Move_Forward else if currentDir = South and waypoint.y > currentPos.y then Move_Forward else if currentDir = East and waypoint.x < currentPos.x then Move_Forward else if currentDir = West and waypoint.x > currentPos.x then Move_Forward else if currentDir = North and waypoint.y = currentPos.y and waypoint.x < currentPos.x then Turn_Right else if currentDir = South and waypoint.y = currentPos.y and waypoint.x < currentPos.x then Turn_Left else if currentDir = West and waypoint.y = currentPos.y and waypoint.x < currentPos.x then Turn_Right else if currentDir = North and waypoint.y = currentPos.y and waypoint.x > currentPos.x then Turn_Left else if currentDir = South and waypoint.y = currentPos.y and waypoint.x > currentPos.x then Turn_Right else if currentDir = East and waypoint.y = currentPos.y and waypoint.x > currentPos.x then Turn_Left else if currentDir = South and waypoint.x = currentPos.x and waypoint.y < currentPos.y then Turn_Right else if currentDir = West and waypoint.x = currentPos.x and waypoint.y < currentPos.y then Turn_Right else if currentDir = East and waypoint.x = currentPos.x and waypoint.y < currentPos.y then Turn_Left else if currentDir = North and waypoint.x = currentPos.x and waypoint.y > currentPos.y then Turn_Right else if currentDir = West and waypoint.x = currentPos.x and waypoint.y > currentPos.y then Turn_Left else if currentDir = East and waypoint.x = currentPos.x and waypoint.y > currentPos.y then Turn_Right else if waypoint.x <> currentPos.x and waypoint.y <> currentPos.y then Turn_Right else Stop;
+  guarantee "dest_reached_Def" dest_reached = (currentPos.x = waypoint.x and currentPos.y = waypoint.y);
+*)
+
+node imported PositionEstimator
+  (voted_pos : Position_Impl;
+  voted_dir : Direction)
+returns
+  (currentPos : Position_Impl;
+  currentDir : Direction);
+(*@contract
+  guarantee "currentPos_Def" currentPos = voted_pos;
+  guarantee "currentDir_Def" currentDir = voted_dir;
+*)
+
+node imported RCReceiver
+  (rcv_payloadCMD : Action;
+  rcv_move : Movement;
+  rcv_uavMode : UAVState)
+returns
+  (normal : bool;
+  payloadCMD : Action;
+  move : Movement;
+  uavMode : UAVState);
+(*@contract
+  guarantee "payloadCMD_Def" payloadCMD = rcv_payloadCMD;
+  guarantee "move_Def" move = rcv_move;
+  guarantee "uavMode_Def" uavMode = rcv_uavMode;
+  guarantee "normal_Def" normal = true;
+*)
+
+node imported RCReceiverHealthCheck
+  (normal : bool)
+returns
+  (ATE6 : ATE6Type);
+(*@contract
+  var next_ATE6 : ATE6Type = if duration(normal) <= RC_RECEIVER_TOLERANCE_LEVEL then RC_Normal else RC_Abnormal;
+  guarantee "ATE6_Def" ATE6 = (RC_Normal -> pre next_ATE6);
+*)
+
+node imported StateController
+  (ATE6 : ATE6Type;
+  ATE7 : ATE7Type;
+  uavMode : UAVState)
+returns
+  (mstate : UAVState);
+(*@contract
+  guarantee "mstate_Def" mstate = if ATE7 = Adequate and ATE6 = RC_Normal then uavMode else s_RETURN_TO_LAUNCH;
+*)
+
+node imported TriplexVoter
+  (gps_pos : Position_Impl;
+  dme_vor_pos : Position_Impl;
+  iru_pos : Position_Impl;
+  gps_dir : Direction;
+  dme_vor_dir : Direction;
+  iru_dir : Direction)
+returns
+  (voted_pos : Position_Impl;
+  voted_dir : Direction);
+(*@contract
+  guarantee "voted_pos_Def" voted_pos = if is_equal(gps_pos, dme_vor_pos) then gps_pos else if is_equal(gps_pos, iru_pos) then gps_pos else dme_vor_pos;
+  guarantee "voted_dir_Def" voted_dir = if gps_dir = dme_vor_dir then gps_dir else if gps_dir = iru_dir then gps_dir else dme_vor_dir;
+*)
+
+node UAVSystem_Impl
+  (location_source_pos : Position_Impl;
+  location_source_dir : Direction;
+  rcv_payloadCMD : Action;
+  rcv_move : Movement;
+  rcv_uavMode : UAVState)
+returns
+  (cmd : MotorCommand;
+  currentPos : Position_Impl;
+  payloadCmdFC : Action;
+  payloadCmdRC : Action;
+  mstate : UAVState;
+  tasks : Tasks_Impl;
+  payload_performed : bool);
+(*@contract
+  var picture_waypoint : Position_Impl = tasks.task1.waypoint;
+  var bomb_waypoint : Position_Impl = tasks.task2.waypoint;
+  var destination_waypoint : Position_Impl = tasks.task3.waypoint;
+  var payloadCMD : Action = if mstate = s_MANUAL_FLIGHT_MODE then payloadCmdRC else payloadCmdFC;
+  assume location_source_pos = LocationSource_Pos(cmd);
+  assume location_source_dir = LocationSource_Dir(cmd);
+  assume rcv_uavMode = s_AUTO_FLIGHT_MODE;
+  assume rcv_payloadCMD = RemoteOperatorController_payloadCMD();
+  assume rcv_move = RemoteOperatorController_Move();
+  guarantee "a_picture_only_in_task1_waypoint" mstate = s_AUTO_FLIGHT_MODE and payload_performed and payloadCMD = Camera => is_equal(location_source_pos, picture_waypoint);
+  guarantee "b_weapon_only_in_task2_waypoint" mstate = s_AUTO_FLIGHT_MODE and payload_performed and payloadCMD = Weapon => is_equal(location_source_pos, bomb_waypoint);
+  guarantee "c_not_taking_picture_on_arbitrary_location" mstate = s_AUTO_FLIGHT_MODE and payload_performed and payloadCMD = Camera => not is_equal(location_source_pos, Position_Impl { x = 1; y = 2 });
+  guarantee "d_not_releasing_weapon_on_arbitrary_location" mstate = s_AUTO_FLIGHT_MODE and payload_performed and payloadCMD = Weapon => not is_equal(location_source_pos, Position_Impl { x = 2; y = 2 });
+  guarantee "e_appropriate_movement" true -> location_source_pos.x = pre location_source_pos.x and location_source_pos.y = pre location_source_pos.y + 1 => pre location_source_dir = North and location_source_pos.x = pre location_source_pos.x + 1 and location_source_pos.y = pre location_source_pos.y => pre location_source_dir = East and location_source_pos.x = pre location_source_pos.x - 1 and location_source_pos.y = pre location_source_pos.y => pre location_source_dir = West and location_source_pos.x = pre location_source_pos.x and location_source_pos.y = pre location_source_pos.y - 1 => pre location_source_dir = South;
+  guarantee "f_picture_only_in_PILOT_TARGET_POSITION" sofar(mstate = s_MANUAL_FLIGHT_MODE) and payload_performed and payloadCMD = Camera => is_equal(location_source_pos, PILOT_TARGET_POSITION);
+  guarantee "g_pilot_only_takes_picture" sofar(mstate = s_MANUAL_FLIGHT_MODE) and payload_performed => payloadCMD = Camera;
+*)
+var
+  actuators_battery_level : int;
+  actuators_payload_performed : bool;
+  battery_health_check_ATE7 : ATE7Type;
+  flight_controller_payloadCmd : Action;
+  flight_controller_waypoint : Position_Impl;
+  gps_pos : Position_Impl;
+  gps_dir : Direction;
+  dme_vor_pos : Position_Impl;
+  dme_vor_dir : Direction;
+  iru_pos : Position_Impl;
+  iru_dir : Direction;
+  triplex_voter_voted_pos : Position_Impl;
+  triplex_voter_voted_dir : Direction;
+  mission_planner_tasks : Tasks_Impl;
+  mixer_cmd : MotorCommand;
+  navigator_move : Movement;
+  navigator_dest_reached : bool;
+  position_estimator_currentPos : Position_Impl;
+  position_estimator_currentDir : Direction;
+  RC_receiver_normal : bool;
+  RC_receiver_payloadCMD : Action;
+  RC_receiver_move : Movement;
+  RC_receiver_uavMode : UAVState;
+  RC_receiver_health_check_ATE6 : ATE6Type;
+  state_controller_mstate : UAVState;
+let
+  actuators_battery_level, actuators_payload_performed = Actuators(mixer_cmd, flight_controller_payloadCmd, state_controller_mstate, RC_receiver_payloadCMD);
+  battery_health_check_ATE7 = BatteryHealthCheck(actuators_battery_level);
+  flight_controller_payloadCmd, flight_controller_waypoint = FlightController(navigator_dest_reached, actuators_payload_performed, mission_planner_tasks, state_controller_mstate);
+  gps_pos, gps_dir = GPS(location_source_pos, location_source_dir);
+  dme_vor_pos, dme_vor_dir = DME_VOR(location_source_pos, location_source_dir);
+  iru_pos, iru_dir = IRU(location_source_pos, location_source_dir);
+  triplex_voter_voted_pos, triplex_voter_voted_dir = TriplexVoter(gps_pos, dme_vor_pos, iru_pos, gps_dir, dme_vor_dir, iru_dir);
+  mission_planner_tasks = MissionPlanner();
+  mixer_cmd = Mixer(state_controller_mstate, RC_receiver_move, navigator_move, position_estimator_currentDir);
+  navigator_move, navigator_dest_reached = Navigator(position_estimator_currentPos, flight_controller_waypoint, position_estimator_currentDir);
+  position_estimator_currentPos, position_estimator_currentDir = PositionEstimator(triplex_voter_voted_pos, triplex_voter_voted_dir);
+  RC_receiver_normal, RC_receiver_payloadCMD, RC_receiver_move, RC_receiver_uavMode = RCReceiver(rcv_payloadCMD, rcv_move, rcv_uavMode);
+  RC_receiver_health_check_ATE6 = RCReceiverHealthCheck(RC_receiver_normal);
+  state_controller_mstate = StateController(RC_receiver_health_check_ATE6, battery_health_check_ATE7, RC_receiver_uavMode);
+  cmd = mixer_cmd;
+  currentPos = position_estimator_currentPos;
+  payloadCmdFC = flight_controller_payloadCmd;
+  payloadCmdRC = RC_receiver_payloadCMD;
+  mstate = state_controller_mstate;
+  tasks = mission_planner_tasks;
+  payload_performed = actuators_payload_performed;
+tel
+

@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: com.ge.research.osate.verdict.dsl.ui
+Bundle-ManifestVersion: 2
+Bundle-Name: com.ge.research.osate.verdict.dsl.ui
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.ge.research.osate.verdict.dsl.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: com.ge.research.osate.verdict.dsl,
+ com.ge.research.osate.verdict.dsl.ide,
+ org.eclipse.xtext.ui,
+ org.eclipse.xtext.ui.shared,
+ org.eclipse.xtext.ui.codetemplates.ui,
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.0",
+ org.eclipse.ui,
+ org.eclipse.xtext.builder,
+ org.antlr.runtime,
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.xtext.aadl2;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
+ org.osate.annexsupport;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.properties.ui;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.ui;bundle-version="1.0.0"
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: com.ge.research.osate.verdict.dsl.ui,
+ com.ge.research.osate.verdict.dsl.ui.annex,
+ com.ge.research.osate.verdict.dsl.ui.contentassist,
+ com.ge.research.osate.verdict.dsl.ui.contentassist.antlr,
+ com.ge.research.osate.verdict.dsl.ui.contentassist.antlr.internal,
+ com.ge.research.osate.verdict.dsl.ui.contentassist.antlr.lexer,
+ com.ge.research.osate.verdict.dsl.ui.internal,
+ com.ge.research.osate.verdict.dsl.ui.labeling,
+ com.ge.research.osate.verdict.dsl.ui.outline,
+ com.ge.research.osate.verdict.dsl.ui.quickfix
+Bundle-Activator: com.ge.research.osate.verdict.dsl.ui.internal.VerdictActivator

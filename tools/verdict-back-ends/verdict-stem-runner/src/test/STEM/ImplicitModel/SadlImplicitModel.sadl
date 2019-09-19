@@ -1,0 +1,59 @@
+uri "http://sadl.org/sadlimplicitmodel" alias sadlimplicitmodel.
+/****** The content of this model is automatically included in every SADL model ******/
+
+impliedProperty is a type of annotation.
+expandedProperty is a type of annotation.
+ScientificConcept is a class.
+UnittedQuantity is a type of ScientificConcept,
+	described by ^value with values of type decimal,
+	described by stddev with values of type decimal,
+	described by unit with values of type string.
+
+DataDescriptor is a class, described by localDescriptorName with a single value of type string,
+	described by dataType (note "the simple data type, e.g., float") with a single value of type anyURI,
+	described by augmentedType (note "ties the DataDescriptor to the semantic domain model") with values of type AugmentedType.
+dataType of DataDescriptor has at most 1 value.
+descriptorVariable of DataDescriptor has at most 1 value.
+
+Language is a class, must be one of {Java, Python, Text, OtherLanguage}.
+Script is a class, described by language with a single value of type Language,
+	described by script with a single value of type string.
+^Equation is a class,
+	described by expression with values of type Script.
+arguments describes ^Equation with a single value of type DataDescriptor List.
+returnTypes describes ^Equation with a single value of type DataDescriptor List.
+
+ExternalEquation is a type of ^Equation,
+	described by externalURI with a single value of type anyURI,
+	described by externalURL with values of type anyURI.
+	
+AugmentedType is a class.
+augTypeUnits describes AugmentedType with a single value of type string List.
+SemanticType (note "allows direct specification of the semantic type of an argument") is a type of AugmentedType, 
+	described by semType with a single value of type class.
+GraphPattern is a class.
+{TriplePattern, FunctionPattern} are types of GraphPattern.
+gpSubject describes TriplePattern.
+gpPredicate describes TriplePattern.
+gpObject describes TriplePattern.
+builtin describes FunctionPattern with a single value of type ^Equation.
+GPAtom is a class.
+{GPVariable, GPLiteralValue, GPResource} are types of GPAtom.
+gpVariableName describes GPVariable with a single value of type string.
+gpLiteralValue describes GPLiteralValue with values of type data.
+argValues (note "values of arguments to the built-in") describes FunctionPattern with a single value of type GPAtom List.
+
+SemanticConstraint (note "used to identify necessary patterns in semantic domain terms") is a type of AugmentedType, 
+	described by constraints with a single value of type GraphPattern List.
+ThisArgument (note "allows reference to self within an Argument's constraints") is a DataDescriptor.
+
+anyDataType (note "union of all relevant data types") is a type of {decimal or boolean or string or date or dateTime or anyURI}.
+DataTableRow is a class,
+	described by rowValues with a single value of type anyDataType List.
+DataTable is a class,
+	described by columnDescriptors with a single value of type DataDescriptor List,
+	described by dataContent with a single value of type DataTableRow List,
+	described by dataLocation with a single value of type anyURI.
+
+^Rule is a class.
+NamedQuery is a class.

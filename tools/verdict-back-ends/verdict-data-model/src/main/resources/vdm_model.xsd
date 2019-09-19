@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="verdict::vdm::vdm_model"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:vdm_model="verdict::vdm::vdm_model"
+    xmlns:vdm_data="verdict::vdm::vdm_data"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+    xmlns:vdm_lustre="verdict::vdm::vdm_lustre">
+
+    <import schemaLocation="vdm_lustre.xsd"
+        namespace="verdict::vdm::vdm_lustre"></import>
+    <import schemaLocation="vdm_data.xsd"
+        namespace="verdict::vdm::vdm_data"></import>
+
+    <element name="model" type="vdm_model:Model"></element>
+
+    <complexType name="Model">
+        <sequence>
+            <element name="name" type="vdm_data:Identifier"></element>
+            <element name="typeDeclaration"
+                type="vdm_data:TypeDeclaration" maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="componentType" type="vdm_model:ComponentType"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="componentImpl" type="vdm_model:ComponentImpl"
+                maxOccurs="unbounded" minOccurs="0">
+            </element>
+            <element name="dataflowCode" type="vdm_lustre:LustreProgram"
+                maxOccurs="1" minOccurs="0">
+            </element>
+            <element name="cyberReq" type="vdm_model:CyberReq"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
+            <element name="mission" type="vdm_model:Mission"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="ComponentType">
+        <sequence>
+            <element name="port" type="vdm_model:Port"
+                maxOccurs="unbounded" minOccurs="1">
+            </element>
+            <element name="contract" type="vdm_lustre:ContractSpec"
+                maxOccurs="1" minOccurs="0">
+            </element>
+            <element name="cyberRel" type="vdm_model:CyberRel"
+                minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+        <attribute name="id" type="ID" use="required"></attribute>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <complexType name="ComponentImpl">
+        <choice>
+            <element name="blockImpl" type="vdm_model:BlockImpl"></element>
+            <element name="dataflowImpl" type="vdm_lustre:NodeBody"></element>
+        </choice>
+        <attribute name="id" type="ID" use="required"></attribute>
+        <attribute name="type" type="IDREF" use="required">
+            <annotation>
+                <appinfo>
+                    <jaxb:property>
+                        <jaxb:baseType
+                            name="verdict.vdm.vdm_model.ComponentType" />
+                    </jaxb:property>
+                </appinfo>
+            </annotation>
+        </attribute>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <complexType name="Port">
+        <sequence>
+            <element name="name" type="vdm_data:Identifier" maxOccurs="1"
+                minOccurs="1">
+            </element>
+            <element name="mode" type="vdm_model:PortMode" maxOccurs="1"
+                minOccurs="1">
+            </element>
+            <element name="type" type="vdm_data:DataType" maxOccurs="1"
+                minOccurs="0">
+            </element>
+        </sequence>
+        <attribute name="id" type="ID" use="required"></attribute>
+    </complexType>
+
+    <simpleType name="PortMode">
+        <restriction base="string">
+            <enumeration value="in"></enumeration>
+            <enumeration value="out"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="ComponentInstance">
+        <choice>
+            <element name="specification" type="IDREF">
+                <annotation>
+                    <appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType
+                                name="verdict.vdm.vdm_model.ComponentType" />
+                        </jaxb:property>
+                    </appinfo>
+                </annotation>
+            </element>
+            <element name="implementation" type="IDREF">
+                <annotation>
+                    <appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType
+                                name="verdict.vdm.vdm_model.ComponentImpl" />
+                        </jaxb:property>
+                    </appinfo>
+                </annotation>
+            </element>
+        </choice>
+        <attribute name="id" type="ID"></attribute>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+        <attributeGroup ref="vdm_model:STEMComponentProperties" />
+        <attribute name="heterogeneity" type="boolean"></attribute>
+        <attribute name="encryption" type="boolean"></attribute>
+        <attribute name="anti_jamming" type="boolean"></attribute>
+        <attribute name="anti_flooding" type="boolean"></attribute>
+        <attribute name="anti_fuzzing" type="boolean"></attribute>
+        <attribute name="heterogeneity_dal" type="int"></attribute>
+        <attribute name="encryption_dal" type="int"></attribute>
+        <attribute name="anti_jamming_dal" type="int"></attribute>
+        <attribute name="anti_flooding_dal" type="int"></attribute>
+        <attribute name="anti_fuzzing_dal" type="int"></attribute>
+        <attributeGroup
+            ref="vdm_model:InstrumentedComponentProperties">
+        </attributeGroup>
+        <attribute name="adversariallyTested" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="BlockImpl">
+        <sequence>
+            <element name="subcomponent"
+                type="vdm_model:ComponentInstance" maxOccurs="unbounded"
+                minOccurs="1">
+            </element>
+            <element name="connection" type="vdm_model:Connection"
+                maxOccurs="unbounded" minOccurs="1">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="Connection">
+        <all>
+            <element name="source" type="vdm_model:ConnectionEnd"></element>
+            <element name="destination" type="vdm_model:ConnectionEnd">
+            </element>
+        </all>
+        <attribute name="name" type="vdm_data:Identifier"
+            use="required">
+        </attribute>
+        <attribute name="flow" type="vdm_model:Flow" use="optional"></attribute>
+        <attribute name="data_encrypted" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="authenticated" type="boolean"
+            use="optional"></attribute>
+        <attribute name="conn_type" type="vdm_model:ConnectionType"
+            use="optional"></attribute>
+    </complexType>
+
+    <attributeGroup name="STEMComponentProperties">
+        <attribute name="hasSensitiveInfo" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="insideTrustedBoundary" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="broadcastFromOutsideTB" type="boolean"
+            use="optional"></attribute>
+        <attribute name="wifiFromOutsideTB" type="boolean"
+            use="optional"></attribute>
+    </attributeGroup>
+
+    <simpleType name="Flow">
+        <restriction base="string">
+            <enumeration value="Xdata"></enumeration>
+            <enumeration value="Control"></enumeration>
+            <enumeration value="Request"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="ConnectionEnd">
+        <choice>
+            <element name="componentPort" type="IDREF">
+                <annotation>
+                    <appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType name="verdict.vdm.vdm_model.Port" />
+                        </jaxb:property>
+                    </appinfo>
+                </annotation>
+            </element>
+            <element name="subcomponentPort"
+                type="vdm_model:CompInstancePort"></element>
+        </choice>
+    </complexType>
+
+    <complexType name="CompInstancePort">
+        <sequence>
+            <element name="subcomponent" type="IDREF" maxOccurs="1"
+                minOccurs="1">
+                <annotation>
+                    <appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType
+                                name="verdict.vdm.vdm_model.ComponentInstance" />
+                        </jaxb:property>
+                    </appinfo>
+                </annotation>
+            </element>
+            <element name="port" type="IDREF" maxOccurs="1" minOccurs="1">
+                <annotation>
+                    <appinfo>
+                        <jaxb:property>
+                            <jaxb:baseType name="verdict.vdm.vdm_model.Port" />
+                        </jaxb:property>
+                    </appinfo>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+
+    <attributeGroup name="InstrumentedComponentProperties">
+        <attribute name="category" type="string" use="optional"></attribute>
+        <attribute name="component_type"
+            type="vdm_model:KindOfComponent" use="optional">
+        </attribute>
+        <attribute name="situated" type="vdm_model:SituatedType"
+            use="optional">
+        </attribute>
+        <attribute name="manufacturer"
+            type="vdm_model:ManufacturerType" use="optional"></attribute>
+    </attributeGroup>
+
+
+    <simpleType name="KindOfComponent">
+        <restriction base="string">
+            <enumeration value="Software"></enumeration>
+            <enumeration value="Hardware"></enumeration>
+            <enumeration value="Human"></enumeration>
+            <enumeration value="Hybrid"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="SituatedType">
+        <restriction base="string">
+            <enumeration value="OnBoard"></enumeration>
+            <enumeration value="Remote"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="ConnectionType">
+        <restriction base="string">
+            <enumeration value="Local"></enumeration>
+            <enumeration value="Remote"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="ManufacturerType">
+        <restriction base="string">
+            <enumeration value="ThirdParty"></enumeration>
+            <enumeration value="InHouse"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="CIAPort">
+        <sequence>
+            <element name="name" type="string" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="cia" type="vdm_model:CIA" minOccurs="1"
+                maxOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="CIA">
+        <restriction base="string">
+            <enumeration value="Confidentiality"></enumeration>
+            <enumeration value="Integrity"></enumeration>
+            <enumeration value="Availability"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="CyberExprKind">
+        <restriction base="string">
+            <enumeration value="Port"></enumeration>
+            <enumeration value="And"></enumeration>
+            <enumeration value="Or"></enumeration>
+            <enumeration value="Not"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="CyberExpr">
+        <choice>
+            <element name="kind" type="vdm_model:CyberExprKind"></element>
+            <element name="port" type="vdm_model:CIAPort"></element>
+            <element name="and" type="vdm_model:CyberExprList"></element>
+            <element name="or" type="vdm_model:CyberExprList"></element>
+            <element name="not" type="vdm_model:CyberExpr"></element>
+        </choice>
+    </complexType>
+
+    <complexType name="CyberExprList">
+        <sequence>
+            <element name="expr" type="vdm_model:CyberExpr" minOccurs="1"
+                maxOccurs="unbounded"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="CyberReq">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="cia" type="vdm_model:CIA" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="severity" type="vdm_model:Severity"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="condition" type="vdm_model:CyberExpr"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <simpleType name="Severity">
+        <restriction base="string">
+            <enumeration value="None"></enumeration>
+            <enumeration value="Minor"></enumeration>
+            <enumeration value="Major"></enumeration>
+            <enumeration value="Hazardous"></enumeration>
+            <enumeration value="Catastrophic"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="CyberRel">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="output" type="vdm_model:CIAPort" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="inputs" type="vdm_model:CyberExpr"
+                minOccurs="0" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <complexType name="Mission">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="cyberReqs" type="string" minOccurs="0"
+                maxOccurs="unbounded"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+</schema>

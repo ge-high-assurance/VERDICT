@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ge.verdict</groupId>
+        <artifactId>verdict-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>verdict-stem-runner</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Verdict STEM Runner</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>reasoner-api</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>reasoner-impl</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-api</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-impl</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.8.0-beta4</version>
+        </dependency>
+        <!-- Dependencies needed only by tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.12.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.8.0-beta4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-assertj</artifactId>
+            <version>2.6.3</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.chrisdchristo</groupId>
+                <artifactId>capsule-maven-plugin</artifactId>
+                <configuration>
+                    <appClass>com.ge.verdict.stem.App</appClass>
+                    <includeApp>true</includeApp>
+                    <includeAppDep>true</includeAppDep>
+                    <includePluginDep>false</includePluginDep>
+                    <includeTransitiveDep>true</includeTransitiveDep>
+                    <includeCompileDep>true</includeCompileDep>
+                    <includeRuntimeDep>true</includeRuntimeDep>
+                    <includeProvidedDep>false</includeProvidedDep>
+                    <includeSystemDep>false</includeSystemDep>
+                    <includeTestDep>true</includeTestDep>
+                    <includeOptionalDep>false</includeOptionalDep>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

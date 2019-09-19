@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vdm_model:model xmlns:vdm_lustre="verdict::vdm::vdm_lustre" xmlns:vdm_model="verdict::vdm::vdm_model" xmlns:vdm_data="verdict::vdm::vdm_data">
+    <name>Example</name>
+    <typeDeclaration>
+        <vdm_data:name>Point</vdm_data:name>
+        <vdm_data:definition>
+            <vdm_data:recordType>
+                <vdm_data:recordField>
+                    <vdm_data:name>x</vdm_data:name>
+                    <vdm_data:type>
+                        <vdm_data:plainType>int</vdm_data:plainType>
+                    </vdm_data:type>
+                </vdm_data:recordField>
+                <vdm_data:recordField>
+                    <vdm_data:name>y</vdm_data:name>
+                    <vdm_data:type>
+                        <vdm_data:plainType>int</vdm_data:plainType>
+                    </vdm_data:type>
+                </vdm_data:recordField>
+            </vdm_data:recordType>
+        </vdm_data:definition>
+    </typeDeclaration>
+    <componentType id="A" name="A">
+        <port id="A.x1">
+            <name>x1</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="A.y1">
+            <name>y1</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <contract>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>G1</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:lessThan>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>y1</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>x1</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:lessThan>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+        </contract>
+    </componentType>
+    <componentType id="B" name="B">
+        <port id="B.x2">
+            <name>x2</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="B.y2">
+            <name>y2</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="B.z2">
+            <name>z2</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+    </componentType>
+    <componentType id="C" name="C">
+        <port id="C.x3">
+            <name>x3</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="C.y3">
+            <name>y3</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="C.z3">
+            <name>z3</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </type>
+        </port>
+        <contract>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>G2</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:lessThan>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>z3</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>x3</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:lessThan>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+        </contract>
+    </componentType>
+    <componentImpl id="B.Impl" type="B" name="B.Impl">
+        <dataflowImpl>
+            <vdm_lustre:equation>
+                <vdm_lustre:lhs>
+                    <vdm_lustre:identifier>z2</vdm_lustre:identifier>
+                </vdm_lustre:lhs>
+                <vdm_lustre:rhs>
+                    <vdm_lustre:plus>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:plus>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>x2</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>y2</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:plus>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>one</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:plus>
+                </vdm_lustre:rhs>
+            </vdm_lustre:equation>
+        </dataflowImpl>
+    </componentImpl>
+    <componentImpl id="C.Impl" type="C" name="C.Impl">
+        <blockImpl>
+            <subcomponent id="my_a1" name="my_a1">
+                <specification>A</specification>
+            </subcomponent>
+            <subcomponent id="my_a2" name="my_a2">
+                <specification>A</specification>
+            </subcomponent>
+            <subcomponent id="my_b" name="my_b">
+                <implementation>B.Impl</implementation>
+            </subcomponent>
+            <connection name="c1" flow="Xdata">
+                <source>
+                    <componentPort>C.x3</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>my_a1</subcomponent>
+                        <port>A.x1</port>
+                    </subcomponentPort>
+                </destination>
+            </connection>
+            <connection name="c2" flow="Xdata">
+                <source>
+                    <componentPort>C.y3</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>my_a2</subcomponent>
+                        <port>A.x1</port>
+                    </subcomponentPort>
+                </destination>
+            </connection>
+            <connection name="c3" flow="Xdata">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>my_a1</subcomponent>
+                        <port>A.y1</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>my_b</subcomponent>
+                        <port>B.x2</port>
+                    </subcomponentPort>
+                </destination>
+            </connection>
+            <connection name="c4" flow="Xdata">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>my_a2</subcomponent>
+                        <port>A.y1</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>my_b</subcomponent>
+                        <port>B.y2</port>
+                    </subcomponentPort>
+                </destination>
+            </connection>
+            <connection name="c5" flow="Xdata">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>my_b</subcomponent>
+                        <port>B.z2</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <componentPort>C.z3</componentPort>
+                </destination>
+            </connection>
+        </blockImpl>
+    </componentImpl>
+    <dataflowCode>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>one</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>int</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:intLiteral>1</vdm_lustre:intLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+    </dataflowCode>
+</vdm_model:model>

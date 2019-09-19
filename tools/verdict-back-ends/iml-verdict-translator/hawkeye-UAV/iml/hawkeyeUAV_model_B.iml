@@ -1,0 +1,1678 @@
+package HawkeyeUAV;
+
+import iml.utils.*;
+import iml.verdict.*;
+
+model: Model := some (m: Model) {
+  m.name = "HawkeyeUAV" &&
+  m.type_declarations.length = 0 &&
+  m.component_types.length = 15 &&
+  m.component_types.element[0] = some (ct: ComponentType) {
+    ct.name = "Actuators" &&
+    ct.ports.length = 6 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "cmd" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "payloadCmdFC" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "mstate" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "payloadCmdRC" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "battery_level" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "payload_performed" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[1] = some (ct: ComponentType) {
+    ct.name = "BatteryHealthCheck" &&
+    ct.ports.length = 2 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "battery_level" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "ATE7" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[2] = some (ct: ComponentType) {
+    ct.name = "DME_VOR" &&
+    ct.ports.length = 4 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "location_source_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "location_source_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "pos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "dir" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[3] = some (ct: ComponentType) {
+    ct.name = "FlightController" &&
+    ct.ports.length = 6 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "dest_reached" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "payload_performed" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "tasks" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "mstate" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "payloadCmd" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "waypoint" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[4] = some (ct: ComponentType) {
+    ct.name = "GPS" &&
+    ct.ports.length = 4 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "location_source_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "location_source_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "pos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "dir" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[5] = some (ct: ComponentType) {
+    ct.name = "IRU" &&
+    ct.ports.length = 4 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "location_source_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "location_source_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "pos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "dir" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[6] = some (ct: ComponentType) {
+    ct.name = "MissionPlanner" &&
+    ct.ports.length = 1 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "tasks" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[7] = some (ct: ComponentType) {
+    ct.name = "Mixer" &&
+    ct.ports.length = 5 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "mstate" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "moveRC" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "moveNav" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "currentDir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "cmd" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[8] = some (ct: ComponentType) {
+    ct.name = "Navigator" &&
+    ct.ports.length = 5 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "currentPos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "waypoint" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "currentDir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "move" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "dest_reached" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[9] = some (ct: ComponentType) {
+    ct.name = "PositionEstimator" &&
+    ct.ports.length = 4 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "voted_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "voted_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "currentPos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "currentDir" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[10] = some (ct: ComponentType) {
+    ct.name = "RCReceiver" &&
+    ct.ports.length = 7 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "rcv_payloadCMD" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "rcv_move" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "rcv_uavMode" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "normal" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "payloadCMD" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "move" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[6] = some(p: Port) {
+      p.name = "uavMode" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[11] = some (ct: ComponentType) {
+    ct.name = "RCReceiverHealthCheck" &&
+    ct.ports.length = 2 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "normal" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "ATE6" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[12] = some (ct: ComponentType) {
+    ct.name = "StateController" &&
+    ct.ports.length = 4 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "ATE6" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "ATE7" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "uavMode" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "mstate" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[13] = some (ct: ComponentType) {
+    ct.name = "TriplexVoter" &&
+    ct.ports.length = 8 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "gps_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "dme_vor_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "iru_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "gps_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "dme_vor_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "iru_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[6] = some(p: Port) {
+      p.name = "voted_pos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[7] = some(p: Port) {
+      p.name = "voted_dir" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.component_types.element[14] = some (ct: ComponentType) {
+    ct.name = "UAVSystem" &&
+    ct.ports.length = 12 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "location_source_pos" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "location_source_dir" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "rcv_payloadCMD" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "rcv_move" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "rcv_uavMode" &&
+      p.mode = PortMode.In &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "cmd" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[6] = some(p: Port) {
+      p.name = "currentPos" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[7] = some(p: Port) {
+      p.name = "payloadCmdFC" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[8] = some(p: Port) {
+      p.name = "payloadCmdRC" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[9] = some(p: Port) {
+      p.name = "mstate" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[10] = some(p: Port) {
+      p.name = "tasks" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[11] = some(p: Port) {
+      p.name = "payload_performed" &&
+      p.mode = PortMode.Out &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.contract = mk_none<ContractSpec>
+  } &&
+  m.dataflow_code = mk_none<LustreProgram> &&
+  m.component_impl.length = 1 &&
+  m.component_impl.element[0] = some (ci: ComponentImpl) {
+    ci.name = "UAVSystem.Impl" &&
+    ci.ctype = m.component_types.element[14] &&
+    ci.kind = ComponentImplKind.Block_Impl &&
+    ci.block_impl = some (imp: BlockImpl) {
+      imp.subcomponents.length = 14 &&
+      imp.subcomponents.element[0] = some (ci: ComponentInstance) {
+        ci.name = "actuators" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[0] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("Actuators") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Hybrid) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[1] = some (ci: ComponentInstance) {
+        ci.name = "battery_health_check" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[1] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("BatteryHealthChecker") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[2] = some (ci: ComponentInstance) {
+        ci.name = "flight_controller" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[3] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("FlightController") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[3] = some (ci: ComponentInstance) {
+        ci.name = "gps" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[4] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("GPS") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Hybrid) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_some<Bool>(true) &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_some<Bool>(true) &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_some<Bool>(true) &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_some<Int>(7) &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[4] = some (ci: ComponentInstance) {
+        ci.name = "dme_vor" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[2] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("DME_VOR") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Hybrid) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_some<Bool>(true) &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_some<Bool>(true) &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_some<Bool>(true) &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_some<Int>(7) &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[5] = some (ci: ComponentInstance) {
+        ci.name = "iru" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[5] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("IRU") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Hybrid) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_some<Bool>(true) &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_some<Int>(7) &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[6] = some (ci: ComponentInstance) {
+        ci.name = "triplex_voter" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[13] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("TriplexVoter") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[7] = some (ci: ComponentInstance) {
+        ci.name = "mission_planner" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[6] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("MissionPlanner") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_some<Bool>(true) &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[8] = some (ci: ComponentInstance) {
+        ci.name = "mixer" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[7] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("Mixer") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[9] = some (ci: ComponentInstance) {
+        ci.name = "navigator" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[8] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("Navigator") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[10] = some (ci: ComponentInstance) {
+        ci.name = "position_estimator" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[9] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("PositionEstimator") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[11] = some (ci: ComponentInstance) {
+        ci.name = "RC_receiver" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[10] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("RCReceiver") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Hybrid) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_some<Bool>(false) &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_some<Bool>(true) &&
+        ci.anti_flooding = mk_some<Bool>(true) &&
+        ci.anti_fuzzing = mk_some<Bool>(true) &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_flooding_dal = mk_some<Int>(7) &&
+        ci.anti_jamming_dal = mk_some<Int>(7) &&
+        ci.anti_fuzzing_dal = mk_some<Int>(7)
+      } &&
+      imp.subcomponents.element[12] = some (ci: ComponentInstance) {
+        ci.name = "RC_receiver_health_check" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[11] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.ThirdParty) &&
+        ci.category = mk_some<String>("RCReceiverHealthChecker") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.subcomponents.element[13] = some (ci: ComponentInstance) {
+        ci.name = "state_controller" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[12] &&
+        ci.manufacturer = mk_some<ManufacturerType>(ManufacturerType.InHouse) &&
+        ci.category = mk_some<String>("StateController") &&
+        ci.component_type = mk_some<KindOfComponent>(KindOfComponent.Software) &&
+        ci.situated = mk_some<SituatedType>(SituatedType.OnBoard) &&
+        ci.has_sensitive_info = mk_none<Bool> &&
+        ci.inside_trusted_boundary = mk_some<Bool>(true) &&
+        ci.broadcast_from_outside_tb = mk_none<Bool> &&
+        ci.wifi_from_outside_tb = mk_none<Bool> &&
+        ci.heterogeneity = mk_none<Bool> &&
+        ci.encryption = mk_none<Bool> &&
+        ci.anti_jamming = mk_none<Bool> &&
+        ci.anti_flooding = mk_none<Bool> &&
+        ci.anti_fuzzing = mk_none<Bool> &&
+        ci.heterogeneity_dal = mk_none<Int> &&
+        ci.encryption_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_flooding_dal = mk_none<Int> &&
+        ci.anti_jamming_dal = mk_none<Int> &&
+        ci.anti_fuzzing_dal = mk_none<Int>
+      } &&
+      imp.connections.length = 44 &&
+      imp.connections.element[0] = some (c: Connection) {
+        c.name = "wireless1" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[2]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[1] = some (c: Connection) {
+        c.name = "wireless2" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[3]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[2] = some (c: Connection) {
+        c.name = "wireless3" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[4]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[3] = some (c: Connection) {
+        c.name = "wireless4_A" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[0]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[4].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[4] = some (c: Connection) {
+        c.name = "wireless5_A" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[1]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[4].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[5] = some (c: Connection) {
+        c.name = "wireless4_B" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[0]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[4] &&
+            sp.port = m.component_types.element[2].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[6] = some (c: Connection) {
+        c.name = "wireless5_B" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[1]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[4] &&
+            sp.port = m.component_types.element[2].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[7] = some (c: Connection) {
+        c.name = "wireless4_C" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[0]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[5] &&
+            sp.port = m.component_types.element[5].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[8] = some (c: Connection) {
+        c.name = "wireless5_C" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Remote) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[14].ports.element[1]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[5] &&
+            sp.port = m.component_types.element[5].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[9] = some (c: Connection) {
+        c.name = "ethernet1" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[6]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[10] = some (c: Connection) {
+        c.name = "ethernet2" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[7]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[11] = some (c: Connection) {
+        c.name = "ethernet3" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[9] &&
+            sp.port = m.component_types.element[8].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[12] = some (c: Connection) {
+        c.name = "ethernet4A" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[9] &&
+            sp.port = m.component_types.element[8].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[13] = some (c: Connection) {
+        c.name = "ethernet4B" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[3]
+          }
+        }
+      } &&
+      imp.connections.element[14] = some (c: Connection) {
+        c.name = "ethernet5" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[9] &&
+            sp.port = m.component_types.element[8].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[15] = some (c: Connection) {
+        c.name = "ethernet6" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(false) &&
+        c.authenticated = mk_some<Bool>(false) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[9] &&
+            sp.port = m.component_types.element[8].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[16] = some (c: Connection) {
+        c.name = "ethernet7" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[5]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[9] &&
+            sp.port = m.component_types.element[8].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[17] = some (c: Connection) {
+        c.name = "ethernet8" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[18] = some (c: Connection) {
+        c.name = "ethernet9" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[7] &&
+            sp.port = m.component_types.element[6].ports.element[0]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[19] = some (c: Connection) {
+        c.name = "ethernet10" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[12] &&
+            sp.port = m.component_types.element[11].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[20] = some (c: Connection) {
+        c.name = "ethernet11" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[12] &&
+            sp.port = m.component_types.element[11].ports.element[1]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[21] = some (c: Connection) {
+        c.name = "ethernet12" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[3]
+          }
+        }
+      } &&
+      imp.connections.element[22] = some (c: Connection) {
+        c.name = "ethernet13" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[5]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[23] = some (c: Connection) {
+        c.name = "ethernet14" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[1].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[24] = some (c: Connection) {
+        c.name = "ethernet15" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[1].ports.element[1]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[25] = some (c: Connection) {
+        c.name = "ethernet16" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[26] = some (c: Connection) {
+        c.name = "ethernet17" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[3]
+          }
+        }
+      } &&
+      imp.connections.element[27] = some (c: Connection) {
+        c.name = "ethernet18" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[5]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[28] = some (c: Connection) {
+        c.name = "ethernet19" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[6]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[29] = some (c: Connection) {
+        c.name = "ethernet20" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[30] = some (c: Connection) {
+        c.name = "ethernet21" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[31] = some (c: Connection) {
+        c.name = "ethernet22" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[8] &&
+            sp.port = m.component_types.element[7].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[5]
+        }
+      } &&
+      imp.connections.element[32] = some (c: Connection) {
+        c.name = "ethernet23" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[10] &&
+            sp.port = m.component_types.element[9].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[6]
+        }
+      } &&
+      imp.connections.element[33] = some (c: Connection) {
+        c.name = "ethernet24" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[3].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[7]
+        }
+      } &&
+      imp.connections.element[34] = some (c: Connection) {
+        c.name = "ethernet25" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Control &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[11] &&
+            sp.port = m.component_types.element[10].ports.element[4]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[8]
+        }
+      } &&
+      imp.connections.element[35] = some (c: Connection) {
+        c.name = "ethernet26" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[13] &&
+            sp.port = m.component_types.element[12].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[9]
+        }
+      } &&
+      imp.connections.element[36] = some (c: Connection) {
+        c.name = "ethernet27" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[7] &&
+            sp.port = m.component_types.element[6].ports.element[0]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[10]
+        }
+      } &&
+      imp.connections.element[37] = some (c: Connection) {
+        c.name = "ethernet28" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[0].ports.element[5]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[14].ports.element[11]
+        }
+      } &&
+      imp.connections.element[38] = some (c: Connection) {
+        c.name = "ethernet29_A" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[4].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[39] = some (c: Connection) {
+        c.name = "ethernet30_A" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[4].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[3]
+          }
+        }
+      } &&
+      imp.connections.element[40] = some (c: Connection) {
+        c.name = "ethernet29_B" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[4] &&
+            sp.port = m.component_types.element[2].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[41] = some (c: Connection) {
+        c.name = "ethernet30_B" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[4] &&
+            sp.port = m.component_types.element[2].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[4]
+          }
+        }
+      } &&
+      imp.connections.element[42] = some (c: Connection) {
+        c.name = "ethernet29_C" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[5] &&
+            sp.port = m.component_types.element[5].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[43] = some (c: Connection) {
+        c.name = "ethernet30_C" &&
+        c.conn_type = mk_some<ConnectionType>(ConnectionType.Local) &&
+        c.flow_type = FlowType.Xdata &&
+        c.data_encrypted = mk_some<Bool>(true) &&
+        c.authenticated = mk_some<Bool>(true) &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[5] &&
+            sp.port = m.component_types.element[5].ports.element[3]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[6] &&
+            sp.port = m.component_types.element[13].ports.element[5]
+          }
+        }
+      }
+    }
+  }
+};

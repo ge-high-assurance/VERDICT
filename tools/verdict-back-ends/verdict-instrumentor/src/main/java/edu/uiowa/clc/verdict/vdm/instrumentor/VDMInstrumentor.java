@@ -1,0 +1,1316 @@
+/* See LICENSE in project directory */
+package edu.uiowa.clc.verdict.vdm.instrumentor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.apache.commons.cli.CommandLine;
+import verdict.vdm.vdm_data.DataType;
+import verdict.vdm.vdm_data.PlainType;
+import verdict.vdm.vdm_lustre.BinaryOperation;
+import verdict.vdm.vdm_lustre.ConstantDeclaration;
+import verdict.vdm.vdm_lustre.ContractItem;
+import verdict.vdm.vdm_lustre.ContractSpec;
+import verdict.vdm.vdm_lustre.Expression;
+import verdict.vdm.vdm_lustre.IfThenElse;
+import verdict.vdm.vdm_lustre.NodeBody;
+import verdict.vdm.vdm_lustre.NodeCall;
+import verdict.vdm.vdm_lustre.NodeEquation;
+import verdict.vdm.vdm_lustre.NodeEquationLHS;
+import verdict.vdm.vdm_lustre.SymbolDefinition;
+import verdict.vdm.vdm_model.BlockImpl;
+import verdict.vdm.vdm_model.CompInstancePort;
+import verdict.vdm.vdm_model.ComponentImpl;
+import verdict.vdm.vdm_model.ComponentInstance;
+import verdict.vdm.vdm_model.ComponentType;
+import verdict.vdm.vdm_model.Connection;
+import verdict.vdm.vdm_model.ConnectionEnd;
+import verdict.vdm.vdm_model.ConnectionType;
+import verdict.vdm.vdm_model.KindOfComponent;
+import verdict.vdm.vdm_model.ManufacturerType;
+import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Port;
+import verdict.vdm.vdm_model.PortMode;
+
+public class VDMInstrumentor {
+
+    protected Model vdm_model;
+
+    public VDMInstrumentor(Model vdm_model) {
+        this.vdm_model = vdm_model;
+    }
+
+    // Attacks:
+    // IT: Insider Threats
+    // OT: Outside User Threats
+    // RC: Remote Code Injection
+    // * LB: Logic Bomb
+    // * LS: Location Spoofing
+    // CR: Crash* (Not supproted)
+    // SV: virus/malware/worm/trojan
+    // * NI: Network Injection modulo Denial-of-Service
+    // HT: Hardware Trojan
+
+    // Demo Threat List:
+    // (LS)Location Spoofing - Instrument GPS
+    // (NI)Network Injection - Instrument GPS & RC_receiver
+    // (LB)Logic Bomb - Instrument BatteryHealthCheck, FlightController, GPS,
+    // RC_receiver &
+    // RC_reciverHealthChecker
+    public Model instrument(Model vdm_model, CommandLine cmdLine) {
+
+        Model instrumented_model = null;
+
+        String[] possibleThreats = {"LS", "LB", "NI", "SV", "RI", "OT", "IT", "HT", "BG"};
+        List<String> threats =
+                Arrays.asList(possibleThreats).stream()
+                        .filter(threat -> cmdLine.hasOption(threat))
+                        .collect(Collectors.toList());
+        boolean blameAssignment = cmdLine.hasOption("B");
+        boolean componentLevel = cmdLine.hasOption("C");
+
+        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+
+        return instrumented_model;
+    }
+
+    public Model instrument(
+            Model vdm_model,
+            List<String> threats,
+            boolean blameAssignment,
+            boolean componentLevel) {
+        Model instrumented_model = null;
+
+        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+
+        return instrumented_model;
+    }
+
+    public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment) {
+        return instrument(vdm_model, threats, blameAssignment, false);
+    }
+
+    protected void retrieve_component_and_channels(
+            Model vdm_model,
+            List<String> threats,
+            boolean blame_assignment,
+            boolean component_level) {
+
+        HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
+        HashSet<Connection> vdm_links = new HashSet<Connection>();
+
+        if (threats.contains("NI")) {
+            System.out.println("Network Injection Instrumentation");
+            networkInjection(vdm_links);
+        }
+        if (threats.contains("LS")) {
+            System.out.println("Location Spoofing Instrumentation");
+            locationSpoofing(vdm_components);
+        }
+        if (threats.contains("LB")) {
+            System.out.println("Logic Bomb Instrumentation");
+            logicBomb(vdm_components);
+        }
+        if (threats.contains("SV")) {
+            System.out.println("Software Virus/malware/worm/trojan");
+            softwareVirus(vdm_components);
+        }
+        if (threats.contains("RI")) {
+            System.out.println("Remote Code Injection");
+            remoteCodeInjection(vdm_components);
+        }
+        if (threats.contains("OT")) {
+            System.out.println("Outsider Threat");
+            outsiderThreat(vdm_components);
+        }
+        if (threats.contains("IT")) {
+            System.out.println("Insider Threat");
+            insiderThreat(vdm_components);
+        }
+        if (threats.contains("HT")) {
+            System.out.println("Hardware Trojans");
+            hardwareTrojan(vdm_components);
+        }
+        if (threats.contains("BG")) {
+            System.out.println("Benign");
+            vdm_components.clear();
+            vdm_links.clear();
+        }
+
+        int component_index = 1;
+
+        // Assume only One Block Implementation exits.
+        ComponentImpl componentImpl = vdm_model.getComponentImpl().get(0);
+
+        BlockImpl blockImpl = componentImpl.getBlockImpl();
+
+        Map<String, HashSet<Connection>> components_map =
+                new HashMap<String, HashSet<Connection>>();
+
+        if (vdm_components.size() > 0) {
+            System.out.println("Selected Components:");
+
+            for (ComponentType component : vdm_components) {
+                System.out.println("(" + component_index++ + ") " + component.getId());
+                HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
+                vdm_links.addAll(vdm_cmp_links);
+
+                components_map.put(component.getId(), vdm_cmp_links);
+                // if (component.getName().equals("GPS")) {}
+            }
+        } else {
+            System.out.println("No Component found!");
+        }
+
+        int connection_index = 1;
+
+        HashSet<String> global_constants = new HashSet<String>();
+
+        Map<Connection, String> connections_map = new HashMap<Connection, String>();
+
+        if (vdm_links.size() > 0) {
+
+            System.out.println("Selected Links:");
+
+            for (Connection connection : vdm_links) {
+                System.out.println("(" + connection_index++ + ") " + connection.getName());
+                // instrument_link(connection, blockImpl);
+                String constant = instrument_link(connection, blockImpl);
+                global_constants.add(constant);
+
+                connections_map.put(connection, constant);
+            }
+        } else {
+            System.out.println("No Links found!");
+        }
+
+        // Declare Global Constants
+        for (String comp_id : global_constants) {
+
+            ConstantDeclaration global_comp_const = new ConstantDeclaration();
+
+            DataType global_comp_dataType = new DataType();
+            global_comp_dataType.setPlainType(PlainType.BOOL);
+            global_comp_const.setName(comp_id);
+            global_comp_const.setDataType(global_comp_dataType);
+
+            // Expression global_expr = new Expression();
+
+            // global_expr.setBoolLiteral(true);
+            // global_comp_const.setDefinition(global_expr);
+
+            vdm_model.getDataflowCode().getConstantDeclaration().add(global_comp_const);
+            // g_constants.add(global_comp_const);
+        }
+
+        Map<String, List<String>> connection_gps_comp_map =
+                connection_gps_mapper(connections_map, components_map);
+
+        // Choosing Blame options
+        if (threats.contains("LS") && component_level) {
+            // Link Level Instrumentation varibales
+            dec_var_asmp_const(connection_gps_comp_map, blame_assignment, false);
+        } else if (threats.contains("LS") && !component_level) {
+            dec_var_asmp_const(connection_gps_comp_map, blame_assignment, true);
+        }
+
+        if (blame_assignment && component_level) {
+
+            Map<String, List<String>> connection_comp_map =
+                    connection_mapper(connections_map, components_map);
+
+            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ContractSpec contractSpec = compImpl.getType().getContract();
+
+            for (String key : components_map.keySet()) {
+                Expression wk_expr = new Expression();
+                wk_expr.setIdentifier(key);
+
+                Expression not_wkexpr = new Expression();
+                not_wkexpr.setNot(wk_expr);
+
+                // Adding weakly assume variables
+                ContractItem weakly_assume_item = new ContractItem();
+
+                weakly_assume_item.setName(key + " is not instrumented");
+                weakly_assume_item.setExpression(not_wkexpr);
+                contractSpec.getWeaklyassume().add(weakly_assume_item);
+            }
+
+            dec_var_const(connection_comp_map);
+
+        } else if (blame_assignment && !component_level) {
+            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ContractSpec contractSpec = compImpl.getType().getContract();
+
+            for (String key : global_constants) {
+                Expression wk_expr = new Expression();
+                wk_expr.setIdentifier(key);
+
+                Expression not_wkexpr = new Expression();
+                not_wkexpr.setNot(wk_expr);
+
+                // Adding weakly assume variables
+                ContractItem weakly_assume_item = new ContractItem();
+                weakly_assume_item.setName(link_name(key) + " is not instrumented");
+                weakly_assume_item.setExpression(not_wkexpr);
+                contractSpec.getWeaklyassume().add(weakly_assume_item);
+            }
+        }
+    }
+
+    protected String link_name(String link) {
+
+        String weak_assumption = "(.+)_instrumented$";
+
+        Pattern fml_pattern = Pattern.compile(weak_assumption);
+
+        Matcher m = fml_pattern.matcher(link);
+
+        if (m.find()) {
+            weak_assumption = m.group(1);
+        } else {
+            weak_assumption = "NO NAME!";
+        }
+
+        return weak_assumption;
+    }
+
+    protected Map<String, List<String>> connection_gps_mapper(
+            Map<Connection, String> connections, Map<String, HashSet<Connection>> comp_asmp) {
+
+        Map<String, List<String>> comp_link = new HashMap<String, List<String>>();
+
+        for (String key : comp_asmp.keySet()) {
+
+            List<String> constants = new ArrayList<String>();
+            for (Connection con : comp_asmp.get(key)) {
+
+                String g_constant = connections.get(con);
+                constants.add(g_constant);
+                // System.out.println("COMP: " + key + " ==>" + g_constant);
+            }
+
+            if (key.equals("GPS") || key.equals("DME_VOR") || key.equals("IRU")) {
+                comp_link.put(key, constants);
+            }
+        }
+
+        return comp_link;
+    }
+
+    protected Map<String, List<String>> connection_mapper(
+            Map<Connection, String> connections, Map<String, HashSet<Connection>> comp_asmp) {
+
+        Map<String, List<String>> comp_link = new HashMap<String, List<String>>();
+
+        for (String key : comp_asmp.keySet()) {
+
+            List<String> constants = new ArrayList<String>();
+            for (Connection con : comp_asmp.get(key)) {
+
+                String g_constant = connections.get(con);
+                constants.add(g_constant);
+                comp_link.put(key, constants);
+            }
+        }
+
+        return comp_link;
+    }
+
+    protected void dec_var_asmp_const(
+            Map<String, List<String>> connection_comp_map,
+            boolean blame_assignment,
+            boolean link_level) {
+
+        Set<String> vars = connection_comp_map.keySet();
+        List<SymbolDefinition> vars_dec = new ArrayList<SymbolDefinition>();
+        //        String default_var = null;
+
+        Set<String> var_links = new HashSet<String>();
+
+        for (String var : vars) {
+            // Declaration global variables for instrumented links.
+            List<String> connections = connection_comp_map.get(var);
+            SymbolDefinition var_dec = add_vars_assume(var, connections);
+            vars_dec.add(var_dec);
+            //            default_var = var;
+
+            var_links.addAll(connections);
+        }
+
+        String vars_assumption[] = new String[vars.size()];
+        vars_assumption = vars.toArray(vars_assumption);
+
+        Expression assume_expr = null;
+
+        if (link_level) {
+            String links[] = new String[var_links.size()];
+            links = var_links.toArray(links);
+            assume_expr = add_assume_amo(links);
+        } else {
+
+            assume_expr = add_assume_amo(vars_assumption);
+        }
+        // Adding Xor assumption for components.
+        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ContractSpec contractSpec = compImpl.getType().getContract();
+
+        ContractItem assume_item = new ContractItem();
+
+        //        if (assume_expr == null) {
+        //            if (default_var != null) {
+        //                assume_expr = new Expression();
+        //                assume_expr.setIdentifier(default_var);
+        //            }
+        //        }
+
+        if (assume_expr != null) {
+            assume_item.setExpression(assume_expr);
+            contractSpec.getAssume().add(assume_item);
+        }
+
+        if (blame_assignment == false) {
+            contractSpec.getSymbol().addAll(vars_dec);
+        }
+    }
+
+    protected void dec_var_const(Map<String, List<String>> connection_comp_map) {
+
+        Set<String> vars = connection_comp_map.keySet();
+        List<SymbolDefinition> vars_dec = new ArrayList<SymbolDefinition>();
+
+        for (String var : vars) {
+            // Declaration global variables for instrumented links.
+            List<String> connections = connection_comp_map.get(var);
+
+            SymbolDefinition var_dec = add_vars_assume(var, connections);
+            vars_dec.add(var_dec);
+        }
+
+        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ContractSpec contractSpec = compImpl.getType().getContract();
+
+        contractSpec.getSymbol().addAll(vars_dec);
+    }
+
+    protected SymbolDefinition add_vars_assume(String var, List<String> connections) {
+
+        SymbolDefinition var_dec = new SymbolDefinition();
+
+        Expression var_expr = new Expression();
+
+        Stack<Expression> var_stack = new Stack<Expression>();
+        for (String con : connections) {
+            Expression expr = new Expression();
+            expr.setIdentifier(con);
+            var_stack.push(expr);
+        }
+
+        var_expr = or_expr(var_stack);
+
+        if (var_expr == null) {
+            var_expr = new Expression();
+            var_expr.setIdentifier(var);
+        }
+
+        var_dec.setDefinition(var_expr);
+        var_dec.setName(var);
+
+        DataType dataType = new DataType();
+        dataType.setPlainType(PlainType.BOOL);
+        var_dec.setDataType(dataType);
+
+        return var_dec;
+    }
+
+    protected Expression add_assume_amo(String[] global_constants) {
+
+        Stack<Expression> xor_list = new Stack<Expression>();
+
+        int n = global_constants.length;
+
+        for (int index_i = 0; index_i < n - 1; index_i++) {
+            for (int index_j = index_i + 1; index_j < n; index_j++) {
+
+                String x_i = global_constants[index_i];
+                String x_j = global_constants[index_j];
+
+                Expression xor = xor_expr(x_i, x_j);
+                xor_list.push(xor);
+                // xor_list.getExpression().add(xor);
+            }
+        }
+
+        // Adding assumption
+        Expression and_expr = null;
+
+        if (xor_list.size() > 1) {
+            and_expr = and_expr(xor_list);
+        }
+
+        return and_expr;
+    }
+
+    protected Expression and_expr(Stack<Expression> expr_stack) {
+
+        while (expr_stack.size() > 1) {
+
+            Expression left_expr = expr_stack.pop();
+            Expression right_expr = expr_stack.pop();
+
+            BinaryOperation and_op = new BinaryOperation();
+            and_op.setLhsOperand(left_expr);
+            and_op.setRhsOperand(right_expr);
+
+            Expression and_expr = new Expression();
+            and_expr.setAnd(and_op);
+
+            expr_stack.push(and_expr);
+        }
+
+        return expr_stack.pop();
+    }
+
+    protected Expression or_expr(Stack<Expression> expr_stack) {
+
+        while (expr_stack.size() > 1) {
+
+            Expression left_expr = expr_stack.pop();
+            Expression right_expr = expr_stack.pop();
+
+            BinaryOperation or_op = new BinaryOperation();
+            or_op.setLhsOperand(left_expr);
+            or_op.setRhsOperand(right_expr);
+
+            Expression or_expr = new Expression();
+            or_expr.setOr(or_op);
+
+            expr_stack.push(or_expr);
+        }
+
+        return expr_stack.pop();
+    }
+
+    protected Expression xor_expr(String i_id, String j_id) {
+
+        Expression amo_expr = new Expression();
+
+        Expression expr_i = new Expression();
+        expr_i.setIdentifier(i_id);
+        Expression expr_j = new Expression();
+        expr_j.setIdentifier(j_id);
+
+        Expression notexpr_i = new Expression();
+        notexpr_i.setNot(expr_i);
+        Expression notexpr_j = new Expression();
+        notexpr_j.setNot(expr_j);
+
+        BinaryOperation or_op = new BinaryOperation();
+        or_op.setLhsOperand(notexpr_i);
+        or_op.setRhsOperand(notexpr_j);
+
+        amo_expr.setOr(or_op);
+
+        return amo_expr;
+    }
+
+    // LS:
+    // - Select all components in the model M such that:
+    // c.Component-Group = 'GPS' v 'IMU' v 'LIDAR'
+    public void locationSpoofing(HashSet<ComponentType> vdm_components) {
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    componentType = componentInstance.getSpecification();
+                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+
+                    // Option 1) Specification
+                    if (componentType != null) {
+
+                    }
+                    // Option 2) Implementation
+                    else if (subcomponentImpl != null) {
+
+                        componentType = subcomponentImpl.getType();
+                    }
+
+                    String component_group = componentInstance.getCategory();
+
+                    if (component_group == null) {
+                        component_group = "";
+                    }
+
+                    if (component_group.equals("GPS")
+                            || component_group.equals("DME_VOR")
+                            || component_group.equals("IRU")) {
+                        vdm_components.add(componentType);
+                    }
+                }
+            }
+        }
+    }
+
+    // NI:
+    // - Select all channels ch in the model M such that:
+    // ch.ConnectionType = Remote & ch.Connection-Encrypted = False &
+    // ch.Connection-Authentication = False
+    public void networkInjection(HashSet<Connection> vdm_links) {
+
+        // ArrayList<Connection> selected_channels = new ArrayList<Connection>();
+
+        boolean data_encryption = false;
+        boolean authentication = false;
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            blockImpl = componentImpl.getBlockImpl();
+            // BlockImpl
+            if (blockImpl != null) {
+
+                // Selection channels (Authentication = OFF & DataEncrypted = OFF)
+                for (Connection connection : blockImpl.getConnection()) {
+                    // visit(connection, instrumented_channel);
+                    ConnectionType con_type = connection.getConnType();
+                    if (con_type == ConnectionType.REMOTE
+                            && connection.isDataEncrypted() == data_encryption
+                            && connection.isAuthenticated() == authentication) {
+
+                        // selected_channels.add(connection);
+                        // LOGGER.info("(" + connection_index++ + ") " +
+                        // connection.getName());
+                        vdm_links.add(connection);
+                    }
+                }
+            }
+        }
+    }
+
+    // LB:
+    // - Select components c in the model M such that:
+    // c.ComponentType = 'Software' v c.ComponentType = 'Hybrid' & c.Manufacturer =
+    // 'ThirdParty'
+    public void logicBomb(HashSet<ComponentType> vdm_components) {
+
+        // Conditions
+        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    componentType = componentInstance.getSpecification();
+                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+
+                    // Option 1) Specification
+                    if (componentType != null) {
+
+                    }
+                    // Option 2) Implementation
+                    else if (subcomponentImpl != null) {
+
+                        componentType = subcomponentImpl.getType();
+                    }
+
+                    boolean comp_cond_3 = false;
+
+                    if (componentInstance.isAdversariallyTested() != null) {
+                        comp_cond_3 = componentInstance.isAdversariallyTested();
+                    }
+
+                    if ((kind_of_component == component_kind_cond_1
+                                    || kind_of_component == component_kind_cond_2)
+                            && manufacturer == manufacturer_cond
+                            && !comp_cond_3) {
+                        // Store component
+                        // if (!vdm_components.contains(componentType)) {
+                        vdm_components.add(componentType);
+                        // }
+                    }
+                }
+            }
+        }
+    }
+
+    // SV:
+    // - Select components c in the model M such that:
+    // c.ComponentType = 'Software' v c.ComponentType = 'Hybrid' & c.Manufacturer =
+    // 'ThirdParty'
+    // & \exists ch\in M. p\in InputPort(c). ch = p.channel & ch.Connectin-Type =
+    // Remote
+    public void softwareVirus(HashSet<ComponentType> vdm_components) {
+
+        // Conditions
+        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    componentType = componentInstance.getSpecification();
+                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+
+                    // Option 1) Specification
+                    if (componentType != null) {
+
+                    }
+                    // Option 2) Implementation
+                    else if (subcomponentImpl != null) {
+
+                        componentType = subcomponentImpl.getType();
+                    }
+
+                    if ((kind_of_component == component_kind_cond_1
+                                    || kind_of_component == component_kind_cond_2)
+                            && manufacturer == manufacturer_cond) {
+
+                        // Port
+                        for (Port port : componentType.getPort()) {
+                            // System.out.print("(" + port_index + ") ");
+
+                            PortMode mode = port.getMode();
+                            if (mode == PortMode.IN) {;
+                            }
+                            {
+                                for (Connection con : blockImpl.getConnection()) {
+
+                                    ConnectionType con_type = con.getConnType();
+
+                                    if (con_type == ConnectionType.REMOTE) {
+
+                                        ConnectionEnd src_con = con.getSource();
+                                        Port src_port = src_con.getComponentPort();
+
+                                        if (src_port == null) {
+                                            CompInstancePort compPort =
+                                                    src_con.getSubcomponentPort();
+                                            src_port = compPort.getPort();
+                                        }
+
+                                        if (port == src_port) {
+                                            vdm_components.add(componentType);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Remote Code Injection:
+    // - Select components c in the model M such that:
+    // c.ComponentType = 'Software' v c.ComponentType = 'Hybrid'
+    // & \exists ch\in M. p\in InputPort(c). ch = p.channel & ch.Connectin-Type =
+    // Remote
+    public void remoteCodeInjection(HashSet<ComponentType> vdm_components) {
+
+        // Conditions
+        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    componentType = componentInstance.getSpecification();
+                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+
+                    // Option 1) Specification
+                    if (componentType != null) {
+
+                    }
+                    // Option 2) Implementation
+                    else if (subcomponentImpl != null) {
+
+                        componentType = subcomponentImpl.getType();
+                    }
+
+                    if ((kind_of_component == component_kind_cond_1
+                            || kind_of_component == component_kind_cond_2)) {
+
+                        // Port
+                        for (Port port : componentType.getPort()) {
+                            // System.out.print("(" + port_index + ") ");
+
+                            PortMode mode = port.getMode();
+                            if (mode == PortMode.IN) {;
+                            }
+                            {
+                                for (Connection con : blockImpl.getConnection()) {
+
+                                    ConnectionType con_type = con.getConnType();
+
+                                    if (con_type == ConnectionType.REMOTE) {
+
+                                        ConnectionEnd src_con = con.getSource();
+                                        Port src_port = src_con.getComponentPort();
+
+                                        if (src_port == null) {
+                                            CompInstancePort compPort =
+                                                    src_con.getSubcomponentPort();
+                                            src_port = compPort.getPort();
+                                        }
+
+                                        if (port == src_port) {
+                                            vdm_components.add(componentType);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // HT
+    // - Select all components c in the model M that meet condition:
+    // ComponentKind = Hardware v Hybrid and manufacturer = ThirdParty
+    public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
+
+        KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
+        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+
+                    componentType = getType(componentInstance);
+
+                    if ((kind_of_component == component_kind_cond_1
+                                    || kind_of_component == component_kind_cond_2)
+                            && manufacturer == manufacturer_cond) {
+                        // Store component
+                        vdm_components.add(componentType);
+                        // instrument_component(componentType, blockImpl);
+                    }
+                }
+            }
+        }
+    }
+
+    // OT
+    // - Select all components c in the model M that meet condition:
+    // ComponentKind = Human and c.InsideTrustedBoundary = False
+    public void outsiderThreat(HashSet<ComponentType> vdm_components) {
+
+        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
+        boolean boundary_cond = false;
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+
+                    componentType = getType(componentInstance);
+
+                    if (kind_of_component == component_kind_cond_1
+                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
+                        // Store component
+                        vdm_components.add(componentType);
+                        // instrument_component(componentType, blockImpl);
+                    }
+                }
+            }
+        }
+    }
+
+    // IT
+    // - Select all components c in the model M that meet condition:
+    // ComponentKind = Human and c.InsideTrustedBoundary = True
+    public void insiderThreat(HashSet<ComponentType> vdm_components) {
+
+        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
+        boolean boundary_cond = true;
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+
+            blockImpl = componentImpl.getBlockImpl();
+
+            // BlockImpl
+            if (blockImpl != null) {
+
+                ComponentType componentType = componentImpl.getType();
+
+                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+
+                    componentType = getType(componentInstance);
+
+                    if (kind_of_component == component_kind_cond_1
+                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
+                        // Store component
+                        vdm_components.add(componentType);
+                        // instrument_component(componentType, blockImpl);
+                    }
+                }
+            }
+        }
+
+        // for (ComponentType component : selected_components) {
+        // LOGGER.info("(" + component_index++ + ") " + component.getId());
+        // instrument_component(component, blockImpl);
+        // }
+    }
+
+    protected ComponentType getType(ComponentInstance componentInstance) {
+
+        ComponentType componentType = componentInstance.getSpecification();
+        ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+
+        // Option 1) Specification
+        if (componentType != null) {
+
+        }
+        // Option 2) Implementation
+        else if (subcomponentImpl != null) {
+
+            componentType = subcomponentImpl.getType();
+        }
+
+        return componentType;
+    }
+
+    // Instrument Link for all outgoing edges
+    public HashSet<Connection> instrument_component(ComponentType component, BlockImpl blockImpl) {
+
+        HashSet<Connection> vdm_links = new HashSet<Connection>();
+
+        for (Port port : component.getPort()) {
+
+            PortMode mode = port.getMode();
+
+            if (mode == PortMode.OUT) {;
+            }
+            {
+                // instrument_link(port, blockImpl);
+                for (Connection connection : blockImpl.getConnection()) {
+                    if (retrieve_links(connection, port)) {
+                        vdm_links.add(connection);
+                    }
+                }
+            }
+        }
+
+        return vdm_links;
+    }
+
+    protected boolean retrieve_links(Connection connection, Port instrumented_port) {
+
+        // Default Block Implementation
+        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        // R.H.S
+        ConnectionEnd src = connection.getSource();
+        ComponentInstance src_componentInstance = new ComponentInstance();
+
+        // Source Connection
+        Port src_port = src.getComponentPort();
+
+        if (src_port != null) {
+            String identifier = compImpl.getId();
+            identifier = identifier.replace(".I", "_I");
+
+            src_componentInstance.setId(identifier);
+            src_componentInstance.setName(identifier);
+            src_componentInstance.setImplementation(compImpl);
+        }
+
+        // if (src_port == instrumented_port) {
+
+        CompInstancePort compInstancePort = src.getSubcomponentPort();
+
+        if (compInstancePort != null) {
+
+            src_componentInstance = compInstancePort.getSubcomponent();
+            src_port = compInstancePort.getPort();
+        }
+
+        if (instrumented_port == src_port) {
+            // System.out.println(
+            // "Outgoing Channels to Component: "
+            // + src_componentInstance.getName()
+            // + " -- "
+            // + connection.getName()
+            // + " --> "
+            // + src_port.getName());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // public void instrument_link(Connection connection) {
+    // // Connection Source
+    // ConnectionEnd src = connection.getSource();
+    //
+    // // Connection Destination
+    // ConnectionEnd dest = connection.getDestination();
+    //
+    // // Source Component
+    // Port src_port = src.getComponentPort();
+    // // Destination Component
+    // Port dest_port = dest.getComponentPort();
+    //
+    // if (src_port == null && dest_port == null) {
+    // // Both are sub-compon
+    // System.out.println("Both are subcomponents.");
+    // }
+    // if (src_port == null && dest_port != null) {
+    // // Only one is Subcomponent
+    // System.out.println(dest_port.getId() + " -- " + dest_port.getName());
+    // }
+    // if (src_port != null && dest_port == null) {
+    // // One Subcomponent
+    // System.out.println(src_port.getId() + " -- " + src_port.getName());
+    // }
+    // }
+
+    // public void create_link(Connection old_channel, ComponentInstance
+    // src_componentInstance,
+    // ComponentInstance dest_componentInstance) {
+    //
+    // ComponentInstance instrumented_componentInstance = new ComponentInstance();
+    //
+    // String component_ID = src_componentInstance.getName() + "_Inst_" +
+    // dest_componentInstance.getName();
+    // instrumented_componentInstance.setId(component_ID + "_Instance");
+    // instrumented_componentInstance.setName(component_ID);
+    //
+    // instrumented_componentInstance.setSpecification(value);
+    // instrumented_componentInstance.setImplementation(value);
+    //
+    // ComponentType instrumented_component = new ComponentType();
+    // instrumented_component.setId(component_ID);
+    // instrumented_component.setName(component_ID);
+    //
+    //
+    //
+    // Connection inst_channel = new Connection();
+    //
+    // //Update Old connection Destination
+    // old_channel.setDestination(value);
+    //
+    // //Add New Connection Source
+    // inst_channel.setSource(value);
+    // //Add New Connection Destination
+    // inst_channel.setDestination(value);
+    //
+    //
+    // }
+
+    public String instrument_link(Connection connection, BlockImpl blockImpl) {
+        // instrument_link(connection);
+
+        // Default Block Implementation
+        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentType instrumented_cmp = new ComponentType();
+
+        // R.H.S
+        ConnectionEnd src = connection.getSource();
+        ComponentInstance src_componentInstance = new ComponentInstance();
+
+        // Source Connection
+        Port src_port = src.getComponentPort();
+
+        if (src_port != null) {
+            String identifier = compImpl.getId();
+            identifier = identifier.replace(".I", "_I");
+
+            src_componentInstance.setId(identifier);
+            src_componentInstance.setName(identifier);
+            src_componentInstance.setImplementation(compImpl);
+        }
+
+        // if (src_port == instrumented_port) {
+
+        CompInstancePort compInstancePort = src.getSubcomponentPort();
+
+        if (compInstancePort != null) {
+
+            src_componentInstance = compInstancePort.getSubcomponent();
+            src_port = compInstancePort.getPort();
+        }
+
+        // R.H.S
+        ConnectionEnd dest = connection.getDestination();
+        ComponentInstance dest_componentInstance = new ComponentInstance();
+
+        // Source Connection
+        Port dest_port = dest.getComponentPort();
+
+        if (dest_port != null) {
+            String identifier = compImpl.getId();
+            identifier = identifier.replace(".I", "_I");
+
+            dest_componentInstance.setId(identifier);
+            dest_componentInstance.setName(identifier);
+            dest_componentInstance.setImplementation(compImpl);
+        }
+        // if (dest_port == instrumented_port) {
+
+        compInstancePort = dest.getSubcomponentPort();
+
+        if (compInstancePort != null) {
+
+            dest_componentInstance = compInstancePort.getSubcomponent();
+            dest_port = compInstancePort.getPort();
+        }
+
+        String instrument_cmp_Id =
+                src_componentInstance.getName()
+                        + "_Inst_"
+                        + dest_componentInstance.getName()
+                        + "_port_"
+                        + dest_port.getName();
+
+        // Setting Component IDs
+        instrumented_cmp.setId(instrument_cmp_Id);
+        instrumented_cmp.setName(instrument_cmp_Id);
+
+        // output port
+        Port instrumented_port_dest = new Port();
+
+        instrumented_port_dest.setId(dest_port.getId());
+
+        instrumented_port_dest.setName(dest_port.getName());
+        instrumented_port_dest.setMode(dest_port.getMode());
+
+        instrumented_port_dest.setType(dest_port.getType());
+
+        instrumented_cmp.getPort().add(instrumented_port_dest);
+
+        // Input port
+        Port instrumented_port_src = new Port();
+
+        instrumented_port_src.setId(src_port.getId());
+
+        instrumented_port_src.setName(src_componentInstance + "_port_" + src_port.getName());
+        instrumented_port_src.setMode(src_port.getMode());
+
+        String global_constant_Id = src_componentInstance.getName();
+
+        if (instrumented_port_src.getMode() == instrumented_port_dest.getMode()) {
+            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+
+            if (instrumented_port_src.getMode() == PortMode.IN) {
+                instrumented_port_src.setMode(PortMode.OUT);
+            } else {
+                instrumented_port_dest.setMode(PortMode.IN);
+            }
+        } else {
+            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+        }
+
+        if (dest_port.getMode() == PortMode.OUT) {
+            global_constant_Id += "_port_" + dest_port.getName() + "_instrumented";
+        } else {
+            global_constant_Id += "_port_" + src_port.getName() + "_instrumented";
+        }
+
+        instrumented_port_src.setType(dest_port.getType());
+
+        instrumented_cmp.getPort().add(instrumented_port_src);
+
+        vdm_model.getComponentType().add(instrumented_cmp);
+
+        // Modify connection.
+
+        ConnectionEnd con_end_inst = new ConnectionEnd();
+
+        // instrumentd_port.setPort(value);
+        ComponentInstance instrumented_compInstance = new ComponentInstance();
+        instrumented_compInstance.setId(connection.getName());
+        instrumented_compInstance.setName(connection.getName());
+
+        instrumented_compInstance.setSpecification(instrumented_cmp);
+
+        // -----------------------------------------
+        // Adding Auxiliary Node.
+        NodeCall nodeCall = new NodeCall();
+        nodeCall.setNodeId(instrumented_cmp.getId());
+        Expression callExpr = new Expression();
+        callExpr.setCall(nodeCall);
+
+        ContractItem true_guarantee_item = new ContractItem();
+        // true_guarantee_item.setName("true");
+        Expression true_expr = new Expression();
+        Boolean true_lit = Boolean.valueOf("true");
+        true_expr.setBoolLiteral(true_lit);
+        true_guarantee_item.setExpression(true_expr);
+
+        ContractSpec contractSpec = new ContractSpec();
+        contractSpec.getGuarantee().add(true_guarantee_item);
+
+        // instrumented_cmp.setContract(contractSpec);
+
+        // ---------------------------------------------
+
+        ComponentImpl instrument_compImpl = new ComponentImpl();
+
+        instrument_compImpl.setId(instrumented_cmp.getId() + ".impl");
+        instrument_compImpl.setName(instrumented_cmp.getName() + "_Impl");
+        instrument_compImpl.setType(instrumented_cmp);
+
+        IfThenElse ifelse = new IfThenElse();
+
+        // Condition
+        Expression cond_expr = new Expression();
+        cond_expr.setIdentifier(global_constant_Id);
+        ifelse.setCondition(cond_expr);
+        // Then
+        Expression then_arg = new Expression();
+        then_arg.setIdentifier(dest_port.getName());
+        ifelse.setThenBranch(callExpr);
+        // Else
+        Expression else_arg = new Expression();
+
+        else_arg.setIdentifier(dest_port.getName());
+        nodeCall.getArgument().add(else_arg);
+        ifelse.setElseBranch(then_arg);
+
+        Expression instrumented_expr = new Expression();
+        instrumented_expr.setConditionalExpression(ifelse);
+
+        NodeEquation n_eq = new NodeEquation();
+        NodeEquationLHS neq_lhs = new NodeEquationLHS();
+        neq_lhs.getIdentifier().add(src_port.getName() + "_instrumented");
+        n_eq.setLhs(neq_lhs);
+
+        n_eq.setRhs(instrumented_expr);
+
+        NodeBody nodeBody = new NodeBody();
+
+        // VariableDeclaration cond_var = new VariableDeclaration();
+        // cond_var.setName(gloabal_constant_Id);
+        // DataType dataType = new DataType();
+        // dataType.setPlainType(PlainType.BOOL);
+        // cond_var.setDataType(dataType);
+        // nodeBody.getVariableDeclaration().add(cond_var);
+
+        nodeBody.setIsMain(false);
+        nodeBody.getEquation().add(n_eq);
+
+        instrument_compImpl.setDataflowImpl(nodeBody);
+
+        instrumented_compInstance.setImplementation(instrument_compImpl);
+        vdm_model.getComponentImpl().add(instrument_compImpl);
+        vdm_model.getComponentType().add(instrumented_cmp);
+        // -----------------------------------------
+
+        CompInstancePort compInstance_inst_port = new CompInstancePort();
+
+        compInstance_inst_port.setPort(dest_port);
+        compInstance_inst_port.setSubcomponent(instrumented_compInstance);
+        con_end_inst.setSubcomponentPort(compInstance_inst_port);
+
+        blockImpl.getSubcomponent().add(instrumented_compInstance);
+
+        connection.setDestination(con_end_inst);
+
+        Connection new_con = new Connection();
+        // Copying connection related artifacts
+        new_con.setName(connection.getName() + "_instrumented_channel");
+        new_con.setConnType(connection.getConnType());
+        new_con.setFlow(connection.getFlow());
+        new_con.setDataEncrypted(connection.isDataEncrypted());
+        new_con.setAuthenticated(connection.isAuthenticated());
+
+        new_con.setSource(con_end_inst);
+
+        compInstance_inst_port.setPort(src_port);
+
+        new_con.setDestination(dest);
+
+        blockImpl.getConnection().add(new_con);
+
+        return global_constant_Id;
+    }
+}

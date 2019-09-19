@@ -1,0 +1,6 @@
+package iml.lang;
+
+type Int;
+type Real;
+type Bool;
+type String;

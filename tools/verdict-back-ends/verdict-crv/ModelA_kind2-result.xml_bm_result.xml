@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<blameAssignment xmlns="http://www.example.org/BlameAssignment">
+    <ViolatedProperties PropertyID="g_pilot_only_takes_picture[7]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="f_picture_only_in_PILOT_TARGET_POSITION[6]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="e_appropriate_movement[5]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="d_not_releasing_weapon_on_arbitrary_location[4]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="c_not_taking_picture_on_arbitrary_location[3]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="b_weapon_only_in_task2_waypoint[2]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+    <ViolatedProperties PropertyID="a_picture_only_in_task1_waypoint[1]">
+        <MinA>
+            <Links LinkID="FlightController" Compromised="true"/>
+            <Links LinkID="Navigator" Compromised="true"/>
+            <Links LinkID="RCReceiverHealthCheck" Compromised="true"/>
+            <Links LinkID="GPS" Compromised="true"/>
+            <Links LinkID="BatteryHealthCheck" Compromised="true"/>
+        </MinA>
+        <ApplicableThreat>
+            <AttackId>LB</AttackId>
+        </ApplicableThreat>
+    </ViolatedProperties>
+</blameAssignment>
