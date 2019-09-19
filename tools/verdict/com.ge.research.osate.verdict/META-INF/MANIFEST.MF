@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: DARPA CASE VERDICT Plugin
+Bundle-SymbolicName: com.ge.research.osate.verdict;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.ge.research.osate.verdict.Activator
+Bundle-Vendor: GE
+Require-Bundle: org.eclipse.emf.ecore.editor;bundle-version="2.13.0",
+ org.osate.xtext.aadl2.ui;bundle-version="1.0.0",
+ org.eclipse.ui.console;bundle-version="3.7.1",
+ org.apache.ant;bundle-version="1.10.0",
+ org.osate.aadl2,
+ com.ge.research.osate.verdict.dsl,
+ com.ge.research.osate.verdict.dsl.ui;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: com.ge.research.osate.verdict
+Bundle-ActivationPolicy: lazy
+Export-Package: com.ge.research.osate.verdict,
+ com.ge.research.osate.verdict.gui,
+ com.ge.research.osate.verdict.handlers

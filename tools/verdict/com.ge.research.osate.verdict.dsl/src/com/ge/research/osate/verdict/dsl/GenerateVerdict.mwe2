@@ -1,0 +1,123 @@
+module com.ge.research.osate.verdict.dsl.GenerateVerdict
+
+import org.eclipse.emf.mwe.utils.*
+import org.eclipse.xtext.generator.*
+import org.eclipse.xtext.ui.generator.*
+
+import org.eclipse.xtext.generator.Generator
+
+var rootPath = ".."
+
+var grammarUri = "classpath:/com/ge/research/osate/verdict/dsl/Verdict.xtext"
+var file.extensions = "verdict"
+var projectName = "com.ge.research.osate.verdict.dsl"
+var runtimeProject = "../${projectName}"
+
+// Note: This is an old-style workflow because AADL does not support new (2.9+) workflows
+// That's why everything is deprecated
+
+Workflow {
+	// Register EMF and AADL packages
+	bean = org.eclipse.emf.mwe.utils.StandaloneSetup {
+		platformUri = rootPath
+		scanClassPath = true
+		
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.emf.codegen.ecore/model/GenModel.genmodel"
+			to = "platform:/resource/org.eclipse.emf.codegen.ecore/model/GenModel.genmodel"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.emf.ecore/model/Ecore.genmodel"
+		    to = "platform:/resource/org.eclipse.emf.ecore/model/Ecore.genmodel"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.uml2.codegen.ecore/model/GenModel.genmodel"
+		    to = "platform:/resource/org.eclipse.uml2.codegen.ecore/model/GenModel.genmodel"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.uml2.uml/model/UML.genmodel"
+		    to = "platform:/resource/org.eclipse.uml2.uml/model/UML.genmodel"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.emf.codegen.ecore/model/GenModel.ecore"
+		    to = "platform:/resource/org.eclipse.emf.codegen.ecore/model/GenModel.ecore"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore"
+		    to = "platform:/resource/org.eclipse.emf.ecore/model/Ecore.ecore"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.uml2.codegen.ecore/model/GenModel.ecore"
+		    to = "platform:/resource/org.eclipse.uml2.codegen.ecore/model/GenModel.ecore"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.uml2.uml/model/UML.ecore"
+		    to = "platform:/resource/org.eclipse.uml2.uml/model/UML.ecore"
+		}
+		uriMap = {
+		    from = "platform:/plugin/org.eclipse.uml2.types/model/Types.genmodel"
+		    to = "platform:/resource/org.eclipse.uml2.types/model/Types.genmodel"
+		}
+		uriMap = {
+			from = "platform:/plugin/org.eclipse.uml2.types/model/Types.ecore"
+			to = "platform:/resource/org.eclipse.uml2.types/model/Types.ecore"
+		}
+		
+		registerGeneratedEPackage = "org.eclipse.emf.ecore.EcorePackage"
+		registerGeneratedEPackage = "org.eclipse.uml2.types.TypesPackage"
+		registerGeneratedEPackage = "org.eclipse.uml2.uml.UMLPackage"
+		registerGeneratedEPackage = "org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage"
+		registerGeneratedEPackage = "org.eclipse.uml2.codegen.ecore.genmodel.GenModelPackage"
+		registerGenModelFile = "platform:/resource/org.eclipse.emf.ecore/model/Ecore.genmodel"
+		registerGenModelFile = "platform:/resource/org.eclipse.emf.codegen.ecore/model/GenModel.genmodel"
+		registerGenModelFile = "platform:/resource/org.eclipse.uml2.uml/model/UML.genmodel"
+		registerGenModelFile = "platform:/resource/org.eclipse.uml2.types/model/Types.genmodel"
+		registerGenModelFile = "platform:/resource/org.eclipse.uml2.codegen.ecore/model/GenModel.genmodel"
+		
+		registerGeneratedEPackage = "org.osate.aadl2.Aadl2Package"
+		registerGenModelFile = "platform:/resource/org.osate.aadl2/model/aadl2.genmodel"
+	}
+	
+	component = Generator {
+		pathRtProject = runtimeProject
+		pathUiProject = "${runtimeProject}.ui"
+		projectNameRt = projectName
+		projectNameUi = "${projectName}.ui"
+		
+		language = {
+			uri = grammarUri
+			fileExtensions = file.extensions
+			fragment = grammarAccess.GrammarAccessFragment {}
+			fragment = ecore.EMFGeneratorFragment {}
+			fragment = parseTreeConstructor.ParseTreeConstructorFragment {}
+			// Serialization
+			fragment = serializer.SerializerFragment {}
+			fragment = resourceFactory.ResourceFactoryFragment {
+				fileExtensions = file.extensions
+			}
+			fragment = parser.antlr.XtextAntlrGeneratorFragment {}
+			// Validation
+			fragment = validation.JavaValidatorFragment {}
+			// Scoping and exporting
+			fragment = scoping.ImportNamespacesScopingFragment {}
+			fragment = builder.BuilderIntegrationFragment {}
+			// Formatter
+			fragment = formatting2.Formatter2Fragment auto-inject {}
+			// Labeling
+			fragment = labeling.LabelProviderFragment {}
+			// Outline
+			fragment = outline.OutlineTreeProviderFragment {}
+			fragment = outline.QuickOutlineFragment {}
+			// Quickfix
+			fragment = quickfix.QuickfixProviderFragment {}
+			// Content assist
+			fragment = contentAssist.JavaBasedContentAssistFragment {}
+			// Rename refactoring
+			fragment = refactoring.RefactorElementNameFragment {}
+			// Content assist parser
+			fragment = parser.antlr.ex.ca.ContentAssistParserGeneratorFragment {
+				partialParsing = true
+			}
+		}
+	}
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<!-- All templates should be placed in this file.
+     Variables of the form VerdictTemplateVar('context.part')
+     will be resolved by VerdictTemplateVariableResolver. -->
+<templates>
+<!-- Cyber relations -->
+<template
+	name="CyberRel"
+	description="Autofill Cyber Relation Template"
+	id="CyberRel"
+	context="com.ge.research.osate.verdict.dsl.Verdict.CyberRel"
+	supplier="Verdict"
+	enabled="true">CyberRel {
+	id = "${cursor}"
+	inputs = ${in:VerdictTemplateVar('CyberRel.in')}:${cia1:Enum('CIA')}
+	output = ${out:VerdictTemplateVar('CyberRel.out')}:${cia2:Enum('CIA')}
+}</template>
+<!-- Cyber requirements -->
+<template
+	name="CyberReq"
+	description="Autofill Cyber Requirement Template"
+	id="CyberReq"
+	context="com.ge.research.osate.verdict.dsl.Verdict.CyberReq"
+	supplier="Verdict"
+	enabled="true">CyberReq {
+	id = "${cursor}"
+	condition = ${cond:VerdictTemplateVar('CyberReq.cond')}:${cia1:Enum('CIA')}
+	cia = ${cia2:Enum('CIA')}
+	severity = ${Major:Enum('Severity')}
+}</template>
+<template
+	name="MissionReq"
+	description="Autofill MissionReq Template"
+	id="MissionReq"
+	context="com.ge.research.osate.verdict.dsl.Verdict.CyberMission"
+	supplier="Verdict"
+	enabled="true">MissionReq {
+	id = "${cursor}"
+	cyberReqs = ${req:VerdictTemplateVar('Mission.req')}
+}</template>
+</templates>

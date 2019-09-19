@@ -1,0 +1,12 @@
+Scenario,CompType,CompImpl,CompInstance,hasSensitiveInfo,insideTrustedBoundary,broadcastFromOutsideTB,wifiFromOutsideTB,heterogeneity,encryption,antiJamming,antiFlooding,antiFuzzing
+VERDICT_output_iml,,Actuators,actuators,,1,,,,,,,
+VERDICT_output_iml,,BatteryHealthCheck,battery_health_check,,1,,,,,,,
+VERDICT_output_iml,,FlightController,flight_controller,,1,,,,,,,
+VERDICT_output_iml,,GPS,gps,,1,1,,,,,,
+VERDICT_output_iml,,MissionPlanner,mission_planner,1,1,,,,,,,
+VERDICT_output_iml,,Mixer,mixer,,1,,,,,,,
+VERDICT_output_iml,,Navigator,navigator,,1,,,,,,,
+VERDICT_output_iml,,PositionEstimator,position_estimator,,1,,,,,,,
+VERDICT_output_iml,,RCReceiver,RC_receiver,,1,,1,,,,,
+VERDICT_output_iml,,RCReceiverHealthCheck,RC_receiver_health_check,,1,,,,,,,
+VERDICT_output_iml,,StateController,state_controller,,1,,,,,,,

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="verdict::vdm::vdm_data"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:vdm_data="verdict::vdm::vdm_data" elementFormDefault="qualified"
+    attributeFormDefault="qualified"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0">
+
+    <complexType name="DataType">
+        <choice>
+            <element name="plainType" type="vdm_data:PlainType">
+            </element>
+            <element name="subrangeType" type="vdm_data:SubrangeType"></element>
+            <element name="arrayType" type="vdm_data:ArrayType"></element>
+            <element name="tupleType" type="vdm_data:TupleType"></element>
+            <element name="enumType" type="vdm_data:EnumType"></element>
+            <element name="recordType" type="vdm_data:RecordType"></element>
+            <element name="userDefinedType" type="vdm_data:Identifier"></element>
+        </choice>
+    </complexType>
+
+    <simpleType name="PlainType">
+        <restriction base="string">
+            <enumeration value="bool"></enumeration>
+            <enumeration value="int"></enumeration>
+            <enumeration value="real"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="SubrangeType">
+        <all>
+            <element name="lowerBound" type="string" maxOccurs="1"
+                minOccurs="1">
+            </element>
+            <element name="upperBound" type="string" maxOccurs="1"
+                minOccurs="1">
+            </element>
+        </all>
+        <attribute name="type" type="string" use="optional"
+            fixed="int"></attribute>
+    </complexType>
+
+    <complexType name="ArrayType">
+        <sequence>
+            <element name="dataType" type="vdm_data:DataType"
+                maxOccurs="1" minOccurs="1">
+            </element>
+            <element name="dimension" type="string" maxOccurs="1"
+                minOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="TupleType">
+        <sequence>
+            <element name="dataType" type="vdm_data:DataType"
+                maxOccurs="unbounded" minOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="EnumType">
+        <sequence>
+            <element name="enumValue" type="vdm_data:Identifier"
+                maxOccurs="unbounded" minOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="Identifier">
+        <restriction base="string">
+            <pattern value="[:_a-zA-Z][.:_a-zA-Z0-9]*"></pattern>
+        </restriction>
+    </simpleType>
+
+    <complexType name="RecordType">
+        <sequence>
+            <element name="recordField" type="vdm_data:RecordField"
+                maxOccurs="unbounded" minOccurs="1">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="RecordField">
+        <sequence>
+            <element name="name" type="vdm_data:Identifier" maxOccurs="1"
+                minOccurs="1">
+            </element>
+            <element name="type" type="vdm_data:DataType" maxOccurs="1"
+                minOccurs="1">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="TypeDeclaration">
+        <sequence>
+            <element name="name" type="vdm_data:Identifier" maxOccurs="1"
+                minOccurs="1"></element>
+            <element name="definition" type="vdm_data:DataType"
+                maxOccurs="1" minOccurs="0"></element>
+        </sequence>
+    </complexType>
+</schema>

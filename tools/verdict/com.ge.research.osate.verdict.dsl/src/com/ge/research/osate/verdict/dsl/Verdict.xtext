@@ -1,0 +1,247 @@
+grammar com.ge.research.osate.verdict.dsl.Verdict with org.osate.xtext.aadl2.properties.Properties
+
+generate verdict "http://www.ge.com/research/osate/verdict/dsl/Verdict"
+
+import "http://aadl.info/AADL/2.0" as aadl2
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+// NOTE: And has a higher precedence than Or. This is a limitation of LL(*) parsers.
+
+// The syntactic predicate ("=>") resolves the ambiguity in the case of an empty annex
+// Note that this rule is not used directly, but it is necessary
+Model returns aadl2::Element:
+	AnnexSubclause
+	| AnnexLibrary
+;
+
+// Connect to AADL
+Element returns aadl2::Element:
+	Statement
+	| LExpr
+	| LPort
+	| LOr
+	| LAnd
+	| LNot
+	| ThreatModel
+	| Intro
+	| ThreatExpr
+	| ThreatEqualContains
+	| Var
+	| ThreatOr
+	| ThreatAnd
+	| ThreatNot
+	| Forall
+	| Exists
+	| Implies
+;
+
+// This is glue for AADL annexes
+AnnexSubclause returns aadl2::AnnexSubclause: VerdictSubclause;
+AnnexLibrary returns aadl2::AnnexLibrary: VerdictLibrary;
+VerdictSubclause: {VerdictContractSubclause} contract=Verdict;
+VerdictLibrary: {VerdictContractLibrary} contract=VerdictThreatModels;
+
+// ===== CYBER PROPERTIES =====
+
+// Top-level rule for cyber properties
+Verdict: {Verdict} (elements+=Statement)*;
+
+Statement: (CyberMission | CyberReq | CyberRel) DELIMETER_OPT;
+
+CyberMission: 'MissionReq' CyberMissionBlock;
+
+CyberMissionBlock returns CyberMission:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('cyberReqs' '=' cyberReqs+=STRING (',' cyberReqs+=STRING)* DELIMETER_OPT) &
+	('description' '=' description=STRING DELIMETER_OPT)? &
+	// Why note instead of comment? Because Xtext is stupid.
+	// Try changing it and see that it generates two fields with the same name in VerdictPackage...
+	('comment' '=' note=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+CyberReq: 'CyberReq' CyberReqBlock;
+
+// Fields may appear in any order (Xtext's '&' connector)
+CyberReqBlock returns CyberReq:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('cia' '=' cia=CIA DELIMETER_OPT)? &
+	('severity' '=' severity=Severity DELIMETER_OPT) &
+	('condition' '=' condition=CyberReqConditionLogic DELIMETER_OPT) &
+	('comment' '=' comment=STRING DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)? &
+	('phases' '=' phase=STRING DELIMETER_OPT)? &
+	('external' '=' external=STRING DELIMETER_OPT)? &
+	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)?
+	) '}'
+;
+
+CyberRel: 'CyberRel' (CyberRelBlock | CyberRelShort);
+
+// Fields may appear in any order (Xtext's '&' connector)
+CyberRelBlock returns CyberRel:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('output' '=' output=CyberRelOutputLogic DELIMETER_OPT) &
+	('inputs' '=' inputs=CyberRelInputLogic DELIMETER_OPT)? &
+	('comment' '=' comment=STRING DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)? &
+	('phases' '=' phase=STRING DELIMETER_OPT)? &
+	('external' '=' external=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+CyberRelShort returns CyberRel:
+	id=STRING ('=' inputs=CyberRelInputLogic)? ('=>' | '->') output=CyberRelOutputLogic
+;
+
+// Inputs and condition are arbitrary expressions, but output is only one port
+CyberReqConditionLogic: value=LExpr;
+CyberRelInputLogic: value=LExpr;
+CyberRelOutputLogic: value=LPort;
+
+// TODO: tree rewrite rules?
+
+// Left-factored; all tree paths must go through LOr then LAnd
+LExpr: LOr;
+
+LExprTerm returns LExpr:
+	LPort | LNot
+	| '(' LExpr ')' | '{' LExpr '}' | '[' LExpr ']'
+;
+
+LPort: port=ID ':' cia=CIA;
+
+LOr: exprs+=LAnd (OR exprs+=LAnd)*;
+
+LAnd: exprs+=LExprTerm (AND exprs+=LExprTerm)*;
+
+LNot: NOT expr=LExprTerm;
+
+DELIMETER_OPT: ';'?;
+
+OR: 'or' | '||' | '\\/';
+
+AND: 'and' | '&&' | '/\\';
+
+NOT: 'not' | '!';
+
+// Redundancy for flexibility
+enum CIA:
+	CIA_C = 'C'
+	| CIA_I = 'I'
+	| CIA_A = 'A'
+	| CIA_C = 'Confidentiality'
+	| CIA_I = 'Integrity'
+	| CIA_A = 'Availability'
+;
+
+enum Severity:
+	Severity_None = 'None'
+	| Severity_Minor = 'Minor'
+	| Severity_Major = 'Major'
+	| Severity_Hazardous = 'Hazardous'
+	| Severity_Catastrophic = 'Catastrophic'
+;
+
+enum TargetLikelihood:
+	TL_None = '1'
+	| TL_Minor = '1e-3'
+	| TL_Minor = '1e-03'
+	| TL_Major = '1e-5'
+	| TL_Major = '1e-05'
+	| TL_Hazardous = '1e-7'
+	| TL_Hazardous = '1e-07'
+	| TL_Catastrophic = '1e-9'
+	| TL_Catastrophic = '1e-09'
+	;
+
+// ===== THREAT MODELS =====
+
+// Top-level rule for threat models
+VerdictThreatModels: {VerdictThreatModels} (statements+=ThreatStatement)*;
+
+ThreatStatement: (ThreatModel | ThreatDefense | ThreatDatabase) DELIMETER_OPT;
+
+ThreatModel: "ThreatEffectModel" ThreatModelBlock;
+
+ThreatModelBlock returns ThreatModel:
+	"{" (
+	("id" "=" id=STRING DELIMETER_OPT) &
+	("entities" "=" "{" intro=Intro "|" expr=ThreatExpr "}" DELIMETER_OPT) &
+	("cia" "=" cia=CIA DELIMETER_OPT)? &
+	("reference" "=" reference=STRING DELIMETER_OPT)? &
+	("assumptions" "=" assumptions+=CRVAssumption ("," assumptions+=CRVAssumption)* DELIMETER_OPT)? &
+	("description" "=" description=STRING DELIMETER_OPT)? &
+	("comment" "=" comment=STRING DELIMETER_OPT)?
+	) "}"
+;
+
+ThreatDefense: "ThreatDefense" ThreatDefenseBlock;
+
+ThreatDefenseBlock returns ThreatDefense:
+	'{' (
+	('id' '=' name=STRING DELIMETER_OPT) &
+	('threats' '=' threats+=STRING (',' threats+=STRING)* DELIMETER_OPT) &
+	('description' '=' desc=STRING DELIMETER_OPT)? &
+	('comment' '=' note=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+ThreatDatabase: "ThreatDatabase" id=STRING;
+
+enum CRVAssumption:
+	Mutually_Exclusive = "mutuallyExclusive"
+;
+
+// We include this here so that we can perform syntax coloring
+BuiltInType: "system" | "port";
+
+// Introduce a new quantified variable
+// Note: presently only built-in types are supported, but this can change
+Intro: id=ID ":" type=(ID | BuiltInType);
+
+// The expression grammar is left-factored
+ThreatExpr:
+	Implies | Forall | Exists
+;
+
+ThreatExprTerm returns ThreatExpr:
+	ThreatEqualContains | ThreatNot
+	| '(' ThreatExpr ')' | '[' ThreatExpr ']' | '{' ThreatExpr '}'
+;
+
+// Values that variables can have
+Const: ID | QuotedString | INTEGER_LIT | REAL_LIT | 'true' | 'false' | 'in' | 'out';
+
+BuiltInField: "connections" | "subcomponents";
+
+// Either a variable with dotted fields (e.g. mySystem.field1.field2) or a value constant (e.g. Local)
+// Note that a single variable (e.g. just mySystem) will be parsed the same way as a value constant
+Var: (id=ID ("." ids+=(ID | BuiltInField))+) | (id=Const);
+
+// Either equality (mySystem.name="foobar") or contains (e.g. "mySystem.ports contains myPort")
+ThreatEqualContains: left=Var (equal?="=" | contains?="contains") right=Var;
+
+// This grammar is left-factored, so there can be things parsed as implications
+// that aren't actually implications because they only have one child,
+// just like ThreatAnd and ThreatOr.
+Implies: antecedent=ThreatOr (("=>" | "->") consequent=ThreatOr)?;
+
+ThreatOr: exprs+=ThreatAnd (OR exprs+=ThreatAnd)*;
+
+ThreatAnd: exprs+=ThreatExprTerm (AND exprs+=ThreatExprTerm)*;
+
+ThreatNot: NOT expr=ThreatExprTerm;
+
+Forall: "forall" intro=Intro "," expr=ThreatExpr;
+
+Exists: "exists" intro=Intro "," expr=ThreatExpr;
+
+// We don't use STRING directly because Xtext strips the quotes from the string;
+// we want to preserve them to perform our own validation
+QuotedString: STRING;
+
+terminal INTEGER: ('0'..'9')+;

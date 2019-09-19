@@ -1,0 +1,8 @@
+ModelVersion,MissionReqID,MissionReq,CyberReqId,CyberReq,MissionImpactCIA,Effect,Severity,CompInstanceDependency,CompOutputDependency,Confidentiality,Integrity,Availability
+HawkeyeUAV,,,1_1,,Integrity,,Hazardous,FlightController,payloadCmd,,,Availability
+HawkeyeUAV,,,1_1,,Integrity,,Hazardous,,,,,
+HawkeyeUAV,,,1_1,,Integrity,,Hazardous,PositionEstimator,currentPos,,,Availability
+HawkeyeUAV,,,1_1,,Integrity,,Hazardous,FlightController,payloadCmd,,Integrity,
+HawkeyeUAV,,,1_1,,Integrity,,Hazardous,PositionEstimator,currentPos,,Integrity,
+HawkeyeUAV,,,1_2,,Integrity,,Major,FlightController,payloadCmd,,Integrity,
+HawkeyeUAV,,,1_2,,Integrity,,Major,PositionEstimator,currentPos,,Integrity,
