@@ -11,10 +11,10 @@ sources are in this directory.
 
 You will need Java and Maven to build the back-end tools since most of
 the back-end tool sources are written in Java.  One exception is
-aad2iml, which is written in OCaml; see its own [README](aad2iml) for
-instructions how to build it (briefly, install OCaml, run make, rename
-the newly built ./main.native executable to aad2iml, and put aad2iml
-someplace where VERDICT can find it).
+aadl2iml, which is written in OCaml; see its own [README](aadl2iml)
+for instructions how to build it (briefly, install OCaml, run make,
+rename the newly built ./main.native executable to aadl2iml, and put
+aadl2iml someplace where VERDICT can find it).
 
 We have been building the tools with [Java
 8](https://www.oracle.com/technetwork/java/javase/overview/java8-2100321.html)
