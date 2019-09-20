@@ -40,7 +40,7 @@ will typically be recommendations to improve the resiliency of
 components, such as control access to and encrypt communications
 links, or add components to reduce dependence on a specific source of
 information.  For example, add position sensors and voting logic
-rather than depend exclusively on a GPS signal to determinelocation.
+rather than depend exclusively on a GPS signal to determine location.
 Once the architectural analysis is complete, VERDICT supports
 refinement of the architecture model with behavioral modeling
 information using AGREE.  The VERDICT Cyber Resiliency Verifier (CRV)
