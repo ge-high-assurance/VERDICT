@@ -124,7 +124,9 @@ public class BlameAssignment {
                                     applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
-                            break;
+                            if (attack.getAttackId() != null) {
+                                break;
+                            }
                         }
                     }
 
@@ -138,7 +140,9 @@ public class BlameAssignment {
                                     applicableAttack(link.getLinkID(), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
-                            break;
+                            if (attack.getAttackId() != null) {
+                                break;
+                            }
                         }
                         //                        }
                     }
