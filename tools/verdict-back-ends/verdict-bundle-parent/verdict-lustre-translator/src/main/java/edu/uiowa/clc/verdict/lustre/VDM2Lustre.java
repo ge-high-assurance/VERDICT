@@ -564,7 +564,7 @@ public class VDM2Lustre {
 
                 String inst_cmp = "(.+)_instrumented";
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
-
+                //                System.out.println(src_portID);
                 Matcher m = inst_pattern.matcher(src_portID);
                 if (m.matches()) {
                     src_portID = m.group(1);
@@ -572,6 +572,7 @@ public class VDM2Lustre {
 
                 id_expr = componentInstance.getId() + "_port_" + src_portID;
                 expr.setIdentifier(id_expr);
+                //                System.out.println(id_expr);
 
                 //                System.out.println(">>>>>>>>>>>>>Identifiers: " +
                 // expr.getIdentifier());
@@ -598,13 +599,15 @@ public class VDM2Lustre {
             if (componentType == null) {
                 componentType = componentImpl.getType();
                 called_node_ID = componentType.getName() + "_Impl";
-            } else if (componentType != null && componentImpl != null) {
+            }
+            if (componentType != null && componentImpl != null) {
                 componentType = componentImpl.getType();
                 called_node_ID = componentType.getName() + "_Impl";
 
                 String inst_cmp = "(.+)_instrumented";
-                Pattern inst_pattern = Pattern.compile(inst_cmp);
 
+                Pattern inst_pattern = Pattern.compile(inst_cmp);
+                //                System.out.println(arg_value);
                 Matcher m = inst_pattern.matcher(arg_value);
                 if (m.matches()) {
                     arg_value = m.group(1);
@@ -613,6 +616,7 @@ public class VDM2Lustre {
             } else {
                 called_node_ID = componentType.getName();
                 arg_value = src_component_port.getName();
+                //                System.out.println(arg_value);
             }
 
             for (Port port : componentType.getPort()) {
@@ -637,7 +641,8 @@ public class VDM2Lustre {
                         node_id = node_called.getNodeId();
                     }
 
-                    //                    System.out.println(" = " + node_id);
+                    //                    System.out.println(" = " + node_id + " (" + arg_value +
+                    // ")");
                     Matcher m = inst_pattern.matcher(node_called.getNodeId());
 
                     IfThenElse ifelse = new IfThenElse();
@@ -705,27 +710,47 @@ public class VDM2Lustre {
             ComponentType componentType = componentInstance.getSpecification();
             ComponentImpl componentImpl = componentInstance.getImplementation();
 
+            String old_portID = null;
+
             if (componentType == null) {
                 componentType = componentImpl.getType();
                 called_node_ID = componentType.getName();
-            } else if (componentType != null && componentImpl != null) {
+            }
+            if (componentType != null && componentImpl != null) {
 
                 componentType = componentImpl.getType();
                 called_node_ID = componentType.getName() + "_Impl";
 
                 String inst_cmp = "(.+)_instrumented";
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
-
+                //                System.out.print(src_portID + " ==> ");
                 Matcher m = inst_pattern.matcher(src_portID);
                 if (m.matches()) {
+                    old_portID = src_portID;
+
                     src_portID = m.group(1);
                     arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
+                    //                    System.out.println(old_portID + " -- " + src_portID);
                 }
+                //                System.out.println(arg_expr.getIdentifier() + " <== " +
+                // src_portID);
 
             } else {
                 called_node_ID = componentType.getName();
             }
 
+            String node_arg = "(.+)_Inst_.*";
+            Pattern arg_pattern = Pattern.compile(node_arg);
+
+            Matcher m_arg = arg_pattern.matcher(called_node_ID);
+
+            if (!m_arg.matches() && old_portID != null) {
+                arg_expr.setIdentifier(componentInstanceID + "_port_" + old_portID);
+                //                System.out.println("Node ID =>" + called_node_ID + "(" +
+                // arg_expr.getIdentifier() + ")");
+            }
+
+            //            System.out.println(called_node_ID);
             for (Port port : componentType.getPort()) {
                 // MODE
                 PortMode port_mode = port.getMode();
@@ -743,9 +768,11 @@ public class VDM2Lustre {
                         String inst_cmp = "(.+)_Inst_.*";
                         Pattern inst_pattern = Pattern.compile(inst_cmp);
                         String node_id = "";
+
                         if (node_called != null) {
                             node_id = node_called.getNodeId();
                         }
+
                         Matcher m = inst_pattern.matcher(node_id);
 
                         IfThenElse ifelse = new IfThenElse();
