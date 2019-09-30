@@ -1,0 +1,15 @@
+Scenario,Parent,CompType,Cardinality
+VERDICT_output_iml,UAVSystem,Actuators,1
+VERDICT_output_iml,UAVSystem,BatteryHealthCheck,1
+VERDICT_output_iml,UAVSystem,FlightController,1
+VERDICT_output_iml,UAVSystem,GPS,1
+VERDICT_output_iml,UAVSystem,DME_VOR,1
+VERDICT_output_iml,UAVSystem,IRU,1
+VERDICT_output_iml,UAVSystem,TriplexVoter,1
+VERDICT_output_iml,UAVSystem,MissionPlanner,1
+VERDICT_output_iml,UAVSystem,Mixer,1
+VERDICT_output_iml,UAVSystem,Navigator,1
+VERDICT_output_iml,UAVSystem,PositionEstimator,1
+VERDICT_output_iml,UAVSystem,RCReceiver,1
+VERDICT_output_iml,UAVSystem,RCReceiverHealthCheck,1
+VERDICT_output_iml,UAVSystem,StateController,1
