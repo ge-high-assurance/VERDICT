@@ -1,0 +1,68 @@
+package Agree_Constants
+public
+	with Data_Types;
+	
+	annex agree {**
+		const NoInput_cia_I: bool = true;	
+		const NoInput_cia_A: bool = true;	
+		
+		const Boolean_cia_I: bool = false;
+		const Boolean_cia_A: bool = false;
+
+		const Integer_cia_I: Base_Types::Integer = 0;
+		const Integer_cia_A: Base_Types::Integer = 0;
+
+		const UAVState_cia_I: Data_Types::UAVState = enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH);
+		const UAVState_cia_A: Data_Types::UAVState = enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH);
+		
+		const Action_cia_I: Data_Types::Action = enum(Data_Types::Action, Camera);
+		const Action_cia_A: Data_Types::Action = enum(Data_Types::Action, Camera);	
+		
+		const Direction_cia_I: Data_Types::Direction = enum(Data_Types::Direction, North);
+		const Direction_cia_A: Data_Types::Direction = enum(Data_Types::Direction, North);	
+		
+		const Movement_cia_I: Data_Types::Movement = enum(Data_Types::Movement, Turn_Right);
+		const Movement_cia_A: Data_Types::Movement = enum(Data_Types::Movement, Turn_Right);	
+
+		const MotorCommand_cia_I: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, IncreaseX);
+		const MotorCommand_cia_A: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, IncreaseX);	
+
+		const ATE6Type_cia_I: Data_Types::ATE6Type = enum(Data_Types::ATE6Type, RC_Abnormal);
+		const ATE6Type_cia_A: Data_Types::ATE6Type = enum(Data_Types::ATE6Type, RC_Abnormal);	
+
+		const ATE7Type_cia_I: Data_Types::ATE7Type = enum(Data_Types::ATE7Type, Inadequate);
+		const ATE7Type_cia_A: Data_Types::ATE7Type = enum(Data_Types::ATE7Type, Inadequate);	
+
+		const Position_impl_cia_I: Data_Types::Position.impl = Data_Types::Position.impl {x=0; y=0};	
+		const Position_impl_cia_A: Data_Types::Position.impl = Data_Types::Position.impl {x=0; y=0};
+				
+		const Tasks_impl_cia_I: Data_Types::Tasks.impl = Data_Types::Tasks.impl {
+			task1 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)} ;
+			task2 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)} ;
+			task3 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)}  
+			};	
+		const Tasks_impl_cia_A: Data_Types::Tasks.impl = Data_Types::Tasks.impl {
+			task1 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)} ;
+			task2 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)} ;
+			task3 = Data_Types::Task.impl{waypoint = Data_Types::Position.impl {x=0; y=0}; action = enum(Data_Types::Action, Camera); status = enum(Data_Types::TaskStatus, Started)}  
+			};	
+			
+		const INITIAL_BATTERY_LEVEL: int = 100;
+		const BATTERY_LEVEL_THRESHOLD: int = 20;
+		
+		const BATTERY_CONSUMPTION_LOWER_BOUND: int = 1;
+		const BATTERY_CONSUMPTION_UPPER_BOUND: int = 4;
+
+		const RC_RECEIVER_TOLERANCE_LEVEL: int = 1;
+
+		const LAUNCH_POS: Data_Types::Position.impl =
+			Data_Types::Position.impl {x = 0; y = 0};
+			
+        const LAUNCH_DIR: Data_Types::Direction =
+        	enum(Data_Types::Direction, North);
+        	
+        const PILOT_TARGET_POSITION: Data_Types::Position.impl =
+        	Data_Types::Position.impl {x = -2; y = 2};
+	**};
+	
+end Agree_Constants;
