@@ -160,6 +160,11 @@ public class VDMInstrumentor {
 
             for (ComponentType component : vdm_components) {
                 System.out.println("(" + component_index++ + ") " + component.getId());
+
+                if (blockImpl == null) {
+                    blockImpl = retrieve_block(component);
+                }
+
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
                 vdm_links.addAll(vdm_cmp_links);
 
@@ -228,6 +233,11 @@ public class VDMInstrumentor {
                     connection_mapper(connections_map, components_map);
 
             ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+
+            if (compImpl.getBlockImpl() == null) {
+                compImpl = retrieve_block(compImpl);
+            }
+
             ContractSpec contractSpec = compImpl.getType().getContract();
 
             for (String key : components_map.keySet()) {
@@ -249,6 +259,11 @@ public class VDMInstrumentor {
 
         } else if (blame_assignment && !component_level) {
             ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+
+            if (compImpl.getBlockImpl() == null) {
+                compImpl = retrieve_block(compImpl);
+            }
+
             ContractSpec contractSpec = compImpl.getType().getContract();
 
             for (String key : global_constants) {
@@ -265,6 +280,45 @@ public class VDMInstrumentor {
                 contractSpec.getWeaklyassume().add(weakly_assume_item);
             }
         }
+    }
+
+    protected ComponentImpl retrieve_block(ComponentImpl compImpl) {
+        BlockImpl blockImpl = null;
+        String cmpID = compImpl.getType().getId();
+        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+            if (cImpl.getBlockImpl() != null) {
+                blockImpl = cImpl.getBlockImpl();
+
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentType enumType = cmpInstance.getImplementation().getType();
+                    if (cmpID.equals(enumType.getId())) {
+                        //                        System.out.println(cImpl.getId() + " == " +
+                        // compImpl.getId());
+                        return cImpl;
+                    }
+                }
+            }
+        }
+        return compImpl;
+    }
+
+    protected BlockImpl retrieve_block(ComponentType compType) {
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentType enumType = cmpInstance.getImplementation().getType();
+                    if (compType.getId().equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
     }
 
     protected String link_name(String link) {
@@ -362,6 +416,10 @@ public class VDMInstrumentor {
         }
         // Adding Xor assumption for components.
         ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        if (compImpl.getBlockImpl() == null) {
+            compImpl = retrieve_block(compImpl);
+        }
+
         ContractSpec contractSpec = compImpl.getType().getContract();
 
         ContractItem assume_item = new ContractItem();
@@ -397,6 +455,10 @@ public class VDMInstrumentor {
         }
 
         ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        if (compImpl.getBlockImpl() == null) {
+            compImpl = retrieve_block(compImpl);
+        }
+
         ContractSpec contractSpec = compImpl.getType().getContract();
 
         contractSpec.getSymbol().addAll(vars_dec);
@@ -970,11 +1032,15 @@ public class VDMInstrumentor {
             if (mode == PortMode.OUT) {;
             }
             {
-                // instrument_link(port, blockImpl);
-                for (Connection connection : blockImpl.getConnection()) {
-                    if (retrieve_links(connection, port)) {
-                        vdm_links.add(connection);
+                // Block Implementation Component Selection.
+                if (blockImpl != null) {
+                    for (Connection connection : blockImpl.getConnection()) {
+                        if (retrieve_links(connection, port)) {
+                            vdm_links.add(connection);
+                        }
                     }
+                } else {
+                    // DataFlow Implementation Selection.
                 }
             }
         }
