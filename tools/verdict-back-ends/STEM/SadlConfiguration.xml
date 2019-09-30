@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SadlConfiguration version="0.2">
+	<!--Possible enumerations for certain values are listed explicitly where applicable-->
+	<preferences id="SADL">
+		<setting label="BaseURI" value="http://sadl.org"/>
+		<setting label="SavedOWLModelFormat" value="RDF/XML-ABBREV"/><!--"RDF/XML","N3","N-TRIPLE","Jena TBD"-->
+		<setting label="ShowImportModelListAs" value="Model Namespaces"/><!--"SADL File Names"-->
+		<setting label="ShowPrefixesForImportedConceptsOnlyWhenNeededForDisambiguation" value="false"/>
+		<setting label="ValidateBeforeTesting" value="false"/>
+		<setting label="Test/QueryWithKnowledgeServer" value="false"/>
+		<setting label="ShowNamespacesInQueryResults" value="false"/>
+		<setting label="ShowTimingInformation" value="false"/>
+		<setting label="InterpretDateAs" value="MM/DD/YYYY"/><!--"DD/MM/YYYY"-->
+		<setting label="DisableDeepValidationOfModel" value="false"/>
+		<setting label="GraphRendererPackageAndClass" value="com.ge.research.sadl.model.visualizer.GraphVizVisualizer"/>
+		<setting label="TabularDataImporterClass" value="com.ge.research.sadl.jena.importer.CsvImporter"/>
+		<setting label="IncludeImplicitElementsInGraph" value="false"/>
+		<setting label="IncludeImplicitElementInstancesInGraph" value="false"/>
+		<setting label="CheckForAmbiguousNames" value="true"/>
+		<setting label="CheckForCardinalityOfPropertyOnSpecificDomain" value="false"/>
+		<setting label="UseIndefiniteAndDefiniteArticlesInValidationAndTranslation" value="true"/>
+		<setting label="TypeCheckingWarningOnly" value="false"/>
+		<setting label="TypeCheckingRangeRequired" value="true"/>
+		<setting label="IgnoreUnittedQuantitiesDuringTranslation" value="false"/>
+		<setting label="IncludeImpliedPropertiesInTranslation" value="false"/>
+		<setting label="TranslateMultipleClassDomainOrRangeAsUnionClass" value="true"/>
+		<setting label="GenerateMetricsReportDuringProjectCleanBuild" value="false"/>
+		<setting label="FileContainingMetricQueries" value="SadlQueries.txt"/>
+		<setting label="GraphImplicitElements" value="false"/>
+		<setting label="GraphImplicitElementInstances" value="false"/>
+	</preferences>
+</SadlConfiguration>

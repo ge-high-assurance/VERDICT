@@ -1,0 +1,97 @@
+package Data_Types
+public
+	with Data_Model, Base_Types;
+	
+    data Movement
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("Turn_Right", "Turn_Left", "Move_Forward", "Stop");
+	    Data_Model::Representation => ("Turn_Right", "Turn_Left", "Move_Forward", "Stop");
+	end Movement;
+	
+	data Direction
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("North", "South", "East", "West");
+	    Data_Model::Representation => ("North", "South", "East", "West");
+	end Direction;
+	
+	data Action
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("Camera", "Weapon", "Land", "None");
+	    Data_Model::Representation => ("Camera", "Weapon", "Land", "None");
+	end Action;
+	
+	data Position
+	end Position;
+	
+	data implementation Position.impl
+	  subcomponents
+	  	x: data Base_Types::Integer; 
+		y: data Base_Types::Integer;
+  	end Position.impl;
+	
+	data TaskStatus
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("Successful", "Aborted", "InProgress", "Started");
+	    Data_Model::Representation => ("Successful", "Aborted", "InProgress", "Started");
+	end TaskStatus;
+	
+	data Task
+	end Task;
+	
+	data implementation Task.impl
+		subcomponents
+		  waypoint: data Position.impl;
+		  action: data Action;
+		  status: data TaskStatus;
+  	end Task.impl;
+  	
+  	data MotorCommand
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("IncreaseX", "DecreaseX", "IncreaseY", "DecreaseY", "IncreaseYaw", "DecreaseYaw", "NoChange");
+	    Data_Model::Representation => ("IncreaseX", "DecreaseX", "IncreaseY", "DecreaseY", "IncreaseYaw", "DecreaseYaw", "NoChange");
+	end MotorCommand;
+	
+	data UAVState
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("s_RETURN_TO_LAUNCH", "s_AUTO_FLIGHT_MODE", "s_MANUAL_FLIGHT_MODE");
+	    Data_Model::Representation => ("s_RETURN_TO_LAUNCH", "s_AUTO_FLIGHT_MODE", "s_MANUAL_FLIGHT_MODE");
+	end UAVState;
+  	
+  	data YawAngle
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("Y_0", "Y_90", "Y_180", "Y_270");
+	    Data_Model::Representation => ("Y_0", "Y_90", "Y_180", "Y_270");
+	end YawAngle;
+	
+	data Tasks
+	end Tasks;
+	
+	data implementation Tasks.impl
+		subcomponents
+		  task1: data Task.impl;
+		  task2: data Task.impl;
+		  task3: data Task.impl;
+	end Tasks.impl;
+		
+	data ATE6Type
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("RC_Abnormal", "RC_Normal");
+	    --Data_Model::Representation => ("0", "1");
+	end ATE6Type;
+	
+	data ATE7Type
+	  properties
+	    Data_Model::Data_Representation => Enum;
+	    Data_Model::Enumerators => ("Inadequate", "Adequate");
+	    --Data_Model::Representation => ("0", "1");
+	end ATE7Type;
+	
+end Data_Types;

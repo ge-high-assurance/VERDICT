@@ -1,0 +1,29 @@
+uri "http://sadl.org/STEM/Scenario" alias scn
+import "http://sadl.org/STEM/BaseModel".
+
+//log "c:/tmp/scnarch.log"
+
+validate <Scenario> not blank skip
+validate <ConnectionName> not blank skip
+validate <SrcCompType> not blank skip
+validate <SrcCompInstance> not blank skip
+validate <SrcPortName> not blank skip
+validate <DestCompType> not blank skip
+validate <DestCompInstance> not blank skip
+validate <DestPortName> not blank skip
+validate <Flow1> not blank skip
+validate <Flow2> not blank skip
+validate <Flow3> not blank skip
+
+<SrcCompType> rdfs:subClassOf Subsystem
+<SrcCompInstance> rdf:type <SrcCompType>
+<DestCompType> rdfs:subClassOf Subsystem
+<DestCompInstance> rdf:type <DestCompType>
+<ConnectionName> rdf:type Connection
+<ConnectionName> connectionSource <SrcCompInstance>
+<ConnectionName> connectionDestination <DestCompInstance>
+<ConnectionName> outPort <SrcPortName>
+<ConnectionName> inPort <DestPortName>
+<ConnectionName> connectionFlow <Flow1>
+<ConnectionName> connectionFlow <Flow2>
+<ConnectionName> connectionFlow <Flow3>

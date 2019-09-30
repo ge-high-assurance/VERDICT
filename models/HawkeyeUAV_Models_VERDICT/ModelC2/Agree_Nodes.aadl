@@ -1,0 +1,139 @@
+package Agree_Nodes
+public
+	with Data_Types;
+	with Agree_Constants;
+	
+	annex agree {**
+		const c_North: Data_Types::Direction = enum(Data_Types::Direction, North);
+		const c_East: Data_Types::Direction = enum(Data_Types::Direction, East);
+		const c_West: Data_Types::Direction = enum(Data_Types::Direction, West);
+		const c_South: Data_Types::Direction = enum(Data_Types::Direction, South);
+		const c_Y_0: Data_Types::YawAngle = enum(Data_Types::YawAngle, Y_0);
+		const c_Y_90: Data_Types::YawAngle = enum(Data_Types::YawAngle, Y_90);
+		const c_Y_180: Data_Types::YawAngle = enum(Data_Types::YawAngle, Y_180);
+		const c_Y_270: Data_Types::YawAngle = enum(Data_Types::YawAngle, Y_270);
+		
+		node duration (p: bool) returns (r: int) ;
+		let 
+		  r = (if not p then 1 else 0) -> (if not p then pre (r) + 1 else 0) ;
+		tel;
+		
+		node is_equal (pos1: Data_Types::Position.impl, pos2: Data_Types::Position.impl)
+		returns (z: bool);
+		let
+    		z = pos1.x = pos2.x and pos1.y = pos2.y;
+		tel;
+		
+		node yaw2dir (yaw: Data_Types::YawAngle)
+		returns (dir: Data_Types::Direction);
+		let
+		    dir = if yaw = c_Y_0 then c_North
+		     else if yaw = c_Y_90 then c_East
+		     else if yaw = c_Y_180 then c_South
+		     else c_West;
+		tel;
+		
+		node set_task_status(curr_task: Data_Types::Task.impl, new_status: Data_Types::TaskStatus)
+		returns (new_task: Data_Types::Task.impl);
+		let
+		  new_task = Data_Types::Task.impl {
+		    waypoint = curr_task.waypoint;
+		    action = curr_task.action;
+		    status = new_status
+		  };
+        tel;
+		
+		const c_IncreaseX: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, IncreaseX);
+		const c_IncreaseY: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, IncreaseY);
+		const c_DecreaseX: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, DecreaseX);
+		const c_DecreaseY: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, DecreaseY);
+		const c_IncreaseYaw: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, IncreaseYaw);
+		const c_DecreaseYaw: Data_Types::MotorCommand = enum(Data_Types::MotorCommand, DecreaseYaw);
+		
+		node LocationSource_Pos (cmd: Data_Types::MotorCommand)
+		returns (GPS_pos: Data_Types::Position.impl);
+		var nextPos: Data_Types::Position.impl;
+			x: int; y: int;
+		let
+			GPS_pos = (Agree_Constants.LAUNCH_POS -> pre (nextPos));
+			
+			x = if cmd = c_IncreaseX then GPS_pos.x + 1
+			    else if cmd = c_DecreaseX then GPS_pos.x - 1
+			    else GPS_pos.x;
+			
+			y = if cmd = c_IncreaseY then GPS_pos.y + 1
+			    else if cmd = c_DecreaseY then GPS_pos.y - 1
+			    else GPS_pos.y;
+			
+			nextPos = Data_Types::Position.impl {x = x; y = y};
+		tel;
+		
+		node LocationSource_Dir (cmd: Data_Types::MotorCommand)
+		returns (GPS_dir: Data_Types::Direction);
+		var nextDir: Data_Types::Direction;
+			yaw: Data_Types::YawAngle;
+		let
+			GPS_dir = (Agree_Constants.LAUNCH_DIR -> pre (nextDir));
+			
+			yaw = 
+				if cmd = c_IncreaseYaw then (
+		          c_Y_90 ->
+		          if pre(yaw) = c_Y_0 then c_Y_90
+		          else if pre(yaw) = c_Y_90 then c_Y_180
+		          else if pre(yaw) = c_Y_180 then c_Y_270
+		          else c_Y_0
+		        )
+		        else if cmd = c_DecreaseYaw then (
+		          c_Y_270 ->
+		          if pre(yaw) = c_Y_0 then c_Y_270
+		          else if pre(yaw) = c_Y_90 then c_Y_0
+		          else if pre(yaw) = c_Y_180 then c_Y_90
+		          else c_Y_180
+		        )
+		        else c_Y_0 -> pre(yaw);
+			
+			nextDir = Agree_Nodes.yaw2dir (yaw);
+		tel;
+		
+		const c_Move_Forward: Data_Types::Movement = enum(Data_Types::Movement, Move_Forward);
+		const c_Turn_Left: Data_Types::Movement = enum(Data_Types::Movement, Turn_Left);
+		const c_Stop: Data_Types::Movement = enum(Data_Types::Movement, Stop);
+		
+		node RemoteOperatorController_Move()
+		returns (move: Data_Types::Movement);
+		let
+			move = (
+	    			c_Move_Forward -> pre (
+					c_Move_Forward -> pre (
+					c_Turn_Left -> pre (
+					c_Move_Forward -> pre (
+					c_Move_Forward -> pre (
+					c_Stop
+	    		))))));
+		tel;
+		
+		const c_None: Data_Types::Action = enum(Data_Types::Action, None);
+		const c_Camera: Data_Types::Action = enum(Data_Types::Action, Camera);
+		
+		node RemoteOperatorController_payloadCMD()
+		returns (payloadCMD: Data_Types::Action);
+		let
+			payloadCMD = (
+    				c_None -> pre (
+    				c_None -> pre (
+    				c_None -> pre (
+    				c_None -> pre (
+    				c_None -> pre (
+    				c_Camera -> pre (
+    				c_None
+    			)))))));
+		tel;
+		
+		node sofar(a : bool) returns (b : bool);
+		let
+    		b = a -> (a and pre (b));
+		tel;
+		
+	**};
+	
+end Agree_Nodes;
