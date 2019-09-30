@@ -1,0 +1,120 @@
+uri "http://sadl.org/STEM/BaseModel" alias base.
+
+SL (note "Security Level") is a type of int [1,5].  
+DAL (note "Design Assurance Level") is a type of int [0,9]. // 0 for DAL in case the implementation property is not present
+Thing (alias "super class of everything") is a class.  
+Person is a type of Thing.
+
+// As (implementation) property may have a DAL, we need to define a Property class instead of just having it as a string
+ImplProperty is a class
+	described by name with a single value of type string
+	described by val with a single value of type boolean
+	described by dal with a single value of type DAL. 
+
+System is a type of Thing
+	described by component with values of type Subsystem
+	described by inputPort with values of type string 
+	described by outputPort with values of type string 
+	described by dependency with values of type Dependency
+	described by secLevel with a single value of type SL //int range 1-5 
+	// properties
+	described by isHardware with a single value of type boolean
+	described by insideTrustedBoundary with a single value of type boolean
+	described by broadcast with a single value of type boolean
+	described by broadcastFromOutsideTB with a single value of type boolean
+	described by wifiFromOutsideTB with a single value of type boolean
+//	described by canBeSpoofed with a single value of type boolean
+//	described by canBeJammed with a single value of type boolean
+//	described by canBeBlinded with a single value of type boolean  
+	described by hasSensitiveInfo with a single value of type boolean
+	// implementation properties related to mitigations
+	described by encryption with a single value of type ImplProperty 	
+	described by heterogeneity with a single value of type ImplProperty 
+	described by antiJamming with a single value of type ImplProperty 	
+	described by antiFlooding with a single value of type ImplProperty
+	described by antiFuzzing with a single value of type ImplProperty	 	
+	// threats, protections
+	described by cia with values of type SecurityIssueLabel // not used
+	described by capecString with values of type string
+	described by protection with values of type Protection. 
+
+// the following would also work so that we can filter on the properties we want to show as tooltip, but is not as clean as using annotations
+//tooltipProp is a property with values of type data.
+//{heterogeneity, insideTrustedBoundary, unencWifiFromOutsideTB, hasSensitiveInfo, broadcastFromOutsideTB} are types of tooltipProp.
+
+tooltipProp is a type of annotation.	// all the component properties we want to display will have tooltipProp annotation set to true
+heterogeneity has tooltipProp true.
+insideTrustedBoundary has tooltipProp true.	
+wifiFromOutsideTB has tooltipProp true.
+hasSensitiveInfo has tooltipProp true.	
+broadcastFromOutsideTB has tooltipProp true.
+encryption has tooltipProp true.
+antiJamming has tooltipProp true.	
+antiFlooding has tooltipProp true.
+antiFuzzing has tooltipProp true.
+
+Subsystem is a type of System.
+Dependency is a class // for an output identify the input ports 
+	described by comp with a single value of type Subsystem
+	described by input with a single value of type string  
+	described by inputCIA with a single value of type SecurityIssueLabel 
+	described by output with a single value of type string
+	described by outputCIA with a single value of type SecurityIssueLabel. 
+Protection is a class //I have not put in a slot for CAPEC Description
+  described by capecMitigated with a single value of type string
+  described by capecDescription with a single value of type string
+  described by ciaIssue with a single value of type SecurityIssueLabel
+  described by affectedComponent with a single value of type Subsystem 
+  described by defense with a single value of type string  // using NIST defenses
+  described by protectionDescription with a single value of type string 
+  described by implProperty with a single value of type string
+  described by dal with a single value of type DAL
+  described by addressed with a single value of type boolean  
+  . 
+//ProtectionType is a class.  
+//RateLimit is a type of ProtectionType.
+//PhysicalSecurity is a type of ProtectionType.
+Connection is a type of Subsystem 
+	described by connectionFlow with values of type ContentType
+	described by connectionSource with a single value of type Thing 
+	described by outPort with a single value of type string //outPort is on the "source"
+	described by connectionDestination with a single value of type Thing
+	described by inPort with a single value of type string // inPort is on the "destination"
+	described by infoFlowSeverity with a single value of type int.  
+
+ContentType is a class, must be one of {Xdata, Control, Request}.
+SecurityIssueLabel is a class, must be one of {Confidentiality, Integrity, Availability}.
+CIAIssue is a class
+  described by depth with a single value of type int
+  described by causingCIAIssue with a single value of type CIAIssue
+  described by ciaIssue with a single value of type SecurityIssueLabel
+  described by affectedComponent with a single value of type Subsystem  
+  described by causingComponent with a single value of type Thing   
+  described by capec with a single value of type string 
+  described by capecDescription with a single value of type string
+  described by likelihoodOfSuccess with a single value of type float. 
+
+Severity is a class, must be one of {NoSafetyEffect, Minor, Major, Hazardous, Catastrophic}. //from DO-356A
+
+// One Mission Requirement may get mapped to multiple Cyber Requirements
+// Each Cyber Requirement has 
+//		mission impact in terms of CIA (one value only???)
+//		effect
+//		severity
+//		multiple <comp instance, CIA value> - more than 1 CIA value allowed
+
+MissionReq is a class
+	described by id with a single value of type string	// can we avoid string	
+	described by description with a single value of type string
+	described by cyberReq with values of type CyberReq.
+	
+CyberReq is a class
+	described by id with a single value of type string		
+	described by description with a single value of type string
+	described by missionImpact with a single value of type SecurityIssueLabel  //do we need multiple CIA values?
+	described by effect with a single value of type string
+	described by severity with a single value of type Severity	
+	described by compOutputDependency with a single value of type string  // output port name
+	described by confidentialityImpactedBy with values of type Subsystem //this plus next two specify for one comp instance that impacts the cyber req
+	described by integrityImpactedBy with values of type Subsystem 
+	described by availabilityImpactedBy with values of type Subsystem.

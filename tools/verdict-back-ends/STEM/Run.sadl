@@ -1,0 +1,229 @@
+uri "http://sadl.org/STEM/Run" alias run.
+
+import "http://sadl.org/STEM/STEMRules".
+
+// For debugging csv file importing, uncomment the line that writes out the log file in each of the template files.
+//		In VM would need to also replace c:/tmp/ by /home/soteria/tmp/
+
+// On the VM, the text in the node does not always fit inside the box though it fits inside on my desktop computer.
+//		Note that the same file on VM that has text outside is fine on my desktop.
+//		So, the issue seems to be with GraphViz on Ubuntu.
+
+// Then updated SADL with the version dated 4/23/2019 on the desktop; both of the files in ImplicitModel are now different!
+//		the SADL on the VM still needs to be updated to 4/23/2019 version. 
+// Latest SADL3 update on desktop and VM is dated 3/11/2019. 
+
+// Instead of writing out files into c:/tmp, we are now writing them into a project folder called Output
+//		this will reduce the number of paths that are used.
+// replaced allWifiEncFromOutsideTB by encryption
+
+// On 5/2/2019: corrected graphing query; also expanded it so that we can see connection flow type
+// On 3/26/2019: cleaned up the queries to reduce number of "FILTER" used and took out some parts that were not needed
+
+// On 3/26/2019; No longer reading in 3 csv files (CompDep.csv, Mission.csv and ScnComp.csv)
+//		and only writing out 2 csv files: CAPEC.csv and Defenses.csv.
+//		This is because SOTERIA++ has been refactored.
+
+// TBD:
+//		Add property "trustedComponent" so that later we can show what happens when we use an untrusted FlightController
+//				what CAPECs would be present and for which components?
+
+// SADL extensions needed / notes
+// 		Minor: same property for a node appears multiple times in the .dot file
+
+// checked in to BitBucket, CSV. Pushed to Amazon VM
+// 2/18/2019 If CAPEC is addressed then it shows as yellow box (earlier it was red box)
+// 2/14/2019 adding additional properties like antiJamming etc. renamed lOS to likelihoodOfSuccess
+// 2/14/2019 decided we are going to use properties like "anti-jamming" and not going to use low values of lOS
+// - so I am going to make all likelihoodOfSuccess  1.0 (as SOTERIA++ has already been altered to read this value in
+// 2/13/2019 added likelihoodOfSuccess for Soteria++
+// 2/5/2019 added implementation properties allWifiEncFromOutsideTB and heterogeneity
+//			these are read in from csv file along with their DAL values
+//			and ApplicableDefenses.csv file has been renamed and has 2 additional columns
+//			altered rules so that CAPEC does not go away if heterogeneity present etc. added additional rules
+// 1/28/2019 The tooltip now shows CAPECs and properties across multiple lines (altered how capecString is set in rules)
+// 1/24/2019 showing properties for components (capecs and properties as tooltip)
+// 1/15/2019 Corrected some queries to write out to files
+// 1/13/2019 Corrected one rule by adding a clause
+// 1/9/2019 I now no longer need the file Components.sadl and CompDep.csv has been corrected.
+// 1/4/2019 Since I have turned off the transitive rules, some queries can be simplified. But have not done so.
+
+// 1/3/2019: added space around ";" in two template files to avoid errors (these errors do not impact processing)
+
+// 12/31/2018: Do not need CompPorts.csv and its template.
+// 12/27/2018: Doing fancy graphing now. Note that the first time a node is encountered whatever properties it has are used throughout
+// 		even if later additional properties are set for that node.
+
+// Updated with 12/17/2018 version of SADL3 and with this I can read in ScnComp.csv and drop file Scenario1.sadl
+// and graphing works. However I had error markers in template files so had to alter them.
+
+// 12/14/2018: WE NO LONGER DROP CAPEC EVEN IF DEFENSE IS IN PLACE
+
+Read: data from "ScnArch.csv" using "ScnArch.tmpl".  //connections and ports
+Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
+
+//Explain: Rule Heterogeneity.
+
+Print: "Just get the counts of all DIRECT CIA Issues".
+Ask: "select count(*) where {{select distinct ?z2  ?CAPEC ?z4  where {
+?x <affectedComponent> ?z2 . ?x <ciaIssue> ?z4
+. ?x <capec> ?CAPEC}} } ".
+
+Print: "All the sorted DIRECT CIA Issues".
+Ask: "select distinct (?z5 as ?CompType) (?z2 as ?CompInst) ?CAPEC ?CAPECDescription (?z4 as ?CIAIssue)
+where {?x <affectedComponent> ?z2 . ?x <ciaIssue> ?z4
+. ?x <capec> ?CAPEC . ?z2 <type> ?z5 . ?x <capecDescription> ?CAPECDescription
+. FILTER NOT EXISTS {?z2 <type> ?z6 . ?z6 <rdfs:subClassOf> ?z5 }} order by ?z5 ?z2 ?CAPEC".
+
+Print: "All the protections". // Note I do not write out CAPECDescription , would need to set up a property to easily access it
+Ask: "select distinct  (?z6 as ?CompType) (?z2 as ?CompInst) (?z8 as ?CAPEC) (?z4 as ?CIAIssue)
+(?z9 as ?Defense) (?z7 as ?DefenseDescription)
+where {?x <defense> ?z5 . ?x <affectedComponent> ?z2 . ?x <ciaIssue> ?z4
+. ?z2 <type> ?z6
+. FILTER NOT EXISTS {?z2 <type> ?a1 . ?a1 <rdfs:subClassOf> ?z6 }
+ . ?x <protectionDescription> ?z7 . ?x <capecMitigated> ?z8 . ?x <defense> ?z9} order by ?z6 ?z2 ?CAPEC ".
+
+//write out 2 files for SOTERIA++
+
+Write: data {
+Ask: "select distinct (?z5 as ?CompType) (?z2 as ?CompInst) ?CAPEC ?CAPECDescription
+(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess
+where {?x <affectedComponent> ?z2
+. OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
+. OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
+. OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
+. ?x <capec> ?CAPEC . ?z2 <type> ?z5 . ?x <capecDescription> ?CAPECDescription
+. ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess
+. FILTER NOT EXISTS {?z2 <type> ?z6 . ?z6 <rdfs:subClassOf> ?z5 }} order by ?z5 ?z2 ?CAPEC".
+} to "/Output/CAPEC.csv". 
+
+Write: data {
+Ask: "select distinct  (?z6 as ?CompType) (?z2 as ?CompInst) (?z8 as ?CAPEC)
+(?z10 as ?CAPECDescription)
+(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
+(?z9 as ?ApplicableDefense) (?z7 as ?DefenseDescription) ?ImplProperty ?DAL
+where {?x <defense> ?z5 . ?x <affectedComponent> ?z2
+. OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
+. OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
+. OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
+. ?z2 <type> ?z6
+. FILTER NOT EXISTS {?z2 <type> ?a1 . ?a1 <rdfs:subClassOf> ?z6 }
+. ?x <protectionDescription> ?z7 . ?x <capecMitigated> ?z8 . ?x <defense> ?z9
+. ?x <capecDescription> ?z10
+. OPTIONAL{?x <implProperty> ?ImplProperty}
+. OPTIONAL{?x <dal> ?DAL}} order by ?z6 ?z2 ?CAPEC".
+ } to "/Output/Defenses.csv".
+
+//For graphing to work, install GraphViz and set path in environment variable GraphVizPath
+
+///////////////////// GRAPHS ////////////////////////////
+//
+//// Extended Architecture graph: shows connections (blue edges) and dependencies (red edges)
+//// each node shows <component instance>:<port name>
+//Graph: "select distinct ?b2 ?link ?b3 ?link_color  where
+//{{?x <rdf:type> ?z . FILTER(regex(str(?z),'Dependency'))
+//. ?x <comp> ?z0
+//. ?z1 <rdf:type> ?z0
+//. ?x <output> ?z2
+//. ?x <input> ?z3
+//. LET(?link := '')
+//. LET(?link_color := 'red')
+//. LET(?a2 :=concat(concat(str(?z1),':'),str(?z3)))
+//. LET(?a3 :=concat(concat(str(?z1),':'),str(?z2)))
+//. LET(?b2 := replace(str(?a2),'^.*#',''))
+//. LET(?b3 := replace(str(?a3),'^.*#',''))
+//}
+//UNION
+//{?x <rdf:type> ?z . FILTER(regex(str(?z),'Connection'))
+//. ?x <connectionSource> ?z1
+//. ?x <connectionDestination> ?z2
+//. ?x <outPort> ?z3
+//. ?x <inPort> ?z4
+//. LET(?link := '')
+//. LET(?link_color := 'blue')
+//. LET(?a2 :=concat(concat(str(?z1),':'),str(?z3)))
+//. LET(?a3 :=concat(concat(str(?z2),':'),str(?z4)))
+//. LET(?b2 := replace(str(?a2),'^.*#',''))
+//. LET(?b3 := replace(str(?a3),'^.*#',''))
+//}}".
+//
+// Architecture Graph; make the label be concatenation of output port and input port; source and tails are component instances
+// shows component intances that have CAPEC as red and the CAPECs as well as component properties as tooltip
+// I can use xlabel for properties; but that puts it outside the box and does not look good
+// 3/26/2019 : simplified the main graphing query
+// 5/2/2019 : corrected part of the query
+Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?cplist as ?N1_tooltip) where
+{  ?x <rdf:type> ?z . FILTER(regex(str(?z),'Connection'))
+ . ?x <connectionSource> ?src . ?x <connectionDestination> ?dest
+ . ?x <outPort> ?oport . ?x <inPort> ?iport
+ . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#',''))
+ . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')
+ . OPTIONAL{  ?u <affectedComponent> ?src . ?u <addressed> ?c1 . FILTER(regex(str(?c1), 'true'))
+            . ?src <capecString> ?str . LET(?N1_fillcolor := 'yellow')}
+ . OPTIONAL{  ?u2 <affectedComponent> ?dest . ?u2 <addressed> ?c1 . FILTER(regex(str(?c1), 'true'))
+            . ?dest <capecString> ?str . LET(?N2_fillcolor := 'yellow')}
+ . OPTIONAL{?u <affectedComponent> ?src . ?src <capecString> ?str . LET(?N1_fillcolor := 'red')}
+ . OPTIONAL{?u2 <affectedComponent> ?dest . ?dest <capecString> ?str . LET(?N2_fillcolor := 'red')}
+ . ?x <connectionFlow> ?cf0 # flowtype
+ . LET(?cf := replace(str(?cf0),'^.*#',''))
+# select what we want to show on links - so comment two of the choices below 
+# . LET(?link := concat(concat(str(?oport),':'),str(?iport))) .  # if we want to show port names at both ends
+ . LET(?link := ?cf) . 										# if we want to show flowtype
+# . LET(?link := concat(concat(concat(concat(str(?oport),':'),str(?iport)),':'),str(?cf))) .  # if we want to show port names at both ends and control flow
+   {select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where # use &#10; for newline in tooltip
+      {?x <rdf:type> <Connection> . ?x <connectionSource> ?src . OPTIONAL{?src <capecString> ?capec}
+      } group by ?src
+   }
+# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
+ . {select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where
+    { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
+         ?src ?prop ?z3 		#?z3 is true/false or is a blank node
+       . ?prop <tooltipProp> ?r2 . ?z3 <val> ?prop_val
+      }
+    UNION
+    {?x <rdf:type> ?z . FILTER(regex(str(?z),'Connection')) . ?x <connectionSource> ?src
+     . OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
+    }
+   . LET(?c3 := concat(str(?prop_val),str(?prop)))
+   . LET(?c4 := replace(str(?c3),'http.*#',''))
+   . LET(?c5 := replace(str(?c4),'^true',''))
+   . LET(?c6 := replace(str(?c5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble gettting that working
+   } group by ?src}
+# now concat capec list and property list
+ . LET(?clist     := COALESCE(?capeclist,''))
+ . LET(?templist  := concat(concat(?clist,'; &#10;'),?plist))
+ . LET(?templist2 := replace(?templist,'^; ',''))  # get rid of initial ';'
+ . LET(?templist3 := replace(?templist2,';','; ')) # having a space ensures that we get quotes around in .dot file
+ . LET(?cplist    := replace(?templist3,'  ',' ')) # do not need 2 spaces
+}".
+
+//
+//// construct the graph of connections between components; shows ethernet names
+//Graph: "select ?a2 ?a1 ?a3 where
+//{?z1 <connectionSource> ?z2 . ?z1 <connectionDestination> ?z3 . ?z1 <connectionFlow> ?z4
+//. LET(?a2 := replace(str(?z2),'^.*#',''))
+//. LET(?a1 := replace(str(?z1),'^.*#',''))
+//. LET(?a3 := replace(str(?z3),'^.*#',''))}".
+//
+//// construct the graph of flow types between components
+//Graph: "select ?a2 ?a4 ?a3 where
+//{?z1 <connectionSource> ?z2 . ?z1 <connectionDestination> ?z3 . ?z1 <connectionFlow> ?z4
+//. LET(?a2 := replace(str(?z2),'^.*#',''))
+//. LET(?a4 := replace(str(?z4),'^.*#',''))
+//. LET(?a3 := replace(str(?z3),'^.*#',''))}".
+//
+////Graph with Connection and Connection flow
+//Graph: "select ?a2 ?a5 ?a3 where
+//{?z1 <connectionSource> ?z2 . ?z1 <connectionDestination> ?z3 . ?z1 <connectionFlow> ?z4
+//. LET(?a1 := replace(str(?z1),'^.*#',''))
+//. LET(?a2 := replace(str(?z2),'^.*#',''))
+//. LET(?a4 := replace(str(?z4),'^.*#',''))
+//. LET(?a3 := replace(str(?z3),'^.*#',''))
+//. LET(?a5 := concat(concat(?a1,'/'),?a4))}".
+
+//////////////////// END GRAPHS ///////////////////////////////
+
+//// Show port names
+//Ask: "select ?x ?y ?z
+//where {?x ?y ?z . FILTER(regex(str(?y),'inPort') || regex(str(?y),'outPort'))} order by ?x ?y".
+
