@@ -1,0 +1,10 @@
+ModelVersion,MissionReqId,MissionReq,CyberReqId,CyberReq,MissionImpactCIA,Effect,Severity,CompInstanceDependency,CompOutputDependency,Confidentiality,Integrity,Availability
+VERDICT_output_iml,,,1_2,,Integrity,,Major,flight_controller,payloadCmd,,Integrity,
+VERDICT_output_iml,,,1_2,,Integrity,,Major,position_estimator,currentPos,,Integrity,
+VERDICT_output_iml,,,1_2,,Integrity,,Major,position_estimator,currentDir,,Integrity,
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,flight_controller,payloadCmd,,Integrity,
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,flight_controller,payloadCmd,,,Availability
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,position_estimator,currentPos,,Integrity,
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,position_estimator,currentPos,,,Availability
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,position_estimator,currentDir,,Integrity,
+VERDICT_output_iml,,,1_1,,Integrity,,Hazardous,position_estimator,currentDir,,,Availability
