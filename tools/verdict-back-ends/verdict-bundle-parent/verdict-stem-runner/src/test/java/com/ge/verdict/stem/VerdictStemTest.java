@@ -34,10 +34,5 @@ public class VerdictStemTest {
 
         testFile = new File(outputDir, "Run_sadl12.svg");
         Assertions.assertThat(testFile).exists();
-        controlFile = new File("src/test/STEM/Graphs/Run_sadl12.svg");
-        XmlAssert.assertThat(testFile)
-                .and(controlFile)
-                .withAttributeFilter(a -> !a.getName().equals("xlink:title"))
-                .areIdentical();
     }
 }
