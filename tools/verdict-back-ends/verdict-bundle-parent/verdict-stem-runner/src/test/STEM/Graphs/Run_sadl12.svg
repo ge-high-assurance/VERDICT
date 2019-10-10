@@ -12,16 +12,16 @@
 <text text-anchor="middle" x="56.5" y="-673.8" font-family="Times New Roman,serif" font-size="14.00">Cmd 13 &#160;(Graph)</text>
 <!-- n1 -->
 <g id="node1" class="node"><title>n1</title>
-<g id="a_node1"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="142,-492 74,-492 74,-456 142,-456 142,-492"/>
+<g id="a_node1"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="142,-492 74,-492 74,-456 142,-456 142,-492"/>
 <text text-anchor="middle" x="108" y="-470.3" font-family="Times New Roman,serif" font-size="14.00">navigator</text>
 </a>
 </g>
 </g>
 <!-- n2 -->
 <g id="node2" class="node"><title>n2</title>
-<g id="a_node2"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="320,-405 266,-405 266,-369 320,-369 320,-405"/>
+<g id="a_node2"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="320,-405 266,-405 266,-369 320,-369 320,-405"/>
 <text text-anchor="middle" x="293" y="-383.3" font-family="Times New Roman,serif" font-size="14.00">mixer</text>
 </a>
 </g>
@@ -34,8 +34,8 @@
 </g>
 <!-- n8 -->
 <g id="node8" class="node"><title>n8</title>
-<g id="a_node8"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="348.5,-36 243.5,-36 243.5,-0 348.5,-0 348.5,-36"/>
+<g id="a_node8"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="348.5,-36 243.5,-36 243.5,-0 348.5,-0 348.5,-36"/>
 <text text-anchor="middle" x="296" y="-14.3" font-family="Times New Roman,serif" font-size="14.00">flight_controller</text>
 </a>
 </g>
@@ -48,8 +48,8 @@
 </g>
 <!-- n6 -->
 <g id="node6" class="node"><title>n6</title>
-<g id="a_node6"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="435,-297 367,-297 367,-261 435,-261 435,-297"/>
+<g id="a_node6"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="435,-297 367,-297 367,-261 435,-261 435,-297"/>
 <text text-anchor="middle" x="401" y="-275.3" font-family="Times New Roman,serif" font-size="14.00">actuators</text>
 </a>
 </g>
@@ -62,8 +62,8 @@
 </g>
 <!-- n3 -->
 <g id="node3" class="node"><title>n3</title>
-<g id="a_node3"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="369,-579 249,-579 249,-543 369,-543 369,-579"/>
+<g id="a_node3"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="369,-579 249,-579 249,-543 369,-543 369,-579"/>
 <text text-anchor="middle" x="309" y="-557.3" font-family="Times New Roman,serif" font-size="14.00">position_estimator</text>
 </a>
 </g>
@@ -82,7 +82,7 @@
 </g>
 <!-- n4 -->
 <g id="node4" class="node"><title>n4</title>
-<g id="a_node4"><a xlink:title="CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;601:Jamming; &#10; insideTrustedBoundary; &#10; broadcastFromOutsideTB">
+<g id="a_node4"><a xlink:title="CAPEC&#45;601:Jamming; &#10; CAPEC&#45;148:Content Spoofing; &#10; insideTrustedBoundary; &#10; broadcastFromOutsideTB">
 <polygon fill="red" stroke="black" points="336,-666 282,-666 282,-630 336,-630 336,-666"/>
 <text text-anchor="middle" x="309" y="-644.3" font-family="Times New Roman,serif" font-size="14.00">gps</text>
 </a>
@@ -96,8 +96,8 @@
 </g>
 <!-- n5 -->
 <g id="node5" class="node"><title>n5</title>
-<g id="a_node5"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="269.5,-123 166.5,-123 166.5,-87 269.5,-87 269.5,-123"/>
+<g id="a_node5"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="269.5,-123 166.5,-123 166.5,-87 269.5,-87 269.5,-123"/>
 <text text-anchor="middle" x="218" y="-101.3" font-family="Times New Roman,serif" font-size="14.00">state_controller</text>
 </a>
 </g>
@@ -128,8 +128,8 @@
 </g>
 <!-- n10 -->
 <g id="node10" class="node"><title>n10</title>
-<g id="a_node10"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="381.5,-210 246.5,-210 246.5,-174 381.5,-174 381.5,-210"/>
+<g id="a_node10"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="381.5,-210 246.5,-210 246.5,-174 381.5,-174 381.5,-210"/>
 <text text-anchor="middle" x="314" y="-188.3" font-family="Times New Roman,serif" font-size="14.00">battery_health_check</text>
 </a>
 </g>
@@ -168,7 +168,7 @@
 </g>
 <!-- n9 -->
 <g id="node9" class="node"><title>n9</title>
-<g id="a_node9"><a xlink:title="CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;125:Flooding; &#10; CAPEC&#45;601:Jamming; &#10; CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;28:Fuzzing; &#10; insideTrustedBoundary; &#10; wifiFromOutsideTB">
+<g id="a_node9"><a xlink:title="CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;125:Flooding; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;601:Jamming; &#10; CAPEC&#45;28:Fuzzing; &#10; insideTrustedBoundary; &#10; wifiFromOutsideTB">
 <polygon fill="red" stroke="black" points="288.5,-492 201.5,-492 201.5,-456 288.5,-456 288.5,-492"/>
 <text text-anchor="middle" x="245" y="-470.3" font-family="Times New Roman,serif" font-size="14.00">RC_receiver</text>
 </a>
@@ -194,8 +194,8 @@
 </g>
 <!-- n11 -->
 <g id="node11" class="node"><title>n11</title>
-<g id="a_node11"><a xlink:title="CAPEC&#45;242:Code Injection; &#10; insideTrustedBoundary">
-<polygon fill="red" stroke="black" points="277.5,-351 110.5,-351 110.5,-315 277.5,-315 277.5,-351"/>
+<g id="a_node11"><a xlink:title="&#10; insideTrustedBoundary">
+<polygon fill="lightgrey" stroke="black" points="277.5,-351 110.5,-351 110.5,-315 277.5,-315 277.5,-351"/>
 <text text-anchor="middle" x="194" y="-329.3" font-family="Times New Roman,serif" font-size="14.00">RC_receiver_health_check</text>
 </a>
 </g>

@@ -7,17 +7,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.xmlunit.assertj.XmlAssert;
 
 /** Runs unit tests on a VerdictStem object. */
 public class VerdictStemTest {
-    @Rule public TemporaryFolder folder = new TemporaryFolder();
+    @Rule public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
     public void testSTEM() throws IOException {
         File projectDir = new File("src/test/STEM");
-        File outputDir = folder.getRoot();
-        File graphsDir = folder.getRoot();
+        File outputDir = tmpFolder.getRoot();
+        File graphsDir = outputDir;
 
         VerdictStem stem = new VerdictStem();
         stem.runStem(projectDir, outputDir, graphsDir);
@@ -32,7 +31,7 @@ public class VerdictStemTest {
         controlFile = new File("src/test/STEM/Output/Defenses.csv");
         Assertions.assertThat(testFile).hasSameContentAs(controlFile);
 
-        testFile = new File(outputDir, "Run_sadl12.svg");
+        testFile = new File(graphsDir, "Run_sadl12.svg");
         Assertions.assertThat(testFile).exists();
     }
 }
