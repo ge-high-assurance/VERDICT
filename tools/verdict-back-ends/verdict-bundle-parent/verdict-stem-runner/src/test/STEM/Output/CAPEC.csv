@@ -1,16 +1,8 @@
 "CompType","CompInst","CAPEC","CAPECDescription","Confidentiality","Integrity","Availability","LikelihoodOfSuccess"
-"Actuators","actuators","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"BatteryHealthCheck","battery_health_check","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"FlightController","flight_controller","CAPEC-242","Code Injection",null,"Integrity",null,1.0
 "GPS","gps","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
 "GPS","gps","CAPEC-601","Jamming",null,null,"Availability",1.0
-"Mixer","mixer","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"Navigator","navigator","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"PositionEstimator","position_estimator","CAPEC-242","Code Injection",null,"Integrity",null,1.0
 "RCReceiver","RC_receiver","CAPEC-125","Flooding",null,null,"Availability",1.0
 "RCReceiver","RC_receiver","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
 "RCReceiver","RC_receiver","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
 "RCReceiver","RC_receiver","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
 "RCReceiver","RC_receiver","CAPEC-601","Jamming",null,null,"Availability",1.0
-"RCReceiverHealthCheck","RC_receiver_health_check","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"StateController","state_controller","CAPEC-242","Code Injection",null,"Integrity",null,1.0
