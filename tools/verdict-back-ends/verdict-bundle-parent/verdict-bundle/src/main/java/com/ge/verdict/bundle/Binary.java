@@ -21,6 +21,9 @@ import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 public class Binary {
     /** Thrown upon errors during unpacking/invocation of a binary. */
     public static class ExecutionException extends Exception {
+        /** */
+        private static final long serialVersionUID = 1L;
+
         private Optional<Integer> code;
 
         public ExecutionException(Exception child) {

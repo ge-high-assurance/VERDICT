@@ -3,6 +3,7 @@ package com.ge.verdict.bundle;
 
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.mbas.VDM2CSV;
+import com.ge.verdict.stem.VerdictStem;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
@@ -350,43 +351,43 @@ public class App {
         VDM2CSV vdm2csv = new VDM2CSV();
         vdm2csv.marshalToMbasInputs(vdmModel, imlPath, stemCsvDir, stemOutputDir);
 
-        //        logHeader("STEM");
-        //
-        //        log("STEM project directory: " + stemProjectDir);
-        //        log("STEM output directory: " + stemOutputDir);
-        //        log("STEM graphs directory: " + stemGraphsDir);
-        //
-        //        hideErrorStream(
-        //                () -> {
-        //                    VerdictStem stemRunner = new VerdictStem();
-        //                    stemRunner.runStem(
-        //                            new File(stemProjectDir),
-        //                            new File(stemOutputDir),
-        //                            new File(stemGraphsDir));
-        //                });
-        //
-        //        if (!stem_output_csv.stream()
-        //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
-        //            throw new VerdictRunException("STEM failed to generate all required files");
-        //        }
-        //
-        //        logHeader("Soteria++");
-        //
-        //        log("Soteria++ input directory: " + stemOutputDir);
-        //        log("Soteria++ output directory: " + soteriaPpOutputDir);
-        //
-        //        try {
-        //            SOTERIA_PP.invoke(
-        //                    soteriaPpOutputDir,
-        //                    new PumpStreamHandler(),
-        //                    "-o",
-        //                    soteriaPpOutputDir,
-        //                    stemOutputDir);
-        //        } catch (Binary.ExecutionException e) {
-        //            throw new VerdictRunException("Failed to execute soteria_pp", e);
-        //        }
-        //
-        //        logHeader("Finished");
+        logHeader("STEM");
+
+        log("STEM project directory: " + stemProjectDir);
+        log("STEM output directory: " + stemOutputDir);
+        log("STEM graphs directory: " + stemGraphsDir);
+
+        hideErrorStream(
+                () -> {
+                    VerdictStem stemRunner = new VerdictStem();
+                    stemRunner.runStem(
+                            new File(stemProjectDir),
+                            new File(stemOutputDir),
+                            new File(stemGraphsDir));
+                });
+
+        if (!stem_output_csv.stream()
+                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
+            throw new VerdictRunException("STEM failed to generate all required files");
+        }
+
+        logHeader("Soteria++");
+
+        log("Soteria++ input directory: " + stemOutputDir);
+        log("Soteria++ output directory: " + soteriaPpOutputDir);
+
+        try {
+            SOTERIA_PP.invoke(
+                    soteriaPpOutputDir,
+                    new PumpStreamHandler(),
+                    "-o",
+                    soteriaPpOutputDir,
+                    stemOutputDir);
+        } catch (Binary.ExecutionException e) {
+            throw new VerdictRunException("Failed to execute soteria_pp", e);
+        }
+
+        logHeader("Finished");
     }
 
     /**
