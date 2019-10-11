@@ -69,40 +69,25 @@ public class MBASHandler extends AbstractHandler {
 				public void run() {
 					try {
 						VerdictHandlersUtils.printGreeting();
-
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
-
-//						String stemProjectDir = STEMPATH;
-//						String soteriaOutputDir = stemProjectDir + SEP + "Output" + SEP + "Soteria_Output";
-
-//						if (runBundle(selection.get(0), stemProjectDir)) {
-//							// TODO display output in GUI
-//							VerdictHandlersUtils.openSvgGraphsAndTxtInDir(soteriaOutputDir);
-//						}
-
 						String externStemDir = STEMPATH;
 
 						deleteCsvFilesInDir(new File(externStemDir, "CSVData"));
 						deleteCsvFilesInDir(new File(externStemDir, "Output"));
 
 						if (runBundle(selection.get(0), externStemDir)) {
-							String soteriaDir2 = invokeStem(new File(externStemDir, "CSVData").getAbsolutePath());
-							if (VerdictHandlersUtils.isValidDir(soteriaDir2)) {
-								String soteriaOut = invokeSoteria(soteriaDir2);
-								if (soteriaOut != null) {
-									// Run this code on the UI thread
-									mainThreadDisplay.asyncExec(() -> {
-										File applicableDefense = new File(soteriaOut, "ApplicableDefense.xml");
-										File implProperty = new File(soteriaOut, "ImplProperty.xml");
-										if (applicableDefense.exists() && implProperty.exists()) {
-											new MBASReportGenerator(applicableDefense.getAbsolutePath(),
-													implProperty.getAbsolutePath(), iWindow);
-										} else {
-											System.err.println("Error: No Soteria++ output generated!");
-										}
-									});
+							// Run this code on the UI thread
+							mainThreadDisplay.asyncExec(() -> {
+								String soteriaOut = externStemDir + SEP + "Output" + SEP + "Soteria_Output";
+								File applicableDefense = new File(soteriaOut, "ApplicableDefense.xml");
+								File implProperty = new File(soteriaOut, "ImplProperty.xml");
+								if (applicableDefense.exists() && implProperty.exists()) {
+									new MBASReportGenerator(applicableDefense.getAbsolutePath(),
+											implProperty.getAbsolutePath(), iWindow);
+								} else {
+									System.err.println("Error: No Soteria++ output generated!");
 								}
-							}
+							});
 						}
 					} finally {
 						VerdictHandlersUtils.finishRun();
