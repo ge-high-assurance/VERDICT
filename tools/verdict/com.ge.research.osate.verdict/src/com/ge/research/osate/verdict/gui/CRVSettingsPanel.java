@@ -91,6 +91,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Group atgGroup = new Group(composite, SWT.NONE);
 		atgGroup.setLayout(new GridLayout(1, false));
 
+		// The "Enable Test Case Generation (ATG)" section
 		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
 		atgCheckBox.setText("Enable Test Case Generation (ATG)");
 		atgCheckBox.setFont(font);
@@ -98,6 +99,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/atg.png").createImage());
 		atgCheckBox.setSelection(testCaseGeneration);
 
+		// The "Blame Assignment" section: component-level and link-level
 		Label blameAssignmentLabel = new Label(composite, SWT.NONE);
 		blameAssignmentLabel.setText("Blame Assignment");
 		blameAssignmentLabel.setFont(boldFont);
@@ -128,6 +130,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		linkLevel.setSelection(!componentLevel);
 		linkLevel.setEnabled(blameAssignment);
 
+		// The "Enabled Threat Models" section: all the threats
 		Label threatModelsLabel = new Label(composite, SWT.NONE);
 		threatModelsLabel.setText("Enabled Threat Models");
 		threatModelsLabel.setFont(boldFont);
@@ -198,6 +201,53 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		if (selectedThreats.contains(HT)) {
 			ht.setSelection(true);
 		}
+
+		Group selDeAllButtons = new Group(composite, SWT.NONE);
+		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
+		selDeAllButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
+
+		Button selectAll = new Button(selDeAllButtons, SWT.PUSH);
+		selectAll.setText("Select All");
+		selectAll.setFont(font);
+		selectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ls.setSelection(true);
+				selectedThreats.add(LS);
+				ni.setSelection(true);
+				selectedThreats.add(NI);
+				lb.setSelection(true);
+				selectedThreats.add(LB);
+				it.setSelection(true);
+				selectedThreats.add(IT);
+				ot.setSelection(true);
+				selectedThreats.add(OT);
+				ri.setSelection(true);
+				selectedThreats.add(RI);
+				sv.setSelection(true);
+				selectedThreats.add(SV);
+				ht.setSelection(true);
+				selectedThreats.add(HT);
+			}
+		});
+
+		Button deselectAll = new Button(selDeAllButtons, SWT.PUSH);
+		deselectAll.setText("Deselect All");
+		deselectAll.setFont(font);
+		deselectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ls.setSelection(false);
+				ni.setSelection(false);
+				lb.setSelection(false);
+				it.setSelection(false);
+				ot.setSelection(false);
+				ri.setSelection(false);
+				sv.setSelection(false);
+				ht.setSelection(false);
+				selectedThreats.clear();
+			}
+		});
 
 		Composite closeButtons = new Composite(composite, SWT.NONE);
 		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
