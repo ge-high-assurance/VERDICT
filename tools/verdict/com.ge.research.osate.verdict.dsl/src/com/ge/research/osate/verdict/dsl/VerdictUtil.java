@@ -5,7 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
@@ -174,7 +173,6 @@ public class VerdictUtil {
 		 *
 		 * Note: in-out ports are not currently supported.
 		 */
-		@NotNull
 		public List<String> availablePorts;
 
 		/**
