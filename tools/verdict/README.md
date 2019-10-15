@@ -19,22 +19,29 @@ OSATE plugin sources into an OSATE development environment, which is
 an Eclipse IDE based on the Eclipse Modeling Tools package, and
 manually export the VERDICT plugin feature into a deployable archive.
 
-If you try to build our plugin sources in a plain Eclipse IDE (even
+If you try to build our plugin sources in a regular Eclipse IDE (even
 one that can build Eclipse plugins), the Eclipse IDE will not have the
-OSATE software and you will not be able to install the missing OSATE
-software using Eclipse's Install New Software wizard since the OSATE
-software is not part of the regular Eclipse software.
+OSATE development tools.  OSATE does have an [update
+site](https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates/)
+so you can install the OSATE AADL Tool Environment feature using
+Eclipse's Install New Software wizard.  However, you also may have to
+install some other target platform requirements such as the Xtext
+Complete SDK using Eclipse's Install New Software Wizard to ensure
+your Eclipse IDE can build the VERDICT plugin sources.
 
-Likewise, if you try to build our plugin sources in an OSATE release,
-the OSATE release will not have some of the Eclipse Modeling Tools
-software needed to build an OSATE plugin.  You would have to know how
-to install the missing Modeling Tools software using Eclipse's Install
-New Software wizard.
+If you try to build our plugin sources in an OSATE release, the OSATE
+release will not have some of the necessary software development
+tools.  As with a regular Eclipse IDE, you still will have to
+find and install all the software development tools using Eclipse's
+Install New Software wizard to ensure your OSATE release can build the
+VERDICT plugin sources.
 
-Therefore, you will have to follow the instructions in [Setting up an
-OSATE development
-environment](https://osate.org/setup-development.html) as your first
-step.
+Therefore, the first step we recommend is to follow the instructions
+in [Setting up an OSATE development
+environment](https://osate.org/setup-development.html).  Even though
+these instructions take longer than using the Install New Software
+Wizard, you will be certain to get an Eclipse development environment
+that can build the VERDICT plugin sources.
 
 You do not need to build an OSATE release; you simply have to launch
 your OSATE development environment and wait for it to get and build
@@ -98,12 +105,7 @@ files:
    button.
 
    ![proceed despite errors](../../docs/images/proceed-despite-errors.png)
-7. If the MWE2 workflow aborts with an exception saying Verdict.xtext
-   isn't in the classpath, manually copy that file from
-   com.ge.research.osate.verdict.dsl/src/.../Verdict.xtext to
-   com.ge.research.osate.verdict.dsl/bin/.../Verdict.xtext and run the
-   MWE2 Workflow again.  It should work then.
-8. Wait for Eclipse to rebuild the projects and the errors should go
+7. Wait for Eclipse to rebuild the projects and the errors should go
    away.
 
 ## Export our OSATE plugin feature
