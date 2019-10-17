@@ -19,6 +19,12 @@ import com.ge.research.osate.verdict.dsl.verdict.CyberRelInputLogic;
 import com.ge.research.osate.verdict.dsl.verdict.CyberRelOutputLogic;
 import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
 import com.ge.research.osate.verdict.dsl.verdict.CyberReqConditionLogic;
+import com.ge.research.osate.verdict.dsl.verdict.Event;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyRelInputLogic;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyRelOutputLogic;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyReqConditionLogic;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
@@ -71,6 +77,21 @@ public class VerdictUtil {
 	 * Requires: port must be an LPort or inside a CyberRel/CyberReq
 	 *
 	 * @param port the AST object from which to search up the tree
+	 * @return the ports info (see AvailablePortsInfo)
+	 */
+	public static AvailablePortsInfo getAvailableSystemPorts(EObject port, boolean allowSkipInput) {
+		return getAvailablePorts(port, allowSkipInput, null);
+	}
+
+	/**
+	 * Finds all input/output ports for the system enclosing an LPort.
+	 *
+	 * Automatically detects if the ports should be input or output based
+	 * on the context (if possible).
+	 *
+	 * Requires: port must be an LPort or inside a CyberRel/CyberReq
+	 *
+	 * @param port the AST object from which to search up the tree
 	 * @param allowSkipInput used in the proposal provider because model
 	 *        is not necessarily where we expect it to be
 	 * @return the ports info (see AvailablePortsInfo)
@@ -86,7 +107,9 @@ public class VerdictUtil {
 		EObject container = port;
 		while (!(container instanceof CyberRelInputLogic || container instanceof CyberRelOutputLogic
 				|| container instanceof CyberReqConditionLogic || container instanceof CyberRel
-				|| container instanceof CyberReq || container instanceof SystemType
+				|| container instanceof CyberReq || container instanceof SafetyRelInputLogic
+				|| container instanceof SafetyRelOutputLogic || container instanceof SafetyReqConditionLogic
+				|| container instanceof SafetyRel || container instanceof SafetyReq || container instanceof SystemType
 				|| container instanceof PublicPackageSection)) {
 			if (container == null) {
 				break;
@@ -100,6 +123,12 @@ public class VerdictUtil {
 			dir = DirectionType.OUT;
 		} else if (container instanceof CyberReqConditionLogic) {
 			dir = DirectionType.OUT;
+		} else if (container instanceof SafetyRelInputLogic) {
+			dir = DirectionType.IN;
+		} else if (container instanceof SafetyRelOutputLogic) {
+			dir = DirectionType.OUT;
+		} else if (container instanceof SafetyReqConditionLogic) {
+			dir = DirectionType.OUT;
 		} else {
 			// If allowSkipInput is true, then we will simply collect both input and output
 			if (!allowSkipInput) {
@@ -109,7 +138,9 @@ public class VerdictUtil {
 
 		// Determine if we are in a cyber relation or requirement
 
-		while (!(container instanceof CyberRel || container instanceof CyberReq || container instanceof SystemType
+		while (!(container instanceof CyberRel || container instanceof CyberReq || container instanceof SafetyReq
+				|| container instanceof SafetyRel || container instanceof Event
+				|| container instanceof SystemType
 				|| container instanceof PublicPackageSection)) {
 			if (container == null) {
 				break;
@@ -120,6 +151,12 @@ public class VerdictUtil {
 		if (container instanceof CyberReq) {
 			isCyberReq = true;
 		} else if (container instanceof CyberRel) {
+			isCyberReq = false;
+		} else if (container instanceof SafetyReq) {
+			isCyberReq = false;
+		} else if (container instanceof SafetyRel) {
+			isCyberReq = false;
+		} else if (container instanceof Event) {
 			isCyberReq = false;
 		} else {
 			if (specifiedDir == null) {

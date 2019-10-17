@@ -37,8 +37,10 @@ import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
 import com.ge.research.osate.verdict.dsl.verdict.CyberRel;
 import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
 import com.ge.research.osate.verdict.dsl.verdict.Event;
+import com.ge.research.osate.verdict.dsl.verdict.FExpr;
 import com.ge.research.osate.verdict.dsl.verdict.Intro;
 import com.ge.research.osate.verdict.dsl.verdict.LPort;
+import com.ge.research.osate.verdict.dsl.verdict.SLPort;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
@@ -285,6 +287,72 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 			}
 		}
 	}
+
+	/**
+	 * Check that ports are valid input or output ports for the enclosing
+	 * system, depending on what is required for the context.
+	 *
+	 * @param port
+	 */
+	@Check(CheckType.FAST)
+	public void checkFExpr(FExpr fExpr) {
+		/*
+		 * If this condition is not met, then there is an error being
+		 * shown by a different validation check, so we don't have to do
+		 * anything here.
+		 */
+		String eventName = fExpr.getEventName();
+
+		if (eventName == null) {
+			error("Event name cannot be null");
+		} else if (eventName.equals("")) {
+			error("Event name cannot be empty");
+		}
+//		 else if(VerdictUtil.hasEvent()) {
+//				error("Fault name cannot be empty");
+//			}
+//
+//		if (info.system != null) {
+//			if (!info.availablePorts.contains(port.getPort())) {
+//				if (info.isInput) {
+//					error("Not an input data port for system " + info.system.getName(),
+//							VerdictPackage.Literals.SL_PORT__PORT);
+//				} else {
+//					error("Not an output data port for system " + info.system.getName(),
+//							VerdictPackage.Literals.SL_PORT__PORT);
+//				}
+//			}
+//		}
+	}
+
+	/**
+	 * Check that ports are valid input or output ports for the enclosing
+	 * system, depending on what is required for the context.
+	 *
+	 * @param port
+	 */
+	@Check(CheckType.FAST)
+	public void checkSLPort(SLPort port) {
+		VerdictUtil.AvailablePortsInfo info = VerdictUtil.getAvailableSystemPorts(port, false);
+
+		/*
+		 * If this condition is not met, then there is an error being
+		 * shown by a different validation check, so we don't have to do
+		 * anything here.
+		 */
+		if (info.system != null) {
+			if (!info.availablePorts.contains(port.getPort())) {
+				if (info.isInput) {
+					error("Not an input data port for system " + info.system.getName(),
+							VerdictPackage.Literals.SL_PORT__PORT);
+				} else {
+					error("Not an output data port for system " + info.system.getName(),
+							VerdictPackage.Literals.SL_PORT__PORT);
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Check that the var ID is in scope and that each field is
