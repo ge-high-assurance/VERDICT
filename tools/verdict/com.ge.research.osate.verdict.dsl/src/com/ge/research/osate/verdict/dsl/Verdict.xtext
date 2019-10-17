@@ -22,6 +22,11 @@ Element returns aadl2::Element:
 	| LOr
 	| LAnd
 	| LNot
+	| SLExpr
+	| SLPort
+	| SLOr
+	| SLAnd
+	| SLNot	
 	| ThreatModel
 	| Intro
 	| ThreatExpr
@@ -46,7 +51,7 @@ VerdictLibrary: {VerdictContractLibrary} contract=VerdictThreatModels;
 // Top-level rule for cyber properties
 Verdict: {Verdict} (elements+=Statement)*;
 
-Statement: (CyberMission | CyberReq | CyberRel) DELIMETER_OPT;
+Statement: (CyberMission | CyberReq | CyberRel | SafetyReq | SafetyRel | Event) DELIMETER_OPT;
 
 CyberMission: 'MissionReq' CyberMissionBlock;
 
@@ -157,6 +162,84 @@ enum TargetLikelihood:
 	| TL_Catastrophic = '1e-9'
 	| TL_Catastrophic = '1e-09'
 	;
+	
+	
+
+//===== Safety requirements, relations, and error event definition
+SafetyReq: 'SafetyReq' SafetyReqBlock;
+// Fields may appear in any order (Xtext's '&' connector)
+SafetyReqBlock returns SafetyReq:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('condition' '=' condition=SafetyReqConditionLogic DELIMETER_OPT) &
+	('comment' '=' comment=STRING DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+SafetyReqConditionLogic: value=SLExpr;
+
+
+SafetyRel: 'SafetyRel' (SafetyRelBlock | SafetyRelShort);
+
+SafetyRelBlock returns SafetyRel:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('output' '=' output=SafetyRelOutputLogic DELIMETER_OPT) &
+	('inputs' '=' inputs=SafetyRelInputLogic DELIMETER_OPT)? &
+	('comment' '=' comment=STRING DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+SafetyRelShort returns SafetyRel:
+	id=STRING ('=' inputs=SafetyRelInputLogic)? ('=>' | '->') output=SafetyRelOutputLogic
+;
+
+SafetyRelInputLogic: value=SLExpr;
+SafetyRelOutputLogic: value=SLPort;
+
+Event: 'Event' EventBlock;
+
+EventBlock returns Event:
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('probability' '=' probability=PROP DELIMETER_OPT)? &
+	('comment' '=' comment=STRING DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)?
+	) '}'
+;
+
+SLExpr: SLOr;
+
+SLExprTerm returns SLExpr:
+	SLPort | SLNot | FEXPR
+	| '(' SLExpr ')' | '{' SLExpr '}' | '[' SLExpr ']'
+;
+
+SLPort: port=ID ':' ia=IA;
+
+SLOr: exprs+=SLAnd (OR exprs+=SLAnd)*;
+
+SLAnd: exprs+=SLExprTerm (AND exprs+=SLExprTerm)*;
+
+SLNot: NOT expr=SLExprTerm;
+	
+FEXPR: fault='happens' '(' faultName=STRING ')';
+
+
+enum IA:
+	IA_I = 'I'
+	| IA_A = 'A'
+	| IA_I = 'Integrity'
+	| IA_A = 'Availability'
+;	
+terminal E : 'e';
+terminal MINUS : '-';
+terminal PROP: DOUBLE E MINUS INTEGER;	
+terminal DOUBLE:
+    INTEGER ('.' INTEGER)?;
+
 
 // ===== THREAT MODELS =====
 

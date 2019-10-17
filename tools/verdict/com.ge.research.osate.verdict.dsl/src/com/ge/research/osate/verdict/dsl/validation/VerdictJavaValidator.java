@@ -36,8 +36,11 @@ import com.ge.research.osate.verdict.dsl.verdict.CRVAssumption;
 import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
 import com.ge.research.osate.verdict.dsl.verdict.CyberRel;
 import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
+import com.ge.research.osate.verdict.dsl.verdict.Event;
 import com.ge.research.osate.verdict.dsl.verdict.Intro;
 import com.ge.research.osate.verdict.dsl.verdict.LPort;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
+import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.TargetLikelihood;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatDatabase;
@@ -97,8 +100,18 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 		} else if (statement instanceof CyberMission) {
 			statementType = "Mission";
 			shouldBeSubcomponent = false;
+		} else if (statement instanceof SafetyReq) {
+			statementType = "Safety requirement";
+			shouldBeSubcomponent = false;
+		} else if (statement instanceof SafetyRel) {
+			statementType = "Safety relation";
+			shouldBeSubcomponent = true;
+		} else if (statement instanceof Event) {
+			statementType = "Event";
+			shouldBeSubcomponent = true;
 		} else {
-			throw new RuntimeException("statement is not CyberRel, or CyberReq, or Mission!?");
+			throw new RuntimeException(
+					"statement is not CyberRel, or CyberReq, or Mission, or SafetyReq, or SafetyRel, or Event!?");
 		}
 
 		if (statement.getId().length() == 0) {
