@@ -186,7 +186,7 @@ SafetyRelBlock returns SafetyRel:
 	'{' (
 	('id' '=' id=STRING DELIMETER_OPT) &
 	('output' '=' output=SafetyRelOutputLogic DELIMETER_OPT) &
-	('inputs' '=' inputs=SafetyRelInputLogic DELIMETER_OPT)? &
+	('faultSrc' '=' faultSrc=SafetyRelInputLogic DELIMETER_OPT)? &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)?
 	) '}'
@@ -213,7 +213,7 @@ EventBlock returns Event:
 SLExpr: SLOr;
 
 SLExprTerm returns SLExpr:
-	SLPort | SLNot | FEXPR
+	SLPort | SLNot | FExpr
 	| '(' SLExpr ')' | '{' SLExpr '}' | '[' SLExpr ']'
 ;
 
@@ -225,7 +225,7 @@ SLAnd: exprs+=SLExprTerm (AND exprs+=SLExprTerm)*;
 
 SLNot: NOT expr=SLExprTerm;
 	
-FEXPR: fault='happens' '(' faultName=STRING ')';
+FExpr: fault='happens' '(' eventName=STRING ')';
 
 
 enum IA:
