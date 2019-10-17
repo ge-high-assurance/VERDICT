@@ -57,6 +57,12 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		stylesSubclause.put("kw_CyberRel", KEYWORD_ID);
 		stylesSubclause.put("kw_CyberReq", KEYWORD_ID);
 
+		stylesSubclause.put("kw_SafetyReq", KEYWORD_ID);
+		stylesSubclause.put("kw_SafetyRel", KEYWORD_ID);
+		stylesSubclause.put("kw_Event", KEYWORD_ID);
+		stylesSubclause.put("kw_probability", KEYWORD_ID);
+		stylesSubclause.put("kw_happens", KEYWORD_ID);
+
 		stylesSubclause.put("kw_id", KEYWORD_ID);
 		stylesSubclause.put("kw_cia", KEYWORD_ID);
 		stylesSubclause.put("kw_severity", KEYWORD_ID);
