@@ -1,6 +1,7 @@
 package com.ge.research.osate.verdict.dsl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,52 @@ public class VerdictUtil {
 		} else {
 			throw new IllegalArgumentException("bad verdict: " + obj.getClass().getName());
 		}
+	}
+
+	/**
+	 * Finds all Events for the system.
+	 *
+	 * Automatically detects if the ports should be input or output based
+	 * on the context (if possible).
+	 *
+	 * Requires: port must be an LPort or inside a CyberRel/CyberReq
+	 *
+	 * @param port the AST object from which to search up the tree
+	 * @return the ports info (see AvailablePortsInfo)
+	 */
+	public static Set<String> getAvailableEventIds(SystemType systemType) {
+		Set<String> eventIds = new HashSet<String>();
+		if (systemType != null) {
+			for (AnnexSubclause annex : systemType.getOwnedAnnexSubclauses()) {
+				if ("verdict".equals(annex.getName())) {
+					Verdict subclause = VerdictUtil.getVerdict(annex);
+
+					// Get all cyber req IDs
+					for (Statement statement : subclause.getElements()) {
+						if (statement instanceof Event) {
+							eventIds.add(statement.getId());
+						}
+					}
+				}
+			}
+		}
+		return eventIds;
+	}
+
+	public static SystemType getHostingSystemType(EObject element) {
+		SystemType hostingSysType = null;
+		EObject container = element;
+
+		while (!(container instanceof SystemType)) {
+			if (container == null) {
+				break;
+			}
+			container = container.eContainer();
+		}
+		if (container instanceof SystemType) {
+			hostingSysType = (SystemType) container;
+		}
+		return hostingSysType;
 	}
 
 	/**
@@ -278,4 +325,46 @@ public class VerdictUtil {
 
 		return cyberReqs;
 	}
+
+	/**
+	 * Get the (linked) set of all cyber requirements in the AADL AST of which obj is part.
+	 *
+	 * @param obj
+	 * @return
+	 */
+	public static Set<String> getEvents(EObject obj) {
+		Set<String> cyberReqs = new LinkedHashSet<>();
+
+		// Find public package section
+		EObject container = obj;
+		while (container != null && !(container instanceof PublicPackageSection)) {
+			container = container.eContainer();
+		}
+
+		PublicPackageSection pack = (PublicPackageSection) container;
+		if (pack != null && pack.getOwnedClassifiers() != null) {
+			// Find all systems
+			for (Classifier cls : pack.getOwnedClassifiers()) {
+				if (cls instanceof SystemType) {
+					SystemType system = (SystemType) cls;
+					// Get all verdict annexes for this system
+					for (AnnexSubclause annex : system.getOwnedAnnexSubclauses()) {
+						if ("verdict".equals(annex.getName())) {
+							Verdict subclause = VerdictUtil.getVerdict(annex);
+
+							// Get all cyber req IDs
+							for (Statement statement : subclause.getElements()) {
+								if (statement instanceof CyberReq) {
+									cyberReqs.add(statement.getId());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return cyberReqs;
+	}
+
 }
