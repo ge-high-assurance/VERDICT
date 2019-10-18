@@ -296,33 +296,24 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 	 */
 	@Check(CheckType.FAST)
 	public void checkFExpr(FExpr fExpr) {
-		/*
-		 * If this condition is not met, then there is an error being
-		 * shown by a different validation check, so we don't have to do
-		 * anything here.
-		 */
 		String eventName = fExpr.getEventName();
+		SystemType hostingSysType = VerdictUtil.getHostingSystemType(fExpr);
 
 		if (eventName == null) {
-			error("Event name cannot be null");
-		} else if (eventName.equals("")) {
+			error("Event must have a name");
+		}
+		if (eventName != null && eventName.equals("")) {
 			error("Event name cannot be empty");
 		}
-//		 else if(VerdictUtil.hasEvent()) {
-//				error("Fault name cannot be empty");
-//			}
-//
-//		if (info.system != null) {
-//			if (!info.availablePorts.contains(port.getPort())) {
-//				if (info.isInput) {
-//					error("Not an input data port for system " + info.system.getName(),
-//							VerdictPackage.Literals.SL_PORT__PORT);
-//				} else {
-//					error("Not an output data port for system " + info.system.getName(),
-//							VerdictPackage.Literals.SL_PORT__PORT);
-//				}
-//			}
-//		}
+		if (hostingSysType == null) {
+			error("No hosting system type found for the event expression");
+		} else {
+			Set<String> eventIds = VerdictUtil.getAvailableEventIds(hostingSysType);
+
+			if (eventIds != null && !eventIds.contains(fExpr.getEventName())) {
+				error("No such event has been declared in VERDICT");
+			}
+		}
 	}
 
 	/**
