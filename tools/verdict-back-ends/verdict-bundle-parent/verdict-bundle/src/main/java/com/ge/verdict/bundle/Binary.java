@@ -80,7 +80,7 @@ public class Binary {
         } else if (os.indexOf("win") != -1) {
             // Windows
             return "win";
-        } else if (os.indexOf("nux") != -1) {
+        } else if (os.indexOf("nix") != -1) {
             // Linux
             return "nix";
         } else {
