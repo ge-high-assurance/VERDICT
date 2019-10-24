@@ -68,11 +68,9 @@ Fortunately, you will not have to do these steps since the Eclipse
 project files are in source control.
 
 Start Eclipse's project import wizard using a pulldown menu (File >
-Import... > General > Projects from Folder or Archive).  Select this
-directory as the folder to import.  The wizard will detect and list
-the nested projects inside each subdirectory automatically.  The first
-project will be this verdict directory which has no files worth
-opening in Eclipse, so unselect it by toggling its checkbox off.
+Import... > General > Existing Projects into Workspace).  Select this
+verdict directory as the folder to import.  The wizard will detect and
+list the nested projects inside each subdirectory automatically.
 Toggle the checkbox under Working Sets next to Add project to working
 sets.  Press the New... button, select Java as the working set type,
 type com.ge.research.osate.verdict as the Working set's name, and
