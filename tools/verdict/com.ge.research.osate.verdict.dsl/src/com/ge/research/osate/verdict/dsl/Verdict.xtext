@@ -77,7 +77,7 @@ CyberReqBlock returns CyberReq:
 	('condition' '=' condition=CyberReqConditionLogic DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)? &
-	('phases' '=' phase=STRING DELIMETER_OPT)? &
+	('phases' '=' phases=STRING DELIMETER_OPT)? &
 	('external' '=' external=STRING DELIMETER_OPT)? &
 	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)?
 	) '}'
@@ -93,7 +93,7 @@ CyberRelBlock returns CyberRel:
 	('inputs' '=' inputs=CyberRelInputLogic DELIMETER_OPT)? &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)? &
-	('phases' '=' phase=STRING DELIMETER_OPT)? &
+	('phases' '=' phases=STRING DELIMETER_OPT)? &
 	('external' '=' external=STRING DELIMETER_OPT)?
 	) '}'
 ;
