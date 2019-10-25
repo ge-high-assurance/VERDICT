@@ -132,26 +132,40 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 			while (!(container instanceof PublicPackageSection)) {
 				container = container.eContainer();
 			}
-			PublicPackageSection pack = (PublicPackageSection) container;
-			// Find all systems
-			for (Classifier cls : pack.getOwnedClassifiers()) {
-				if (cls instanceof SystemType) {
-					SystemType system = (SystemType) cls;
-					// Get all verdict annexes for this system
-					for (AnnexSubclause annex : system.getOwnedAnnexSubclauses()) {
-						if ("verdict".equals(annex.getName())) {
-							Verdict subclause = VerdictUtil.getVerdict(annex);
 
-							// Get all other statement IDs
-							for (Statement other : subclause.getElements()) {
-								// Don't double-count self
-								if (!statement.equals(other)) {
-									otherIds.add(other.getId());
-								}
+			// Get all verdict annexes for this system
+			for (AnnexSubclause annex : currentSystem.getOwnedAnnexSubclauses()) {
+				if ("verdict".equals(annex.getName())) {
+					Verdict subclause = VerdictUtil.getVerdict(annex);
+
+					// Get all other statement IDs in the same system type
+					// We only check that within the same statement category, there should not be naming conflicts.
+					for (Statement other : subclause.getElements()) {
+
+						// Don't double-count self
+						if (!statement.equals(other)) {
+							if ((statement instanceof CyberRel) && (other instanceof CyberRel)) {
+								otherIds.add(other.getId());
+							} else if ((statement instanceof CyberReq) && (other instanceof CyberReq)) {
+								otherIds.add(other.getId());
+							} else if ((statement instanceof CyberMission) && (other instanceof CyberMission)) {
+								otherIds.add(other.getId());
+							} else if ((statement instanceof SafetyReq) && (other instanceof SafetyReq)) {
+								otherIds.add(other.getId());
+							} else if ((statement instanceof SafetyRel) && (other instanceof SafetyRel)) {
+								otherIds.add(other.getId());
+							} else if ((statement instanceof Event) && (other instanceof Event)) {
+								otherIds.add(other.getId());
 							}
 						}
 					}
-				} else if (cls instanceof SystemImplementation) {
+				}
+			}
+
+			PublicPackageSection pack = (PublicPackageSection) container;
+			// Find all systems
+			for (Classifier cls : pack.getOwnedClassifiers()) {
+				if (cls instanceof SystemImplementation) {
 					// Grab the dependency/subcomponent tree
 					SystemImplementation systemImpl = (SystemImplementation) cls;
 					for (Subcomponent sub : systemImpl.getAllSubcomponents()) {
