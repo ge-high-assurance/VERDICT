@@ -88,10 +88,8 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 	 */
 	@Check(CheckType.FAST)
 	public void checkStatement(Statement statement) {
-		Set<String> otherIds = new HashSet<>();
-		Set<SubcomponentType> subcomponents = new HashSet<>();
-
 		String statementType;
+
 		boolean shouldBeSubcomponent;
 		if (statement instanceof CyberRel) {
 			statementType = "Cyber relation";
@@ -126,6 +124,13 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 		while (container != null && !(container instanceof SystemType || container instanceof PublicPackageSection)) {
 			container = container.eContainer();
 		}
+
+		/*
+		 * Within the same component, we need to make sure that cyber relations, cyber requirements,
+		 * safety relations, safety missions, events do not have naming conflicts respectively.
+		 */
+		Set<String> otherIds = new HashSet<>();
+
 		if (container instanceof SystemType) {
 			SystemType currentSystem = (SystemType) container;
 			// Get enclosing file
@@ -162,18 +167,6 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 				}
 			}
 
-			PublicPackageSection pack = (PublicPackageSection) container;
-			// Find all systems
-			for (Classifier cls : pack.getOwnedClassifiers()) {
-				if (cls instanceof SystemImplementation) {
-					// Grab the dependency/subcomponent tree
-					SystemImplementation systemImpl = (SystemImplementation) cls;
-					for (Subcomponent sub : systemImpl.getAllSubcomponents()) {
-						subcomponents.add(sub.getSubcomponentType());
-					}
-				}
-			}
-
 			/*
 			 * A system is a top-level system if it is not a subcomponent
 			 * of any other system (cyber requirements are valid).
@@ -181,6 +174,23 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 			 * If it is a subcomponent of another system, then it is a
 			 * subcomponent (cyber relations are valid).
 			 */
+			Set<SubcomponentType> subcomponents = new HashSet<>();
+			PublicPackageSection pack = (PublicPackageSection) container;
+			// Find all system impls
+			for (Classifier cls : pack.getOwnedClassifiers()) {
+				if (cls instanceof SystemImplementation) {
+					// Grab the dependency/subcomponent tree
+					SystemImplementation systemImpl = (SystemImplementation) cls;
+					for (Subcomponent sub : systemImpl.getAllSubcomponents()) {
+						if (sub.getComponentImplementation() != null) {
+							subcomponents.add(sub.getComponentImplementation().getType());
+						}
+						subcomponents.add(sub.getSubcomponentType());
+
+					}
+				}
+			}
+
 			boolean isSubcomponent = subcomponents.contains(currentSystem);
 
 			if (isSubcomponent && !shouldBeSubcomponent) {
