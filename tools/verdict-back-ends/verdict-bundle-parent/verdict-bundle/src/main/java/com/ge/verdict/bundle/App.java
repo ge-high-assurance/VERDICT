@@ -36,6 +36,8 @@ import verdict.vdm.vdm_model.Model;
 
 public class App {
     private static class VerdictRunException extends Exception {
+        private static final long serialVersionUID = 6913775561040946636L;
+
         public VerdictRunException(String message) {
             super(message);
         }
@@ -290,11 +292,13 @@ public class App {
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
         String stemOutputDir = (new File(stemProjectDir, "Output")).getAbsolutePath();
         String stemGraphsDir = (new File(stemProjectDir, "Graphs")).getAbsolutePath();
+        String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
         String soteriaPpOutputDir = (new File(stemOutputDir, "Soteria_Output")).getAbsolutePath();
 
         checkFile(stemCsvDir, true, true, true, null);
         checkFile(stemOutputDir, true, true, true, null);
         checkFile(stemGraphsDir, true, true, true, null);
+        checkFile(stemSadlFile, true, false, false, null);
         checkFile(soteriaPpOutputDir, true, true, true, null);
 
         deleteDirectoryContents(stemCsvDir);
@@ -360,10 +364,7 @@ public class App {
         hideErrorStream(
                 () -> {
                     VerdictStem stemRunner = new VerdictStem();
-                    stemRunner.runStem(
-                            new File(stemProjectDir),
-                            new File(stemOutputDir),
-                            new File(stemGraphsDir));
+                    stemRunner.runStem(new File(stemProjectDir), new File(stemSadlFile));
                 });
 
         if (!stem_output_csv.stream()
