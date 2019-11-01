@@ -12,26 +12,18 @@
     <artifactId>verdict-blame-assignment</artifactId>
     <packaging>jar</packaging>
 
-    <name>VERDICT Blame Assignment Module</name>
+    <name>Verdict Blame Assignment Module</name>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.8.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.8.0-beta4</version>
-        </dependency>
-
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>2.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.8.2</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
@@ -39,36 +31,10 @@
             <version>2.3.2</version>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.8.0-beta4</version>
+        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.github.chrisdchristo</groupId>
-                <artifactId>capsule-maven-plugin</artifactId>
-                <configuration>
-                    <appClass>edu.uiowa.clc.verdict.blm</appClass>
-                    <includeApp>true</includeApp>
-                    <includeAppDep>true</includeAppDep>
-                    <includePluginDep>false</includePluginDep>
-                    <includeTransitiveDep>true</includeTransitiveDep>
-                    <includeCompileDep>true</includeCompileDep>
-                    <includeRuntimeDep>true</includeRuntimeDep>
-                    <includeProvidedDep>false</includeProvidedDep>
-                    <includeSystemDep>false</includeSystemDep>
-                    <includeTestDep>true</includeTestDep>
-                    <includeOptionalDep>false</includeOptionalDep>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-    </build>
 </project>
