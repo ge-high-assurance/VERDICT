@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -111,7 +111,7 @@ public class AppClass {
     public static void main(String[] args) throws IOException {
 
         Options options = createOptions();
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
 
         File inputFile = null;

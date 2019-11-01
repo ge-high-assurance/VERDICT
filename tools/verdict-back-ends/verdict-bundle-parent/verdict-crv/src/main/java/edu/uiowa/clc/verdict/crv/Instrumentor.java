@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_model.BlockImpl;
 import verdict.vdm.vdm_model.CompInstancePort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -40,8 +38,6 @@ public class Instrumentor extends VDMInstrumentor {
     // ThreatID, Components/Links
     private HashMap<String, HashSet<String>> attack_cmp_link_map =
             new HashMap<String, HashSet<String>>();
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Instrumentor.class);
 
     public Instrumentor(Model vdm_model) {
         super(vdm_model);

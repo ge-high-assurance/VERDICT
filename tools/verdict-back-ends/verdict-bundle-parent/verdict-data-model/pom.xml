@@ -19,7 +19,7 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.8.0-beta4</version>
         </dependency>
-        <!-- JAXB dependencies needed only under Java 9 or later -->
+        <!-- JAXB dependencies needed under Java 9 or later -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>

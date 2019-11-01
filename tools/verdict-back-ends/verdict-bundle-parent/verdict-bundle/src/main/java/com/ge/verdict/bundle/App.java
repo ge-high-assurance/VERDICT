@@ -24,7 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
@@ -157,7 +157,7 @@ public class App {
         Options options = buildOptions();
 
         try {
-            CommandLineParser parser = new GnuParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine opts = parser.parse(options, args);
             handleOpts(opts);
         } catch (ParseException e) {
