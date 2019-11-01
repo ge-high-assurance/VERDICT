@@ -22,17 +22,21 @@ public class VerdictStemTest {
         File sadlFile = new File(projectDir, "Run.sadl");
 
         // Remove the output and graphs directories first
-        for (Path path :
-                Files.walk(outputDir)
-                        .sorted(Comparator.reverseOrder())
-                        .collect(Collectors.toList())) {
-            Files.delete(path);
+        if (Files.exists(outputDir)) {
+            for (Path path :
+                    Files.walk(outputDir)
+                            .sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList())) {
+                Files.delete(path);
+            }
         }
-        for (Path path :
-                Files.walk(graphsDir)
-                        .sorted(Comparator.reverseOrder())
-                        .collect(Collectors.toList())) {
-            Files.delete(path);
+        if (Files.exists(graphsDir)) {
+            for (Path path :
+                    Files.walk(graphsDir)
+                            .sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList())) {
+                Files.delete(path);
+            }
         }
 
         // Run SADL on the STEM test project

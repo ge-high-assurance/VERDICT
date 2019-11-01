@@ -16,7 +16,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
 import verdict.vdm.vdm_model.Model;
 
 // Coordinate All processes.
@@ -26,8 +25,6 @@ import verdict.vdm.vdm_model.Model;
 // 4. ResultProcessor
 
 public class AppClass {
-
-    private static final Logger LOGGER = Logger.getLogger(AppClass.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
         runCRV(args);

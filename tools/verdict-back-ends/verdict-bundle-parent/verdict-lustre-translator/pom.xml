@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>net.htmlparser.jericho</groupId>
@@ -39,7 +39,13 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.8.0-beta4</version>
         </dependency>
-        <!-- Dependencies needed only by tests -->
+        <!-- JAXB dependencies needed under Java 9 or later -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
