@@ -17,21 +17,9 @@
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Dependencies needed only by tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.12.2</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>

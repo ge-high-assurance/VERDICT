@@ -5,9 +5,8 @@
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the [Eclipse Modeling
 Tools](https://www.eclipse.org/downloads/packages/release/2019-03/r/eclipse-modeling-tools)
-package (currently build 2019-03, moving to build 2019-09 in the next
-OSATE release).  The VERDICT tool consists of an OSATE plugin and a
-set of VERDICT back-end tools invoked by the plugin.  The OSATE plugin
+package.  The VERDICT tool consists of an OSATE plugin and a set of
+VERDICT back-end tools invoked by the plugin.  The OSATE plugin
 sources are in this directory and the back-end tool sources are in
 another directory [(../verdict-back-ends)](../verdict-back-ends).
 

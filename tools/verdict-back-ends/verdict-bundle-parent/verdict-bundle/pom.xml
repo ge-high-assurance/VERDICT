@@ -11,17 +11,12 @@
     <artifactId>verdict-bundle</artifactId>
     <packaging>jar</packaging>
 
-    <name>VERDICT Bundle</name>
+    <name>Verdict Bundle</name>
 
     <dependencies>
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-instrumentor</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -68,23 +63,6 @@
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.8.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.8.0-beta4</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.8.0-beta4</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
