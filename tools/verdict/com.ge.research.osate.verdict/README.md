@@ -26,8 +26,7 @@
     * On Mac OS: brew install z3 (if you have installed brew)
     * On Ubuntu: sudo apt install z3
 
-6. Copy the "extern" folder in the project to a location on your
-   machine where you normally store binaries.
+6. Unpack the release's "extern" folder to a location on your machine.
 
 ## Setup Instructions on MacOS
 
@@ -47,7 +46,7 @@
     <string>setenv</string>
     <string>GraphVizPath</string>
     <string>/path/to/the/dir/contains/dot</string>
-    <!-- "dot" is a graph visualization tool; This path would probably look like /usr/local/bin -->
+    <!-- "dot" is a graph visualization tool; this path might look like /usr/local/bin -->
   </array>
   <key>RunAtLoad</key>
   <true/>
@@ -64,23 +63,31 @@
 
         mv /path/to/the/plist/file  /Library/LaunchDaemons/
 
-4. Load the environment variables on terminal:
+4. Load the environment variable in your terminal:
 
         launchctl load -w /Library/LaunchDaemons/com.ge.verdict.vars.plist
 
-5. To test if you set the parameters successfully, type the following
+5. To test if you set the variable successfully, type the following
    command on terminal and it should return the path you just set in
-   the plist file. Similarly, you can test other paths.
+   the plist file.
 
-        launchctl getenv ECLIPSE_SADL
+        launchctl getenv GraphVizPath
 
 6. Install the VERDICT plugin for OSATE
+
    * Open OSATE
-   * Go to "Help -> Install New Software -> Add... -> Archive..." and find the plugin archive (com.ge.research.verdict.feature.zip) in the "plugin" folder of the VERDICT project
-   * Make sure uncheck the "Group items by category" to be able to see the plugin
+   * Go to "Help -> Install New Software -> Add... -> Archive..." and
+     find the "com.ge.research.osate.verdict.feature.zip" file in
+     the "extern" folder
+   * Make sure uncheck the "Group items by category" to be able to see
+     the plugin
    * Finish the installation
-   * Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict -> Verdict Bundle". Browse to the "verdict-bundle-1.0.jar" in the extern folder to set the bundle jar path
-   * In the same place, also set the STEM path to the extern/STEM folder, and then save and close
+   * Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict
+     -> Verdict Bundle" and find the
+     "verdict-bundle-1.0-SNAPSHOT-capsule.jar" file in the "extern"
+     folder
+   * In the same place, also set the STEM path to the extern/STEM
+     folder, and then save and close the dialog
 
 ## Setup Instructions on Ubuntu
 
@@ -89,18 +96,25 @@
 
         sudo -H gedit /etc/environment
 
-2. Set environment variables for GraphVizPath and append the following
-   text to the environment variables file (change the paths according
-   to the locations of those apps on your platform):
+2. Append the following environment variable setting for GraphVizPath
+   to your environment variables file (change the path according to
+   the location of the GraphViz "dot" app on your platform):
 
-`GraphVizPath="/usr/bin"`
+        GraphVizPath="/usr/bin"
 
 3. Save it, logout Ubuntu and login again.
 
 4. Install the VERDICT plugin for OSATE:
+
    * Open OSATE
-   * Go to "Help -> Install New Software -> Add... -> Archive..." and find the plugin archive (com.ge.research.verdict.feature.zip) in the "plugin" folder of the VERDICT project
-   * Make sure uncheck the "Group items by category" to be able to see the plugin
+   * Go to "Help -> Install New Software -> Add... -> Archive..." and
+     find the "com.ge.research.osate.verdict.feature.zip" file in the
+     "extern" folder
+   * Make sure uncheck the "Group items by category" to be able to see
+     the plugin
    * Finish the installation
-   * Set VERDICT bundle path: Go to "Windows -> Preferences -> Verdict -> Verdict Bundle". Browse to the "verdict-bundle-1.0.jar" in the extern folder to set the bundle jar path
-   * In the same place, also set the STEM path to the extern/STEM folder, and then save and close
+   * Set VERDICT bundle path: Go to "Windows -> Preferences -> Verdict
+     -> Verdict Bundle" and find the
+     "verdict-bundle-1.0-SNAPSHOT-capsule.jar" in the "extern" folder
+   * In the same place, also set the STEM path to the extern/STEM
+     folder, and then save and close the dialog
