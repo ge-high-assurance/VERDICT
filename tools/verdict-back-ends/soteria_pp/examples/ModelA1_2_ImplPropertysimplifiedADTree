@@ -1,0 +1,18 @@
+digraph G {
+rankdir=BT 
+layout = dot
+splines = true
+overlap = false
+sep ="+10, +10"
+esep ="+8, +8"
+outputorder=edgesfirst
+4 [label ="Or", shape=none, margin=0, height=0, width=0, image="or.png"]
+3 [label = "gps: CAPEC-148", shape = box]
+2 [label = "RC_receiver: CAPEC-28", shape = box]
+1 [label = "RC_receiver: CAPEC-151", shape = box]
+0 [label = "RC_receiver: CAPEC-148", shape = box]
+3 -> 4
+2 -> 4
+1 -> 4
+0 -> 4
+}

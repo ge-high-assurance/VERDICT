@@ -1,0 +1,16 @@
+Scenario,CompType,CompInstance,hasSensitiveInfo,insideTrustedBoundary,broadcastFromOutsideTB,wifiFromOutsideTB,heterogeneity,allWifiEncFromOutsideTB,antiJamming,antiFlooding,antiFuzzing
+ModelD,GPS,gps,,1,1,,1#7,,1#7,,
+ModelD,DME_VOR,dme_vor,,1,1,,1#7,,1#7,,
+ModelD,IRU,iru,,1,,,1#7,,,,
+ModelD,TriplexVoter,triplex_voter,,1,,,,,,,
+ModelD,PositionEstimator,position_estimator,,1,,,,,,,
+ModelD,Navigator,navigator,,1,,,,,,,
+ModelD,FlightController,flight_controller,,1,,,,,,,
+ModelD,MissionPlanner,mission_planner,1,1,,,,,,,
+ModelD,RCReceiver,RC_receiver,,1,,1,,1#7,1#7,1#7,1#7
+ModelD,RCReceiverHealthCheck,RC_receiver_health_check,,1,,,,,,,
+ModelD,StateController,state_controller,,1,,,,,,,
+ModelD,Actuators,actuators,,1,,,,,,,
+ModelD,BatteryHealthCheck,battery_health_check,,1,,,,,,,
+ModelD,Mixer,mixer,,1,,, ,,,,
+ModelD,NavigatorFilter,navigator_filter,,1,,,,,,,

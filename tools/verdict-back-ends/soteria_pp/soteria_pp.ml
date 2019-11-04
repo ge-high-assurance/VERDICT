@@ -1,0 +1,205 @@
+(**
+   Description: This tool provides a compositional, model-based framework
+   for modeling, visualizing and analyzing the safety and security of system
+   architectures. See the README file for instructions on how to build and use the tool.
+
+   MODELING:
+
+   The modeling language is designed to provide a minimal set of capabilities
+   for modeling architectures at the level required to perform safety/
+   reliability, as well as security analyses. The modeling language requires users to
+   describe safety and security in a compositional manner; one defines how faults and
+   attacks propagate through the components of an architecture. Once components are 
+   modeled in this way, we wind up with a library of components that can be shared 
+   throughout an organization, thereby allowing for consistency, reuse and rapid 
+   architectural development. Our modeling language allows us to define components, 
+   libraries and architectures. 
+
+   KNOWN ISSUES
+
+   If the visualizations generated have problems (e.g., node names extend beyond
+   node shapes), then check that graphviz and your renderer are using the same
+   fonts. This can cause problems, e.g., if graphviz is not using the same fonts
+   as your renderer, then when graphviz determines the dimensions of bounding
+   boxes, it will generate node shapes of the wrong size. 
+
+*)
+
+open Core
+open PrintBox
+open FaultTree 
+open AttackDefenseTree
+open Qualitative
+open Quantitative
+open Modeling
+open Validation
+open TreeSynthesis
+open Visualization
+open ArchitectureSynthesis
+open Translator
+open TranslatorInputsValidation
+
+(** Mapping between the file name and the file path *)
+let input_file_table = Hashtbl.create ~size:5 (module String);;
+
+let has_csv_extension file_name =
+   Filename.check_suffix file_name ".csv"
+
+let has_png_extension file_name =
+   Filename.check_suffix file_name ".png"   
+
+(** Collect all the CSV files in the input directory *)
+let expand_dir input_dir =
+  match Sys.is_directory input_dir with 
+  | `Yes -> Sys.readdir input_dir
+      |> Array.to_list
+      |> List.filter ~f:(fun file_name -> (has_csv_extension file_name))
+  | `No |`Unknown -> []
+
+(** If the dir_path does not end with '/', we will
+    append one for it. Otherwise return as it is. *)
+let append_dir_sep dir_path = 
+  match String.rindex dir_path Filename.dir_sep.[0] with 
+  | Some index -> 
+    if (String.length dir_path <> index + 1) then 
+      dir_path^Filename.dir_sep
+    else
+      dir_path
+  | None -> dir_path^Filename.dir_sep
+
+(* Check if the csv files are using the designated names *)
+let rec populate_hashtable input_dir file_names = 
+   match file_names with
+   | file_name::fns -> (
+
+     (* Add the mapping to the hashtable*)
+     let add_to_input_hashtable file_name file_path =
+       Hashtbl.add_exn input_file_table ~key:file_name ~data:file_path in
+
+     (* Construct the full input path *)
+     let input_file_path = input_dir ^ file_name in
+
+     (* Check if the first file name matches any of the designated names.
+         If it matches, put the mapping between its name and path in the hashtable, 
+         and continue with the rest file names. *)
+     match file_name with 
+     | "Mission.csv"
+       -> add_to_input_hashtable "Mission.csv" input_file_path;
+          populate_hashtable input_dir fns
+     | "CompDep.csv" 
+       -> add_to_input_hashtable "CompDep.csv" input_file_path;
+          populate_hashtable input_dir fns      
+     | "ScnArch.csv" 
+       -> add_to_input_hashtable "ScnArch.csv" input_file_path;
+          populate_hashtable input_dir fns      
+     | "Defenses.csv" 
+       -> add_to_input_hashtable "Defenses.csv" input_file_path; 
+          populate_hashtable input_dir fns      
+     | "CAPEC.csv" 
+       -> add_to_input_hashtable "CAPEC.csv" input_file_path;
+          populate_hashtable input_dir fns
+     | _ -> populate_hashtable input_dir fns
+   )
+   | [] -> ()
+
+(** Check if input_file_table has 5 csv files with designated names *)
+let validate_input input_dir file_names = 
+  match Sys.is_directory input_dir with 
+  | `Yes -> 
+    (populate_hashtable (append_dir_sep input_dir) file_names;
+     if Hashtbl.length input_file_table = 5 then 
+       Ok "Success" 
+     else (
+       Format.printf "Error: Insufficient input files!@.";
+       Format.printf "       SOTERIA++ expects five input files: CAPEC.csv, CompDep.csv, Defenses.csv, Mission.csv, ScnArch.csv!@.";
+       Error "Fail"
+     )
+    )
+  | `No | `Unknown -> 
+    Format.printf "Error: Invalid input directory: %s@." input_dir; 
+    Error "Fail"
+        
+
+(** Remove old svg, pdf files and etc from the output_dir *)
+let clean_up_dir output_dir =
+  match Sys.is_directory output_dir with 
+  | `Yes -> let output_dir_path = append_dir_sep output_dir in
+      Sys.readdir output_dir
+      |> Array.to_list
+      |> List.map 
+           ~f:(fun file_name -> output_dir_path ^ file_name)
+      |> List.iter 
+           ~f:(fun file_full_path -> 
+             if (has_csv_extension file_full_path) 
+               || (has_png_extension file_full_path) 
+               || (Sys.is_directory_exn file_full_path) then () 
+             else Sys.remove file_full_path)
+  | `No |`Unknown -> ()
+
+(** Clean up output_dir if it exists. Otherwise, 
+return the input_dir as the output_dir *)
+let process_output_dir input_dir output_dir =
+  match Sys.is_directory output_dir with
+  | `Yes -> 
+    (clean_up_dir output_dir;
+     append_dir_sep output_dir)
+  | `No | `Unknown -> 
+    (clean_up_dir input_dir;
+     append_dir_sep input_dir)    
+
+(** Execute the analysis *)
+let execute input_dir output_dir =
+  try (
+    (* Collect all CSV files *)
+    let input_files = expand_dir input_dir in
+
+    (* Check if there are 5 CSV files in total with designated names *)
+    match validate_input input_dir input_files with
+    | Ok _ -> (
+      Format.printf 
+        "Info: Got all input files: CAPEC.csv, CompDep.csv, Defenses.csv, Mission.csv, ScnArch.csv@."; 
+      
+      (* Process the output dir path: clean up old files or create a new directory *)
+      let output_dir_path = process_output_dir input_dir output_dir in
+      Format.printf 
+        "Info: Output from SOTERIA++ will be generated at: %s@." output_dir_path;
+
+      (* Obtain all the channels and pass them to the architecture analysis *)
+      let mission_ch  = In_channel.read_lines (Hashtbl.find_exn input_file_table "Mission.csv") in
+      let comp_dep_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "CompDep.csv") in
+      let scn_arch_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "ScnArch.csv") in
+      let defense_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "Defenses.csv") in
+      let attack_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "CAPEC.csv") in
+      let _ = do_arch_analysis comp_dep_ch attack_ch scn_arch_ch mission_ch defense_ch output_dir_path in
+
+      Format.printf "Info: Done!@."
+    )
+    | Error _ -> ()
+  )
+  with
+  | Sys_error msg ->
+      Format.eprintf "%s@." msg 
+
+(** Parse the command line arguments *)
+let parse_command_line_args () =
+  let num_args = (Array.length Sys.argv) - 1 in
+  if num_args = 1 then
+    Some (Sys.argv.(1), Sys.argv.(1))
+  else if num_args = 3 &&  Sys.argv.(1) = "-o" then
+    Some (Sys.argv.(3), Sys.argv.(2))
+  else 
+    None
+    
+(** The entry point of the program *)
+let main () =
+  match parse_command_line_args () with
+  | Some (input_dir, output_dir) ->
+    execute input_dir output_dir
+  | None ->
+    Format.printf 
+      "SOTERIA++: a framework for analyzing and visualizing the safety and security of system architecture@.";
+    Format.printf
+      "Usage: %s [-o <output path>] <input path>@."
+      Sys.argv.(0)
+
+let () = main ()

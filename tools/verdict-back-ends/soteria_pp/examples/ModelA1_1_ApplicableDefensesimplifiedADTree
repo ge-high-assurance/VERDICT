@@ -1,0 +1,166 @@
+digraph G {
+rankdir=BT 
+layout = dot
+splines = true
+overlap = false
+sep ="+10, +10"
+esep ="+8, +8"
+outputorder=edgesfirst
+66 [label ="Or", shape=none, margin=0, height=0, width=0, image="or.png"]
+65 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+64 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+63 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+62 [label = "RC_receiver: SI-17", shape = box]
+61 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+60 [label = "RC_receiver: SI-10", shape = box]
+59 [label = "RC_receiver: CAPEC-28", shape = box]
+58 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+57 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+56 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+55 [label = "RC_receiver: SC-8", shape = box]
+54 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+53 [label = "RC_receiver: SC-23", shape = box]
+52 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+51 [label = "RC_receiver: SC-13", shape = box]
+50 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+49 [label = "RC_receiver: SC-12", shape = box]
+48 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+47 [label = "RC_receiver: SC-10", shape = box]
+46 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+45 [label = "RC_receiver: IA-7", shape = box]
+44 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+43 [label = "RC_receiver: IA-3", shape = box]
+42 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+41 [label = "RC_receiver: IA-2", shape = box]
+40 [label = "RC_receiver: CAPEC-151", shape = box]
+39 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+38 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+37 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+36 [label = "RC_receiver: SC-8", shape = box]
+35 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+34 [label = "RC_receiver: SC-23", shape = box]
+33 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+32 [label = "RC_receiver: SC-13", shape = box]
+31 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+30 [label = "RC_receiver: SC-12", shape = box]
+29 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+28 [label = "RC_receiver: SC-10", shape = box]
+27 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+26 [label = "RC_receiver: IA-7", shape = box]
+25 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+24 [label = "RC_receiver: IA-3", shape = box]
+23 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+22 [label = "RC_receiver: IA-2", shape = box]
+21 [label = "RC_receiver: CAPEC-148", shape = box]
+20 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+19 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+18 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+17 [label = "RC_receiver: SC-7", shape = box]
+16 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+15 [label = "RC_receiver: SC-6", shape = box]
+14 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+13 [label = "RC_receiver: SC-5", shape = box]
+12 [label = "RC_receiver: CAPEC-125", shape = box]
+11 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+10 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+9 [label = "gps: SC-40", shape = box]
+8 [label = "gps: CAPEC-601", shape = box]
+7 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+6 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+5 [label = "gps: SC-29", shape = box]
+4 [label = "gps: CAPEC-148", shape = box]
+3 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+2 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+1 [label = "RC_receiver: SC-40", shape = box]
+0 [label = "RC_receiver: CAPEC-601", shape = box]
+65 -> 66
+58 -> 66
+39 -> 66
+20 -> 66
+11 -> 66
+7 -> 66
+3 -> 66
+64 -> 65
+59 -> 65
+63 -> 64
+61 -> 64
+62 -> 63
+60 -> 61
+57 -> 58
+40 -> 58
+56 -> 57
+54 -> 57
+52 -> 57
+50 -> 57
+48 -> 57
+46 -> 57
+44 -> 57
+42 -> 57
+55 -> 56
+53 -> 54
+51 -> 52
+49 -> 50
+47 -> 48
+45 -> 46
+43 -> 44
+41 -> 42
+38 -> 39
+21 -> 39
+37 -> 38
+35 -> 38
+33 -> 38
+31 -> 38
+29 -> 38
+27 -> 38
+25 -> 38
+23 -> 38
+36 -> 37
+34 -> 35
+32 -> 33
+30 -> 31
+28 -> 29
+26 -> 27
+24 -> 25
+22 -> 23
+19 -> 20
+12 -> 20
+18 -> 19
+16 -> 19
+14 -> 19
+17 -> 18
+15 -> 16
+13 -> 14
+10 -> 11
+8 -> 11
+9 -> 10
+6 -> 7
+4 -> 7
+5 -> 6
+2 -> 3
+0 -> 3
+1 -> 2
+}

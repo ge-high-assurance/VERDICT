@@ -1,0 +1,13 @@
+Scenario,CompType,CompInstance,hasSensitiveInfo,insideTrustedBoundary,broadcastFromOutsideTB,wifiFromOutsideTB,heterogeneity,allWifiEncFromOutsideTB,antiJamming,antiFlooding,antiFuzzing
+ModelA,GPS,gps,,1,1,, ,,,,
+ModelA,PositionEstimator,position_estimator,,1,,,,,,,
+ModelA,Navigator,navigator,,1,,,,,,,
+ModelA,FlightController,flight_controller,,1,,,,,,,
+ModelA,MissionPlanner,mission_planner,1,1,,,,,,,
+ModelA,RCReceiver,RC_receiver,,1,,1,, ,,,
+ModelA,RCReceiverHealthCheck,RC_receiver_health_check,,1,,,,,,,
+ModelA,StateController,state_controller,,1,,,,,,,
+ModelA,Actuators,actuators,,1,,,,,,,
+ModelA,BatteryHealthCheck,battery_health_check,,1,,,,,,,
+ModelA,Mixer,mixer,,1,,,,,,,
+ ,,,,,,,,,,,
