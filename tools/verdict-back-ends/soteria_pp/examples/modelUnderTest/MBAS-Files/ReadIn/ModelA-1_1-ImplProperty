@@ -1,0 +1,73 @@
+digraph G {
+rankdir=BT 
+layout = dot
+splines = true
+overlap = false
+sep ="+10, +10"
+esep ="+8, +8"
+outputorder=edgesfirst
+28 [label ="Or", shape=none, margin=0, height=0, width=0, image="or.png"]
+27 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+26 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+25 [label = "gps: antiJamming", shape = box]
+24 [label = "gps: CAPEC-601", shape = box]
+23 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+22 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+21 [label = "gps: heterogeneity", shape = box]
+20 [label = "gps: CAPEC-148", shape = box]
+19 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+18 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+17 [label = "RC_receiver: antiJamming", shape = box]
+16 [label = "RC_receiver: CAPEC-601", shape = box]
+15 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+14 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+13 [label = "RC_receiver: antiFuzzing", shape = box]
+12 [label = "RC_receiver: CAPEC-28", shape = box]
+11 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+10 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+9 [label = "RC_receiver: encryption", shape = box]
+8 [label = "RC_receiver: CAPEC-151", shape = box]
+7 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+6 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+5 [label = "RC_receiver: encryption", shape = box]
+4 [label = "RC_receiver: CAPEC-148", shape = box]
+3 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+2 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+1 [label = "RC_receiver: antiFlooding", shape = box]
+0 [label = "RC_receiver: CAPEC-125", shape = box]
+27 -> 28
+23 -> 28
+19 -> 28
+15 -> 28
+11 -> 28
+7 -> 28
+3 -> 28
+26 -> 27
+24 -> 27
+25 -> 26
+22 -> 23
+20 -> 23
+21 -> 22
+18 -> 19
+16 -> 19
+17 -> 18
+14 -> 15
+12 -> 15
+13 -> 14
+10 -> 11
+8 -> 11
+9 -> 10
+6 -> 7
+4 -> 7
+5 -> 6
+2 -> 3
+0 -> 3
+1 -> 2
+}

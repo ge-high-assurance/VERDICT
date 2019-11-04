@@ -1,0 +1,17 @@
+Scenario,Parent,CompType,Cardinality
+ModelD,UAV,GPS,1
+ModelD,UAV,DME_VOR,1
+ModelD,UAV,IRU,1
+ModelD,UAV,TriplexVoter,1
+ModelD,UAV,MissionPlanner,1
+ModelD,UAV,FlightController,1
+ModelD,UAV,Navigator,1
+ModelD,UAV,PositionEstimator,1
+ModelD,UAV,RCReceiver,1
+ModelD,UAV,RCReceiverHealthCheck,1
+ModelD,UAV,StateController,1
+ModelD,UAV,Actuators,1
+ModelD,UAV,BatteryHealthCheck,1
+ModelD,UAV,Mixer,1
+ModelD,UAV,NavigatorFilter,1
+ ,,,
