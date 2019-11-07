@@ -1,0 +1,115 @@
+package iml.ports ;
+import iml.lang.* ;
+import iml.lang.utils.* ;
+import iml.connectivity.* ;
+import iml.fsm.* ;
+
+type Port;
+
+type FlowPoint {
+	event : Bool ;
+	upperBound : Real ;
+	lowerBound : Real ;
+}
+
+type FlowPath {
+	start : FlowPoint ;
+	end : FlowPoint ;
+	upperBound : Real ;
+	lowerBound : Real ;
+	//assert { (end.upperBound = start.upperBound + upperBound) && 
+	//		 (end.lowerBound = start.lowerBound + lowerBound) };
+}
+
+flowpathspec : (FlowPoint,FlowPoint,Real,Real) -> FlowPath :=
+fun(x:FlowPoint,y:FlowPoint,l:Real,u:Real) {
+	oneof FlowPath { start = x ; end = y ; lowerBound = l ; upperBound = u }	
+}  ;
+
+
+flowpath : (FlowPoint,FlowPoint) -> FlowPath :=
+fun(x:FlowPoint,y:FlowPoint) {
+	oneof FlowPath { start = x ; end = y }	
+}  ;
+
+
+type EndToEndFlow {
+	start : FlowPoint ;
+	end : FlowPoint ;
+	append : FlowPath -> EndToEndFlow := 
+	fun(x:FlowPath){
+		oneof EndToEndFlow{
+			start = self.start ; 
+			end.lowerBound = self.end.lowerBound + x.end.lowerBound ;
+			end.upperBound = self.end.upperBound + x.end.upperBound 
+		} 
+	};
+}
+
+source : FlowPath -> EndToEndFlow :=
+	fun(x:FlowPath){
+		oneof EndToEndFlow{ start = x.start ; end = x.end}
+	};
+
+	
+type DataPort<T> extends (Port) {
+	data : T ;
+	flowpoint : FlowPoint ;
+} 
+
+type EventPort extends (Port) {
+	event : Bool ;
+	flowpoint : FlowPoint ;
+}
+
+type EventDataPort<T> extends (Port) {
+	event : Bool ;
+	data : T ;
+	flowpoint : FlowPoint ;
+}
+
+type FlowConnector<T> {
+	connector : Connector<T>;
+	flow:FlowPath ;
+}
+
+<T>flowconnect : (T,T)->FlowConnector<T> :=
+fun(x:T,y:T) {
+	oneof FlowConnector<T>{ connector.source = x ; connector.target = y}
+} ;
+
+flowdelaybound : (EndToEndFlow,Real,Real) -> Bool :=
+fun(x:EndToEndFlow,u:Real,l:Real){
+	x.end.upperBound - x.start.lowerBound <= u &&
+	x.end.lowerBound - x.start.upperBound >= l
+};
+
+type DelayState enum {s0,s1,s2}; 
+type [Fsm] delay {
+	[Input] f : FlowPath ;
+	[Input] n : Int ;
+	state : PrimedVar<DelayState>  ;
+	i : PrimedVar<Int> ;
+	[Init] state_i_init : Bool := (i = 1) && (state = DelayState.s0) ;
+	[Transition] s_trans : Bool := {
+		state.next = 
+			case {
+				state.current = DelayState.s0 && f.end.event : DelayState.s2;
+				state.current = DelayState.s0 && f.start.event : DelayState.s1 ;
+				state.current = DelayState.s1 && f.end.event : DelayState.s0 ;
+				state.current = DelayState.s1 && i >= n : DelayState.s2 ;
+				true : state.current ;
+			} 	
+	};
+	[Transition] i_trans : Bool := { 
+		i.next =
+		case {
+			state.current = DelayState.s0 :  1 ;
+			state.current = DelayState.s1 : i.current + 1 ;
+			true : i.current ;	
+		}
+	} ;
+	[Output] holds : Bool := (state.current = DelayState.s0 || state.current = DelayState.s1) ;
+}
+
+

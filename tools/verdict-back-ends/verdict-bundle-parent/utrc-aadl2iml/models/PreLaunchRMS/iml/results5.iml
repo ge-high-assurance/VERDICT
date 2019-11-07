@@ -1,0 +1,56 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait CODE_Waypoints_OutTrait  refines(Data) {
+};
+
+type CODE_Waypoints_Out  exhibits(CODE_Waypoints_OutTrait);
+type Kinetic_Vehicle_dot_impl   exhibits(Kinetic_VehicleTrait){
+};
+
+trait Target_Information_GeneratorTrait  refines(Synchronous, Process, Component) {
+	Camera_Data_Out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@2a07d669 (name: f2) (kind: source) not supported
+};
+
+type Target_Information_Generator  exhibits(Target_Information_GeneratorTrait);
+trait Camera_DataTrait  refines(Data) {
+};
+
+type Camera_Data  exhibits(Camera_DataTrait);
+trait Guidance_Command_From_MCTrait  refines(Data) {
+};
+
+type Guidance_Command_From_MC  exhibits(Guidance_Command_From_MCTrait);
+type IFS_dot_with_processes   exhibits(IFSTrait){
+	rCASE_CODE : CODE;
+	rCASE_Kinetic_Vehicle : Kinetic_Vehicle;
+	rCASE_Target_Information_Generator : Target_Information_Generator;
+};
+
+trait CODETrait  refines(Synchronous, Process, Component) {
+	CODE_Waypoints_Out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@37045c86 (name: f0) (kind: source) not supported
+};
+
+type CODE  exhibits(CODETrait);
+trait Kinetic_VehicleTrait  refines(Synchronous, Process, Component) {
+	Guidance_Command_In_MC: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@4c2373c3 (name: f1) (kind: sink) not supported
+};
+
+type Kinetic_Vehicle  exhibits(Kinetic_VehicleTrait);
+trait IFSTrait  refines(Synchronous, Component, System) {
+};
+
+type IFS  exhibits(IFSTrait);
+type Target_Information_Generator_dot_impl   exhibits(Target_Information_GeneratorTrait){
+};
+
+type CODE_dot_impl   exhibits(CODETrait){
+};
+
+

@@ -1,0 +1,96 @@
+package UxASRespondsEvents_pkg
+public
+	--Included DataTypes
+    with UxASNodeLibEvents;
+    with GenericServiceEvents_pkg;
+    with GenericLastServiceEvents_pkg ;
+    with Base_Types;
+    
+ 
+     
+    process UxAS_responds
+    	features
+    		AutomationRequest_in: in event data port Base_Types::Boolean;
+    		AutomationResponse_out: out event data port Base_Types::Boolean;	
+    	flows
+			processing_path : flow path AutomationRequest_in -> AutomationResponse_out;
+		properties
+			latency => 8 ms .. 8ms applies to processing_path;
+    	annex iml {**
+			
+			amonitor : one_request_at_a_time ;
+			adelaymonitor : one_request_at_a_time ;
+			gmonitor : responds_once ;
+			
+			c1 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.event,amonitor.b);
+			c2 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.event,amonitor.a);
+			
+			c11 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.flowpoint.event,adelaymonitor.b);
+			c21 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.flowpoint.event,adelaymonitor.a);
+			
+			c3 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.event,gmonitor.b);
+			c4 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.event,gmonitor.a);
+			
+			d : delay;
+			c5 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path,d.f);
+			c6 : Connector < Int > := 
+			<Int>connect(8,d.n);
+			
+			
+			[Assumption,Output] a : Bool := {amonitor.holds && adelaymonitor.holds};
+			[Guarantee,Output] g : Bool := {gmonitor.holds && d.holds};
+	    					
+    	**};
+    end UxAS_responds;
+ 
+    
+    process implementation UxAS_responds.i
+    	subcomponents
+    		AutomationRequestValidator: thread GenericServiceEvents_pkg::GenericService;
+    		PlanBuilder: thread GenericServiceEvents_pkg::GenericService;
+    		TaskServiceBase: thread GenericServiceEvents_pkg::GenericService;
+    		RouteAggregator: thread GenericServiceEvents_pkg::GenericService;
+    		Planner: thread GenericLastServiceEvents_pkg::GenericLastService;
+    	connections
+    		-- Connection between Main System and AutomationRequestValidatorService : AutomationRq/Rs message pair
+    		conn001: port AutomationRequest_in -> AutomationRequestValidator.CmdRequest_in;
+    		conn002: port AutomationRequestValidator.CmdResponse_out -> AutomationResponse_out;
+    		
+    		-- Connection between AutomationRequestValidatorService and PlanBuilderService : UniqueAutomationRq/Rs message pair
+    		conn011: port AutomationRequestValidator.SubRequest_out -> PlanBuilder.CmdRequest_in;
+    	    conn012: port PlanBuilder.CmdResponse_out -> AutomationRequestValidator.SubResponse_in;
+    	    
+    	    -- Connection between PlanBuilderService and TaskServiceBase : TaskImplementationRq/Rs message pair
+    	    conn021: port PlanBuilder.SubRequest_out -> TaskServiceBase.CmdRequest_in;
+    	    conn022: port TaskServiceBase.CmdResponse_out -> PlanBuilder.SubResponse_in;
+    	    
+    	    -- Connection between TaskServiceBase and RouteAggregator : Route Rq/Rs message pair
+    	    conn031: port TaskServiceBase.SubRequest_out -> RouteAggregator.CmdRequest_in;
+    	    conn032: port RouteAggregator.CmdResponse_out -> TaskServiceBase.SubResponse_in;
+    	    
+    	    -- Connection between RouteAggregator and Planner: RoutePlan Rq/Rs message pair
+    	    conn041: port RouteAggregator.SubRequest_out -> Planner.CmdRequest_in;
+    	    conn042: port Planner.CmdResponse_out -> RouteAggregator.SubResponse_in;
+    	--flows
+    	--	f : end to end flow AutomationRequestValidator.processing_path0 -> conn011 -> 
+    	--						PlanBuilder.processing_path0 -> conn021 -> 
+    	--						TaskServiceBase.processing_path0 -> conn031 ->
+    	--						RouteAggregator.processing_path0 -> conn041 ->
+    	--						Planner.processing_path -> conn042 ->
+    	--						RouteAggregator.processing_path1 -> conn032 ->
+    	--						TaskServiceBase.processing_path1 -> conn022 ->
+    	--						PlanBuilder.processing_path1 -> conn012 ->
+    	--						AutomationRequestValidator.processing_path1
+    	--						;
+    	--properties
+		--	latency => 8 ms .. 8 ms applies to f;
+    end UxAS_responds.i;
+
+end UxASRespondsEvents_pkg;

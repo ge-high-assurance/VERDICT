@@ -1,0 +1,1489 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="c49ff9ee-72cf-44a5-b9f1-b11249522d5c" manual="true">
+    <element uuid="667ef254-d227-4435-a1a0-6cce1130e200">
+      <bo>
+        <seg>classifier</seg>
+        <seg>command_bit</seg>
+      </bo>
+      <position x="631.0" y="38.0"/>
+      <size width="149.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="722c79ba-174e-4a0d-9c51-31e7c5baa688">
+      <element uuid="a476b0df-f9b7-4613-bc63-292755cf243e">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="627.0" y="68.0"/>
+          <point x="639.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>command_bit.impl</seg>
+      </bo>
+      <position x="428.0" y="38.0"/>
+      <size width="183.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f3a4001e-87aa-4d87-84e3-f5188b6cd609">
+      <bo>
+        <seg>classifier</seg>
+        <seg>command_purge_keypath</seg>
+      </bo>
+      <position x="385.0" y="85.0"/>
+      <size width="236.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5f111235-594f-47a7-ae22-0020de9b6dd8">
+      <element uuid="f5124584-429d-4800-b609-b398c9402afc">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="381.0" y="115.0"/>
+          <point x="393.0" y="115.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>command_purge_keypath.impl</seg>
+      </bo>
+      <position x="92.0" y="85.0"/>
+      <size width="273.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="9dc291f4-de54-46de-9439-02119ab89352">
+      <bo>
+        <seg>classifier</seg>
+        <seg>launcher</seg>
+      </bo>
+      <position x="2687.0" y="179.0"/>
+      <size width="120.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="563ac3c2-b64f-4c45-8439-7b2afb5bb935">
+      <element uuid="787a8382-36be-4773-918d-4d0ee33e2000">
+        <element uuid="f2acab11-d4a3-49e9-94d5-db0840cf67cd">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_impl_new_connection</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="5ada410f-374f-40ba-98f7-f19b4496df81">
+        <element uuid="b00b24e9-bc9f-4bff-a933-7a1b3554457e">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_almanac_data</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="232ccb39-1656-42a8-9e7b-3e703ffb9657">
+        <element uuid="10da5a08-a9f8-4993-b6cc-aab2e980c5d1">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_bit_cmd</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="cd83daed-81d8-40c5-8e71-e67906c4fd04">
+        <element uuid="e11608df-e02b-456f-b491-686739afdd14">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_ephemeris_data</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="4586a49b-0366-434f-ba03-79eab51b1c6f">
+        <element uuid="4ed4767d-ff38-49a6-8d5d-21b638b26b00">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_gps_keys</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="90c58b03-12f3-4eb7-b243-c91fdce93f4d">
+        <element uuid="da6e4946-4d46-416c-9f7f-94f15bd276df">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_mcd</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="c7c53ca2-16bd-4bd9-9c93-bd80a77c03e7">
+        <element uuid="e2804371-15c2-4016-a8cd-c66d2ce4dd0e">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_power</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="166cb07b-aa8c-43b9-b4e9-aec38b151787">
+        <element uuid="95f9c981-deaf-4883-8e54-a1beded12416">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_ptam</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="c9944eea-1c7d-4937-8fe6-74fe4c2a0351">
+        <element uuid="aaa315c6-5430-4a02-81db-e3b5ffacae76">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_purge_keypath</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="53194a89-9bd1-4cc7-996f-42f561c122d3">
+        <element uuid="23d7eb0e-134b-4c29-bf62-b47adad381a9">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_squib_battery</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="1f4af839-8f5f-4033-8ec3-b48db074d7c9">
+        <element uuid="522db66a-8eab-4da4-906d-f8dac86b4fd6">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>launcher_to_mc_squib_battery_prep</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="de9b7420-5d98-425f-bba9-56e357e0df5b">
+        <element uuid="14c8bd96-198c-462a-8efb-20c97d0cb744">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>missile_to_launcher_ack_message</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="6b79fd6e-bdbc-45fd-9f1c-2d5e09bfc1bb">
+        <element uuid="75e3d66f-0f48-4815-be5c-fc92d066f482">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>missile_to_launcher_bit_report</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="442a710f-6fb0-4637-80cc-b0ea04b004e0">
+        <element uuid="118de420-9ead-44e5-84a1-f51a3ddaf2e9">
+          <bo>
+            <seg>tag</seg>
+            <seg>unidirectional</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>connection</seg>
+          <seg>missile_to_launcher_keypath_purged</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <element uuid="341bb028-5bb7-4cd8-9390-2f0e923a63e5" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>acknowledgement_message_missile</seg>
+        </bo>
+        <position y="264.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="e45ba919-8cc0-452f-873d-7100e6ddf251" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>almanac_data_cmd_launcher</seg>
+        </bo>
+        <position x="2332.0" y="624.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="d12714a5-997c-43e6-9297-2e901891a1ed" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>bit_cmd_launcher</seg>
+        </bo>
+        <position x="2412.0" y="408.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="033d4583-b948-4788-8c6f-d9666aa8662d" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>detailed_bit_report_missile</seg>
+        </bo>
+        <position y="192.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="90dde11d-5b19-46fa-81d7-9be5e760a940" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>ephemeris_data_launcher</seg>
+        </bo>
+        <position x="2359.0" y="696.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="4ff7b591-b147-43eb-8464-5aacc1f1b3a7" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>gps_keys_launcher</seg>
+        </bo>
+        <position x="2403.0" y="480.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="09c64ed2-56e8-475c-8be2-6da49936d159" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>keypath_purged_missile</seg>
+        </bo>
+        <position y="48.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="95944a0b-1bd0-46d8-b3e1-d12e8e9db0ca" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>launcher_power_present_missile</seg>
+        </bo>
+        <position y="120.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="27147c61-2764-445f-904b-07f46c14c778" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>mission_critical_data_launcher</seg>
+        </bo>
+        <position x="2320.0" y="336.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="8764a1e0-49c7-4021-8097-9509a10859e8" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>power_to_missile_launcher</seg>
+        </bo>
+        <position x="2350.0" y="264.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="f269648d-29c6-4e07-a90f-591a9386822c" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>ptam_launcher</seg>
+        </bo>
+        <position x="2434.0" y="120.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="8ef804b0-1f6c-4db7-9206-4bb67154f6cc" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>purge_keypath_command_launcher</seg>
+        </bo>
+        <position x="2286.0" y="48.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="cd6f2fbb-670f-4138-a4d1-688962fee773" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>squib_battery_command_launcher</seg>
+        </bo>
+        <position x="2294.0" y="192.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="30145082-3327-4938-985e-8e06dadcad2a" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>squib_battery_preparation_command_launcher</seg>
+        </bo>
+        <position x="2200.0" y="552.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="d45a3ac2-fbb9-4253-b521-3cce042261c4">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="120.0" y="219.0"/>
+          <point x="104.0" y="219.0"/>
+          <point x="104.0" y="209.0"/>
+          <point x="2695.0" y="209.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <element uuid="7972bc2d-d5de-4fc8-8d24-32d7bf88a8db">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>acknowledgement_message</seg>
+        </bo>
+        <position x="1057.0" y="251.0"/>
+        <size width="249.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="c01fcdbd-5e36-4cac-9211-3d520dd298f6">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>almanac_data</seg>
+        </bo>
+        <position x="1057.0" y="392.0"/>
+        <size width="152.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="12ac2ebf-85fd-49f3-89ab-62d374957c15">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>detailed_bit_report</seg>
+        </bo>
+        <position x="1318.0" y="251.0"/>
+        <size width="191.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="524cbd34-c56e-481d-b590-faa03b56aec7">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>ephemeris_data</seg>
+        </bo>
+        <position x="1057.0" y="345.0"/>
+        <size width="163.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="f904cce4-ec22-4aaf-b3c3-c4659a91a40a">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>gps_keys</seg>
+        </bo>
+        <position x="1391.0" y="157.0"/>
+        <size width="125.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="88b7dd1f-8c44-4ba1-ab0d-43a6291ce9d8">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>keypath_purged</seg>
+        </bo>
+        <position x="1297.0" y="110.0"/>
+        <size width="165.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="43e4371d-11d5-496e-8771-a006bd010308">
+        <element uuid="bcd69340-8af5-4957-9089-11cebd017315" dockArea="left">
+          <bo>
+            <seg>feature</seg>
+            <seg>bit_report_in</seg>
+          </bo>
+          <position y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="4dfff320-308d-4a94-8893-9baa6205fd1e">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_in</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="058d5fd0-1d93-4249-ada9-2df59d475c7c">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_bit_report</seg>
+        </bo>
+        <position x="276.0" y="182.0"/>
+        <size width="460.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="adf08968-878e-49e2-a2e5-99184f0a9a5c">
+        <element uuid="960959b6-f184-4d84-b060-2c165fcea02e" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>bit_cmd_out</seg>
+          </bo>
+          <position x="314.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="93a41140-edf9-4075-9133-6ebe5d13c10a">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="293ee673-3b50-4ecd-bca6-56c9f7687146">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_command_bit</seg>
+        </bo>
+        <position x="1533.0" y="398.0"/>
+        <size width="412.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="642609d6-8732-445a-9ef2-f7a3b280bf17">
+        <element uuid="c1aef6ec-e211-40e3-af74-89158cf8c45a" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>gps_keys_out</seg>
+          </bo>
+          <position x="315.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="308c9f75-f793-486c-a545-e0b64f39e53e">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="978e44a9-7134-42de-8372-3f7825bfa77a">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_crypto_keys</seg>
+        </bo>
+        <position x="1533.0" y="470.0"/>
+        <size width="425.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="cfe4804d-9804-461a-bca2-aab8819b4354">
+        <element uuid="dca27693-b948-4344-87bc-79f9a279877d" dockArea="left">
+          <bo>
+            <seg>feature</seg>
+            <seg>command_response_in</seg>
+          </bo>
+          <position y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="18d81d99-e4b2-44bc-a604-6c9baf3a8df0" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>purge_keypath_command_out</seg>
+          </bo>
+          <position x="490.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="a58f17c8-de93-476f-84a7-695b1b8aaf47">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_in</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="60ba7e85-eb48-4e0f-8a14-2d1c2423d57c">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="a8c6b1dd-ab82-4888-9db9-d89840eddc60">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_keypath_purge_cmd</seg>
+        </bo>
+        <position x="276.0" y="38.0"/>
+        <size width="714.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="ed932757-091a-4df4-8579-e787bcd097e2">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_power_present</seg>
+        </bo>
+        <position x="1182.0" y="204.0"/>
+        <size width="231.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="7b528f34-a114-4515-a702-9c2d3f7e4e44">
+        <element uuid="c7689787-d2ca-4b10-84cb-5bbf2170d8aa" dockArea="left">
+          <bo>
+            <seg>feature</seg>
+            <seg>ack_message_in</seg>
+          </bo>
+          <position y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="e8927019-72d0-4520-a44e-72059e2556c9">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_in</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="48de9c83-9567-476d-9c71-08e8b7abb13c">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_receive_ack_message</seg>
+        </bo>
+        <position x="276.0" y="254.0"/>
+        <size width="566.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="0c9c33c2-c08b-471b-a969-651c437a828a">
+        <element uuid="928e1f62-764d-45bc-bb1b-ec7b0ee2493b" dockArea="left">
+          <bo>
+            <seg>feature</seg>
+            <seg>power_present_message_in</seg>
+          </bo>
+          <position y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="7f2b51c2-a70e-4772-83dc-96c6d235f22e">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_in</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="3ac5f8c4-ee10-405d-be9a-741c3a1147eb">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_receive_power_present_message</seg>
+        </bo>
+        <position x="276.0" y="110.0"/>
+        <size width="769.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="18cd1668-8ab0-47f2-af02-1e2427f75178">
+        <element uuid="5a673b55-4b58-4ab3-92d7-e22fd2ef84ed" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>almanac_data_out</seg>
+          </bo>
+          <position x="402.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="7d80b855-eab3-43af-8ef1-7155e72ca6e0">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="627e8c2c-deb3-4e40-b040-e0723ffd3a66">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_send_almanac_data</seg>
+        </bo>
+        <position x="1533.0" y="614.0"/>
+        <size width="539.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="7a8f2bdf-7bee-4c16-a00d-2d16eb5cbd09">
+        <element uuid="7ad73ca2-5e2d-4cf5-9610-ecabc45dbeee" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>ephemeris_data_out</seg>
+          </bo>
+          <position x="428.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="756e15f8-3b92-4ab7-8bee-010a58540f1a">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="bb860771-8a9d-4fb7-9ecc-4da6e9812124">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_send_ephemeris_data</seg>
+        </bo>
+        <position x="1533.0" y="686.0"/>
+        <size width="578.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="a7dbf833-9f55-4534-9667-3f237d0d7af1">
+        <element uuid="405180e2-30f9-4a97-a59a-8996e19e4f9f" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>mcd_out</seg>
+          </bo>
+          <position x="318.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="d2858942-97a4-4120-bb70-9231e7b515bc">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="e7dd1811-8e3f-442b-abf2-273aeff64d50">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_send_mcd</seg>
+        </bo>
+        <position x="1533.0" y="326.0"/>
+        <size width="392.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="af3d56bb-1404-40d0-92ff-ff9a5b267c33">
+        <element uuid="15def101-e468-414b-a948-465a7ec0f6e3" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>ptam_out</seg>
+          </bo>
+          <position x="282.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="107f3bc2-d90e-4729-9c39-bb428e1bc24f">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="0dc50012-052b-46d1-a2ac-9fecbbcbbee5">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_send_ptam</seg>
+        </bo>
+        <position x="1533.0" y="110.0"/>
+        <size width="363.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="fd9564b0-7302-4725-9796-9de8acfd7e31">
+        <element uuid="273b2559-c821-4033-aba3-ab8dff1c4f5c" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>squib_command_out</seg>
+          </bo>
+          <position x="499.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="8e35d48b-2fbf-470d-8038-88f2524e9650">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="050516ef-4e4c-4058-b822-9f18025ac1b1">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_send_squib_battery_command</seg>
+        </bo>
+        <position x="1533.0" y="182.0"/>
+        <size width="655.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="4c130099-bdc3-4889-a8d0-275ddac2b037">
+        <element uuid="5f9b97e4-a6d8-4ac1-a26d-969024f74ff9" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>command_out</seg>
+          </bo>
+          <position x="446.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="f59775f3-8174-4389-a399-19dde91d6212">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="7d2913ed-c263-4446-a52e-ed3e1b957d9b">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>launcher_squib_battery_preparation</seg>
+        </bo>
+        <position x="1533.0" y="542.0"/>
+        <size width="556.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="06a59cd5-2684-4832-9e0d-6d4fa16a70d6">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>mission_critical_data</seg>
+        </bo>
+        <position x="1305.0" y="298.0"/>
+        <size width="202.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="9efa8c20-a7a1-4ce1-92bd-ba4a11b94461">
+        <element uuid="595fb0b2-fb17-46a0-946d-f59866f7638c" dockArea="right">
+          <bo>
+            <seg>feature</seg>
+            <seg>power_out</seg>
+          </bo>
+          <position x="276.0" y="10.0"/>
+          <contentFilters/>
+        </element>
+        <element uuid="7482879c-5e1d-49ce-8be0-3deb89dd574a">
+          <bo>
+            <seg>flow_specification</seg>
+            <seg>f_out</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <element uuid="6a53a4de-fd03-40ef-8cc1-5d64603c1fdd">
+          <bo>
+            <seg>tag</seg>
+            <seg>sc_type</seg>
+          </bo>
+          <contentFilters/>
+        </element>
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>power_on_launcher</seg>
+        </bo>
+        <position x="1533.0" y="254.0"/>
+        <size width="362.0" height="60.0"/>
+        <contentFilters>
+          <filter>agree.all</filter>
+          <filter>subcomponentType</filter>
+          <filter>features</filter>
+          <filter>modeTransitions</filter>
+          <filter>modes</filter>
+          <filter>flowSpecifications</filter>
+          <filter>connections</filter>
+          <filter>subcomponents</filter>
+          <filter>subprogramCallSequences</filter>
+          <filter>processorFeatures</filter>
+          <filter>internalFeatures</filter>
+        </contentFilters>
+      </element>
+      <element uuid="47f86bc0-42cf-4a94-af93-76d0a55da4b5">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>power_to_missile</seg>
+        </bo>
+        <position x="1232.0" y="345.0"/>
+        <size width="172.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="11fc9ce0-1d97-4f73-9584-5c7c128ba4f1">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>ptam</seg>
+        </bo>
+        <position x="1425.0" y="204.0"/>
+        <size width="96.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="5c4410a9-dd74-4250-93e1-5fb5d38ad29c">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>purge_keypath_command</seg>
+        </bo>
+        <position x="1057.0" y="298.0"/>
+        <size width="236.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="5eed0438-ae48-43f2-bf27-db9bd201547a">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>run_bit</seg>
+        </bo>
+        <position x="1057.0" y="204.0"/>
+        <size width="113.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="efb0c1a8-2a8f-495c-a470-41128e76a70b">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>squib_battery_command</seg>
+        </bo>
+        <position x="1057.0" y="110.0"/>
+        <size width="228.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <element uuid="861fef81-1d5a-4c01-a3fe-6d3b4288e080">
+        <bo>
+          <seg>subcomponent</seg>
+          <seg>squib_battery_preparation_command</seg>
+        </bo>
+        <position x="1057.0" y="157.0"/>
+        <size width="322.0" height="35.0"/>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>launcher.impl</seg>
+      </bo>
+      <position x="112.0" y="207.0"/>
+      <size width="2555.0" height="758.0"/>
+      <contentFilters>
+        <filter>agree.all</filter>
+        <filter>generalizations</filter>
+        <filter>features</filter>
+        <filter>modeTransitions</filter>
+        <filter>modes</filter>
+        <filter>flowSpecifications</filter>
+        <filter>connections</filter>
+        <filter>subcomponents</filter>
+        <filter>subprogramCallSequences</filter>
+        <filter>processorFeatures</filter>
+        <filter>internalFeatures</filter>
+      </contentFilters>
+    </element>
+    <element uuid="c79fd5a4-06aa-4958-a32f-5069b8eeed12">
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_acknowledgement_message</seg>
+      </bo>
+      <position x="1115.0" y="132.0"/>
+      <size width="315.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2bd846bc-bba2-4e9e-924a-bbc5ec39c4b5">
+      <element uuid="5386b1a6-56bf-4fc0-b727-47917726653f">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1111.0" y="162.0"/>
+          <point x="1123.0" y="162.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_acknowledgement_message.impl</seg>
+      </bo>
+      <position x="743.0" y="132.0"/>
+      <size width="352.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="41def2e1-1622-4282-bbf7-0731fe0e83f2">
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_detailed_bit_report</seg>
+      </bo>
+      <position x="1510.0" y="85.0"/>
+      <size width="257.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="cf2377b2-f16f-46a2-b049-b88a032cb95b">
+      <element uuid="823cf694-ebf6-4838-a0d4-e3332e609001">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1506.0" y="115.0"/>
+          <point x="1518.0" y="115.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_detailed_bit_report.impl</seg>
+      </bo>
+      <position x="1196.0" y="85.0"/>
+      <size width="294.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="35e0bce8-e347-4e83-9ed6-c1086e3a65c9">
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_power_present_message</seg>
+      </bo>
+      <position x="440.0" y="132.0"/>
+      <size width="291.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="ae26a7ae-9509-495d-b1c8-a1c6906df46c">
+      <element uuid="e2ab21e0-80a3-4df9-95df-9aff737152ae">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="436.0" y="162.0"/>
+          <point x="448.0" y="162.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>receive_power_present_message.impl</seg>
+      </bo>
+      <position x="92.0" y="132.0"/>
+      <size width="328.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5c7edeb6-1a6c-4eaa-9e30-93fc691952f2">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_almanac_data</seg>
+      </bo>
+      <position x="1870.0" y="38.0"/>
+      <size width="195.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f0126f8d-601f-4ede-8563-af427f7dc926">
+      <element uuid="a00ebc50-fee7-4d54-91e0-f5d74108c8fa">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1866.0" y="68.0"/>
+          <point x="1878.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_almanac_data.impl</seg>
+      </bo>
+      <position x="1618.0" y="38.0"/>
+      <size width="232.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="68c80d47-49a8-4291-b789-0e4da11bc2ff">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_ephemeris_data</seg>
+      </bo>
+      <position x="2342.0" y="38.0"/>
+      <size width="208.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="74d69d8c-fb59-418e-a7c0-746762e0efc2">
+      <element uuid="43d11fe3-d417-4532-9b1c-078efbaa4a42">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="2338.0" y="68.0"/>
+          <point x="2350.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_ephemeris_data.impl</seg>
+      </bo>
+      <position x="2077.0" y="38.0"/>
+      <size width="245.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f5870e99-05c2-45da-a7b9-ea3139effd8b">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_gps_keys</seg>
+      </bo>
+      <position x="1013.0" y="38.0"/>
+      <size width="165.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="16602a7f-e08b-4701-a7bd-2f8fff7f0bab">
+      <element uuid="1ff070c1-800c-4001-89f7-3af1c936804f">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1009.0" y="68.0"/>
+          <point x="1021.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_gps_keys.impl</seg>
+      </bo>
+      <position x="792.0" y="38.0"/>
+      <size width="201.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="4546688d-eda2-4640-b8d3-f1e070b62d04">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_mission_critical_data</seg>
+      </bo>
+      <position x="937.0" y="85.0"/>
+      <size width="247.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="ed532d35-d2cb-416e-93c2-f9c298122f1b">
+      <element uuid="5475cde5-f267-4520-814e-cae03b95cf13">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="933.0" y="115.0"/>
+          <point x="945.0" y="115.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_mission_critical_data.impl</seg>
+      </bo>
+      <position x="633.0" y="85.0"/>
+      <size width="284.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="4b5ed725-c03a-4c01-9dfd-fda024d7549c">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_prepare_squib_battery_command</seg>
+      </bo>
+      <position x="1838.0" y="132.0"/>
+      <size width="339.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2f613356-23fd-4dd5-ac8a-f4560627bc0d">
+      <element uuid="e3579591-0409-42eb-a560-912969f078c5">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1834.0" y="162.0"/>
+          <point x="1846.0" y="162.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_prepare_squib_battery_command.impl</seg>
+      </bo>
+      <position x="1442.0" y="132.0"/>
+      <size width="376.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="30b5d378-06dc-4e64-bd07-51eae8f9211a">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_ptam</seg>
+      </bo>
+      <position x="280.0" y="38.0"/>
+      <size width="136.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="adbdcab1-136f-4855-996e-0be8e1a58d94">
+      <element uuid="4354d48a-c983-4ec5-a9de-c222b2abcd56">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="276.0" y="68.0"/>
+          <point x="288.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_ptam.impl</seg>
+      </bo>
+      <position x="92.0" y="38.0"/>
+      <size width="168.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="622781ba-b7bf-49e4-b8ed-29444644a931">
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_squib_battery_command</seg>
+      </bo>
+      <position x="2109.0" y="85.0"/>
+      <size width="273.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="561957aa-43ef-45a5-a069-ab55ab4b2203">
+      <element uuid="87b8c1cb-8a3b-4cac-96bf-b4269279f154">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="2105.0" y="115.0"/>
+          <point x="2117.0" y="115.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>send_squib_battery_command.impl</seg>
+      </bo>
+      <position x="1779.0" y="85.0"/>
+      <size width="310.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2806e6db-4a8f-414e-8697-20714ec22d86">
+      <bo>
+        <seg>classifier</seg>
+        <seg>turn_on_launcher</seg>
+      </bo>
+      <position x="1426.0" y="38.0"/>
+      <size width="180.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="e65259ed-1d6d-4f5f-ab0d-6153db9c0727">
+      <element uuid="022e10c6-f979-48b5-941d-4e5d5360da39">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="1422.0" y="68.0"/>
+          <point x="1434.0" y="68.0"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>turn_on_launcher.impl</seg>
+      </bo>
+      <position x="1190.0" y="38.0"/>
+      <size width="216.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>package</seg>
+      <seg>launcher</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="2819.0" height="977.0"/>
+    <contentFilters>
+      <filter>classifiers</filter>
+    </contentFilters>
+  </element>
+  <config type="package" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>package</seg>
+      <seg>launcher</seg>
+    </context>
+  </config>
+</diagram:Diagram>

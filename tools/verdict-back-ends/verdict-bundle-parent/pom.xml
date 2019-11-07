@@ -16,6 +16,7 @@
 
     <modules>
         <module>iml-verdict-translator</module>
+        <module>utrc-aadl2iml</module>
         <module>verdict-data-model</module>
         <module>verdict-lustre-translator</module>
         <module>verdict-instrumentor</module>
@@ -31,7 +32,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.target.javaVersion>1.8</project.target.javaVersion>
+        <xtext.version>2.17.0</xtext.version>
     </properties>
+
+    <!-- Manage Xtext dependencies using Xtext BOM -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.eclipse.xtext</groupId>
+                <artifactId>xtext-dev-bom</artifactId>
+                <version>${xtext.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -133,6 +148,43 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.7</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.tycho</groupId>
+                    <artifactId>target-platform-configuration</artifactId>
+                    <version>1.5.1</version>
+                    <configuration>
+                        <environments>
+                            <environment>
+                                <os>win32</os>
+                                <ws>win32</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                            <environment>
+                                <os>linux</os>
+                                <ws>gtk</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                            <environment>
+                                <os>macosx</os>
+                                <ws>cocoa</ws>
+                                <arch>x86_64</arch>
+                            </environment>
+                        </environments>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.tycho</groupId>
+                    <artifactId>tycho-compiler-plugin</artifactId>
+                    <version>1.5.1</version>
+                    <configuration>
+                        <useProjectSettings>false</useProjectSettings>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.tycho</groupId>
+                    <artifactId>tycho-maven-plugin</artifactId>
+                    <version>1.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>

@@ -1,0 +1,203 @@
+package UxASRespondsEvents_pkg ;
+import iml.contracts.* ;
+import iml.connectivity.* ;
+import iml.software.* ;
+import iml.lang.* ;
+import iml.ports.* ;
+import iml.fsm.* ;
+
+type RespondsState enum { s0 , s1 , s2 } ;
+type [ Thread ] GenericService {
+	[ Input ] CmdRequest_in : EventDataPort < Bool > ;
+	[ Output ] CmdResponse_out : EventDataPort < Bool > ;
+	[ Output ] SubRequest_out : EventDataPort < Bool > ;
+	[ Input ] SubResponse_in : EventDataPort < Bool > ;
+	processing_path0 : FlowPath ;
+	assert { ( processing_path0 . start = CmdRequest_in && processing_path0 . end = SubRequest_out ) } ;
+	processing_path1 : FlowPath ;
+	assert { ( processing_path1 . start = SubResponse_in && processing_path1 . end = CmdResponse_out ) } ;
+
+
+		  	
+		  	g1monitor : responds_once ;
+			c1 : Connector < Bool > := 
+			<Bool>connect(CmdRequest_in.event,g1monitor.b);
+			c2 : Connector < Bool > := 
+			<Bool>connect(SubRequest_out.event,g1monitor.a);
+			
+			g2monitor : responds_once ;
+			c3 : Connector < Bool > := 
+			<Bool>connect(SubResponse_in.event,g2monitor.b);
+			c4 : Connector < Bool > := 
+			<Bool>connect(CmdResponse_out.event,g2monitor.a);
+			
+			d1 : delay ;
+			c5 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path0,d1.f);
+			c6 : Connector < Int > := 
+			<Int>connect(1,d1.n);
+			
+			d2 : delay ;
+			c7 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path1,d2.f);
+			c8 : Connector < Int > := 
+			<Int>connect(1,d2.n);
+			
+			[Guarantee,Output] g : Bool := {g1monitor.holds && g2monitor.holds && d1.holds && d2.holds};
+
+			
+	    
+}
+type [ Thread ] GenericLastService {
+	[ Input ] CmdRequest_in : EventDataPort < Bool > ;
+	[ Output ] CmdResponse_out : EventDataPort < Bool > ;
+	processing_path : FlowPath ;
+	assert { ( processing_path . start = CmdRequest_in && processing_path . end = CmdResponse_out ) } ;
+
+
+			gmonitor : responds_once ;
+			c1 : Connector < Bool > := 
+			<Bool>connect(CmdRequest_in.event,gmonitor.b);
+			c2 : Connector < Bool > := 
+			<Bool>connect(CmdResponse_out.event,gmonitor.a);
+			
+			d1 : delay ;
+			c5 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path,d1.f);
+			c6 : Connector < Int > := 
+			<Int>connect(1,d1.n);
+			
+			[Guarantee,Output] g : Bool := {gmonitor.holds  && d1.holds}  ;
+			
+	   	
+}
+type [ Process ] UxAS_responds {
+	[ Input ] AutomationRequest_in : EventDataPort < Bool > ;
+	[ Output ] AutomationResponse_out : EventDataPort < Bool > ;
+	processing_path : FlowPath ;
+	assert { ( processing_path . start = AutomationRequest_in && processing_path . end = AutomationResponse_out ) } ;
+
+
+			
+			amonitor : one_request_at_a_time ;
+			adelaymonitor : one_request_at_a_time ;
+			gmonitor : responds_once ;
+			
+			c1 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.event,amonitor.b);
+			c2 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.event,amonitor.a);
+			
+			c11 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.flowpoint.event,adelaymonitor.b);
+			c21 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.flowpoint.event,adelaymonitor.a);
+			
+			c3 : Connector < Bool > := 
+			<Bool>connect(AutomationRequest_in.event,gmonitor.b);
+			c4 : Connector < Bool > := 
+			<Bool>connect(AutomationResponse_out.event,gmonitor.a);
+			
+			d : delay;
+			c5 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path,d.f);
+			c6 : Connector < Int > := 
+			<Int>connect(8,d.n);
+			
+			
+			[Assumption,Output] a : Bool := {amonitor.holds && adelaymonitor.holds};
+			[Guarantee,Output] g : Bool := {gmonitor.holds && d.holds};
+	    					
+    	
+}
+type [ Implementation ] UxAS_responds_dot_i extends ( UxAS_responds ) {
+	[ Component ] AutomationRequestValidator : GenericService ;
+	[ Component ] PlanBuilder : GenericService ;
+	[ Component ] TaskServiceBase : GenericService ;
+	[ Component ] RouteAggregator : GenericService ;
+	[ Component ] Planner : GenericLastService ;
+	conn001 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( AutomationRequest_in , AutomationRequestValidator . CmdRequest_in ) ;
+	conn002 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( AutomationRequestValidator . CmdResponse_out , AutomationResponse_out ) ;
+	conn011 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( AutomationRequestValidator . SubRequest_out , PlanBuilder . CmdRequest_in ) ;
+	conn012 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( PlanBuilder . CmdResponse_out , AutomationRequestValidator . SubResponse_in ) ;
+	conn021 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( PlanBuilder . SubRequest_out , TaskServiceBase . CmdRequest_in ) ;
+	conn022 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( TaskServiceBase . CmdResponse_out , PlanBuilder . SubResponse_in ) ;
+	conn031 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( TaskServiceBase . SubRequest_out , RouteAggregator . CmdRequest_in ) ;
+	conn032 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( RouteAggregator . CmdResponse_out , TaskServiceBase . SubResponse_in ) ;
+	conn041 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( RouteAggregator . SubRequest_out , Planner . CmdRequest_in ) ;
+	conn042 : Connector < EventDataPort < Bool > > := < EventDataPort < Bool > > connect ( Planner . CmdResponse_out , RouteAggregator . SubResponse_in ) ;
+}
+
+		
+		type [Fsm] responds_once{
+			[Input]  a : Bool ;
+			[Input]  b : Bool ;
+			// State variable
+			s : PrimedVar<RespondsState> ;
+			// Initialization of the state variable
+			[Init] s_init : Bool := { s.current = RespondsState.s0 } ;
+			// Transition relation
+			
+			[Transition] state_trans : Bool := { 
+					s.next =
+						case {
+							s.current = RespondsState.s0 && b && !a :  RespondsState.s1 ;
+							s.current = RespondsState.s0 && a :  RespondsState.s2 ;
+							s.current = RespondsState.s1 && a : RespondsState.s0 ;
+							true : s.current ;
+					}	  
+			} ;
+			// Definition of the output
+			[Output] holds : Bool := ( s.current = RespondsState.s0 ||  s.current = RespondsState.s1 );
+		}
+		
+		
+		type [Fsm] one_request_at_a_time  {
+			[Input]  a : Bool ;
+			[Input]  b : Bool ;
+			s : PrimedVar<RespondsState> ;
+			[Init] s_init : Bool := {s = RespondsState.s0 } ;
+			[Transition] s_trans : Bool := { 
+				s.next = 
+					case {
+						s.current = RespondsState.s0 && b : RespondsState.s1 ;
+						s.current = RespondsState.s1 && b : RespondsState.s2 ;
+						s.current = RespondsState.s1 && a && ! b : RespondsState.s0 ;
+						true : s.current ;
+					}  	
+			} ;
+			[Output] holds : Bool :=  ( s.current = RespondsState.s0 ||  s.current = RespondsState.s1 );
+		}
+		
+		type [Fsm] delay {
+			[Input] f : FlowPath ;
+			[Input] n : Int ;
+			state : PrimedVar<RespondsState>  ;
+			i : PrimedVar<Int> ;
+			[Init] state_i_init : Bool := (i = 1) && (state = RespondsState.s0) ;
+			[Transition] s_trans : Bool := {
+				state.next = 
+					case {
+						state.current = RespondsState.s0 && f.end.event : RespondsState.s2;
+						state.current = RespondsState.s0 && f.start.event : RespondsState.s1 ;
+						state.current = RespondsState.s1 && f.end.event : RespondsState.s0 ;
+						state.current = RespondsState.s1 && i >= n : RespondsState.s2 ;
+						true : state.current ;
+					}
+			};
+			[Transition] i_trans : Bool := { 
+				i.next =
+				case {
+					state.current = RespondsState.s0 :  1 ;
+					state.current = RespondsState.s1 : i.current + 1 ;
+					true : i.current ;	
+				}
+			} ;
+			[Output] holds : Bool := (state.current = RespondsState.s0 || state.current = RespondsState.s1) ;
+		}
+
+
+			
+		
+	
+

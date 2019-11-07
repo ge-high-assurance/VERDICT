@@ -23,4 +23,3 @@
 "RCReceiver","RC_receiver","CAPEC-28","Fuzzing",null,"Integrity",null,"SI-10","Information Input Validation",null,null
 "RCReceiver","RC_receiver","CAPEC-28","Fuzzing",null,"Integrity",null,"SI-17","Fail-Safe Procedures",null,null
 "RCReceiver","RC_receiver","CAPEC-601","Jamming",null,null,"Availability","SC-40","Wireless Link Protection",null,null
-

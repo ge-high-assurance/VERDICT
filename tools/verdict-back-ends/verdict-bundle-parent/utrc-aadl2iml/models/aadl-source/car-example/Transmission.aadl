@@ -1,0 +1,100 @@
+package Transmission
+public
+	with Types;
+	with Base_Types;
+
+	system Speed_Control
+		features
+			Target: in data port Types::speed.speed_impl;
+			--Actuator_Input: out data port Types::actuator.actuator_impl;
+			Actuator_Input: out data port Base_Types::Float;
+			Actual: in data port Types::speed.speed_impl;
+			
+	annex agree {** 
+		
+		const P : real = 1.0;
+		const D : real = 0.0;
+		const I : real = 0.0;   
+				
+		eq e : real = Target.val - Actual.val;
+		eq e_int : real = prev(e, 0.0) + e; 
+		eq e_dot : real = prev(e, 0.0) - e;
+		
+		eq u : real = P*e + D*e_dot + I*e_int;
+		guarantee "Acuator_Behavior" : Actuator_Input = u;
+	**}; 
+	
+	end Speed_Control;
+
+	system implementation Speed_Control.Speed_Control_Impl
+		
+	annex agree {**
+		assert Actuator_Input = u;
+	**};
+	end Speed_Control.Speed_Control_Impl;
+
+
+	system Throttle
+		features
+			--Actuator_Input: in data port Types::actuator.actuator_impl;
+			Actuator_Input: in data port Base_Types::Float;
+			Actual: out data port Types::speed.speed_impl;
+			
+		annex agree {**
+			guarantee "Throttle_Behavior" : Actual.val = prev(Actual.val, 0.0) + 0.1*Actuator_Input;  
+		**};
+		
+	end Throttle;
+
+	
+	system implementation Throttle.Throttle_Impl
+	
+	annex agree {**
+		assert Actual.val = prev(Actual.val, 0.0) + 0.1*Actuator_Input;  
+	**};
+	
+	end Throttle.Throttle_Impl;
+	
+	system State_Machine
+		features
+			State_Out: out data port Types::state_sig.impl;
+			
+		annex agree{**
+			guarantee "sub behavior" : true;
+		**};
+			
+	end State_Machine;
+	
+	system implementation State_Machine.Impl
+		subcomponents
+			SSM: system Sub_State_Machine.Impl; 
+			
+		connections
+			SMToSSM: port SSM.State_Out -> State_Out {Communication_Properties::Timing => immediate;};
+			
+		annex agree {**
+			assert 	 false;
+
+			--lift SSM; 
+		**};
+		
+	end State_Machine.impl;
+	
+	system Sub_State_Machine
+		features
+			State_Out: out data port Types::state_sig.impl;
+			
+		annex agree {**
+			--guarantee "test" : true;
+			guarantee "sub behavior" : State_Out.val = prev(State_Out.val, 0);
+		**};
+	end Sub_State_Machine;
+	
+	system implementation Sub_State_Machine.Impl
+	
+		annex agree {**
+			assert State_Out.val = prev(State_Out.val,0);
+		**};
+	end Sub_State_Machine.impl;
+	
+end Transmission;

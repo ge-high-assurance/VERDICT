@@ -1,0 +1,55 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait Experimental_PlatformTrait  refines(Synchronous, Component, System) {
+};
+
+type Experimental_Platform  exhibits(Experimental_PlatformTrait);
+type Experimental_Platform_dot_impl   exhibits(Experimental_PlatformTrait){
+	EP_Launcher : Launcher_dot_impl;
+	EP_GNC : GNC_dot_with_devices;
+	EP_IFS : IFS_dot_with_processes;
+	EP_Seeker : Seeker_dot_with_device;
+	EP_Mission_Control : Mission_Control_dot_with_hardware;
+	Launcher_to_MC_PTAM : Connector<OutDataPort<PTAM>, InDataPort<PTAM>> := connect<OutDataPort<PTAM>, InDataPort<PTAM>>(EP_Launcher.PTAM_Launcher, EP_Mission_Control.PTAM_Launcher);
+	assert{EP_Launcher.PTAM_Launcher.data = EP_Mission_Control.PTAM_Launcher.data};
+	Missile_to_Launcher_ACK_Message : Connector<OutDataPort<Acknowledgement_Message>, InDataPort<Acknowledgement_Message>> := connect<OutDataPort<Acknowledgement_Message>, InDataPort<Acknowledgement_Message>>(EP_Mission_Control.Acknowledgement_Message_Missile, EP_Launcher.Acknowledgement_Message_Missile);
+	assert{EP_Mission_Control.Acknowledgement_Message_Missile.data = EP_Launcher.Acknowledgement_Message_Missile.data};
+	Missile_to_Launcher_Bit_Report : Connector<OutDataPort<Detailed_Bit_Report>, InDataPort<Detailed_Bit_Report>> := connect<OutDataPort<Detailed_Bit_Report>, InDataPort<Detailed_Bit_Report>>(EP_Mission_Control.Detailed_Bit_Report_Missile, EP_Launcher.Detailed_Bit_Report_Missile);
+	assert{EP_Mission_Control.Detailed_Bit_Report_Missile.data = EP_Launcher.Detailed_Bit_Report_Missile.data};
+	Missile_to_Launcher_Keypath_Purged : Connector<OutDataPort<Keypath_Purged>, InDataPort<Keypath_Purged>> := connect<OutDataPort<Keypath_Purged>, InDataPort<Keypath_Purged>>(EP_Mission_Control.Keypath_Purged_Missile, EP_Launcher.Keypath_Purged_Missile);
+	assert{EP_Mission_Control.Keypath_Purged_Missile.data = EP_Launcher.Keypath_Purged_Missile.data};
+	Launcher_to_MC_Purge_Keypath : Connector<OutDataPort<Purge_Keypath_Command>, InDataPort<Purge_Keypath_Command>> := connect<OutDataPort<Purge_Keypath_Command>, InDataPort<Purge_Keypath_Command>>(EP_Launcher.Purge_Keypath_Command_Launcher, EP_Mission_Control.Purge_Keypath_Command_Launcher);
+	assert{EP_Launcher.Purge_Keypath_Command_Launcher.data = EP_Mission_Control.Purge_Keypath_Command_Launcher.data};
+	Launcher_to_MC_Squib_Battery : Connector<OutDataPort<Squib_Battery_Command>, InDataPort<Squib_Battery_Command>> := connect<OutDataPort<Squib_Battery_Command>, InDataPort<Squib_Battery_Command>>(EP_Launcher.Squib_Battery_Command_Launcher, EP_Mission_Control.Squib_Battery_Command_Launcher);
+	assert{EP_Launcher.Squib_Battery_Command_Launcher.data = EP_Mission_Control.Squib_Battery_Command_Launcher.data};
+	Launcher_to_MC_Ephemeris_Data : Connector<OutDataPort<Ephemeris_data>, InDataPort<Ephemeris_data>> := connect<OutDataPort<Ephemeris_data>, InDataPort<Ephemeris_data>>(EP_Launcher.Ephemeris_Data_Launcher, EP_Mission_Control.Ephemeris_Data_Launcher);
+	assert{EP_Launcher.Ephemeris_Data_Launcher.data = EP_Mission_Control.Ephemeris_Data_Launcher.data};
+	Launcher_to_MC_Almanac_Data : Connector<OutDataPort<Almanac_Data>, InDataPort<Almanac_Data>> := connect<OutDataPort<Almanac_Data>, InDataPort<Almanac_Data>>(EP_Launcher.Almanac_Data_Cmd_Launcher, EP_Mission_Control.Almanac_Data_Cmd_Launcher);
+	assert{EP_Launcher.Almanac_Data_Cmd_Launcher.data = EP_Mission_Control.Almanac_Data_Cmd_Launcher.data};
+	Launcher_to_MC_MCD : Connector<OutDataPort<Mission_Critical_Data>, InDataPort<Mission_Critical_Data>> := connect<OutDataPort<Mission_Critical_Data>, InDataPort<Mission_Critical_Data>>(EP_Launcher.Mission_Critical_Data_Launcher, EP_Mission_Control.Mission_Critical_Data_Launcher);
+	assert{EP_Launcher.Mission_Critical_Data_Launcher.data = EP_Mission_Control.Mission_Critical_Data_Launcher.data};
+	Launcher_to_MC_BIT_Cmd : Connector<OutDataPort<Run_Bit>, InDataPort<Run_Bit>> := connect<OutDataPort<Run_Bit>, InDataPort<Run_Bit>>(EP_Launcher.BIT_Cmd_Launcher, EP_Mission_Control.BIT_Cmd_Launcher);
+	assert{EP_Launcher.BIT_Cmd_Launcher.data = EP_Mission_Control.BIT_Cmd_Launcher.data};
+	Launcher_to_MC_Squib_Battery_Prep : Connector<OutDataPort<Squib_Battery_Preparation_Command>, InDataPort<Squib_Battery_Preparation_Command>> := connect<OutDataPort<Squib_Battery_Preparation_Command>, InDataPort<Squib_Battery_Preparation_Command>>(EP_Launcher.Squib_Battery_Preparation_Command_Launcher, EP_Mission_Control.Squib_Battery_Preparation_Command_Launcher);
+	assert{EP_Launcher.Squib_Battery_Preparation_Command_Launcher.data = EP_Mission_Control.Squib_Battery_Preparation_Command_Launcher.data};
+	Launcher_to_MC_Power : Connector<OutDataPort<Power_to_Missile>, InDataPort<Power_to_Missile>> := connect<OutDataPort<Power_to_Missile>, InDataPort<Power_to_Missile>>(EP_Launcher.Power_to_Missile_Launcher, EP_Mission_Control.Power_to_Missile_Launcher);
+	assert{EP_Launcher.Power_to_Missile_Launcher.data = EP_Mission_Control.Power_to_Missile_Launcher.data};
+	Launcher_to_MC_GPS_Keys : Connector<OutDataPort<GPS_Keys>, InDataPort<GPS_Keys>> := connect<OutDataPort<GPS_Keys>, InDataPort<GPS_Keys>>(EP_Launcher.GPS_Keys_Launcher, EP_Mission_Control.GPS_Keys_Launcher);
+	assert{EP_Launcher.GPS_Keys_Launcher.data = EP_Mission_Control.GPS_Keys_Launcher.data};
+	Missile_to_Launcher_Power_Present : Connector<OutDataPort<Launcher_Power_Present>, InDataPort<Launcher_Power_Present>> := connect<OutDataPort<Launcher_Power_Present>, InDataPort<Launcher_Power_Present>>(EP_Mission_Control.Launcher_Power_Present_Missile, EP_Launcher.Launcher_Power_Present_Missile);
+	assert{EP_Mission_Control.Launcher_Power_Present_Missile.data = EP_Launcher.Launcher_Power_Present_Missile.data};
+	MC_to_GPS_Almanac_data : Connector<OutDataPort<Almanac_Data>, InDataPort<Almanac_Data>> := connect<OutDataPort<Almanac_Data>, InDataPort<Almanac_Data>>(EP_Mission_Control.Almanac_Data_Cmd_Missile, EP_GNC.Almanac_Data_Cmd_Missile);
+	assert{EP_Mission_Control.Almanac_Data_Cmd_Missile.data = EP_GNC.Almanac_Data_Cmd_Missile.data};
+	MC_to_GPS_GPS_Keys : Connector<OutDataPort<GPS_Keys>, InDataPort<GPS_Keys>> := connect<OutDataPort<GPS_Keys>, InDataPort<GPS_Keys>>(EP_Mission_Control.GPS_Keys_Missile, EP_GNC.GPS_Keys_Missile);
+	assert{EP_Mission_Control.GPS_Keys_Missile.data = EP_GNC.GPS_Keys_Missile.data};
+	MC_to_GPS_Ephemeris_data : Connector<OutDataPort<Ephemeris_data>, InDataPort<Ephemeris_data>> := connect<OutDataPort<Ephemeris_data>, InDataPort<Ephemeris_data>>(EP_Mission_Control.Ephemeris_Data_Missile, EP_GNC.Ephemeris_Data_Missile);
+	assert{EP_Mission_Control.Ephemeris_Data_Missile.data = EP_GNC.Ephemeris_Data_Missile.data};
+			
+			
+};
+
+

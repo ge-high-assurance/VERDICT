@@ -1,0 +1,494 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait Mission_Critical_DataTrait  refines(Data) {
+};
+
+type Mission_Critical_Data  exhibits(Mission_Critical_DataTrait);
+trait mcg_cruise_speedTrait  refines(Data) {
+};
+
+type mcg_cruise_speed  exhibits(mcg_cruise_speedTrait);
+trait guidance_data_containerTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@cf15d6 (name: in_out) (kind: provides) not supported
+};
+
+type guidance_data_container  exhibits(guidance_data_containerTrait);
+trait Keypath_PurgedTrait  refines(Data) {
+};
+
+type Keypath_Purged  exhibits(Keypath_PurgedTrait);
+trait Ephemeris_dataTrait  refines(Data) {
+};
+
+type Ephemeris_data  exhibits(Ephemeris_dataTrait);
+type PDOP_value_dot_impl   exhibits(PDOP_valueTrait){
+};
+
+trait mm_sys_timeTrait  refines(Data) {
+};
+
+type mm_sys_time  exhibits(mm_sys_timeTrait);
+trait esw_stateTrait  refines(Data) {
+};
+
+type esw_state  exhibits(esw_stateTrait);
+trait mm_launch_timeTrait  refines(Data) {
+};
+
+type mm_launch_time  exhibits(mm_launch_timeTrait);
+trait mcg_altitude_errTrait  refines(Data) {
+};
+
+type mcg_altitude_err  exhibits(mcg_altitude_errTrait);
+trait mm_sys_substateTrait  refines(Data) {
+};
+
+type mm_sys_substate  exhibits(mm_sys_substateTrait);
+trait navigation_data_containerTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@790a35fd (name: in_out) (kind: provides) not supported
+};
+
+type navigation_data_container  exhibits(navigation_data_containerTrait);
+trait CNO_bufferTrait  refines(Data) {
+};
+
+type CNO_buffer  exhibits(CNO_bufferTrait);
+trait GDOP_valueTrait  refines(Data) {
+};
+
+type GDOP_value  exhibits(GDOP_valueTrait);
+type esw_state_dot_impl   exhibits(esw_stateTrait){
+};
+
+trait Squib_Battery_Preparation_CommandTrait  refines(Data) {
+};
+
+type Squib_Battery_Preparation_Command  exhibits(Squib_Battery_Preparation_CommandTrait);
+trait ecef_position_data_validTrait  refines(Data) {
+};
+
+type ecef_position_data_valid  exhibits(ecef_position_data_validTrait);
+type NCH_counter_dot_impl   exhibits(NCH_counterTrait){
+};
+
+trait ecef_position_time_validTrait  refines(Data) {
+};
+
+type ecef_position_time_valid  exhibits(ecef_position_time_validTrait);
+type status_gps_fix_dot_impl   exhibits(status_gps_fixTrait){
+};
+
+trait Run_BitTrait  refines(Data) {
+};
+
+type Run_Bit  exhibits(Run_BitTrait);
+trait Almanac_DataTrait  refines(Data) {
+};
+
+type Almanac_Data  exhibits(Almanac_DataTrait);
+type ecef_position_accuracy_dot_impl   exhibits(ecef_position_accuracyTrait){
+};
+
+type NoisePerMS_dot_impl   exhibits(NoisePerMSTrait){
+};
+
+type ecef_velocity_dot_impl   exhibits(ecef_velocityTrait){
+};
+
+type mm_state_container_dot_impl   exhibits(mm_state_containerTrait){
+	mm_sys_state : mm_state_dot_mm_sys_state;
+	mm_sys_substate : mm_state_dot_mm_sys_substate;
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@5dab9949 (name: c1) (bidirectional: true) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@52acf8a8 (name: c2) (bidirectional: true) (accessCategory: data) not supported
+};
+
+trait ecef_velocity_time_validTrait  refines(Data) {
+};
+
+type ecef_velocity_time_valid  exhibits(ecef_velocity_time_validTrait);
+type NDOP_value_dot_impl   exhibits(NDOP_valueTrait){
+};
+
+type Squib_Battery_Preparation_Command_dot_impl   exhibits(Squib_Battery_Preparation_CommandTrait){
+};
+
+trait mm_launchedTrait  refines(Data) {
+};
+
+type mm_launched  exhibits(mm_launchedTrait);
+trait ecef_positionTrait  refines(Data) {
+};
+
+type ecef_position  exhibits(ecef_positionTrait);
+type launch_detected_dot_impl   exhibits(launch_detectedTrait){
+};
+
+trait PTAMTrait  refines(Data) {
+};
+
+type PTAM  exhibits(PTAMTrait);
+trait ecef_position_accuracyTrait  refines(Data) {
+};
+
+type ecef_position_accuracy  exhibits(ecef_position_accuracyTrait);
+trait mcg_speed_eerTrait  refines(Data) {
+};
+
+type mcg_speed_eer  exhibits(mcg_speed_eerTrait);
+type Run_Bit_dot_impl   exhibits(Run_BitTrait){
+};
+
+type SVID_buffer_dot_impl   exhibits(SVID_bufferTrait){
+};
+
+type Ephemeris_Data_dot_impl   exhibits(Ephemeris_dataTrait){
+};
+
+trait Power_to_MissileTrait  refines(Data) {
+};
+
+type Power_to_Missile  exhibits(Power_to_MissileTrait);
+trait NDOP_valueTrait  refines(Data) {
+};
+
+type NDOP_value  exhibits(NDOP_valueTrait);
+trait Launcher_Power_PresentTrait  refines(Data) {
+};
+
+type Launcher_Power_Present  exhibits(Launcher_Power_PresentTrait);
+trait mm_sys_stateTrait  refines(Data) {
+};
+
+type mm_sys_state  exhibits(mm_sys_stateTrait);
+trait ecef_velocityTrait  refines(Data) {
+};
+
+type ecef_velocity  exhibits(ecef_velocityTrait);
+trait launch_detectedTrait  refines(Data) {
+};
+
+type launch_detected  exhibits(launch_detectedTrait);
+trait Purge_Keypath_CommandTrait  refines(Data) {
+};
+
+type Purge_Keypath_Command  exhibits(Purge_Keypath_CommandTrait);
+type ubx_message_counter_dot_impl   exhibits(ubx_message_counterTrait){
+};
+
+type Mission_Critical_Data_dot_impl   exhibits(Mission_Critical_DataTrait){
+};
+
+type Purge_Keypath_Command_dot_impl   exhibits(Purge_Keypath_CommandTrait){
+};
+
+type altimeter_altitude_dot_impl   exhibits(altimeter_altitudeTrait){
+};
+
+type lla_horizontal_accuracy_dot_impl   exhibits(lla_horizontal_accuracyTrait){
+};
+
+type ecef_position_time_valid_dot_impl   exhibits(ecef_position_time_validTrait){
+};
+
+trait gnc_frame_timeTrait  refines(Data) {
+};
+
+type gnc_frame_time  exhibits(gnc_frame_timeTrait);
+trait gnc_inTrait  refines(Data) {
+};
+
+type gnc_in  exhibits(gnc_inTrait);
+trait ecef_velocity_accuracyTrait  refines(Data) {
+};
+
+type ecef_velocity_accuracy  exhibits(ecef_velocity_accuracyTrait);
+trait PDOP_valueTrait  refines(Data) {
+};
+
+type PDOP_value  exhibits(PDOP_valueTrait);
+type timer_out_dot_impl   exhibits(timer_outTrait){
+};
+
+type GDOP_value_dot_impl   exhibits(GDOP_valueTrait){
+};
+
+trait SVID_bufferTrait  refines(Data) {
+};
+
+type SVID_buffer  exhibits(SVID_bufferTrait);
+type HDOP_value_dot_impl   exhibits(HDOP_valueTrait){
+};
+
+type antenna_status_dot_impl   exhibits(antenna_statusTrait){
+};
+
+type gps_data_container_dot_impl   exhibits(gps_data_containerTrait){
+	ecef_position : gps_data_dot_ecef_position;
+	ecef_position_accuracy : ecef_position_accuracy;
+	ecef_position_data_valid : ecef_position_data_valid;
+	ecef_velocity : ecef_velocity;
+	ecef_velocity_accuracy : ecef_velocity_accuracy;
+	ecef_velocity_data_valid : ecef_velocity_data_valid;
+	lla_horizontal_accuracy : lla_horizontal_accuracy;
+	lla_vertical_accuracy : lla_vertical_accuracy;
+	PDOP_value : PDOP_value;
+	TDOP_value : TDOP_value;
+	VDOP_value : VDOP_value;
+	HDOP_value : HDOP_value;
+	status_gps_fix : status_gps_fix;
+	ubx_message_counter : ubx_message_counter;
+	antenna_status : antenna_status;
+	NoisePerMS : NoisePerMS;
+	AGCCnt : AGCCnt;
+	NCH_counter : NCH_counter;
+	SVID_buffer : SVID_buffer;
+	CNO_buffer : CNO_buffer;
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@7837c99c (name: ecef_position_in) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@669abb5c (name: ecef_position_out) (bidirectional: true) (accessCategory: data) not supported
+};
+
+trait ubx_message_counterTrait  refines(Data) {
+};
+
+type ubx_message_counter  exhibits(ubx_message_counterTrait);
+trait mcg_heading_errTrait  refines(Data) {
+};
+
+type mcg_heading_err  exhibits(mcg_heading_errTrait);
+type guidance_data_container_dot_impl   exhibits(guidance_data_containerTrait){
+};
+
+type Squib_Battery_Command_dot_impl   exhibits(Squib_Battery_CommandTrait){
+};
+
+type Power_to_Missile_dot_impl   exhibits(Power_to_MissileTrait){
+};
+
+trait altimeter_altitudeTrait  refines(Data) {
+};
+
+type altimeter_altitude  exhibits(altimeter_altitudeTrait);
+type Launcher_Power_Present_dot_impl   exhibits(Launcher_Power_PresentTrait){
+};
+
+trait lla_vertical_accuracyTrait  refines(Data) {
+};
+
+type lla_vertical_accuracy  exhibits(lla_vertical_accuracyTrait);
+trait nav_dataTrait  refines(Data) {
+};
+
+type nav_data  exhibits(nav_dataTrait);
+trait mcg_flightPathAngle_radTrait  refines(Data) {
+};
+
+type mcg_flightPathAngle_rad  exhibits(mcg_flightPathAngle_radTrait);
+type TDOP_value_dot_impl   exhibits(TDOP_valueTrait){
+};
+
+type gnc_frame_time_dot_impl   exhibits(gnc_frame_timeTrait){
+};
+
+trait mm_esw_dtTrait  refines(Data) {
+};
+
+type mm_esw_dt  exhibits(mm_esw_dtTrait);
+trait AGCCntTrait  refines(Data) {
+};
+
+type AGCCnt  exhibits(AGCCntTrait);
+type AGCCnt_dot_impl   exhibits(AGCCntTrait){
+};
+
+type EDOP_value_dot_impl   exhibits(EDOP_valueTrait){
+};
+
+trait gnc_outTrait  refines(Data) {
+};
+
+type gnc_out  exhibits(gnc_outTrait);
+type ecef_velocity_time_valid_dot_impl   exhibits(ecef_velocity_time_validTrait){
+};
+
+type imu_data_container_dot_impl   exhibits(imu_data_containerTrait){
+	imu_data_buffer : imu_data_buffer;
+	imu_ready : imu_ready;
+	launch_detected : launch_detected;
+	altimeter_altitude : altimeter_altitude;
+	airspeed_speed : airspeed_speed;
+};
+
+type PTAM_dot_impl   exhibits(PTAMTrait){
+};
+
+trait imu_readyTrait  refines(Data) {
+};
+
+type imu_ready  exhibits(imu_readyTrait);
+trait mcg_heading_cmdTrait  refines(Data) {
+};
+
+type mcg_heading_cmd  exhibits(mcg_heading_cmdTrait);
+type Almanac_Data_dot_impl   exhibits(Almanac_DataTrait){
+};
+
+type gnc_out_dot_impl   exhibits(gnc_outTrait){
+};
+
+trait imu_data_containerTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@14269e0 (name: io_write) (kind: provides) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@477f3b7d (name: geu_step_read_write) (kind: provides) not supported
+};
+
+type imu_data_container  exhibits(imu_data_containerTrait);
+type ecef_velocity_accuracy_dot_impl   exhibits(ecef_velocity_accuracyTrait){
+};
+
+trait timer_outTrait  refines(Data) {
+};
+
+type timer_out  exhibits(timer_outTrait);
+trait navfctTrait  refines(Data) {
+};
+
+type navfct  exhibits(navfctTrait);
+trait exec_init_calledTrait  refines(Data) {
+};
+
+type exec_init_called  exhibits(exec_init_calledTrait);
+trait HDOP_valueTrait  refines(Data) {
+};
+
+type HDOP_value  exhibits(HDOP_valueTrait);
+type Acknowledgement_Message_dot_impl   exhibits(Acknowledgement_MessageTrait){
+};
+
+type GPS_Keys_dot_impl   exhibits(GPS_KeysTrait){
+};
+
+trait status_gps_fixTrait  refines(Data) {
+};
+
+type status_gps_fix  exhibits(status_gps_fixTrait);
+type CNO_buffer_dot_impl   exhibits(CNO_bufferTrait){
+};
+
+trait TDOP_valueTrait  refines(Data) {
+};
+
+type TDOP_value  exhibits(TDOP_valueTrait);
+trait ecef_velocity_data_validTrait  refines(Data) {
+};
+
+type ecef_velocity_data_valid  exhibits(ecef_velocity_data_validTrait);
+type imu_data_buffer_dot_impl   exhibits(imu_data_bufferTrait){
+};
+
+trait airspeed_speedTrait  refines(Data) {
+};
+
+type airspeed_speed  exhibits(airspeed_speedTrait);
+trait EDOP_valueTrait  refines(Data) {
+};
+
+type EDOP_value  exhibits(EDOP_valueTrait);
+trait Acknowledgement_MessageTrait  refines(Data) {
+};
+
+type Acknowledgement_Message  exhibits(Acknowledgement_MessageTrait);
+type Detailed_Bit_Report_dot_impl   exhibits(Detailed_Bit_ReportTrait){
+};
+
+trait GPS_KeysTrait  refines(Data) {
+};
+
+type GPS_Keys  exhibits(GPS_KeysTrait);
+type ecef_position_data_valid_dot_impl   exhibits(ecef_position_data_validTrait){
+};
+
+type airspeed_speed_dot_impl   exhibits(airspeed_speedTrait){
+};
+
+type geu_main_dot_impl   exhibits(geu_mainTrait){
+};
+
+trait mcg_altitude_cmdTrait  refines(Data) {
+};
+
+type mcg_altitude_cmd  exhibits(mcg_altitude_cmdTrait);
+type gnc_in_dot_impl   exhibits(gnc_inTrait){
+};
+
+type ecef_position_dot_impl   exhibits(ecef_positionTrait){
+};
+
+trait lla_horizontal_accuracyTrait  refines(Data) {
+};
+
+type lla_horizontal_accuracy  exhibits(lla_horizontal_accuracyTrait);
+type lla_vertical_accuracy_dot_impl   exhibits(lla_vertical_accuracyTrait){
+};
+
+type navigation_data_container_dot_impl   exhibits(navigation_data_containerTrait){
+};
+
+type VDOP_value_dot_impl   exhibits(VDOP_valueTrait){
+};
+
+type imu_ready_dot_impl   exhibits(imu_readyTrait){
+};
+
+trait NoisePerMSTrait  refines(Data) {
+};
+
+type NoisePerMS  exhibits(NoisePerMSTrait);
+trait Squib_Battery_CommandTrait  refines(Data) {
+};
+
+type Squib_Battery_Command  exhibits(Squib_Battery_CommandTrait);
+trait mm_state_containerTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@56e18141 (name: in_out) (kind: provides) not supported
+};
+
+type mm_state_container  exhibits(mm_state_containerTrait);
+trait Detailed_Bit_ReportTrait  refines(Data) {
+};
+
+type Detailed_Bit_Report  exhibits(Detailed_Bit_ReportTrait);
+type Keypath_Purged_dot_impl   exhibits(Keypath_PurgedTrait){
+};
+
+type ecef_velocity_data_valid_dot_impl   exhibits(ecef_velocity_data_validTrait){
+};
+
+trait geu_mainTrait  refines(Data) {
+};
+
+type geu_main  exhibits(geu_mainTrait);
+trait imu_data_bufferTrait  refines(Data) {
+};
+
+type imu_data_buffer  exhibits(imu_data_bufferTrait);
+trait VDOP_valueTrait  refines(Data) {
+};
+
+type VDOP_value  exhibits(VDOP_valueTrait);
+trait antenna_statusTrait  refines(Data) {
+};
+
+type antenna_status  exhibits(antenna_statusTrait);
+trait NCH_counterTrait  refines(Data) {
+};
+
+type NCH_counter  exhibits(NCH_counterTrait);
+trait gps_data_containerTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@aff6d3f (name: io_write) (kind: provides) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@b1fdcf8 (name: geu_step_read_write) (kind: provides) not supported
+};
+
+type gps_data_container  exhibits(gps_data_containerTrait);
+

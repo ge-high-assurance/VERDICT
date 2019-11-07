@@ -23,13 +23,13 @@ public class App {
             File projectDir = new File(args[0]);
             checkDir(projectDir);
 
-            // By convention, the SADL file will be called "Run.sadl" (check it can be read)
-            File sadlFile = new File(projectDir, "Run.sadl");
-            checkFile(sadlFile);
+            // By convention, the output and graphs directories will be subdirectories of projectDir
+            File outputDir = new File(projectDir, "Output");
+            File graphsDir = new File(projectDir, "Graphs");
 
             // Run SADL on the Verdict STEM project
             VerdictStem stem = new VerdictStem();
-            stem.runStem(projectDir, sadlFile);
+            stem.runStem(projectDir, outputDir, graphsDir);
         } else {
             File jarFile =
                     new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -54,22 +54,6 @@ public class App {
 
         if (!directory.canWrite()) {
             throw new RuntimeException("Directory is not writable: " + directory);
-        }
-    }
-
-    /**
-     * Checks the given file exists and can be read.
-     *
-     * @param file The path to the file
-     * @throws RuntimeException If the file doesn't exist or cannot be read
-     */
-    private static void checkFile(File file) {
-        if (!file.exists()) {
-            throw new RuntimeException("File does not exist: " + file);
-        }
-
-        if (!file.canRead()) {
-            throw new RuntimeException("File is not readable: " + file);
         }
     }
 }

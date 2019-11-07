@@ -1,0 +1,43 @@
+package Agree_Nodes
+public
+
+annex agree {** 
+	
+	node abs(inp: real) returns (outp: real);
+	let
+		outp = if(inp < 0.0) then -inp else inp;
+	tel;
+	
+    node Y(inp: bool) returns (outpr: bool); 
+    let
+      outpr = false -> pre(inp);
+    tel;  
+ 
+    node Z(inp: bool) returns (outp: bool); 
+    let 
+      outp = true -> pre(inp); 
+    tel; 
+     
+    node H(inp: bool) returns (outp: bool);  
+    let
+      outp = inp -> (inp and pre(outp));
+    tel;
+    
+    node O(inp: bool) returns (outp: bool); 
+    let
+      outp = inp -> (inp or (pre(outp))); 
+    tel ;  
+
+    node S_Univ(p: bool, q: bool) returns (outp: bool); 
+    let
+      outp = (Y(O(q))) => p; 
+    tel; 
+
+	node T_Univ(p: bool, q: bool) returns (outp: bool);
+    let
+      outp = (S_Univ(q,p)) or H(p) ; 
+    tel;
+	
+**};
+
+end Agree_Nodes;

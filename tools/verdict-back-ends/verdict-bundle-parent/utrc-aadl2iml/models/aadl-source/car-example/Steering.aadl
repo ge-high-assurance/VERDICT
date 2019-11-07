@@ -1,0 +1,38 @@
+package Steering
+public
+	with Types;
+
+	system Axel
+		features
+			Target_Tire_Direction: in data port Types::pitch.pitch_impl;
+			Actual_Tire_Direction: out data port Types::pitch.pitch_impl;
+			Speed: in data port Types::speed.speed_impl;
+			
+	annex agree {**
+--		assume "reasonable tire pitch" :
+--			Agree_Nodes.abs(Target_Tire_Direction.val) <= 0.45;
+			
+		guarantee "roll limiter" :
+			if (Agree_Nodes.abs(Target_Tire_Direction.val) > 0.20 and Speed.val > 45.0)
+			then
+				Actual_Tire_Direction.val = 0.20
+			else
+				Actual_Tire_Direction.val = Target_Tire_Direction.val;
+	**};
+	
+	
+	end Axel;
+	
+	system implementation Axel.Axel_Impl
+	
+	annex agree {**
+		assert if (Agree_Nodes.abs(Target_Tire_Direction.val) > 0.20 and Speed.val > 45.0)
+			then
+				Actual_Tire_Direction.val = 0.20
+			else
+				Actual_Tire_Direction.val = Target_Tire_Direction.val;
+	**};
+	end Axel.Axel_Impl;
+	
+
+end Steering;

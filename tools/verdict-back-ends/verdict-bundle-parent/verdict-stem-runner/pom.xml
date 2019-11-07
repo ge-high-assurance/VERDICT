@@ -16,41 +16,6 @@
     <dependencies>
         <dependency>
             <groupId>com.ge.research.sadl</groupId>
-            <artifactId>com.ge.research.sadl</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>com.ge.research.sadl.errorgenerator</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>com.ge.research.sadl.ide</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>com.ge.research.sadl.jena</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.ge.research.sadl</groupId>
-                    <artifactId>com.ge.research.sadl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>com.ge.research.sadl.jena-wrapper-for-sadl</artifactId>
-            <version>3.2.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.sadl</groupId>
             <artifactId>reasoner-api</artifactId>
             <version>3.2.1-SNAPSHOT</version>
             <exclusions>
@@ -66,34 +31,14 @@
             <version>3.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>3.0</version>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-api</artifactId>
+            <version>3.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.platform</groupId>
-            <artifactId>org.eclipse.core.resources</artifactId>
-            <version>3.13.500</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.emf</groupId>
-            <artifactId>org.eclipse.emf.common</artifactId>
-            <version>2.15.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.emf</groupId>
-            <artifactId>org.eclipse.emf.ecore</artifactId>
-            <version>2.15.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xtext</groupId>
-            <artifactId>org.eclipse.xtext</artifactId>
-            <version>2.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.xtext</groupId>
-            <artifactId>org.eclipse.xtext.util</artifactId>
-            <version>2.14.0</version>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-impl</artifactId>
+            <version>3.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

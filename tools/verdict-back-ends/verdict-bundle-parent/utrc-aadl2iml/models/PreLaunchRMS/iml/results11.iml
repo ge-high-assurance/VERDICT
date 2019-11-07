@@ -1,0 +1,202 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+type Send_GPS_Keys_dot_impl   exhibits(Send_GPS_KeysTrait){
+};
+
+trait Command_BitTrait  refines(Synchronous, Process, Component) {
+	Bit_CMD_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@20eb7f95 (name: f_Out) (kind: source) not supported
+};
+
+type Command_Bit  exhibits(Command_BitTrait);
+trait Send_Mission_Critical_DataTrait  refines(Synchronous, Process, Component) {
+	MCD_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@213b9116 (name: f_out) (kind: source) not supported
+};
+
+type Send_Mission_Critical_Data  exhibits(Send_Mission_Critical_DataTrait);
+type Launcher_dot_impl   exhibits(LauncherTrait){
+	Power_to_Missile : Power_to_Missile;
+	Run_BIT : Run_Bit;
+	Detailed_Bit_Report : Detailed_Bit_Report;
+	GPS_Keys : GPS_Keys;
+	Purge_Keypath_Command : Purge_Keypath_Command;
+	Keypath_Purged : Keypath_Purged;
+	Almanac_Data : Almanac_Data;
+	Ephemeris_Data : Ephemeris_data;
+	PTAM : PTAM;
+	Mission_Critical_Data : Mission_Critical_Data;
+	Squib_Battery_Preparation_Command : Squib_Battery_Preparation_Command;
+	Squib_Battery_Command : Squib_Battery_Command;
+	Acknowledgement_Message : Acknowledgement_Message;
+	Launcher_Power_Present : Launcher_Power_Present;
+	Power_On_Launcher : Turn_on_Launcher;
+	Launcher_Command_Bit : Command_Bit;
+	Launcher_BIT_Report : Receive_Detailed_Bit_Report;
+	Launcher_Crypto_Keys : Send_GPS_Keys;
+	Launcher_Keypath_Purge_Cmd : Command_Purge_Keypath;
+	Launcher_Send_Almanac_Data : Send_Almanac_Data;
+	Launcher_Send_Ephemeris_Data : Send_Ephemeris_Data;
+	Launcher_Send_PTAM : Send_PTAM;
+	Launcher_Send_MCD : Send_Mission_Critical_Data;
+	Launcher_Squib_Battery_Preparation : Send_Prepare_Squib_Battery_Command;
+	Launcher_Send_Squib_Battery_Command : Send_Squib_Battery_Command;
+	Launcher_Receive_ACK_Message : Receive_acknowledgement_message;
+	Launcher_Receive_Power_Present_Message : Receive_Power_Present_Message;
+	Launcher_to_MC_Power : Connector<OutDataPort<>, OutDataPort<Power_to_Missile>> := connect<OutDataPort<>, OutDataPort<Power_to_Missile>>(Power_On_Launcher.Power_out, Power_to_Missile_Launcher);
+	assert{Power_On_Launcher.Power_out.data = Power_to_Missile_Launcher.data};
+	Launcher_to_MC_BIT_Cmd : Connector<OutDataPort<>, OutDataPort<Run_Bit>> := connect<OutDataPort<>, OutDataPort<Run_Bit>>(Launcher_Command_Bit.Bit_CMD_out, BIT_Cmd_Launcher);
+	assert{Launcher_Command_Bit.Bit_CMD_out.data = BIT_Cmd_Launcher.data};
+	Missile_to_Launcher_Bit_Report : Connector<InDataPort<Detailed_Bit_Report>, InDataPort<>> := connect<InDataPort<Detailed_Bit_Report>, InDataPort<>>(Detailed_Bit_Report_Missile, Launcher_BIT_Report.Bit_Report_in);
+	assert{Detailed_Bit_Report_Missile.data = Launcher_BIT_Report.Bit_Report_in.data};
+	Launcher_to_MC_Squib_Battery_Prep : Connector<OutDataPort<>, OutDataPort<Squib_Battery_Preparation_Command>> := connect<OutDataPort<>, OutDataPort<Squib_Battery_Preparation_Command>>(Launcher_Squib_Battery_Preparation.Command_out, Squib_Battery_Preparation_Command_Launcher);
+	assert{Launcher_Squib_Battery_Preparation.Command_out.data = Squib_Battery_Preparation_Command_Launcher.data};
+	Missile_to_Launcher_ACK_Message : Connector<InDataPort<Acknowledgement_Message>, InDataPort<>> := connect<InDataPort<Acknowledgement_Message>, InDataPort<>>(Acknowledgement_Message_Missile, Launcher_Receive_ACK_Message.ACK_message_in);
+	assert{Acknowledgement_Message_Missile.data = Launcher_Receive_ACK_Message.ACK_message_in.data};
+	Launcher_to_MC_Ephemeris_Data : Connector<OutDataPort<>, OutDataPort<Ephemeris_data>> := connect<OutDataPort<>, OutDataPort<Ephemeris_data>>(Launcher_Send_Ephemeris_Data.Ephemeris_data_out, Ephemeris_Data_Launcher);
+	assert{Launcher_Send_Ephemeris_Data.Ephemeris_data_out.data = Ephemeris_Data_Launcher.data};
+	Launcher_to_MC_Squib_Battery : Connector<OutDataPort<>, OutDataPort<Squib_Battery_Command>> := connect<OutDataPort<>, OutDataPort<Squib_Battery_Command>>(Launcher_Send_Squib_Battery_Command.Squib_Command_out, Squib_Battery_Command_Launcher);
+	assert{Launcher_Send_Squib_Battery_Command.Squib_Command_out.data = Squib_Battery_Command_Launcher.data};
+	Launcher_to_MC_Purge_Keypath : Connector<OutDataPort<>, OutDataPort<Purge_Keypath_Command>> := connect<OutDataPort<>, OutDataPort<Purge_Keypath_Command>>(Launcher_Keypath_Purge_Cmd.Purge_Keypath_Command_out, Purge_Keypath_Command_Launcher);
+	assert{Launcher_Keypath_Purge_Cmd.Purge_Keypath_Command_out.data = Purge_Keypath_Command_Launcher.data};
+	Missile_to_Launcher_Keypath_Purged : Connector<InDataPort<Keypath_Purged>, InDataPort<>> := connect<InDataPort<Keypath_Purged>, InDataPort<>>(Keypath_Purged_Missile, Launcher_Keypath_Purge_Cmd.Command_Response_in);
+	assert{Keypath_Purged_Missile.data = Launcher_Keypath_Purge_Cmd.Command_Response_in.data};
+	Launcher_to_MC_GPS_Keys : Connector<OutDataPort<>, OutDataPort<GPS_Keys>> := connect<OutDataPort<>, OutDataPort<GPS_Keys>>(Launcher_Crypto_Keys.GPS_Keys_out, GPS_Keys_Launcher);
+	assert{Launcher_Crypto_Keys.GPS_Keys_out.data = GPS_Keys_Launcher.data};
+	Launcher_to_MC_PTAM : Connector<OutDataPort<>, OutDataPort<PTAM>> := connect<OutDataPort<>, OutDataPort<PTAM>>(Launcher_Send_PTAM.PTAM_out, PTAM_Launcher);
+	assert{Launcher_Send_PTAM.PTAM_out.data = PTAM_Launcher.data};
+	Launcher_to_MC_Almanac_Data : Connector<OutDataPort<>, OutDataPort<Almanac_Data>> := connect<OutDataPort<>, OutDataPort<Almanac_Data>>(Launcher_Send_Almanac_Data.Almanac_data_out, Almanac_Data_Cmd_Launcher);
+	assert{Launcher_Send_Almanac_Data.Almanac_data_out.data = Almanac_Data_Cmd_Launcher.data};
+	Launcher_to_MC_MCD : Connector<OutDataPort<>, OutDataPort<Mission_Critical_Data>> := connect<OutDataPort<>, OutDataPort<Mission_Critical_Data>>(Launcher_Send_MCD.MCD_out, Mission_Critical_Data_Launcher);
+	assert{Launcher_Send_MCD.MCD_out.data = Mission_Critical_Data_Launcher.data};
+	Missile_to_Launcher_Power_Present : Connector<InDataPort<Launcher_Power_Present>, InDataPort<>> := connect<InDataPort<Launcher_Power_Present>, InDataPort<>>(Launcher_Power_Present_Missile, Launcher_Receive_Power_Present_Message.Power_Present_Message_in);
+	assert{Launcher_Power_Present_Missile.data = Launcher_Receive_Power_Present_Message.Power_Present_Message_in.data};
+};
+
+type Send_Squib_Battery_Command_dot_impl   exhibits(Send_Squib_Battery_CommandTrait){
+};
+
+trait Turn_on_LauncherTrait  refines(Synchronous, Process, Component) {
+	Power_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@1c290b82 (name: f_Out) (kind: source) not supported
+};
+
+type Turn_on_Launcher  exhibits(Turn_on_LauncherTrait);
+trait Send_Squib_Battery_CommandTrait  refines(Synchronous, Process, Component) {
+	Squib_Command_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@176e95bb (name: f_out) (kind: source) not supported
+};
+
+type Send_Squib_Battery_Command  exhibits(Send_Squib_Battery_CommandTrait);
+type Send_Mission_Critical_Data_dot_impl   exhibits(Send_Mission_Critical_DataTrait){
+};
+
+trait Send_Almanac_DataTrait  refines(Synchronous, Process, Component) {
+	Almanac_data_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@7bd5f420 (name: f_out) (kind: source) not supported
+};
+
+type Send_Almanac_Data  exhibits(Send_Almanac_DataTrait);
+type Command_Bit_dot_impl   exhibits(Command_BitTrait){
+};
+
+type Turn_on_Launcher_dot_impl   exhibits(Turn_on_LauncherTrait){
+};
+
+trait Send_GPS_KeysTrait  refines(Synchronous, Process, Component) {
+	GPS_Keys_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@69242944 (name: f_Out) (kind: source) not supported
+};
+
+type Send_GPS_Keys  exhibits(Send_GPS_KeysTrait);
+trait Command_Purge_KeypathTrait  refines(Synchronous, Process, Component) {
+	Purge_Keypath_Command_out: OutDataPort<>;
+	Command_Response_in: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@5d730f36 (name: f_in) (kind: sink) not supported
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@155573d5 (name: f_Out) (kind: source) not supported
+};
+
+type Command_Purge_Keypath  exhibits(Command_Purge_KeypathTrait);
+type Send_Prepare_Squib_Battery_Command_dot_impl   exhibits(Send_Prepare_Squib_Battery_CommandTrait){
+};
+
+trait LauncherTrait  refines(Synchronous, Component, System) {
+	Power_to_Missile_Launcher: OutDataPort<Power_to_Missile>;
+	BIT_Cmd_Launcher: OutDataPort<Run_Bit>;
+	GPS_Keys_Launcher: OutDataPort<GPS_Keys>;
+	Purge_Keypath_Command_Launcher: OutDataPort<Purge_Keypath_Command>;
+	Almanac_Data_Cmd_Launcher: OutDataPort<Almanac_Data>;
+	Ephemeris_Data_Launcher: OutDataPort<Ephemeris_data>;
+	PTAM_Launcher: OutDataPort<PTAM>;
+	Squib_Battery_Preparation_Command_Launcher: OutDataPort<Squib_Battery_Preparation_Command>;
+	Squib_Battery_Command_Launcher: OutDataPort<Squib_Battery_Command>;
+	Mission_Critical_Data_Launcher: OutDataPort<Mission_Critical_Data>;
+	Detailed_Bit_Report_Missile: InDataPort<Detailed_Bit_Report>;
+	Keypath_Purged_Missile: InDataPort<Keypath_Purged>;
+	Acknowledgement_Message_Missile: InDataPort<Acknowledgement_Message>;
+	Launcher_Power_Present_Missile: InDataPort<Launcher_Power_Present>;
+};
+
+type Launcher  exhibits(LauncherTrait);
+trait Receive_acknowledgement_messageTrait  refines(Synchronous, Process, Component) {
+	ACK_message_in: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@16a67578 (name: f_in) (kind: sink) not supported
+};
+
+type Receive_acknowledgement_message  exhibits(Receive_acknowledgement_messageTrait);
+type Receive_Power_Present_Message_dot_impl   exhibits(Receive_Power_Present_MessageTrait){
+};
+
+trait Receive_Detailed_Bit_ReportTrait  refines(Synchronous, Process, Component) {
+	Bit_Report_in: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@5f9f8c55 (name: f_In) (kind: sink) not supported
+};
+
+type Receive_Detailed_Bit_Report  exhibits(Receive_Detailed_Bit_ReportTrait);
+type Receive_acknowledgement_message_dot_impl   exhibits(Receive_acknowledgement_messageTrait){
+};
+
+type Send_Almanac_Data_dot_impl   exhibits(Send_Almanac_DataTrait){
+};
+
+type Receive_Detailed_Bit_Report_dot_impl   exhibits(Receive_Detailed_Bit_ReportTrait){
+};
+
+trait Send_Prepare_Squib_Battery_CommandTrait  refines(Synchronous, Process, Component) {
+	Command_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@27c73893 (name: f_out) (kind: source) not supported
+};
+
+type Send_Prepare_Squib_Battery_Command  exhibits(Send_Prepare_Squib_Battery_CommandTrait);
+trait Send_Ephemeris_DataTrait  refines(Synchronous, Process, Component) {
+	Ephemeris_data_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@71577b6b (name: f_out) (kind: source) not supported
+};
+
+type Send_Ephemeris_Data  exhibits(Send_Ephemeris_DataTrait);
+type Send_Ephemeris_Data_dot_impl   exhibits(Send_Ephemeris_DataTrait){
+};
+
+trait Receive_Power_Present_MessageTrait  refines(Synchronous, Process, Component) {
+	Power_Present_Message_in: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@3bde2ba (name: f_in) (kind: sink) not supported
+};
+
+type Receive_Power_Present_Message  exhibits(Receive_Power_Present_MessageTrait);
+type Command_Purge_Keypath_dot_impl   exhibits(Command_Purge_KeypathTrait){
+};
+
+type Send_PTAM_dot_impl   exhibits(Send_PTAMTrait){
+};
+
+trait Send_PTAMTrait  refines(Synchronous, Process, Component) {
+	PTAM_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@6c6f9897 (name: f_out) (kind: source) not supported
+};
+
+type Send_PTAM  exhibits(Send_PTAMTrait);
+

@@ -1,0 +1,103 @@
+package GNC
+public
+	with SLLM;
+	with globals;
+	
+	system GNC
+		features
+			GPS_Keys_Missile: in data port globals::GPS_Keys;
+			Almanac_Data_Cmd_Missile: in data port globals::Almanac_Data;
+			Ephemeris_Data_Missile: in data port globals::Ephemeris_Data;
+			PTAM_Missile: in data port globals::PTAM;			
+	end GNC;
+	
+	system implementation GNC.with_devices
+		subcomponents
+				--> System instantiations of the model components are defined below.
+			rCASE_GPS: device GPS;
+			rCASE_IMU: device IMU;
+			rCASE_Battery: device GEU_Battery;
+			rCASE_GPS_Data_Generation: process GPS_Data_Generation;
+			CASE_SLLM: system SLLM::SLLM_system;
+			rCASE_IMU_Data_Generation: process IMU_Data_Generation;
+			GPS_Keys: data globals::GPS_Keys;
+			Almanac_Data: data globals::Almanac_Data;
+			Ephemeris_Data: data globals::Ephemeris_Data;
+			rCASE_Ethernet: bus Ethernet;
+			rCASE_Serial: bus Serial;
+				--connections
+				--> The Data Port connections between the model elements are defined below.
+				--> The Bus connections between the model elements are define below.
+		connections
+			MC_to_GPS_Almanac_Data: port Almanac_Data_Cmd_Missile -> rCASE_GPS.Data_In;
+			MC_to_GPS_Ephemeris_Data: port Ephemeris_Data_Missile -> rCASE_GPS.Data_In;
+			MC_to_GPS_GPS_Keys: port GPS_Keys_Missile -> rCASE_GPS.Data_In;
+			MC_to_SLLM_PTAM: feature PTAM_Missile -> CASE_SLLM.dev_port;
+	end GNC.with_devices; 
+	
+	--> the Serial bus element is declared below.
+	bus Serial
+	end Serial;
+	
+	--> the ethernet bus element is declared below.
+	bus Ethernet
+	end Ethernet;
+	
+	--> the IMU device element is declared and defined with the necessary characteristics.
+	device IMU
+		features
+			Data_Out: out data port;
+			Bus_Out: requires bus access Ethernet;
+		flows
+			f_Out: flow source Data_Out; 
+	end IMU;
+	
+	--> the IMU data element is declared below.  Further characterizations would be added here.
+	data IMU_Data
+	end IMU_Data;
+	
+    --> the IMU Data Generation process element is declared and defined with the necessary characteristics.
+	--> the process type was used since the Simulation is providing the data.  Also, we are using the black box view of this element.	
+	process IMU_Data_Generation
+		features
+			DA_Out: requires data access;
+	end IMU_Data_Generation;
+	
+	--> The process implementation elements accompanies the associated process element.
+	process implementation IMU_Data_Generation.impl
+	end IMU_Data_Generation.impl;
+	
+	--> the GPS device element is declared and defined with the necessary characteristics.	
+	device GPS
+		features
+			Data_In: in data port;
+			Data_Out: out data port;
+			Bus_Out: requires bus access Ethernet;
+			Bus_in: provides bus access Ethernet;	
+		flows
+			f_in: flow sink Data_In;
+			f_Out: flow source Data_Out;
+	end GPS;
+	
+	--> the GPS Data Generation process element is declared and defined with the necessary characteristics.
+	--> the process type was used since the Simulation is providing the data.  Also, we are using the black box view of this element.	
+	process GPS_Data_Generation
+		features
+			DA_Out: requires data access;
+	end GPS_Data_Generation;
+	
+	--> The process implementation elements accompanies the associated process element.
+	process implementation GPS_Data_Generation.impl
+	end GPS_Data_Generation.impl;
+	
+	--> the Navigator process element is declared and defined with the necessary characteristics.
+	--> The process type is used since it is a software element.	
+	
+	device GEU_Battery
+		features
+			Power_out: out data port;
+		flows
+			f_out: flow source Power_out;
+	end GEU_Battery;
+	
+end GNC;

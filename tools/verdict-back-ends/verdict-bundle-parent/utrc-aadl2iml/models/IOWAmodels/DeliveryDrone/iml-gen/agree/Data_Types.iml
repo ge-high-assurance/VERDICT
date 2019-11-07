@@ -1,0 +1,62 @@
+package agree.Data_Types;
+import iml.systems.*;
+import agree.Data_Model.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait InputBusTrait  refines(Data) {
+};
+
+type InputBus  exhibits(InputBusTrait);
+type ProbePlannerSignals_dot_impl   exhibits(ProbePlannerSignalsTrait){
+	is_target_clear : Bool;
+	is_target_location : Bool;
+};
+
+trait PositionTrait  refines(Data) {
+};
+
+type Position  exhibits(PositionTrait);
+type DeliveryOrder_dot_impl   exhibits(DeliveryOrderTrait){
+	target_position : Position_dot_impl;
+	target_picture : Int;
+	item_value : Real;
+};
+
+type RadioResponse_dot_impl   exhibits(RadioResponseTrait){
+	data_available : Bool;
+	target_confirmed : Bool;
+};
+
+type DeliveryStatus exhibits(Data) enum{
+	NOT_STARTED,
+	IN_PROGRESS,
+	COMPLETED,
+	FAILED
+};
+
+trait DeliveryOrderTrait  refines(Data) {
+};
+
+type DeliveryOrder  exhibits(DeliveryOrderTrait);
+trait RadioResponseTrait  refines(Data) {
+};
+
+type RadioResponse  exhibits(RadioResponseTrait);
+trait ProbePlannerSignalsTrait  refines(Data) {
+};
+
+type ProbePlannerSignals  exhibits(ProbePlannerSignalsTrait);
+type Position_dot_impl   exhibits(PositionTrait){
+	x : Real;
+	y : Real;
+};
+
+type InputBus_dot_impl   exhibits(InputBusTrait){
+	connected : Bool;
+	update_order : Bool;
+	order : DeliveryOrder_dot_impl;
+};
+
+

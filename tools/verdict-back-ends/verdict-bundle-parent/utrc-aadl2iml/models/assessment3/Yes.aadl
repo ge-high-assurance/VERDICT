@@ -1,0 +1,63 @@
+
+-- This model similar to the Toy example from the AGREE User Guide. The original models can be found at
+-- https://github.com/smaccm/smaccm/blob/master/models/Toy_AGREE_Models/Toy_Example.zip
+
+package UTRC_Explain_Yes
+public
+	 
+    with Base_Types;
+
+    system A
+       features
+           Input: in data port Base_Types::Integer;
+            Output: out data port Base_Types::Integer;
+        annex agree {**
+            assume "A input domain" : Input < 20;
+            guarantee "A output range" : Output < 2 * Input;
+        **};
+    end A ;
+
+    system B
+        features
+            Input: in data port Base_Types::Integer;
+            Output: out data port Base_Types::Integer;
+        annex agree {**
+            assume "B input domain" : Input < 20;
+            guarantee "B output range" : Output < Input + 15;
+        **};
+    end B ;
+
+    system C
+        features
+            Input1: in data port Base_Types::Integer;
+            Input2: in data port Base_Types::Integer;
+            Output: out data port Base_Types::Integer;
+        annex agree {**
+            guarantee "C output range" : Output = Input1 + Input2;
+        **};
+    end C ;
+
+    system top_level
+        features
+            Input: in data port Base_Types::Integer;
+            Output: out data port Base_Types::Integer;
+        annex agree {**
+            assume "System input domain" : Input < 10;
+            guarantee "System output range" : Output < 50;
+        **};
+    end top_level;
+
+    system implementation top_level.Impl
+        subcomponents
+            A_sub : system A ;
+            B_sub : system B ;
+            C_sub : system C ;
+        connections
+            IN_TO_A : port Input -> A_sub.Input;
+            A_TO_B : port A_sub.Output -> B_sub.Input;
+            A_TO_C : port A_sub.Output -> C_sub.Input1;
+            B_TO_C : port B_sub.Output -> C_sub.Input2;
+            C_TO_Output : port C_sub.Output -> Output;
+    end top_level.Impl;
+	
+end UTRC_Explain_Yes;

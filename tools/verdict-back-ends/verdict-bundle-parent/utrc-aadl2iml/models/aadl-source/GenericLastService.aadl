@@ -1,0 +1,36 @@
+package GenericLastServiceEvents_pkg
+public
+	with UxASNodeLibEvents;
+    with Base_Types ;
+        
+    thread GenericLastService
+    	features 
+    	    CmdRequest_in: in event data port Base_Types::Boolean;
+    	    CmdResponse_out: out event data port Base_Types::Boolean;
+    	flows
+			processing_path : flow path CmdRequest_in -> CmdResponse_out;
+		properties
+			latency => 1 ms .. 1ms applies to processing_path;
+			
+	    annex iml {**
+			gmonitor : responds_once ;
+			c1 : Connector < Bool > := 
+			<Bool>connect(CmdRequest_in.event,gmonitor.b);
+			c2 : Connector < Bool > := 
+			<Bool>connect(CmdResponse_out.event,gmonitor.a);
+			
+			d1 : delay ;
+			c5 : Connector < FlowPath > := 
+			<FlowPath>connect(processing_path,d1.f);
+			c6 : Connector < Int > := 
+			<Int>connect(1,d1.n);
+			
+			[Guarantee,Output] g : Bool := {gmonitor.holds  && d1.holds}  ;
+			
+	   	**};
+    	
+    end GenericLastService;
+    
+ 
+    
+end GenericLastServiceEvents_pkg;

@@ -1,0 +1,14 @@
+package iml.fsm ;
+
+annotation Invariant ;
+annotation Transition ;
+annotation Init ;
+annotation Fsm ;
+
+
+type PrimedVar<T> {
+	current : T ;
+	next : T;
+} ;
+
+

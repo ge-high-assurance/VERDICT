@@ -1,0 +1,251 @@
+package Mission_Control
+public
+	with globals;
+	
+	system Mission_Control
+		features
+			Power_to_Missile_Launcher: in data port globals::Power_to_Missile;
+			BIT_Cmd_Launcher: in data port globals::Run_BIT;
+			GPS_Keys_Launcher: in data port globals::GPS_Keys;
+			Purge_Keypath_Command_Launcher: in data port globals::Purge_Keypath_Command;
+			Almanac_Data_Cmd_Launcher: in data port globals::Almanac_Data;
+			Ephemeris_Data_Launcher: in data port globals::Ephemeris_Data;			
+			PTAM_Launcher: in data port globals::PTAM;
+			Squib_Battery_Preparation_Command_Launcher: in data port globals::Squib_Battery_Preparation_Command;
+			Squib_Battery_Command_Launcher: in data port globals::Squib_Battery_Command;			
+			Mission_Critical_Data_Launcher: in data port globals::Mission_Critical_Data;
+			Detailed_Bit_Report_Missile: out data port globals::Detailed_Bit_Report;
+			Keypath_Purged_Missile: out data port globals::Keypath_Purged;
+			GPS_Keys_Missile: out data port globals::GPS_Keys;
+			Almanac_Data_Cmd_Missile: out data port globals::Almanac_Data;
+			Ephemeris_Data_Missile: out data port globals::Ephemeris_Data;	
+			Acknowledgement_Message_Missile: out data port globals::Acknowledgement_Message;
+			Launcher_Power_Present_Missile: out data port globals::Launcher_Power_Present;
+			PTAM_Missile: out data port globals::PTAM;			
+	
+	end Mission_Control;
+	
+	system implementation Mission_Control.with_hardware
+		subcomponents
+			rCASE_Mission_Controller: processor Mission_Controller;
+			Missile_Run_CBIT: process Run_CBIT;
+			Missile_Bit_Report_Out: process Provide_detailed_Bit_report;
+			Missile_GPS_Keys_in: process Receive_GPS_Keys;
+			Missile_Purge_Keypath: process Purge_Keypath;
+			Missile_Almanac_Data_in: process Receive_Almanac_Data;
+			Missile_Ephemeris_Data_in: process Receive_Ephemeris_Data;
+			Missile_PTAM_in: process Receive_PTAM;
+			Missile_MCD_in: process Receive_Mission_Critical_Data;
+			Missile_Prepare_to_Squib_battery: process Prepare_to_Squib_Battery;
+			Missile_Squib_Battery: process Squib_Battery_Command;
+			Missile_Send_acknowledgement: process Activate_Battery_Command_Received;
+			Missile_Verify_Launcher_Power: process Verify_Launcher_Power_Present;
+			Power_to_Missile: data globals::Power_to_Missile;
+			Run_BIT: data globals::Run_BIT;
+			Detailed_Bit_Report: data globals::Detailed_Bit_Report;
+			GPS_Keys: data globals::GPS_Keys;
+			Purge_Keypath_Command: data globals::Purge_Keypath_Command;
+			Keypath_Purged: data globals::Keypath_Purged;
+			Almanac_Data: data globals::Almanac_Data;
+			Ephemeris_Data: data globals::Ephemeris_Data;
+			PTAM: data globals::PTAM;
+			Mission_Critical_Data: data globals::Mission_Critical_Data;
+			Squib_Battery_Preparation_Command: data globals::Squib_Battery_Preparation_Command;
+			Squib_Battery_Command: data globals::Squib_Battery_Command;
+			Acknowledgement_Message: data globals::Acknowledgement_Message;
+			Launcher_Power_Present: data globals::Launcher_Power_Present;
+		connections
+			Launcher_to_MC_Purge_Keypath: port Purge_Keypath_Command_Launcher -> Missile_Purge_Keypath.Command_In;
+			Missile_to_Launcher_Keypath_Purged: port Missile_Purge_Keypath.Response_Out -> Keypath_Purged_Missile;
+			Launcher_to_MC_Ephemeris_Data: port Ephemeris_Data_Launcher -> Missile_Ephemeris_Data_in.Ephemeris_Data_in;
+			Launcher_to_MC_Almanac_Data: port Almanac_Data_Cmd_Launcher -> Missile_Almanac_Data_in.Almanac_Data_in;
+			Launcher_to_MC_PTAM: port PTAM_Launcher -> Missile_PTAM_in.PTAM_in;
+			Launcher_to_MC_GPS_Keys: port GPS_Keys_Launcher -> Missile_GPS_Keys_in.GPS_Keys_in;
+			Launcher_to_MC_BIT_Cmd: port BIT_Cmd_Launcher -> Missile_Run_CBIT.Bit_Command_In;
+			Missile_to_Launcher_Bit_Report: port Missile_Bit_Report_Out.Bit_Report_Out -> Detailed_Bit_Report_Missile;
+			Launcher_to_MC_MCD: port Mission_Critical_Data_Launcher -> Missile_MCD_in.Mission_Critical_Data_in;
+			Launcher_to_MC_Power: port Power_to_Missile_Launcher -> rCASE_Mission_Controller.Power_from_launcher;
+			MC_to_GPS_GPS_Keys: port Missile_GPS_Keys_in.GPS_Keys_out -> GPS_Keys_Missile;
+			MC_to_GPS_Almanac_data: port Missile_Almanac_Data_in.Almanac_Data_Out -> Almanac_Data_Cmd_Missile;
+			MC_to_GPS_Ephemeris_data: port Missile_Ephemeris_Data_in.Ephemeris_Data_out -> Ephemeris_Data_Missile;
+			Missile_to_Launcher_ACK_Message: port Missile_Send_acknowledgement.Acknowledge_Message_out -> Acknowledgement_Message_Missile;
+			Launcher_to_MC_Squib_Battery_Prep: port Squib_Battery_Preparation_Command_Launcher -> Missile_Prepare_to_Squib_battery.Command_in;
+			Launcher_to_MC_Squib_Battery: port Squib_Battery_Command_Launcher -> Missile_Squib_Battery.Squib_Command_in;
+			Missile_to_Launcher_Power_Present: port Missile_Verify_Launcher_Power.Launcher_Power_Present -> Launcher_Power_Present_Missile;
+			MC_to_SLLM_PTAM: port Missile_PTAM_in.PTAM_out -> PTAM_Missile;
+	end Mission_Control.with_hardware;
+	
+	processor Mission_Controller
+		features
+			CODE_Waypoints_In: in data port;
+			Guidance_Command_Out_MC: out data port;
+			Navigation_Cmd_Out: out data port;
+			Target_Location_In: in data port;
+			GNC_Waypoint_Out: out data port;
+			Guidance_Cmd_In_GNC: in data port;
+			Power_from_launcher: in data port;
+			
+		flows
+			f0: flow sink CODE_Waypoints_In;
+			f1: flow source Guidance_Command_Out_MC;
+			f2: flow source Navigation_Cmd_Out;
+			f3: flow sink Target_Location_In;
+			f4: flow source GNC_Waypoint_Out;
+			f5: flow sink Guidance_Cmd_In_GNC;
+	end Mission_Controller;
+	
+	process Receive_Power_from_Launcher
+	end Receive_Power_from_Launcher;
+	
+	process implementation Receive_Power_from_Launcher.impl
+	end Receive_Power_from_Launcher.impl;
+	
+	process Run_CBIT
+		features
+			Bit_Command_In: in data port;
+		flows
+			f_in: flow sink Bit_Command_In;
+	end run_CBIT;
+	
+	process implementation Run_CBIT.impl
+	end Run_CBIT.impl;
+	
+	process Provide_detailed_Bit_Report
+		features
+			Bit_Report_Out: out data port;
+		flows
+			f_out: flow source Bit_Report_Out;			
+	end Provide_detailed_Bit_Report;
+	
+	process implementation Provide_detailed_Bit_Report.impl
+	end Provide_detailed_Bit_Report.impl;
+	
+	Process Receive_GPS_Keys
+		features
+			GPS_Keys_in: in data port;
+			GPS_Keys_out: out data port;
+		flows
+			f_in: flow sink GPS_Keys_in;			
+			f_out: flow source GPS_Keys_out;	
+	end Receive_GPS_Keys;
+	
+	Process Implementation Receive_GPS_Keys.impl
+	end Receive_GPS_Keys.impl;
+	
+	Process Purge_Keypath
+		features
+			Command_In: in data port;
+			Response_Out: out data port;
+		flows
+			f_in: flow sink Command_In;			
+			f_out: flow source Response_Out;				
+	end Purge_Keypath;
+	
+	process implementation Purge_Keypath.impl
+	end Purge_Keypath.impl;
+	
+	Process Receive_Almanac_Data
+		features
+			Almanac_Data_in: in data port;
+			Almanac_Data_Out: out data port;
+		flows
+			f_in: flow sink Almanac_Data_in;			
+			f_out: flow source Almanac_Data_Out;				
+	end Receive_Almanac_Data;
+	
+	process implementation Receive_Almanac_Data.impl
+	end Receive_Almanac_Data.impl;
+	
+	Process Receive_Ephemeris_Data
+		features
+			Ephemeris_Data_in: in data port;
+			Ephemeris_Data_out: out data port;
+		flows
+			f_in: flow sink Ephemeris_Data_in;			
+			f_out: flow source Ephemeris_Data_out;				
+	end Receive_Ephemeris_Data;
+	
+	process implementation Receive_Ephemeris_Data.impl
+	end Receive_Ephemeris_Data.impl;
+	
+	Process Receive_PTAM
+		features
+			PTAM_in: in data port;
+			PTAM_out: out data port;
+		flows
+			f_in: flow sink PTAM_in;
+			f_out: flow source PTAM_out;			
+	end Receive_PTAM;
+	
+	Process implementation Receive_PTAM.impl
+	end Receive_PTAM.impl;
+	
+	Process Receive_Mission_Critical_Data
+		features
+			Mission_Critical_Data_in: in data port;
+		flows
+			f_in: flow sink Mission_Critical_Data_in;				
+	end Receive_Mission_Critical_Data;
+	
+	Process implementation Receive_Mission_Critical_Data.impl
+	end Receive_Mission_Critical_Data.impl;
+	
+	process Prepare_to_Squib_Battery
+		features
+			Command_in: in data port;
+		flows
+			f_in: flow sink Command_in;
+	end Prepare_to_Squib_Battery;
+	
+	process implementation Prepare_to_Squib_Battery.impl
+	end Prepare_to_Squib_Battery.impl;
+	
+	Process Squib_Battery_Command
+		features
+			Squib_Command_in: in data port;
+		flows
+			f_in: flow sink Squib_Command_in;
+	end Squib_Battery_Command;
+	
+	process implementation Squib_Battery_Command.impl
+	end Squib_Battery_Command.impl;
+	
+	process Activate_Battery_Command_Received
+		features
+			Acknowledge_Message_out: out data port;
+		flows
+			f_out: flow source Acknowledge_Message_out;
+	end Activate_Battery_Command_Received;
+	
+	process implementation Activate_Battery_Command_Received.impl
+	end Activate_Battery_Command_Received.impl;
+	
+	Process Verify_Launcher_Power_Present
+		features
+			Launcher_Power_Present: out data port;
+		flows
+			f_out: flow source Launcher_Power_Present;
+	end Verify_Launcher_Power_Present;
+	
+	process implementation Verify_Launcher_Power_Present.impl
+	end Verify_Launcher_Power_Present.impl;
+	
+	data CODE_Waypoints_Data
+	end CODE_Waypoints_Data;
+	
+	data Guidance_Command_From_MC
+	end Guidance_Command_From_MC;
+	
+	data Navigation_Cmd
+	end Navigation_Cmd;
+	
+	data Target_Location
+	end Target_Location;
+	
+	data GNC_Waypoint
+	end GNC_Waypoint;
+	
+	data Guidance_Cmd_From_GNC
+	end Guidance_Cmd_From_GNC;
+	
+end Mission_Control;

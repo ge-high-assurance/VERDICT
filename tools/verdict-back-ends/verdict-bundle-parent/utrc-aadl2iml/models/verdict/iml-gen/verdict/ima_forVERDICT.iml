@@ -1,0 +1,82 @@
+package verdict.ima_forVERDICT;
+import iml.lang.utils.*;
+import iml.systems.*;
+import iml.verdict.*;
+import iml.software.*;
+import iml.contracts.*;
+ 
+trait VoterTrait  refines(Component, System) {
+	in1: InDataPort<Int>;
+	in2: InDataPort<Int>;
+	in3: InDataPort<Int>;
+	out1: OutDataPort<Int>;
+	[EventAn{comment="loss of availability of the Voter" && description="VoterLOA" && probability="1.0e-5"}] Ev_loa_event1 : Event;
+	
+	[SafetyRel] SRel_my_safety_relation_01 : Bool :=  happens(Ev_loa_event1) ||( A(in1) && A(in2) )||( A(in1) && A(in3) )||( A(in2) && A(in3) )=>  I(out1) ;
+	
+	[EventAn{comment="undetected erroneous data from the Voter" && description="VoterUED" && probability="1.0e-6"}] Ev_ued_event2 : Event;
+	
+	[SafetyRel] SRel_my_safety_relation_02 : Bool :=  happens(Ev_ued_event2) || I(in1) || I(in2) || I(in3) =>  I(out1) ;
+	
+	[CyberRel] CRel_my_cyber_relation_03 : Bool :=  I(in1) || I(in2) || I(in3) =>  I(out1) ;
+	
+	[CyberRel] CRel_my_cyber_relation_04 : Bool :=  A(in1) || A(in2) || A(in3) =>  A(out1) ;
+	
+			
+			
+};
+
+type Voter  exhibits(VoterTrait);
+trait IRUTrait  refines(Component, System) {
+	in1: InDataPort<Int>;
+	out1: OutDataPort<Int>;
+	[EventAn{comment="loss of availability of the Voter" && description="VoterLOA" && probability="3.0e-5"}] Ev_loa_event : Event;
+	
+	[EventAn{comment="loss of availability of the Voter" && description="VoterLOA" && probability="4.0e-4"}] Ev_ued_event : Event;
+	
+	[SafetyRel] SRel_failed : Bool :=  A(out1) ;
+	
+	[SafetyRel] SRel_erroneous : Bool :=  I(out1) ;
+	
+	[CyberRel] CRel_my_cyber_relation_01 : Bool :=  I(out1) ;
+	
+	[CyberRel] CRel_my_cyber_relation_02 : Bool :=  A(out1) ;
+	
+			
+			
+};
+
+type IRU  exhibits(IRUTrait);
+type SampleIMA_dot_Impl   exhibits(SampleIMATrait){
+	voter : Voter;
+	iru1 : IRU;
+	iru2 : IRU;
+	iru3 : IRU;
+	c1 : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(iru1.out1, voter.in1);
+	assert{iru1.out1.data = voter.in1.data};
+	c2 : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(iru2.out1, voter.in2);
+	assert{iru2.out1.data = voter.in2.data};
+	c3 : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(iru3.out1, voter.in3);
+	assert{iru3.out1.data = voter.in3.data};
+	c4 : Connector<OutDataPort<Int>, OutDataPort<Int>> := connect<OutDataPort<Int>, OutDataPort<Int>>(voter.out1, out1);
+	assert{voter.out1.data = out1.data};
+};
+
+trait SampleIMATrait  refines(Component, System) {
+	out1: OutDataPort<Int>;
+	[SafetyReq] SReq_my_safety_requirement01 : Bool := A(out1) ;
+	
+	[SafetyReq] SReq_my_safety_requirement02 : Bool := I(out1) ;
+	
+	[CyberReq{description="some text description of the requirement" && severity=Severity.Hazardous && cia=CIA.I && targetLikelihood=TargetLikelihood.TL_Hazardous}] CReq_1_1 : Bool := A(out1) || I(out1) ;
+	
+	[CyberReq{description="some text description of the requirement" && severity=Severity.Hazardous && cia=CIA.I && targetLikelihood=TargetLikelihood.TL_Hazardous}] CReq_1_2 : Bool := A(out1) || I(out1) ;
+	
+	[CyberMission{comment="ddd"}] CMis_Mission1 : Bool := CReq_1_1 &&  CReq_1_2 ;
+	
+			
+			
+};
+
+type SampleIMA  exhibits(SampleIMATrait);
+
