@@ -1,0 +1,37 @@
+package Types
+public
+	with Base_Types;
+	data speed
+	end speed;
+	
+	data implementation speed.speed_impl
+    	subcomponents
+      		val: data Base_Types::Float;
+  	end speed.speed_impl;
+	
+	data actuator
+	end actuator;
+	
+	data implementation actuator.actuator_impl
+    	subcomponents
+      		val: data Base_Types::Float;
+  	end actuator.actuator_impl;
+  	
+  	data pitch
+  	end pitch;
+  	
+  	data implementation pitch.pitch_impl
+  		subcomponents
+  			val: data Base_Types::Float;
+  	end pitch.pitch_impl;
+  	
+  	
+  	data state_sig
+  	end state_sig;
+  	
+  	data implementation state_sig.impl
+  		subcomponents
+  			val: data Base_Types::Integer;
+  	end state_sig.impl;
+  	
+end Types;

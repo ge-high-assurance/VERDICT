@@ -1,0 +1,42 @@
+package d
+public
+	
+	with Base_Types;
+	with VERDICT_Properties;
+	
+	annex iml {**
+			
+		FOOOO 1
+																										
+	**};
+	
+	process superprocess
+		
+	end superprocess; 
+	annex iml {**
+			
+		FOOOO 2
+																										
+	**};
+	
+	process subprocess extends superprocess
+		features
+			in_out_data : in out data port Base_Types::Integer;                 
+		flows
+			f1: flow source in_out_data {
+	        	Latency => 2 ms .. 3 ms;
+	        };
+	        
+		annex iml {**
+			assume "in out is positive" : in_out_data.val >= 0;																					
+		**};
+	
+	end subprocess; 
+	
+	annex iml {**
+			
+		FOOOO 3
+																										
+	**};
+
+end d;

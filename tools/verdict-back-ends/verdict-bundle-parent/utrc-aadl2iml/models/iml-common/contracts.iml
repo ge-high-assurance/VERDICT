@@ -1,0 +1,8 @@
+package iml.contracts ;
+import iml.lang.*;
+
+annotation Contract ;
+annotation Specification ;
+annotation Implementation ;
+annotation Assumption ;
+annotation Guarantee ;

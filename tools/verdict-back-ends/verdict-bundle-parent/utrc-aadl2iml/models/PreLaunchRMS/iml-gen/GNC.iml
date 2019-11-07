@@ -1,0 +1,87 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+type GNC_dot_with_devices   exhibits(GNCTrait){
+	rCASE_Ethernet : Ethernet;
+	rCASE_Serial : Serial;
+	GPS_Keys : GPS_Keys;
+	Almanac_Data : Almanac_Data;
+	Ephemeris_Data : Ephemeris_data;
+	rCASE_GPS : GPS;
+	rCASE_IMU : IMU;
+	rCASE_Battery : GEU_Battery;
+	rCASE_GPS_Data_Generation : GPS_Data_Generation;
+	rCASE_IMU_Data_Generation : IMU_Data_Generation;
+	CASE_SLLM : SLLM_system;
+	// FEATURE: org.osate.aadl2.impl.FeatureConnectionImpl@297b13d6 (name: MC_to_SLLM_PTAM) (bidirectional: false) not supported
+	MC_to_GPS_Almanac_Data : Connector<InDataPort<Almanac_Data>, InDataPort<>> := connect<InDataPort<Almanac_Data>, InDataPort<>>(Almanac_Data_Cmd_Missile, rCASE_GPS.Data_In);
+	assert{Almanac_Data_Cmd_Missile.data = rCASE_GPS.Data_In.data};
+	MC_to_GPS_Ephemeris_Data : Connector<InDataPort<Ephemeris_data>, InDataPort<>> := connect<InDataPort<Ephemeris_data>, InDataPort<>>(Ephemeris_Data_Missile, rCASE_GPS.Data_In);
+	assert{Ephemeris_Data_Missile.data = rCASE_GPS.Data_In.data};
+	MC_to_GPS_GPS_Keys : Connector<InDataPort<GPS_Keys>, InDataPort<>> := connect<InDataPort<GPS_Keys>, InDataPort<>>(GPS_Keys_Missile, rCASE_GPS.Data_In);
+	assert{GPS_Keys_Missile.data = rCASE_GPS.Data_In.data};
+};
+
+trait EthernetTrait  {
+};
+
+type Ethernet  exhibits(EthernetTrait);
+trait GPSTrait  {
+	Data_In: InDataPort<>;
+	Data_Out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.BusAccessImpl@15c55ab5 (name: Bus_Out) (kind: requires) (virtual: false) not supported
+	// FEATURE: org.osate.aadl2.impl.BusAccessImpl@38d0b1d2 (name: Bus_in) (kind: provides) (virtual: false) not supported
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@765eb017 (name: f_in) (kind: sink) not supported
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@6735383a (name: f_Out) (kind: source) not supported
+};
+
+type GPS  exhibits(GPSTrait);
+trait IMU_Data_GenerationTrait  refines(Synchronous, Process, Component) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@2830a10e (name: DA_Out) (kind: requires) not supported
+};
+
+type IMU_Data_Generation  exhibits(IMU_Data_GenerationTrait);
+trait IMU_DataTrait  refines(Data) {
+};
+
+type IMU_Data  exhibits(IMU_DataTrait);
+type IMU_Data_Generation_dot_impl   exhibits(IMU_Data_GenerationTrait){
+};
+
+trait GNCTrait  refines(Synchronous, Component, System) {
+	GPS_Keys_Missile: InDataPort<GPS_Keys>;
+	Almanac_Data_Cmd_Missile: InDataPort<Almanac_Data>;
+	Ephemeris_Data_Missile: InDataPort<Ephemeris_data>;
+	PTAM_Missile: InDataPort<PTAM>;
+};
+
+type GNC  exhibits(GNCTrait);
+trait SerialTrait  {
+};
+
+type Serial  exhibits(SerialTrait);
+type GPS_Data_Generation_dot_impl   exhibits(GPS_Data_GenerationTrait){
+};
+
+trait GEU_BatteryTrait  {
+	Power_out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@281e68dd (name: f_out) (kind: source) not supported
+};
+
+type GEU_Battery  exhibits(GEU_BatteryTrait);
+trait GPS_Data_GenerationTrait  refines(Synchronous, Process, Component) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@581ad69b (name: DA_Out) (kind: requires) not supported
+};
+
+type GPS_Data_Generation  exhibits(GPS_Data_GenerationTrait);
+trait IMUTrait  {
+	Data_Out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.BusAccessImpl@7c5ecfca (name: Bus_Out) (kind: requires) (virtual: false) not supported
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@3d8904f8 (name: f_Out) (kind: source) not supported
+};
+
+type IMU  exhibits(IMUTrait);
+

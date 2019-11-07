@@ -1,0 +1,35 @@
+package UAV
+public
+	
+	with MC;
+	with FC;
+	with UAS;
+	
+	bus Serial
+	end Serial;
+	
+	system UAV
+		features
+			recv_map: in event data port;
+			send_status: out event data port;
+			RFA: requires bus access UAS::RF;
+	end UAV;
+	
+	system implementation UAV.impl
+		subcomponents
+			MCMP: system MC::MissionComputer;
+			FCTL: system FC::FlightController;
+			SBUS: bus Serial;
+			
+		connections
+			bac1: bus access SBUS <-> MCMP.UARTA;
+			bac2: bus access SBUS <-> FCTL.UARTA;
+			bac3: bus access RFA -> MCMP.RFA;
+			c1: port recv_map -> MCMP.recv_map;
+			c2: port MCMP.send_status -> send_status;
+			c3: port MCMP.waypoint -> FCTL.waypoint;
+			c4: port FCTL.position_status -> MCMP.position_status;
+			
+	end UAV.impl;
+	
+end UAV;

@@ -1,0 +1,158 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+type geu_step_system_dot_impl   exhibits(geu_step_systemTrait){
+	UpdateDriverIn : UpdateDriverIn;
+	UpdateDriverOut : UpdateDriverOut;
+	latch_gnc_frame_time : latch_gnc_frame_time;
+	get_gnc_frame_dt : get_gnc_frame_dt;
+	get_timer : get_timer;
+	initialization_functions : initialization_functions;
+	state_machine_set_state : state_machine_set_state;
+	state_machine_get_esw_state : state_machine_get_esw_state;
+	geu_main : geu_main;
+	gnc_in : gnc_in;
+	gnc_out : gnc_out;
+	esw_state : esw_state;
+	exec_init_called : exec_init_called;
+	guidance_data : guidance_data_container;
+	navigation_data : navigation_data_container;
+	mm_state : mm_state_container;
+	dt : dt;
+	gnc_step : gnc_step_system;
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@311ce8c0 (name: c1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@5b1965ea (name: c8) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@7d0a43a8 (name: c6) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@649cae23 (name: c7) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@32101098 (name: init1) (bidirectional: true) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@22360505 (name: Uin1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@d0e05e8 (name: Uin2) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@c624fdc (name: Uin3) (bidirectional: true) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@3ec40a18 (name: Uin4) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@2cc83ee8 (name: gnc1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@51145fdc (name: gnc2) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@4f16f68d (name: gnc3) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@519cb1bd (name: gnc4) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@3cceea18 (name: gnc5) (bidirectional: true) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@4f57a8e2 (name: Uout1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@378d8d1b (name: Uout2) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@3a8d30e (name: Uout3) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@48fd7749 (name: Uout4) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@3a9fd60c (name: Uout5) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@61a16111 (name: Uout6) (bidirectional: false) (accessCategory: data) not supported
+	Uout7 : Connector<OutDataPort<UBX_message_dot_GUID_message>, OutDataPort<UBX_message_dot_GUID_message>> := connect<OutDataPort<UBX_message_dot_GUID_message>, OutDataPort<UBX_message_dot_GUID_message>>(UpdateDriverOut.GUID_message_out, GUID_message_out);
+	assert{UpdateDriverOut.GUID_message_out.data = GUID_message_out.data};
+	Uout8 : Connector<OutDataPort<UBX_message_dot_NAV_message>, OutDataPort<UBX_message_dot_NAV_message>> := connect<OutDataPort<UBX_message_dot_NAV_message>, OutDataPort<UBX_message_dot_NAV_message>>(UpdateDriverOut.NAV_message_out, NAV_message_out);
+	assert{UpdateDriverOut.NAV_message_out.data = NAV_message_out.data};
+};
+
+trait gncExecInitTrait  {
+};
+
+type gncExecInit  exhibits(gncExecInitTrait);
+trait state_machine_get_esw_stateTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@5a77475d (name: get_esw_state) (kind: requires) not supported
+};
+
+type state_machine_get_esw_state  exhibits(state_machine_get_esw_stateTrait);
+type gncExecInit_dot_impl   exhibits(gncExecInitTrait){
+};
+
+type state_machine_set_state_dot_impl   exhibits(state_machine_set_stateTrait){
+};
+
+trait dtTrait  refines(Data) {
+};
+
+type dt  exhibits(dtTrait);
+trait geu_step_systemTrait  refines(Synchronous, Component, System) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@15ab938d (name: gps_data) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@624b0e1b (name: imu_data) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@4a9fb5e9 (name: gnc_in_write) (kind: provides) not supported
+	GUID_message_out: OutDataPort<UBX_message_dot_GUID_message>;
+	NAV_message_out: OutDataPort<UBX_message_dot_NAV_message>;
+};
+
+type geu_step_system  exhibits(geu_step_systemTrait);
+trait get_gnc_frame_dtTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@194f5558 (name: assignment) (kind: requires) not supported
+};
+
+type get_gnc_frame_dt  exhibits(get_gnc_frame_dtTrait);
+trait state_machine_set_stateTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@454048e (name: set_esw_state) (kind: requires) not supported
+};
+
+type state_machine_set_state  exhibits(state_machine_set_stateTrait);
+type latch_gnc_frame_time_dot_impl   exhibits(latch_gnc_frame_timeTrait){
+};
+
+type UpdateDriverOut_dot_impl   exhibits(UpdateDriverOutTrait){
+};
+
+trait InitializeDriversTrait  {
+};
+
+type InitializeDrivers  exhibits(InitializeDriversTrait);
+type get_timer_dot_impl   exhibits(get_timerTrait){
+};
+
+trait UpdateDriverInTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@596c189f (name: gnc_in_write) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@2d6645a4 (name: geu_main_read_write) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@5aef1a93 (name: gps_data_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@7cc87859 (name: imu_data_read) (kind: requires) not supported
+};
+
+type UpdateDriverIn  exhibits(UpdateDriverInTrait);
+type get_gnc_frame_dt_dot_impl   exhibits(get_gnc_frame_dtTrait){
+};
+
+trait get_timerTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@406b7e73 (name: timer_gnc) (kind: requires) not supported
+};
+
+type get_timer  exhibits(get_timerTrait);
+type InitializeDrivers_dot_impl   exhibits(InitializeDriversTrait){
+};
+
+trait initialization_functionsTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@1c9513b9 (name: exec_init_called) (kind: requires) not supported
+};
+
+type initialization_functions  exhibits(initialization_functionsTrait);
+type dt_dot_impl   exhibits(dtTrait){
+};
+
+trait latch_gnc_frame_timeTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@a6203b5 (name: gnc_frame_time) (kind: requires) not supported
+};
+
+type latch_gnc_frame_time  exhibits(latch_gnc_frame_timeTrait);
+trait UpdateDriverOutTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@7814ab85 (name: geu_main_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@47211e6e (name: gnc_out_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@4b09f5f2 (name: guidance_data_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@79781e77 (name: navigation_data_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@24edca5e (name: mm_sys_state_read) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@6b7072c3 (name: mm_sys_substate_read) (kind: requires) not supported
+	NAV_message_out: OutDataPort<UBX_message_dot_NAV_message>;
+	GUID_message_out: OutDataPort<UBX_message_dot_GUID_message>;
+};
+
+type UpdateDriverOut  exhibits(UpdateDriverOutTrait);
+type UpdateDriverIn_dot_impl   exhibits(UpdateDriverInTrait){
+};
+
+type state_machine_get_esw_state_dot_impl   exhibits(state_machine_get_esw_stateTrait){
+};
+
+type initialization_functions_dot_impl   exhibits(initialization_functionsTrait){
+	InitializeDrivers : InitializeDrivers;
+	gncExecInit : gncExecInit;
+};
+
+

@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="5">
+  <element id="0" manual="true">
+    <element id="46">
+      <element id="47">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c1</seg>
+      </bo>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="40">
+      <element id="41">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c10</seg>
+      </bo>
+      <primaryLabelPosition x="-12.0" y="-26.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="56">
+      <element id="57">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c11</seg>
+      </bo>
+      <contentFilters/>
+    </element>
+    <element id="44">
+      <element id="45">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c2</seg>
+      </bo>
+      <primaryLabelPosition x="1.0" y="-1.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="24">
+      <element id="25">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c3</seg>
+      </bo>
+      <primaryLabelPosition x="-16.0" y="-36.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="38">
+      <element id="39">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c5</seg>
+      </bo>
+      <primaryLabelPosition x="14.0" y="-29.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="30">
+      <element id="31">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c6</seg>
+      </bo>
+      <bendpoints>
+        <point x="940.0" y="256.0"/>
+      </bendpoints>
+      <primaryLabelPosition x="-29.0" y="11.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="28">
+      <element id="29">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c7</seg>
+      </bo>
+      <bendpoints>
+        <point x="910.0" y="426.0"/>
+      </bendpoints>
+      <primaryLabelPosition x="6.0" y="14.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="26">
+      <element id="27">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c8</seg>
+      </bo>
+      <primaryLabelPosition x="-14.0" y="3.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="42">
+      <element id="43">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c9</seg>
+      </bo>
+      <primaryLabelPosition x="-20.0" y="10.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="3" dockArea="right">
+      <bo>
+        <seg>feature</seg>
+        <seg>position_status</seg>
+      </bo>
+      <position x="1110.0" y="500.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="4" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>recv_map</seg>
+      </bo>
+      <position y="320.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="5" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>send_status</seg>
+      </bo>
+      <position y="370.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="2" dockArea="right">
+      <bo>
+        <seg>feature</seg>
+        <seg>waypoint</seg>
+      </bo>
+      <position x="1145.0" y="350.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="1">
+      <bo>
+        <seg>realization</seg>
+      </bo>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+      </contentFilters>
+    </element>
+    <element id="6">
+      <element id="8" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>flight_plan</seg>
+        </bo>
+        <position x="136.0" y="52.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="7" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>position_status</seg>
+        </bo>
+        <position x="110.0" y="110.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="10" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>recv_map</seg>
+        </bo>
+        <position y="52.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="9">
+        <bo>
+          <seg>tag</seg>
+          <seg>sc_type</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>fpln</seg>
+      </bo>
+      <position x="360.0" y="94.0"/>
+      <size width="221.0" height="157.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+        <filter>features</filter>
+        <filter>flowSpecifications</filter>
+        <filter>modes</filter>
+        <filter>modeTransitions</filter>
+        <filter>subcomponentType</filter>
+      </contentFilters>
+    </element>
+    <element id="32">
+      <element id="48" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>recv_map_in</seg>
+        </bo>
+        <position y="44.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="50" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>recv_map_out</seg>
+        </bo>
+        <position x="134.0" y="44.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="49" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>send_status_in</seg>
+        </bo>
+        <position x="131.0" y="106.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="51" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>send_status_out</seg>
+        </bo>
+        <position y="96.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="34">
+        <bo>
+          <seg>tag</seg>
+          <seg>sc_type</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>radio</seg>
+      </bo>
+      <position x="79.0" y="280.0"/>
+      <size width="241.0" height="157.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+        <filter>features</filter>
+        <filter>flowSpecifications</filter>
+        <filter>modes</filter>
+        <filter>modeTransitions</filter>
+        <filter>subcomponentType</filter>
+      </contentFilters>
+    </element>
+    <element id="11">
+      <element id="52" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>position_status_in</seg>
+        </bo>
+        <position x="98.0" y="130.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="55" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>position_status_out</seg>
+        </bo>
+        <position y="108.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="53" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>waypoint_in</seg>
+        </bo>
+        <position y="60.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="54" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>waypoint_out</seg>
+        </bo>
+        <position x="128.0" y="60.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="16">
+        <bo>
+          <seg>tag</seg>
+          <seg>sc_type</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>uart</seg>
+      </bo>
+      <position x="890.0" y="290.0"/>
+      <size width="231.0" height="187.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+        <filter>features</filter>
+        <filter>flowSpecifications</filter>
+        <filter>modes</filter>
+        <filter>modeTransitions</filter>
+        <filter>subcomponentType</filter>
+      </contentFilters>
+    </element>
+    <element id="17">
+      <element id="20" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>flight_plan</seg>
+        </bo>
+        <position y="52.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="19" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>position_status</seg>
+        </bo>
+        <position x="120.0" y="110.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="18" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>waypoint</seg>
+        </bo>
+        <position x="155.0" y="52.0"/>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <element id="21">
+        <bo>
+          <seg>tag</seg>
+          <seg>sc_type</seg>
+        </bo>
+        <contentFilters>
+          <filter>generalizations</filter>
+          <filter>subprogramCallOrders</filter>
+          <filter>calledSubprogram</filter>
+        </contentFilters>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>wpm</seg>
+      </bo>
+      <position x="610.0" y="94.0"/>
+      <size width="231.0" height="157.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+        <filter>subprogramCallOrders</filter>
+        <filter>calledSubprogram</filter>
+        <filter>features</filter>
+        <filter>flowSpecifications</filter>
+        <filter>modes</filter>
+        <filter>modeTransitions</filter>
+        <filter>subcomponentType</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>classifier</seg>
+      <seg>mc_sw.impl</seg>
+    </bo>
+    <position x="50.0" y="30.0"/>
+    <size width="1221.0" height="581.0"/>
+    <contentFilters>
+      <filter>generalizations</filter>
+      <filter>subprogramCallOrders</filter>
+      <filter>calledSubprogram</filter>
+      <filter>features</filter>
+      <filter>flowSpecifications</filter>
+      <filter>modes</filter>
+      <filter>modeTransitions</filter>
+      <filter>subcomponentType</filter>
+      <filter>classifiers</filter>
+      <filter>connections</filter>
+      <filter>internalFeatures</filter>
+      <filter>processorFeatures</filter>
+      <filter>modeTransitionTriggerNames</filter>
+      <filter>subcomponents</filter>
+      <filter>subprogramCalls</filter>
+      <filter>subprogramCallSequences</filter>
+    </contentFilters>
+  </element>
+  <config type="structure">
+    <enabledAadlProperties/>
+    <context>
+      <seg>classifier</seg>
+      <seg>sw::mc_sw.impl</seg>
+    </context>
+  </config>
+</diagram:Diagram>

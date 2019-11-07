@@ -1,0 +1,17 @@
+package iml.aadl ;
+import iml.lang.* ;
+type Integer is Int;
+type Float is Real ;
+type Boolean is Bool ;
+annotation system ;
+annotation data ;
+annotation event ;
+annotation eventData ;
+annotation process ;
+annotation thread ;
+annotation implementation ;
+annotation in ;
+annotation out;
+annotation port;
+annotation connection;
+annotation subcomponent;

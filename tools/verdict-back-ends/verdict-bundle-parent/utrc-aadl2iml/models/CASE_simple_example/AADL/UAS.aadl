@@ -1,0 +1,26 @@
+package UAS
+public
+	
+	with GS;
+	with UAV;
+
+	bus RF
+	end RF;
+
+	system UAS
+	end UAS;
+
+	system implementation UAS.impl
+		subcomponents
+			GND: device GS::GroundStation;
+			UAV: system UAV::UAV;
+			RFB: bus RF;
+		connections
+			c1: port GND.send_map -> UAV.recv_map;
+			c2: port UAV.send_status -> GND.recv_status;
+			bac1: bus access RFB <-> GND.RFA;
+			bac2: bus access RFB <-> UAV.RFA;
+
+	end UAS.impl;
+
+end UAS;

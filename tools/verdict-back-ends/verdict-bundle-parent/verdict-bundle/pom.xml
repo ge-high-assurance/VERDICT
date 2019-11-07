@@ -16,6 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>com.ge.verdict</groupId>
+            <artifactId>utrc-aadl2iml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -38,16 +43,6 @@
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-test-instrumentor</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.utc.utrc.hermes</groupId>
-            <artifactId>com.utc.utrc.hermes.aadl.gen.iml</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.utc.utrc.hermes</groupId>
-            <artifactId>com.utc.utrc.hermes.aadl.gen.iml.test</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -83,20 +78,6 @@
         </dependency>
     </dependencies>
 
-    <!-- This microrepository has our Hermes dependencies -->
-    <repositories>
-        <repository>
-            <id>sadl-snapshot-repository</id>
-            <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -119,17 +100,6 @@
                     <execution>
                         <goals>
                             <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr4</goal>
                         </goals>
                     </execution>
                 </executions>

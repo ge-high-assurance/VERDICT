@@ -1,0 +1,206 @@
+package iml.verdict;
+
+import iml.utils.*;
+
+type PortMode enum { In, Out };
+
+type Port {
+	name: Identifier;
+	mode: PortMode;
+	ptype: Option<DataType>;
+};
+
+type ComponentType {
+	name: Identifier;
+	ports: ArrayList<Port>;
+    contract: Option<ContractSpec>;
+    cyber_relations: ArrayList<CyberRel>;
+};
+
+type ComponentImplKind enum { Block_Impl, Dataflow_Impl };
+
+type ComponentInstanceKind enum { Specification, Implementation };
+
+type ManufacturerType enum { ThirdParty, InHouse };
+
+type KindOfComponent enum { Software, Hardware, Human, Hybrid };
+
+type SituatedType enum { OnBoard, Remote };
+
+type ComponentInstance {
+	name: Identifier;
+	kind: ComponentInstanceKind;
+	specification: ComponentType;
+	implementation: ComponentImpl;
+	adversarially_tested : Option<Bool>;
+	manufacturer: Option<ManufacturerType>;
+	category: Option<String>;
+	component_type: Option<KindOfComponent>;
+	situated: Option<SituatedType>;
+	has_sensitive_info: Option<Bool>;
+	inside_trusted_boundary: Option<Bool>;
+	broadcast_from_outside_tb: Option<Bool>;
+	wifi_from_outside_tb: Option<Bool>;
+	heterogeneity: Option<Bool>;
+	encryption: Option<Bool>;
+	anti_jamming: Option<Bool>;
+	anti_flooding: Option<Bool>;
+	anti_fuzzing: Option<Bool>;
+	heterogeneity_dal: Option<Int>;
+    encryption_dal: Option<Int>;
+    anti_jamming_dal: Option<Int>;
+    anti_flooding_dal: Option<Int>;
+    anti_fuzzing_dal: Option<Int>;
+};
+
+type ConnectionEndKind enum { ComponentCE, SubcomponentCE };
+
+type CompInstPort {
+	subcomponent: ComponentInstance;	
+	port: Port;
+};
+
+type ConnectionEnd {
+	kind: ConnectionEndKind;
+	component_port: Port;
+	subcomponent_port: CompInstPort;
+};
+
+type FlowType enum  { Xdata, Control, Request };
+
+type ConnectionType enum { Local, Remote }; 
+
+type Connection {
+	name: Identifier;
+	conn_type: Option<ConnectionType>;
+	flow_type: FlowType;
+	authenticated: Option<Bool>;
+	data_encrypted: Option<Bool>;
+	source: ConnectionEnd;
+	destination: ConnectionEnd;
+};
+
+type BlockImpl {
+	subcomponents: ArrayList<ComponentInstance>;
+	connections: ArrayList<Connection>; 
+};
+
+type ComponentImpl {
+	name: Identifier;
+	ctype: ComponentType;
+	kind: ComponentImplKind;
+	block_impl: BlockImpl;
+	dataflow_impl: NodeBody;
+};
+
+type CIA enum {Confidentiality, Integrity, Availability};
+
+type Severity enum {None, Minor, Major, Hazardous, Catastrophic};
+
+type CIAPort {
+	name: String;
+	cia: CIA;
+};
+
+type CyberExprKind enum {Port, And, Or, Not};
+
+type CyberExpr {
+	kind: CyberExprKind;
+	port: CIAPort;
+	and: ArrayList<CyberExpr>;
+	or: ArrayList<CyberExpr>;
+	not: CyberExpr;
+};
+
+type CyberReq {
+    id: String;
+    cia: CIA;
+    severity: Severity;
+    condition: CyberExpr;
+    comment: Option<String>;
+    description : Option<String>;
+    phases : Option<String>;
+    extern : Option<String>;
+};
+
+type CyberRel {
+    id : String;
+    output : CIAPort;
+    inputs : Option<CyberExpr>;
+    comment: Option<String>;
+    description : Option<String>;
+    phases : Option<String>;
+    extern : Option<String>;
+};
+
+type Mission {
+    id : String;
+    description : Option<String>;
+    comment : Option<String>;
+    reqs : ArrayList<String>;
+}
+
+type ThreatExprKind enum
+    {Equal, Contains, Forall, Exists, Implies, Or, And, Not};
+
+type ThreatIntro {
+    var_name : String;
+    var_type : String;
+}
+
+type ThreatVarPair {
+    left : ArrayList<String>;
+    right : ArrayList<String>;
+}
+
+type ThreatQuantifier {
+    intro : ThreatIntro;
+    expr : ThreatExpr;
+}
+
+type ThreatImplies {
+    antecedent : ThreatExpr;
+    consequent : ThreatExpr;
+}
+
+type ThreatExpr {
+    kind : ThreatExprKind;
+    equal : ThreatVarPair;
+    contains : ThreatVarPair;
+    forall_val : ThreatQuantifier;
+    exists_val : ThreatQuantifier;
+    implies_val : ThreatImplies;
+    or : ArrayList<ThreatExpr>;
+    and : ArrayList<ThreatExpr>;
+    not : ThreatExpr;
+}
+
+type ThreatModel {
+    id : String;
+    intro : ThreatIntro;
+    expr : ThreatExpr;
+    cia : CIA;
+    reference : Option<String>;
+    assumptions : ArrayList<String>;
+    description : Option<String>;
+    comment : Option<String>;
+}
+
+type ThreatDefense {
+    id : String;
+    threats : ArrayList<String>;
+    description : Option<String>;
+    comment : Option<String>;
+}
+
+type Model {
+	name: Identifier;
+	type_declarations: ArrayList<TypeDeclaration>;
+	component_types: ArrayList<ComponentType>;
+	component_impl: ArrayList<ComponentImpl>;
+	dataflow_code: Option<LustreProgram>;
+	cyber_requirements: ArrayList<CyberReq>;
+        missions: ArrayList<Mission>;
+        threat_models: ArrayList<ThreatModel>;
+        threat_defenses: ArrayList<ThreatDefense>;
+};

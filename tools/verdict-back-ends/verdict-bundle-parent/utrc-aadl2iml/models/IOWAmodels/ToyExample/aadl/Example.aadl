@@ -1,0 +1,79 @@
+package Example
+public
+	with Base_Types;
+	with VERDICT_Properties;
+	
+	data Point
+	end Point;
+	
+	data implementation Point.Impl
+	  subcomponents
+	    x: data Base_Types::Integer;
+	    y: data Base_Types::Integer;
+	end Point.Impl;
+	
+	annex agree {**
+		const one: int = 1;
+	**};
+	
+	system A
+		features
+			x1: in data port Base_Types::Integer;
+			y1: out data port Base_Types::Integer;
+		annex agree {**
+			guarantee "G1": y1 > x1;
+		**};
+	end A;
+	
+	system B
+		features
+			x2: in data port Base_Types::Integer;
+			y2: in data port Base_Types::Integer;
+			z2: out data port Base_Types::Integer;
+	end B;
+	
+	system implementation B.Impl
+		annex agree {**
+			assign z2 = x2 + y2 + one;
+		**};
+	end B.Impl;
+	
+	system C
+		features
+			x3: in data port Base_Types::Integer;
+			y3: in data port Base_Types::Integer;
+			z3: out data port Base_Types::Integer;
+		annex agree {**
+			guarantee "G2": z3 > x3;
+		**};
+	end C;
+	
+	system implementation C.Impl
+		subcomponents
+			my_a1: system A;
+			my_a2: system A;
+			my_b: system B.Impl;
+		connections
+			c1: port x3 -> my_a1.x1
+                        { 
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c2: port y3 -> my_a2.x1
+                        { 
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c3: port my_a1.y1 -> my_b.x2
+                        { 
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c4: port my_a2.y1 -> my_b.y2
+                        { 
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c5: port my_b.z2 -> z3
+                        { 
+				VERDICT_Properties::flowType => Xdata;
+			};
+	end C.Impl;
+	
+end Example;

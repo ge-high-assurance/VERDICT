@@ -1,0 +1,58 @@
+package agree.Agree_Nodes;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+import agree.Data_Types.*;
+ 
+type HasHappened exhibits (Synchronous) enum {node}
+{
+	f: (Bool) -> (Bool);
+	assert {
+		forall (X:Bool){
+			var Y:(Bool) :=f(X);
+			Y = (X || init<Bool>(false,pre<Bool>(X)))					
+		}
+	};
+} 
+
+
+type InitiallyX exhibits (Synchronous) enum {node}
+{
+	f: (Bool) -> (Bool);
+	assert {
+		forall (X:Bool){
+			var Y:(Bool) :=f(X);
+			Y = (init<Bool>(X,true))					
+		}
+	};
+} 
+
+
+type FirstLocation exhibits (Synchronous) enum {node}
+{
+	f: (Position_dot_impl) -> (Position_dot_impl);
+	assert {
+		forall (X:Position_dot_impl){
+			var Y:(Position_dot_impl) :=f(X);
+			Y = (init<Position_dot_impl>(X,pre<Position_dot_impl>(Y)))					
+		}
+	};
+} 
+
+
+type close_locations exhibits (Synchronous) enum {node}
+{
+	f: (Position_dot_impl, Position_dot_impl) -> (Bool);
+	assert {
+		forall (p1:Position_dot_impl, p2:Position_dot_impl){
+			var are_close:(Bool) :=f(p1, p2);
+			are_close = (p1 = p2)					
+		}
+	};
+} 
+
+
+		
+		
+

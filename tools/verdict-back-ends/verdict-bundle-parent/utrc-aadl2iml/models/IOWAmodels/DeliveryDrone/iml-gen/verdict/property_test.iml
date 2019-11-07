@@ -1,0 +1,12 @@
+package verdict.property_test;
+import iml.lang.utils.*;
+import iml.systems.*;
+import iml.verdict.*;
+import iml.software.*;
+import iml.contracts.*;
+ 
+annotation property_test{
+	pA : Real; 		
+	
+};
+

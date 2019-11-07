@@ -1,0 +1,51 @@
+package IFS
+public
+	system IFS
+	end IFS;
+	
+	system implementation IFS.with_processes
+		subcomponents
+			rCASE_CODE: process CODE;
+			rCASE_Kinetic_Vehicle: process Kinetic_Vehicle;
+			rCASE_Target_Information_Generator: process Target_Information_Generator;
+	end IFS.with_processes;
+	
+	process CODE
+		features
+			CODE_Waypoints_Out: out data port;
+		flows
+			f0: flow source CODE_Waypoints_Out;
+	end CODE;
+	
+	process implementation CODE.impl
+	end CODE.impl;
+	
+	data CODE_Waypoints_Out
+	end CODE_Waypoints_Out;
+	
+	process Kinetic_Vehicle
+		features
+			Guidance_Command_In_MC: in data port;
+		flows
+			f1: flow sink Guidance_Command_In_MC;
+	end Kinetic_Vehicle;
+	
+	process implementation Kinetic_Vehicle.impl
+	end Kinetic_Vehicle.impl;
+	
+    data Guidance_Command_From_MC
+    end Guidance_Command_From_MC;
+	
+	process Target_Information_Generator
+		features
+			Camera_Data_Out: out data port;
+		flows
+			f2: flow source Camera_Data_Out;
+	end Target_Information_Generator;
+	
+	process implementation Target_Information_Generator.impl
+	end Target_Information_Generator.impl;
+	
+	data Camera_Data
+	end Camera_Data;
+end IFS;

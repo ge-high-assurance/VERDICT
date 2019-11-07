@@ -1,0 +1,101 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait process_avionics_io_recieve_queueTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@4fb3632c (name: gnc_in_write) (kind: requires) not supported
+	Waypoint_message_in: InDataPort<UBX_message_dot_Waypoint_message>;
+};
+
+type process_avionics_io_recieve_queue  exhibits(process_avionics_io_recieve_queueTrait);
+type process_device_io_recieve_queue_dot_impl   exhibits(process_device_io_recieve_queueTrait){
+};
+
+type SLLM_system_dot_impl   exhibits(SLLM_systemTrait){
+	process_avionics_io_recieve_queue : process_avionics_io_recieve_queue;
+	process_device_io_recieve_queue : process_device_io_recieve_queue;
+	gps_data : gps_data_container;
+	imu_data : imu_data_container;
+	geu_step : geu_step_system;
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@5494539a (name: Aio1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@f5b7b13 (name: devio1) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@55c5690d (name: devio2) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@3cd7ca94 (name: geu1) (bidirectional: true) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@4aa95617 (name: geu2) (bidirectional: true) (accessCategory: data) not supported
+	Waypoint_msg_in : Connector<InOutDataPort<UBX_message>, InDataPort<UBX_message_dot_Waypoint_message>> := connect<InOutDataPort<UBX_message>, InDataPort<UBX_message_dot_Waypoint_message>>(Aio_port, process_avionics_io_recieve_queue.Waypoint_message_in);
+	assert{Aio_port.data = process_avionics_io_recieve_queue.Waypoint_message_in.data};
+	GPS_msg_in : Connector<InDataPort<UBX_message>, InDataPort<UBX_message_dot_GPS_message>> := connect<InDataPort<UBX_message>, InDataPort<UBX_message_dot_GPS_message>>(dev_port, process_device_io_recieve_queue.GPS_message_in);
+	assert{dev_port.data = process_device_io_recieve_queue.GPS_message_in.data};
+	IMU_msg_in : Connector<InDataPort<UBX_message>, InDataPort<UBX_message_dot_IMU_message>> := connect<InDataPort<UBX_message>, InDataPort<UBX_message_dot_IMU_message>>(dev_port, process_device_io_recieve_queue.IMU_message_in);
+	assert{dev_port.data = process_device_io_recieve_queue.IMU_message_in.data};
+	GUID_msg_out : Connector<OutDataPort<UBX_message_dot_GUID_message>, InOutDataPort<UBX_message>> := connect<OutDataPort<UBX_message_dot_GUID_message>, InOutDataPort<UBX_message>>(geu_step.GUID_message_out, Aio_port);
+	assert{geu_step.GUID_message_out.data = Aio_port.data};
+	NAV_msg_out : Connector<OutDataPort<UBX_message_dot_NAV_message>, InOutDataPort<UBX_message>> := connect<OutDataPort<UBX_message_dot_NAV_message>, InOutDataPort<UBX_message>>(geu_step.NAV_message_out, Aio_port);
+	assert{geu_step.NAV_message_out.data = Aio_port.data};
+};
+
+type process_avionics_io_recieve_queue_dot_impl   exhibits(process_avionics_io_recieve_queueTrait){
+};
+
+type gps_data_dot_impl   exhibits(gps_dataTrait){
+	ecef_position : gps_data_dot_ecef_position;
+	ecef_position_accuracy : ecef_position_accuracy;
+	ecef_position_data_valid : ecef_position_data_valid;
+	ecef_velocity : ecef_velocity;
+	ecef_velocity_accuracy : ecef_velocity_accuracy;
+	ecef_velocity_data_valid : ecef_velocity_data_valid;
+	lla_horizontal_accuracy : lla_horizontal_accuracy;
+	lla_vertical_accuracy : lla_vertical_accuracy;
+	PDOP_value : PDOP_value;
+	TDOP_value : TDOP_value;
+	VDOP_value : VDOP_value;
+	HDOP_value : HDOP_value;
+	status_gps_fix : status_gps_fix;
+	ubx_message_counter : ubx_message_counter;
+	antenna_status : antenna_status;
+	NoisePerMS : NoisePerMS;
+	AGCCnt : AGCCnt;
+	NCH_counter : NCH_counter;
+	SVID_buffer : SVID_buffer;
+	CNO_buffer : CNO_buffer;
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@4c2373c3 (name: ecef_position_in) (bidirectional: false) (accessCategory: data) not supported
+	// FEATURE: org.osate.aadl2.impl.AccessConnectionImpl@59d6e6ad (name: ecef_position_out) (bidirectional: true) (accessCategory: data) not supported
+};
+
+trait gps_dataTrait  refines(Data) {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@55cedfda (name: io_write) (kind: provides) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@4a114a53 (name: geu_step_read_write) (kind: provides) not supported
+};
+
+type gps_data  exhibits(gps_dataTrait);
+type imu_data_dot_impl   exhibits(imu_dataTrait){
+	imu_data_buffer : imu_data_buffer;
+	imu_ready : imu_ready;
+	launch_detected : launch_detected;
+	altimeter_altitude : altimeter_altitude;
+	airspeed_speed : airspeed_speed;
+};
+
+trait SLLM_systemTrait  refines(Synchronous, Component, System) {
+	Aio_port: InOutDataPort<UBX_message>;
+	dev_port: InDataPort<UBX_message>;
+};
+
+type SLLM_system  exhibits(SLLM_systemTrait);
+trait process_device_io_recieve_queueTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@32818880 (name: gps_data_out) (kind: requires) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@66ff37ff (name: imu_data_out) (kind: requires) not supported
+	GPS_message_in: InDataPort<UBX_message_dot_GPS_message>;
+	IMU_message_in: InDataPort<UBX_message_dot_IMU_message>;
+};
+
+type process_device_io_recieve_queue  exhibits(process_device_io_recieve_queueTrait);
+trait imu_dataTrait  {
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@2a07d669 (name: io_write) (kind: provides) not supported
+	// FEATURE: org.osate.aadl2.impl.DataAccessImpl@7d6d0581 (name: geu_step_read_write) (kind: provides) not supported
+};
+
+type imu_data  exhibits(imu_dataTrait);
+

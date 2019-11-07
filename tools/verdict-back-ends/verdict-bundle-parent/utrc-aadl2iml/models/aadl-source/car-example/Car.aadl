@@ -1,0 +1,54 @@
+package Car
+public
+with Base_Types;
+	with Types, Transmission, Steering;
+	system Car
+		features
+			Target_Speed: in data port Types::speed.speed_impl;
+			Actual_Speed: out data port Types::speed.speed_impl;
+			Target_Tire_Pitch: in data port Types::pitch.pitch_impl;
+			Actual_Tire_Pitch: out data port Types::pitch.pitch_impl; 
+			State_Signal: out data port Types::state_sig.impl;
+	
+		annex agree {**
+
+			const max_accel : real = 40.0;
+
+			assume "target speed is positive" : Target_Speed.val >= 0.0;
+			assume "reasonable target speed" : Target_Speed.val < 150.0;
+			
+--			property const_tar_speed = 
+--				Agree_Nodes.H(Target_Speed.val = prev(Target_Speed.val,0.0)); 
+				
+			property const_tar_speed = 
+				true -> Target_Speed.val = pre(Target_Speed.val); 
+			
+			guarantee "actual speed is less than constant target speed" : 
+				const_tar_speed => (Actual_Speed.val <= Target_Speed.val);
+			
+			guarantee "acceleration is limited" : 
+				Agree_Nodes.abs(Actual_Speed.val - prev(Actual_Speed.val, 0.0)) < max_accel;
+				
+		**};
+		
+	end Car;
+	
+	system implementation Car.Car_Impl
+		subcomponents
+			THROT: system Transmission::Throttle.Throttle_Impl;
+			CNTRL: system Transmission::Speed_Control.Speed_Control_Impl;
+			AXL: system Steering::Axel.Axel_Impl;
+			SM: system Transmission::State_Machine.Impl;
+			
+		connections 
+			SpeedToThrot: port CNTRL.Actuator_Input -> THROT.Actuator_Input {Communication_Properties::Timing => immediate;}; 
+			AcSpeedToTop: port THROT.Actual -> Actual_Speed {Communication_Properties::Timing => immediate;};
+			AcSpeedToCntrl: port THROT.Actual -> CNTRL.Actual {Communication_Properties::Timing => immediate;};
+			TgSpeedToCntrl: port Target_Speed -> CNTRL.Target {Communication_Properties::Timing => immediate;};
+			TgPtichToAxl: port Target_Tire_Pitch -> AXL.Target_Tire_Direction {Communication_Properties::Timing => immediate;};
+			AcPtichToCar: port AXL.Actual_Tire_Direction -> Actual_Tire_Pitch {Communication_Properties::Timing => immediate;};
+			SSToSM: port SM.State_Out -> State_Signal {Communication_Properties::Timing => immediate;};
+	
+	end Car.Car_Impl;
+
+end Car;

@@ -1,9 +1,8 @@
 "CompType","CompInst","CAPEC","CAPECDescription","Confidentiality","Integrity","Availability","LikelihoodOfSuccess"
-"GPS","gps","CAPEC-148","Content Spoofing",null,"Integrity",null,"1.0"
-"GPS","gps","CAPEC-601","Jamming",null,null,"Availability","1.0"
-"RCReceiver","RC_receiver","CAPEC-125","Flooding",null,null,"Availability","1.0"
-"RCReceiver","RC_receiver","CAPEC-148","Content Spoofing",null,"Integrity",null,"1.0"
-"RCReceiver","RC_receiver","CAPEC-151","Identity Spoofing",null,"Integrity",null,"1.0"
-"RCReceiver","RC_receiver","CAPEC-28","Fuzzing",null,"Integrity",null,"1.0"
-"RCReceiver","RC_receiver","CAPEC-601","Jamming",null,null,"Availability","1.0"
-
+"GPS","gps","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-601","Jamming",null,null,"Availability",1.0
+"RCReceiver","RC_receiver","CAPEC-125","Flooding",null,null,"Availability",1.0
+"RCReceiver","RC_receiver","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
+"RCReceiver","RC_receiver","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
+"RCReceiver","RC_receiver","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
+"RCReceiver","RC_receiver","CAPEC-601","Jamming",null,null,"Availability",1.0

@@ -1,0 +1,209 @@
+package gnc_step
+public
+	
+	with dataStructs;
+	with globals;
+	
+	system gnc_step_system -- gnc_exec.c, line 207
+		features
+			gnc_in : requires data access globals::gnc_in;
+			gnc_out : requires data access globals::gnc_out;
+			guidance_data_write : requires data access dataStructs::guidance_data;
+			navigation_data_write : requires data access dataStructs::navigation_data;
+			mm_state : requires data access dataStructs::mm_state;
+			
+	end gnc_step_system;
+	
+	system implementation gnc_step_system.impl
+		subcomponents
+			-- always called in gnc_step
+			mmExec : abstract mmExec;
+			gncSetThrottle : abstract gncSetThrottle;
+			teleExec : abstract teleExec; --
+			
+			-- if gnc_in.guidance.gps_guidance
+			gtgTseExec : abstract gtgTseExec;
+			gtgModeControl : abstract gtgModeControl;
+			
+			-- functions used in multiple states
+			navExec : abstract navExec;
+			tseExec : abstract tseExec;
+			autopilotExec : abstract autopilotExec;
+			cameraInterfaceExec : abstract cameraInterfaceExec;
+			calcGatePlacement : abstract calcGatePlacement;
+			midCourseGuidExec : abstract midCourseGuidExec;
+			
+			-- PreLaunch only functions
+
+			-- Launch only functions
+			tseExecInit : abstract tseExecInit;
+			transWayPointsLLA2NED : abstract transWayPointsLLA2NED;
+						
+			-- Ascent only functions
+			pitchOverGuidExec : abstract pitchOverGuidExec;
+			escWatchdog : abstract escWatchdog;
+			
+			-- Midcourse only functions
+									
+			-- Transition only functions
+						
+			-- Terminal only functions
+			gtgTermGuidExec : abstract gtgTermGuidExec;
+			termGuidExec : abstract termGuidExec;
+		connections
+			-- mmExec variable connections
+			mmExec1 : data access gnc_in -> mmExec.gnc_in_read;
+			mmExec2 : data access mm_state <-> mmExec.mm_sys_state_read_write;
+			mmExec3 : data access mm_state <-> mmExec.mm_sys_substate_read_write;
+			--mmExec4 : data access mm_launched <-> mmExec.mm_launched;
+			
+			-- navExec variable connection
+			navExec1 : data access gnc_in -> navExec.gnc_in_read;
+			navExec2 : data access mm_state -> navExec.mm_sys_substate_read;
+			navExec3 : data access navExec.navfct_write -> navigation_data_write;
+			navExec4 : data access navExec.nav_data_write -> navigation_data_write;
+	end gnc_step_system.impl;
+	
+	-- main functions
+	abstract autopilotExec -- autopilot_exec.c, line 82
+	end autopilotExec;
+	
+	abstract implementation autopilotExec.impl
+	end autopilotExec.impl;
+	
+	abstract midCourseGuidExec -- mcg_exec.c, line 266
+	end midCourseGuidExec;
+	
+	abstract implementation midCourseGuidExec.impl
+	end midCourseGuidExec.impl;
+	
+	abstract cameraInterfaceExec -- camera_interface.c, line 172
+	end cameraInterfaceExec;
+	
+	abstract implementation cameraInterfaceExec.impl
+	end cameraInterfaceExec.impl;
+	
+	abstract teleExec -- tele_exec.c, line 60
+	end teleExec;
+	
+	abstract implementation teleExec.impl
+	end teleExec.impl;
+	
+	abstract calcGatePlacement -- tg_exec.c, line 856
+	end calcGatePlacement;
+	
+	abstract implementation calcGatePlacement.impl
+	end calcGatePlacement.impl;
+	
+	abstract navExec -- nav_exec.c, line 116
+		features
+			gnc_in_read : requires data access globals::gnc_in;
+			
+			-- state reading
+			mm_sys_substate_read : requires data access dataStructs::mm_state.mm_sys_substate;
+			
+			-- nav_data assignment
+			navfct_write : requires data access dataStructs::navigation_data.navfct;
+			nav_data_write : requires data access dataStructs::navigation_data.nav_data;
+	end navExec;
+	
+	abstract implementation navExec.impl
+	end navExec.impl;
+	
+	abstract gtgTseExec -- gtg_exec.c, line 46
+		-- calls calcNed and calcLosRate
+		--features
+			
+	end gtgTseExec;
+	
+	abstract implementation gtgTseExec.impl
+	end gtgTseExec.impl;
+	
+	abstract pitchOverGuidExec -- po_guid_exec.c, line 125
+	end pitchOverGuidExec;
+	
+	abstract implementation pitchOverGuidExec.impl
+	end pitchOverGuidExec.impl;
+	
+	abstract gtgTermGuidExec -- gtg_exec.c, line 301
+	end gtgTermGuidExec;
+	
+	abstract implementation gtgTermGuidExec.impl
+	end gtgTermGuidExec.impl;
+	
+	abstract transWaypointsLLA2NED -- mcg_exec.c, line 686
+	end transWaypointsLLA2NED;
+	
+	abstract implementation transWaypointsLLA2NED.impl
+	end transWaypointsLLA2NED.impl;
+	
+	abstract termGuidExec -- tg_exec.c, line 67
+	end termGuidExec;
+	
+	abstract implementation termGuidExec.impl
+	end termGuidExec.impl;
+	
+	abstract tseExecInit -- tse_exec.c, line 779
+	end tseExecInit;
+	
+	abstract implementation tseExecInit.impl
+	end tseExecInit.impl;
+	
+	abstract escWatchdog -- escWatchdog.c, line 16
+	end escWatchdog;
+	
+	abstract implementation escWatchdog.impl
+	end escWatchdog.impl;
+	
+	abstract gncSetThrottle -- gnc_exec.c, line 291
+	end gncSetThrottle;
+	
+	abstract implementation gncSetThrottle.impl
+	end gncSetThrottle.impl;
+	
+	abstract gtgModeControl -- gtg_exec.c, line 119
+	end gtgModeControl;
+	
+	abstract implementation gtgModeControl.impl
+	end gtgModeControl.impl;
+	
+	abstract mmExec -- mm_exec.c, line 64
+		features
+			gnc_in_read : requires data access globals::gnc_in;
+			
+			-- state variables 
+			mm_sys_state_read_write : requires data access dataStructs::mm_state.mm_sys_state;
+			mm_sys_substate_read_write : requires data access dataStructs::mm_state.mm_sys_substate;
+			--mm_launched : requires data access globals::mm_launched;
+			
+			-- timing variables
+			--mm_sys_time_write : requires data access globals::mm_sys_time;
+			--mm_launch_time : requires data access globals::mm_launch_time;
+			--mm_esw_dt : requires data access globals::mm_esw_dt;
+			
+			-- !! there are more global variables that are check in this step, but may not need to be included for this model !!
+	end mmExec;
+	
+	abstract implementation mmExec.impl
+		subcomponents
+			mm_launched : data globals::mm_launched;
+	end mmExec.impl;
+	
+	abstract tseExec -- tse_exec.c, line 44
+	end tseExec;
+	
+	abstract implementation tseExec.impl
+	end tseExec.impl;
+	
+	-- state-based function group
+	abstract state_based_functions
+		features
+			mm_sys_state : requires data access globals::mm_sys_state;
+	end state_based_functions;
+	
+	abstract implementation state_based_functions.impl
+		subcomponents
+			navExec : abstract navExec;
+	end state_based_functions.impl;
+	
+end gnc_step;

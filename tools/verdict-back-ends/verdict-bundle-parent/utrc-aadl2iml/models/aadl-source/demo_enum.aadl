@@ -1,0 +1,27 @@
+package SW
+public
+    
+    with Data_Model;
+    with Base_Types;
+    -- with claim;
+
+    -- The Flight Pattern is an enumeration that defines how the UAV will fly through the
+    -- sensing region to conduct surveillance.
+    data FlightPattern
+        properties        
+            Data_Model::Data_Representation => Enum;
+            Data_Model::Enumerators => ("ZigZag", "StraightLine", "Perimeter");
+    end FlightPattern;
+    
+    
+    annex agree {**
+            
+        -- These functions check the well-formedness of message structures
+                                                    
+        fun good_pattern(pattern : FlightPattern) : bool =    (pattern = enum(FlightPattern, ZigZag)) or 
+                                                                (pattern = enum(FlightPattern, StraightLine)) or 
+                                                                (pattern = enum(FlightPattern, Perimeter));
+                                                                                                                                                            
+    **};
+    
+end SW;

@@ -1,0 +1,131 @@
+package SLLM
+public
+	
+	with globals;
+	with dataStructs;
+	with geu_step;
+	
+	system SLLM_system
+		features
+			Aio_port : in out data port dataStructs::UBX_message;
+			dev_port : in data port dataStructs::UBX_message;
+		--flows
+			--Waypoint_source : flow source Aio_port;
+			--GPS_source : flow source dev_port;
+			--IMU_source : flow source dev_port;
+	end SLLM_system;
+	
+	system implementation SLLM_system.impl -- rCASEGNCComp.cpp, line 378 
+		subcomponents
+			-- subsystems
+			geu_step : system geu_step::geu_step_system;
+			
+			-- functions
+			process_avionics_io_recieve_queue : abstract process_avionics_io_recieve_queue;
+			process_device_io_recieve_queue : abstract process_device_io_recieve_queue;
+			
+			-- global variables
+			gps_data : data globals::gps_data_container;
+			imu_data : data globals::imu_data_container;
+			
+		connections
+			-- input and outputs in system
+			Waypoint_msg_in : port Aio_port -> process_avionics_io_recieve_queue.Waypoint_message_in;
+			GPS_msg_in : port dev_port -> process_device_io_recieve_queue.GPS_message_in;
+			IMU_msg_in : port dev_port -> process_device_io_recieve_queue.IMU_message_in;
+			GUID_msg_out : port geu_step.GUID_message_out -> Aio_port;
+			NAV_msg_out : port geu_step.NAV_message_out -> Aio_port;
+			
+			-- connections from io to globals
+			Aio1 : data access process_avionics_io_recieve_queue.gnc_in_write -> geu_step.gnc_in_write;
+			devio1 : data access process_device_io_recieve_queue.imu_data_out -> imu_data.io_write;
+			devio2 : data access process_device_io_recieve_queue.gps_data_out -> gps_data.io_write;
+			
+			-- connections from globals to geu_step
+			geu1 : data access gps_data.geu_step_read_write <-> geu_step.gps_data;
+			geu2 : data access imu_data.geu_step_read_write <-> geu_step.imu_data;
+			
+	end SLLM_system.impl;
+	
+	-- SLLM level function
+	abstract process_avionics_io_recieve_queue -- avionics_io_UBX_receiver.c, line 129
+		features
+			Waypoint_message_in : in data port dataStructs::UBX_message.Waypoint_message;
+			gnc_in_write : requires data access globals::gnc_in;
+			
+	end process_avionics_io_recieve_queue;
+	
+	abstract implementation process_avionics_io_recieve_queue.impl
+	end process_avionics_io_recieve_queue.impl;
+	
+	abstract process_device_io_recieve_queue -- u_blox_GPS_interface5.c, line 222
+		features
+			GPS_message_in : in data port dataStructs::UBX_message.GPS_message;
+			IMU_message_in : in data port dataStructs::UBX_message.IMU_message;
+			gps_data_out : requires data access dataStructs::gps_data;
+			imu_data_out : requires data access dataStructs::imu_data;
+			
+	end process_device_io_recieve_queue;
+	
+	abstract implementation process_device_io_recieve_queue.impl
+	end process_device_io_recieve_queue.impl;
+	
+	-- global variable buckets
+	data gps_data
+		features
+			io_write : provides data access dataStructs::gps_data;
+			geu_step_read_write : provides data access dataStructs::gps_data;
+	end gps_data;
+	
+	data implementation gps_data.impl -- u_blox_GPS_interface5.c, line 61-108
+		subcomponents
+			ecef_position : data dataStructs::gps_data.ecef_position;
+			--ecef_position : data globals::ecef_position[3];
+			ecef_position_accuracy : data globals::ecef_position_accuracy;
+				--ecef_position_time_valid : data globals::ecef_position_time_valid;
+			ecef_position_data_valid : data globals::ecef_position_data_valid;
+			ecef_velocity : data globals::ecef_velocity[3];
+			ecef_velocity_accuracy : data globals::ecef_velocity_accuracy;
+				--ecef_velocity_time_valid : data globals::ecef_velocity_time_valid;
+			ecef_velocity_data_valid : data globals::ecef_velocity_data_valid;
+			lla_horizontal_accuracy : data globals::lla_horizontal_accuracy;
+			lla_vertical_accuracy : data globals::lla_vertical_accuracy;
+				--GDOP_value : data globals::GDOP_value;
+			PDOP_value : data globals::PDOP_value;
+			TDOP_value : data globals::TDOP_value;
+			VDOP_value : data globals::VDOP_value;
+			HDOP_value : data globals::HDOP_value;
+				--NDOP_value : data globals::NDOP_value;
+				--EDOP_value : data globals::EDOP_value;
+			status_gps_fix : data globals::status_gps_fix;
+			ubx_message_counter : data globals::ubx_message_counter;
+			antenna_status : data globals::antenna_status;
+			NoisePerMS : data globals::NoisePerMS;
+			AGCCnt : data globals::AGCCnt;
+			NCH_counter : data globals::NCH_counter;
+			SVID_buffer : data globals::SVID_buffer;
+			CNO_buffer : data globals::CNO_buffer;
+
+		connections
+			ecef_position_in : data access io_write -> ecef_position;
+			ecef_position_out : data access ecef_position <-> geu_step_read_write;
+			
+	end gps_data.impl;
+	
+	abstract imu_data
+		features
+			io_write : provides data access dataStructs::imu_data;
+			geu_step_read_write : provides data access dataStructs::imu_data;
+	end imu_data;
+	
+	abstract implementation imu_data.impl  -- imu_driver.c, line 41-58
+		subcomponents 
+			imu_data_buffer : data globals::imu_data_buffer[6];
+			imu_ready : data globals::imu_ready;
+			launch_detected : data globals::launch_detected;
+			altimeter_altitude : data globals::altimeter_altitude;
+			airspeed_speed : data globals::airspeed_speed;
+	end imu_data.impl;
+	
+		
+end SLLM;

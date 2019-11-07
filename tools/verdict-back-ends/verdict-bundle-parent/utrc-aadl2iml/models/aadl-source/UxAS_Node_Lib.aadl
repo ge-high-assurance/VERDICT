@@ -1,0 +1,90 @@
+-------------------------------------------------------------------
+-- This package contains a library of nodes that can be used 
+-- throughout the project.
+-------------------------------------------------------------------
+
+package UxASNodeLibEvents
+public
+	with Data_Model;
+	
+	data RespondsState
+		properties		
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("s0", "s1", "s2");
+	end RespondsState;
+	
+	annex iml {**
+		
+		type [Fsm] responds_once{
+			[Input]  a : Bool ;
+			[Input]  b : Bool ;
+			// State variable
+			s : PrimedVar<RespondsState> ;
+			// Initialization of the state variable
+			[Init] s_init : Bool := { s.current = RespondsState.s0 } ;
+			// Transition relation
+			
+			[Transition] state_trans : Bool := { 
+					s.next =
+						case {
+							s.current = RespondsState.s0 && b && !a :  RespondsState.s1 ;
+							s.current = RespondsState.s0 && a :  RespondsState.s2 ;
+							s.current = RespondsState.s1 && a : RespondsState.s0 ;
+							true : s.current ;
+					}	  
+			} ;
+			// Definition of the output
+			[Output] holds : Bool := ( s.current = RespondsState.s0 ||  s.current = RespondsState.s1 );
+		}
+		
+		
+		type [Fsm] one_request_at_a_time  {
+			[Input]  a : Bool ;
+			[Input]  b : Bool ;
+			s : PrimedVar<RespondsState> ;
+			[Init] s_init : Bool := {s = RespondsState.s0 } ;
+			[Transition] s_trans : Bool := { 
+				s.next = 
+					case {
+						s.current = RespondsState.s0 && b : RespondsState.s1 ;
+						s.current = RespondsState.s1 && b : RespondsState.s2 ;
+						s.current = RespondsState.s1 && a && ! b : RespondsState.s0 ;
+						true : s.current ;
+					}  	
+			} ;
+			[Output] holds : Bool :=  ( s.current = RespondsState.s0 ||  s.current = RespondsState.s1 );
+		}
+		
+		type [Fsm] delay {
+			[Input] f : FlowPath ;
+			[Input] n : Int ;
+			state : PrimedVar<RespondsState>  ;
+			i : PrimedVar<Int> ;
+			[Init] state_i_init : Bool := (i = 1) && (state = RespondsState.s0) ;
+			[Transition] s_trans : Bool := {
+				state.next = 
+					case {
+						state.current = RespondsState.s0 && f.end.event : RespondsState.s2;
+						state.current = RespondsState.s0 && f.start.event : RespondsState.s1 ;
+						state.current = RespondsState.s1 && f.end.event : RespondsState.s0 ;
+						state.current = RespondsState.s1 && i >= n : RespondsState.s2 ;
+						true : state.current ;
+					}
+			};
+			[Transition] i_trans : Bool := { 
+				i.next =
+				case {
+					state.current = RespondsState.s0 :  1 ;
+					state.current = RespondsState.s1 : i.current + 1 ;
+					true : i.current ;	
+				}
+			} ;
+			[Output] holds : Bool := (state.current = RespondsState.s0 || state.current = RespondsState.s1) ;
+		}
+
+
+			
+		
+	**} ;
+	
+end UxASNodeLibEvents;

@@ -1,0 +1,14 @@
+package GS
+
+public
+	
+	with UAS;
+	
+	device GroundStation
+		features
+			send_map: out event data port;
+			recv_status: in event data port;
+			RFA: requires bus access UAS::RF;
+	end GroundStation;
+	
+end GS;

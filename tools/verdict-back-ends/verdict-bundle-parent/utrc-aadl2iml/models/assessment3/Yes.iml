@@ -1,0 +1,83 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait CTrait  refines(Synchronous, Component, Contract, System) {
+	Input1: InDataPort<Int>;
+	Input2: InDataPort<Int>;
+	Output: OutDataPort<Int>;
+	[Guarantee{comment="C output range"}] REQ1 : Bool := Output.data = Input1.data + Input2.data;
+	
+			
+	guarantee: Bool := REQ1;
+	
+			
+};
+
+type C  exhibits(CTrait);
+trait BTrait  refines(Synchronous, Component, Contract, System) {
+	Input: InDataPort<Int>;
+	Output: OutDataPort<Int>;
+	[Assume{comment="B input domain"}] REQ1 : Bool := Input.data < 20;
+	
+	[Guarantee{comment="B output range"}] REQ2 : Bool := Output.data < Input.data + 15;
+	
+			
+	assumption: Bool := REQ1;
+	
+	guarantee: Bool := REQ2;
+	
+			
+};
+
+type B  exhibits(BTrait);
+trait ATrait  refines(Synchronous, Component, Contract, System) {
+	Input: InDataPort<Int>;
+	Output: OutDataPort<Int>;
+	[Assume{comment="A input domain"}] REQ1 : Bool := Input.data < 20;
+	
+	[Guarantee{comment="A output range"}] REQ2 : Bool := Output.data < 2 * Input.data;
+	
+			
+	assumption: Bool := REQ1;
+	
+	guarantee: Bool := REQ2;
+	
+			
+};
+
+type A  exhibits(ATrait);
+type top_level_dot_Impl   exhibits(top_levelTrait){
+	A_sub : A;
+	B_sub : B;
+	C_sub : C;
+	IN_TO_A : Connector<InDataPort<Int>, InDataPort<Int>> := connect<InDataPort<Int>, InDataPort<Int>>(Input, A_sub.Input);
+	assert{Input.data = A_sub.Input.data};
+	A_TO_B : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(A_sub.Output, B_sub.Input);
+	assert{A_sub.Output.data = B_sub.Input.data};
+	A_TO_C : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(A_sub.Output, C_sub.Input1);
+	assert{A_sub.Output.data = C_sub.Input1.data};
+	B_TO_C : Connector<OutDataPort<Int>, InDataPort<Int>> := connect<OutDataPort<Int>, InDataPort<Int>>(B_sub.Output, C_sub.Input2);
+	assert{B_sub.Output.data = C_sub.Input2.data};
+	C_TO_Output : Connector<OutDataPort<Int>, OutDataPort<Int>> := connect<OutDataPort<Int>, OutDataPort<Int>>(C_sub.Output, Output);
+	assert{C_sub.Output.data = Output.data};
+};
+
+trait top_levelTrait  refines(Synchronous, Component, Contract, System) {
+	Input: InDataPort<Int>;
+	Output: OutDataPort<Int>;
+	[Assume{comment="System input domain"}] REQ1 : Bool := Input.data < 10;
+	
+	[Guarantee{comment="System output range"}] REQ2 : Bool := Output.data < 50;
+	
+			
+	assumption: Bool := REQ1;
+	
+	guarantee: Bool := REQ2;
+	
+			
+};
+
+type top_level  exhibits(top_levelTrait);

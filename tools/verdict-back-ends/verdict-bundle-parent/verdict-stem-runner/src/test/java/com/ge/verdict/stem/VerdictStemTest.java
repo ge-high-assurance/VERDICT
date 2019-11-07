@@ -19,7 +19,6 @@ public class VerdictStemTest {
         File projectDir = new File("target/test-classes/STEM");
         Path outputDir = Paths.get(projectDir.getPath(), "Output");
         Path graphsDir = Paths.get(projectDir.getPath(), "Graphs");
-        File sadlFile = new File(projectDir, "Run.sadl");
 
         // Remove the output and graphs directories first
         if (Files.exists(outputDir)) {
@@ -41,7 +40,7 @@ public class VerdictStemTest {
 
         // Run SADL on the STEM test project
         VerdictStem stem = new VerdictStem();
-        stem.runStem(projectDir, sadlFile);
+        stem.runStem(projectDir, outputDir.toFile(), graphsDir.toFile());
 
         // Verify that SADL created some new files with expected contents
         Path testFile = outputDir.resolve("CAPEC.csv");

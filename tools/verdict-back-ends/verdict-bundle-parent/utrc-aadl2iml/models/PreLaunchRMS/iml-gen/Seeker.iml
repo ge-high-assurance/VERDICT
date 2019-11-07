@@ -1,0 +1,50 @@
+package agree;
+import iml.systems.*;
+import iml.software.*;
+import iml.synchdf.ontological.*;
+import iml.contracts.*;
+ 
+trait Data_ProcessorTrait  {
+	Navigation_Cmd_In: InDataPort<>;
+	Target_Location_Out: OutDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@1bdf24c0 (name: f1) (kind: sink) not supported
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@2d5bfc3a (name: f2) (kind: source) not supported
+};
+
+type Data_Processor  exhibits(Data_ProcessorTrait);
+trait SeekerTrait  refines(Synchronous, Component, System) {
+};
+
+type Seeker  exhibits(SeekerTrait);
+trait Camera_DataTrait  refines(Data) {
+};
+
+type Camera_Data  exhibits(Camera_DataTrait);
+type Seeker_dot_with_device   exhibits(SeekerTrait){
+	rCASE_Camera : Camera;
+	rCASE_Data_Processing : Data_Processing;
+	rCASE_Data_Processor : Data_Processor;
+};
+
+trait Data_ProcessingTrait  refines(Synchronous, Process, Component) {
+};
+
+type Data_Processing  exhibits(Data_ProcessingTrait);
+type Data_Processing_dot_impl   exhibits(Data_ProcessingTrait){
+};
+
+trait Target_LocationTrait  refines(Data) {
+};
+
+type Target_Location  exhibits(Target_LocationTrait);
+trait CameraTrait  {
+	Camera_Data_In: InDataPort<>;
+	// FEATURE: org.osate.aadl2.impl.FlowSpecificationImpl@67b5a089 (name: f0) (kind: sink) not supported
+};
+
+type Camera  exhibits(CameraTrait);
+trait Navigation_CmdTrait  refines(Data) {
+};
+
+type Navigation_Cmd  exhibits(Navigation_CmdTrait);
+

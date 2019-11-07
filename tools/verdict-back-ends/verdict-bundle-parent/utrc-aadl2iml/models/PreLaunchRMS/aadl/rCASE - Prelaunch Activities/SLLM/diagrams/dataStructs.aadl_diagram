@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="62d0987f-d848-4d71-91b7-5bdbb894b43f" manual="true">
+    <element uuid="75fb2560-5c22-4dae-a527-6357b8b6a449">
+      <bo>
+        <seg>classifier</seg>
+        <seg>airdata_type</seg>
+      </bo>
+      <position x="313.0" y="226.0"/>
+      <size width="150.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="6ad81674-2493-4093-b296-c13bdbb137b0">
+      <element uuid="9c2ecf3f-1c5c-41c3-91da-f59ddfc0472f">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="309.0" y="255.5"/>
+          <point x="321.0" y="255.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>airdata_type.impl</seg>
+      </bo>
+      <position x="103.0" y="226.0"/>
+      <size width="190.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="a210a6bc-143e-4ea5-acf7-4a6726c140f1">
+      <bo>
+        <seg>classifier</seg>
+        <seg>double</seg>
+      </bo>
+      <position x="207.0" y="38.0"/>
+      <size width="99.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5cdbb63c-333f-4b9d-8ae0-9f2f6e664e5c">
+      <bo>
+        <seg>classifier</seg>
+        <seg>float64</seg>
+      </bo>
+      <position x="540.0" y="38.0"/>
+      <size width="111.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="07d026bd-aebf-4819-9e46-26d012a91b30">
+      <bo>
+        <seg>classifier</seg>
+        <seg>geu_main</seg>
+      </bo>
+      <position x="282.0" y="132.0"/>
+      <size width="122.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="524854d2-4504-4339-90d3-bcd5c71a4cbc">
+      <element uuid="d5a561a3-3c31-454a-b481-3b519959a534">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="278.0" y="161.5"/>
+          <point x="290.0" y="161.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>geu_main.impl</seg>
+      </bo>
+      <position x="103.0" y="132.0"/>
+      <size width="159.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="020823a6-38ff-48dc-bb61-cbbe04da0bac">
+      <bo>
+        <seg>classifier</seg>
+        <seg>geu_main_drivers_in</seg>
+      </bo>
+      <position x="748.0" y="226.0"/>
+      <size width="210.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="9c933001-55a6-402e-8826-4f0275f3cfba">
+      <element uuid="386f33c0-2dc2-4dcd-b3b7-83ea0fd6916e">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="744.0" y="255.5"/>
+          <point x="756.0" y="255.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>geu_main_drivers_in.impl</seg>
+      </bo>
+      <position x="475.0" y="226.0"/>
+      <size width="253.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="59cb4136-5f8c-467e-b7be-5ef24bb44f0f">
+      <bo>
+        <seg>classifier</seg>
+        <seg>gps_data</seg>
+      </bo>
+      <position x="330.0" y="279.0"/>
+      <size width="112.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f75cff4e-bbab-43fc-b10b-e495636a6c00">
+      <element uuid="467471ad-388a-491d-a978-032e62e67315">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="326.0" y="357.5"/>
+          <point x="332.0" y="357.5"/>
+          <point x="332.0" y="314.1666666666667"/>
+          <point x="338.0" y="314.1666666666667"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>gps_data.ecef_position</seg>
+      </bo>
+      <position x="103.0" y="328.0"/>
+      <size width="207.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="c24946cc-ddb1-46e5-ace8-6aa917c16d48">
+      <element uuid="211cfe8d-2c78-48c4-af99-cef0f0bc8cf9">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="326.0" y="302.5"/>
+          <point x="338.0" y="302.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>gps_data.impl</seg>
+      </bo>
+      <position x="166.0" y="273.0"/>
+      <size width="144.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="20ee095f-8e03-4d4f-8899-3a40d3798ea0">
+      <bo>
+        <seg>classifier</seg>
+        <seg>gps_type</seg>
+      </bo>
+      <position x="596.0" y="132.0"/>
+      <size width="123.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="8d0e79ef-1804-43f0-ab17-cc8d47da914d">
+      <element uuid="4516b9b5-2113-4688-8046-8b8a161c9b3f">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="592.0" y="161.5"/>
+          <point x="604.0" y="161.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>gps_type.impl</seg>
+      </bo>
+      <position x="416.0" y="132.0"/>
+      <size width="160.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f81f3c0b-557e-4d12-b4a8-7323a67a48da">
+      <bo>
+        <seg>classifier</seg>
+        <seg>guidance_data</seg>
+      </bo>
+      <position x="307.0" y="179.0"/>
+      <size width="149.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="6d5a2931-3d1c-4cd4-bfee-f6140724c637">
+      <element uuid="3f297856-91d4-429b-bd3e-e70891dff152">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="303.0" y="208.5"/>
+          <point x="315.0" y="208.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>guidance_data.impl</seg>
+      </bo>
+      <position x="103.0" y="179.0"/>
+      <size width="184.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="c29935d4-7c36-40d6-a7e9-ffef185299da">
+      <bo>
+        <seg>classifier</seg>
+        <seg>imu_data</seg>
+      </bo>
+      <position x="269.0" y="85.0"/>
+      <size width="114.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="7a8bd6f5-cf10-48d0-bdc7-99d0185af898">
+      <element uuid="f0131d47-52ab-45e6-a54c-785c51c63967">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="265.0" y="114.5"/>
+          <point x="277.0" y="114.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>imu_data.impl</seg>
+      </bo>
+      <position x="103.0" y="85.0"/>
+      <size width="146.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="a7815b8d-ba60-44f8-b93c-18a0817d0372">
+      <bo>
+        <seg>classifier</seg>
+        <seg>imu_type</seg>
+      </bo>
+      <position x="571.0" y="85.0"/>
+      <size width="119.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f704fe0e-9b5d-47a0-9fba-15a00db44131">
+      <element uuid="bc28b515-4e51-4c00-9d0e-449c103fec3b">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="567.0" y="114.5"/>
+          <point x="579.0" y="114.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>imu_type.impl</seg>
+      </bo>
+      <position x="395.0" y="85.0"/>
+      <size width="156.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="d838d02a-6469-498d-9c3e-8b8562e6a47c">
+      <bo>
+        <seg>classifier</seg>
+        <seg>mm_state</seg>
+      </bo>
+      <position x="712.0" y="279.0"/>
+      <size width="116.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="19ef8bc9-2521-43f4-9dbc-f3cc4c3c915d">
+      <element uuid="214e37c6-9a0c-4e8c-883b-bab8936dc51c">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="708.0" y="357.5"/>
+          <point x="714.0" y="357.5"/>
+          <point x="714.0" y="314.1666666666667"/>
+          <point x="720.0" y="314.1666666666667"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>mm_state.mm_sys_state</seg>
+      </bo>
+      <position x="479.0" y="328.0"/>
+      <size width="213.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="45a262d7-d53e-484d-9737-fdb383b2d268">
+      <element uuid="c7f710f5-69d8-4d61-b0dd-ebb92efd10b7">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="708.0" y="302.5"/>
+          <point x="720.0" y="302.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>mm_state.mm_sys_substate</seg>
+      </bo>
+      <position x="454.0" y="273.0"/>
+      <size width="238.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="0b9b2aca-01c1-4c5e-91f0-907f4bb9c1b4">
+      <bo>
+        <seg>classifier</seg>
+        <seg>navigation_data</seg>
+      </bo>
+      <position x="351.0" y="428.0"/>
+      <size width="157.0" height="40.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="449abc06-a9ff-4d75-8367-4c73865258d5">
+      <element uuid="d6081734-19fb-4304-b162-556b3ad44028">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="347.0" y="514.5"/>
+          <point x="353.0" y="514.5"/>
+          <point x="353.0" y="469.5"/>
+          <point x="359.0" y="469.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>navigation_data.impl</seg>
+      </bo>
+      <position x="137.0" y="485.0"/>
+      <size width="194.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="fa1893c9-224d-4db2-8621-c38885012a1e">
+      <element uuid="a6370b78-6f0f-4aa3-8f50-dbf1436c6f54">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="347.0" y="404.5"/>
+          <point x="353.0" y="404.5"/>
+          <point x="353.0" y="449.5"/>
+          <point x="359.0" y="449.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>navigation_data.nav_data</seg>
+      </bo>
+      <position x="103.0" y="375.0"/>
+      <size width="228.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5b1c4703-836a-478b-8c87-8ffb2113efac">
+      <element uuid="cdb54086-a5c1-482b-a79b-9439ed09467a">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="347.0" y="459.5"/>
+          <point x="359.0" y="459.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>navigation_data.navfct</seg>
+      </bo>
+      <position x="125.0" y="430.0"/>
+      <size width="206.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="77621afc-5ef5-4751-add6-d9f94d68844b">
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor_type</seg>
+      </bo>
+      <position x="676.0" y="179.0"/>
+      <size width="149.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5ea25911-2fd6-49d6-9a9e-6dd9d4a59e7c">
+      <element uuid="5842c5b6-2704-4ea6-8a39-66cad0afb35c">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="672.0" y="208.5"/>
+          <point x="684.0" y="208.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>sensor_type.impl</seg>
+      </bo>
+      <position x="468.0" y="179.0"/>
+      <size width="188.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="a470b864-4ad4-4d5f-965e-6741ded477ab">
+      <bo>
+        <seg>classifier</seg>
+        <seg>servo_data</seg>
+      </bo>
+      <position x="878.0" y="85.0"/>
+      <size width="124.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="10bf2c41-2596-4c77-a287-06c478892f8a">
+      <element uuid="20ae9195-1458-4013-b839-678f7fbbd739">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="874.0" y="114.5"/>
+          <point x="886.0" y="114.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>servo_data.impl</seg>
+      </bo>
+      <position x="702.0" y="85.0"/>
+      <size width="156.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="1cb4c3b5-0819-45f5-9632-4a3dd042f769">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message</seg>
+      </bo>
+      <position x="835.0" y="473.0"/>
+      <size width="145.0" height="60.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="2575992a-0adb-4ab4-bf05-cc60c477a66f">
+      <element uuid="980f28ea-4c29-4b5b-89d9-09691d534b7c">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="821.0" y="404.5"/>
+          <point x="837.0" y="404.5"/>
+          <point x="837.0" y="494.5"/>
+          <point x="843.0" y="494.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message.gps_message</seg>
+      </bo>
+      <position x="557.0" y="375.0"/>
+      <size width="248.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="508608ae-091d-4b71-91fe-1ee532f94ffa">
+      <element uuid="256e26f0-a317-4fa2-bfe9-b7abb9b5e2c8">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="821.0" y="624.5"/>
+          <point x="837.0" y="624.5"/>
+          <point x="837.0" y="534.5"/>
+          <point x="843.0" y="534.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message.guid_message</seg>
+      </bo>
+      <position x="552.0" y="595.0"/>
+      <size width="253.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="5b38bd7c-6f21-4a11-b414-8dd66c1c00ce">
+      <element uuid="d762bfc1-1cb0-4331-8c98-cf77d916bd71">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="821.0" y="514.5"/>
+          <point x="843.0" y="514.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message.imu_message</seg>
+      </bo>
+      <position x="561.0" y="485.0"/>
+      <size width="244.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="478b5e77-bfb2-42ce-9ba9-57c61d35eee9">
+      <element uuid="6dddeb84-0ff1-424c-bb3a-3b572581498e">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="821.0" y="569.5"/>
+          <point x="827.0" y="569.5"/>
+          <point x="827.0" y="524.5"/>
+          <point x="843.0" y="524.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message.nav_message</seg>
+      </bo>
+      <position x="559.0" y="540.0"/>
+      <size width="246.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="e02a04f6-897c-4b8c-a012-fa59ffd48fec">
+      <element uuid="734a9612-3719-4a78-bf72-317d78180100">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="821.0" y="459.5"/>
+          <point x="827.0" y="459.5"/>
+          <point x="827.0" y="504.5"/>
+          <point x="843.0" y="504.5"/>
+        </bendpoints>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ubx_message.waypoint_message</seg>
+      </bo>
+      <position x="520.0" y="430.0"/>
+      <size width="285.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="657e2769-0c42-4fc5-b416-d1787b9ff0cd">
+      <bo>
+        <seg>classifier</seg>
+        <seg>uint16</seg>
+      </bo>
+      <position x="318.0" y="38.0"/>
+      <size width="99.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="11a36834-7d16-4ff8-b9fc-8633873af18f">
+      <bo>
+        <seg>classifier</seg>
+        <seg>uint32</seg>
+      </bo>
+      <position x="429.0" y="38.0"/>
+      <size width="99.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="fd0b5e98-5835-451e-a3e9-69d83a74edc9">
+      <bo>
+        <seg>classifier</seg>
+        <seg>uint8</seg>
+      </bo>
+      <position x="103.0" y="38.0"/>
+      <size width="92.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="836e3288-486e-441d-9b37-b1d5befb6f4e">
+      <bo>
+        <seg>classifier</seg>
+        <seg>unsigned_char</seg>
+      </bo>
+      <position x="663.0" y="38.0"/>
+      <size width="148.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <element uuid="f5e3ce67-70fc-4fc0-9c58-74aed1a6657e">
+      <bo>
+        <seg>classifier</seg>
+        <seg>unsigned_short</seg>
+      </bo>
+      <position x="823.0" y="38.0"/>
+      <size width="151.0" height="35.0"/>
+      <contentFilters>
+        <filter>generalizations</filter>
+      </contentFilters>
+    </element>
+    <bo>
+      <seg>package</seg>
+      <seg>datastructs</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="1014.0" height="642.0"/>
+    <contentFilters>
+      <filter>classifiers</filter>
+    </contentFilters>
+  </element>
+  <config type="package" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>package</seg>
+      <seg>datastructs</seg>
+    </context>
+  </config>
+</diagram:Diagram>

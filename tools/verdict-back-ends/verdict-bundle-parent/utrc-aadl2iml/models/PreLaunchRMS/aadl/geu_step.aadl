@@ -1,0 +1,195 @@
+package geu_step
+public
+	
+	with gnc_step;
+	with globals;
+	with dataStructs;
+	
+	system geu_step_system -- geu_main.c, line 316
+		features
+			-- global variable data access
+			gps_data : requires data access dataStructs::gps_data;
+			imu_data : requires data access dataStructs::imu_data;
+			gnc_in_write : provides data access globals::gnc_in;
+			
+			-- output message ports
+			GUID_message_out : out data port dataStructs::UBX_message.GUID_message;
+			NAV_message_out : out data port dataStructs::UBX_message.NAV_message;
+			
+	end geu_step_system;
+	
+	system implementation geu_step_system.impl
+		subcomponents
+			-- "main" loop functions
+			UpdateDriverIn : abstract UpdateDriverIn;
+			gnc_step : system gnc_step::gnc_step_system;
+			UpdateDriverOut : abstract UpdateDriverOut;
+			latch_gnc_frame_time : abstract latch_gnc_frame_time;
+			get_gnc_frame_dt : abstract get_gnc_frame_dt;
+			get_timer : abstract get_timer;
+			
+			-- initialization functions
+			initialization_functions : abstract initialization_functions;
+			
+			-- global variables
+			geu_main : data globals::geu_main; -- geu_main.h, line 76
+			gnc_in : data globals::gnc_in; -- gnc_exec.h, line 545
+			gnc_out : data globals::gnc_out;  -- gnc_exec.h, line 546
+			esw_state : data globals::esw_state; -- avionics_io_variables.c, line 15
+			exec_init_called : data globals::exec_init_called; -- geu_main.c, line 254
+			guidance_data : data globals::guidance_data_container;
+			navigation_data : data globals::navigation_data_container;
+			mm_state : data globals::mm_state_container;
+			
+			-- local variables for timing
+			dt : data dt;
+			
+			-- only called if esw_state == configuration
+			state_machine_set_state : abstract state_machine_set_state;
+			state_machine_get_esw_state : abstract state_machine_get_esw_state;
+						
+		connections
+			c1 : data access gnc_in_write -> gnc_in;
+			c8 : data access get_gnc_frame_dt.assignment -> dt;
+			
+			-- only used if esw_state == configuration
+			c6 : data access esw_state -> state_machine_get_esw_state.get_esw_state;
+			c7 : data access state_machine_set_state.set_esw_state -> esw_state;
+			
+			-- initialization
+			init1 : data access exec_init_called <-> initialization_functions.exec_init_called;
+			
+			-- UpdateDriverIn connections
+			Uin1 : data access gps_data -> UpdateDriverIn.gps_data_read;
+			Uin2 : data access imu_data -> UpdateDriverIn.imu_data_read;
+			Uin3 : data access UpdateDriverIn.geu_main_read_write <-> geu_main;
+			Uin4 : data access UpdateDriverIn.gnc_in_write -> gnc_in;
+			
+			-- gnc_step connections
+			gnc1 : data access gnc_step.guidance_data_write -> guidance_data.in_out;
+			gnc2 : data access gnc_step.navigation_data_write -> navigation_data.in_out;
+			gnc3 : data access gnc_in -> gnc_step.gnc_in;
+			gnc4 : data access gnc_step.gnc_out -> gnc_out;
+			gnc5 : data access mm_state.in_out <-> gnc_step.mm_state;
+			
+			-- UpdateDriverOut connections
+			Uout1 : data access guidance_data.in_out -> UpdateDriverOut.guidance_data_read;
+			Uout2 : data access navigation_data.in_out -> UpdateDriverOut.navigation_data_read;
+			Uout3 : data access geu_main -> UpdateDriverOut.geu_main_read;
+			Uout4 : data access gnc_out -> UpdateDriverOut.gnc_out_read;
+			Uout5 : data access mm_state.in_out -> UpdateDriverOut.mm_sys_state_read;
+			Uout6 : data access mm_state.in_out -> UpdateDriverOut.mm_sys_substate_read;
+			Uout7 : port UpdateDriverOut.GUID_message_out -> GUID_message_out;
+			Uout8 : port UpdateDriverOut.NAV_message_out -> NAV_message_out;
+
+	end geu_step_system.impl;
+	
+	-- main loop functions
+	abstract UpdateDriverIn -- geu_main.c, line 695
+		features
+			gnc_in_write : requires data access globals::gnc_in;
+			geu_main_read_write : requires data access globals::geu_main;
+			
+			-- gps data inputs
+			gps_data_read : requires data access dataStructs::gps_data;
+			
+			-- imu data inputs
+			imu_data_read : requires data access dataStructs::imu_data;
+	end UpdateDriverIn;
+	
+	abstract implementation UpdateDriverIn.impl
+	end UpdateDriverIn.impl;
+	
+	abstract UpdateDriverOut -- geu_main.c, line 793
+		features
+			-- global variable inputs
+			geu_main_read : requires data access globals::geu_main;
+			gnc_out_read : requires data access globals::gnc_out;
+			guidance_data_read : requires data access dataStructs::guidance_data;
+			navigation_data_read : requires data access dataStructs::navigation_data;
+			mm_sys_state_read : requires data access dataStructs::mm_state.mm_sys_state;
+			mm_sys_substate_read : requires data access dataStructs::mm_state.mm_sys_substate;
+			
+			-- message outputs
+			NAV_message_out : out data port dataStructs::UBX_message.NAV_message;
+			GUID_message_out : out data port dataStructs::UBX_message.GUID_message;
+	end UpdateDriverOut;
+	
+	abstract implementation UpdateDriverOut.impl
+	end UpdateDriverOut.impl;
+	
+	-- initialization functions and variables
+	abstract initialization_functions
+		features
+			exec_init_called : requires data access globals::exec_init_called;
+	end initialization_functions;
+	
+	abstract implementation initialization_functions.impl
+		subcomponents
+			InitializeDrivers : abstract InitializeDrivers;
+			gncExecInit : abstract gncExecInit;
+	end initialization_functions.impl;
+	
+	-- timing functions	
+	abstract get_timer -- timekeeper.c, line 614
+		features
+			timer_gnc : requires data access globals::timer_out;
+	end get_timer;
+
+	abstract implementation get_timer.impl
+	end get_timer.impl;
+	
+	abstract latch_gnc_frame_time -- timekeeper.c, line 460
+		features
+			gnc_frame_time : requires data access globals::gnc_frame_time;
+	end latch_gnc_frame_time;
+	
+	abstract implementation latch_gnc_frame_time.impl
+	end latch_gnc_frame_time.impl;
+	
+	abstract get_gnc_frame_dt -- timekeeper.c, line 556
+		features
+			assignment : requires data access dt;
+	end get_gnc_frame_dt;
+	
+	abstract implementation get_gnc_frame_dt.impl
+	end get_gnc_frame_dt.impl;
+	
+	-- initialization functions
+	abstract InitializeDrivers -- geu_main.c, line 667
+	end InitializeDrivers;
+	
+	abstract implementation InitializeDrivers.impl
+	end InitializeDrivers.impl;
+	
+	abstract gncExecInit -- gnc_exec.c, line 169
+	end gncExecInit;
+	
+	abstract implementation gncExecInit.impl
+	end gncExecInit.impl;
+	
+	-- only called if esw_state == configuration
+	abstract state_machine_get_esw_state -- state_machine.c, line 83
+		features
+			get_esw_state : requires data access globals::esw_state;
+	end state_machine_get_esw_state;
+	
+	abstract implementation state_machine_get_esw_state.impl
+	end state_machine_get_esw_state.impl;
+	
+	abstract state_machine_set_state -- state_machine.c, line 73
+		features
+			set_esw_state : requires data access globals::esw_state;
+	end state_machine_set_state;
+	
+	abstract implementation state_machine_set_state.impl
+	end state_machine_set_state.impl;
+	
+	-- local variables
+	data dt -- geu_main.c, line 318
+	end dt;
+	
+	data implementation dt.impl
+	end dt.impl;
+	
+end geu_step;
