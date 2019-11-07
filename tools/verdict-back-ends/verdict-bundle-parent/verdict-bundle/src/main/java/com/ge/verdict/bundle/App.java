@@ -364,7 +364,10 @@ public class App {
         hideErrorStream(
                 () -> {
                     VerdictStem stemRunner = new VerdictStem();
-                    stemRunner.runStem(new File(stemProjectDir), new File(stemSadlFile));
+                    stemRunner.runStem(
+                            new File(stemProjectDir),
+                            new File(stemOutputDir),
+                            new File(stemGraphsDir));
                 });
 
         if (!stem_output_csv.stream()

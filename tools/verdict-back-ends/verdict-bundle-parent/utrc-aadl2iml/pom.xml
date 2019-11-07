@@ -138,12 +138,8 @@
             <version>1.0.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
-        <!-- We may need to add more deps if IntegrationTest fails:
-             org.eclipse.emf.ecore.xmi
-             org.osate.contribution.sei
-             org.osate.core
-             org.osate.workspace
-             -->
+        <!-- We may need to add more deps if IntegrationTest fails: org.eclipse.emf.ecore.xmi
+            org.osate.contribution.sei org.osate.core org.osate.workspace -->
     </dependencies>
 
     <repositories>
