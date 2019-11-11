@@ -32,7 +32,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.target.javaVersion>1.8</project.target.javaVersion>
-        <xtext.version>2.17.0</xtext.version>
     </properties>
 
     <!-- Manage Xtext dependencies using Xtext BOM -->
@@ -41,9 +40,293 @@
             <dependency>
                 <groupId>org.eclipse.xtext</groupId>
                 <artifactId>xtext-dev-bom</artifactId>
-                <version>${xtext.version}</version>
+                <version>2.17.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.xtext</groupId>
+                <artifactId>org.eclipse.xtext</artifactId>
+                <version>2.17.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.xtext</groupId>
+                <artifactId>org.eclipse.xtext.util</artifactId>
+                <version>2.17.0</version>
+            </dependency>
+            <!-- Manage other dependencies here as well to be consistent -->
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.research.sadl</groupId>
+                <artifactId>reasoner-api</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+                <!-- Deps shouldn't pick SLF4J backends; only apps should do that -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.research.sadl</groupId>
+                <artifactId>reasoner-impl</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.research.sadl</groupId>
+                <artifactId>sadlserver-api</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.research.sadl</groupId>
+                <artifactId>sadlserver-impl</artifactId>
+                <version>3.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>utrc-aadl2iml</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-data-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-instrumentor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-lustre-translator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-mbas-translator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-stem-runner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-test-instrumentor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rockwellcollins.atc.agree</groupId>
+                <artifactId>com.rockwellcollins.atc.agree</artifactId>
+                <version>2.4.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rockwellcollins.atc.agree</groupId>
+                <artifactId>com.rockwellcollins.atc.agree.analysis</artifactId>
+                <version>2.4.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.utc.utrc.hermes</groupId>
+                <artifactId>com.utc.utrc.hermes.aadl.gen.iml</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.utc.utrc.hermes.iml</groupId>
+                <artifactId>com.utc.utrc.hermes.iml</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.uiowa.clc.verdict.vdm</groupId>
+                <artifactId>iml-verdict-translator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.uiowa.clc.verdict.blm</groupId>
+                <artifactId>verdict-blame-assignment</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.uiowa.clc.verdict.crv</groupId>
+                <artifactId>verdict-crv</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>net.htmlparser.jericho</groupId>
+                <artifactId>jericho-html</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>9.9.1-2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr</artifactId>
+                <version>3.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>4.7.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.12.2</version>
+            </dependency>
+            <dependency><!-- Maven central has only 2007, 2010 - must use WSO2 repository
+                    for 2014 version -->
+                <groupId>org.eclipse</groupId>
+                <artifactId>org.eclipse.emf.transaction</artifactId>
+                <version>1.8.0.201405281451</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.emf</groupId>
+                <artifactId>org.eclipse.emf.edit</artifactId>
+                <version>2.12.0</version>
+            </dependency>
+            <dependency><!-- This dep is problematic; it's the closest one to the
+                    right age but it uses different GAV coordinates for transitive deps -->
+                <groupId>org.eclipse.uml2</groupId>
+                <artifactId>uml</artifactId>
+                <version>5.0.0-v20140602-0749</version>
+                <!-- Exclude different GAV coordinates to avoid duplicating jars -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.core</groupId>
+                        <artifactId>contenttype</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.core</groupId>
+                        <artifactId>osgi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.core</groupId>
+                        <artifactId>jobs</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.core</groupId>
+                        <artifactId>runtime</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.emf</groupId>
+                        <artifactId>ecore</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.emf.ecore</groupId>
+                        <artifactId>xmi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.emf.mapping</groupId>
+                        <artifactId>ecore2xml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.equinox</groupId>
+                        <artifactId>app</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.equinox</groupId>
+                        <artifactId>common</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.equinox</groupId>
+                        <artifactId>preferences</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.equinox</groupId>
+                        <artifactId>registry</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.aadl2</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.aadl2.instance.textual</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.aadl2.modelsupport</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.annexsupport</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.core</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.workspace</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.xtext.aadl2</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osate</groupId>
+                <artifactId>org.osate.xtext.aadl2.properties</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.8.0-beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.8.0-beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xmlunit</groupId>
+                <artifactId>xmlunit-assertj</artifactId>
+                <version>2.6.2</version>
+                <!-- Exclude different GAV coordinates to avoid duplicating jars -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.24</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -150,43 +433,6 @@
                     <version>2.7</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.eclipse.tycho</groupId>
-                    <artifactId>target-platform-configuration</artifactId>
-                    <version>1.5.1</version>
-                    <configuration>
-                        <environments>
-                            <environment>
-                                <os>win32</os>
-                                <ws>win32</ws>
-                                <arch>x86_64</arch>
-                            </environment>
-                            <environment>
-                                <os>linux</os>
-                                <ws>gtk</ws>
-                                <arch>x86_64</arch>
-                            </environment>
-                            <environment>
-                                <os>macosx</os>
-                                <ws>cocoa</ws>
-                                <arch>x86_64</arch>
-                            </environment>
-                        </environments>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.eclipse.tycho</groupId>
-                    <artifactId>tycho-compiler-plugin</artifactId>
-                    <version>1.5.1</version>
-                    <configuration>
-                        <useProjectSettings>false</useProjectSettings>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.eclipse.tycho</groupId>
-                    <artifactId>tycho-maven-plugin</artifactId>
-                    <version>1.5.1</version>
-                </plugin>
-                <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
                     <artifactId>maven-jaxb2-plugin</artifactId>
                     <version>0.14.0</version>
@@ -194,6 +440,7 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- Run these plugins in every module for consistency -->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
@@ -276,7 +523,7 @@
                         <goals>
                             <goal>pom</goal>
                         </goals>
-                        <?m2e execute onConfiguration,onIncremental?>
+                        <?m2e execute onConfiguration?>
                     </execution>
                 </executions>
             </plugin>
@@ -284,6 +531,7 @@
     </build>
 
     <profiles>
+        <!-- Run slower integration tests only when -Pverify is added -->
         <profile>
             <id>verify</id>
             <build>
