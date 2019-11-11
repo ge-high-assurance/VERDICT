@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,131 +17,103 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rockwellcollins.atc.agree</groupId>
+            <artifactId>com.rockwellcollins.atc.agree</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rockwellcollins.atc.agree</groupId>
+            <artifactId>com.rockwellcollins.atc.agree.analysis</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.utc.utrc.hermes</groupId>
             <artifactId>com.utc.utrc.hermes.aadl.gen.iml</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>
-            <version>3.1.1</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>
             <artifactId>org.eclipse.emf.transaction</artifactId>
-            <version>1.8.0.201405281451</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.platform</groupId>
             <artifactId>org.eclipse.core.runtime</artifactId>
-            <version>3.15.200</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.emf</groupId>
             <artifactId>org.eclipse.emf.common</artifactId>
-            <version>2.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.emf</groupId>
             <artifactId>org.eclipse.emf.ecore</artifactId>
-            <version>2.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.emf</groupId>
             <artifactId>org.eclipse.emf.edit</artifactId>
-            <version>2.15.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.uml2</groupId>
             <artifactId>uml</artifactId>
-            <version>5.0.0-v20140602-0749</version>
             <scope>runtime</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.core</groupId>
-                    <artifactId>contenttype</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.core</groupId>
-                    <artifactId>osgi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.core</groupId>
-                    <artifactId>jobs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.core</groupId>
-                    <artifactId>runtime</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.emf</groupId>
-                    <artifactId>ecore</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.emf.ecore</groupId>
-                    <artifactId>xmi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.emf.mapping</groupId>
-                    <artifactId>ecore2xml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.equinox</groupId>
-                    <artifactId>app</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.equinox</groupId>
-                    <artifactId>common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.equinox</groupId>
-                    <artifactId>preferences</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.equinox</groupId>
-                    <artifactId>registry</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse.xtext</groupId>
             <artifactId>org.eclipse.xtext</artifactId>
-            <version>${xtext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xtext</groupId>
+            <artifactId>org.eclipse.xtext.util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osate</groupId>
             <artifactId>org.osate.aadl2</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osate</groupId>
+            <artifactId>org.osate.aadl2.instance.textual</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osate</groupId>
             <artifactId>org.osate.aadl2.modelsupport</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.osate</groupId>
             <artifactId>org.osate.annexsupport</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osate</groupId>
+            <artifactId>org.osate.core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osate</groupId>
+            <artifactId>org.osate.workspace</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.osate</groupId>
             <artifactId>org.osate.xtext.aadl2</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.osate</groupId>
             <artifactId>org.osate.xtext.aadl2.properties</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- We may need to add more deps if IntegrationTest fails: org.eclipse.emf.ecore.xmi
-            org.osate.contribution.sei org.osate.core org.osate.workspace -->
     </dependencies>
 
     <repositories>

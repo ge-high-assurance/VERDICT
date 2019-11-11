@@ -91,7 +91,7 @@ public class IModelVisitor implements IVisitor {
 
         List<Relation> relList = e.getRelations();
 
-        List<TypeRestriction> trList = e.getRestrictions();
+        TypeRestriction tr = e.getRestriction();
 
         for (SymbolDeclaration sd : e.getSymbols()) {
             // visit(sd);
