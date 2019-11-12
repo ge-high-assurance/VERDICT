@@ -3,13 +3,20 @@ package com.ge.verdict.test.instrumentor;
 
 import com.ge.verdict.vdm.VdmTranslator;
 import java.io.File;
+import java.net.URISyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_model.Model;
 
-public class AppClass {
-    public static void main(String[] args) {
+public class App {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
+    public static void main(String[] args) throws URISyntaxException {
         if (args.length != 2) {
-            System.err.println(
-                    "Usage: java -jar verdict-test-instrumentor-1.0-SNAPSHOT-capsule.jar <input file> <output file>");
+            File jarFile =
+                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            LOGGER.error("Usage: java -jar {} <input file> <output file>", jarFile.getName());
         } else {
             // Get the input file
             File inputFile = new File(args[0]);

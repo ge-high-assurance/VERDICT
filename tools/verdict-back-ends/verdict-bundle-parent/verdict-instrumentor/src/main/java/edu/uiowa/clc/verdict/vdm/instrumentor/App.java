@@ -15,9 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_model.Model;
 
-public class AppClass {
+public class App {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     // @SuppressWarnings("static-access")
     private static Options createOptions() {

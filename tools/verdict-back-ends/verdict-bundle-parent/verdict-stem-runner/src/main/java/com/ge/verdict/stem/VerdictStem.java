@@ -19,12 +19,15 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Runs Verdict STEM on a project. */
+/** Runs SADL on a Verdict STEM project. */
 public class VerdictStem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerdictStem.class);
 
     /**
-     * Runs Verdict STEM on a project.
+     * Runs SADL on a Verdict STEM project.
      *
      * @param projectDir Path to Verdict STEM project
      * @param outputDir Output directory to write to
@@ -68,6 +71,7 @@ public class VerdictStem {
                                     + ". ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess "
                                     + ". FILTER NOT EXISTS {?z2 <type> ?z6 . ?z6 <rdfs:subClassOf> ?z5 }} order by ?z5 ?z2 ?CAPEC");
             ResultSet rs = srvr.query(qry);
+            outputDir.mkdirs();
             Files.write(
                     outputDir.toPath().resolve("CAPEC.csv"),
                     rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
@@ -135,6 +139,7 @@ public class VerdictStem {
                                     + " . LET(?cplist    := replace(?templist3,'  ',' ')) "
                                     + "}");
             rs = srvr.query(qry);
+            graphsDir.mkdirs();
             GraphVizVisualizer visualizer = new GraphVizVisualizer();
             visualizer.initialize(
                     graphsDir.getPath(),
@@ -144,6 +149,7 @@ public class VerdictStem {
                     Orientation.TD,
                     "Cmd 13  (Graph)");
             visualizer.graphResultSetData(rs);
+            LOGGER.info("Run finished");
         } catch (IOException
                 | InvalidNameException
                 | SessionNotFoundException

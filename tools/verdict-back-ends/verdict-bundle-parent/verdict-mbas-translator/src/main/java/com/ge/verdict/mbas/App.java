@@ -2,13 +2,14 @@
 package com.ge.verdict.mbas;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_model.Model;
 
-public class AppClass {
+public class App {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static boolean isValidDir(String dirName) {
         if (dirName == null) {
@@ -48,13 +49,16 @@ public class AppClass {
         return true;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         // Check that we have three arguments
         // args[0]: input aadl file path, args[1]: output STEM inputs, args[2]: output Soteria++
         // inputs
         if (args.length != 3) {
+            File jarFile =
+                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             LOGGER.error(
-                    "Usage: java -jar verdict-mbas-translator-1.0-SNAPSHOT-capsule.jar <input file> <STEM output folder> <Soteria++ output folder>");
+                    "Usage: java -jar {} <input file> <STEM output folder> <Soteria++ output folder>",
+                    jarFile.getName());
         } else {
             if (isValidXMLFile(args[0])) {
                 if (isValidDir(args[1]) && isValidDir(args[2])) {
