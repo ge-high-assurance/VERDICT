@@ -27,7 +27,7 @@ import verdict.vdm.vdm_model.Severity;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppClass.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VDM2CSV.class);
 
     /**
      * Marshal a Verdict data model to Mbas files.

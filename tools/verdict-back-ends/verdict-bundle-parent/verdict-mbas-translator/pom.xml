@@ -17,18 +17,15 @@
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.8.0-beta4</version>
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.8.0-beta4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -39,7 +36,7 @@
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
-                    <appClass>com.ge.verdict.mbas.AppClass</appClass>
+                    <appClass>com.ge.verdict.mbas.App</appClass>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>
@@ -55,17 +52,6 @@
                     <execution>
                         <goals>
                             <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>antlr4</goal>
                         </goals>
                     </execution>
                 </executions>

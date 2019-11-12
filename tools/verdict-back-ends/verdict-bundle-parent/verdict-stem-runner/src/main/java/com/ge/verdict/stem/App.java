@@ -2,37 +2,39 @@
 package com.ge.verdict.stem;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Runs Verdict STEM on a project. */
+/** Runs SADL on a Verdict STEM project. */
 public class App {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     /**
-     * Runs Verdict STEM on the given project.
+     * Runs SADL on the given Verdict STEM project.
      *
      * @param args Command line arguments with path to project
      */
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws URISyntaxException {
         // Check that we have one argument
         if (args.length == 1) {
 
-            // Get the project directory (check it exists and is writable)
+            // Get the Verdict STEM project directory (check it exists and is writable)
             File projectDir = new File(args[0]);
-            check(projectDir);
+            checkDir(projectDir);
 
             // By convention, the output and graphs directories will be subdirectories of projectDir
             File outputDir = new File(projectDir, "Output");
             File graphsDir = new File(projectDir, "Graphs");
 
-            // Run Verdict STEM on the project
+            // Run SADL on the Verdict STEM project
             VerdictStem stem = new VerdictStem();
             stem.runStem(projectDir, outputDir, graphsDir);
         } else {
-            LOGGER.error("Usage: java -jar verdict-stem-1.0-SNAPSHOT-capsule.jar <project dir>");
+            File jarFile =
+                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            LOGGER.error("Usage: java -jar {} <project dir>", jarFile.getName());
         }
     }
 
@@ -40,9 +42,9 @@ public class App {
      * Checks the given directory exists and is writable.
      *
      * @param directory The path to the directory
-     * @throws RuntimeException If the dir doesn't exist or is not writable
+     * @throws RuntimeException If the directory doesn't exist or is not writable
      */
-    private static void check(File directory) {
+    private static void checkDir(File directory) {
         if (!directory.exists()) {
             throw new RuntimeException("Directory does not exist: " + directory);
         }

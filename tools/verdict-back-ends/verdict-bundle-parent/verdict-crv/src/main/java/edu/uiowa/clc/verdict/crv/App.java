@@ -24,7 +24,7 @@ import verdict.vdm.vdm_model.Model;
 // 3. BlameAssignment
 // 4. ResultProcessor
 
-public class AppClass {
+public class App {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         runCRV(args);
