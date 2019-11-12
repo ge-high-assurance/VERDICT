@@ -1,3 +1,0 @@
-property set property_test is
- pA : aadlreal applies to (system);
-end property_test;

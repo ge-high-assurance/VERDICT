@@ -16,7 +16,6 @@
 
     <modules>
         <module>iml-verdict-translator</module>
-        <module>utrc-aadl2iml</module>
         <module>verdict-data-model</module>
         <module>verdict-lustre-translator</module>
         <module>verdict-instrumentor</module>
@@ -89,11 +88,6 @@
             </dependency>
             <dependency>
                 <groupId>com.ge.verdict</groupId>
-                <artifactId>utrc-aadl2iml</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-data-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -121,21 +115,6 @@
                 <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-test-instrumentor</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.rockwellcollins.atc.agree</groupId>
-                <artifactId>com.rockwellcollins.atc.agree</artifactId>
-                <version>2.4.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.rockwellcollins.atc.agree</groupId>
-                <artifactId>com.rockwellcollins.atc.agree.analysis</artifactId>
-                <version>2.4.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.utc.utrc.hermes</groupId>
-                <artifactId>com.utc.utrc.hermes.aadl.gen.iml</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.utc.utrc.hermes.iml</groupId>
@@ -174,11 +153,6 @@
             </dependency>
             <dependency>
                 <groupId>org.antlr</groupId>
-                <artifactId>antlr</artifactId>
-                <version>3.1.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
                 <version>4.7.2</version>
             </dependency>
@@ -192,114 +166,10 @@
                 <artifactId>assertj-core</artifactId>
                 <version>3.12.2</version>
             </dependency>
-            <dependency><!-- Maven central has only 2007, 2010 - must use WSO2 repository
-                    for 2014 version -->
-                <groupId>org.eclipse</groupId>
-                <artifactId>org.eclipse.emf.transaction</artifactId>
-                <version>1.8.0.201405281451</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.emf</groupId>
-                <artifactId>org.eclipse.emf.edit</artifactId>
-                <version>2.12.0</version>
-            </dependency>
-            <dependency><!-- This dep is problematic; it's the closest one to the
-                    right age but it uses different GAV coordinates for transitive deps -->
-                <groupId>org.eclipse.uml2</groupId>
-                <artifactId>uml</artifactId>
-                <version>5.0.0-v20140602-0749</version>
-                <!-- Exclude different GAV coordinates to avoid duplicating jars -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.eclipse.core</groupId>
-                        <artifactId>contenttype</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.core</groupId>
-                        <artifactId>osgi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.core</groupId>
-                        <artifactId>jobs</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.core</groupId>
-                        <artifactId>runtime</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.emf</groupId>
-                        <artifactId>ecore</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.emf.ecore</groupId>
-                        <artifactId>xmi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.emf.mapping</groupId>
-                        <artifactId>ecore2xml</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.equinox</groupId>
-                        <artifactId>app</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.equinox</groupId>
-                        <artifactId>common</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.equinox</groupId>
-                        <artifactId>preferences</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.equinox</groupId>
-                        <artifactId>registry</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>2.3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.aadl2</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.aadl2.instance.textual</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.aadl2.modelsupport</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.annexsupport</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.core</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.workspace</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.xtext.aadl2</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osate</groupId>
-                <artifactId>org.osate.xtext.aadl2.properties</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -322,11 +192,6 @@
                         <artifactId>jaxb-api</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>1.24</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -523,7 +388,7 @@
                         <goals>
                             <goal>pom</goal>
                         </goals>
-                        <?m2e execute onConfiguration?>
+                        <?m2e ignore?>
                     </execution>
                 </executions>
             </plugin>
