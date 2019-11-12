@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /** Runs SADL on a Verdict STEM project. */
 public class App {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     /**
