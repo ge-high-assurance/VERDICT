@@ -25,6 +25,7 @@ public class ResourceTest {
         XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
 
         resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+        // 1. Load the IML libraries: figure out which libs
         // Common artifacts
         resourceSet.getResource(URI.createURI("classpath:/iml-common/lang.iml"), true);
         resourceSet.getResource(URI.createURI("classpath:/iml-common/utils.iml"), true);
@@ -33,8 +34,11 @@ public class ResourceTest {
         resourceSet.getResource(URI.createURI("classpath:/iml-common/vdm_lustre.iml"), true);
         resourceSet.getResource(URI.createURI("classpath:/iml-common/vdm_model.iml"), true);
 
+        // 2. Load several IML models
         Resource resource = resourceSet.getResource(URI.createURI(input_file), true);
         // Model model = (Model) resource.getContents().get(0);
+
+        // 3. Check errors of the IML models
         Model iml_model = (Model) resource.getContents().get(0);
 
         EList<Resource.Diagnostic> model_errors = iml_model.eResource().getErrors();
@@ -57,12 +61,19 @@ public class ResourceTest {
         // TODO: Update ArrayList with Array & Free used Tokens.
         ArrayList<Token> tokens = null;
 
+        // 4.  The AADL + AGREE first: pass the main IML model.
         IModelVisitor visitor = new IModelVisitor();
-
+        // Traverse the AST of IML models in a top-down manner
         visitor.visit(iml_model);
+
+        // Collect the leaf tokens
         tokens = visitor.iml_tokens;
+        // Put a EOF token at the end
         tokens.add(new Token(null, Type.EOF));
 
+        // Additionally, we need to translate AADL + VERDICT again
+
+        // With and IML tokens and AST, we need to translate the AST to VDM
         VDMParser vdm_parser = new VDMParser(visitor.iml_tokens);
 
         verdict.vdm.vdm_model.Model vdm_model = vdm_parser.model();
