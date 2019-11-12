@@ -56,6 +56,20 @@
         </dependency>
     </dependencies>
 
+    <!-- This microrepository has our IML dependencies -->
+    <repositories>
+        <repository>
+            <id>sadl-snapshot-repository</id>
+            <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
