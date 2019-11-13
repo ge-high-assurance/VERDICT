@@ -261,6 +261,7 @@
             use="optional"></attribute>
         <attribute name="wifiFromOutsideTB" type="boolean"
             use="optional"></attribute>
+        <attribute name="pedigree" type="vdm_model:PedigreeType"></attribute>            
     </attributeGroup>
 
     <simpleType name="DalType">
@@ -330,7 +331,6 @@
         <attribute name="manufacturer"
             type="vdm_model:ManufacturerType" use="optional">
         </attribute>
-        <attribute name="pedigree" type="vdm_model:PedigreeType"></attribute>
     </attributeGroup>
 
     <simpleType name="KindOfComponent">
