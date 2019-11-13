@@ -133,6 +133,83 @@
             ref="vdm_model:InstrumentedComponentProperties">
         </attributeGroup>
         <attribute name="adversariallyTested" type="boolean"></attribute>
+        <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
+        <attribute name="canReceiveSWUpdate" type="boolean"></attribute>
+        <attribute name="controlReceivedFromUntrusted"
+            type="boolean"></attribute>
+        <attribute name="controlSentToUntrusted" type="boolean"></attribute>
+        <attribute name="dataReceivedFromUntrusted" type="boolean"></attribute>
+        <attribute name="dataSentToUntrusted" type="boolean"></attribute>
+        <attribute name="Configuration_Attack" type="boolean"></attribute>
+        <attribute name="Physical_Theft_Attack" type="boolean"></attribute>
+        <attribute name="Interception_Attack" type="boolean"></attribute>
+        <attribute name="Hardware_Integrity_Attack" type="boolean"></attribute>
+        <attribute name="Supply_Chain_Attack" type="boolean"></attribute>
+        <attribute name="Brute_Force_Attack" type="boolean"></attribute>
+        <attribute name="Fault_Injection_Attack" type="boolean"></attribute>
+        <attribute name="Identity_Spoofing_Attack" type="boolean"></attribute>
+        <attribute name="Excessive_Allocation_Attack" type="boolean"></attribute>
+        <attribute name="Sniffing_Attack" type="boolean"></attribute>
+        <attribute name="Buffer_Attack" type="boolean"></attribute>
+        <attribute name="Flooding_Attack" type="boolean"></attribute>
+        <attribute name="auditMessageResponses" type="boolean"></attribute>
+        <attribute name="deviceAuthentication" type="boolean"></attribute>
+        <attribute name="dosProtection" type="boolean"></attribute>
+        <attribute name="encryptedStorage" type="boolean"></attribute>
+        <attribute name="inputValidation" type="boolean"></attribute>
+        <attribute name="logging" type="boolean"></attribute>
+        <attribute name="memoryProtection" type="boolean"></attribute>
+        <attribute name="physicalAccessControl" type="boolean"></attribute>
+        <attribute name="removeIdentifyingInformation"
+            type="boolean"></attribute>
+        <attribute name="resourceAvailability" type="boolean"></attribute>
+        <attribute name="resourceIsolation" type="boolean"></attribute>
+        <attribute name="secureBoot" type="boolean"></attribute>
+        <attribute name="sessionAuthenticity" type="boolean"></attribute>
+        <attribute name="staticCodeAnalysis" type="boolean"></attribute>
+        <attribute name="strongCryptoAlgorithms" type="boolean"></attribute>
+        <attribute name="supplyChainSecurity" type="boolean"></attribute>
+        <attribute name="systemAccessControl" type="boolean"></attribute>
+        <attribute name="tamperProtection" type="boolean"></attribute>
+        <attribute name="userAuthentication" type="boolean"></attribute>
+        <attribute name="auditMessageResponsesDAL"
+            type="vdm_model:DalType">
+        </attribute>
+        <attribute name="deviceAuthenticationDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="dosProtectionDAL" type="vdm_model:DalType"></attribute>
+        <attribute name="encryptedStorageDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="heterogeneityDAL" type="vdm_model:DalType"></attribute>
+        <attribute name="inputValidationDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="loggingDAL" type="vdm_model:DalType"></attribute>
+        <attribute name="memoryProtectionDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="physicalAccessControlDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="removeIdentifyingInformationDAL"
+            type="vdm_model:DalType">
+        </attribute>
+        <attribute name="resourceAvailabilityDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="resourceIsolationDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="secureBootDAL" type="vdm_model:DalType"></attribute>
+        <attribute name="sessionAuthenticityDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="staticCodeAnalysisDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="strongCryptoAlgorithmsDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="supplyChainSecurityDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="systemAccessControlDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="tamperProtectionDAL"
+            type="vdm_model:DalType"></attribute>
+        <attribute name="userAuthenticationDAL"
+            type="vdm_model:DalType"></attribute>
     </complexType>
 
     <complexType name="BlockImpl">
@@ -163,7 +240,14 @@
         <attribute name="authenticated" type="boolean"
             use="optional"></attribute>
         <attribute name="conn_type" type="vdm_model:ConnectionType"
+            use="optional">
+        </attribute>
+        <attribute name="trustedConnection" type="boolean"
             use="optional"></attribute>
+        <attribute name="encryptedTransmission" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedTransmissionDAL"
+            type="vdm_model:DalType" use="optional" />
     </complexType>
 
     <attributeGroup name="STEMComponentProperties">
@@ -178,6 +262,13 @@
         <attribute name="wifiFromOutsideTB" type="boolean"
             use="optional"></attribute>
     </attributeGroup>
+
+    <simpleType name="DalType">
+        <restriction base="int">
+            <minInclusive value="0"></minInclusive>
+            <maxInclusive value="9"></maxInclusive>
+        </restriction>
+    </simpleType>
 
     <simpleType name="Flow">
         <restriction base="string">
@@ -237,9 +328,10 @@
             use="optional">
         </attribute>
         <attribute name="manufacturer"
-            type="vdm_model:ManufacturerType" use="optional"></attribute>
+            type="vdm_model:ManufacturerType" use="optional">
+        </attribute>
+        <attribute name="pedigree" type="vdm_model:PedigreeType"></attribute>
     </attributeGroup>
-
 
     <simpleType name="KindOfComponent">
         <restriction base="string">
@@ -376,5 +468,13 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
+
+    <simpleType name="PedigreeType">
+        <restriction base="string">
+            <enumeration value="InternallyDeveloped"></enumeration>
+            <enumeration value="COTS"></enumeration>
+            <enumeration value="Sourced"></enumeration>
+        </restriction>
+    </simpleType>
 
 </schema>
