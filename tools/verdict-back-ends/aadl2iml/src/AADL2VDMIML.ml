@@ -466,6 +466,25 @@ let get_manufacturer_prop_value properties =
     | _ -> failwith "Unexpected Manufacturer value"
   )
 
+let get_pedigree_prop_value properties =
+  let pedigree_qpr = AD.mk_full_qpref app_property_set "pedigree" in
+  match AD.find_assoc pedigree_qpr properties with
+  | None -> None
+  | Some {AD.value} -> (
+    match value with
+    | AD.LiteralOrReference (None, (_, id)) -> (
+      let v =
+        match (String.lowercase_ascii id) with
+        | "internallydeveloped" -> VI.InternallyDeveloped
+        | "cots" -> VI.COTS
+        | "sourced" -> VI.Sourced
+        | _ -> failwith "Unexpected Pedigree value"
+      in
+      Some v
+    )
+    | _ -> failwith "Unexpected Pedigree value"
+  )
+
 let get_component_type_prop_value properties =
   let component_type_qpr = AD.mk_full_qpref app_property_set "componentType" in
   match AD.find_assoc component_type_qpr properties with
@@ -513,6 +532,7 @@ let subcomponent_to_comp_inst sys_impl iml_comp_types
   VI.category = (
     let qpr = AD.mk_full_qpref app_property_set "category" in
     get_string_prop_value qpr properties);
+  VI.pedigree = get_pedigree_prop_value properties;
   VI.component_type = get_component_type_prop_value properties;
   VI.situated = get_situated_prop_value properties;
   VI.adversarially_tested = (
@@ -524,20 +544,201 @@ let subcomponent_to_comp_inst sys_impl iml_comp_types
   VI.inside_trusted_boundary = (
     let qpr = AD.mk_full_qpref app_property_set "insideTrustedBoundary" in
     get_bool_prop_value qpr properties);
+  VI.canReceiveConfigUpdate = (
+    let qpr = AD.mk_full_qpref app_property_set "canReceiveConfigUpdate" in
+    get_bool_prop_value qpr properties);
+  VI.canReceiveSWUpdate = (
+    let qpr = AD.mk_full_qpref app_property_set "canReceiveSWUpdate" in
+    get_bool_prop_value qpr properties);
+  VI.controlReceivedFromUntrusted = (
+    let qpr = AD.mk_full_qpref app_property_set "controlReceivedFromUntrusted" in
+    get_bool_prop_value qpr properties);
+  VI.controlSentToUntrusted = (
+    let qpr = AD.mk_full_qpref app_property_set "controlSentToUntrusted" in
+    get_bool_prop_value qpr properties);
+  VI.dataReceivedFromUntrusted = (
+    let qpr = AD.mk_full_qpref app_property_set "dataReceivedFromUntrusted" in
+    get_bool_prop_value qpr properties);
+  VI.dataSentToUntrusted = (
+    let qpr = AD.mk_full_qpref app_property_set "dataSentToUntrusted" in
+    get_bool_prop_value qpr properties);
+
+  VI.configuration_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Configuration_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.physical_Theft_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Physical_Theft_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.interception_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Interception_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.hardware_Integrity_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Hardware_Integrity_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.supply_Chain_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Supply_Chain_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.brute_Force_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Brute_Force_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.fault_Injection_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Fault_Injection_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.identity_Spoofing_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Identity_Spoofing_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.excessive_Allocation_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Excessive_Allocation_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.sniffing_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Sniffing_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.buffer_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Buffer_Attack" in
+    get_bool_prop_value qpr properties);
+  VI.flooding_Attack = (
+    let qpr = AD.mk_full_qpref app_property_set "Flooding_Attack" in
+    get_bool_prop_value qpr properties);
+
+  VI.anti_jamming = (
+    let qpr = AD.mk_full_qpref app_property_set "antiJamming" in
+    get_bool_prop_value qpr properties);
+
+  VI.auditMessageResponses = (
+    let qpr = AD.mk_full_qpref app_property_set "auditMessageResponses" in
+    get_bool_prop_value qpr properties);
+  VI.deviceAuthentication = (
+    let qpr = AD.mk_full_qpref app_property_set "deviceAuthentication" in
+    get_bool_prop_value qpr properties);
+  VI.dosProtection = (
+    let qpr = AD.mk_full_qpref app_property_set "dosProtection" in
+    get_bool_prop_value qpr properties);
+  VI.encryptedStorage = (
+    let qpr = AD.mk_full_qpref app_property_set "encryptedStorage" in
+    get_bool_prop_value qpr properties);
+
+  VI.heterogeneity = (
+    let qpr = AD.mk_full_qpref app_property_set "heterogeneity" in
+    get_bool_prop_value qpr properties);
+  VI.inputValidation = (
+    let qpr = AD.mk_full_qpref app_property_set "inputValidation" in
+    get_bool_prop_value qpr properties);
+  VI.logging = (
+    let qpr = AD.mk_full_qpref app_property_set "logging" in
+    get_bool_prop_value qpr properties);
+  VI.memoryProtection = (
+    let qpr = AD.mk_full_qpref app_property_set "memoryProtection" in
+    get_bool_prop_value qpr properties);
+  VI.physicalAccessControl = (
+    let qpr = AD.mk_full_qpref app_property_set "physicalAccessControl" in
+    get_bool_prop_value qpr properties);
+  VI.removeIdentifyingInformation = (
+    let qpr = AD.mk_full_qpref app_property_set "removeIdentifyingInformation" in
+    get_bool_prop_value qpr properties);
+  VI.resourceAvailability = (
+    let qpr = AD.mk_full_qpref app_property_set "resourceAvailability" in
+    get_bool_prop_value qpr properties);
+  VI.resourceIsolation = (
+    let qpr = AD.mk_full_qpref app_property_set "resourceIsolation" in
+    get_bool_prop_value qpr properties);
+  VI.secureBoot = (
+    let qpr = AD.mk_full_qpref app_property_set "secureBoot" in
+    get_bool_prop_value qpr properties);
+  VI.sessionAuthenticity = (
+    let qpr = AD.mk_full_qpref app_property_set "sessionAuthenticity" in
+    get_bool_prop_value qpr properties);
+  VI.staticCodeAnalysis = (
+    let qpr = AD.mk_full_qpref app_property_set "staticCodeAnalysis" in
+    get_bool_prop_value qpr properties);
+  VI.strongCryptoAlgorithms = (
+    let qpr = AD.mk_full_qpref app_property_set "strongCryptoAlgorithms" in
+    get_bool_prop_value qpr properties);
+  VI.supplyChainSecurity = (
+    let qpr = AD.mk_full_qpref app_property_set "supplyChainSecurity" in
+    get_bool_prop_value qpr properties);
+  VI.systemAccessControl = (
+    let qpr = AD.mk_full_qpref app_property_set "systemAccessControl" in
+    get_bool_prop_value qpr properties);
+  VI.tamperProtection = (
+    let qpr = AD.mk_full_qpref app_property_set "tamperProtection" in
+    get_bool_prop_value qpr properties);
+  VI.userAuthentication = (
+    let qpr = AD.mk_full_qpref app_property_set "userAuthentication" in
+    get_bool_prop_value qpr properties);
+
+  VI.anti_jamming_dal = (
+    let qpr = AD.mk_full_qpref app_property_set "antiJammingDAL" in
+    get_int_prop_value qpr properties);
+  VI.auditMessageResponsesDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "auditMessageResponsesDAL" in
+    get_int_prop_value qpr properties);
+  VI.deviceAuthenticationDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "deviceAuthenticationDAL" in
+    get_int_prop_value qpr properties);
+  VI.dosProtectionDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "dosProtectionDAL" in
+    get_int_prop_value qpr properties);
+  VI.encryptedStorageDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "encryptedStorageDAL" in
+    get_int_prop_value qpr properties);
+  VI.heterogeneity_dal = (
+    let qpr = AD.mk_full_qpref app_property_set "heterogeneityDAL" in
+    get_int_prop_value qpr properties);
+  VI.inputValidationDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "inputValidationDAL" in
+    get_int_prop_value qpr properties);
+  VI.loggingDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "loggingDAL" in
+    get_int_prop_value qpr properties);
+  VI.memoryProtectionDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "memoryProtectionDAL" in
+    get_int_prop_value qpr properties);
+  VI.physicalAccessControlDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "physicalAccessControlDAL" in
+    get_int_prop_value qpr properties);
+  VI.removeIdentifyingInformationDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "removeIdentifyingInformationDAL" in
+    get_int_prop_value qpr properties);
+  VI.resourceAvailabilityDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "resourceAvailabilityDAL" in
+    get_int_prop_value qpr properties);
+  VI.resourceIsolationDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "resourceIsolationDAL" in
+    get_int_prop_value qpr properties);
+  VI.secureBootDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "secureBootDAL" in
+    get_int_prop_value qpr properties);
+  VI.sessionAuthenticityDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "sessionAuthenticityDAL" in
+    get_int_prop_value qpr properties);
+  VI.staticCodeAnalysisDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "staticCodeAnalysisDAL" in
+    get_int_prop_value qpr properties);
+  VI.strongCryptoAlgorithmsDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "strongCryptoAlgorithmsDAL" in
+    get_int_prop_value qpr properties);
+  VI.supplyChainSecurityDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "supplyChainSecurityDAL" in
+    get_int_prop_value qpr properties);
+  VI.systemAccessControlDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "systemAccessControlDAL" in
+    get_int_prop_value qpr properties);
+  VI.tamperProtectionDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "tamperProtectionDAL" in
+    get_int_prop_value qpr properties);
+  VI.userAuthenticationDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "userAuthenticationDAL" in
+    get_int_prop_value qpr properties)
+
+  (*
   VI.broadcast_from_outside_tb = (
     let qpr = AD.mk_full_qpref app_property_set "broadcastFromOutsideTB" in
     get_bool_prop_value qpr properties);
   VI.wifi_from_outside_tb = (
     let qpr = AD.mk_full_qpref app_property_set "wifiFromOutsideTB" in
     get_bool_prop_value qpr properties);
-  VI.heterogeneity = (
-    let qpr = AD.mk_full_qpref app_property_set "heterogeneity" in
-    get_bool_prop_value qpr properties);
   VI.encryption = (
     let qpr = AD.mk_full_qpref app_property_set "encryption" in
-    get_bool_prop_value qpr properties);
-  VI.anti_jamming = (
-    let qpr = AD.mk_full_qpref app_property_set "antiJamming" in
     get_bool_prop_value qpr properties);
   VI.anti_flooding = (
     let qpr = AD.mk_full_qpref app_property_set "antiFlooding" in
@@ -545,21 +746,17 @@ let subcomponent_to_comp_inst sys_impl iml_comp_types
   VI.anti_fuzzing = (
     let qpr = AD.mk_full_qpref app_property_set "antiFuzzing" in
     get_bool_prop_value qpr properties);
-  VI.heterogeneity_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "heterogeneityDAL" in
-    get_int_prop_value qpr properties);
-  VI.encryption_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "encryptionDAL" in
-    get_int_prop_value qpr properties);
-  VI.anti_jamming_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "antiJammingDAL" in
-    get_int_prop_value qpr properties);
   VI.anti_flooding_dal = (
     let qpr = AD.mk_full_qpref app_property_set "antiFloodingDAL" in
     get_int_prop_value qpr properties);
   VI.anti_fuzzing_dal = (
     let qpr = AD.mk_full_qpref app_property_set "antiFuzzingDAL" in
     get_int_prop_value qpr properties);
+  VI.encryption_dal = (
+    let qpr = AD.mk_full_qpref app_property_set "encryptionDAL" in
+    get_int_prop_value qpr properties);
+
+  *)
  }
 
 let get_port_index {VI.ports} port =
@@ -601,14 +798,14 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
 let get_flow_type_prop_value properties =
   let flow_type_qpr = AD.mk_full_qpref app_property_set "flowType" in
   match AD.find_assoc flow_type_qpr properties with
-  | None -> failwith ("No FlowType property for connection was found")
+  | None -> None 
   | Some {AD.value} -> (
     match value with
     | AD.LiteralOrReference (None, (_, id)) -> (
       match (String.lowercase_ascii id) with
-      | "xdata" -> VI.Xdata
-      | "control" -> VI.Control
-      | "request" -> VI.Request
+      | "xdata" -> Some VI.Xdata
+      | "xcontrol" -> Some VI.Xcontrol
+      | "xrequest" -> Some VI.Xrequest
       | _ -> failwith "Unexpected FlowType value"
     )
     | _ -> failwith "Unexpected FlowType value"
@@ -645,6 +842,15 @@ let port_connection_to_iml_connection ct ct_idx sys_impl iml_comp_types subcomps
    VI.data_encrypted = (
      let qpr = AD.mk_full_qpref app_property_set "dataEncrypted" in
      get_bool_prop_value qpr properties);
+   VI.trustedConnection = (
+     let qpr = AD.mk_full_qpref app_property_set "trustedConnection" in
+     get_bool_prop_value qpr properties);
+   VI.encryptedTransmission = (
+     let qpr = AD.mk_full_qpref app_property_set "encryptedTransmission" in
+     get_bool_prop_value qpr properties);
+   VI.encryptedTransmissionDAL = (
+    let qpr = AD.mk_full_qpref app_property_set "encryptedTransmissionDAL" in
+    get_int_prop_value qpr properties);
    VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
    VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
   }
