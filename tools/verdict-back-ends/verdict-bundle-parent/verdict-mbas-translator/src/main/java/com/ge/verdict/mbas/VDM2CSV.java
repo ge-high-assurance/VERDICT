@@ -19,6 +19,7 @@ import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.CyberExpr;
 import verdict.vdm.vdm_model.CyberRel;
 import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.PedigreeType;
@@ -616,7 +617,7 @@ public class VDM2CSV extends VdmTranslator {
                 // Check return type
                 if (PedigreeType.class.equals(method.getReturnType())) {
                     getPropMethods[i] = method;
-                } else if (ComponentKindType.class.equals(method.getReturnType())) {
+                } else if (KindOfComponent.class.equals(method.getReturnType())) {
                     getPropMethods[i] = method;
                 }
             } catch (Exception e) {
@@ -666,8 +667,8 @@ public class VDM2CSV extends VdmTranslator {
                         if (PedigreeType.class.equals(getPropMethods[i].getReturnType())) {
                         	PedigreeType pedigreeType = invokeMethod(inst, getDalMethods[i], PedigreeType.INTERNALLY_DEVELOPED);
                         	table.addValue(pedigreeType.name());
-                        } else if (ComponentKindType.class.equals(getPropMethods[i].getReturnType())) {
-                        	ComponentKindType componentKind = invokeMethod(inst, getDalMethods[i], ComponentKindType.HARDWARE);
+                        } else if (KindOfComponent.class.equals(getPropMethods[i].getReturnType())) {
+                        	KindOfComponent componentKind = invokeMethod(inst, getDalMethods[i], KindOfComponent.HARDWARE);
                         	table.addValue(componentKind.name());                        	
                         } else {
                         	errAndExit("Cannot reach here!");
