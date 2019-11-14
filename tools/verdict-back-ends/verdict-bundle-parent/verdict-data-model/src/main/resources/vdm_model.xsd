@@ -118,10 +118,7 @@
         </choice>
         <attribute name="id" type="ID"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-        <attributeGroup ref="vdm_model:STEMComponentProperties" />
-        <attributeGroup
-            ref="vdm_model:InstrumentedComponentProperties">
-        </attributeGroup>
+        <attributeGroup ref="vdm_model:ComponentProperties" />
     </complexType>
 
     <complexType name="BlockImpl">
@@ -147,12 +144,12 @@
         </attribute>
         <attribute name="flowType" type="vdm_model:Flow"
             use="optional"></attribute>
-        <attribute name="data_encrypted" type="boolean"
+        <attribute name="dataEncrypted" type="boolean"
             use="optional">
         </attribute>
         <attribute name="authenticated" type="boolean"
             use="optional"></attribute>
-        <attribute name="conn_type" type="vdm_model:ConnectionType"
+        <attribute name="connectionKind" type="vdm_model:ConnectionKindType"
             use="optional">
         </attribute>
         <attribute name="trustedConnection" type="boolean"
@@ -163,7 +160,7 @@
             type="vdm_model:DalType" use="optional" />
     </complexType>
 
-    <attributeGroup name="STEMComponentProperties">
+    <attributeGroup name="ComponentProperties">
         <attribute name="hasSensitiveInfo" type="boolean"
             use="optional">
         </attribute>
@@ -175,8 +172,6 @@
         <attribute name="wifiFromOutsideTB" type="boolean"
             use="optional"></attribute>
         <attribute name="pedigree" type="vdm_model:PedigreeType"
-            use="optional"></attribute>
-        <attribute name="cType" type="vdm_model:CTypeType"
             use="optional"></attribute>
 
         <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
@@ -259,6 +254,15 @@
         <attribute name="userAuthenticationDAL"
             type="vdm_model:DalType"></attribute>
         <attribute name="heterogeneity" type="boolean"></attribute>
+        <!-- CRV props below -->
+        <attribute name="category" type="string" use="optional"></attribute>
+        <attribute name="componentKind"
+            type="vdm_model:ComponentKindType" use="optional">
+        </attribute>
+        <attribute name="situated" type="vdm_model:SituatedType"
+            use="optional">
+        </attribute>
+        <attribute name="adversariallyTested" type="boolean"></attribute>        
     </attributeGroup>
 
     <simpleType name="DalType">
@@ -317,21 +321,7 @@
         </sequence>
     </complexType>
 
-    <attributeGroup name="InstrumentedComponentProperties">
-        <attribute name="category" type="string" use="optional"></attribute>
-        <attribute name="component_type"
-            type="vdm_model:KindOfComponent" use="optional">
-        </attribute>
-        <attribute name="situated" type="vdm_model:SituatedType"
-            use="optional">
-        </attribute>
-        <attribute name="manufacturer"
-            type="vdm_model:ManufacturerType" use="optional">
-        </attribute>
-        <attribute name="adversariallyTested" type="boolean"></attribute>
-    </attributeGroup>
-
-    <simpleType name="KindOfComponent">
+    <simpleType name="ComponentKindType">
         <restriction base="string">
             <enumeration value="Software"></enumeration>
             <enumeration value="Hardware"></enumeration>
@@ -347,17 +337,10 @@
         </restriction>
     </simpleType>
 
-    <simpleType name="ConnectionType">
+    <simpleType name="ConnectionKindType">
         <restriction base="string">
             <enumeration value="Local"></enumeration>
             <enumeration value="Remote"></enumeration>
-        </restriction>
-    </simpleType>
-
-    <simpleType name="ManufacturerType">
-        <restriction base="string">
-            <enumeration value="ThirdParty"></enumeration>
-            <enumeration value="InHouse"></enumeration>
         </restriction>
     </simpleType>
 
@@ -474,14 +457,4 @@
             <enumeration value="Sourced"></enumeration>
         </restriction>
     </simpleType>
-
-    <simpleType name="CTypeType">
-        <restriction base="string">
-            <enumeration value="Software"></enumeration>
-            <enumeration value="Hardware"></enumeration>
-            <enumeration value="Human"></enumeration>
-            <enumeration value="Hybrid"></enumeration>
-        </restriction>
-    </simpleType>
-
 </schema>
