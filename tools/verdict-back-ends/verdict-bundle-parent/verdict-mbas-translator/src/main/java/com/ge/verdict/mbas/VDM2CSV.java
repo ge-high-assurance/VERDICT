@@ -618,7 +618,7 @@ public class VDM2CSV extends VdmTranslator {
                 // Check return type
                 if (PedigreeType.class.equals(method.getReturnType())) {
                     getDalMethods[i] = method;
-                } else if(CType)
+                } 
             } catch (Exception e) {
             }
         }
