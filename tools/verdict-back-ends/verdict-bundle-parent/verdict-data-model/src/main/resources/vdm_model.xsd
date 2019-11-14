@@ -147,11 +147,11 @@
         <attribute name="dataEncrypted" type="boolean"
             use="optional">
         </attribute>
+		<attribute name="encryption" type="boolean" use="optional"></attribute>        
         <attribute name="authenticated" type="boolean"
             use="optional"></attribute>
-        <attribute name="connectionKind"
-            type="vdm_model:ConnectionKindType" use="optional">
-        </attribute>
+ 		<attribute name="conn_type" type="vdm_model:ConnectionType"
+            use="optional"></attribute>
         <attribute name="trustedConnection" type="boolean"
             use="optional"></attribute>
         <attribute name="encryptedTransmission" type="boolean"
@@ -259,7 +259,7 @@
         <!-- CRV props below -->
         <attribute name="category" type="string" use="optional"></attribute>
         <attribute name="componentKind"
-            type="vdm_model:ComponentKindType" use="optional">
+            type="vdm_model:KindOfComponent" use="optional">
         </attribute>
         <attribute name="situated" type="vdm_model:SituatedType"
             use="optional">
@@ -323,7 +323,7 @@
         </sequence>
     </complexType>
 
-    <simpleType name="ComponentKindType">
+    <simpleType name="KindOfComponent">
         <restriction base="string">
             <enumeration value="Software"></enumeration>
             <enumeration value="Hardware"></enumeration>
@@ -339,7 +339,7 @@
         </restriction>
     </simpleType>
 
-    <simpleType name="ConnectionKindType">
+    <simpleType name="ConnectionType">
         <restriction base="string">
             <enumeration value="Local"></enumeration>
             <enumeration value="Remote"></enumeration>
