@@ -40,10 +40,12 @@ public class VerdictStem {
             final boolean csvIncludesHeader = true;
             final Path archCsv = csvDataDir.resolve("ScnArch.csv");
             final Path compCsv = csvDataDir.resolve("ScnCompProps.csv");
+            final Path connCsv = csvDataDir.resolve("ScnConnProps.csv");
             final Path modelsDir = knowledgeBaseDir.resolve("OwlModels");
             final Path templatesDir = knowledgeBaseDir.resolve("Templates");
             final Path archTemplate = templatesDir.resolve("ScnArch.tmpl");
             final Path compTemplate = templatesDir.resolve("ScnCompProps.tmpl");
+            final Path connTemplate = templatesDir.resolve("ScnConnProps.tmpl");
 
             final String modelName = "http://sadl.org/STEM/Run";
             final String instanceDataNamespace = "http://sadl.org/STEM/Scenario#";
@@ -58,18 +60,23 @@ public class VerdictStem {
                     archCsv.toUri().toString(), csvIncludesHeader, archTemplate.toUri().toString());
             srvr.loadCsvData(
                     compCsv.toUri().toString(), csvIncludesHeader, compTemplate.toUri().toString());
+            srvr.loadCsvData(
+                    connCsv.toUri().toString(), csvIncludesHeader, connTemplate.toUri().toString());
 
             String qry =
                     srvr.prepareQuery(
-                            "select distinct (?z5 as ?CompType) (?z2 as ?CompInst) ?CAPEC ?CAPECDescription "
+                            "select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription "
                                     + "(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess "
-                                    + "where {?x <affectedComponent> ?z2 "
+                                    + "where {?CompInst <applicableCM> ?x "
+                                    + "?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id))) "
+                                    + ". ?x <capecDesc> ?CAPECDescription "
+                                    + ". ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess "
+                                    + ". ?CompInst <type> ?CompType "
+                                    + ". FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType } "
                                     + ". OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))} "
                                     + ". OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))} "
                                     + ". OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))} "
-                                    + ". ?x <capec> ?CAPEC . ?z2 <type> ?z5 . ?x <capecDescription> ?CAPECDescription "
-                                    + ". ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess "
-                                    + ". FILTER NOT EXISTS {?z2 <type> ?z6 . ?z6 <rdfs:subClassOf> ?z5 }} order by ?z5 ?z2 ?CAPEC");
+                                    + "} order by ?CompType ?CompInst ?CAPEC");
             ResultSet rs = srvr.query(qry);
             outputDir.mkdirs();
             Files.write(
@@ -78,20 +85,48 @@ public class VerdictStem {
 
             qry =
                     srvr.prepareQuery(
-                            "select distinct  (?z6 as ?CompType) (?z2 as ?CompInst) (?z8 as ?CAPEC) "
-                                    + "(?z10 as ?CAPECDescription) "
+                            "select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription  "
                                     + "(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) "
-                                    + "(?z9 as ?ApplicableDefense) (?z7 as ?DefenseDescription) ?ImplProperty ?DAL "
-                                    + "where {?x <defense> ?z5 . ?x <affectedComponent> ?z2 "
+                                    + "?ApplicableDefense1 ?DefenseDescription1 ?ApplicableDefense2 ?DefenseDescription2 "
+                                    + "?m1 ?dal1 ?m2 ?dal2 "
+                                    + "where {?CompInst <applicableCM> ?x  "
+                                    + ". ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id))) "
+                                    + ". ?x <capecDesc> ?CAPECDescription "
+                                    + ". ?CompInst <type> ?CompType "
+                                    + ". FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType } "
                                     + ". OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))} "
                                     + ". OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))} "
                                     + ". OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))} "
-                                    + ". ?z2 <type> ?z6 "
-                                    + ". FILTER NOT EXISTS {?z2 <type> ?a1 . ?a1 <rdfs:subClassOf> ?z6 } "
-                                    + ". ?x <protectionDescription> ?z7 . ?x <capecMitigated> ?z8 . ?x <defense> ?z9 "
-                                    + ". ?x <capecDescription> ?z10 "
-                                    + ". OPTIONAL{?x <implProperty> ?ImplProperty} "
-                                    + ". OPTIONAL{?x <dal> ?DAL}} order by ?z6 ?z2 ?CAPEC");
+                                    + ". ?x <mitigation> ?m1 . LET(?strippedm1 := replace(str(?m1),'http.*#','')) "
+                                    + ". LET(?strippedx := replace(str(?x),'http.*#','')) "
+                                    + ". LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1))) "
+                                    + ". FILTER(?tail = ?strippedm1) "
+                                    + ". LET(?temp1 := lcase(str(?m1))) "
+                                    + ". LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix  "
+                                    + ". OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))  "
+                                    + "           . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?dal1 } "
+                                    + ". OPTIONAL{?m1 <dal> ?dal1}  # why do I need this - test by dropping it "
+                                    + "{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1)  "
+                                    + "    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where "
+                                    + "   {?m1 <nistControl> ?yy2  "
+                                    + "    . ?yy2 <nistId> ?yy3 . LET(?nc := replace(str(?yy3),'http.*#','')) "
+                                    + "    . ?yy2 <nistDesc> ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#','')) "
+                                    + "   } group by ?m1 "
+                                    + "} "
+                                    + ". OPTIONAL {?x <mitigation> ?m2 . FILTER(?m1 != ?m2) # can swap m1 and m2; but not doing that "
+                                    + "            . LET(?tmp1 := lcase(str(?m2))) "
+                                    + "            . LET(?r2 := replace(str(?tmp1),'http.*#','')) # strip out prefix  "
+                                    + "            . ?CompInst ?y3 ?z5 . LET(?tmp2 := lcase(str(?y3)))  "
+                                    + "            . FILTER(?tmp1 = ?tmp2) . ?z5 <dal> ?dal2  "
+                                    + "            {select distinct ?m2 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense2)  "
+                                    + "                (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription2) where "
+                                    + "             {?m2 <nistControl> ?yyy2  "
+                                    + "              . ?yyy2 <nistId> ?yyy3 . LET(?nc := replace(str(?yyy3),'http.*#','')) "
+                                    + "              . ?yyy2 <nistDesc> ?yyy4 . LET(?ncd := replace(str(?yyy4),'http.*#','')) "
+                                    + "             } group by ?m2 "
+                                    + "            } "
+                                    + "           }  "
+                                    + "} order by ?CompInst ?CAPEC ?m1 ");
             rs = srvr.query(qry);
             Files.write(
                     outputDir.toPath().resolve("Defenses.csv"),
@@ -100,43 +135,38 @@ public class VerdictStem {
             qry =
                     srvr.prepareQuery(
                             "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?cplist as ?N1_tooltip) where "
-                                    + "{  ?x <rdf:type> ?z . FILTER(regex(str(?z),'Connection')) "
-                                    + " . ?x <connectionSource> ?src . ?x <connectionDestination> ?dest "
-                                    + " . ?x <outPort> ?oport . ?x <inPort> ?iport "
-                                    + " . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#','')) "
+                                    + "{  ?conn <rdf:type> <Connection>  "
+                                    + " . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest "
+                                    + " . ?conn <outPort> ?oport . ?conn <inPort> ?iport "
+                                    + " . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#',''))  "
                                     + " . LET(?N1_style := 'filled') . LET(?N2_style := 'filled') "
-                                    + " . OPTIONAL{  ?u <affectedComponent> ?src . ?u <addressed> ?c1 . FILTER(regex(str(?c1), 'true')) "
-                                    + "            . ?src <capecString> ?str . LET(?N1_fillcolor := 'yellow')} "
-                                    + " . OPTIONAL{  ?u2 <affectedComponent> ?dest . ?u2 <addressed> ?c1 . FILTER(regex(str(?c1), 'true')) "
-                                    + "            . ?dest <capecString> ?str . LET(?N2_fillcolor := 'yellow')} "
-                                    + " . OPTIONAL{?u <affectedComponent> ?src . ?src <capecString> ?str . LET(?N1_fillcolor := 'red')} "
-                                    + " . OPTIONAL{?u2 <affectedComponent> ?dest . ?dest <capecString> ?str . LET(?N2_fillcolor := 'red')} "
-                                    + " . ?x <connectionFlow> ?cf0 "
-                                    + " . LET(?cf := replace(str(?cf0),'^.*#','')) "
-                                    + " . LET(?link := ?cf) . "
-                                    + "   {select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where "
-                                    + "      {?x <rdf:type> <Connection> . ?x <connectionSource> ?src . OPTIONAL{?src <capecString> ?capec} "
-                                    + "      } group by ?src "
+                                    + " . OPTIONAL{?src <applicableCM> ?acm . LET(?N1_fillcolor := 'red')} "
+                                    + " . OPTIONAL{?dest <applicableCM> ?acm2 . LET(?N2_fillcolor := 'red')} "
+                                    + " . ?conn <connectionFlow> ?flow  "
+                                    + " . LET(?strippedflow := replace(str(?flow),'^.*#','')) "
+                                    + " . ?conn <connectionName> ?connname  "
+                                    + " . LET(?strippedcname := replace(str(?connname),'^.*#','')) "
+                                    + " . LET(?link := ?strippedcname) .  "
+                                    + "   OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where  "
+                                    + "      {?src <applicableCM> ?longcapec  "
+                                    + "       . ?longcapec <id> ?id . ?longcapec <capecDesc> ?desc "
+                                    + "       . LET(?capec := concat(concat(concat('CAPEC-',str(?id)),':'),?desc)) "
+                                    + "      } group by ?src} "
                                     + "   } "
                                     + " . {select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where "
-                                    + "    { { "
-                                    + "         ?src ?prop ?z3 "
+                                    + "    { {  ?src ?prop ?z3  "
                                     + "       . ?prop <tooltipProp> ?r2 . ?z3 <val> ?prop_val "
-                                    + "      } "
-                                    + "    UNION "
-                                    + "    {?x <rdf:type> ?z . FILTER(regex(str(?z),'Connection')) . ?x <connectionSource> ?src "
-                                    + "     . OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))} "
-                                    + "    } "
+                                    + "      } UNION { OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}} "
                                     + "   . LET(?c3 := concat(str(?prop_val),str(?prop))) "
                                     + "   . LET(?c4 := replace(str(?c3),'http.*#','')) "
                                     + "   . LET(?c5 := replace(str(?c4),'^true','')) "
-                                    + "   . LET(?c6 := replace(str(?c5),'^false','NOT_')) "
+                                    + "   . LET(?c6 := replace(str(?c5),'^false','NOT_'))  "
                                     + "   } group by ?src} "
                                     + " . LET(?clist     := COALESCE(?capeclist,'')) "
                                     + " . LET(?templist  := concat(concat(?clist,'; &#10;'),?plist)) "
-                                    + " . LET(?templist2 := replace(?templist,'^; ','')) "
-                                    + " . LET(?templist3 := replace(?templist2,';','; ')) "
-                                    + " . LET(?cplist    := replace(?templist3,'  ',' ')) "
+                                    + " . LET(?templist2 := replace(?templist,'^; ',''))   "
+                                    + " . LET(?templist3 := replace(?templist2,';','; '))  "
+                                    + " . LET(?cplist    := replace(?templist3,'  ',' '))  "
                                     + "}");
             rs = srvr.query(qry);
             graphsDir.mkdirs();
