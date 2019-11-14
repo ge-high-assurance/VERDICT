@@ -9,6 +9,15 @@ External bound(string X) returns boolean:
 External countLiteralValues(string X, string X) returns int:
 "com.hp.hpl.jena.reasoner.rulesys.builtins#countLiteralValues".
 
+External difference(decimal X,  decimal X) returns decimal:
+"com.hp.hpl.jena.reasoner.rulesys.builtins#difference".
+
+External ge(decimal X, decimal X) returns boolean:
+"com.hp.hpl.jena.reasoner.rulesys.builtins#ge".
+
+External le(decimal X, decimal X) returns boolean:
+"com.hp.hpl.jena.reasoner.rulesys.builtins#le".
+
 External isBNode(string X) returns boolean:
 "com.hp.hpl.jena.reasoner.rulesys.builtins#isBNode".
 
@@ -93,7 +102,7 @@ External ceiling(--) returns --:
 External cos(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#cos".
 
-External countMatches(--) returns --:
+External countMatches(...) returns int:
 "com.ge.research.sadl.jena.reasoner.builtin#countMatches".
 
 External countUniqueMatches(--) returns --:
@@ -183,7 +192,7 @@ External tan(--) returns --:
 External ^unique(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#unique".
 
-External table(--) returns --:
+External ^table(--) returns --:
 "com.hp.hpl.jena.reasoner.rulesys.builtins#table".
 
 External tableAll(--) returns --:
