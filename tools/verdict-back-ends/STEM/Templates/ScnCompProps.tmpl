@@ -1,70 +1,238 @@
 uri "http://sadl.org/STEM/Scenario" alias scn
+
 import "http://sadl.org/STEM/BaseModel".
 
 //log "c:/tmp/scncompprops.log"
 
-//need to put 1 and 0 in quotes - just to make it work with an updated SADL version
+// need to put 1 and 0 in quotes - just to make it work with an updated SADL version
+// note that the val* numbers are not contiguous
 
 validate <Scenario> not blank skip
 validate <CompType> not blank skip
 validate <CompInstance> not blank skip
 validate <hasSensitiveInfo> not blank skip
 validate <insideTrustedBoundary> not blank skip
-validate <broadcastFromOutsideTB> not blank skip
-validate <wifiFromOutsideTB> not blank skip
-validate <heterogeneity> not blank skip
-validate <encryption> not blank skip
+validate <cType> not blank skip
+validate <controlReceivedFromUntrusted> not blank skip
+validate <dataReceivedFromUntrusted> not blank skip
+validate <controlSentToUntrusted> not blank skip
+validate <dataSentToUntrusted> not blank skip
+validate <canReceiveSWUpdate> not blank skip
+validate <canReceiveConfigUpdate> not blank skip
+validate <pedigree> not blank skip
+
 validate <antiJamming> not blank skip
-validate <antiFlooding> not blank skip
-validate <antiFuzzing> not blank skip
+validate <auditMessageResponses> not blank skip
+validate <deviceAuthentication> not blank skip
+validate <dosProtection> not blank skip
+validate <encryptedStorage> not blank skip
+validate <heterogeneity> not blank skip
+validate <inputValidation> not blank skip
+validate <logging> not blank skip
+validate <memoryProtection> not blank skip
+validate <physicalAccessControl> not blank skip
+validate <removeIdentifyingInformation> not blank skip
+validate <resourceAvailability> not blank skip
+validate <resourceIsolation> not blank skip
+validate <secureBoot> not blank skip
+validate <sessionAuthenticity> not blank skip
+validate <staticCodeAnalysis> not blank skip
+validate <strongCryptoAlgorithms> not blank skip
+validate <supplyChainSecurity> not blank skip
+validate <systemAccessControl> not blank skip
+validate <tamperProtection> not blank skip
+validate <userAuthentication> not blank skip
 
 transform <hasSensitiveInfo> to <val1> replace "1" : true,"0" : false
 transform <insideTrustedBoundary> to <val2> replace "1" : true,"0" : false
-transform <broadcastFromOutsideTB> to <val3> replace "1" : true,"0" : false
-transform <wifiFromOutsideTB> to <val4> replace "1" : true,"0" : false
-transform <heterogeneity> to <val5A[]> split "#"
-transform <val5A[1]> to <val5> replace "1" : true,"0" : false
-transform <encryption> to <val6A[]> split "#"
-transform <val6A[1]> to <val6> replace "1" : true,"0" : false
-transform <antiJamming> to <val7A[]> split "#"
-transform <val7A[1]> to <val7> replace "1" : true,"0" : false
-transform <antiFlooding> to <val8A[]> split "#"
-transform <val8A[1]> to <val8> replace "1" : true,"0" : false
-transform <antiFuzzing> to <val9A[]> split "#"
-transform <val9A[1]> to <val9> replace "1" : true,"0" : false
+transform <controlReceivedFromUntrusted> to <val7> replace "1" : true,"0" : false
+transform <dataReceivedFromUntrusted> to <val8> replace "1" : true,"0" : false
+transform <controlSentToUntrusted> to <val9> replace "1" : true,"0" : false
+transform <dataSentToUntrusted> to <val10> replace "1" : true,"0" : false
+transform <canReceiveSWUpdate> to <val11> replace "1" : true,"0" : false
+transform <canReceiveConfigUpdate> to <val12> replace "1" : true,"0" : false
+
+transform <antiJamming> to <def1A[]> split "#"
+transform <def1A[1]> to <def1> replace "1" : true,"0" : false
+transform <auditMessageResponses> to <def2A[]> split "#"
+transform <def2A[1]> to <def2> replace "1" : true,"0" : false
+transform <deviceAuthentication> to <def3A[]> split "#"
+transform <def3A[1]> to <def3> replace "1" : true,"0" : false
+transform <dosProtection> to <def4A[]> split "#"
+transform <def4A[1]> to <def4> replace "1" : true,"0" : false
+transform <encryptedStorage> to <def5A[]> split "#"
+transform <def5A[1]> to <def5> replace "1" : true,"0" : false
+
+transform <heterogeneity> to <def7A[]> split "#"
+transform <def7A[1]> to <def7> replace "1" : true,"0" : false
+
+transform <inputValidation> to <def8A[]> split "#"
+transform <def8A[1]> to <def8> replace "1" : true,"0" : false
+
+transform <logging> to <def9A[]> split "#"
+transform <def9A[1]> to <def9> replace "1" : true,"0" : false
+transform <memoryProtection> to <def10A[]> split "#"
+transform <def10A[1]> to <def10> replace "1" : true,"0" : false
+transform <physicalAccessControl> to <def11A[]> split "#"
+transform <def11A[1]> to <def11> replace "1" : true,"0" : false
+transform <removeIdentifyingInformation> to <def12A[]> split "#"
+transform <def12A[1]> to <def12> replace "1" : true,"0" : false
+transform <resourceAvailability> to <def13A[]> split "#"
+transform <def13A[1]> to <def13> replace "1" : true,"0" : false
+transform <resourceIsolation> to <def14A[]> split "#"
+transform <def14A[1]> to <def14> replace "1" : true,"0" : false
+transform <secureBoot> to <def15A[]> split "#"
+transform <def15A[1]> to <def15> replace "1" : true,"0" : false
+transform <sessionAuthenticity> to <def16A[]> split "#"
+transform <def16A[1]> to <def16> replace "1" : true,"0" : false
+transform <staticCodeAnalysis> to <def17A[]> split "#"
+transform <def17A[1]> to <def17> replace "1" : true,"0" : false
+transform <strongCryptoAlgorithms> to <def18A[]> split "#"
+transform <def18A[1]> to <def18> replace "1" : true,"0" : false
+transform <supplyChainSecurity> to <def19A[]> split "#"
+transform <def19A[1]> to <def19> replace "1" : true,"0" : false
+transform <systemAccessControl> to <def20A[]> split "#"
+transform <def20A[1]> to <def20> replace "1" : true,"0" : false
+transform <tamperProtection> to <def21A[]> split "#"
+transform <def21A[1]> to <def21> replace "1" : true,"0" : false
+transform <userAuthentication> to <def22A[]> split "#"
+transform <def22A[1]> to <def22> replace "1" : true,"0" : false
 
 <CompInstance> hasSensitiveInfo <val1> 
 <CompInstance> insideTrustedBoundary <val2> 
-<CompInstance> broadcastFromOutsideTB <val3>
-<CompInstance> wifiFromOutsideTB <val4> 
-//<CompInstance> heterogeneity <val5>
-//<CompInstance> encryption <val6>
+<CompInstance> cType <cType>
+<CompInstance> controlReceivedFromUntrusted <val7> 
+<CompInstance> dataReceivedFromUntrusted <val8> 
+<CompInstance> controlSentToUntrusted <val9> 
+<CompInstance> dataSentToUntrusted <val10> 
+<CompInstance> canReceiveSWUpdate <val11> 
+<CompInstance> canReceiveConfigUpdate <val12> 
+<CompInstance> pedigree <pedigree> 
+
 <1> rdf:type ImplProperty
-<1> name "heterogeneity"
-<1> val <val5>
-<1> dal <val5A[2]>
-<CompInstance> heterogeneity <1>
+<1> name "antiJamming"
+<1> val <def1>
+<1> dal <def1A[2]>
+<CompInstance> antiJamming <1>
 
 <2> rdf:type ImplProperty
-<2> name "encrypted"
-<2> val <val6>
-<2> dal <val6A[2]>
-<CompInstance> encryption <2>
+<2> name "auditMessageResponses"
+<2> val <def2>
+<2> dal <def2A[2]>
+<CompInstance> auditMessageResponses <2>
 
 <3> rdf:type ImplProperty
-<3> name "antiJamming"
-<3> val <val7>
-<3> dal <val7A[2]>
-<CompInstance> antiJamming <3>
+<3> name "deviceAuthentication"
+<3> val <def3>
+<3> dal <def3A[2]>
+<CompInstance> deviceAuthentication <3>
+<CompInstance> XdeviceAuthentication <def3>
 
 <4> rdf:type ImplProperty
-<4> name "antiFlooding"
-<4> val <val8>
-<4> dal <val8A[2]>
-<CompInstance> antiFlooding <4>
+<4> name "dosProtection"
+<4> val <def4>
+<4> dal <def4A[2]>
+<CompInstance> dosProtection <4>
 
 <5> rdf:type ImplProperty
-<5> name "antiFuzzing"
-<5> val <val9>
-<5> dal <val9A[2]>
-<CompInstance> antiFuzzing <5>
+<5> name "encryptedStorage"
+<5> val <def5>
+<5> dal <def5A[2]>
+<CompInstance> encryptedStorage <5>
+
+<7> rdf:type ImplProperty
+<7> name "heterogeneity"
+<7> val <def7>
+<7> dal <def7A[2]>
+<CompInstance> heterogeneity <7>
+
+<8> rdf:type ImplProperty
+<8> name "inputValidation"
+<8> val <def8>
+<8> dal <def8A[2]>
+<CompInstance> inputValidation <8>
+
+<9> rdf:type ImplProperty
+<9> name "logging"
+<9> val <def9>
+<9> dal <def9A[2]>
+<CompInstance> logging <9>
+
+<10> rdf:type ImplProperty
+<10> name "memoryProtection"
+<10> val <def10>
+<10> dal <def10A[2]>
+<CompInstance> memoryProtection <10>
+
+<11> rdf:type ImplProperty
+<11> name "physicalAccessControl"
+<11> val <def11>
+<11> dal <def11A[2]>
+<CompInstance> physicalAccessControl <11>
+<CompInstance> XphysicalAccessControl <def11> 
+
+<12> rdf:type ImplProperty
+<12> name "removeIdentifyingInformation"
+<12> val <def12>
+<12> dal <def12A[2]>
+<CompInstance> removeIdentifyingInformation <12>
+
+<13> rdf:type ImplProperty
+<13> name "resourceAvailability"
+<13> val <def13>
+<13> dal <def13A[2]>
+<CompInstance> resourceAvailability <13>
+
+<14> rdf:type ImplProperty
+<14> name "resourceIsolation"
+<14> val <def14>
+<14> dal <def14A[2]>
+<CompInstance> resourceIsolation <14>
+
+<15> rdf:type ImplProperty
+<15> name "secureBoot"
+<15> val <def15>
+<15> dal <def15A[2]>
+<CompInstance> secureBoot <15>
+
+<16> rdf:type ImplProperty
+<16> name "sessionAuthenticity"
+<16> val <def16>
+<16> dal <def16A[2]>
+<CompInstance> sessionAuthenticity <16>
+
+<17> rdf:type ImplProperty
+<17> name "staticCodeAnalysis"
+<17> val <def17>
+<17> dal <def17A[2]>
+<CompInstance> staticCodeAnalysis <17>
+
+<18> rdf:type ImplProperty
+<18> name "strongCryptoAlgorithms"
+<18> val <def18>
+<18> dal <def18A[2]>
+<CompInstance> strongCryptoAlgorithms <18>
+
+<19> rdf:type ImplProperty
+<19> name "supplyChainSecurity"
+<19> val <def19>
+<19> dal <def19A[2]>
+<CompInstance> supplyChainSecurity <19>
+
+<20> rdf:type ImplProperty
+<20> name "systemAccessControl"
+<20> val <def20>
+<20> dal <def20A[2]>
+<CompInstance> systemAccessControl <20>
+
+<21> rdf:type ImplProperty
+<21> name "tamperProtection"
+<21> val <def21>
+<21> dal <def21A[2]>
+<CompInstance> tamperProtection <21>
+
+<22> rdf:type ImplProperty
+<22> name "userAuthentication"
+<22> val <def22>
+<22> dal <def22A[2]>
+<CompInstance> userAuthentication <22>

@@ -14,16 +14,32 @@ validate <DestPortName> not blank skip
 validate <Flow1> not blank skip
 validate <Flow2> not blank skip
 validate <Flow3> not blank skip
+validate <TrustedConnection> not blank skip
+validate <encryptedTransmission> not blank skip
+
+transform <TrustedConnection> to <trusted> replace "1" : true,"0" : false
+transform <encryptedTransmission> to <def1A[]> split "#"
+transform <def1A[1]> to <def1> replace "1" : true,"0" : false
 
 <SrcCompType> rdfs:subClassOf Subsystem
 <SrcCompInstance> rdf:type <SrcCompType>
 <DestCompType> rdfs:subClassOf Subsystem
 <DestCompInstance> rdf:type <DestCompType>
-<ConnectionName> rdf:type Connection
-<ConnectionName> connectionSource <SrcCompInstance>
-<ConnectionName> connectionDestination <DestCompInstance>
-<ConnectionName> outPort <SrcPortName>
-<ConnectionName> inPort <DestPortName>
-<ConnectionName> connectionFlow <Flow1>
-<ConnectionName> connectionFlow <Flow2>
-<ConnectionName> connectionFlow <Flow3>
+<1> rdf:type Connection
+<1> connectionName <ConnectionName>
+<1> connectionSource <SrcCompInstance>
+<1> connectionDestination <DestCompInstance>
+<1> outPort <SrcPortName>
+<1> inPort <DestPortName>
+<1> connectionFlow <Flow1>
+<1> connectionFlow <Flow2>
+<1> connectionFlow <Flow3>
+<1> trustedConnection <trusted>
+<1> XencryptedTransmission <def1>
+
+<2> rdf:type ImplProperty
+<2> name "encryptedTransmission"
+<2> val <def1>
+<2> dal <def1A[2]>
+<ConnectionName> encryptedTransmission <2>
+
