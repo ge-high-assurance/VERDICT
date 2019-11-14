@@ -149,8 +149,8 @@
         </attribute>
         <attribute name="authenticated" type="boolean"
             use="optional"></attribute>
-        <attribute name="connectionKind" type="vdm_model:ConnectionKindType"
-            use="optional">
+        <attribute name="connectionKind"
+            type="vdm_model:ConnectionKindType" use="optional">
         </attribute>
         <attribute name="trustedConnection" type="boolean"
             use="optional"></attribute>
@@ -173,6 +173,8 @@
             use="optional"></attribute>
         <attribute name="pedigree" type="vdm_model:PedigreeType"
             use="optional"></attribute>
+        <attribute name="manufacturer" type="vdm_model:ManufacturerType"
+            use="optional"></attribute>            
 
         <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
         <attribute name="canReceiveSWUpdate" type="boolean"></attribute>
@@ -262,7 +264,7 @@
         <attribute name="situated" type="vdm_model:SituatedType"
             use="optional">
         </attribute>
-        <attribute name="adversariallyTested" type="boolean"></attribute>        
+        <attribute name="adversariallyTested" type="boolean"></attribute>
     </attributeGroup>
 
     <simpleType name="DalType">
@@ -449,6 +451,13 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
+    
+    <simpleType name="ManufacturerType">
+        <restriction base="string">
+            <enumeration value="ThirdParty"></enumeration>
+            <enumeration value="InHouse"></enumeration>
+        </restriction>
+    </simpleType>    
 
     <simpleType name="PedigreeType">
         <restriction base="string">
