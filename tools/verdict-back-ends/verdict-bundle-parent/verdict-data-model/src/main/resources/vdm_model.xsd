@@ -176,86 +176,86 @@
         <attribute name="manufacturer"
             type="vdm_model:ManufacturerType" use="optional"></attribute>
 
-        <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
-        <attribute name="canReceiveSWUpdate" type="boolean"></attribute>
+        <attribute name="canReceiveConfigUpdate" type="boolean" use="optional"></attribute>
+        <attribute name="canReceiveSWUpdate" type="boolean" use="optional"></attribute>
         <attribute name="controlReceivedFromUntrusted"
-            type="boolean"></attribute>
-        <attribute name="controlSentToUntrusted" type="boolean"></attribute>
-        <attribute name="dataReceivedFromUntrusted" type="boolean"></attribute>
-        <attribute name="dataSentToUntrusted" type="boolean"></attribute>
-        <attribute name="Configuration_Attack" type="boolean"></attribute>
-        <attribute name="Physical_Theft_Attack" type="boolean"></attribute>
-        <attribute name="Interception_Attack" type="boolean"></attribute>
-        <attribute name="Hardware_Integrity_Attack" type="boolean"></attribute>
-        <attribute name="Supply_Chain_Attack" type="boolean"></attribute>
-        <attribute name="Brute_Force_Attack" type="boolean"></attribute>
-        <attribute name="Fault_Injection_Attack" type="boolean"></attribute>
-        <attribute name="Identity_Spoofing_Attack" type="boolean"></attribute>
-        <attribute name="Excessive_Allocation_Attack" type="boolean"></attribute>
-        <attribute name="Sniffing_Attack" type="boolean"></attribute>
-        <attribute name="Buffer_Attack" type="boolean"></attribute>
-        <attribute name="Flooding_Attack" type="boolean"></attribute>
-        <attribute name="auditMessageResponses" type="boolean"></attribute>
-        <attribute name="deviceAuthentication" type="boolean"></attribute>
-        <attribute name="dosProtection" type="boolean"></attribute>
-        <attribute name="encryptedStorage" type="boolean"></attribute>
-        <attribute name="inputValidation" type="boolean"></attribute>
-        <attribute name="logging" type="boolean"></attribute>
-        <attribute name="memoryProtection" type="boolean"></attribute>
-        <attribute name="physicalAccessControl" type="boolean"></attribute>
+            type="boolean" use="optional"></attribute>
+        <attribute name="controlSentToUntrusted" type="boolean" use="optional"></attribute>
+        <attribute name="dataReceivedFromUntrusted" type="boolean" use="optional"></attribute>
+        <attribute name="dataSentToUntrusted" type="boolean" use="optional"></attribute>
+        <attribute name="Configuration_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Physical_Theft_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Interception_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Hardware_Integrity_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Supply_Chain_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Brute_Force_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Fault_Injection_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Identity_Spoofing_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Excessive_Allocation_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Sniffing_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Buffer_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="Flooding_Attack" type="boolean" use="optional"></attribute>
+        <attribute name="auditMessageResponses" type="boolean" use="optional"></attribute>
+        <attribute name="deviceAuthentication" type="boolean" use="optional"></attribute>
+        <attribute name="dosProtection" type="boolean" use="optional"></attribute>
+        <attribute name="encryptedStorage" type="boolean" use="optional"></attribute>
+        <attribute name="inputValidation" type="boolean" use="optional"></attribute>
+        <attribute name="logging" type="boolean" use="optional"></attribute>
+        <attribute name="memoryProtection" type="boolean" use="optional"></attribute>
+        <attribute name="physicalAccessControl" type="boolean" use="optional"></attribute>
         <attribute name="removeIdentifyingInformation"
-            type="boolean"></attribute>
-        <attribute name="resourceAvailability" type="boolean"></attribute>
-        <attribute name="resourceIsolation" type="boolean"></attribute>
-        <attribute name="secureBoot" type="boolean"></attribute>
-        <attribute name="sessionAuthenticity" type="boolean"></attribute>
-        <attribute name="staticCodeAnalysis" type="boolean"></attribute>
-        <attribute name="strongCryptoAlgorithms" type="boolean"></attribute>
-        <attribute name="supplyChainSecurity" type="boolean"></attribute>
-        <attribute name="systemAccessControl" type="boolean"></attribute>
-        <attribute name="tamperProtection" type="boolean"></attribute>
-        <attribute name="userAuthentication" type="boolean"></attribute>
-        <attribute name="antiJamming" type="boolean"></attribute>
+            type="boolean" use="optional"></attribute>
+        <attribute name="resourceAvailability" type="boolean" use="optional"></attribute>
+        <attribute name="resourceIsolation" type="boolean" use="optional"></attribute>
+        <attribute name="secureBoot" type="boolean" use="optional"></attribute>
+        <attribute name="sessionAuthenticity" type="boolean" use="optional"></attribute>
+        <attribute name="staticCodeAnalysis" type="boolean" use="optional"></attribute>
+        <attribute name="strongCryptoAlgorithms" type="boolean" use="optional"></attribute>
+        <attribute name="supplyChainSecurity" type="boolean" use="optional"></attribute>
+        <attribute name="systemAccessControl" type="boolean" use="optional"></attribute>
+        <attribute name="tamperProtection" type="boolean" use="optional"></attribute>
+        <attribute name="userAuthentication" type="boolean" use="optional"></attribute>
+        <attribute name="antiJamming" type="boolean" use="optional"></attribute>
         <attribute name="antiJamming_dal" type="vdm_model:DalType"></attribute>
         <attribute name="auditMessageResponsesDAL"
-            type="vdm_model:DalType">
+            type="vdm_model:DalType" use="optional">
         </attribute>
         <attribute name="deviceAuthenticationDAL"
-            type="vdm_model:DalType"></attribute>
-        <attribute name="dosProtectionDAL" type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="dosProtectionDAL" type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="encryptedStorageDAL"
-            type="vdm_model:DalType"></attribute>
-        <attribute name="heterogeneityDAL" type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="heterogeneityDAL" type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="inputValidationDAL"
-            type="vdm_model:DalType"></attribute>
-        <attribute name="loggingDAL" type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="loggingDAL" type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="memoryProtectionDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="physicalAccessControlDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="removeIdentifyingInformationDAL"
-            type="vdm_model:DalType">
+            type="vdm_model:DalType" use="optional">
         </attribute>
         <attribute name="resourceAvailabilityDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="resourceIsolationDAL"
-            type="vdm_model:DalType"></attribute>
-        <attribute name="secureBootDAL" type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="secureBootDAL" type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="sessionAuthenticityDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="staticCodeAnalysisDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="strongCryptoAlgorithmsDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="supplyChainSecurityDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="systemAccessControlDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="tamperProtectionDAL"
-            type="vdm_model:DalType"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
         <attribute name="userAuthenticationDAL"
-            type="vdm_model:DalType"></attribute>
-        <attribute name="heterogeneity" type="boolean"></attribute>
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="heterogeneity" type="boolean" use="optional"></attribute>
         <!-- CRV props below -->
         <attribute name="category" type="string" use="optional"></attribute>
         <attribute name="componentKind"
@@ -264,7 +264,7 @@
         <attribute name="situated" type="vdm_model:SituatedType"
             use="optional">
         </attribute>
-        <attribute name="adversariallyTested" type="boolean"></attribute>
+        <attribute name="adversariallyTested" type="boolean" use="optional"></attribute>
     </attributeGroup>
 
     <simpleType name="DalType">
