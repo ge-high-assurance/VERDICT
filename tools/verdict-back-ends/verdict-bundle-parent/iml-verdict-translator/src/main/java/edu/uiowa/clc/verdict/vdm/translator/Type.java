@@ -166,6 +166,70 @@ public enum Type {
     RECEIVE_OUTSIDE_TB("wifi_from_outside_tb"),
     ENCRYPTION("encryption"),
 
+    //New attributes.
+    CAN_RECEIVE_CONFIG_UPDATE("canReceiveConfigUpdate"),
+    CAN_RECEIVE_SW_UPDATE("canReceiveSWUpdate"),
+    CONTROL_RECEIVED_FROM_UNTRUSTED("controlReceivedFromUntrusted"),
+    CONTROL_SENT_TO_UNTRUSTED("controlSentToUntrusted"),
+    DATA_RECEIVED_FROM_UNTUSTED("dataReceivedFromUntrusted"),
+    DATA_SENT_TO_UNTRUSTED("dataSentToUntrusted"),
+    CONFIG_ATTACK("Configuration_Attack"),
+    PHY_THEFT_ATTACK("Physical_Theft_Attack"),
+    INTERCEPTION_ATTACK("Interception_Attack"),
+    HARDWARE_INTEGRITY_ATTACK("Hardware_Integrity_Attack"),
+    SUPPLY_CHAIN_ATTACK("Supply_Chain_Attack"),
+    BRUTE_FORCE_ATTACK("Brute_Force_Attack"),
+    FAULT_INJEC_ATTACK("Fault_Injection_Attack"),
+    IDENTITY_SPOOFING_ATTACK("Identity_Spoofing_Attack"),
+    EXPRESSIVE_ALLOC_ATTACK("Excessive_Allocation_Attack"),
+    SNIFFING_ATTACK("Sniffing_Attack"),
+    BUFFER_ATTACK("Buffer_Attack"),
+    FLOODING_ATTACK("Flooding_Attack"),
+    
+    AUDIT_MESSAGE_RESPONSES("auditMessageResponses"),
+    DEVICE_AUTHENTICATION("deviceAuthentication"),
+    DOS_PROTECTION("dosProtection"),
+    ENCRYPTED_STORAGE("encryptedStorage"),
+    
+    INPUT_VALIDATION("inputValidation"),
+    LOGGING("logging"),
+    MEMORY_PROTECTION("memoryProtection"),
+    PHY_ACCESS_CONTROL("physicalAccessControl"),
+    REMOVE_IDEN_INFO("removeIdentifyingInformation"),
+    RESOURCE_AVAILABILITY("resourceAvailability"),
+    RESOURCE_ISOLATION("resourceIsolation"),
+    SECURE_BOOT("secureBoot"),
+    SESSION_AUTH("sessionAuthenticity"),
+    STATIC_CODE_ANALYSIS("staticCodeAnalysis"),
+    STRONG_CRYPTO_ALGO("strongCryptoAlgorithms"),
+    SUPPLY_CHAIN_SECURITY("supplyChainSecurity"),
+    SYS_ACCESS_CONTROL("systemAccessControl"),
+    TAMPER_PROTECTION("tamperProtection"),
+    USER_AUTH("userAuthentication"),
+    
+    AUDIT_MESSAGE_RESPONSE_DAL("auditMessageResponsesDAL"),
+    DEVICE_AUTH_DAL("deviceAuthenticationDAL"),
+    DOS_PROTECTION_DAL("dosProtectionDAL"),
+    
+    ENCRYPTED_STORAGTE_DAL("encryptedStorageDAL"),
+    INPUT_VALIDATION_DAL("inputValidationDAL"),
+    LOGGING_DAL("loggingDAL"),
+    MEMORY_PROTECTION_DAL("memoryProtectionDAL"),
+    PHY_ACCESS_CONTROL_DAL("physicalAccessControlDAL"),
+    REMOVE_IDENTIFYING_INFO_DAL("removeIdentifyingInformationDAL"),
+ 	RESOURCE_AVAIL_DAL("resourceAvailabilityDAL"),
+ 	RESOURCE_ISO_DAL("resourceIsolationDAL"),
+ 	SECURE_BOOT_DAL("secureBootDAL"),
+ 	SESSION_AUTH_DAL("sessionAuthenticityDAL"),
+ 	STATIC_CODE_ANALYSIS_DAL("staticCodeAnalysisDAL"),
+ 	STRONG_PROTECTION_DAL("strongCryptoAlgorithmsDAL"),
+ 	SUPPLY_CHAIN_SECURITY_DAL("supplyChainSecurityDAL"),
+ 	SYSTEM_ACCESS_CONTROL_DAL("systemAccessControlDAL"),
+ 	TAMPER_PROTECTION_DAL("tamperProtectionDAL"),
+ 	USER_AUTH_DAL("userAuthenticationDAL"),
+ 	
+ 	
+    
     HETEROGENEITY("heterogeneity"),
     ANTI_JAMMING("anti_jamming"),
     ANTI_FLOODING("anti_flooding"),
@@ -184,7 +248,12 @@ public enum Type {
 
     AUTHENTICATED("authenticated"),
     DATA_ENCRYPTED("data_encrypted"),
+	TRUSTED_CONNECTION("trustedConnection"),
+ 	ENCRYPTED_TRANSMISSION("encryptedTransmission"),
+ 	ENCRYPTED_TRAMISSION_DAL("encryptedTransmissionDAL"),
 
+    
+    
     KIND_COMPONENT("KindOfComponent"),
     SOFTWARE("Software"),
     HARDWARE("Hardware"),
@@ -198,8 +267,11 @@ public enum Type {
     IN_HOUSE("InHouse"),
 
     CATEGORY("category"),
-    COMP_TYPE("component_type"),
-
+    COMP_KIND("componentKind"),
+    
+    PEDIGREE("pedigree"),
+    PEDIGREE_TYPE("PedigreeType"),
+    
     SITUATED("situated"),
     SITUATED_TYPE("SituatedType"),
     ON_BOARD("OnBoard"),
