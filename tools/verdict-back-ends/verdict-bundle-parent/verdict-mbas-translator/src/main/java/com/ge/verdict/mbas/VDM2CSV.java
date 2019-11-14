@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import verdict.vdm.vdm_model.CIA;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
@@ -23,7 +22,6 @@ import verdict.vdm.vdm_model.CyberReq;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.PedigreeType;
-import verdict.vdm.vdm_model.Severity;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {
@@ -99,13 +97,13 @@ public class VDM2CSV extends VdmTranslator {
      */
     private Table buildCompSafTable(Model model, String scenario) {
         Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
-        for (ComponentType comp : model.getComponentType()) {
+//        for (ComponentType comp : model.getComponentType()) {
 //            table.addValue(comp.getName()); // comp
             //        	for(SafetyRel rel : comp.getSafetyRel()) {
             //
             //        	}
 //            table.capRow();
-        }
+//        }
 
         return table;
     }
@@ -119,13 +117,13 @@ public class VDM2CSV extends VdmTranslator {
      */
     private Table buildEventsTable(Model model, String scenario) {
         Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
-        for (ComponentType comp : model.getComponentType()) {
+//        for (ComponentType comp : model.getComponentType()) {
 //            table.addValue(comp.getName()); // comp
             //        	for(SafetyRel rel : comp.getSafetyRel()) {
             //
             //        	}
 //            table.capRow();
-        }
+//        }
 
         return table;
     }
@@ -612,7 +610,7 @@ public class VDM2CSV extends VdmTranslator {
                 }
             } catch (Exception e) {
             }
-            // Find getXxx method
+            // Find getXxx method (need to make sure the property is "ComponentKind" or "Pedigree")
             try {
                 Method method = cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName));
                 // Check return type
@@ -661,7 +659,7 @@ public class VDM2CSV extends VdmTranslator {
                         // In practice this should only be true when the property is present (output
                         // "1")
                         table.addValue(isProp + "#" + dal.toString());
-                    } else if(isProp.equals("1")){
+                    } else if(!isProp.equals("")){
                         // No DAL information available
                         table.addValue(isProp);
                     } else {
