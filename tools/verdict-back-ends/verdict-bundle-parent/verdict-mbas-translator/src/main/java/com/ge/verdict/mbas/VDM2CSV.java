@@ -14,6 +14,7 @@ import verdict.vdm.vdm_model.CIA;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
+import verdict.vdm.vdm_model.ComponentKindType;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.CyberExpr;
@@ -99,11 +100,11 @@ public class VDM2CSV extends VdmTranslator {
     private Table buildCompSafTable(Model model, String scenario) {
         Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
         for (ComponentType comp : model.getComponentType()) {
-            table.addValue(comp.getName()); // comp
+//            table.addValue(comp.getName()); // comp
             //        	for(SafetyRel rel : comp.getSafetyRel()) {
             //
             //        	}
-            table.capRow();
+//            table.capRow();
         }
 
         return table;
@@ -119,11 +120,11 @@ public class VDM2CSV extends VdmTranslator {
     private Table buildEventsTable(Model model, String scenario) {
         Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
         for (ComponentType comp : model.getComponentType()) {
-            table.addValue(comp.getName()); // comp
+//            table.addValue(comp.getName()); // comp
             //        	for(SafetyRel rel : comp.getSafetyRel()) {
             //
             //        	}
-            table.capRow();
+//            table.capRow();
         }
 
         return table;
@@ -245,7 +246,7 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(""); // dest comp instance
                 }
 
-                String flow = connection.getFlow().name();
+                String flow = connection.getFlowType().name();
 
                 table.addValue("XDATA".equals(flow) ? "Xdata" : ""); // flow1
                 table.addValue("CONTROL".equals(flow) ? "Control" : ""); // flow2
@@ -508,26 +509,12 @@ public class VDM2CSV extends VdmTranslator {
             "canReceiveSWUpdate",
             "hasSensitiveInfo",
             "insideTrustedBoundary",
-            "cType", // enum type
+            "componentKind", // enum type
             "pedigree", // enum type
             "controlReceivedFromUntrusted",
             "dataReceivedFromUntrusted",
             "controlSentToUntrusted",
             "dataSentToUntrusted",
-
-            // 12 Cyber Attack Properties from TA1
-            "Configuration_Attack",
-            "Physical_Theft_Attack",
-            "Interception_Attack",
-            "Hardware_Integrity_Attack",
-            "Supply_Chain_Attack",
-            "Brute_Force_Attack",
-            "Fault_Injection_Attack",
-            "Identity_Spoofing_Attack",
-            "Excessive_Allocation_Attack",
-            "Sniffing_Attack",
-            "Buffer_Attack",
-            "Flooding_Attack",
 
             // 42 props with DAL The columns below are to be filled with 1#N,
             // where 1 is for true, # is the separator, and N is the DAL number
@@ -572,7 +559,21 @@ public class VDM2CSV extends VdmTranslator {
             "tamperProtection",
             "tamperProtectionDAL",
             "userAuthentication",
-            "userAuthenticationDAL"
+            "userAuthenticationDAL",
+
+            // 12 Cyber Attack Properties from TA1
+            "Configuration_Attack",
+            "Physical_Theft_Attack",
+            "Interception_Attack",
+            "Hardware_Integrity_Attack",
+            "Supply_Chain_Attack",
+            "Brute_Force_Attack",
+            "Fault_Injection_Attack",
+            "Identity_Spoofing_Attack",
+            "Excessive_Allocation_Attack",
+            "Sniffing_Attack",
+            "Buffer_Attack",
+            "Flooding_Attack"            
 
             //            "broadcastFromOutsideTB",
             //            "wifiFromOutsideTB",
@@ -613,12 +614,13 @@ public class VDM2CSV extends VdmTranslator {
             }
             // Find getXxx method
             try {
-                Method method =
-                        cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName) + "Dal");
+                Method method = cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName));
                 // Check return type
                 if (PedigreeType.class.equals(method.getReturnType())) {
-                    getDalMethods[i] = method;
-                } 
+                    getPropMethods[i] = method;
+                } else if (ComponentKindType.class.equals(method.getReturnType())) {
+                    getPropMethods[i] = method;
+                }
             } catch (Exception e) {
             }
         }
@@ -626,8 +628,8 @@ public class VDM2CSV extends VdmTranslator {
         // The two arrays get merged together into one set of columns
         Table table = new Table(mainHeaders, props);
 
-        String isProp;
         Integer dal;
+        String isProp;
 
         for (ComponentImpl comp : model.getComponentImpl()) {
             if (comp.getBlockImpl() == null || comp.getBlockImpl().getSubcomponent() == null) {
@@ -649,10 +651,9 @@ public class VDM2CSV extends VdmTranslator {
 
                 for (int i = 0; i < props.length; i++) {
                     // Perform reflection. invokeMethod() handles most of the nasty bits.
-                    // We checked the return types of the methods above, so this is type-safe.
-
-                    isProp = invokeMethod(inst, isPropMethods[i], false) ? "1" : "";
+                    // We checked the return types of the methods above, so this is type-safe.                    
                     dal = invokeMethod(inst, getDalMethods[i], -1);
+                    isProp = invokeMethod(inst, isPropMethods[i], false) ? "1" : "";
 
                     if (!Integer.valueOf(-1).equals(dal)) {
                         // DAL is provided for this property and it is set in this particular case
@@ -660,9 +661,19 @@ public class VDM2CSV extends VdmTranslator {
                         // In practice this should only be true when the property is present (output
                         // "1")
                         table.addValue(isProp + "#" + dal.toString());
-                    } else {
+                    } else if(isProp.equals("1")){
                         // No DAL information available
                         table.addValue(isProp);
+                    } else {
+                        if (PedigreeType.class.equals(getPropMethods[i].getReturnType())) {
+                        	PedigreeType pedigreeType = invokeMethod(inst, getDalMethods[i], PedigreeType.INTERNALLY_DEVELOPED);
+                        	table.addValue(pedigreeType.name());
+                        } else if (ComponentKindType.class.equals(getPropMethods[i].getReturnType())) {
+                        	ComponentKindType componentKind = invokeMethod(inst, getDalMethods[i], ComponentKindType.HARDWARE);
+                        	table.addValue(componentKind.name());                        	
+                        } else {
+                        	errAndExit("Cannot reach here!");
+                        }
                     }
                 }
 
@@ -774,54 +785,11 @@ public class VDM2CSV extends VdmTranslator {
             //                }
             //            }
         } else if (expr.getNot() != null) {
-            System.err.println("MBAS does not currently support NOT expressions");
+            System.err.println("Error: MBAS does not currently support NOT expressions");
             throw new RuntimeException("NOT not supported");
         }
     }
 
-    /**
-     * Convert CIA to string.
-     *
-     * @param cia
-     * @return
-     */
-    private String ciaToString(CIA cia) {
-        switch (cia) {
-            case CONFIDENTIALITY:
-                return "Confidentiality";
-            case INTEGRITY:
-                return "Integrity";
-            case AVAILABILITY:
-                return "Availability";
-            default:
-                // This shouldn't happen?
-                throw new RuntimeException("Unknown CIA: " + cia.toString());
-        }
-    }
-
-    /**
-     * Convert Severity to String.
-     *
-     * @param severity
-     * @return
-     */
-    private String severityToString(Severity severity) {
-        switch (severity) {
-            case CATASTROPHIC:
-                return "Catastrophic";
-            case HAZARDOUS:
-                return "Hazardous";
-            case MAJOR:
-                return "Major";
-            case MINOR:
-                return "Minor";
-            case NONE:
-                return "None";
-            default:
-                // This shouldn't happen?
-                throw new RuntimeException("Unknown severity: " + severity.toString());
-        }
-    }
 
     /**
      * Build the component dependency table.
@@ -849,7 +817,7 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(""); // input port (empty)
                     table.addValue(""); // input CIA (empty)
                     table.addValue(rel.getOutput().getName()); // output port
-                    table.addValue(ciaToString(rel.getOutput().getCia())); // output CIA
+                    table.addValue(rel.getOutput().getCia().name()); // output CIA
 
                     table.capRow();
                 } else {
@@ -860,7 +828,7 @@ public class VDM2CSV extends VdmTranslator {
                         table.addValue(convertListOfPortNameToStr(andPortList)); // input ports
                         table.addValue(convertListOfPortCIAToStr(andPortList)); // input ports CIA
                         table.addValue(rel.getOutput().getName()); // output port
-                        table.addValue(ciaToString(rel.getOutput().getCia())); // output CIA
+                        table.addValue(rel.getOutput().getCia().name()); // output CIA
 
                         table.capRow();
                     }
@@ -881,6 +849,7 @@ public class VDM2CSV extends VdmTranslator {
      * @return
      */
     private Table buildMissionTable(Model model, String scenario) {
+    	// 12 Headers
         Table table =
                 new Table(
                         "ModelVersion",
@@ -893,15 +862,8 @@ public class VDM2CSV extends VdmTranslator {
                         "Severity",
                         "CompInstanceDependency",
                         "CompOutputDependency",
-                        "OutputCIA",
-                        "ReqType"
-                        //                        "Confidentiality",
-                        //                        "Integrity",
-                        //                        "Availability"
-                        /*
-                         * ,
-                         * "CIA"
-                         */ );
+                        "DependentCompOutputCIA",
+                        "ReqType" );
 
         // Map output ports (the name in the system implementation
         // not necessarily the name in the component type) to component instance names
@@ -978,30 +940,31 @@ public class VDM2CSV extends VdmTranslator {
                 }
 
                 for (List<CIAPort> andPortList : condPorts) {
-                    table.addValue(scenario);
+                    table.addValue(scenario); // Scenario
                     table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
                     table.addValue(getStrNullChk(() -> mission.getName())); // mission req
                     table.addValue(req.getId()); // cyber req ID
                     table.addValue(getStrNullChk(() -> req.getName())); // cyber req
                     table.addValue(
-                            getStrNullChk(() -> ciaToString(req.getCia()))); // mission impact CIA
+                            getStrNullChk(() -> req.getCia().name())); // mission impact CIA
                     table.addValue(""); // effect
-                    table.addValue(severityToString(req.getSeverity()));
+                    table.addValue(req.getSeverity().name()); // Severity
                     // Get the name of the component with this output port, determined above
                     table.addValue(
                             findCondPortCompDep(
-                                    outputPortComps, andPortList)); // comp instance dependency
+                                    outputPortComps, andPortList)); // comp instance dependency (one layer inwards)
                     table.addValue(
                             findCondPortCompDep(
-                                    outputPortCompPorts, andPortList)); // comp output dependency
-
-                    // consolidate into one column
-                    table.addValue(convertListOfPortCIAToStr(andPortList));
-
+                                    outputPortCompPorts, andPortList)); // comp output dependency (one layer inwards)
+                    
+                    table.addValue(convertListOfPortCIAToStr(andPortList)); // Dependent Component Output CIA
+                    table.addValue("Cyber"); // cyber for req type 
                     table.capRow();
                 }
             }
         }
+        
+        // also need to iterate over SafetyReq
 
         return table;
     }
@@ -1062,11 +1025,16 @@ public class VDM2CSV extends VdmTranslator {
     private String convertListOfPortCIAToStr(List<CIAPort> andPortList) {
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < andPortList.size(); i++) {
-            sb.append(ciaToString(andPortList.get(i).getCia()));
+            sb.append(andPortList.get(i).getCia().name());
             if (i < andPortList.size() - 1) {
                 sb.append(";");
             }
         }
         return sb.toString();
+    }
+    
+    private void errAndExit(String msg) {
+    	System.err.println("Error: " + msg);
+    	System.exit(-1);
     }
 }

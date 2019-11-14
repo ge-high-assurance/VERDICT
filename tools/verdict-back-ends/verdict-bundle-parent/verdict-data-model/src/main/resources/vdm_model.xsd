@@ -173,8 +173,8 @@
             use="optional"></attribute>
         <attribute name="pedigree" type="vdm_model:PedigreeType"
             use="optional"></attribute>
-        <attribute name="manufacturer" type="vdm_model:ManufacturerType"
-            use="optional"></attribute>            
+        <attribute name="manufacturer"
+            type="vdm_model:ManufacturerType" use="optional"></attribute>
 
         <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
         <attribute name="canReceiveSWUpdate" type="boolean"></attribute>
@@ -451,13 +451,13 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
-    
+
     <simpleType name="ManufacturerType">
         <restriction base="string">
             <enumeration value="ThirdParty"></enumeration>
             <enumeration value="InHouse"></enumeration>
         </restriction>
-    </simpleType>    
+    </simpleType>
 
     <simpleType name="PedigreeType">
         <restriction base="string">
