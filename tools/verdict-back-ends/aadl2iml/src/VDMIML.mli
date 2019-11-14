@@ -334,6 +334,7 @@ type connection = {
   trustedConnection: bool option;
   encryptedTransmission: bool option;
   encryptedTransmissionDAL: integer option;
+  replayProtection: bool option;
   source: connection_end;
   destination: connection_end;
 }
