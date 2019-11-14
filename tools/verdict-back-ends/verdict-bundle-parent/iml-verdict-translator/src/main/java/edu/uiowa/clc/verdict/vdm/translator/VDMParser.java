@@ -2525,7 +2525,7 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-//                        componentInstance.setEncryption(value);
+                        //                        componentInstance.setEncryption(value);
                     }
                 } else if (type == Type.ANTI_JAMMING) {
                     type = option();
@@ -2537,13 +2537,13 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-//                        componentInstance.setAntiFuzzing(value);
+                        //                        componentInstance.setAntiFuzzing(value);
                     }
                 } else if (type == Type.ANTI_FLOODING) {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-//                        componentInstance.setAntiFlooding(value);
+                        //                        componentInstance.setAntiFlooding(value);
                     }
                 } else if (type == Type.MANUFACTURER) {
                     type = option();
@@ -2582,7 +2582,7 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         KindOfComponent kind_type = kindOfComponent();
-                        componentInstance.setComponentType(kind_type);
+                        componentInstance.setComponentKind(kind_type);
                     }
 
                 } else if (type == Type.CATEGORY) {
