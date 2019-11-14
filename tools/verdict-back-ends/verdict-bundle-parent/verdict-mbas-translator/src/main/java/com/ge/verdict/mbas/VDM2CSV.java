@@ -865,8 +865,8 @@ public class VDM2CSV extends VdmTranslator {
 
         // Map output ports (the name in the system implementation
         // not necessarily the name in the component type) to component instance names
-        Map<String, String> outputPortComps = new HashMap<>();
-        Map<String, String> outputPortCompPorts = new HashMap<>();
+        Map<String, String> outportToDepComps = new HashMap<>();
+        Map<String, String> outportToSrcCompPort = new HashMap<>();
         for (ComponentImpl compImpl : model.getComponentImpl()) {
             if (compImpl.getBlockImpl() == null
                     || compImpl.getBlockImpl().getConnection() == null) {
@@ -895,18 +895,18 @@ public class VDM2CSV extends VdmTranslator {
                 //                      or the outmost component implementation port name connecting
                 // to key
                 if (connection.getSource().getSubcomponentPort() != null) {
-                    outputPortComps.put(
+                    outportToDepComps.put(
                             key,
                             connection
                                     .getSource()
                                     .getSubcomponentPort()
                                     .getSubcomponent()
                                     .getName());
-                    outputPortCompPorts.put(
+                    outportToSrcCompPort.put(
                             key, connection.getSource().getSubcomponentPort().getPort().getName());
                 } else if (connection.getSource().getComponentPort() != null) {
-                    outputPortComps.put(key, compImpl.getName());
-                    outputPortCompPorts.put(
+                    outportToDepComps.put(key, compImpl.getName());
+                    outportToSrcCompPort.put(
                             key, connection.getSource().getComponentPort().getName());
                 } else {
                     continue;
@@ -949,11 +949,11 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(req.getSeverity().name()); // Severity
                     // Get the name of the component with this output port, determined above
                     table.addValue(
-                            findCondPortCompDep(
-                                    outputPortComps, andPortList)); // comp instance dependency (one layer inwards)
+                            convertCompOrSrcPortDepToStr(
+                                    outportToDepComps, andPortList)); // comp instance dependency (one layer inwards)
                     table.addValue(
-                            findCondPortCompDep(
-                                    outputPortCompPorts, andPortList)); // comp output dependency (one layer inwards)
+                            convertCompOrSrcPortDepToStr(
+                                    outportToSrcCompPort, andPortList)); // comp output dependency (one layer inwards)
                     
                     table.addValue(convertListOfPortCIAToStr(andPortList)); // Dependent Component Output CIA
                     table.addValue("Cyber"); // cyber for req type 
@@ -988,14 +988,14 @@ public class VDM2CSV extends VdmTranslator {
      * Find outports' dependencies in conditions of a CyberReq or SafetyReq and convert the
      * dependencies to string with ";" to indicate AND
      */
-    public String findCondPortCompDep(Map<String, String> destPortMap, List<CIAPort> andPortList) {
+    public String convertCompOrSrcPortDepToStr(Map<String, String> portToDepCompOrPortmap, List<CIAPort> andPortList) {
         StringBuilder sb = new StringBuilder("");
         List<String> compNames = new ArrayList<>();
 
         for (CIAPort port : andPortList) {
             String portName = port.getName();
-            if (destPortMap.containsKey(portName)) {
-                compNames.add(portName);
+            if (portToDepCompOrPortmap.containsKey(portName)) {
+                compNames.add(portToDepCompOrPortmap.get(portName));
             }
         }
         for (int i = 0; i < compNames.size(); ++i) {
