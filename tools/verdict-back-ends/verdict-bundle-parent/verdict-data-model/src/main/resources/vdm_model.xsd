@@ -119,20 +119,66 @@
         <attribute name="id" type="ID"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
         <attributeGroup ref="vdm_model:STEMComponentProperties" />
-        <attribute name="heterogeneity" type="boolean"></attribute>
-        <attribute name="encryption" type="boolean"></attribute>
-        <attribute name="anti_jamming" type="boolean"></attribute>
-        <attribute name="anti_flooding" type="boolean"></attribute>
-        <attribute name="anti_fuzzing" type="boolean"></attribute>
-        <attribute name="heterogeneity_dal" type="int"></attribute>
-        <attribute name="encryption_dal" type="int"></attribute>
-        <attribute name="anti_jamming_dal" type="int"></attribute>
-        <attribute name="anti_flooding_dal" type="int"></attribute>
-        <attribute name="anti_fuzzing_dal" type="int"></attribute>
         <attributeGroup
             ref="vdm_model:InstrumentedComponentProperties">
         </attributeGroup>
-        <attribute name="adversariallyTested" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="BlockImpl">
+        <sequence>
+            <element name="subcomponent"
+                type="vdm_model:ComponentInstance" maxOccurs="unbounded"
+                minOccurs="1">
+            </element>
+            <element name="connection" type="vdm_model:Connection"
+                maxOccurs="unbounded" minOccurs="1">
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="Connection">
+        <all>
+            <element name="source" type="vdm_model:ConnectionEnd"></element>
+            <element name="destination" type="vdm_model:ConnectionEnd">
+            </element>
+        </all>
+        <attribute name="name" type="vdm_data:Identifier"
+            use="required">
+        </attribute>
+        <attribute name="flowType" type="vdm_model:Flow"
+            use="optional"></attribute>
+        <attribute name="data_encrypted" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="authenticated" type="boolean"
+            use="optional"></attribute>
+        <attribute name="conn_type" type="vdm_model:ConnectionType"
+            use="optional">
+        </attribute>
+        <attribute name="trustedConnection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedTransmission" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedTransmissionDAL"
+            type="vdm_model:DalType" use="optional" />
+    </complexType>
+
+    <attributeGroup name="STEMComponentProperties">
+        <attribute name="hasSensitiveInfo" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="insideTrustedBoundary" type="boolean"
+            use="optional">
+        </attribute>
+        <attribute name="broadcastFromOutsideTB" type="boolean"
+            use="optional"></attribute>
+        <attribute name="wifiFromOutsideTB" type="boolean"
+            use="optional"></attribute>
+        <attribute name="pedigree" type="vdm_model:PedigreeType"
+            use="optional"></attribute>
+        <attribute name="cType" type="vdm_model:CTypeType"
+            use="optional"></attribute>
+
         <attribute name="canReceiveConfigUpdate" type="boolean"></attribute>
         <attribute name="canReceiveSWUpdate" type="boolean"></attribute>
         <attribute name="controlReceivedFromUntrusted"
@@ -172,6 +218,8 @@
         <attribute name="systemAccessControl" type="boolean"></attribute>
         <attribute name="tamperProtection" type="boolean"></attribute>
         <attribute name="userAuthentication" type="boolean"></attribute>
+        <attribute name="antiJamming" type="boolean"></attribute>
+        <attribute name="antiJamming_dal" type="vdm_model:DalType"></attribute>
         <attribute name="auditMessageResponsesDAL"
             type="vdm_model:DalType">
         </attribute>
@@ -210,58 +258,7 @@
             type="vdm_model:DalType"></attribute>
         <attribute name="userAuthenticationDAL"
             type="vdm_model:DalType"></attribute>
-    </complexType>
-
-    <complexType name="BlockImpl">
-        <sequence>
-            <element name="subcomponent"
-                type="vdm_model:ComponentInstance" maxOccurs="unbounded"
-                minOccurs="1">
-            </element>
-            <element name="connection" type="vdm_model:Connection"
-                maxOccurs="unbounded" minOccurs="1">
-            </element>
-        </sequence>
-    </complexType>
-
-    <complexType name="Connection">
-        <all>
-            <element name="source" type="vdm_model:ConnectionEnd"></element>
-            <element name="destination" type="vdm_model:ConnectionEnd">
-            </element>
-        </all>
-        <attribute name="name" type="vdm_data:Identifier"
-            use="required">
-        </attribute>
-        <attribute name="flow" type="vdm_model:Flow" use="optional"></attribute>
-        <attribute name="data_encrypted" type="boolean"
-            use="optional">
-        </attribute>
-        <attribute name="authenticated" type="boolean"
-            use="optional"></attribute>
-        <attribute name="conn_type" type="vdm_model:ConnectionType"
-            use="optional">
-        </attribute>
-        <attribute name="trustedConnection" type="boolean"
-            use="optional"></attribute>
-        <attribute name="encryptedTransmission" type="boolean"
-            use="optional"></attribute>
-        <attribute name="encryptedTransmissionDAL"
-            type="vdm_model:DalType" use="optional" />
-    </complexType>
-
-    <attributeGroup name="STEMComponentProperties">
-        <attribute name="hasSensitiveInfo" type="boolean"
-            use="optional">
-        </attribute>
-        <attribute name="insideTrustedBoundary" type="boolean"
-            use="optional">
-        </attribute>
-        <attribute name="broadcastFromOutsideTB" type="boolean"
-            use="optional"></attribute>
-        <attribute name="wifiFromOutsideTB" type="boolean"
-            use="optional"></attribute>
-        <attribute name="pedigree" type="vdm_model:PedigreeType"></attribute>            
+        <attribute name="heterogeneity" type="boolean"></attribute>
     </attributeGroup>
 
     <simpleType name="DalType">
@@ -274,8 +271,8 @@
     <simpleType name="Flow">
         <restriction base="string">
             <enumeration value="Xdata"></enumeration>
-            <enumeration value="Control"></enumeration>
-            <enumeration value="Request"></enumeration>
+            <enumeration value="Xcontrol"></enumeration>
+            <enumeration value="Xrequest"></enumeration>
         </restriction>
     </simpleType>
 
@@ -331,6 +328,7 @@
         <attribute name="manufacturer"
             type="vdm_model:ManufacturerType" use="optional">
         </attribute>
+        <attribute name="adversariallyTested" type="boolean"></attribute>
     </attributeGroup>
 
     <simpleType name="KindOfComponent">
@@ -474,6 +472,15 @@
             <enumeration value="InternallyDeveloped"></enumeration>
             <enumeration value="COTS"></enumeration>
             <enumeration value="Sourced"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="CTypeType">
+        <restriction base="string">
+            <enumeration value="Software"></enumeration>
+            <enumeration value="Hardware"></enumeration>
+            <enumeration value="Human"></enumeration>
+            <enumeration value="Hybrid"></enumeration>
         </restriction>
     </simpleType>
 
