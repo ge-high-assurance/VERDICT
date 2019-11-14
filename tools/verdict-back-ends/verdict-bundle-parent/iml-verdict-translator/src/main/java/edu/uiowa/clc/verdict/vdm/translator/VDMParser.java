@@ -56,6 +56,7 @@ import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.ManufacturerType;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
 import verdict.vdm.vdm_model.Severity;
@@ -1974,22 +1975,39 @@ public class VDMParser extends Parser {
                 String identifier = Identifier();
                 connection.setName(identifier);
 
-            } else if (token.type == Type.FLOW_TYPE) {
-
-                Flow flow_value = flow();
-                connection.setFlow(flow_value);
-
             } else if (token.type == Type.OPTION) {
 
                 boolean encrption_status = false;
                 boolean authenticated_status = false;
-
+                boolean trusted_connection = false;
+                boolean encrypted_transmission = false;
+                int dal_value = 0;
+                
                 String type_value = token.sd.getName();
                 Type type = Type.get(type_value);
                 // consume(Type.BOOL);
                 consume(Type.OPTION);
+                if (type == Type.ENCRYPTED_TRANSMISSION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                    	trusted_connection = truthValue();
+                        connection.setEncryptedTransmission(trusted_connection);
+                    }
+                } else if (type == Type.ENCRYPTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        connection.setEncryptedTransmissionDAL(dal_value);
+                    }
 
-                if (type == Type.DATA_ENCRYPTED) {
+                } else if (type == Type.TRUSTED_CONNECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                    	trusted_connection = truthValue();
+                        connection.setDataEncrypted(trusted_connection);
+                    }
+                } else if (type == Type.DATA_ENCRYPTED) {
                     type = option();
                     if (type == Type.SOME) {
                         encrption_status = truthValue();
@@ -2002,12 +2020,24 @@ public class VDMParser extends Parser {
                         connection.setAuthenticated(authenticated_status);
                     }
                 } else if (type == Type.CONN_TYPE) {
-                    type = option();
+                    
+                	type = option();
+                    
                     if (type == Type.SOME) {
                         ConnectionType conn_type = connectionType();
                         connection.setConnType(conn_type);
+                    }                     
+                } else if (type == Type.FLOW_TYPE) {
+
+                	type = option();
+                    
+                    if (type == Type.SOME) {
+
+                    	Flow flow_value = flow();
+                    	connection.setFlowType(flow_value);
                     }
                 }
+
 
             } else if (token.type == Type.CONNECTION_END) {
 
@@ -2214,7 +2244,271 @@ public class VDMParser extends Parser {
                         componentInstance.setInsideTrustedBoundary(value);
                     }
 
-                } else if (type == Type.INTERACT_OUTSIDE_TB) {
+                } 
+                
+                else if (type == Type.CAN_RECEIVE_CONFIG_UPDATE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setCanReceiveConfigUpdate(value);
+                    }
+
+                } else if (type == Type.CAN_RECEIVE_SW_UPDATE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setCanReceiveSWUpdate(value);
+                    }
+
+                } else if (type == Type.CONTROL_RECEIVED_FROM_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setControlReceivedFromUntrusted(value);
+                    }
+
+                } else if (type == Type.CONTROL_SENT_TO_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setControlSentToUntrusted(value);
+                    }
+
+                } else if (type == Type.DATA_RECEIVED_FROM_UNTUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDataReceivedFromUntrusted(value);
+                    }
+
+                } else if (type == Type.DATA_SENT_TO_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDataSentToUntrusted(value);
+                    }
+
+                } else if (type == Type.CONFIG_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setConfigurationAttack(value);
+                    }
+
+                } else if (type == Type.PHY_THEFT_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setPhysicalTheftAttack(value);
+                    }
+
+                } else if (type == Type.INTERCEPTION_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setInterceptionAttack(value);
+                    }
+
+                } else if (type == Type.HARDWARE_INTEGRITY_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setHardwareIntegrityAttack(value);
+                    }
+
+                } else if (type == Type.SUPPLY_CHAIN_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSupplyChainAttack(value);
+                    }
+
+                } else if (type == Type.BRUTE_FORCE_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setBruteForceAttack(value);
+                    }
+
+                } else if (type == Type.FAULT_INJEC_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setFaultInjectionAttack(value);
+                    }
+
+                } else if (type == Type.IDENTITY_SPOOFING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setIdentitySpoofingAttack(value);
+                    }
+
+                } else if (type == Type.EXPRESSIVE_ALLOC_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setExcessiveAllocationAttack(value);
+                    }
+
+                } else if (type == Type.SNIFFING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSniffingAttack(value);
+                    }
+
+                } else if (type == Type.BUFFER_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setBufferAttack(value);
+                    }
+
+                }  else if (type == Type.FLOODING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setFloodingAttack(value);
+                    }
+
+                } else if (type == Type.AUDIT_MESSAGE_RESPONSES) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setAuditMessageResponses(value);
+                    }
+
+                } else if (type == Type.DEVICE_AUTHENTICATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDeviceAuthentication(value);
+                    }
+
+                } else if (type == Type.DOS_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDosProtection(value);
+                    }
+
+                } else if (type == Type.ENCRYPTED_STORAGE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setEncryptedStorage(value);
+                    }
+
+                } else if (type == Type.INPUT_VALIDATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setInputValidation(value);
+                    }
+
+                } else if (type == Type.LOGGING) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setLogging(value);
+                    }
+
+                } else if (type == Type.MEMORY_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setMemoryProtection(value);
+                    }
+
+                } else if (type == Type.PHY_ACCESS_CONTROL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setPhysicalAccessControl(value);
+                    }
+
+                } else if (type == Type.REMOVE_IDEN_INFO) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setRemoveIdentifyingInformation(value);
+                    }
+
+                } else if (type == Type.RESOURCE_AVAILABILITY) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setResourceAvailability(value);
+                    }
+
+                } else if (type == Type.RESOURCE_ISOLATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setResourceIsolation(value);
+                    }
+
+                } else if (type == Type.SECURE_BOOT) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSecureBoot(value);
+                    }
+
+                } else if (type == Type.SESSION_AUTH) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSessionAuthenticity(value);
+                    }
+
+                } else if (type == Type.STATIC_CODE_ANALYSIS) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setStaticCodeAnalysis(value);
+                    }
+
+                } else if (type == Type.STRONG_CRYPTO_ALGO) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setStrongCryptoAlgorithms(value);
+                    }
+
+                } else if (type == Type.SUPPLY_CHAIN_SECURITY) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSupplyChainSecurity(value);
+                    }
+
+                } else if (type == Type.SYS_ACCESS_CONTROL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSystemAccessControl(value);
+                    }
+
+                } else if (type == Type.TAMPER_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setTamperProtection(value);
+                    }
+
+                } else if (type == Type.USER_AUTH) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setUserAuthentication(value);
+                    }
+
+                } 
+
+                
+                else if (type == Type.INTERACT_OUTSIDE_TB) {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
@@ -2266,6 +2560,15 @@ public class VDMParser extends Parser {
                         componentInstance.setManufacturer(manf_type);
                     }
 
+                } else if (type == Type.PEDIGREE) {
+                    type = option();
+
+                    if (type == Type.SOME) {
+                        // IN_HOUSE vs THIRD_PARTY
+                        PedigreeType pedigree_type = pedigreeType();
+                        componentInstance.setPedigree(pedigree_type);
+                    }
+
                 } else if (type == Type.ADV_TESTED) {
                     type = option();
 
@@ -2281,7 +2584,7 @@ public class VDMParser extends Parser {
                         SituatedType situated_type = situatedType();
                         componentInstance.setSituated(situated_type);
                     }
-                } else if (type == Type.COMP_TYPE) {
+                } else if (type == Type.COMP_KIND) {
                     type = option();
                     if (type == Type.SOME) {
                         KindOfComponent kind_type = kindOfComponent();
@@ -2299,14 +2602,14 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setHeterogeneityDal(dal_value);
+//                        componentInstance.setHeterogeneityDal(dal_value);
                     }
                 } else if (type == Type.ENCRYPTION_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setEncryptionDal(dal_value);
+//                        componentInstance.setEncryptionDal(dal_value);
                     }
 
                 } else if (type == Type.ANTI_JAMMING_DAL) {
@@ -2321,16 +2624,169 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiFloodingDal(dal_value);
+//                        componentInstance.setAntiFloodingDal(dal_value);
                     }
                 } else if (type == Type.ANTI_FUZZING_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiFuzzingDal(dal_value);
+//                        componentInstance.setAntiFuzzingDal(dal_value);
                     }
                 }
+                else if (type == Type.AUDIT_MESSAGE_RESPONSE_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setAuditMessageResponsesDAL(dal_value);
+                    }
+                }
+                else if (type == Type.DEVICE_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setDeviceAuthenticationDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.DOS_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setDosProtectionDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.ENCRYPTED_STORAGTE_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setEncryptedStorageDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.INPUT_VALIDATION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setInputValidationDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.LOGGING_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setLoggingDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.MEMORY_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setMemoryProtectionDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.PHY_ACCESS_CONTROL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setPhysicalAccessControlDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.REMOVE_IDEN_INFO) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setRemoveIdentifyingInformationDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.RESOURCE_AVAIL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setResourceAvailabilityDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.RESOURCE_ISO_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setResourceIsolationDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.SECURE_BOOT_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSecureBootDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.SESSION_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSessionAuthenticityDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.STATIC_CODE_ANALYSIS_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setStaticCodeAnalysisDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.STRONG_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setStrongCryptoAlgorithmsDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.SUPPLY_CHAIN_SECURITY_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSupplyChainSecurityDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.SYSTEM_ACCESS_CONTROL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSystemAccessControlDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.TAMPER_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setTamperProtectionDAL(dal_value);
+                    }
+                }                
+                else if (type == Type.USER_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setUserAuthenticationDAL(dal_value);
+                    }
+                }                
+                
             }
         }
 
@@ -2372,6 +2828,17 @@ public class VDMParser extends Parser {
 
         String type_name = token.sd.getName();
         SituatedType type = SituatedType.fromValue(type_name);
+
+        consume();
+
+        return type;
+    }
+    
+    //type PedigreeType enum { InternallyDeveloped, COTS, Sourced };
+    public PedigreeType pedigreeType() {
+
+        String type_name = token.sd.getName();
+        PedigreeType type = PedigreeType.fromValue(type_name);
 
         consume();
 
