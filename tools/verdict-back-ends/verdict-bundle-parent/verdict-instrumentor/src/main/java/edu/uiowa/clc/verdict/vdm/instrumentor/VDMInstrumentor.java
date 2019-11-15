@@ -694,7 +694,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -756,7 +756,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -836,7 +836,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     // Option 1) Specification
                     if (componentType != null) {
@@ -910,7 +910,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     componentType = getType(componentInstance);
@@ -947,7 +947,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 
@@ -982,7 +982,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 
@@ -1365,7 +1365,7 @@ public class VDMInstrumentor {
         // Copying connection related artifacts
         new_con.setName(connection.getName() + "_instrumented_channel");
         new_con.setConnType(connection.getConnType());
-        new_con.setFlow(connection.getFlow());
+        new_con.setFlowType(connection.getFlowType());
         new_con.setDataEncrypted(connection.isDataEncrypted());
         new_con.setAuthenticated(connection.isAuthenticated());
 
