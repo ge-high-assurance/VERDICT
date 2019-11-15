@@ -143,7 +143,7 @@
             use="required">
         </attribute>
         <attribute name="replayProtection" type="boolean"
-            use="optional"></attribute>        
+            use="optional"></attribute>
         <attribute name="flowType" type="vdm_model:Flow"
             use="optional"></attribute>
         <attribute name="dataEncrypted" type="boolean"
