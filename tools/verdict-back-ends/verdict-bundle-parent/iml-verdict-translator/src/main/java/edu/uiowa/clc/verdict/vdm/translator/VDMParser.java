@@ -2605,7 +2605,7 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        //                        componentInstance.setHeterogeneityDal(dal_value);
+                        componentInstance.setHeterogeneityDAL(dal_value);
                     }
                 } else if (type == Type.ENCRYPTION_DAL) {
                     type = option();
