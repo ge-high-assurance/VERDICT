@@ -343,11 +343,11 @@ lport:
 
 l_or:
   | expr = l_and exprs = list(OR expr = l_and { expr })
-    { LOr (expr :: exprs) }
+    { if exprs = [] then expr else LOr (expr :: exprs) }
 
 l_and:
   | expr = lexpr_term exprs = list(AND expr = lexpr_term { expr })
-    { LAnd (expr :: exprs) }
+    { if exprs = [] then expr else LAnd (expr :: exprs) }
 
 lnot:
   | NOT expr = lexpr_term { LNot expr }
