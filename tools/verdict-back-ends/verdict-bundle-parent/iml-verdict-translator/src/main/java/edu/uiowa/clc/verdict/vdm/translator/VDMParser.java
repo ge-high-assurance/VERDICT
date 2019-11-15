@@ -102,7 +102,7 @@ public class VDMParser extends Parser {
         identifier_value = token.getStringValue();
         consume(Type.String);
 
-//        LOGGER.info(identifier_name + " := " + identifier_value);
+        //        LOGGER.info(identifier_name + " := " + identifier_value);
 
         return identifier_value;
     }
@@ -2014,7 +2014,7 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         trusted_connection = truthValue();
-                        connection.setDataEncrypted(trusted_connection);
+                        connection.setTrustedConnection(trusted_connection);
                     }
                 } else if (type == Type.DATA_ENCRYPTED) {
                     type = option();
