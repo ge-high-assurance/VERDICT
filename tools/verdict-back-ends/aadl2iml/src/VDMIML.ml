@@ -334,6 +334,7 @@ type connection = {
   trustedConnection: bool option;
   encryptedTransmission: bool option;
   encryptedTransmissionDAL: integer option;
+  replayProtection: bool option;
   source: connection_end;
   destination: connection_end;
 }
@@ -1234,6 +1235,7 @@ let pp_print_connection ind ppf
    trustedConnection;
    encryptedTransmission;
    encryptedTransmissionDAL;
+   replayProtection;
    source;
    destination
  }
@@ -1253,6 +1255,8 @@ let pp_print_connection ind ppf
     pp_print_bool_prop_value encryptedTransmission;
   Format.fprintf ppf "c.encryptedTransmissionDAL = %a &&@,"
     pp_print_int_prop_value encryptedTransmissionDAL;
+  Format.fprintf ppf "c.replayProtection = %a &&@,"
+    pp_print_bool_prop_value replayProtection;
   Format.fprintf ppf "@[<v %d>c.source = some (src: ConnectionEnd) {@," ind;
   Format.fprintf ppf "%a@]@,} &&@,"
     (pp_print_connection_end ind "src") source;

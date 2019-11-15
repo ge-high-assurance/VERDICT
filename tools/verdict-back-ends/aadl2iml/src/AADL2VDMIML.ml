@@ -851,6 +851,9 @@ let port_connection_to_iml_connection ct ct_idx sys_impl iml_comp_types subcomps
    VI.encryptedTransmissionDAL = (
     let qpr = AD.mk_full_qpref app_property_set "encryptedTransmissionDAL" in
     get_int_prop_value qpr properties);
+   VI.replayProtection = (
+     let qpr = AD.mk_full_qpref app_property_set "replayProtection" in
+     get_bool_prop_value qpr properties);
    VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
    VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
   }

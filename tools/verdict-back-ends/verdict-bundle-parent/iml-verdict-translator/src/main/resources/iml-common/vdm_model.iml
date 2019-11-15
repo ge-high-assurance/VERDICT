@@ -143,6 +143,7 @@ type Connection {
 	trustedConnection: Option<Bool>;
  	encryptedTransmission: Option<Bool>;
  	encryptedTransmissionDAL: Option<Int>;
+ 	replayProtection: Option<Bool>;
 	source: ConnectionEnd;
 	destination: ConnectionEnd;
 };
