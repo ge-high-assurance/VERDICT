@@ -167,6 +167,7 @@ public enum Type {
     ENCRYPTION("encryption"),
 
     // New attributes.
+    REPLAY_PROTECTION("replayProtection"),
     CAN_RECEIVE_CONFIG_UPDATE("canReceiveConfigUpdate"),
     CAN_RECEIVE_SW_UPDATE("canReceiveSWUpdate"),
     CONTROL_RECEIVED_FROM_UNTRUSTED("controlReceivedFromUntrusted"),
@@ -227,7 +228,7 @@ public enum Type {
     SYSTEM_ACCESS_CONTROL_DAL("systemAccessControlDAL"),
     TAMPER_PROTECTION_DAL("tamperProtectionDAL"),
     USER_AUTH_DAL("userAuthenticationDAL"),
-
+    REMOVE_IDEN_INFO_DAL("removeIdentifyingInformationDAL"),
     HETEROGENEITY("heterogeneity"),
     ANTI_JAMMING("anti_jamming"),
     ANTI_FLOODING("anti_flooding"),
@@ -263,7 +264,7 @@ public enum Type {
     IN_HOUSE("InHouse"),
 
     CATEGORY("category"),
-    COMP_KIND("componentKind"),
+    COMP_KIND("component_type"),
 
     PEDIGREE("pedigree"),
     PEDIGREE_TYPE("PedigreeType"),
@@ -286,7 +287,8 @@ public enum Type {
     SUBCOMPONENT_CE("SubcomponentCE"),
 
     FLOW("Flow"),
-    FLOW_TYPE("FlowType"),
+    FLOW_TYPE("flow_type"),
+    FLOWTYPE("FlowType"),
 
     TYPE_DECLARATIONS("type_declarations"),
     COMPONENT_TYPES("component_types"),

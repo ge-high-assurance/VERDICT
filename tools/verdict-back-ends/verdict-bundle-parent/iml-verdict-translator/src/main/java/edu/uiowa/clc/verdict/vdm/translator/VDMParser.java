@@ -102,7 +102,7 @@ public class VDMParser extends Parser {
         identifier_value = token.getStringValue();
         consume(Type.String);
 
-        //        LOGGER.info(identifier_name + " := " + identifier_value);
+//        LOGGER.info(identifier_name + " := " + identifier_value);
 
         return identifier_value;
     }
@@ -1981,19 +1981,28 @@ public class VDMParser extends Parser {
                 boolean authenticated_status = false;
                 boolean trusted_connection = false;
                 boolean encrypted_transmission = false;
+                boolean replay_protection = false;
+
                 int dal_value = 0;
 
                 String type_value = token.sd.getName();
                 Type type = Type.get(type_value);
                 // consume(Type.BOOL);
                 consume(Type.OPTION);
+
                 if (type == Type.ENCRYPTED_TRANSMISSION) {
                     type = option();
                     if (type == Type.SOME) {
-                        trusted_connection = truthValue();
-                        connection.setEncryptedTransmission(trusted_connection);
+                        encrypted_transmission = truthValue();
+                        connection.setEncryptedTransmission(encrypted_transmission);
                     }
-                } else if (type == Type.ENCRYPTION_DAL) {
+                } else if (type == Type.REPLAY_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        replay_protection = truthValue();
+                        connection.setReplayProtection(replay_protection);
+                    }
+                } else if (type == Type.ENCRYPTED_TRAMISSION_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
@@ -2061,7 +2070,7 @@ public class VDMParser extends Parser {
     // type FlowType enum { Xdata, Control, Request };
     public Flow flow() {
 
-        consume(Type.FLOW_TYPE);
+        //        consume(Type.FLOWTYPE);
         String flow_type = token.sd.getName();
 
         Flow flow = Flow.fromValue(flow_type);
@@ -2683,7 +2692,7 @@ public class VDMParser extends Parser {
                         consume(Type.Int);
                         componentInstance.setPhysicalAccessControlDAL(dal_value);
                     }
-                } else if (type == Type.REMOVE_IDEN_INFO) {
+                } else if (type == Type.REMOVE_IDEN_INFO_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
