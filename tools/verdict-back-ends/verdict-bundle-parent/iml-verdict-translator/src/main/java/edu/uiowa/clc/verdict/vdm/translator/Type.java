@@ -217,7 +217,7 @@ public enum Type {
     LOGGING_DAL("loggingDAL"),
     MEMORY_PROTECTION_DAL("memoryProtectionDAL"),
     PHY_ACCESS_CONTROL_DAL("physicalAccessControlDAL"),
-    REMOVE_IDENTIFYING_INFO_DAL("removeIdentifyingInformationDAL"),
+    //    REMOVE_IDENTIFYING_INFO_DAL("removeIdentifyingInformationDAL"),
     RESOURCE_AVAIL_DAL("resourceAvailabilityDAL"),
     RESOURCE_ISO_DAL("resourceIsolationDAL"),
     SECURE_BOOT_DAL("secureBootDAL"),
