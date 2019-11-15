@@ -665,13 +665,13 @@ public class VDM2CSV extends VdmTranslator {
                     } else {
                         if (props[i].equals("pedigree")) {
                             if (inst.getPedigree() != null) {
-                                table.addValue(inst.getPedigree().name());
+                                table.addValue(inst.getPedigree().value());
                             } else {
                                 table.addValue("");
                             }
                         } else if (props[i].equals("componentKind")) {
                             if (inst.getComponentKind() != null) {
-                                table.addValue(inst.getComponentKind().name());
+                                table.addValue(inst.getComponentKind().value());
                             } else {
                                 table.addValue("");
                             }
@@ -688,14 +688,14 @@ public class VDM2CSV extends VdmTranslator {
                         //                                                getDalMethods[i],
                         //
                         // PedigreeType.INTERNALLY_DEVELOPED);
-                        //                                table.addValue(pedigreeType.name());
+                        //                                table.addValue(pedigreeType.value());
                         //                            } else if (KindOfComponent.class.equals(
                         //                                    getPropMethods[i].getReturnType())) {
                         //                                KindOfComponent componentKind =
                         //                                        invokeMethod(
                         //                                                inst, getDalMethods[i],
                         // KindOfComponent.HARDWARE);
-                        //                                table.addValue(componentKind.name());
+                        //                                table.addValue(componentKind.value());
                         //                            } else {
                         //                                errAndExit("Cannot reach here!");
                         //                            }
@@ -851,7 +851,7 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(""); // input port (empty)
                     table.addValue(""); // input CIA (empty)
                     table.addValue(rel.getOutput().getName()); // output port
-                    table.addValue(rel.getOutput().getCia().name()); // output CIA
+                    table.addValue(rel.getOutput().getCia().value()); // output CIA
 
                     table.capRow();
                 } else {
@@ -862,7 +862,7 @@ public class VDM2CSV extends VdmTranslator {
                         table.addValue(convertListOfPortNameToStr(andPortList)); // input ports
                         table.addValue(convertListOfPortCIAToStr(andPortList)); // input ports CIA
                         table.addValue(rel.getOutput().getName()); // output port
-                        table.addValue(rel.getOutput().getCia().name()); // output CIA
+                        table.addValue(rel.getOutput().getCia().value()); // output CIA
 
                         table.capRow();
                     }
@@ -979,9 +979,9 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(getStrNullChk(() -> mission.getName())); // mission req
                     table.addValue(req.getId()); // cyber req ID
                     table.addValue(getStrNullChk(() -> req.getName())); // cyber req
-                    table.addValue(getStrNullChk(() -> req.getCia().name())); // mission impact CIA
+                    table.addValue(getStrNullChk(() -> req.getCia().value())); // mission impact CIA
                     table.addValue(""); // effect
-                    table.addValue(req.getSeverity().name()); // Severity
+                    table.addValue(req.getSeverity().value()); // Severity
                     // Get the name of the component with this output port, determined above
                     table.addValue(
                             convertCompOrSrcPortDepToStr(
@@ -1063,7 +1063,7 @@ public class VDM2CSV extends VdmTranslator {
     private String convertListOfPortCIAToStr(List<CIAPort> andPortList) {
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < andPortList.size(); i++) {
-            sb.append(andPortList.get(i).getCia().name());
+            sb.append(andPortList.get(i).getCia().value());
             if (i < andPortList.size() - 1) {
                 sb.append(";");
             }
