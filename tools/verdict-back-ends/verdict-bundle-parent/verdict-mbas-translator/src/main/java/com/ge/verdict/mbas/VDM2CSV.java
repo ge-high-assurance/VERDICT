@@ -13,16 +13,13 @@ import java.util.function.Supplier;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
-import verdict.vdm.vdm_model.ComponentKindType;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.CyberExpr;
 import verdict.vdm.vdm_model.CyberRel;
 import verdict.vdm.vdm_model.CyberReq;
-import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.PedigreeType;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {
@@ -60,20 +57,12 @@ public class VDM2CSV extends VdmTranslator {
 
         Table scnArchTable = buildScnArchTable(model, scenario);
         Table scnCompPropsTable = buildScnCompPropsTable(model, scenario);
-        Table scnCompTable = buildScnCompTable(model, scenario);
         Table compDepTable = buildCompDepTable(model);
         Table missionTable = buildMissionTable(model, scenario);
         // New CSV files
         Table scnConnectionPropsTable = buildScnConnectionPropsTable(model, scenario);
         Table compSafTable = buildCompSafTable(model, scenario);
         Table eventsTable = buildEventsTable(model, scenario);
-
-        // Replace all dots with underscores
-        //        scnArchTable.setReplaceDots(true);
-        //        scnCompPropsTable.setReplaceDots(true);
-        //        scnCompTable.setReplaceDots(true);
-        //        compDepTable.setReplaceDots(true);
-        //        missionTable.setReplaceDots(true);
 
         // Generate STEM input
         scnArchTable.toCsvFile(new File(stemOutputPath, "ScnArch.csv"));
@@ -82,7 +71,6 @@ public class VDM2CSV extends VdmTranslator {
 
         // Generate Soteria_pp input
         scnArchTable.toCsvFile(new File(soteriaOutputPath, "ScnArch.csv"));
-        scnCompTable.toCsvFile(new File(soteriaOutputPath, "ScnComp.csv"));
         compDepTable.toCsvFile(new File(soteriaOutputPath, "CompDep.csv"));
         missionTable.toCsvFile(new File(soteriaOutputPath, "Mission.csv"));
         compSafTable.toCsvFile(new File(soteriaOutputPath, "CompSaf.csv"));
@@ -98,13 +86,13 @@ public class VDM2CSV extends VdmTranslator {
      */
     private Table buildCompSafTable(Model model, String scenario) {
         Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
-//        for (ComponentType comp : model.getComponentType()) {
-//            table.addValue(comp.getName()); // comp
-            //        	for(SafetyRel rel : comp.getSafetyRel()) {
-            //
-            //        	}
-//            table.capRow();
-//        }
+        //        for (ComponentType comp : model.getComponentType()) {
+        //            table.addValue(comp.getName()); // comp
+        //        	for(SafetyRel rel : comp.getSafetyRel()) {
+        //
+        //        	}
+        //            table.capRow();
+        //        }
 
         return table;
     }
@@ -117,14 +105,14 @@ public class VDM2CSV extends VdmTranslator {
      * @return
      */
     private Table buildEventsTable(Model model, String scenario) {
-        Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
-//        for (ComponentType comp : model.getComponentType()) {
-//            table.addValue(comp.getName()); // comp
-            //        	for(SafetyRel rel : comp.getSafetyRel()) {
-            //
-            //        	}
-//            table.capRow();
-//        }
+        Table table = new Table("Comp", "Event", "Probability");
+        //        for (ComponentType comp : model.getComponentType()) {
+        //            table.addValue(comp.getName()); // comp
+        //        	for(SafetyRel rel : comp.getSafetyRel()) {
+        //
+        //        	}
+        //            table.capRow();
+        //        }
 
         return table;
     }
@@ -153,8 +141,7 @@ public class VDM2CSV extends VdmTranslator {
                         "Flow2",
                         "Flow3",
                         "trustedConnection",
-                        "encryptedTransmission",
-                        "encryptedTransmissionDAL");
+                        "encryptedTransmission");
         for (ComponentImpl comp : model.getComponentImpl()) {
             // if a component implementation does have connections, we continue
             if (comp.getBlockImpl() == null || comp.getBlockImpl().getConnection() == null) {
@@ -204,7 +191,7 @@ public class VDM2CSV extends VdmTranslator {
                                                     .getName())); // src comp instance
 
                 } else if (connection.getSource().getComponentPort() != null) {
-                    table.addValue(comp.getType().getName()); // src comp type
+                    table.addValue(comp.getType().getName()); // src comp
                     table.addValue(comp.getName()); // src comp impl
                     table.addValue(""); // src comp instance
                 }
@@ -245,17 +232,37 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(""); // dest comp instance
                 }
 
-                String flow = connection.getFlowType().name();
+                String flow = connection.getFlowType().value();
 
-                table.addValue("XDATA".equals(flow) ? "Xdata" : ""); // flow1
-                table.addValue("CONTROL".equals(flow) ? "Control" : ""); // flow2
-                table.addValue("DATA".equals(flow) ? "Data" : ""); // flow3
+                table.addValue("xdata".equals(flow.toLowerCase()) ? "Xdata" : ""); // flow1
+                table.addValue("xcontrol".equals(flow.toLowerCase()) ? "Xcontrol" : ""); // flow2
+                table.addValue("xrequest".equals(flow.toLowerCase()) ? "Xrequest" : ""); // flow3
                 // add the value for trustedConnection
+                if (connection.isTrustedConnection() != null) {
+                    if (connection.isTrustedConnection()) {
+                        table.addValue("1");
+                    } else {
+                        table.addValue("0");
+                    }
+                } else {
+                    table.addValue("");
+                }
 
                 // add the value for encryptedTransmission
-
-                // add value for encryptedTransmissionDAL
-
+                if (connection.isEncryptedTransmission() != null) {
+                    if (connection.isEncryptedTransmission()) {
+                        if (connection.getEncryptedTransmissionDAL() != null) {
+                            table.addValue(
+                                    "1#"
+                                            + String.valueOf(
+                                                    connection.getEncryptedTransmissionDAL()));
+                        }
+                    } else {
+                        table.addValue("0");
+                    }
+                } else {
+                    table.addValue("");
+                }
                 table.capRow();
             }
         }
@@ -518,47 +525,47 @@ public class VDM2CSV extends VdmTranslator {
             // 42 props with DAL The columns below are to be filled with 1#N,
             // where 1 is for true, # is the separator, and N is the DAL number
             "antiJamming",
-            "antiJammingDAL",
+            //            "antiJammingDAL",
             "auditMessageResponses",
-            "auditMessageResponsesDAL",
+            //            "auditMessageResponsesDAL",
             "deviceAuthentication",
-            "deviceAuthenticationDAL",
+            //            "deviceAuthenticationDAL",
             "dosProtection",
-            "dosProtectionDAL",
+            //            "dosProtectionDAL",
             "encryptedStorage",
-            "encryptedStorageDAL",
+            //            "encryptedStorageDAL",
             "heterogeneity",
-            "heterogeneityDAL",
+            //            "heterogeneityDAL",
             "inputValidation",
-            "inputValidationDAL",
+            //            "inputValidationDAL",
             "logging",
-            "loggingDAL",
+            //            "loggingDAL",
             "memoryProtection",
-            "memoryProtectionDAL",
+            //            "memoryProtectionDAL",
             "physicalAccessControl",
-            "physicalAccessControlDAL",
+            //            "physicalAccessControlDAL",
             "removeIdentifyingInformation",
-            "removeIdentifyingInformationDAL",
+            //            "removeIdentifyingInformationDAL",
             "resourceAvailability",
-            "resourceAvailabilityDAL",
+            //            "resourceAvailabilityDAL",
             "resourceIsolation",
-            "resourceIsolationDAL",
+            //            "resourceIsolationDAL",
             "secureBoot",
-            "secureBootDAL",
+            //            "secureBootDAL",
             "sessionAuthenticity",
-            "sessionAuthenticityDAL",
+            //            "sessionAuthenticityDAL",
             "staticCodeAnalysis",
-            "staticCodeAnalysisDAL",
+            //            "staticCodeAnalysisDAL",
             "strongCryptoAlgorithms",
-            "strongCryptoAlgorithmsDAL",
+            //            "strongCryptoAlgorithmsDAL",
             "supplyChainSecurity",
-            "supplyChainSecurityDAL",
+            //            "supplyChainSecurityDAL",
             "systemAccessControl",
-            "systemAccessControlDAL",
+            //            "systemAccessControlDAL",
             "tamperProtection",
-            "tamperProtectionDAL",
+            //            "tamperProtectionDAL",
             "userAuthentication",
-            "userAuthenticationDAL",
+            //            "userAuthenticationDAL",
 
             // 12 Cyber Attack Properties from TA1
             "Configuration_Attack",
@@ -572,7 +579,7 @@ public class VDM2CSV extends VdmTranslator {
             "Excessive_Allocation_Attack",
             "Sniffing_Attack",
             "Buffer_Attack",
-            "Flooding_Attack"            
+            "Flooding_Attack"
 
             //            "broadcastFromOutsideTB",
             //            "wifiFromOutsideTB",
@@ -586,7 +593,7 @@ public class VDM2CSV extends VdmTranslator {
         // Methods for determining property DALs (0-9)
         Method[] getDalMethods = new Method[props.length];
         // Methods for getting the property enum value
-        Method[] getPropMethods = new Method[props.length];
+        //        Method[] getPropMethods = new Method[props.length];
 
         // Find methods for all properties
         Class<ComponentInstance> cls = ComponentInstance.class;
@@ -604,21 +611,10 @@ public class VDM2CSV extends VdmTranslator {
             // Find getXxxDal method
             try {
                 Method method =
-                        cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName) + "Dal");
+                        cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName) + "DAL");
                 // Check return type
                 if (Integer.class.equals(method.getReturnType())) {
                     getDalMethods[i] = method;
-                }
-            } catch (Exception e) {
-            }
-            // Find getXxx method (need to make sure the property is "ComponentKind" or "Pedigree")
-            try {
-                Method method = cls.getDeclaredMethod("get" + capitalizeFirstLetter(propName));
-                // Check return type
-                if (PedigreeType.class.equals(method.getReturnType())) {
-                    getPropMethods[i] = method;
-                } else if (KindOfComponent.class.equals(method.getReturnType())) {
-                    getPropMethods[i] = method;
                 }
             } catch (Exception e) {
             }
@@ -650,9 +646,12 @@ public class VDM2CSV extends VdmTranslator {
 
                 for (int i = 0; i < props.length; i++) {
                     // Perform reflection. invokeMethod() handles most of the nasty bits.
-                    // We checked the return types of the methods above, so this is type-safe.                    
+                    // We checked the return types of the methods above, so this is type-safe.
+                    isProp = null;
                     dal = invokeMethod(inst, getDalMethods[i], -1);
-                    isProp = invokeMethod(inst, isPropMethods[i], false) ? "1" : "";
+                    if (invokeMethod(inst, isPropMethods[i], null) != null) {
+                        isProp = invokeMethod(inst, isPropMethods[i], false) ? "1" : "0";
+                    }
 
                     if (!Integer.valueOf(-1).equals(dal)) {
                         // DAL is provided for this property and it is set in this particular case
@@ -660,19 +659,49 @@ public class VDM2CSV extends VdmTranslator {
                         // In practice this should only be true when the property is present (output
                         // "1")
                         table.addValue(isProp + "#" + dal.toString());
-                    } else if(!isProp.equals("")){
+                    } else if (isProp != null) {
                         // No DAL information available
                         table.addValue(isProp);
                     } else {
-                        if (PedigreeType.class.equals(getPropMethods[i].getReturnType())) {
-                        	PedigreeType pedigreeType = invokeMethod(inst, getDalMethods[i], PedigreeType.INTERNALLY_DEVELOPED);
-                        	table.addValue(pedigreeType.name());
-                        } else if (KindOfComponent.class.equals(getPropMethods[i].getReturnType())) {
-                        	KindOfComponent componentKind = invokeMethod(inst, getDalMethods[i], KindOfComponent.HARDWARE);
-                        	table.addValue(componentKind.name());                        	
+                        if (props[i].equals("pedigree")) {
+                            if (inst.getPedigree() != null) {
+                                table.addValue(inst.getPedigree().name());
+                            } else {
+                                table.addValue("");
+                            }
+                        } else if (props[i].equals("componentKind")) {
+                            if (inst.getComponentKind() != null) {
+                                table.addValue(inst.getComponentKind().name());
+                            } else {
+                                table.addValue("");
+                            }
                         } else {
-                        	errAndExit("Cannot reach here!");
+                            table.addValue("");
                         }
+
+                        //                        if (getPropMethods[i] != null) {
+                        //                            if
+                        // (PedigreeType.class.equals(getPropMethods[i].getReturnType())) {
+                        //                                PedigreeType pedigreeType =
+                        //                                        invokeMethod(
+                        //                                                inst,
+                        //                                                getDalMethods[i],
+                        //
+                        // PedigreeType.INTERNALLY_DEVELOPED);
+                        //                                table.addValue(pedigreeType.name());
+                        //                            } else if (KindOfComponent.class.equals(
+                        //                                    getPropMethods[i].getReturnType())) {
+                        //                                KindOfComponent componentKind =
+                        //                                        invokeMethod(
+                        //                                                inst, getDalMethods[i],
+                        // KindOfComponent.HARDWARE);
+                        //                                table.addValue(componentKind.name());
+                        //                            } else {
+                        //                                errAndExit("Cannot reach here!");
+                        //                            }
+                        //                        } else {
+                        //                            table.addValue("");
+                        //                        }
                     }
                 }
 
@@ -770,9 +799,14 @@ public class VDM2CSV extends VdmTranslator {
             // Terminate when we get to an AND expr, because of limitations of Soteria_pp
             List<CIAPort> andPorts = new ArrayList<>();
             for (CyberExpr and : expr.getAnd().getExpr()) {
-                andPorts.add(and.getPort());
-                ports.add(andPorts);
+                if (and.getPort() != null) {
+                    andPorts.add(and.getPort());
+                } else {
+                    errAndExit(
+                            "MBAA only supports a dijunction of conjunctions of ports' CIA in cyber relatioins! Something unexpected!");
+                }
             }
+            ports.add(andPorts);
             //            if (expr.getAnd().getExpr().size() > 1) {
             //                System.err.println("MBAS does not currently support AND expressions");
             //                throw new RuntimeException("AND not supported");
@@ -786,9 +820,10 @@ public class VDM2CSV extends VdmTranslator {
         } else if (expr.getNot() != null) {
             System.err.println("Error: MBAS does not currently support NOT expressions");
             throw new RuntimeException("NOT not supported");
+        } else {
+            throw new RuntimeException("We don't supported other operator yet: " + expr.getKind());
         }
     }
-
 
     /**
      * Build the component dependency table.
@@ -848,7 +883,7 @@ public class VDM2CSV extends VdmTranslator {
      * @return
      */
     private Table buildMissionTable(Model model, String scenario) {
-    	// 12 Headers
+        // 12 Headers
         Table table =
                 new Table(
                         "ModelVersion",
@@ -862,7 +897,7 @@ public class VDM2CSV extends VdmTranslator {
                         "CompInstanceDependency",
                         "CompOutputDependency",
                         "DependentCompOutputCIA",
-                        "ReqType" );
+                        "ReqType");
 
         // Map output ports (the name in the system implementation
         // not necessarily the name in the component type) to component instance names
@@ -944,25 +979,28 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(getStrNullChk(() -> mission.getName())); // mission req
                     table.addValue(req.getId()); // cyber req ID
                     table.addValue(getStrNullChk(() -> req.getName())); // cyber req
-                    table.addValue(
-                            getStrNullChk(() -> req.getCia().name())); // mission impact CIA
+                    table.addValue(getStrNullChk(() -> req.getCia().name())); // mission impact CIA
                     table.addValue(""); // effect
                     table.addValue(req.getSeverity().name()); // Severity
                     // Get the name of the component with this output port, determined above
                     table.addValue(
                             convertCompOrSrcPortDepToStr(
-                                    outportToDepComps, andPortList)); // comp instance dependency (one layer inwards)
+                                    outportToDepComps,
+                                    andPortList)); // comp instance dependency (one layer inwards)
                     table.addValue(
                             convertCompOrSrcPortDepToStr(
-                                    outportToSrcCompPort, andPortList)); // comp output dependency (one layer inwards)
-                    
-                    table.addValue(convertListOfPortCIAToStr(andPortList)); // Dependent Component Output CIA
-                    table.addValue("Cyber"); // cyber for req type 
+                                    outportToSrcCompPort,
+                                    andPortList)); // comp output dependency (one layer inwards)
+
+                    table.addValue(
+                            convertListOfPortCIAToStr(
+                                    andPortList)); // Dependent Component Output CIA
+                    table.addValue("Cyber"); // cyber for req type
                     table.capRow();
                 }
             }
         }
-        
+
         // also need to iterate over SafetyReq
 
         return table;
@@ -989,7 +1027,8 @@ public class VDM2CSV extends VdmTranslator {
      * Find outports' dependencies in conditions of a CyberReq or SafetyReq and convert the
      * dependencies to string with ";" to indicate AND
      */
-    public String convertCompOrSrcPortDepToStr(Map<String, String> portToDepCompOrPortmap, List<CIAPort> andPortList) {
+    public String convertCompOrSrcPortDepToStr(
+            Map<String, String> portToDepCompOrPortmap, List<CIAPort> andPortList) {
         StringBuilder sb = new StringBuilder("");
         List<String> compNames = new ArrayList<>();
 
@@ -1031,9 +1070,9 @@ public class VDM2CSV extends VdmTranslator {
         }
         return sb.toString();
     }
-    
+
     private void errAndExit(String msg) {
-    	System.err.println("Error: " + msg);
-    	System.exit(-1);
+        System.err.println("Error: " + msg);
+        System.exit(-1);
     }
 }
