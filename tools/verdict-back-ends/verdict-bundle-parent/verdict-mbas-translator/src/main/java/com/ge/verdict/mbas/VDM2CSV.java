@@ -662,46 +662,20 @@ public class VDM2CSV extends VdmTranslator {
                     } else if (isProp != null) {
                         // No DAL information available
                         table.addValue(isProp);
-                    } else {
-                        if (props[i].equals("pedigree")) {
-                            if (inst.getPedigree() != null) {
-                                table.addValue(inst.getPedigree().value());
-                            } else {
-                                table.addValue("");
-                            }
-                        } else if (props[i].equals("componentKind")) {
-                            if (inst.getComponentKind() != null) {
-                                table.addValue(inst.getComponentKind().value());
-                            } else {
-                                table.addValue("");
-                            }
+                    } else if (props[i].equals("pedigree")) {
+                        if (inst.getPedigree() != null) {
+                            table.addValue(inst.getPedigree().value());
                         } else {
                             table.addValue("");
                         }
-
-                        //                        if (getPropMethods[i] != null) {
-                        //                            if
-                        // (PedigreeType.class.equals(getPropMethods[i].getReturnType())) {
-                        //                                PedigreeType pedigreeType =
-                        //                                        invokeMethod(
-                        //                                                inst,
-                        //                                                getDalMethods[i],
-                        //
-                        // PedigreeType.INTERNALLY_DEVELOPED);
-                        //                                table.addValue(pedigreeType.value());
-                        //                            } else if (KindOfComponent.class.equals(
-                        //                                    getPropMethods[i].getReturnType())) {
-                        //                                KindOfComponent componentKind =
-                        //                                        invokeMethod(
-                        //                                                inst, getDalMethods[i],
-                        // KindOfComponent.HARDWARE);
-                        //                                table.addValue(componentKind.value());
-                        //                            } else {
-                        //                                errAndExit("Cannot reach here!");
-                        //                            }
-                        //                        } else {
-                        //                            table.addValue("");
-                        //                        }
+                    } else if (props[i].equals("componentKind")) {
+                        if (inst.getComponentKind() != null) {
+                            table.addValue(inst.getComponentKind().value());
+                        } else {
+                            table.addValue("");
+                        }
+                    } else {
+                        table.addValue("");
                     }
                 }
 
