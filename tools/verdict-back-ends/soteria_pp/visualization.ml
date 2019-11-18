@@ -1071,7 +1071,7 @@ let report_gen_likelihoodCutImp ?risk:(r="") ?header:(h="") file adtree =
 
 (** This function generates a report with the top-level likelihood, the likelihood of 
     each cutset, and the cutset list. *)
-let saveCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtree =
+let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtree =
    if (Sys.file_exists file = `Yes) then Sys.command_exn("rm " ^ file);
    (* if header file is specified, then copy it as the cutset file *)
    if (not(String.is_empty h) && (Sys.file_exists h = `Yes )) then Sys.command_exn("cp " ^ h ^ " " ^ file);
@@ -1091,7 +1091,6 @@ let saveCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtr
     Out_channel.close ch ;
     )
 ;;
-
 
 let rec get_comp_name adexpL =
    match adexpL with
