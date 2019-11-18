@@ -28,6 +28,9 @@
             <element name="dataflowCode" type="vdm_lustre:LustreProgram"
                 maxOccurs="1" minOccurs="0">
             </element>
+            <element name="safetyReq" type="vdm_model:SafetyReq"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>            
             <element name="cyberReq" type="vdm_model:CyberReq"
                 minOccurs="0" maxOccurs="unbounded">
             </element>
@@ -47,6 +50,10 @@
             </element>
             <element name="cyberRel" type="vdm_model:CyberRel"
                 minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="safetyRel" type="vdm_model:SafetyRel"
+                minOccurs="0" maxOccurs="unbounded"></element>   
+            <element name="event" type="vdm_model:Event"
+                minOccurs="0" maxOccurs="unbounded"></element>                                
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
@@ -395,7 +402,7 @@
             <element name="cia" type="vdm_model:CIA" minOccurs="1"
                 maxOccurs="1"></element>
         </sequence>
-    </complexType>
+    </complexType>   
 
     <simpleType name="CIA">
         <restriction base="string">
@@ -404,6 +411,7 @@
             <enumeration value="Availability"></enumeration>
         </restriction>
     </simpleType>
+       
 
     <simpleType name="CyberExprKind">
         <restriction base="string">
@@ -480,6 +488,147 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
+    
+    
+    <!-- Safety related stuff -->
+
+
+    <!-- Safety relation expression -->         
+    <complexType name="IAPort">
+        <sequence>
+            <element name="name" type="string" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="ia" type="vdm_model:IA" minOccurs="1"
+                maxOccurs="1"></element>
+        </sequence>
+    </complexType>    
+    
+    <complexType name="EventHappens">
+        <sequence>
+            <element name="happens"></element>
+            <element name="eventName" type="string" minOccurs="1"
+                maxOccurs="1"></element>
+        </sequence>
+    </complexType>       
+        
+    <simpleType name="IA">
+        <restriction base="string">
+            <enumeration value="Integrity"></enumeration>
+            <enumeration value="Availability"></enumeration>
+        </restriction>
+    </simpleType>    
+    
+    <complexType name="SafetyRelExpr">
+        <choice>
+            <element name="kind" type="vdm_model:SafetyRelExprKind"></element>
+            <element name="port" type="vdm_model:IAPort"></element>
+            <element name="event" type="vdm_model:EventHappens"></element>
+            <element name="and" type="vdm_model:SafetyRelExprList"></element>
+            <element name="or" type="vdm_model:SafetyRelExprList"></element>
+            <element name="not" type="vdm_model:SafetyRelExpr"></element>
+        </choice>
+    </complexType>            
+    
+    <complexType name="SafetyRelExprList">
+        <sequence>
+            <element name="expr" type="vdm_model:SafetyRelExpr" minOccurs="1"
+                maxOccurs="unbounded"></element>
+        </sequence>
+    </complexType>      
+
+    <simpleType name="SafetyRelExprKind">
+        <restriction base="string">
+            <enumeration value="Port"></enumeration>
+            <enumeration value="Event"></enumeration>
+            <enumeration value="And"></enumeration>
+            <enumeration value="Or"></enumeration>
+            <enumeration value="Not"></enumeration>
+        </restriction>
+    </simpleType>
+    
+	<!-- Safety requirements expression -->    
+    
+    <simpleType name="SafetyReqExprKind">
+        <restriction base="string">
+            <enumeration value="Port"></enumeration>
+            <enumeration value="And"></enumeration>
+            <enumeration value="Or"></enumeration>
+            <enumeration value="Not"></enumeration>
+        </restriction>
+    </simpleType>    
+    
+    <complexType name="SafetyReqExpr">
+        <choice>
+            <element name="kind" type="vdm_model:SafetyReqExprKind"></element>
+            <element name="port" type="vdm_model:IAPort"></element>
+            <element name="and" type="vdm_model:SafetyReqExprList"></element>
+            <element name="or" type="vdm_model:SafetyReqExprList"></element>
+            <element name="not" type="vdm_model:SafetyReqExpr"></element>
+        </choice>
+    </complexType> 
+    
+    <complexType name="SafetyReqExprList">
+        <sequence>
+            <element name="expr" type="vdm_model:SafetyReqExpr" minOccurs="1"
+                maxOccurs="unbounded"></element>
+        </sequence>
+    </complexType>        
+    
+    
+    <complexType name="SafetyRel">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="output" type="vdm_model:IAPort" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="inputs" type="vdm_model:SafetyRelExpr"
+                minOccurs="0" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>  
+    
+    <complexType name="SafetyReq">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="condition" type="vdm_model:SafetyReqExpr"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>      
+    
+    <complexType name="Event">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="probability" type="vdm_model:Prop"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>       
+
+    <simpleType name="Prop">
+        <restriction base="string">
+            <pattern value="[0-9]+[.]?[0-9]+e[-][0-9]+"></pattern>
+        </restriction>
+    </simpleType>
 
     <complexType name="Mission">
         <sequence>
