@@ -50,6 +50,7 @@
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
+        <attribute name="compCateg" type="vdm_model:Categ"></attribute>
     </complexType>
 
     <complexType name="ComponentImpl">
@@ -507,4 +508,23 @@
             <enumeration value="Sourced"></enumeration>
         </restriction>
     </simpleType>
+    
+    <simpleType name="Categ">
+        <restriction base="string">
+            <enumeration value="abstract"></enumeration>
+            <enumeration value="bus"></enumeration>
+            <enumeration value="data"></enumeration>
+            <enumeration value="device"></enumeration>
+            <enumeration value="memory"></enumeration>
+            <enumeration value="process"></enumeration>
+            <enumeration value="processor"></enumeration>
+            <enumeration value="subprogram"></enumeration>
+            <enumeration value="subprogram group"></enumeration>
+            <enumeration value="system"></enumeration>
+            <enumeration value="thread group"></enumeration>
+            <enumeration value="thread"></enumeration>   
+            <enumeration value="virtual bus"></enumeration>
+            <enumeration value="virtual processor"></enumeration>                        
+        </restriction>
+    </simpleType>    
 </schema>
