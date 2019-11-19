@@ -57,7 +57,7 @@
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-        <attribute name="compCateg" type="vdm_model:Categ"></attribute>
+        <attribute name="compCateg" type="string"></attribute>
     </complexType>
 
     <complexType name="ComponentImpl">
