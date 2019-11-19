@@ -35,6 +35,7 @@ type ComponentInstance {
 	specification: ComponentType;
 	implementation: ComponentImpl;
 	
+	compCateg: Option<String>;
 	manufacturer: Option<ManufacturerType>;
 	pedigree: Option<PedigreeType>;
 	category: Option<String>;
