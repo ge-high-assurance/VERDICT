@@ -996,6 +996,8 @@ let pp_print_comp_instance_properties ppf
 *)
   }
 =
+  Format.fprintf ppf "ci.compCateg = %a &&@,"
+    pp_print_string_prop_value (Some "system");
   Format.fprintf ppf "ci.manufacturer = %a &&@,"
     pp_print_manufacturer_prop_value manufacturer;
   Format.fprintf ppf "ci.pedigree = %a &&@,"
