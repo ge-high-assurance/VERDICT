@@ -509,7 +509,7 @@ public class VDM2CSV extends VdmTranslator {
             "canReceiveSWUpdate",
             "hasSensitiveInfo",
             "insideTrustedBoundary",
-            "componentKind", // enum type
+            "componentType", // enum type
             "pedigree", // enum type
             "controlReceivedFromUntrusted",
             "dataReceivedFromUntrusted",
@@ -662,7 +662,7 @@ public class VDM2CSV extends VdmTranslator {
                         } else {
                             table.addValue("");
                         }
-                    } else if (props[i].equals("componentKind")) {
+                    } else if (props[i].equals("componentType")) {
                         if (inst.getComponentKind() != null) {
                             table.addValue(inst.getComponentKind().value());
                         } else {
