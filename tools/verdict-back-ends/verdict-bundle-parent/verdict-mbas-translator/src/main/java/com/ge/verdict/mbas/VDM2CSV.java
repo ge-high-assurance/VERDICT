@@ -163,14 +163,11 @@ public class VDM2CSV extends VdmTranslator {
                 // Source port can be either a subcomponent port or a component port
                 if (connection.getSource().getSubcomponentPort() != null) {
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getSource()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getSpecification()
-                                                    .getName())); // src comp
+                            getCompTypeName(
+                                    connection
+                                            .getSource()
+                                            .getSubcomponentPort()
+                                            .getSubcomponent())); // src comp type
                     table.addValue(
                             getStrNullChk(
                                     () ->
@@ -182,13 +179,11 @@ public class VDM2CSV extends VdmTranslator {
                                                     .getName())); // src comp impl
 
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getSource()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getName())); // src comp instance
+                            connection
+                                    .getSource()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()); // src comp instance
 
                 } else if (connection.getSource().getComponentPort() != null) {
                     table.addValue(comp.getType().getName()); // src comp
@@ -199,14 +194,11 @@ public class VDM2CSV extends VdmTranslator {
                 // Destination port can be either a subcomponent port or a component port
                 if (connection.getDestination().getSubcomponentPort() != null) {
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getDestination()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getSpecification()
-                                                    .getName())); // dest comp
+                            getCompTypeName(
+                                    connection
+                                            .getDestination()
+                                            .getSubcomponentPort()
+                                            .getSubcomponent())); // dest comp type
 
                     table.addValue(
                             getStrNullChk(
@@ -218,13 +210,11 @@ public class VDM2CSV extends VdmTranslator {
                                                     .getImplementation()
                                                     .getName())); // dest comp impl
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getDestination()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getName())); // dest comp instance
+                            connection
+                                    .getDestination()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()); // dest comp instance
                 } else if (connection.getDestination().getComponentPort() != null) {
                     table.addValue(comp.getType().getName()); // dest comp type
 
@@ -268,6 +258,19 @@ public class VDM2CSV extends VdmTranslator {
         }
 
         return table;
+    }
+
+    private String getCompTypeName(ComponentInstance ci) {
+        String compTypeName = "";
+        if (ci.getSpecification() != null) {
+            compTypeName = ci.getSpecification().getName();
+        } else if (ci.getImplementation() != null) {
+            compTypeName = ci.getImplementation().getType().getName();
+        } else {
+            errAndExit(
+                    "Cannot reach here, something is wrong with component instance declaratioins!");
+        }
+        return compTypeName;
     }
 
     /**
@@ -326,14 +329,12 @@ public class VDM2CSV extends VdmTranslator {
                 // Source port can be either a subcomponent port or a component port
                 if (connection.getSource().getSubcomponentPort() != null) {
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getSource()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getSpecification()
-                                                    .getName())); // src comp
+                            getCompTypeName(
+                                    connection
+                                            .getSource()
+                                            .getSubcomponentPort()
+                                            .getSubcomponent())); // src comp type
+
                     table.addValue(
                             getStrNullChk(
                                     () ->
@@ -345,13 +346,11 @@ public class VDM2CSV extends VdmTranslator {
                                                     .getName())); // src comp impl
 
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getSource()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getName())); // src comp instance
+                            connection
+                                    .getSource()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()); // src comp instance
                     table.addValue(""); // src comp category
                     table.addValue(
                             getStrNullChk(
@@ -386,14 +385,11 @@ public class VDM2CSV extends VdmTranslator {
                 // Destination port can be either a subcomponent port or a component port
                 if (connection.getDestination().getSubcomponentPort() != null) {
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getDestination()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getSpecification()
-                                                    .getName())); // dest comp
+                            getCompTypeName(
+                                    connection
+                                            .getDestination()
+                                            .getSubcomponentPort()
+                                            .getSubcomponent())); // dest comp type
 
                     table.addValue(
                             getStrNullChk(
@@ -405,13 +401,11 @@ public class VDM2CSV extends VdmTranslator {
                                                     .getImplementation()
                                                     .getName())); // dest comp impl
                     table.addValue(
-                            getStrNullChk(
-                                    () ->
-                                            connection
-                                                    .getDestination()
-                                                    .getSubcomponentPort()
-                                                    .getSubcomponent()
-                                                    .getName())); // dest comp instance
+                            connection
+                                    .getDestination()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()); // dest comp instance
                     table.addValue(""); // dest comp category
                     table.addValue(
                             getStrNullChk(
@@ -632,13 +626,13 @@ public class VDM2CSV extends VdmTranslator {
             }
 
             for (ComponentInstance inst : comp.getBlockImpl().getSubcomponent()) {
-                if (inst.getSpecification() == null) {
-                    continue;
-                }
+                //                if (inst.getSpecification() == null) {
+                //                    continue;
+                //                }
 
                 table.addValue(scenario); // scenario
 
-                table.addValue(getStrNullChk(() -> inst.getSpecification().getName())); // comp type
+                table.addValue(getCompTypeName(inst)); // comp type
                 table.addValue(
                         getStrNullChk(() -> inst.getImplementation().getName())); // // comp impl
 
@@ -678,62 +672,6 @@ public class VDM2CSV extends VdmTranslator {
                         table.addValue("");
                     }
                 }
-
-                table.capRow();
-            }
-        }
-
-        return table;
-    }
-
-    /**
-     * Build the scenario component table.
-     *
-     * <p>Lists component types with parent information and the number of instances.
-     *
-     * @param model
-     * @param scenario
-     * @return
-     */
-    private Table buildScnCompTable(Model model, String scenario) {
-        Table table = new Table("Scenario", "Parent", "CompType", "Cardinality");
-
-        // Count component instances
-        Map<String, Integer> compCounts = new HashMap<>();
-        if (model.getComponentImpl() != null) {
-            for (ComponentImpl comp : model.getComponentImpl()) {
-                if (comp.getBlockImpl() == null || comp.getBlockImpl().getSubcomponent() == null) {
-                    continue;
-                }
-                for (ComponentInstance inst : comp.getBlockImpl().getSubcomponent()) {
-                    if (inst.getSpecification() == null
-                            || inst.getSpecification().getName() == null) {
-                        continue;
-                    }
-                    // Found an instance
-                    String key = inst.getSpecification().getName();
-                    compCounts.put(key, compCounts.getOrDefault(key, 0) + 1);
-                }
-            }
-        }
-
-        for (ComponentImpl comp : model.getComponentImpl()) {
-            if (comp.getBlockImpl() == null) {
-                continue;
-            }
-
-            for (ComponentInstance inst : comp.getBlockImpl().getSubcomponent()) {
-                if (inst.getSpecification() == null || inst.getSpecification().getName() == null) {
-                    continue;
-                }
-
-                table.addValue(scenario); // scenario
-                table.addValue(comp.getType().getName()); // parent
-                table.addValue(inst.getSpecification().getName()); // comp type
-                // Get number of component instances counted above
-                table.addValue(
-                        Integer.toString(
-                                compCounts.get(inst.getSpecification().getName()))); // cardinality
 
                 table.capRow();
             }
