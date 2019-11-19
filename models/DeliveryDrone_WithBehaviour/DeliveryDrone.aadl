@@ -152,7 +152,67 @@ public
 			
 			p: out data port Data_Types::ProbePlannerSignals.impl;
 			
+			-- added
+			environmental_events: in data port Data_Types::EnvironmentalEvents.impl;
+			
 		annex agree {** 
+			-- events ?
+			eq on_off: bool = bus_in.on_off;
+			eq init_criteria_satisfied: bool = environmental_events.init_criteria_satisfied;
+			eq init_criteria_failed: bool = not init_criteria_satisfied; --TODO: Check if it makes sense?
+			eq abort_cmd: bool = bus_in.abort_cmd;
+			eq unsafe_release: bool = environmental_events.unsafe_release;
+			eq mission_store_release_sequence: bool = environmental_events.mission_store_release_sequence;
+			eq package_secure: bool = environmental_events.package_secure;
+			eq okay_to_launch: bool = environmental_events.okay_to_launch;
+			eq separation: bool = environmental_events.separation;
+			eq destination_location_reached: bool = environmental_events.destination_location_reached;  --TODO: Can we compute this?
+			eq no_clearance: bool = environmental_events.no_clearance;
+			eq successfull_delivery: bool = environmental_events.successfull_delivery;
+			eq exhaustive_retries: bool = environmental_events.exhaustive_retries;
+			eq internal_error_detected: bool = environmental_events.internal_error_detected;
+			eq truck_location_reached: bool = environmental_events.truck_location_reached; --TODO: Can we compute this?
+				
+			-- state transitions
+			eq state: Data_Types::DeliveryPlannerState; -- make it as output?
+			
+			guarantee "DeliveryPlannerFSM":
+				state = (enum(Data_Types::DeliveryPlannerState, OFF) ->
+						if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off then 
+							enum(Data_Types::DeliveryPlannerState, INIT)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_satisfied then 
+							enum(Data_Types::DeliveryPlannerState, READY)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed then 
+							enum(Data_Types::DeliveryPlannerState, INIT)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and (abort_cmd or unsafe_release) then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and (abort_cmd or unsafe_release) then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (abort_cmd or unsafe_release) then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence then 
+							enum(Data_Types::DeliveryPlannerState, LAUNCH)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_secure and okay_to_launch and separation) then 
+							enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST) and destination_location_reached then 
+							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and no_clearance then 
+							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)						
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or abort_cmd or internal_error_detected) then 
+							enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK)
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached then 
+							enum(Data_Types::DeliveryPlannerState, INIT)		
+						else pre(state));
+			
+			
+			
+			-- old sections below	
 			
 			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);
 			
@@ -342,6 +402,8 @@ public
 			launch_pos: in data port Data_Types::Position.impl;
 			bus1: in data port Data_Types::InputBus.impl;
 			comm1: in data port Data_Types::RadioResponse.impl;
+			-- added
+			environmental_events: in data port Data_Types::EnvironmentalEvents.impl;
 			
 			comm2: out data port Base_Types::Boolean;
 			bus2: out data port Base_Types::Boolean;			
@@ -458,6 +520,10 @@ public
 			};
 			
 		connections
+			-- added
+			c0: port environmental_events -> deliveryplanner.environmental_events
+			{VERDICT_Properties::flowType => Xdata;};
+			
 			c1: port positionEstimator.est_pos_out -> navigation.pos_in
 			{VERDICT_Properties::flowType => Xdata;};
 			
