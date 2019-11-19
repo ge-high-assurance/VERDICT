@@ -374,6 +374,7 @@ public class App {
                 .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
             throw new VerdictRunException("STEM failed to generate all required files");
         }
+        log("STEM finished!");
 
         logHeader("Soteria++");
 
