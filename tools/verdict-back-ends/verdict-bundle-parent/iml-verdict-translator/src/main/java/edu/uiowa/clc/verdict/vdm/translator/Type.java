@@ -103,6 +103,20 @@ public enum Type {
     INTEGRITY("Integrity"),
     AVAILABILITY("Availability"),
 
+    // Safety related stuff
+    SAFETY_REQ("SafetyReq"),
+    // condition has been defined as a keyword already
+
+    SAFETY_REL("SafetyRel"),
+    //    INPUTS("inputs"),
+    //    COMMENT("comment"),
+    //    DESCRIPTION("description"),
+    //    PHASES("phases"),
+    //    EXTERN("extern"),
+    //
+    //    CIA_PORT("CIAPort"),
+    //    CIA("CIA"),
+
     SEVERITY("Severity"),
 
     CYBER_EXP("CyberExpr"),

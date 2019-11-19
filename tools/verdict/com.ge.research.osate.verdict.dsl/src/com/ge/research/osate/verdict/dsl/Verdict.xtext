@@ -193,7 +193,7 @@ SafetyRelBlock returns SafetyRel:
 ;
 
 SafetyRelShort returns SafetyRel:
-	id=STRING ('=' inputs=SafetyRelInputLogic)? ('=>' | '->') output=SafetyRelOutputLogic
+	id=STRING ('=' faultSrc=SafetyRelInputLogic)? ('=>' | '->') output=SafetyRelOutputLogic
 ;
 
 SafetyRelInputLogic: value=SLExpr;
