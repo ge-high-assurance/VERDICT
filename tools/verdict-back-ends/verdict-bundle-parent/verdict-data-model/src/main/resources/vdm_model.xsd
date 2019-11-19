@@ -30,7 +30,7 @@
             </element>
             <element name="safetyReq" type="vdm_model:SafetyReq"
                 minOccurs="0" maxOccurs="unbounded">
-            </element>            
+            </element>
             <element name="cyberReq" type="vdm_model:CyberReq"
                 minOccurs="0" maxOccurs="unbounded">
             </element>
@@ -51,9 +51,9 @@
             <element name="cyberRel" type="vdm_model:CyberRel"
                 minOccurs="0" maxOccurs="unbounded"></element>
             <element name="safetyRel" type="vdm_model:SafetyRel"
-                minOccurs="0" maxOccurs="unbounded"></element>   
-            <element name="event" type="vdm_model:Event"
-                minOccurs="0" maxOccurs="unbounded"></element>                                
+                minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="event" type="vdm_model:Event" minOccurs="0"
+                maxOccurs="unbounded"></element>
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
@@ -402,7 +402,7 @@
             <element name="cia" type="vdm_model:CIA" minOccurs="1"
                 maxOccurs="1"></element>
         </sequence>
-    </complexType>   
+    </complexType>
 
     <simpleType name="CIA">
         <restriction base="string">
@@ -411,7 +411,7 @@
             <enumeration value="Availability"></enumeration>
         </restriction>
     </simpleType>
-       
+
 
     <simpleType name="CyberExprKind">
         <restriction base="string">
@@ -488,12 +488,12 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
-    
-    
+
+
     <!-- Safety related stuff -->
 
 
-    <!-- Safety relation expression -->         
+    <!-- Safety relation expression -->
     <complexType name="IAPort">
         <sequence>
             <element name="name" type="string" minOccurs="1"
@@ -501,23 +501,23 @@
             <element name="ia" type="vdm_model:IA" minOccurs="1"
                 maxOccurs="1"></element>
         </sequence>
-    </complexType>    
-    
+    </complexType>
+
     <complexType name="EventHappens">
         <sequence>
             <element name="happens"></element>
             <element name="eventName" type="string" minOccurs="1"
                 maxOccurs="1"></element>
         </sequence>
-    </complexType>       
-        
+    </complexType>
+
     <simpleType name="IA">
         <restriction base="string">
             <enumeration value="Integrity"></enumeration>
             <enumeration value="Availability"></enumeration>
         </restriction>
-    </simpleType>    
-    
+    </simpleType>
+
     <complexType name="SafetyRelExpr">
         <choice>
             <element name="kind" type="vdm_model:SafetyRelExprKind"></element>
@@ -527,14 +527,14 @@
             <element name="or" type="vdm_model:SafetyRelExprList"></element>
             <element name="not" type="vdm_model:SafetyRelExpr"></element>
         </choice>
-    </complexType>            
-    
+    </complexType>
+
     <complexType name="SafetyRelExprList">
         <sequence>
-            <element name="expr" type="vdm_model:SafetyRelExpr" minOccurs="1"
-                maxOccurs="unbounded"></element>
+            <element name="expr" type="vdm_model:SafetyRelExpr"
+                minOccurs="1" maxOccurs="unbounded"></element>
         </sequence>
-    </complexType>      
+    </complexType>
 
     <simpleType name="SafetyRelExprKind">
         <restriction base="string">
@@ -545,9 +545,9 @@
             <enumeration value="Not"></enumeration>
         </restriction>
     </simpleType>
-    
-	<!-- Safety requirements expression -->    
-    
+
+    <!-- Safety requirements expression -->
+
     <simpleType name="SafetyReqExprKind">
         <restriction base="string">
             <enumeration value="Port"></enumeration>
@@ -555,8 +555,8 @@
             <enumeration value="Or"></enumeration>
             <enumeration value="Not"></enumeration>
         </restriction>
-    </simpleType>    
-    
+    </simpleType>
+
     <complexType name="SafetyReqExpr">
         <choice>
             <element name="kind" type="vdm_model:SafetyReqExprKind"></element>
@@ -565,16 +565,16 @@
             <element name="or" type="vdm_model:SafetyReqExprList"></element>
             <element name="not" type="vdm_model:SafetyReqExpr"></element>
         </choice>
-    </complexType> 
-    
+    </complexType>
+
     <complexType name="SafetyReqExprList">
         <sequence>
-            <element name="expr" type="vdm_model:SafetyReqExpr" minOccurs="1"
-                maxOccurs="unbounded"></element>
+            <element name="expr" type="vdm_model:SafetyReqExpr"
+                minOccurs="1" maxOccurs="unbounded"></element>
         </sequence>
-    </complexType>        
-    
-    
+    </complexType>
+
+
     <complexType name="SafetyRel">
         <sequence>
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
@@ -592,8 +592,8 @@
                 maxOccurs="1"></element>
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-    </complexType>  
-    
+    </complexType>
+
     <complexType name="SafetyReq">
         <sequence>
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
@@ -609,8 +609,8 @@
                 maxOccurs="1"></element>
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-    </complexType>      
-    
+    </complexType>
+
     <complexType name="Event">
         <sequence>
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
@@ -622,7 +622,7 @@
                 maxOccurs="1"></element>
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-    </complexType>       
+    </complexType>
 
     <simpleType name="Prop">
         <restriction base="string">
@@ -657,7 +657,7 @@
             <enumeration value="Sourced"></enumeration>
         </restriction>
     </simpleType>
-    
+
     <simpleType name="Categ">
         <restriction base="string">
             <enumeration value="abstract"></enumeration>
@@ -671,9 +671,9 @@
             <enumeration value="subprogram group"></enumeration>
             <enumeration value="system"></enumeration>
             <enumeration value="thread group"></enumeration>
-            <enumeration value="thread"></enumeration>   
+            <enumeration value="thread"></enumeration>
             <enumeration value="virtual bus"></enumeration>
-            <enumeration value="virtual processor"></enumeration>                        
+            <enumeration value="virtual processor"></enumeration>
         </restriction>
-    </simpleType>    
+    </simpleType>
 </schema>
