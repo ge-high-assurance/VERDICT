@@ -106,16 +106,14 @@ public enum Type {
     // Safety related stuff
     SAFETY_REQ("SafetyReq"),
     // condition has been defined as a keyword already
-
     SAFETY_REL("SafetyRel"),
-    //    INPUTS("inputs"),
-    //    COMMENT("comment"),
-    //    DESCRIPTION("description"),
-    //    PHASES("phases"),
-    //    EXTERN("extern"),
-    //
-    //    CIA_PORT("CIAPort"),
-    //    CIA("CIA"),
+    FAULTSRC("faultSrc"),
+    IA_PORT("IAPort"),
+    HAPPENS("happens"),
+    IA("IA"),
+    EVENT("Event"),
+    PROBABILITY("probability"),
+    // Safety related stuff ends
 
     SEVERITY("Severity"),
 
