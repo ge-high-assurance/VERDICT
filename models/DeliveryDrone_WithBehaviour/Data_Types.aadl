@@ -35,6 +35,9 @@ public
   			connected: data Base_Types::Boolean;
   			update_order: data Base_Types::Boolean;
   			order: data DeliveryOrder.impl;
+  			-- added
+  			on_off: data Base_Types::Boolean;
+  			abort_cmd: data Base_Types::Boolean;
   	end InputBus.impl;
   	
   	data RadioResponse
@@ -55,5 +58,28 @@ public
   			is_target_location: data Base_Types::Boolean;
   	end ProbePlannerSignals.impl;
  
+	data DeliveryPlannerState
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("OFF", "INIT", "READY", "LAUNCH", "ABORT", "FLYING_TO_DEST", "MAKING_DELIVERY", "RETURN_TO_TRUCK");
+	end DeliveryPlannerState; 
+	
+	data EnvironmentalEvents
+  	end EnvironmentalEvents;
   	
+  	data implementation EnvironmentalEvents.impl
+  		subcomponents
+  			init_criteria_satisfied: data Base_Types::Boolean;
+  			unsafe_release: data Base_Types::Boolean;
+  			mission_store_release_sequence: data Base_Types::Boolean;
+  			package_secure: data Base_Types::Boolean;
+  			okay_to_launch: data Base_Types::Boolean;
+  			separation: data Base_Types::Boolean;
+  			destination_location_reached: data Base_Types::Boolean; --?
+  			no_clearance: data Base_Types::Boolean;
+  			successfull_delivery: data Base_Types::Boolean;
+  			exhaustive_retries: data Base_Types::Boolean;
+  			internal_error_detected: data Base_Types::Boolean;
+  			truck_location_reached: data Base_Types::Boolean; --?
+  	end EnvironmentalEvents.impl; 	
 end Data_Types;
