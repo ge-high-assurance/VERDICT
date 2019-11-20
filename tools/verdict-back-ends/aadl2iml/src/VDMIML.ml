@@ -834,10 +834,24 @@ let pp_print_cyber_rels_list ind ppf cyber_rels =
     ppf
     (List.mapi (fun i rel -> (i, rel)) cyber_rels)
 
+let pp_print_bool_prop_value ppf = function
+  | None -> Format.fprintf ppf "mk_none<Bool>"
+  | Some v -> Format.fprintf ppf "mk_some<Bool>(%B)" v
+
+let pp_print_int_prop_value ppf = function
+  | None -> Format.fprintf ppf "mk_none<Int>"
+  | Some i -> Format.fprintf ppf "mk_some<Int>(%s)" i
+
+let pp_print_string_prop_value ppf = function
+  | None -> Format.fprintf ppf "mk_none<String>"
+  | Some s -> Format.fprintf ppf "mk_some<String>(\"%s\")" s
+
 let pp_print_component_type ind ppf {name; ports; contract; cyber_rels} =
   Format.fprintf ppf "ct.name = \"%s\" &&@," name;
   Format.fprintf ppf "ct.ports.length = %d &&@," (List.length ports);
   pp_print_port_list ind ppf ports;
+  Format.fprintf ppf "ct.compCateg = %a &&@,"
+    pp_print_string_prop_value (Some "system");
   pp_print_contract_spec_opt "ct" ind ppf contract;
   Format.fprintf ppf " &&@,ct.cyber_relations.length = %d %s@,"
     (List.length cyber_rels)
@@ -851,18 +865,6 @@ let pp_print_comp_types_list ind ppf comp_types =
     Format.fprintf ppf "%a@]@,} &&@,"
       (pp_print_component_type ind) ct
   )
-
-let pp_print_bool_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<Bool>"
-  | Some v -> Format.fprintf ppf "mk_some<Bool>(%B)" v
-
-let pp_print_int_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<Int>"
-  | Some i -> Format.fprintf ppf "mk_some<Int>(%s)" i
-
-let pp_print_string_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<String>"
-  | Some s -> Format.fprintf ppf "mk_some<String>(\"%s\")" s
 
 let pp_print_manufacturer_type ppf = function
   | ThirdParty -> Format.fprintf ppf "ManufacturerType.ThirdParty"
@@ -996,8 +998,6 @@ let pp_print_comp_instance_properties ppf
 *)
   }
 =
-  Format.fprintf ppf "ci.compCateg = %a &&@,"
-    pp_print_string_prop_value (Some "system");
   Format.fprintf ppf "ci.manufacturer = %a &&@,"
     pp_print_manufacturer_prop_value manufacturer;
   Format.fprintf ppf "ci.pedigree = %a &&@,"

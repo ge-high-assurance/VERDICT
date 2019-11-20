@@ -13,6 +13,7 @@ type Port {
 type ComponentType {
 	name: Identifier;
 	ports: ArrayList<Port>;
+	compCateg: Option<String>;
     contract: Option<ContractSpec>;
     cyber_relations: ArrayList<CyberRel>;
 };
@@ -35,7 +36,6 @@ type ComponentInstance {
 	specification: ComponentType;
 	implementation: ComponentImpl;
 	
-	compCateg: Option<String>;
 	manufacturer: Option<ManufacturerType>;
 	pedigree: Option<PedigreeType>;
 	category: Option<String>;
@@ -192,6 +192,7 @@ type CyberReq {
     extern : Option<String>;
 };
 
+
 type CyberRel {
     id : String;
     output : CIAPort;
@@ -200,6 +201,46 @@ type CyberRel {
     description : Option<String>;
     phases : Option<String>;
     extern : Option<String>;
+};
+
+type SafetyExprKind enum {Port, Fault, And, Or, Not};
+
+type IA enum {Integrity, Availability};
+
+type IAPort {
+	name: String;
+	ia: IA;
+};
+
+type SafetyExpr {
+	kind: CyberExprKind;
+	port: IAPort;
+	fault: String;
+	and: ArrayList<CyberExpr>;
+	or: ArrayList<CyberExpr>;
+	not: CyberExpr;
+};
+
+type SafetyReq {
+	id: String;
+	condition: SafetyExpr;
+	comment: Option<String>;
+    description : Option<String>;
+};
+
+type SafetyRel {
+	id: String;
+	output: IAPort;
+	faultSrc: Option<SafetyExpr>;
+	comment: Option<String>;
+    description : Option<String>;
+};
+
+type SafetyEvent {
+	id: String;
+	probability: String;
+	comment: Option<String>;
+    description : Option<String>;
 };
 
 type Mission {
