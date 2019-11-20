@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -14,11 +12,6 @@
     <packaging>jar</packaging>
 
     <name>Verdict STEM Runner</name>
-
-    <!-- Skip unit test until we get new CSV, OWL, and Template files -->
-    <properties>
-        <maven.test.skip>true</maven.test.skip>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -73,7 +66,16 @@
         </repository>
     </repositories>
 
-    <build>
+    <build><!-- Let's use the STEM project above us rather than copying it into
+            src/test/resources -->
+        <testResources>
+            <testResource>
+                <directory>${basedir}/../..</directory>
+                <includes>
+                    <include>STEM/</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>com.github.chrisdchristo</groupId>

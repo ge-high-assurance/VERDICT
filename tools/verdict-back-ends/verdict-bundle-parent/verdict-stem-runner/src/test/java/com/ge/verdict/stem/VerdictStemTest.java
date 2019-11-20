@@ -17,21 +17,23 @@ public class VerdictStemTest {
     @Test
     public void testSTEM() throws IOException {
         File projectDir = new File("target/test-classes/STEM");
-        Path outputDir = Paths.get(projectDir.getPath(), "Output");
-        Path graphsDir = Paths.get(projectDir.getPath(), "Graphs");
+        Path controlOutputDir = Paths.get(projectDir.getPath(), "Output");
+        Path controlGraphsDir = Paths.get(projectDir.getPath(), "Graphs");
+        Path testOutputDir = Paths.get(projectDir.getPath(), "Output2");
+        Path testGraphsDir = Paths.get(projectDir.getPath(), "Graphs2");
 
         // Remove the output and graphs directories first
-        if (Files.exists(outputDir)) {
+        if (Files.exists(testOutputDir)) {
             for (Path path :
-                    Files.walk(outputDir)
+                    Files.walk(testOutputDir)
                             .sorted(Comparator.reverseOrder())
                             .collect(Collectors.toList())) {
                 Files.delete(path);
             }
         }
-        if (Files.exists(graphsDir)) {
+        if (Files.exists(testGraphsDir)) {
             for (Path path :
-                    Files.walk(graphsDir)
+                    Files.walk(testGraphsDir)
                             .sorted(Comparator.reverseOrder())
                             .collect(Collectors.toList())) {
                 Files.delete(path);
@@ -40,26 +42,31 @@ public class VerdictStemTest {
 
         // Run SADL on the STEM test project
         VerdictStem stem = new VerdictStem();
-        stem.runStem(projectDir, outputDir.toFile(), graphsDir.toFile());
+        stem.runStem(projectDir, testOutputDir.toFile(), testGraphsDir.toFile());
 
         // Verify that SADL created some new files with expected contents
-        Path testFile = outputDir.resolve("CAPEC.csv");
+        Path controlFile = controlOutputDir.resolve("CAPEC.csv");
+        Path testFile = testOutputDir.resolve("CAPEC.csv");
         Assertions.assertThat(testFile).exists();
-
-        Path controlFile = Paths.get("src/test/resources/STEM/Output/CAPEC.csv");
-        String testData = new String(Files.readAllBytes(testFile));
         String controlData = new String(Files.readAllBytes(controlFile));
+        String testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
-        testFile = outputDir.resolve("Defenses.csv");
+        controlFile = controlOutputDir.resolve("Defenses.csv");
+        testFile = testOutputDir.resolve("Defenses.csv");
         Assertions.assertThat(testFile).exists();
-
-        controlFile = Paths.get("src/test/resources/STEM/Output/Defenses.csv");
-        testData = new String(Files.readAllBytes(testFile));
         controlData = new String(Files.readAllBytes(controlFile));
+        testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
-        testFile = graphsDir.resolve("Run_sadl12.svg");
+        controlFile = controlOutputDir.resolve("Defenses2NIST.csv");
+        testFile = testOutputDir.resolve("Defenses2NIST.csv");
+        Assertions.assertThat(testFile).exists();
+        controlData = new String(Files.readAllBytes(controlFile));
+        testData = new String(Files.readAllBytes(testFile));
+        Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
+
+        testFile = testGraphsDir.resolve("Run_sadl11.svg");
         Assertions.assertThat(testFile).exists();
     }
 }
