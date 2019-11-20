@@ -107,15 +107,6 @@ public class VDMParser extends Parser {
         return identifier_value;
     }
 
-    public String compCateg() {
-        String compCategVal;
-        String compCateg = token.sd.getName();
-        consume(Type.COMPCATEG);        
-        compCategVal = token.getStringValue();
-        consume(Type.String);
-        return compCategVal;
-    }
-
     // DATATYPE ::= {DATA_TYPE:t}* {DATA_TYPE_KIND, kind}
     // NULL: Plain | NULL:Enum | NULL:Subrange | NULL:ArrayType | NULL:TupleType |
     // NULL:RecordType
@@ -1505,9 +1496,6 @@ public class VDMParser extends Parser {
                 componentType.setName(identifier);
                 componentType.setId(identifier);
                 // LOGGER.info("COMPONENT TYPE: >>>>>>>>>>>" + identifier);
-            } else if (token.type == Type.COMPCATEG) {
-                String categ = compCateg();
-                componentType.setCompCateg(categ);
             }
             // PORT ARRAY LIST.
             else if (token.type == Type.ARRAY_LIST) {
@@ -1546,6 +1534,10 @@ public class VDMParser extends Parser {
                     if (token.type == Type.CONTRACT_SPEC) {
                         ContractSpec contract = contractSpec();
                         componentType.setContract(contract);
+                    } else if (token.type == Type.String) {
+                        String categ = token.getStringValue();
+                        componentType.setCompCateg(categ);
+                        consume(Type.String);
                     }
                 }
                 // Skip None

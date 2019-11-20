@@ -277,9 +277,9 @@ public class VDM2CSV extends VdmTranslator {
     private ComponentType getCompType(ComponentInstance ci) {
         ComponentType compType = null;
         if (ci.getSpecification() != null) {
-        	compType = ci.getSpecification();
+            compType = ci.getSpecification();
         } else if (ci.getImplementation() != null) {
-        	compType = ci.getImplementation().getType();
+            compType = ci.getImplementation().getType();
         } else {
             errAndExit(
                     "Cannot reach here, something is wrong with component instance declaratioins!");
@@ -342,20 +342,33 @@ public class VDM2CSV extends VdmTranslator {
 
                 // Source port can be either a subcomponent port or a component port
                 if (connection.getSource().getSubcomponentPort() != null) {
-                	CompInstancePort srcCip = connection.getSource().getSubcomponentPort();
-                	
+                    CompInstancePort srcCip = connection.getSource().getSubcomponentPort();
+
                     table.addValue(getCompTypeName(srcCip.getSubcomponent())); // src comp type
-                    table.addValue(getStrNullChk(() -> srcCip.getSubcomponent().getImplementation().getName())); // src comp impl
+                    table.addValue(
+                            getStrNullChk(
+                                    () ->
+                                            srcCip.getSubcomponent()
+                                                    .getImplementation()
+                                                    .getName())); // src comp impl
                     table.addValue(srcCip.getSubcomponent().getName()); // src comp instance
-                    table.addValue(getStrNullChk(()-> getCompType(srcCip.getSubcomponent()).getCompCateg())); // src comp category
-                    table.addValue(getStrNullChk(() -> srcCip.getPort().getName())); // src port name
+                    table.addValue(
+                            getStrNullChk(
+                                    () ->
+                                            getCompType(srcCip.getSubcomponent())
+                                                    .getCompCateg())); // src comp category
+                    table.addValue(
+                            getStrNullChk(() -> srcCip.getPort().getName())); // src port name
                     table.addValue(srcCip.getPort().getMode().value()); // src port mode: in or out
                 } else if (connection.getSource().getComponentPort() != null) {
                     table.addValue(comp.getType().getName()); // src comp type
                     table.addValue(comp.getName()); // src comp impl
                     table.addValue(""); // src comp instance
-                    table.addValue(getStrNullChk(()->comp.getType().getCompCateg())); // src comp category
-                    table.addValue(connection.getSource().getComponentPort().getName()); // src port name
+                    table.addValue(
+                            getStrNullChk(
+                                    () -> comp.getType().getCompCateg())); // src comp category
+                    table.addValue(
+                            connection.getSource().getComponentPort().getName()); // src port name
                     table.addValue(
                             connection
                                     .getSource()
@@ -366,20 +379,33 @@ public class VDM2CSV extends VdmTranslator {
 
                 // Destination port can be either a subcomponent port or a component port
                 if (connection.getDestination().getSubcomponentPort() != null) {
-                	CompInstancePort destCip = connection.getDestination().getSubcomponentPort();
-                	
+                    CompInstancePort destCip = connection.getDestination().getSubcomponentPort();
+
                     table.addValue(getCompTypeName(destCip.getSubcomponent())); // dest comp type
-                    table.addValue(getStrNullChk(() ->destCip.getSubcomponent().getImplementation().getName())); // dest comp impl
+                    table.addValue(
+                            getStrNullChk(
+                                    () ->
+                                            destCip.getSubcomponent()
+                                                    .getImplementation()
+                                                    .getName())); // dest comp impl
                     table.addValue(destCip.getSubcomponent().getName()); // dest comp instance
-                    table.addValue(getStrNullChk(()-> getCompType(destCip.getSubcomponent()).getCompCateg())); // dest comp category
-                    table.addValue(getStrNullChk(() -> destCip.getPort().getName())); // dest port name
-                    table.addValue(destCip.getPort().getMode().value()); // dest port mode: in or out
+                    table.addValue(
+                            getStrNullChk(
+                                    () ->
+                                            getCompType(destCip.getSubcomponent())
+                                                    .getCompCateg())); // dest comp category
+                    table.addValue(
+                            getStrNullChk(() -> destCip.getPort().getName())); // dest port name
+                    table.addValue(
+                            destCip.getPort().getMode().value()); // dest port mode: in or out
                 } else if (connection.getDestination().getComponentPort() != null) {
                     table.addValue(comp.getType().getName()); // dest comp type
 
                     table.addValue(comp.getName()); // dest comp impl
                     table.addValue(""); // dest comp instance
-                    table.addValue(getStrNullChk(()->comp.getType().getCompCateg())); // dest comp category
+                    table.addValue(
+                            getStrNullChk(
+                                    () -> comp.getType().getCompCateg())); // dest comp category
                     table.addValue(
                             connection
                                     .getDestination()
