@@ -27,5 +27,10 @@ public
   			are_close = p1 = p2;
 		tel;
 		
+		node Duration(p: bool) returns (r: int) ;
+		let   
+			r = (if p then 1 else 0) -> (if p then pre(r) + 1 else 0) ;
+		tel;
+		
 	**};
 end Agree_Nodes;

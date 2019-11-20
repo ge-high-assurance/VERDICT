@@ -13,10 +13,16 @@ public
 
 	system GPS
 		features
-			satellite_pos_in: in data port Data_Types::Position.impl;
-			gps_pos_out: out data port Data_Types::Position.impl;		
+			constellation_in: in data port Base_Types::Boolean;
+			satellite0_pos_in: in data port Data_Types::Position.impl;
+			satellite1_pos_in: in data port Data_Types::Position.impl;
+			gps_pos_out: out data port Data_Types::Position.impl;
+			health_check_out: out data port Base_Types::Boolean;	
 			
 		annex agree {**
+			 -- variables
+			 eq satellite_pos_in: Data_Types::Position.impl = if not constellation_in then satellite0_pos_in else satellite1_pos_in;
+			 
 			 guarantee "gps_pos_out_Def": Agree_Nodes.close_locations(gps_pos_out, satellite_pos_in);
 		**};
 		
@@ -30,6 +36,7 @@ public
 		features
 			launch_pos_in: in data port Data_Types::Position.impl;
 			imu_pos_out: out data port Data_Types::Position.impl;
+			health_check_out: out data port Base_Types::Boolean;
 		
 		annex verdict {**
 			CyberRel "imu_out_I" => imu_pos_out:I;
@@ -153,48 +160,65 @@ public
 			p: out data port Data_Types::ProbePlannerSignals.impl;
 			
 			-- added
+			constellation_out: out data port Base_Types::Boolean;
+			
 			environmental_events: in data port Data_Types::EnvironmentalEvents.impl;
 			
-		annex agree {** 
-			-- events ?
+			
+		annex agree {**
+			-- variables
+			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);	
+			eq dest_position: Data_Types::Position.impl = bus_in.order.target_position;
+			eq expensive_item: bool = bus_in.order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+			eq confirmation: bool = target_confirmed; -- can I use target_confirmed from old model?
+			eq confirmation_timeout: bool = steps_in_confirming_mode > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD; -- Correct?
+			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
+			
+			-- events
 			eq on_off: bool = bus_in.on_off;
 			eq init_criteria_satisfied: bool = environmental_events.init_criteria_satisfied;
-			eq init_criteria_failed: bool = not init_criteria_satisfied; --TODO: Check if it makes sense?
+			eq init_criteria_failed: bool = not init_criteria_satisfied;
 			eq abort_cmd: bool = bus_in.abort_cmd;
-			eq unsafe_release: bool = environmental_events.unsafe_release;
 			eq mission_store_release_sequence: bool = environmental_events.mission_store_release_sequence;
 			eq package_secure: bool = environmental_events.package_secure;
-			eq okay_to_launch: bool = environmental_events.okay_to_launch;
-			eq separation: bool = environmental_events.separation;
-			eq destination_location_reached: bool = environmental_events.destination_location_reached;  --TODO: Can we compute this?
+			eq okay_to_launch: bool = not internal_error_detected;
+			eq separation: bool = not connected;
+			eq destination_location_reached: bool = Agree_Nodes.close_locations(nav_location, dest_position);
 			eq no_clearance: bool = environmental_events.no_clearance;
-			eq successfull_delivery: bool = environmental_events.successfull_delivery;
-			eq exhaustive_retries: bool = environmental_events.exhaustive_retries;
+			eq successfull_delivery: bool = delivery_cmd_out and destination_location_reached and not no_clearance; -- merge with delivery_done from old model?
+			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
 			eq internal_error_detected: bool = environmental_events.internal_error_detected;
-			eq truck_location_reached: bool = environmental_events.truck_location_reached; --TODO: Can we compute this?
+			eq truck_location_reached: bool = Agree_Nodes.close_locations(nav_location, truck_position);
+			eq connected: bool = bus_in.connected;
 				
 			-- state transitions
 			eq state: Data_Types::DeliveryPlannerState; -- make it as output?
 			
+			guarantee "Computing output: delivery_cmd_out": -- should we merge this to old model?
+				delivery_cmd_out = not no_clearance and (not expensive_item or confirmation);
+				
+			guarantee "Computing output: constellation_out":
+				constellation_out = bus_in.constellation;
+			
 			guarantee "DeliveryPlannerFSM":
 				state = (enum(Data_Types::DeliveryPlannerState, OFF) ->
-						if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off then 
+						if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_satisfied then 
 							enum(Data_Types::DeliveryPlannerState, READY)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and (abort_cmd or unsafe_release) then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and (abort_cmd or unsafe_release) then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (abort_cmd or unsafe_release) then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence then 
 							enum(Data_Types::DeliveryPlannerState, LAUNCH)
@@ -204,7 +228,7 @@ public
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and no_clearance then 
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)						
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or abort_cmd or internal_error_detected) then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or (abort_cmd) or internal_error_detected) then 
 							enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached then 
 							enum(Data_Types::DeliveryPlannerState, INIT)		
@@ -214,7 +238,7 @@ public
 			
 			-- old sections below	
 			
-			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);
+			--eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);
 			
 			eq have_order: bool = Agree_Nodes.HasHappened(bus_in.connected and bus_in.update_order);
 			
@@ -345,6 +369,7 @@ public
 			radio_in: in data port Base_Types::Boolean;
 			comm_out: out data port Base_Types::Boolean;
 			radio_out: out data port Data_Types::RadioResponse.impl;
+			health_check_out: out data port Base_Types::Boolean;
 			
 		annex agree {**
 			guarantee "Radio receives data from remote communication channel":
@@ -376,7 +401,7 @@ public
 				true -> (not delivery_cmd_in => (delivery_status_out = pre (delivery_status_out)));
 			
 			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
-				delivery_cmd_in => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+				true -> (delivery_cmd_in => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED));
 		**};
 			
 		annex verdict {**
@@ -389,6 +414,7 @@ public
 		features
 			camera_in: in data port Base_Types::Boolean;
 			camera_out: out data port Base_Types::Integer;
+			health_check_out: out data port Base_Types::Boolean;
 
 		annex verdict {**
 			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
@@ -398,7 +424,8 @@ public
 	
 	system DeliveryDroneSystem
 		features
-			satellite_sig_pos: in data port Data_Types::Position.impl;
+			satellite0_sig_pos: in data port Data_Types::Position.impl;
+			satellite1_sig_pos: in data port Data_Types::Position.impl;
 			launch_pos: in data port Data_Types::Position.impl;
 			bus1: in data port Data_Types::InputBus.impl;
 			comm1: in data port Data_Types::RadioResponse.impl;
@@ -585,7 +612,10 @@ public
 			c20: port actuation.response_out -> fc.response_in
 			{VERDICT_Properties::flowType => Xdata;};	
 
-			c22: port satellite_sig_pos -> gps.satellite_pos_in
+			c22: port satellite0_sig_pos -> gps.satellite0_pos_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c23: port satellite1_sig_pos -> gps.satellite1_pos_in
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
@@ -613,7 +643,10 @@ public
 			{VERDICT_Properties::flowType => Xdata;}; 							
 			
 			c32: port actuation.response_out -> actuation_out
-			{VERDICT_Properties::flowType => Xdata;};										
+			{VERDICT_Properties::flowType => Xdata;};	
+			
+			c33: port deliveryPlanner.constellation_out -> gps.constellation_in
+			{VERDICT_Properties::flowType => Xdata;};									
 	end DeliveryDroneSystem.impl;
 	
 end DeliveryDrone;
