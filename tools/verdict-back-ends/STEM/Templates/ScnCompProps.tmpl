@@ -8,18 +8,19 @@ import "http://sadl.org/STEM/BaseModel".
 // note that the val* numbers are not contiguous
 
 validate <Scenario> not blank skip
-validate <CompType> not blank skip
+validate <Comp> not blank skip
+validate <Impl> not blank skip
 validate <CompInstance> not blank skip
+validate <canReceiveConfigUpdate> not blank skip
+validate <canReceiveSWUpdate> not blank skip
 validate <hasSensitiveInfo> not blank skip
 validate <insideTrustedBoundary> not blank skip
-validate <cType> not blank skip
+validate <componentType> not blank skip
+validate <pedigree> not blank skip
 validate <controlReceivedFromUntrusted> not blank skip
 validate <dataReceivedFromUntrusted> not blank skip
 validate <controlSentToUntrusted> not blank skip
 validate <dataSentToUntrusted> not blank skip
-validate <canReceiveSWUpdate> not blank skip
-validate <canReceiveConfigUpdate> not blank skip
-validate <pedigree> not blank skip
 
 validate <antiJamming> not blank skip
 validate <auditMessageResponses> not blank skip
@@ -100,7 +101,7 @@ transform <def22A[1]> to <def22> replace "1" : true,"0" : false
 
 <CompInstance> hasSensitiveInfo <val1> 
 <CompInstance> insideTrustedBoundary <val2> 
-<CompInstance> cType <cType>
+<CompInstance> cType <componentType>
 <CompInstance> controlReceivedFromUntrusted <val7> 
 <CompInstance> dataReceivedFromUntrusted <val8> 
 <CompInstance> controlSentToUntrusted <val9> 
