@@ -15,6 +15,10 @@ import "http://sadl.org/STEM/STEMRules".
 // Oracle VM has SADL version dated 20190311.
 // OVA on my laptop is dated 20190311.
 
+// 11/19/2019: Now handling hierarchies - reading in 3 csv files and outputting 3 csv files. 
+//		componentKind is now both componentType (internally I use cType property)
+//		There is an error marking in a template file but that is XText issue so ignore it
+//		Altered graphing as some components do not have any properties etc.
 // 11/14/2019: added additional columns to Defenses.csv; now all relevant info is nicely laid out.
 //		However, SOTERIA++ may want it differently and will say what the structure should be.
 // 11/13/2019: Now have ScnCompProps.csv and ScnCompPropsTA1.csv as the TA1 properties I used to add
@@ -111,6 +115,7 @@ import "http://sadl.org/STEM/STEMRules".
 	
 Read: data from "ScnArch.csv" using "ScnArch.tmpl".  //connections and ports
 Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
+Read: data from "ScnConnectionProps.csv" using "ScnConnectionProps.tmpl". //scenario specific properties of connection instances
 
 // the following has 2 TA1 CAPs; if using this, comment out the read of ScnCompProps.csv above
 //Read: data from "ScnCompPropsTA1.csv" using "ScnCompPropsTA1.tmpl".
@@ -123,6 +128,20 @@ Ask: "select count(*) where {?x <applicableCM> ?z2 } ".
 
 //Print: "All the sorted CIA Issues".
 //Ask: "select * where {?x <applicableCM> ?z2 } order by ?x ?z2".
+
+Write: data {
+Ask: "select distinct (?m1 as ?DefenseProperty)
+(?ApplicableDefense1 as ?NISTProfile) (?DefenseDescription1 as ?DefenseDescription) 
+where {#?m1 <rdf:type> <Mitigation>
+# get NIST controls and their names for mitigation m1
+{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1) 
+    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where
+   {?m1 <rdf:type> <Mitigation> . ?m1 <nistControl> ?yy2 
+    . ?yy2 <nistId> ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))
+    . ?yy2 <nistDesc> ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))
+   } group by ?m1}
+} ".
+} to "/Output/Defenses2NIST.csv".
 
 Write: data {
 Ask: "select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription  
@@ -139,17 +158,16 @@ where {?CompInst <applicableCM> ?x
 } order by ?CompType ?CompInst ?CAPEC".
 } to "/Output/CAPEC.csv". 
 
-//DROPPED the following, was giving error even when it was commented out
-// 		#. OPTIONAL{?x <causingComponent> ?z11}  # not sure about this - needs to be checked
-// not outputting Connection in last column: (?z11 as ?Connection)
-// 11/14/2109: Adding extra columns in Defenses.csv file; could concatenate if needed
-//		tried concatenating - see commented query at end - it still has issues and not clear
-//		if we can really represent the DALs in proper order 
+
 Write: data {
-Ask: "select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription 
+Ask: "
+select distinct ?CompType ?CompInst ?CAPEC ?Confidentiality ?Integrity ?Availability
+?ApplicableDefenseProperties (?ImplProperty2 as ?ImplProperties) (?DAL2 as ?DAL) where {
+select distinct ?CompType ?CompInst ?CAPEC  
 (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
-?ApplicableDefense1 ?DefenseDescription1 ?ApplicableDefense2 ?DefenseDescription2
-?m1 ?dal1 ?m2 ?dal2
+?ApplicableDefenseProperties  
+(?nullProp1 as ?ImplProperty1) (concat(?nullProp1,concat(';',?nullProp2)) as ?ImplProperty2)
+(?nullDAL1 as ?DAL1) (concat(?nullDAL1,concat(';',?nullDAL2)) as ?DAL2)
 where {?CompInst <applicableCM> ?x 
 . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
 . ?x <capecDesc> ?CAPECDescription
@@ -158,50 +176,64 @@ where {?CompInst <applicableCM> ?x
 . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
 . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
 . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
+
 . ?x <mitigation> ?m1 . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
 # ?x ends with ?strippedm1
 . LET(?strippedx := replace(str(?x),'http.*#',''))
 . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
 . FILTER(?tail = ?strippedm1)
+# get second mitigation  
+. OPTIONAL {?x <mitigation> ?xm2 . FILTER(?m1 != ?xm2)} # can swap m1 and m2; but not doing that
+. LET(?strippedm1 := replace(str(?m1),'http.*#',''))
+. LET(?strippedxm2 := replace(str(?xm2),'http.*#',''))
+. LET(?q1 := concat(?strippedm1, concat(';',?strippedxm2)))
+. LET(?ApplicableDefenseProperties := COALESCE(?q1, ?strippedm1)) # is m1;m2 when 2 mitigations or is m1 when only 1 mitigation
+
 # get the dal from the appropriate implementation property of the component for mitigation m1
+# if there are 2 mitigations, m1 may not be present
 . LET(?temp1 := lcase(str(?m1)))
 . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix 
 . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2))) 
-           . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?dal1 }
-. OPTIONAL{?m1 <dal> ?dal1}  # why do I need this - test by dropping it
-# get NIST controls and their names for mitigation m1
-{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1) 
-    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where
-   {?m1 <nistControl> ?yy2 
-    . ?yy2 <nistId> ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))
-    . ?yy2 <nistDesc> ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))
-   } group by ?m1
-}
-# get second mitigation and its NIST controls and their names and its dal if it exists
+           . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?dal1 
+           . LET(?Prop1 := ?y2)}
+
+# get second mitigation dal 
 . OPTIONAL {?x <mitigation> ?m2 . FILTER(?m1 != ?m2) # can swap m1 and m2; but not doing that
-            # get the dal from the appropriate implementation property of the component for mitigation m2
-            . LET(?tmp1 := lcase(str(?m2)))
-            . LET(?r2 := replace(str(?tmp1),'http.*#','')) # strip out prefix 
-            . ?CompInst ?y3 ?z5 . LET(?tmp2 := lcase(str(?y3))) 
-            . FILTER(?tmp1 = ?tmp2) . ?z5 <dal> ?dal2 
-            # get NIST controls and their names for mitigation m2
-            {select distinct ?m2 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense2) 
-                (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription2) where
-             {?m2 <nistControl> ?yyy2 
-              . ?yyy2 <nistId> ?yyy3 . LET(?nc := replace(str(?yyy3),'http.*#',''))
-              . ?yyy2 <nistDesc> ?yyy4 . LET(?ncd := replace(str(?yyy4),'http.*#',''))
-             } group by ?m2
-            }
-           } 
-} order by ?CompInst ?CAPEC ?m1 ".
+            . LET(?temp7 := lcase(str(?m2)))
+            . ?CompInst ?y8 ?z8 . LET(?temp8 := lcase(str(?y8))) 
+            . FILTER(?temp7 = ?temp8) . ?z8 <dal> ?dal2
+            . LET(?Prop2 := ?y8)}
+# do stripping, concat with null etc
+. LET(?strippedm2 := replace(str(?m2),'http.*#',''))
+. LET(?strippedProp1 := replace(str(?Prop1),'http.*#',''))
+. LET(?strippedProp2 := replace(str(?Prop2),'http.*#',''))
+. LET(?strippedDal1 := str(?dal1)) #replace(str(?dal1),'http.*#',''))
+. LET(?strippedDal2 := str(?dal2)) #replace(str(?dal2),'http.*#',''))
+
+. LET(?nullstr := 'null')
+. LET(?nullProp1 := COALESCE(?strippedProp1,?nullstr))
+. LET(?nullProp2 := COALESCE(?strippedProp2,?nullstr))
+. LET(?nullDAL1 := COALESCE(?strippedDal1,?nullstr))
+. LET(?nullDAL2 := COALESCE(?strippedDal2,?nullstr))
+
+# set number of mitigations
+. OPTIONAL{FILTER(?strippedm1 = ?ApplicableDefenseProperties) . LET(?numMitigations := '1mitigation')}
+. OPTIONAL{FILTER(?strippedm1 != ?ApplicableDefenseProperties) . LET(?numMitigations := '2mitigations')}
+
+
+#. OPTIONAL{FILTER(?numMitigations = '1mitigation') . LET (?ImplProperty := ?ImplProperty1) . LET(?DAL := ?DAL1)}
+#. OPTIONAL{FILTER(?numMitigations = '2mitigations') . LET (?ImplProperty := ?ImplProperty2) . LET(?DAL := ?DAL2)}
+
+}}
+order by ?CompInst ?CAPEC ?ApplicableDefenseProperties  ".
 } to "/Output/Defenses.csv".
+//
+/////////////////////// GRAPHS ////////////////////////////
+////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
+//// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
+//// changed by dropping ". FILTER(?dal > 0)" in 2 places
 
-///////////////////// GRAPHS ////////////////////////////
-//For graphing to work, install GraphViz and set path in environment variable GraphVizPath
-// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
-// changed by dropping ". FILTER(?dal > 0)" in 2 places
-
-Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?cplist as ?N1_tooltip) where
+Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?finallist as ?N1_tooltip) where
 {  ?conn <rdf:type> <Connection> 
  . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest
  . ?conn <outPort> ?oport . ?conn <inPort> ?iport
@@ -226,8 +258,10 @@ Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fill
        . LET(?capec := concat(concat(concat('CAPEC-',str(?id)),':'),?desc))
       } group by ?src}
    }
+
 # now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
- . {select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where
+# using OPTIONAL as the 'generated' object does not have capecs or properties on it
+ . OPTIONAL{{select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where
     { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
          ?src ?prop ?z3 		#?z3 is true/false or is a blank node
        . ?prop <tooltipProp> ?r2 . ?z3 <val> ?prop_val
@@ -240,13 +274,15 @@ Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fill
    . LET(?c4 := replace(str(?c3),'http.*#',''))
    . LET(?c5 := replace(str(?c4),'^true',''))
    . LET(?c6 := replace(str(?c5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble gettting that working
-   } group by ?src}
+   } group by ?src}}
 # now concat capec list and property list
  . LET(?clist     := COALESCE(?capeclist,''))
- . LET(?templist  := concat(concat(?clist,'; &#10;'),?plist))
+ . LET(?tempplist := COALESCE(?plist,''))
+ . LET(?templist  := concat(concat(?clist,'; &#10;'),?tempplist))
  . LET(?templist2 := replace(?templist,'^; ',''))  # get rid of initial ';'
  . LET(?templist3 := replace(?templist2,';','; ')) # having a space ensures that we get quotes around in .dot file
  . LET(?cplist    := replace(?templist3,'  ',' ')) # do not need 2 spaces
+ . LET(?finallist     := COALESCE(?cplist,''))
 }".
 
 /////////////////////// THE FOLLOWING TO GENERATE DATA FOR COMBINED VIEW //////////////////
@@ -294,62 +330,31 @@ Graph: "select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fill
 //{?c <rdf:type> <CAPEC> . FILTER NOT EXISTS{?c <mitigation> ?m}
 //}".
 
-//// trying to concatenate; almost there but still some issues (for instance ?m2 not present in last line which is for radio capec-74)
-//// also what would happen if m1 and m2 in a row and dal1 not present but dal2 is present; how would it show up as?
-//Ask: "select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription 
-//(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
-//?AD ?DD ?Mitigation ?DAL
-//where {?CompInst <applicableCM> ?x 
-//. ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
-//. ?x <capecDesc> ?CAPECDescription
-//. ?CompInst <type> ?CompType
-//. FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
-//. OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-//. OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
-//. OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-//. ?x <mitigation> ?m1 . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-//# ?x ends with ?strippedm1
-//. LET(?strippedx := replace(str(?x),'http.*#',''))
-//. LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-//. FILTER(?tail = ?strippedm1)
-//# get the dal from the appropriate implementation property of the component for mitigation m1
-//. LET(?temp1 := lcase(str(?m1)))
-//. LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix 
-//. OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2))) 
-//           . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?dal1 }
-//. OPTIONAL{?m1 <dal> ?dal1}  # why do I need this - test by dropping it
+//The following 2 should be equivalent but are not - why?
+//Ask: "select distinct ?acm ?CompInst ?CAPEC ?CAPECDescription ?Mitigation ?DAL
+//where {
 //
-//# get NIST controls and their names for mitigation m1
-//{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1) 
-//    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where
-//   {?m1 <nistControl> ?yy2 
-//    . ?yy2 <nistId> ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))
-//    . ?yy2 <nistDesc> ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))
-//   } group by ?m1
+//{select distinct ?newacm ?newCompInst (?dal as ?DAL) (?mit as ?Mitigation)
+//where { ?newacm <mitigation> ?mit  . LET(?tx1 := lcase(str(?mit)))
+//        . ?newCompInst ?prop ?val  . LET(?tx2 := lcase(str(?prop))) 
+//        . FILTER(?tx1 = ?tx2) . ?val <dal> ?dal }
 //}
 //
-//# get second mitigation and its NIST controls and their names and its dal if it exists
-//. OPTIONAL {?x <mitigation> ?m2 . FILTER(?m1 != ?m2) # can swap m1 and m2; but not doing that
-//            # get the dal from the appropriate implementation property of the component for mitigation m2
-//            . LET(?tmp1 := lcase(str(?m2)))
-//            . LET(?r2 := replace(str(?tmp1),'http.*#','')) # strip out prefix 
-//            . ?CompInst ?y3 ?z5 . LET(?tmp2 := lcase(str(?y3))) 
-//            . FILTER(?tmp1 = ?tmp2) . ?z5 <dal> ?dal2 
-//            # get NIST controls and their names for mitigation m2
-//            {select distinct ?m2 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense2) 
-//                (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription2) where
-//             {?m2 <nistControl> ?yyy2 
-//              . ?yyy2 <nistId> ?yyy3 . LET(?nc := replace(str(?yyy3),'http.*#',''))
-//              . ?yyy2 <nistDesc> ?yyy4 . LET(?ncd := replace(str(?yyy4),'http.*#',''))
-//             } group by ?m2
-//            }
-//           } 
-//. LET (?ApplicableDefense := concat(?ApplicableDefense1, concat(';',?ApplicableDefense2))) 
-//. LET (?DefenseDescription := concat(?DefenseDescription1, concat(';',?DefenseDescription2)))
-//. LET (?m := concat(?m1, concat(';',?m2))) . LET (?dal := concat(?dal1,concat(';',?dal2)))
+//?CompInst <applicableCM> ?acm 
+//. ?acm <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
+//. ?acm <capecDesc> ?CAPECDescription
+//. FILTER(?newacm = ?acm)
+//. FILTER(?newCompInst = ?CompInst)
 //
-//. LET(?AD         := COALESCE(?ApplicableDefense, ?ApplicableDefense1))
-//. LET(?DD         := COALESCE(?DefenseDescription, ?DefenseDescription1))
-//. LET(?Mitigation := COALESCE(?m, ?m1))
-//. LET(?DAL        := COALESCE(?dal, ?dal1))
-//} order by ?CompInst ?CAPEC ?m1 ".
+//} order by ?CompInst ?CAPEC ?Mitigation ".
+//
+//Ask: "select distinct ?acm ?CompInst ?CAPEC ?CAPECDescription ?mit ?DAL
+//where {?CompInst <applicableCM> ?acm 
+//. ?acm <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
+//. ?acm <capecDesc> ?CAPECDescription
+//
+//. ?acm <mitigation> ?mit . LET(?tx1 := lcase(str(?mit)))
+//. OPTIONAL{?CompInst ?prop ?val . LET(?tx2 := lcase(str(?prop))) 
+//           . FILTER(?tx1 = ?tx2) . ?val <dal> ?DAL }
+//
+//} order by ?CompInst ?CAPEC ?mit ".

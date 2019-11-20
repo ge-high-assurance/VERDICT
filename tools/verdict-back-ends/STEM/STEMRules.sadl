@@ -3,6 +3,19 @@ uri "http://sadl.org/STEM/STEMRules" alias stemr.
 import "http://sadl.org/STEM/BaseModel".
 //This version is using SADL 3 constructs and uses OWL_MEM reasoner.
 
+Rule InferConnectionSource
+if n1 is connectionName of a Connection
+   and noValue(the Connection, connectionSource)
+   and n2 is srcCompType of the Connection
+   and n3 is srcCompImpl of the Connection  
+then connectionSource of the Connection is n3.  
+
+Rule InferConnectionDestination
+if n1 is connectionName of a Connection
+   and noValue(the Connection, connectionDestination)
+   and n2 is destCompType of the Connection
+   and n3 is destCompImpl of the Connection 
+then connectionDestination of the Connection is n3.
 
 ///////////////////////////////////////////////   
 
@@ -878,14 +891,3 @@ Rule Vul-CAPEC-624-2
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-624C-PhysicalAccessControl.
-
-
-
-
-
-
-
-
-
-  
-						
