@@ -19,7 +19,7 @@
 		<setting label="CheckForAmbiguousNames" value="true"/>
 		<setting label="CheckForCardinalityOfPropertyOnSpecificDomain" value="false"/>
 		<setting label="UseIndefiniteAndDefiniteArticlesInValidationAndTranslation" value="true"/>
-		<setting label="TypeCheckingWarningOnly" value="false"/>
+		<setting label="TypeCheckingWarningOnly" value="true"/>
 		<setting label="TypeCheckingRangeRequired" value="true"/>
 		<setting label="IgnoreUnittedQuantitiesDuringTranslation" value="false"/>
 		<setting label="IncludeImpliedPropertiesInTranslation" value="false"/>
