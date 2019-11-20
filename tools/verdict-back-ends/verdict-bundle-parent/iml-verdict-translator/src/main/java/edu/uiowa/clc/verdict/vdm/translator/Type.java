@@ -76,6 +76,7 @@ public enum Type {
 
     IDENTIFIER("Identifier"),
     CONTRACT("Contract"),
+    COMPCATEG("compCateg"),
     CONTRACT_SPEC("ContractSpec"),
     SYMBOL_DEFINITION("SymbolDefinition"),
 
