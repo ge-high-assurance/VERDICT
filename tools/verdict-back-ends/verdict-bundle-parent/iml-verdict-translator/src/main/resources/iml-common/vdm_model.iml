@@ -13,6 +13,7 @@ type Port {
 type ComponentType {
 	name: Identifier;
 	ports: ArrayList<Port>;
+	compCateg: Option<String>;
     contract: Option<ContractSpec>;
     cyber_relations: ArrayList<CyberRel>;
 };
@@ -35,7 +36,6 @@ type ComponentInstance {
 	specification: ComponentType;
 	implementation: ComponentImpl;
 	
-	compCateg: Option<String>;
 	manufacturer: Option<ManufacturerType>;
 	pedigree: Option<PedigreeType>;
 	category: Option<String>;
