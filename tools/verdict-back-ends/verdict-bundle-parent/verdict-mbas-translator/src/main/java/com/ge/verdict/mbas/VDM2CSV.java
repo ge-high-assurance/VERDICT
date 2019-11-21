@@ -19,8 +19,13 @@ import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.CyberExpr;
 import verdict.vdm.vdm_model.CyberRel;
 import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.Event;
+import verdict.vdm.vdm_model.EventHappens;
+import verdict.vdm.vdm_model.IAPort;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.SafetyRel;
+import verdict.vdm.vdm_model.SafetyRelExpr;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {
@@ -86,14 +91,22 @@ public class VDM2CSV extends VdmTranslator {
      * @return
      */
     private Table buildCompSafTable(Model model, String scenario) {
-        Table table = new Table("Comp", "InputPortOrEvent", "InputIA", "OutputPort", "OutputIA");
-        //        for (ComponentType comp : model.getComponentType()) {
-        //            table.addValue(comp.getName()); // comp
-        //        	for(SafetyRel rel : comp.getSafetyRel()) {
-        //
-        //        	}
-        //            table.capRow();
-        //        }
+        Table table = new Table("Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
+        for (ComponentType comp : model.getComponentType()) {
+            for (SafetyRel safeRel : comp.getSafetyRel()) {
+                List<List<Object>> allPortsEvents = new ArrayList<>();
+                extractIAPortsAndEvents(safeRel.getFaultSrc(), allPortsEvents);
+                
+            	for(int i = 0; i < allPortsEvents.size(); ++i) {
+                    table.addValue(comp.getName()); // comp
+                    table.addValue(convertPortsAndEventsToStr(allPortsEvents.get(i))); // InputPortOrEvent
+                    table.addValue(convertPortsIAAndEventHappensToStr(allPortsEvents.get(i))); // InputIAOrEvent
+                    table.addValue(safeRel.getOutput().getName()); // OutputPort
+                    table.addValue(safeRel.getOutput().getIa().value()); // OutputIA
+                    table.capRow();                   		
+            	}   
+            }            
+        }
 
         return table;
     }
@@ -107,16 +120,18 @@ public class VDM2CSV extends VdmTranslator {
      */
     private Table buildEventsTable(Model model, String scenario) {
         Table table = new Table("Comp", "Event", "Probability");
-        //        for (ComponentType comp : model.getComponentType()) {
-        //            table.addValue(comp.getName()); // comp
-        //        	for(SafetyRel rel : comp.getSafetyRel()) {
-        //
-        //        	}
-        //            table.capRow();
-        //        }
+        for (ComponentType comp : model.getComponentType()) {
+            for (Event e : comp.getEvent()) {
+                table.addValue(getStrNullChk(()->comp.getName())); // comp
+                table.addValue(getStrNullChk(()->e.getId()));
+                table.addValue(getStrNullChk(()->e.getProbability()));
+                table.capRow();
+            }
+        }
 
         return table;
     }
+
 
     /**
      * Build the scenario connection properties table.
@@ -494,50 +509,29 @@ public class VDM2CSV extends VdmTranslator {
             "controlSentToUntrusted",
             "dataSentToUntrusted",
 
-            // 42 props with DAL The columns below are to be filled with 1#N,
+            // 21 props with DAL The columns below are to be filled with 1#N,
             // where 1 is for true, # is the separator, and N is the DAL number
             "antiJamming",
-            //            "antiJammingDAL",
             "auditMessageResponses",
-            //            "auditMessageResponsesDAL",
             "deviceAuthentication",
-            //            "deviceAuthenticationDAL",
             "dosProtection",
-            //            "dosProtectionDAL",
             "encryptedStorage",
-            //            "encryptedStorageDAL",
             "heterogeneity",
-            //            "heterogeneityDAL",
-            "inputValidation",
-            //            "inputValidationDAL",
+            "inputValidation",            
             "logging",
-            //            "loggingDAL",
             "memoryProtection",
-            //            "memoryProtectionDAL",
             "physicalAccessControl",
-            //            "physicalAccessControlDAL",
             "removeIdentifyingInformation",
-            //            "removeIdentifyingInformationDAL",
             "resourceAvailability",
-            //            "resourceAvailabilityDAL",
             "resourceIsolation",
-            //            "resourceIsolationDAL",
             "secureBoot",
-            //            "secureBootDAL",
             "sessionAuthenticity",
-            //            "sessionAuthenticityDAL",
             "staticCodeAnalysis",
-            //            "staticCodeAnalysisDAL",
             "strongCryptoAlgorithms",
-            //            "strongCryptoAlgorithmsDAL",
             "supplyChainSecurity",
-            //            "supplyChainSecurityDAL",
             "systemAccessControl",
-            //            "systemAccessControlDAL",
             "tamperProtection",
-            //            "tamperProtectionDAL",
             "userAuthentication",
-            //            "userAuthenticationDAL",
 
             // 12 Cyber Attack Properties from TA1
             "Configuration_Attack",
@@ -552,12 +546,6 @@ public class VDM2CSV extends VdmTranslator {
             "Sniffing_Attack",
             "Buffer_Attack",
             "Flooding_Attack"
-
-            //            "broadcastFromOutsideTB",
-            //            "wifiFromOutsideTB",
-            //            "encryption",
-            //            "antiFlooding",
-            //            "antiFuzzing"
         };
 
         // Methods for determining property values (true or false)
@@ -697,16 +685,6 @@ public class VDM2CSV extends VdmTranslator {
                 }
             }
             ports.add(andPorts);
-            //            if (expr.getAnd().getExpr().size() > 1) {
-            //                System.err.println("MBAS does not currently support AND expressions");
-            //                throw new RuntimeException("AND not supported");
-            //            } else {
-            //                // An AND with a single child is used implicitly due to the structure
-            // of the parser
-            //                for (CyberExpr and : expr.getAnd().getExpr()) {
-            //                    extractCIAPorts(and, ports);
-            //                }
-            //            }
         } else if (expr.getNot() != null) {
             System.err.println("Error: MBAS does not currently support NOT expressions");
             throw new RuntimeException("NOT not supported");
@@ -960,6 +938,105 @@ public class VDM2CSV extends VdmTranslator {
         }
         return sb.toString();
     }
+    
+    /**
+     * Convert a list of ports and events names to a string with ";" to indicate "AND" 
+     * */
+    private String convertPortsAndEventsToStr(List<Object> portsEvents) {
+    	StringBuilder sb = new StringBuilder("");
+    	for(int i = 0; i < portsEvents.size(); i++) {
+    		Object obj = portsEvents.get(i);
+    		
+    		if(obj instanceof IAPort) {
+    			sb.append(((IAPort)obj).getName());
+    		} else if(obj instanceof EventHappens) {
+    			sb.append(((EventHappens)obj).getEventName());
+    		} else {
+    			errAndExit("Unexpected!");
+    		}
+    		if(i < portsEvents.size()-1) {
+    			sb.append(";");
+    		}
+    	}
+    	return sb.toString();
+    }
+    
+    /**
+     * Convert a list of ports' IA and events to a string with ";" to indicate "AND" 
+     * */    
+    private String convertPortsIAAndEventHappensToStr(List<Object> portsEvents) {
+    	StringBuilder sb = new StringBuilder("");
+    	for(int i = 0; i < portsEvents.size(); i++) {
+    		Object obj = portsEvents.get(i);
+    		
+    		if(obj instanceof IAPort) {
+    			sb.append(((IAPort)obj).getIa().value());
+    		} else if(obj instanceof EventHappens) {
+    			sb.append("happens");
+    		} else {
+    			errAndExit("Unexpected!");
+    		}
+    		if(i < portsEvents.size()-1) {
+    			sb.append(";");
+    		}
+    	}
+    	return sb.toString();
+    }    
+    
+    /**
+     * Get a list of all IAPorts and evetns in a given expression. MBAA only supports a disjunctions of
+     * conjunctions.
+     *
+     * <p>MBAS does not currently support arbitrary logical expressions, it only supports OR. For
+     * the time being, we simply find all ports in the input expression and "or" them together.
+     *
+     * <p>TODO update MBAS to support arbitrary expressions
+     *
+     * @param expr
+     * @param allPorts
+     * @param allEvents 
+     */
+    private void extractIAPortsAndEvents(SafetyRelExpr expr, List<List<Object>> allPortsEvents) {
+        if (expr == null) {
+            return;
+        }
+
+        // Note: the kind field is not currently being set properly
+        // The only case we will see an expr without any operator is the expr itself
+        if (expr.getPort() != null) {
+            List<Object> ports = new ArrayList<>();
+            ports.add(expr.getPort());
+            allPortsEvents.add(ports);
+        } else if (expr.getEvent() != null) {
+            List<Object> events = new ArrayList<>();
+            events.add(expr.getEvent());
+            allPortsEvents.add(events);        	
+        } else if (expr.getOr() != null) {
+            for (SafetyRelExpr or : expr.getOr().getExpr()) {
+            	extractIAPortsAndEvents(or, allPortsEvents);
+            }
+        } else if (expr.getAnd() != null) {
+            // Terminate when we get to an AND expr, because of limitations of Soteria_pp
+            List<Object> portsEvents = new ArrayList<>();
+            
+            for (SafetyRelExpr andExpr : expr.getAnd().getExpr()) {
+                if (andExpr.getPort() != null) {
+                	portsEvents.add(andExpr.getPort());
+                } else if (andExpr.getEvent() != null) {
+                	portsEvents.add(andExpr.getEvent());
+                } else {
+                    errAndExit(
+                            "MBAA only supports a dijunction of conjunctions of ports' CIA in cyber relatioins! Something unexpected!");
+                }
+            }
+            allPortsEvents.add(portsEvents);
+        } else if (expr.getNot() != null) {
+            System.err.println("Error: MBAS does not currently support NOT expressions");
+            throw new RuntimeException("NOT not supported");
+        } else {
+            throw new RuntimeException("We don't supported other operator yet: " + expr.getKind());
+        }
+    }        
 
     private void errAndExit(String msg) {
         System.err.println("Error: " + msg);

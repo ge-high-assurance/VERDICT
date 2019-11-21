@@ -580,7 +580,7 @@
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
             <element name="output" type="vdm_model:IAPort" minOccurs="1"
                 maxOccurs="1"></element>
-            <element name="inputs" type="vdm_model:SafetyRelExpr"
+            <element name="faultSrc" type="vdm_model:SafetyRelExpr"
                 minOccurs="0" maxOccurs="1"></element>
             <element name="comment" type="string" minOccurs="0"
                 maxOccurs="1"></element>
