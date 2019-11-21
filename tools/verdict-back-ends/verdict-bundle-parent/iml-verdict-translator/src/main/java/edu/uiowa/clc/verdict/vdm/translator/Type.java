@@ -114,6 +114,12 @@ public enum Type {
     IA("IA"),
     EVENT("Event"),
     PROBABILITY("probability"),
+   
+    SAFETY_REQ_EXP("SafetyReqExpr"),
+    SAFETY_REQ_EXP_KIND("SafetyReqExprKind"),    
+    
+    SAFETY_REL_EXP("SafetyRelExpr"),
+    SAFETY_REL_EXP_KIND("SafetyRelExprKind"),        
     // Safety related stuff ends
 
     SEVERITY("Severity"),
