@@ -1,7 +1,6 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.stem;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,11 +15,10 @@ public class VerdictStemTest {
 
     @Test
     public void testSTEM() throws IOException {
-        File projectDir = new File("target/test-classes/STEM");
-        Path controlOutputDir = Paths.get(projectDir.getPath(), "Output");
-        Path controlGraphsDir = Paths.get(projectDir.getPath(), "Graphs");
-        Path testOutputDir = Paths.get(projectDir.getPath(), "Output2");
-        Path testGraphsDir = Paths.get(projectDir.getPath(), "Graphs2");
+        Path controlOutputDir = Paths.get("../../STEM/Output");
+        Path testStemDir = Paths.get("target/test-classes/STEM");
+        Path testOutputDir = testStemDir.resolve("Output");
+        Path testGraphsDir = testStemDir.resolve("Graphs");
 
         // Remove the output and graphs directories first
         if (Files.exists(testOutputDir)) {
@@ -42,7 +40,7 @@ public class VerdictStemTest {
 
         // Run SADL on the STEM test project
         VerdictStem stem = new VerdictStem();
-        stem.runStem(projectDir, testOutputDir.toFile(), testGraphsDir.toFile());
+        stem.runStem(testStemDir.toFile(), testOutputDir.toFile(), testGraphsDir.toFile());
 
         // Verify that SADL created some new files with expected contents
         Path controlFile = controlOutputDir.resolve("CAPEC.csv");
