@@ -51,7 +51,11 @@ import verdict.vdm.vdm_model.CyberExprKind;
 import verdict.vdm.vdm_model.CyberExprList;
 import verdict.vdm.vdm_model.CyberRel;
 import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.Event;
+import verdict.vdm.vdm_model.EventHappens;
 import verdict.vdm.vdm_model.Flow;
+import verdict.vdm.vdm_model.IA;
+import verdict.vdm.vdm_model.IAPort;
 import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.ManufacturerType;
 import verdict.vdm.vdm_model.Mission;
@@ -59,12 +63,18 @@ import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
+import verdict.vdm.vdm_model.SafetyRel;
+import verdict.vdm.vdm_model.SafetyRelExpr;
+import verdict.vdm.vdm_model.SafetyRelExprKind;
+import verdict.vdm.vdm_model.SafetyRelExprList;
+import verdict.vdm.vdm_model.SafetyReq;
+import verdict.vdm.vdm_model.SafetyReqExpr;
+import verdict.vdm.vdm_model.SafetyReqExprKind;
+import verdict.vdm.vdm_model.SafetyReqExprList;
 import verdict.vdm.vdm_model.Severity;
 import verdict.vdm.vdm_model.SituatedType;
 
 public class VDMParser extends Parser {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(VDMParser.class);
 
     private Model model;
 
@@ -72,6 +82,7 @@ public class VDMParser extends Parser {
     private List<ComponentType> componentTypes;
     private List<ComponentImpl> componentImpls;
     private List<CyberReq> cyberRequirements;
+    private List<SafetyReq> safetyRequirements;
     private List<Mission> missions;
 
     private ComponentImpl componentImpl;
@@ -84,6 +95,7 @@ public class VDMParser extends Parser {
         componentTypes = model.getComponentType();
         componentImpls = model.getComponentImpl();
         cyberRequirements = model.getCyberReq();
+        safetyRequirements = model.getSafetyReq();
         missions = model.getMission();
     }
 
@@ -1479,6 +1491,8 @@ public class VDMParser extends Parser {
         ComponentType componentType = new ComponentType();
         List<Port> ports = componentType.getPort();
         List<CyberRel> cyber_relations = componentType.getCyberRel();
+        List<SafetyRel> safety_relations = componentType.getSafetyRel();
+        List<Event> events = componentType.getEvent();
 
         int list_size = 0;
         Type type;
@@ -1520,6 +1534,18 @@ public class VDMParser extends Parser {
 
                         CyberRel cyberRel = cyber_rel();
                         cyber_relations.add(rel_index, cyberRel);
+                    } else if (type == Type.SAFETY_REL) {
+
+                        int rel_index = arrayList_element();
+
+                        SafetyRel safetyRel = safety_rel();
+                        safety_relations.add(rel_index, safetyRel);
+                    } else if (type == Type.EVENT) {
+
+                        int event_index = arrayList_element();
+
+                        Event event = event();
+                        events.add(event_index, event);
                     }
                 }
                 // Confirm length of ports match with elements.
@@ -1557,9 +1583,6 @@ public class VDMParser extends Parser {
         CyberExpr cyberExpr = new CyberExpr();
         CyberExprKind kind = null;
 
-        // Check length bound and terminate.
-        int array_length = 0;
-
         while (this.token.type == Type.CYBER_EXP) {
 
             consume(Type.CYBER_EXP);
@@ -1571,12 +1594,8 @@ public class VDMParser extends Parser {
             }
             if (token.type == Type.CYBER_EXP_KIND) {
                 kind = cyberExprKind();
-                //                cyberExpr.setKind(kind);
             }
 
-            //            if (token.type == Type.ARRAY_LIST) {
-            //                System.out.println("!!!!!!!!!!!! in Array List");
-            //            }
             if (kind == CyberExprKind.NOT) {
                 CyberExpr not_expr = new CyberExpr();
                 not_expr.setNot(not_expr);
@@ -1642,47 +1661,215 @@ public class VDMParser extends Parser {
 
         return cyberExprList;
     }
-    //
-    // public CyberExprList cyberExprList() {
-    //
-    // CyberExprList cyberExprList = new CyberExprList();
-    // int list_length = 0;
-    // Type type = this.token.type;
-    //
-    // while (type == Type.ARRAY_LIST) {
-    //
-    // consume(Type.ARRAY_LIST);
-    //
-    // // length
-    // if (this.token.type == Type.INT) {
-    //
-    // consume(Type.INT);
-    //
-    // Token token = this.token;
-    // NumberLiteral enumLength_literal = (NumberLiteral) token.value;
-    // list_length = enumLength_literal.getValue();
-    //
-    // consume();
-    //
-    // while (list_length > 0) {
-    //
-    // // NULL:element
-    // consume(Type.NULL);
-    // list_length--;
-    // // element Index
-    // token = this.token;
-    // NumberLiteral element_index = (NumberLiteral) token.value;
-    // consume(Type.INT);
-    //
-    // // //element Value : Expression
-    // CyberExpr expr = cyberExpr();
-    // cyberExprList.getExpr().add(element_index.getValue(), expr);
-    // }
-    // }
-    // }
-    //
-    // return cyberExprList;
-    // }
+
+    /**
+     * 
+     * Handle safety requirement expressions
+     * 
+     * */
+    public SafetyReqExpr safetyReqExpr() {
+
+    	SafetyReqExpr safetyReqExpr = new SafetyReqExpr();
+    	SafetyReqExprKind kind = null;
+
+        while (this.token.type == Type.SAFETY_REQ_EXP) {
+
+            consume(Type.SAFETY_REQ_EXP);
+
+            if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyReqExpr.setPort(iaPort);
+            }
+            if (token.type == Type.SAFETY_REQ_EXP_KIND) {
+                kind = safetyReqExprKind();
+            }
+            if (kind == SafetyReqExprKind.NOT) {
+                SafetyReqExpr not_expr = new SafetyReqExpr();
+                not_expr.setNot(not_expr);
+                return not_expr;
+            }
+            if (kind == SafetyReqExprKind.OR) {
+
+            	SafetyReqExprList or_exprs = safetyReqExprList();
+            	safetyReqExpr.setOr(or_exprs);
+            }
+            if (kind == SafetyReqExprKind.AND) {
+
+            	SafetyReqExprList and_exprs = safetyReqExprList();
+                safetyReqExpr.setAnd(and_exprs);
+            }
+            if (kind == SafetyReqExprKind.PORT) {
+                return safetyReqExpr();
+            }
+        }
+
+        return safetyReqExpr;
+    }
+
+    public SafetyReqExprList safetyReqExprList() {
+
+    	SafetyReqExprList safetyReqExprList = new SafetyReqExprList();
+
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_REQ_EXP) {
+
+            consume(Type.SAFETY_REQ_EXP);
+            if (token.type == Type.ARRAY_LIST) {
+                if (peek().type == Type.INT) {
+                    array_length = arrayList_length();
+                } else {
+
+                    while (array_length > 0) {
+
+                        array_length--;
+
+                        int element_index = arrayList_element();
+                        SafetyReqExpr reqExpr = safetyReqExpr();
+                        safetyReqExprList.getExpr().add(element_index, reqExpr);
+                    }
+                }
+            }
+        }
+
+        return safetyReqExprList;
+    } 
+    
+    /**
+     * 
+     * Handle safety relations
+     * */
+    public SafetyRel safety_rel() {
+
+    	SafetyRel safetyRel = new SafetyRel();
+
+        while (this.token.type == Type.SAFETY_REL) {
+
+            consume(Type.SAFETY_REL);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                safetyRel.setId(identifier);
+
+            } else if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyRel.setOutput(iaPort);
+
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                if (type == Type.FAULTSRC) {
+                    SafetyRelExpr expr_value = safetyRelExpr();
+                    safetyRel.setFaultSrc(expr_value);
+
+                } else if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    safetyRel.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    safetyRel.setDescription(description);
+
+                } else if (type == Type.PHASES) {
+
+                    String phases = str_value();
+                    safetyRel.setPhases(phases);
+
+                } else if (type == Type.EXTERN) {
+
+                    String extern = str_value();
+                    safetyRel.setExtern(extern);
+                }
+            }
+        }
+
+        return safetyRel;
+    }    
+    
+    public SafetyRelExpr safetyRelExpr() {
+
+    	SafetyRelExpr safetyRelExpr = new SafetyRelExpr();
+    	SafetyRelExprKind kind = null;
+
+        // Check length bound and terminate.
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_REL_EXP) {
+
+            consume(Type.SAFETY_REL_EXP);
+
+            if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyRelExpr.setPort(iaPort);
+            }
+            if (token.type == Type.SAFETY_REL_EXP_KIND) {
+                kind = safetyRelExprKind();
+            }
+            if (kind == SafetyRelExprKind.NOT) {
+                SafetyRelExpr not_expr = new SafetyRelExpr();
+                not_expr.setNot(not_expr);
+                return not_expr;
+            }
+            if (kind == SafetyRelExprKind.OR) {
+
+            	SafetyRelExprList or_exprs = safetyRelExprList();
+            	safetyRelExpr.setOr(or_exprs);
+            }
+            if (kind == SafetyRelExprKind.AND) {
+
+            	SafetyRelExprList and_exprs = safetyRelExprList();
+            	safetyRelExpr.setAnd(and_exprs);
+            }
+            if (kind == SafetyRelExprKind.PORT) {
+                return safetyRelExpr();
+            }
+            if (kind == SafetyRelExprKind.EVENT) {
+            	EventHappens event = eventHappens();
+            	safetyRelExpr.setEvent(event);
+            }
+        }
+
+        return safetyRelExpr;
+    }    
+    
+    
+    public SafetyRelExprList safetyRelExprList() {
+
+    	SafetyRelExprList safetyRelExprList = new SafetyRelExprList();
+
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_REL_EXP) {
+
+            consume(Type.SAFETY_REL_EXP);
+            if (token.type == Type.ARRAY_LIST) {
+                if (peek().type == Type.INT) {
+                    array_length = arrayList_length();
+                } else {
+
+                    while (array_length > 0) {
+
+                        array_length--;
+
+                        int element_index = arrayList_element();
+                        SafetyRelExpr relExpr = safetyRelExpr();
+                        safetyRelExprList.getExpr().add(element_index, relExpr);
+                    }
+                }
+            }
+        }
+
+        return safetyRelExprList;
+    }     
 
     /*
      * type CyberRel { id : String; output : CIAPort; inputs : Option<CyberExpr>;
@@ -1832,6 +2019,54 @@ public class VDMParser extends Parser {
 
         return cyberReq;
     }
+    
+    public SafetyReq safety_req() {
+
+    	SafetyReq safetyReq = new SafetyReq();
+
+        while (this.token.type == Type.SAFETY_REQ) {
+            consume(Type.SAFETY_REQ);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                safetyReq.setId(identifier);
+
+            } else if (token.type == Type.SAFETY_REQ_EXP) {
+            	SafetyReqExpr safetyExpr = safetyReqExpr();
+            	safetyReq.setCondition(safetyExpr);
+
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    safetyReq.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    safetyReq.setDescription(description);
+
+                } else if (type == Type.PHASES) {
+
+                    String phases = str_value();
+                    safetyReq.setPhases(phases);
+
+                } else if (type == Type.EXTERN) {
+
+                    String extern = str_value();
+                    safetyReq.setExtern(extern);
+                }
+            }
+        }
+
+        return safetyReq;
+    }    
 
     public Mission mission() {
         Mission mission = new Mission();
@@ -1886,6 +2121,46 @@ public class VDMParser extends Parser {
 
         return mission;
     }
+    
+    public Event event() {
+
+    	Event event = new Event();
+
+        while (this.token.type == Type.EVENT) {
+
+            consume(Type.EVENT);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                event.setId(identifier);
+
+            } else if (token.type == Type.PROBABILITY) {
+            	String prob = id_value();
+            	event.setProbability(prob);
+
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    event.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    event.setDescription(description);
+
+                } 
+            }
+        }
+
+        return event;
+    }    
 
     /*
      * type CIAPort { name: String; cia: CIA; }
@@ -1909,6 +2184,44 @@ public class VDMParser extends Parser {
 
         return ciaPort;
     }
+    
+    // SAFETY
+    public IAPort ia_port() {
+        IAPort iaPort = new IAPort();
+
+        while (this.token.type == Type.IA_PORT) {
+            consume(Type.IA_PORT);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                iaPort.setName(identifier);
+
+            } else if (token.type == Type.IA) {
+                IA ia = ia();
+                iaPort.setIa(ia);
+            }
+        }
+
+        return iaPort;
+    }    
+    
+    public EventHappens eventHappens() {
+    	EventHappens event = new EventHappens();
+
+        while (this.token.type == Type.HAPPENS) {
+            consume(Type.HAPPENS);
+            
+            if (token.type == Type.STRING) {
+                String identifier = id_value();
+                event.setEventName(identifier);
+            } else {
+            	System.out.println("Event happens: toeken " + token);
+            }
+        }
+
+        return event;
+    }        
 
     /*
      * type CIA enum {Confidentiality, Integrity, Availability};
@@ -1925,6 +2238,19 @@ public class VDMParser extends Parser {
 
         return cia_type;
     }
+    
+    public IA ia() {
+
+        consume(Type.IA);
+
+        String type_name = token.sd.getName();
+
+        IA ia_type = IA.fromValue(type_name);
+
+        consume();
+
+        return ia_type;
+    }    
 
     /*
      * type Severity enum {None, Minor, Major, Hazardous, Catastrophic};
@@ -1958,7 +2284,33 @@ public class VDMParser extends Parser {
 
         return cyberExprKind;
     }
+    
+    public SafetyReqExprKind safetyReqExprKind() {
 
+        consume(Type.SAFETY_REQ_EXP_KIND);
+
+        String type_name = token.sd.getName();
+
+        SafetyReqExprKind safetyReqExprKind = SafetyReqExprKind.fromValue(type_name);
+
+        consume();
+
+        return safetyReqExprKind;
+    }    
+
+    public SafetyRelExprKind safetyRelExprKind() {
+
+        consume(Type.SAFETY_REL_EXP_KIND);
+
+        String type_name = token.sd.getName();
+
+        SafetyRelExprKind safetyRelExprKind = SafetyRelExprKind.fromValue(type_name);
+
+        consume();
+
+        return safetyRelExprKind;
+    }     
+    
     // ComponentInstance?
     // Block
     // Connection
@@ -3254,6 +3606,13 @@ public class VDMParser extends Parser {
 
                         CyberReq cyberReq = cyber_req();
                         cyberRequirements.add(cyberReq_index, cyberReq);
+
+                    } else if (type == Type.SAFETY_REQ) {
+
+                        int safetyReq_index = arrayList_element();
+
+                        SafetyReq safetyReq = safety_req();
+                        safetyRequirements.add(safetyReq_index, safetyReq);
 
                     } else if (type == Type.MISSIONS) {
 
