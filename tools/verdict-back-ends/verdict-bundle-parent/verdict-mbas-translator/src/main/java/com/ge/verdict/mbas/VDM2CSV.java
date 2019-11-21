@@ -91,21 +91,25 @@ public class VDM2CSV extends VdmTranslator {
      * @return
      */
     private Table buildCompSafTable(Model model, String scenario) {
-        Table table = new Table("Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
+        Table table =
+                new Table("Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
         for (ComponentType comp : model.getComponentType()) {
             for (SafetyRel safeRel : comp.getSafetyRel()) {
                 List<List<Object>> allPortsEvents = new ArrayList<>();
                 extractIAPortsAndEvents(safeRel.getFaultSrc(), allPortsEvents);
-                
-            	for(int i = 0; i < allPortsEvents.size(); ++i) {
+
+                for (int i = 0; i < allPortsEvents.size(); ++i) {
                     table.addValue(comp.getName()); // comp
-                    table.addValue(convertPortsAndEventsToStr(allPortsEvents.get(i))); // InputPortOrEvent
-                    table.addValue(convertPortsIAAndEventHappensToStr(allPortsEvents.get(i))); // InputIAOrEvent
+                    table.addValue(
+                            convertPortsAndEventsToStr(allPortsEvents.get(i))); // InputPortOrEvent
+                    table.addValue(
+                            convertPortsIAAndEventHappensToStr(
+                                    allPortsEvents.get(i))); // InputIAOrEvent
                     table.addValue(safeRel.getOutput().getName()); // OutputPort
                     table.addValue(safeRel.getOutput().getIa().value()); // OutputIA
-                    table.capRow();                   		
-            	}   
-            }            
+                    table.capRow();
+                }
+            }
         }
 
         return table;
@@ -122,16 +126,15 @@ public class VDM2CSV extends VdmTranslator {
         Table table = new Table("Comp", "Event", "Probability");
         for (ComponentType comp : model.getComponentType()) {
             for (Event e : comp.getEvent()) {
-                table.addValue(getStrNullChk(()->comp.getName())); // comp
-                table.addValue(getStrNullChk(()->e.getId()));
-                table.addValue(getStrNullChk(()->e.getProbability()));
+                table.addValue(getStrNullChk(() -> comp.getName())); // comp
+                table.addValue(getStrNullChk(() -> e.getId()));
+                table.addValue(getStrNullChk(() -> e.getProbability()));
                 table.capRow();
             }
         }
 
         return table;
     }
-
 
     /**
      * Build the scenario connection properties table.
@@ -517,7 +520,7 @@ public class VDM2CSV extends VdmTranslator {
             "dosProtection",
             "encryptedStorage",
             "heterogeneity",
-            "inputValidation",            
+            "inputValidation",
             "logging",
             "memoryProtection",
             "physicalAccessControl",
@@ -938,54 +941,50 @@ public class VDM2CSV extends VdmTranslator {
         }
         return sb.toString();
     }
-    
-    /**
-     * Convert a list of ports and events names to a string with ";" to indicate "AND" 
-     * */
+
+    /** Convert a list of ports and events names to a string with ";" to indicate "AND" */
     private String convertPortsAndEventsToStr(List<Object> portsEvents) {
-    	StringBuilder sb = new StringBuilder("");
-    	for(int i = 0; i < portsEvents.size(); i++) {
-    		Object obj = portsEvents.get(i);
-    		
-    		if(obj instanceof IAPort) {
-    			sb.append(((IAPort)obj).getName());
-    		} else if(obj instanceof EventHappens) {
-    			sb.append(((EventHappens)obj).getEventName());
-    		} else {
-    			errAndExit("Unexpected!");
-    		}
-    		if(i < portsEvents.size()-1) {
-    			sb.append(";");
-    		}
-    	}
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < portsEvents.size(); i++) {
+            Object obj = portsEvents.get(i);
+
+            if (obj instanceof IAPort) {
+                sb.append(((IAPort) obj).getName());
+            } else if (obj instanceof EventHappens) {
+                sb.append(((EventHappens) obj).getEventName());
+            } else {
+                errAndExit("Unexpected!");
+            }
+            if (i < portsEvents.size() - 1) {
+                sb.append(";");
+            }
+        }
+        return sb.toString();
     }
-    
-    /**
-     * Convert a list of ports' IA and events to a string with ";" to indicate "AND" 
-     * */    
+
+    /** Convert a list of ports' IA and events to a string with ";" to indicate "AND" */
     private String convertPortsIAAndEventHappensToStr(List<Object> portsEvents) {
-    	StringBuilder sb = new StringBuilder("");
-    	for(int i = 0; i < portsEvents.size(); i++) {
-    		Object obj = portsEvents.get(i);
-    		
-    		if(obj instanceof IAPort) {
-    			sb.append(((IAPort)obj).getIa().value());
-    		} else if(obj instanceof EventHappens) {
-    			sb.append("happens");
-    		} else {
-    			errAndExit("Unexpected!");
-    		}
-    		if(i < portsEvents.size()-1) {
-    			sb.append(";");
-    		}
-    	}
-    	return sb.toString();
-    }    
-    
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < portsEvents.size(); i++) {
+            Object obj = portsEvents.get(i);
+
+            if (obj instanceof IAPort) {
+                sb.append(((IAPort) obj).getIa().value());
+            } else if (obj instanceof EventHappens) {
+                sb.append("happens");
+            } else {
+                errAndExit("Unexpected!");
+            }
+            if (i < portsEvents.size() - 1) {
+                sb.append(";");
+            }
+        }
+        return sb.toString();
+    }
+
     /**
-     * Get a list of all IAPorts and evetns in a given expression. MBAA only supports a disjunctions of
-     * conjunctions.
+     * Get a list of all IAPorts and evetns in a given expression. MBAA only supports a disjunctions
+     * of conjunctions.
      *
      * <p>MBAS does not currently support arbitrary logical expressions, it only supports OR. For
      * the time being, we simply find all ports in the input expression and "or" them together.
@@ -994,7 +993,7 @@ public class VDM2CSV extends VdmTranslator {
      *
      * @param expr
      * @param allPorts
-     * @param allEvents 
+     * @param allEvents
      */
     private void extractIAPortsAndEvents(SafetyRelExpr expr, List<List<Object>> allPortsEvents) {
         if (expr == null) {
@@ -1010,20 +1009,20 @@ public class VDM2CSV extends VdmTranslator {
         } else if (expr.getEvent() != null) {
             List<Object> events = new ArrayList<>();
             events.add(expr.getEvent());
-            allPortsEvents.add(events);        	
+            allPortsEvents.add(events);
         } else if (expr.getOr() != null) {
             for (SafetyRelExpr or : expr.getOr().getExpr()) {
-            	extractIAPortsAndEvents(or, allPortsEvents);
+                extractIAPortsAndEvents(or, allPortsEvents);
             }
         } else if (expr.getAnd() != null) {
             // Terminate when we get to an AND expr, because of limitations of Soteria_pp
             List<Object> portsEvents = new ArrayList<>();
-            
+
             for (SafetyRelExpr andExpr : expr.getAnd().getExpr()) {
                 if (andExpr.getPort() != null) {
-                	portsEvents.add(andExpr.getPort());
+                    portsEvents.add(andExpr.getPort());
                 } else if (andExpr.getEvent() != null) {
-                	portsEvents.add(andExpr.getEvent());
+                    portsEvents.add(andExpr.getEvent());
                 } else {
                     errAndExit(
                             "MBAA only supports a dijunction of conjunctions of ports' CIA in cyber relatioins! Something unexpected!");
@@ -1036,7 +1035,7 @@ public class VDM2CSV extends VdmTranslator {
         } else {
             throw new RuntimeException("We don't supported other operator yet: " + expr.getKind());
         }
-    }        
+    }
 
     private void errAndExit(String msg) {
         System.err.println("Error: " + msg);
