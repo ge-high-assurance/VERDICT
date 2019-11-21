@@ -38,7 +38,8 @@ public
   			-- added
   			on_off: data Base_Types::Boolean; --Check if it makes sense to come from bus?
   			abort_cmd: data Base_Types::Boolean; --Check if it makes sense to come from bus?
-  			constellation: data Base_Types::Boolean;
+  			constellation: data Constellation;
+  			launch_pos: data Position.impl;
   	end InputBus.impl;
   	
   	data RadioResponse
@@ -73,6 +74,13 @@ public
   			init_criteria_satisfied: data Base_Types::Boolean;
   			mission_store_release_sequence: data Base_Types::Boolean;
   			package_secure: data Base_Types::Boolean;
-  			no_clearance: data Base_Types::Boolean;
-  	end EnvironmentalEvents.impl; 	
+  			no_clearance: data Base_Types::Boolean; -- TODO: From camera 
+  	end EnvironmentalEvents.impl; 
+ 
+  	
+  	data Constellation
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("Satellite0", "Satellite1");
+	end Constellation; 	
 end Data_Types;
