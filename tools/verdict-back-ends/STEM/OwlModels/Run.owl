@@ -10,6 +10,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://sadl.org/STEM/Run">
   <owl:Ontology rdf:about="">
+    <owl:imports rdf:resource="Queries"/>
     <owl:imports rdf:resource="STEMRules"/>
     <owl:imports rdf:resource="/builtinfunctions"/>
     <owl:imports rdf:resource="/sadlimplicitmodel"/>
