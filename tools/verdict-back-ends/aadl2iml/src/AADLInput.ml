@@ -36,7 +36,8 @@ let parse_buffer lexbuf =
   | AGREELexer.Unexpected_EOF ->
     let pos = Position.get_position lexbuf in Error (SyntaxError pos)
   | AADLParser.Error
-  | AGREEParser.Error ->
+  | AGREEParser.Error
+  | VerdictParser.Error ->
     let pos = Position.get_position lexbuf in Error (SyntaxError pos)
 
 let from_channel in_ch =

@@ -22,8 +22,13 @@ let newline = '\r' | '\n' | "\r\n"
 
 let id = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 
+let decimal = ['0'-'9']+ ('.' ['0'-'9']+)? (('E'|'e') ('+'|'-')? ['0'-'9']+)?
+
 rule token = parse
   | "MissionReq" { P.MISSION }
+  | "SafetyReq" { P.SAFETY_REQ }
+  | "SafetyRel" { P.SAFETY_REL }
+  | "Event" { P.SAFETY_EV }
   | "CyberReq" { P.CYBER_REQ }
   | "CyberRel" { P.CYBER_REL }
   | "ThreatEffectModel" { P.THREAT_MODEL }
@@ -36,6 +41,9 @@ rule token = parse
   | "comment" { P.COMMENT }
   | "output" { P.OUTPUT }
   | "inputs" { P.INPUTS }
+  | "faultSrc" { P.FAULT_SRC }
+  | "happens" { P.HAPPENS }
+  | "probability" { P.PROBABILITY }
   | "description" { P.DESCRIPTION }
   | "phases" { P.PHASES }
   | "external" { P.EXTERNAL }
@@ -78,6 +86,9 @@ rule token = parse
   | "exists" { P.EXISTS }
   | "contains" { P.CONTAINS }
 
+  | decimal as d { P.DECIMAL d }
+
+(*
   | "1" { P.TARGET_LIKELIHOOD_VAL }
   | "1e-3" { P.TARGET_LIKELIHOOD_VAL }
   | "1e-03" { P.TARGET_LIKELIHOOD_VAL }
@@ -87,6 +98,7 @@ rule token = parse
   | "1e-07" { P.TARGET_LIKELIHOOD_VAL }
   | "1e-9" { P.TARGET_LIKELIHOOD_VAL }
   | "1e-09" { P.TARGET_LIKELIHOOD_VAL }
+*)
 
   | '"' { Buffer.clear string_buf; str_double lexbuf }
   | "'" { Buffer.clear string_buf; str_single lexbuf }

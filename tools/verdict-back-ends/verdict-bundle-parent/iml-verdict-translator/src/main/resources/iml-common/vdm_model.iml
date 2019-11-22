@@ -16,6 +16,8 @@ type ComponentType {
 	compCateg: Option<String>;
     contract: Option<ContractSpec>;
     cyber_relations: ArrayList<CyberRel>;
+    safety_relations: ArrayList<SafetyRel>;
+    safety_events: ArrayList<SafetyEvent>;
 };
 
 type ComponentImplKind enum { Block_Impl, Dataflow_Impl };
@@ -310,7 +312,8 @@ type Model {
 	component_impl: ArrayList<ComponentImpl>;
 	dataflow_code: Option<LustreProgram>;
 	cyber_requirements: ArrayList<CyberReq>;
-        missions: ArrayList<Mission>;
-        threat_models: ArrayList<ThreatModel>;
-        threat_defenses: ArrayList<ThreatDefense>;
+	safety_requirements: ArrayList<SafetyReq>;
+	missions: ArrayList<Mission>;
+	threat_models: ArrayList<ThreatModel>;
+	threat_defenses: ArrayList<ThreatDefense>;
 };
