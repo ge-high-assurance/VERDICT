@@ -17,11 +17,11 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
 	function also requires the output file path to be specified.
 	
 	- {b libraries_threatConditions} : this function generates a list with the following
-	tuple: ((reqID,defenseType), (lib,mdl)) where cyberReqID is a string with the 
-	requirement identifier, defenseType is either the applicable defense properties or 
-	the implemented defense properties (see Defenses.csv for the header names used)
-	and the lib and mdl are the corresponding library and model for the requirement ID and
-	the defenseType.
+	tuple: ((missionID,reqID,defenseType), (lib,mdl)) where missionID is a string with the
+	mission identifier, reqID is a string with the requirement identifier, 
+	defenseType is either the applicable defense properties or the implemented defense properties 
+	(see Defenses.csv for the header names used) and the lib and mdl are the corresponding 
+	library and model for the requirement ID and the defenseType.
 	
 	- {b mainListtag} : this function takes a list of lines (from In_channel.read_lines) and 
 	creates an association list.
@@ -642,9 +642,16 @@ let gen_library cyberReqId defType l_comp_dep l_comp_saf l_attack l_events l_arc
 let libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist =
    let arch_prime = massageArch arch in
    let compDepen_prime = massageCompDepen compDepen arch_prime in
-   List.map (missionIds mission)
-        ~f:(fun x->((x,deftype),((gen_library x deftype compDepen_prime compSafe attack events arch_prime defense defense2nist mission), 
-                                  gen_model x arch_prime mission))) ;;
+   List.map (missionReqId mission) ~f:(fun y ->
+       (* find what reqIDs are under this missionReqID and iterate through those *)
+       let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) cyberReqId_M)) in
+	   (y, List.map reqL ~f:(fun x->
+	      (x,deftype),(( gen_library x deftype compDepen_prime compSafe attack events arch_prime defense defense2nist mission), 
+                            gen_model x arch_prime mission 
+                         )
+          )
+       )
+   ) ;;
 
     
 (* translate mission severity to level of risk *)
@@ -725,31 +732,17 @@ let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun 
    concat_And_Or "or" listAND;;
 *)
 
-let cybReqAttackDefenseProb cyberReqIDStr defenseTypeStr lib mdl =
-   let tc_adtree = model_to_adtree lib mdl in
-      ((cyberReqIDStr,defenseTypeStr), (likelihoodCut tc_adtree, cutSetsList (likelihoodCutImp tc_adtree) ));;                  
-
-
-let xml_gen filename_ch listCutsetInfo mission = (* defType l_defense = *)
-    let lReqs_of_mission missionID mission = missionIds (compInfo missionID missionReqId_M mission) in
-    let cutset_of_Mission missionID mission lcutsets = List.filter lcutsets ~f:(fun x->List.mem (lReqs_of_mission missionID mission) (fst (fst x))  ~equal:(=) ) in
-    let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in 
-    let cybReq_Severity lmission =  List.map lmission ~f:(fun x->(getval x cyberReqId_M, getval x severity_M)) in
-    let getSeverity_Of_cybReq req lmission = getval (cybReq_Severity lmission) req in 
-    let reqId l = (fst(fst l)) in let defenseType l = (snd(fst l))in
-    let reqPro l = (string_of_float (fst(snd l))) in         
-    let probCompAttackDefense l = List.iter (snd(snd l)) 
-             ~f:(fun x-> cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") 
-             (*(compAttackDefense (getval x "comp")  (getval x "attack") defType l_defense)*)
-             (getval x "defense" )) in
-    let cyberReq_of_Mission listReq  = List.iter   listReq ~f:(fun x->
-          fprintf filename_ch "\t<Requirement label=  \"%s\" defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" (reqId x)(defenseType x) (reqPro x) 
-                         (severity2risk(getSeverity_Of_cybReq (reqId x) mission));
-          probCompAttackDefense x;
-          fprintf filename_ch "\t</Requirement > \n" ) in
-    List.iter (missionReqId mission)  ~f:(fun x-> fprintf filename_ch "<Mission label=  \"%s\" >\n" x;
-                                                  cyberReq_of_Mission (cutset_of_Mission x mission listCutsetInfo) ;
-                                                  fprintf filename_ch "</Mission > \n");
+let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission = 
+   (* list of cutsets to print *)
+   let infoList = cutSetsList (likelihoodCutImp tc_adtree) in
+   (* internal functions *)
+   let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
+   let cybReq_Severity lmission =  List.map l_mission ~f:(fun x->(getval x cyberReqId_M, getval x severity_M)) in
+   let getSeverity_Of_cybReq req lmission = getval (cybReq_Severity l_mission) req 
+   in
+   fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
+                        (defenseTypeStr) (string_of_float (likelihoodCut tc_adtree)) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
+   List.iter infoList ~f:(fun x-> cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") (getval x "defense" ) );
 ;;
    
 
@@ -763,7 +756,7 @@ let get_CyberReqText_Risk mission_al cyberReqID =
      ( List.Assoc.find_exn al ~equal:(=) modelVersion_M,
        List.Assoc.find_exn al ~equal:(=) cyberReq_M, 
        severity2risk (List.Assoc.find_exn al ~equal:(=) severity_M) ) ;;
-
+       
 (* Analyze function - calls model_to_adtree and generates the artifacts *)
 let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath =
    let compDepen =  mainListtag comp_dep_ch  
@@ -780,38 +773,48 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    (* check if there's anything to analyze *)
    if List.is_empty mission 
    then Format.printf 
-        "Info: mission.csv is empty. No requirements to analyze@." ;
-   
+        "Info: mission.csv is empty. No requirements to analyze@." ;   
    let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist
+
    in
 
    (* start the xml formatted results file *)
    fprintf xml_oc "<?xml version=\"1.0\"?>\n";
    fprintf xml_oc "<Results xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
 
-   List.iter l_librariesThreats ~f:(fun x -> 
-      let ((cyberReqIDStr,defenseTypeStr), (lib,mdl)) = x in
-         (* -- extract some text info -- *)
-         let (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission cyberReqIDStr in  
-         (* -- save .ml file of the lib and mdl for reference -- *)    
-         saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
-         (* -- determine whether to perform cyber or safety analysis -- *)
-         let rType = compReqType cyberReqIDStr mission in
-          	match rType with
-         	| "Cyber" -> let t = model_to_adtree lib mdl in
-               (* cutset metric file, in printbox format *)    
-               saveADCutSetsToFile ~cyberReqID:(cyberReqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
-               (* tree visualizations *)    
-               dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr) t ;
-               (*.xml file *)
-               xml_gen xml_oc [(cybReqAttackDefenseProb cyberReqIDStr defenseTypeStr lib mdl)] mission;
-    	    | "Safety" -> let t = model_to_ftree lib mdl in
-               (* tree visualizations *)    
-               dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr) t ;
-            | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq")
+   (* iterate through the list of mission IDs *)
+   List.iter l_librariesThreats ~f:(fun mID -> 
+      let (missionReqIdStr, l_libmdl) = mID in
+      fprintf xml_oc "<Mission label=  \"%s\" >\n" missionReqIdStr;
+
+      (* iterate through the list of requirements under each mission ID *)
+      List.iter l_libmdl ~f:(fun x -> 
+         (let ((reqIDStr, defenseTypeStr), (lib,mdl)) = x in
+            (* -- extract some text info -- *)
+            let (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
+            (* -- save .ml file of the lib and mdl for reference -- *)    
+            saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
+            (* -- determine whether to perform cyber or safety analysis -- *)
+            let rType = compReqType reqIDStr mission in
+          	   match rType with
+         	   | "Cyber" -> let t = model_to_adtree lib mdl in
+                  (* cutset metric file, in printbox format *)    
+                  saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
+                  (* tree visualizations *)    
+                  dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
+                  (*.xml file *)
+                  fprintf xml_oc "\t<Requirement label=  \"%s\"> " reqIDStr;
+                  xml_gen xml_oc reqIDStr defenseTypeStr t mission;
+                  fprintf xml_oc "\t</Requirement > \n";
+    	       | "Safety" -> let t = model_to_ftree lib mdl in
+                  (* tree visualizations *)    
+                  dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
+               | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq");)
+
       );
-    
-    (* complete the xml file  *)
+    fprintf xml_oc "</Mission >\n";
+    );
+    (* complete and close the xml file  *)
     fprintf xml_oc "</Results>\n";
     Out_channel.close xml_oc    
 ;;
