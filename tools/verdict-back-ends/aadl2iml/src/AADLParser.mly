@@ -181,12 +181,15 @@ feature:
 
 data_port:
   pid = port_id; pdir = port_direction; DATA PORT
-  qcr = option(qcref) (* aadl2::DataSubcomponentType *)
+  qcr = option(qcref); (* aadl2::DataSubcomponentType *)
+  prop_assocs = property_associations
+  (* INCOMPLETE *)
   ";"
   {
     { A.name = pid;
       A.dir = pdir;
       A.dtype = qcr;
+      A.properties = prop_assocs;
     }
   }
   (* INCOMPLETE *)
@@ -582,6 +585,7 @@ metaclass_name:
 core_keyword:
   | SYSTEM {}
   | CONNECTIONS {}
+  | PORT {}
   (* INCOMPLETE *)
 
 (*

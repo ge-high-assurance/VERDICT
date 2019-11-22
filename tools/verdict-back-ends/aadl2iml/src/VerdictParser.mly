@@ -49,6 +49,36 @@
             |> force_opt ~msg:"No cyber reqs specified";
         }
 
+    type safety_req_param =
+      | SReq_ID of string
+      | SReq_CONDITION of slexpr
+      | SReq_COMMENT of string
+      | SReq_DESCRIPTION of string
+
+    let build_safety_req params =
+      SafetyReq {
+          id = (match (List.find_opt
+                        (function SReq_ID _ -> true
+                                | _ -> false) params) with
+                | Some (SReq_ID id) -> id
+                | _ -> failwith "no ID specified");
+          condition = (match (List.find_opt
+                        (function SReq_CONDITION _ -> true
+                                | _ -> false) params) with
+                | Some (SReq_CONDITION condition) -> condition
+                | _ -> failwith "no condition specified");
+          comment = (match (List.find_opt
+                        (function SReq_COMMENT _ -> true
+                                | _ -> false) params) with
+                | Some (SReq_COMMENT comment) -> Some comment
+                | _ -> None);
+          description = (match (List.find_opt
+                        (function SReq_DESCRIPTION _ -> true
+                                | _ -> false) params) with
+                | Some (SReq_DESCRIPTION description) -> Some description
+                | _ -> None)
+      }
+
     type cyber_req_param =
       | Req_ID of string
       | Req_CIA of cia
@@ -102,6 +132,72 @@
                                 | _ -> false) params) with
                 | Some (Req_EXTERNAL extern) -> Some extern
                 | _ -> None);
+      }
+
+    type safety_rel_param =
+      | SRel_ID of string
+      | SRel_OUTPUT of iaport
+      | SRel_FAULT_SRC of slexpr
+      | SRel_COMMENT of string
+      | SRel_DESCRIPTION of string
+
+    let build_safety_rel params =
+      SafetyRel {
+          id = (match (List.find_opt
+                        (function SRel_ID _ -> true
+                                | _ -> false) params) with
+                | Some (SRel_ID id) -> id
+                | _ -> failwith "no ID specified");
+          output = (match (List.find_opt
+                        (function SRel_OUTPUT _ -> true
+                                | _ -> false) params) with
+                | Some (SRel_OUTPUT output) -> output
+                | _ -> failwith "no output specified");
+          faultSrc = (match (List.find_opt
+                        (function SRel_FAULT_SRC _ -> true
+                                | _ -> false) params) with
+                | Some (SRel_FAULT_SRC fault_src) -> Some fault_src
+                | _ -> None);
+          comment = (match (List.find_opt
+                        (function SRel_COMMENT _ -> true
+                                | _ -> false) params) with
+                | Some (SRel_COMMENT comment) -> Some comment
+                | _ -> None);
+          description = (match (List.find_opt
+                        (function SRel_DESCRIPTION _ -> true
+                                | _ -> false) params) with
+                | Some (SRel_DESCRIPTION description) -> Some description
+                | _ -> None) 
+      }
+
+    type safety_event_param =
+      | SEv_ID of string
+      | SEv_PROBABILITY of string
+      | SEv_COMMENT of string
+      | SEv_DESCRIPTION of string
+
+    let build_safety_event params =
+      SafetyEvent {
+          id = (match (List.find_opt
+                        (function SEv_ID _ -> true
+                                | _ -> false) params) with
+                | Some (SEv_ID id) -> id
+                | _ -> failwith "no ID specified");
+          probability = (match (List.find_opt
+                        (function SEv_PROBABILITY _ -> true
+                                | _ -> false) params) with
+                | Some (SEv_PROBABILITY prob) -> prob
+                | _ -> failwith "no probability specified");
+          comment = (match (List.find_opt
+                        (function SEv_COMMENT _ -> true
+                                | _ -> false) params) with
+                | Some (SEv_COMMENT comment) -> Some comment
+                | _ -> None);
+          description = (match (List.find_opt
+                        (function SEv_DESCRIPTION _ -> true
+                                | _ -> false) params) with
+                | Some (SEv_DESCRIPTION description) -> Some description
+                | _ -> None) 
       }
 
     type cyber_rel_param =
@@ -235,8 +331,9 @@
 
 %}
 
-%token MISSION CYBER_REQ CYBER_REL THREAT_MODEL THREAT_DEFENSE THREAT_DATABASE
-%token PARAM_ID CIA SEVERITY CONDITION COMMENT OUTPUT INPUTS DESCRIPTION PHASES EXTERNAL ENTITIES ASSUMPTIONS REFERENCE THREATS CYBER_REQS TARGET_LIKELIHOOD
+%token MISSION SAFETY_REQ SAFETY_REL SAFETY_EV CYBER_REQ CYBER_REL THREAT_MODEL THREAT_DEFENSE THREAT_DATABASE
+%token PARAM_ID CIA SEVERITY CONDITION COMMENT OUTPUT INPUTS DESCRIPTION PHASES EXTERNAL ENTITIES ASSUMPTIONS REFERENCE THREATS
+%token FAULT_SRC HAPPENS PROBABILITY CYBER_REQS TARGET_LIKELIHOOD
 %token FORALL EXISTS CONTAINS
 %token CIA_C CIA_I CIA_A
 %token SEVERITY_NONE SEVERITY_MINOR SEVERITY_MAJOR SEVERITY_HAZARDOUS SEVERITY_CATASTROPHIC
@@ -255,9 +352,10 @@
 %token RPAREN ")"
 %token VERT_BAR "|"
 %token AND OR NOT
-%token TARGET_LIKELIHOOD_VAL
+(*%token TARGET_LIKELIHOOD_VAL*)
 %token <string>ID
 %token <string>STRING
+%token <string>DECIMAL
 
 %start<VerdictAst.t> verdict_annex
 
@@ -269,6 +367,9 @@ verdict_annex:
 
 statement:
   | mission = mission { mission }
+  | sreq = safety_req { sreq }
+  | srel = safety_rel { srel }
+  | ev = safety_event { ev }
   | req = cyber_req { req }
   | rel = cyber_rel { rel }
   | threat = threat_model { threat }
@@ -277,6 +378,9 @@ statement:
 
 port:
   | port = ID ":" cia = cia { (port, cia) }
+
+ia_port:
+  | port = ID ":" ia = ia { (port, ia) }
 
 mission:
   | MISSION "{"
@@ -290,10 +394,24 @@ mission_param:
   | CYBER_REQS "=" hd = STRING tl = list("," req = STRING { req })
     { Mission_REQS (hd :: tl) }
 
+safety_req:
+  | SAFETY_REQ "{"
+    params = list(p = safety_req_param option(";") { p }) "}"
+    { build_safety_req params }
+
+safety_req_param:
+  | PARAM_ID "=" id = STRING { SReq_ID id }
+  | CONDITION "=" condition = slexpr { SReq_CONDITION condition }
+  | COMMENT "=" comment = STRING { SReq_COMMENT comment }
+  | DESCRIPTION "=" description = STRING { SReq_DESCRIPTION description }
+
 cyber_req:
   | CYBER_REQ "{"
     params = list(p = cyber_req_param option(";") { p }) "}"
     { build_cyber_req params }
+
+probability:
+  | s = DECIMAL { s }
 
 cyber_req_param:
   | PARAM_ID "=" id = STRING { Req_ID id }
@@ -304,7 +422,37 @@ cyber_req_param:
   | DESCRIPTION "=" description = STRING { Req_DESCRIPTION description }
   | PHASES "=" phases = STRING { Req_PHASES phases }
   | EXTERNAL "=" extern = STRING { Req_EXTERNAL extern }
-  | TARGET_LIKELIHOOD "=" TARGET_LIKELIHOOD_VAL { Req_DUD }
+  | TARGET_LIKELIHOOD "=" probability { Req_DUD }
+  (*| TARGET_LIKELIHOOD "=" TARGET_LIKELIHOOD_VAL { Req_DUD }*)
+
+safety_rel:
+  | SAFETY_REL "{"
+    params = list(p = safety_rel_param option(";") { p }) "}"
+    { build_safety_rel params }
+  | SAFETY_REL id = STRING "=" fault_src = slexpr "=>" output = ia_port
+    { (SRel_ID id) :: (SRel_FAULT_SRC fault_src)
+      :: (SRel_OUTPUT output) :: [] |> build_safety_rel}
+  | SAFETY_REL id = STRING "=>" output = ia_port
+    { (SRel_ID id) :: (SRel_OUTPUT output) :: []
+      |> build_safety_rel }
+
+safety_rel_param:
+  | PARAM_ID "=" id = STRING { SRel_ID id }
+  | OUTPUT "=" output = ia_port { SRel_OUTPUT output }
+  | FAULT_SRC "=" fault_src = slexpr { SRel_FAULT_SRC fault_src }
+  | COMMENT "=" comment = STRING { SRel_COMMENT comment }
+  | DESCRIPTION "=" description = STRING { SRel_DESCRIPTION description }
+
+safety_event:
+  | SAFETY_EV "{"
+    params = list(p = safety_event_param option(";") { p }) "}"
+    { build_safety_event params }
+
+safety_event_param:
+  | PARAM_ID "=" id = STRING { SEv_ID id }
+  | PROBABILITY "=" prop = probability { SEv_PROBABILITY prop }
+  | COMMENT "=" comment = STRING { SEv_COMMENT comment }
+  | DESCRIPTION "=" description = STRING { SEv_DESCRIPTION description }
 
 cyber_rel:
   | CYBER_REL "{"
@@ -356,6 +504,39 @@ cia:
   | CIA_C { CIA_C }
   | CIA_I { CIA_I }
   | CIA_A { CIA_A }
+
+slexpr:
+  | sl_or = sl_or { sl_or }
+
+slexpr_term:
+  | port = slport { port }
+  | id = slfault { id }
+  | not = slnot { not }
+
+  | "(" slexpr = slexpr ")" { slexpr }
+  | "[" slexpr = slexpr "]" { slexpr }
+  | "{" slexpr = slexpr "}" { slexpr }
+
+slport:
+  | port = ia_port { SLPort port }
+
+slfault:
+  | HAPPENS "(" id = STRING ")" { SLFault id }
+
+sl_or:
+  | expr = sl_and exprs = list(OR expr = sl_and { expr })
+    { if exprs = [] then expr else SLOr (expr :: exprs) }
+
+sl_and:
+  | expr = slexpr_term exprs = list(AND expr = slexpr_term { expr })
+    { if exprs = [] then expr else SLAnd (expr :: exprs) }
+
+slnot:
+  | NOT expr = slexpr_term { SLNot expr }
+
+ia:
+  | CIA_I { IA_I }
+  | CIA_A { IA_A }
 
 severity:
   | SEVERITY_NONE { Severity_None }

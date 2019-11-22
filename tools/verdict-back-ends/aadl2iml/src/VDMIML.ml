@@ -41,7 +41,8 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode;
-  ptype: data_type option
+  ptype: data_type option;
+  probe: bool;
 }
 
 type binary_op =
@@ -162,17 +163,28 @@ type dataflow_model = {
 
 type cyber_cia = CyberC | CyberI | CyberA
 
+type safety_ia = SafetyI | SafetyA
+
 type cyber_severity =
   CyberNone | CyberMinor | CyberMajor
   | CyberHazardous | CyberCatastrophic
 
 type cyber_port = {name: string; cia: cyber_cia}
 
+type safety_port = {name: string; ia: safety_ia}
+
 type cyber_expr =
   | CyberPort of cyber_port
   | CyberAnd of cyber_expr list
   | CyberOr of cyber_expr list
   | CyberNot of cyber_expr
+
+type safety_expr =
+  | SafetyPort of safety_port
+  | SafetyFault of string
+  | SafetyAnd of safety_expr list
+  | SafetyOr of safety_expr list
+  | SafetyNot of safety_expr
 
 type cyber_req = {
     id: string;
@@ -185,6 +197,13 @@ type cyber_req = {
     extern: string option;
   }
 
+type safety_req = {
+    id: string;
+    condition: safety_expr;
+    comment: string option;
+    description: string option;
+  }
+
 type cyber_rel = {
     id: string;
     output: cyber_port;
@@ -193,6 +212,21 @@ type cyber_rel = {
     description: string option;
     phases: string option;
     extern: string option;
+  }
+
+type safety_rel = {
+    id: string;
+    output: safety_port;
+    faultSrc: safety_expr option;
+    comment: string option;
+    description: string option;
+  }
+
+type safety_event = {
+    id: string;
+    probability: string;
+    comment: string option;
+    description: string option;
   }
 
 type mission = {
@@ -207,6 +241,8 @@ type component_type = {
   ports: port list;
   contract: contract_spec option;
   cyber_rels: cyber_rel list;
+  safety_rels: safety_rel list;
+  safety_events: safety_event list;
 }
 
 type comp_type_ref = int
@@ -409,6 +445,7 @@ type model = {
   dataflow_code: dataflow_model option;
   comp_impl: component_impl list;
   cyber_reqs: cyber_req list;
+  safety_reqs: safety_req list;
   missions: mission list;
   threat_models: threat_model list;
   threat_defenses: threat_defense list;
@@ -635,9 +672,10 @@ let pp_print_port_mode ppf = function
   | In -> Format.fprintf ppf "In"
   | Out -> Format.fprintf ppf "Out"
 
-let pp_print_port ind ppf { name; mode; ptype } =
+let pp_print_port ind ppf { name; mode; ptype; probe } =
   Format.fprintf ppf "p.name = \"%s\" &&@," name;
   Format.fprintf ppf "p.mode = PortMode.%a &&@," pp_print_port_mode mode;
+  Format.fprintf ppf "p.probe = %B &&@," probe;
   match ptype with
   | None -> Format.fprintf ppf "p.ptype = mk_none<DataType>"
   | Some dt -> (
@@ -731,6 +769,12 @@ let pp_print_cyber_cia ind ppf cia =
            | CyberI -> "Integrity"
            | CyberA -> "Availability")
 
+let pp_print_safety_ia ind ppf ia =
+  Format.fprintf ppf "IA.%s"
+    (match ia with
+           | SafetyI -> "Integrity"
+           | SafetyA -> "Availability")
+
 let pp_print_cyber_severity ind ppf severity =
   Format.fprintf ppf "Severity.%s"
     (match severity with
@@ -745,6 +789,13 @@ let pp_print_cyber_port ind ppf {name; cia} =
   Format.fprintf ppf "port.name = \"%s\" &&@," name;
   Format.fprintf ppf "port.cia = %a@,"
     (pp_print_cyber_cia ind) cia;
+  Format.fprintf ppf "}"
+
+let pp_print_safety_port ind ppf {name; ia} =
+  Format.fprintf ppf "some (port: IAPort) {@,";
+  Format.fprintf ppf "port.name = \"%s\" &&@," name;
+  Format.fprintf ppf "port.ia = %a@,"
+    (pp_print_safety_ia ind) ia;
   Format.fprintf ppf "}"
 
 let rec pp_print_cyber_expr ind ppf expr =
@@ -780,6 +831,44 @@ and pp_print_cyber_expr_list name lst ind ppf exprs =
     ppf
     (List.mapi (fun i expr -> (i, expr)) exprs)
 
+let rec pp_print_safety_expr ind ppf expr =
+  Format.fprintf ppf "some (expr: SafetyExpr) {@,";
+  let kind, val_fmt = match expr with
+    | SafetyPort port
+      -> "Port", fun () -> (Format.fprintf ppf
+                              "@[<v %d>expr.port = %a@]@," ind
+                              (pp_print_safety_port ind) port)
+
+    | SafetyFault id
+      -> "Fault", fun () -> (Format.fprintf ppf
+                              "@[<v %d>expr.fault = \"%s\"@]@," ind id)
+    | SafetyAnd es
+      -> "And", fun ()
+                -> pp_print_safety_expr_list "expr" "and" ind ppf es
+    | SafetyOr es
+      -> "Or", fun ()
+               -> pp_print_safety_expr_list "expr" "or" ind ppf es
+    | SafetyNot e
+      -> "Not", fun () -> (Format.fprintf ppf
+                             "@[<v %d>expr.not = %a@]@," ind
+                             (pp_print_safety_expr ind) e) in
+  Format.fprintf ppf "expr.kind = SafetyExprKind.%s &&@," kind;
+  val_fmt ();
+  Format.fprintf ppf "}@,"
+
+and pp_print_safety_expr_list name lst ind ppf exprs =
+  Format.fprintf ppf
+    "%s.%s.length = %d &&@," name lst (List.length exprs);
+  let pp_sep ppf () = Format.fprintf ppf " &&@," in
+  Format.pp_print_list ~pp_sep
+    (fun ppf (i, expr) ->
+      Format.fprintf ppf "@[<v %d>%s.%s.element[%d] = %a@]"
+        ind name lst i (pp_print_safety_expr ind) expr
+    )
+    ppf
+    (List.mapi (fun i expr -> (i, expr)) exprs)
+
+
 let pp_print_cyber_req_body ind ppf
       {id; cia; severity; condition; comment; description; phases; extern} =
   Format.fprintf ppf "req.id = \"%s\" &&@," id;
@@ -794,6 +883,14 @@ let pp_print_cyber_req_body ind ppf
   match cia with
   | Some cia_val -> Format.fprintf ppf "&& req.cia = %a@," (pp_print_cyber_cia ind) cia_val
   | None -> ()
+
+let pp_print_safety_req_body ind ppf
+      {id; condition; comment; description} =
+  Format.fprintf ppf "req.id = \"%s\" &&@," id;
+  Format.fprintf ppf "@[<v %d>req.condition = %a &&@]@," ind
+    (pp_print_safety_expr ind) condition;
+  pp_print_opt ppf "req.comment = \"%s\" &&@," comment;
+  pp_print_opt ppf "req.description = \"%s\"@," description
 
 let pp_print_cyber_rel_body ind ppf
   {id; output; inputs; comment; description; phases; extern} =
@@ -810,6 +907,26 @@ let pp_print_cyber_rel_body ind ppf
   pp_print_opt ppf "rel.phases = \"%s\" &&@," phases;
   pp_print_opt ppf "rel.extern = \"%s\"@," extern
 
+let pp_print_safety_rel_body ind ppf
+  {id; output; faultSrc; comment; description} =
+  Format.fprintf ppf "rel.id = \"%s\" &&@," id;
+  Format.fprintf ppf "@[<v %d>rel.output = %a &&@]@," ind
+    (pp_print_safety_port ind) output;
+  (match faultSrc with
+  | Some expr -> Format.fprintf ppf
+                   "@[<v %d>rel.faultSrc = %a &&@]@," ind
+                   (pp_print_safety_expr ind) expr
+  | None -> ());
+  pp_print_opt ppf "rel.comment = \"%s\" &&@," comment;
+  pp_print_opt ppf "rel.description = \"%s\"@," description
+
+let pp_print_safety_event_body ind ppf
+  {id; probability; comment; description} =
+  Format.fprintf ppf "ev.id = \"%s\" &&@," id;
+  Format.fprintf ppf "ev.probability = \"%s\" &&@," probability;
+  pp_print_opt ppf "ev.comment = \"%s\" &&@," comment;
+  pp_print_opt ppf "ev.description = \"%s\"@," description
+
 let pp_print_cyber_reqs_list ind ppf cyber_reqs =
   let pp_sep ppf () = Format.fprintf ppf " &&@," in
   Format.pp_print_list ~pp_sep
@@ -821,6 +938,18 @@ let pp_print_cyber_reqs_list ind ppf cyber_reqs =
     )
     ppf
     (List.mapi (fun i req -> (i, req)) cyber_reqs)
+
+let pp_print_safety_reqs_list ind ppf safety_reqs =
+  let pp_sep ppf () = Format.fprintf ppf " &&@," in
+  Format.pp_print_list ~pp_sep
+    (fun ppf (i, req) ->
+      Format.fprintf ppf "@[<v %d>m.safety_requirements.element[%d] = " ind i;
+      Format.fprintf ppf "some (req: SafetyReq) {@,";
+      Format.fprintf ppf "%a@]@,}"
+        (pp_print_safety_req_body ind) req
+    )
+    ppf
+    (List.mapi (fun i req -> (i, req)) safety_reqs)
 
 let pp_print_cyber_rels_list ind ppf cyber_rels =
   let pp_sep ppf () = Format.fprintf ppf " &&@," in
@@ -834,6 +963,30 @@ let pp_print_cyber_rels_list ind ppf cyber_rels =
     ppf
     (List.mapi (fun i rel -> (i, rel)) cyber_rels)
 
+let pp_print_safety_rels_list ind ppf safety_rels =
+  let pp_sep ppf () = Format.fprintf ppf " &&@," in
+  Format.pp_print_list ~pp_sep
+    (fun ppf (i, rel) ->
+      Format.fprintf ppf "@[<v %d>ct.safety_relations.element[%d] = " ind i;
+      Format.fprintf ppf "some (rel: SafetyRel) {@,";
+      Format.fprintf ppf "%a@]@,}"
+        (pp_print_safety_rel_body ind) rel
+    )
+    ppf
+    (List.mapi (fun i rel -> (i, rel)) safety_rels)
+
+let pp_print_safety_events_list ind ppf safety_events =
+  let pp_sep ppf () = Format.fprintf ppf " &&@," in
+  Format.pp_print_list ~pp_sep
+    (fun ppf (i, ev) ->
+      Format.fprintf ppf "@[<v %d>ct.safety_events.element[%d] = " ind i;
+      Format.fprintf ppf "some (ev: SafetyEvent) {@,";
+      Format.fprintf ppf "%a@]@,}"
+        (pp_print_safety_event_body ind) ev
+    )
+    ppf
+    (List.mapi (fun i ev -> (i, ev)) safety_events)
+
 let pp_print_bool_prop_value ppf = function
   | None -> Format.fprintf ppf "mk_none<Bool>"
   | Some v -> Format.fprintf ppf "mk_some<Bool>(%B)" v
@@ -846,7 +999,9 @@ let pp_print_string_prop_value ppf = function
   | None -> Format.fprintf ppf "mk_none<String>"
   | Some s -> Format.fprintf ppf "mk_some<String>(\"%s\")" s
 
-let pp_print_component_type ind ppf {name; ports; contract; cyber_rels} =
+let pp_print_component_type ind ppf
+  {name; ports; contract; cyber_rels; safety_rels; safety_events}
+=
   Format.fprintf ppf "ct.name = \"%s\" &&@," name;
   Format.fprintf ppf "ct.ports.length = %d &&@," (List.length ports);
   pp_print_port_list ind ppf ports;
@@ -856,7 +1011,15 @@ let pp_print_component_type ind ppf {name; ports; contract; cyber_rels} =
   Format.fprintf ppf " &&@,ct.cyber_relations.length = %d %s@,"
     (List.length cyber_rels)
     (match cyber_rels with _ :: _ -> "&&" | [] -> "");
-  pp_print_cyber_rels_list ind ppf cyber_rels
+  pp_print_cyber_rels_list ind ppf cyber_rels;
+  Format.fprintf ppf " &&@,ct.safety_relations.length = %d %s@,"
+    (List.length safety_rels)
+    (match safety_rels with _ :: _ -> "&&" | [] -> "");
+  pp_print_safety_rels_list ind ppf safety_rels;
+  Format.fprintf ppf " &&@,ct.safety_events.length = %d %s@,"
+    (List.length safety_events)
+    (match safety_events with _ :: _ -> "&&" | [] -> "");
+  pp_print_safety_events_list ind ppf safety_events
 
 let pp_print_comp_types_list ind ppf comp_types =
   comp_types |> List.iteri (fun i ct ->
@@ -1660,7 +1823,7 @@ let pp_print_missions_list ind ppf missions =
 
 let pp_print_model_body ind ppf
       { name; type_declarations; component_types;
-        dataflow_code; comp_impl; cyber_reqs; missions;
+        dataflow_code; comp_impl; cyber_reqs; safety_reqs; missions;
         threat_models; threat_defenses }
 =
   Format.fprintf ppf "m.name = \"%s\" &&@," name;
@@ -1678,6 +1841,10 @@ let pp_print_model_body ind ppf
     (List.length cyber_reqs)
     (match cyber_reqs with _ :: _ -> "&&" | [] -> "");
   pp_print_cyber_reqs_list ind ppf cyber_reqs;
+  Format.fprintf ppf " && @,m.safety_requirements.length = %d %s@,"
+    (List.length safety_reqs)
+    (match safety_reqs with _ :: _ -> "&&" | [] -> "");
+  pp_print_safety_reqs_list ind ppf safety_reqs;
   Format.fprintf ppf " && @,m.missions.length = %d %s@,"
     (List.length missions)
     (match missions with _ :: _ -> "&&" | [] -> "");
