@@ -78,8 +78,6 @@ public class MBASResultSummary {
 				// the size of missions1.get(i).getRequirements() should be the same as the size of
 				// tableContents1
 				RequirementAttributes reqAttr1 = missions1.get(i).getRequirements().get(j);
-
-//				List<PathAttributes> paths2 = tableContents2.get(j).getPaths();
 				List<PathAttributes> paths2 = getPaths(missions1.get(i), reqAttr1, missions2);
 
 				// assumption: same size of path1 and path2
@@ -87,27 +85,10 @@ public class MBASResultSummary {
 
 				for (int k = 0; k < paths1.size(); k++) {
 					List<ComponentAttributes> components1 = paths1.get(k).getComponents();
-					List<ComponentAttributes> components2 = paths2.get(k).getComponents();
-
-//					if (k < paths2.size()) {
-//						components2 = paths2.get(k).getComponents();
-//					}
-
 					for (int ii = 0; ii < components1.size(); ii++) {
 						String comp1Name = components1.get(ii).getComponent();
 						List<String> comp1Capes = components1.get(ii).getCapecs();
-//						findImplDefenseFromPath2(paths2, comp1Name, comp1Capes);
 						components1.get(ii).setDescriptions(findImplDefenseFromPath2(paths2, comp1Name, comp1Capes));
-//						components1.get(ii).setDescriptions(components2.get(ii).getDefenses());
-
-//						if (components2 != null) {
-//							String comp1Name = components1.get(ii).getComponent();
-//							List<String> comp1Capes = components1.get(ii).getCapecs();
-//
-//							components1.get(ii).setDescriptions(components2.get(ii).getDefenses());
-//						} else {
-//							components1.get(ii).setDescriptions(Arrays.asList(""));
-//						}
 					}
 				}
 			}
@@ -127,7 +108,6 @@ public class MBASResultSummary {
 				String comp2Name = compAttrs.get(j).getComponent();
 
 				if (comp1Name.equals(comp2Name)) {
-
 					if (comp1Capes.equals(compAttrs.get(j).getCapecs())) {
 						return compAttrs.get(j).getDefenses();
 					}
@@ -137,6 +117,9 @@ public class MBASResultSummary {
 		return new ArrayList<String>();
 	}
 
+	/*
+	 * Try to find the matching path attributes of mission1 in mission2
+	 */
 	private List<PathAttributes> getPaths(MissionAttributes mission1, RequirementAttributes reqAttr1,
 			List<MissionAttributes> missions2) {
 		String missionName = mission1.getMission();
