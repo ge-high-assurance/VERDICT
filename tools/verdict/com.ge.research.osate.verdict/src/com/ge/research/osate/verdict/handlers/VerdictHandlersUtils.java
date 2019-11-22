@@ -537,4 +537,9 @@ public class VerdictHandlersUtils {
 		}
 		return true;
 	}
+
+	public static void errAndExit(String err) {
+		System.out.println("Error: " + err);
+		System.exit(-1);
+	}
 }
