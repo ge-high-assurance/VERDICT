@@ -41,7 +41,8 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode; 
-  ptype: data_type option
+  ptype: data_type option;
+  probe: bool;
 }
 
 type binary_op =
@@ -162,17 +163,28 @@ type dataflow_model = {
 
 type cyber_cia = CyberC | CyberI | CyberA
 
+type safety_ia = SafetyI | SafetyA
+
 type cyber_severity =
   CyberNone | CyberMinor | CyberMajor
   | CyberHazardous | CyberCatastrophic
 
 type cyber_port = {name: string; cia: cyber_cia}
 
+type safety_port = {name: string; ia: safety_ia}
+
 type cyber_expr =
   | CyberPort of cyber_port
   | CyberAnd of cyber_expr list
   | CyberOr of cyber_expr list
   | CyberNot of cyber_expr
+
+type safety_expr =
+  | SafetyPort of safety_port
+  | SafetyFault of string
+  | SafetyAnd of safety_expr list
+  | SafetyOr of safety_expr list
+  | SafetyNot of safety_expr
 
 type cyber_req = {
     id: string;
@@ -185,6 +197,13 @@ type cyber_req = {
     extern: string option;
   }
 
+type safety_req = {
+    id: string;
+    condition: safety_expr;
+    comment: string option;
+    description: string option;
+  }
+
 type cyber_rel = {
     id: string;
     output: cyber_port;
@@ -193,6 +212,21 @@ type cyber_rel = {
     description: string option;
     phases: string option;
     extern: string option;
+  }
+
+type safety_rel = {
+    id: string;
+    output: safety_port;
+    faultSrc: safety_expr option;
+    comment: string option;
+    description: string option;
+  }
+
+type safety_event = {
+    id: string;
+    probability: string;
+    comment: string option;
+    description: string option;
   }
 
 type mission = {
@@ -207,6 +241,8 @@ type component_type = {
   ports: port list;
   contract: contract_spec option;
   cyber_rels: cyber_rel list;
+  safety_rels: safety_rel list;
+  safety_events: safety_event list;
 }
 
 type comp_type_ref = int
@@ -409,6 +445,7 @@ type model = {
   dataflow_code: dataflow_model option;
   comp_impl: component_impl list;
   cyber_reqs: cyber_req list;
+  safety_reqs: safety_req list;
   missions: mission list;
   threat_models: threat_model list;
   threat_defenses: threat_defense list;

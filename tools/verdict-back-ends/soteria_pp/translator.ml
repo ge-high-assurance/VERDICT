@@ -103,10 +103,20 @@ let attack_cia name cia l_attack =
                           let fun_cia x = if f x c_A = cia || f x i_A = cia || f x a_A= cia 
                                           then [f x capec_A] else [] in
                           List.map (compAttack name l_attack)  ~f:fun_cia;;
+(* TODO: zip and unzip *)
 let attack_events name l_attack = let f_capec x = List.Assoc.find_exn x capec_A ~equal:(=) in
                          List.map (compAttack name l_attack) ~f:f_capec ;;
+                         
 let attack_info name l_attack= let f_info x = float_of_string (List.Assoc.find_exn x likeli_A ~equal:(=)) in
                          List.map (compAttack name l_attack) ~f:f_info ;;                                                   
+
+(* there could be duplicate attack events. Assuming that each CAPECs in l_attack 
+   will each have the same likelihoods, the best way to eliminate duplicates is to 
+   zip the attack events and the info lists, dedup, then unzip *)
+   
+let makeAttackList_AttackInfoList name l_attack =
+   let aL = List.zip_exn (attack_events name l_attack) (attack_info name l_attack) in
+   List.unzip (List.dedup_and_sort ~compare:compare aL) ;;
 
 (* - * - * - *)
 
@@ -176,8 +186,8 @@ let rec makeNIST2DAL_assocList aL l_defense2nist =
                    let d2nAList = List.concat( propInfo p dprop_D l_defense2nist ) in
                        let nistprofile = List.Assoc.find d2nAList ~equal:(=) dprofile_D in
                           let pp = match nistprofile with
-                                     | Some x -> x
-                                     | None -> p  in
+                                     | Some x -> x     (* if found, return the nist profile *)
+                                     | None -> p  in   (* otherwise, return the property name *)
                           (pp,dal) :: makeNIST2DAL_assocList tl l_defense2nist)
     | [] -> [];;
 
@@ -186,7 +196,7 @@ let makeDefenseList_DefenseRigorsList comp deftype defense defense2nist =
  let f a = 
   (let (p,dal) = a in 
    let strList = String.split_on_chars ~on:[';'] p in
-    List.map strList ~f:(fun x -> (x,dal)) ) in
+    List.map strList ~f:(fun x -> (x,dal)) ) in  (* this line replicates the defense with the defense DAL *)
   List.unzip (List.concat (List.map (makeNIST2DAL_assocList aL defense2nist) ~f:(fun x -> f x)));;
 
 let rec convertProp2Profile l l_defense2nist =
@@ -195,8 +205,8 @@ let rec convertProp2Profile l l_defense2nist =
          (let aL = List.concat (propInfo hd dprop_D l_defense2nist) in
             (let nistprofile = List.Assoc.find aL ~equal:(=) dprofile_D in
                match nistprofile with
-                 | Some x -> x
-                 | None -> hd
+                 | Some x -> x (* if found, return the nist profile *)
+                 | None -> hd  (* otherwise, return the property name *)
             ) 
          ) :: (convertProp2Profile tl l_defense2nist)
      | [] -> [];;
@@ -210,6 +220,15 @@ let defenseProfileAux name defType l_defense l_defense2nist =
     List.map cpconverted ~f:(fun (c,pl) -> (c, List.map pl ~f:(fun l -> List.filter l ~f:(fun x -> x<>"null"))))
     ;;   
 
+(* this function gets rid of the empty And in a list like this 
+   [And [D ["deviceAuthentication"]]; And [D ["heterogeneity"]]; And []] *)
+let rec eliminateEmptyAnd l =
+   match l with
+       hd::tl -> (match hd with
+                     And[] -> eliminateEmptyAnd tl
+                   | _     -> hd::eliminateEmptyAnd tl )
+     | [] -> [];;
+
 let rec processDL dl =
    let capec x = fst x
    and defenList x = snd x 
@@ -217,22 +236,22 @@ let rec processDL dl =
    and andProfile l = And( List.map l ~f:(fun x -> D[x]))       (* list of strings get ANDed together *) 
    in      
    match dl with
-       hd::tl -> (capec hd, Or( List.map (defenList hd) ~f:(fun x -> andProfile 
-          (let p = andList x in
-          match p with
-              [""] -> []
-            | _ -> p ) ))) :: processDL tl
+       hd::tl -> (capec hd, Or( eliminateEmptyAnd (
+                                   List.map (defenList hd) ~f:(fun x -> andProfile 
+                                                                         (let p = andList x in match p with [""] -> [] | _ -> p )
+                                ))
+                  )) :: processDL tl
      | [] -> [];;
-
+     
 (* need to post process the list of defense profiles because 
-   if the profile is equal to Or[And[]] then that means there was no defense 
+   if the profile is equal to Or[And[]] then that means there is no defense 
    so eliminate it from the list *)
 let rec postProcessDefenseProfile dL =
    match dL with
    hd::tl -> let (c, p) = hd in 
       (match p with 
-           Or [And []] -> postProcessDefenseProfile tl
-         | _ -> (c,p) :: postProcessDefenseProfile tl)
+           Or [] -> postProcessDefenseProfile tl
+         | _     -> (c,p) :: postProcessDefenseProfile tl)
    |[] -> [];;
 
 let defenseProfile name defType l_defense l_defense2nist =
@@ -252,7 +271,7 @@ let compEventsInfo name l_events = List.map (comp_find eventsH_Probability (comp
 
 (* from l_comp_saf we get faults and fault_formulas *)
 let (compsafH_CompType, compsafH_IOrE,      compsafH_InputIA, compsafH_Out, compsafH_OutputIA) =
-	("Comp",            "InputPortOrEvent", "InputIA",        "OutputPort", "OutputIA");;
+	("Comp",            "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");;
 
 let compFaults name l_comp_saf = comp_find2 compsafH_InputIA (comp name l_comp_saf);;
 
@@ -519,7 +538,8 @@ let formula name coutputs l_arch l_comp_dep l_attack =
 let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
-	and (eventsList, rigorsList) = makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist in
+	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
+	and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) in
 	genComp (*name*)            name 
 			(*input_flows*)     (compInputArch name l_arch) 
 			(*output_flows*)    coutputs
@@ -528,11 +548,11 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defe
 			(*event_info*)      (compEventsInfo name l_events) 
 			(*fault_formulas*)  (formulaSafe name coutputs l_arch l_comp_saf)
 			(*attacks*)         ["Confidentiality";"Integrity";"Availability"] (*(List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
-			(*attack_events*)   (attack_events name l_attack) 
-			(*attack_info*)     (attack_info name l_attack)
+			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
+			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
 			(*attack_formula*)  (formula name coutputs l_arch l_comp_dep l_attack) 
-			(*defense_events*)  eventsList (* (defenseEvents name defType l_defense) *)
-			(*defense_rigors*)  rigorsList (* (defenseRigors name defType l_defense) *)
+			(*defense_events*)  eventsList  (* (defenseEvents name defType l_defense) *)
+			(*defense_rigors*)  rigorsList  (* (defenseRigors name defType l_defense) *)
 			(*defense_profiles*)(defenseProfile name defType l_defense l_defense2nist);;
 (* - *)
 
@@ -710,8 +730,7 @@ let cybReqAttackDefenseProb cyberReqIDStr defenseTypeStr lib mdl =
       ((cyberReqIDStr,defenseTypeStr), (likelihoodCut tc_adtree, cutSetsList (likelihoodCutImp tc_adtree) ));;                  
 
 
-let xml_gen filename listCutsetInfo mission = (* defType l_defense = *)
-    let oc = Out_channel.create filename in
+let xml_gen filename_ch listCutsetInfo mission = (* defType l_defense = *)
     let lReqs_of_mission missionID mission = missionIds (compInfo missionID missionReqId_M mission) in
     let cutset_of_Mission missionID mission lcutsets = List.filter lcutsets ~f:(fun x->List.mem (lReqs_of_mission missionID mission) (fst (fst x))  ~equal:(=) ) in
     let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in 
@@ -720,21 +739,18 @@ let xml_gen filename listCutsetInfo mission = (* defType l_defense = *)
     let reqId l = (fst(fst l)) in let defenseType l = (snd(fst l))in
     let reqPro l = (string_of_float (fst(snd l))) in         
     let probCompAttackDefense l = List.iter (snd(snd l)) 
-             ~f:(fun x-> cutSet oc (getval x "prob") (getval x "comp") (getval x "attack") 
+             ~f:(fun x-> cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") 
              (*(compAttackDefense (getval x "comp")  (getval x "attack") defType l_defense)*)
              (getval x "defense" )) in
     let cyberReq_of_Mission listReq  = List.iter   listReq ~f:(fun x->
-          fprintf oc "\t<Requirement label=  \"%s\" defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" (reqId x)(defenseType x) (reqPro x) 
+          fprintf filename_ch "\t<Requirement label=  \"%s\" defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" (reqId x)(defenseType x) (reqPro x) 
                          (severity2risk(getSeverity_Of_cybReq (reqId x) mission));
           probCompAttackDefense x;
-          fprintf oc "\t</Requirement > \n" ) in
-    fprintf oc "<?xml version=\"1.0\"?>\n";
-    fprintf oc "<Results xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
-    List.iter (missionReqId mission)  ~f:(fun x-> fprintf oc "<Mission label=  \"%s\" >\n" x;
+          fprintf filename_ch "\t</Requirement > \n" ) in
+    List.iter (missionReqId mission)  ~f:(fun x-> fprintf filename_ch "<Mission label=  \"%s\" >\n" x;
                                                   cyberReq_of_Mission (cutset_of_Mission x mission listCutsetInfo) ;
-                                                  fprintf oc "</Mission > \n");
-    fprintf oc "</Results>\n";
-     Out_channel.close oc;;
+                                                  fprintf filename_ch "</Mission > \n");
+;;
    
 
 (* This function returns the following tuple given the CyberReqID: (modelVersion, cyberReq, risk) 
@@ -757,7 +773,8 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    and arch = mainListtag arch_ch 
    and mission = mainListtag mission_ch 
    and defense = mainListtag defense_ch 
-   and defense2nist = mainListtag defense2nist_ch   
+   and defense2nist = mainListtag defense2nist_ch
+   and xml_oc = Out_channel.create (fpath^deftype^".xml")  
    in
 
    (* check if there's anything to analyze *)
@@ -767,7 +784,11 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    
    let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist
    in
-   
+
+   (* start the xml formatted results file *)
+   fprintf xml_oc "<?xml version=\"1.0\"?>\n";
+   fprintf xml_oc "<Results xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
+
    List.iter l_librariesThreats ~f:(fun x -> 
       let ((cyberReqIDStr,defenseTypeStr), (lib,mdl)) = x in
          (* -- extract some text info -- *)
@@ -783,12 +804,16 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
                (* tree visualizations *)    
                dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr) t ;
                (*.xml file *)
-               xml_gen (fpath^deftype^".xml") [(cybReqAttackDefenseProb cyberReqIDStr defenseTypeStr lib mdl)] mission;
+               xml_gen xml_oc [(cybReqAttackDefenseProb cyberReqIDStr defenseTypeStr lib mdl)] mission;
     	    | "Safety" -> let t = model_to_ftree lib mdl in
                (* tree visualizations *)    
                dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ cyberReqIDStr ^ "-" ^ defenseTypeStr) t ;
             | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq")
       );
+    
+    (* complete the xml file  *)
+    fprintf xml_oc "</Results>\n";
+    Out_channel.close xml_oc    
 ;;
 
 (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
