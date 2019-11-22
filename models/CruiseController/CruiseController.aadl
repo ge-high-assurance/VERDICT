@@ -54,19 +54,16 @@ public
 			eq set_condition: bool = set_speed and MIN_SPEED <= speed and speed <= MAX_SPEED;
 			
 			eq ready_mode: bool = false ->
-								  (pre(ready_mode) and not on_off) or
-								  (pre(ready_mode) and not set_condition) or
+								  (pre(ready_mode) and not on_off and not set_condition) or
 								  (pre(off_mode) and on_off);
 			
 			eq on_mode: bool = false ->
-							   (pre(on_mode) and not on_off) or
-							   (pre(on_mode) and not brake_cancel) or
+							   (pre(on_mode) and not on_off and not brake_cancel) or
 							   (pre(ready_mode) and set_condition) or
 							   (pre(paused_mode) and resume_speed);   
 			
 			eq paused_mode: bool = false ->
-								   (pre(paused_mode) and not on_off) or
-								   (pre(paused_mode) and not resume_speed) or
+								   (pre(paused_mode) and not on_off and not resume_speed) or
 								   (pre(on_mode) and brake_cancel);
 			
 			-- Assumptions
@@ -75,7 +72,7 @@ public
 			assume "Buttons are mutually exclusive": 
 					ToInt(on_off) + 
 					ToInt(resume_speed) + ToInt(set_speed) + 
-					ToInt(inc) + ToInt(dec) <= 1;
+					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;
 			
 			guarantee "Cruise control is enabled if and only if it is On":
 					  enabled = on_mode;
@@ -151,9 +148,8 @@ public
 					speed > 0.0;
 			
 			assume "Buttons are mutually exclusive": 
-					ToInt(on_off) +
-					ToInt(resume_speed) + ToInt(set_speed) + 
-					ToInt(inc) + ToInt(dec) <= 1;	
+					ToInt(on_off) + ToInt(resume_speed) + ToInt(set_speed) + 
+					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;	
 				
 			-- Properties
 			guarantee "1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed":
