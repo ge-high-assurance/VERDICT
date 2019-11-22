@@ -41,7 +41,8 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode;
-  ptype: data_type option
+  ptype: data_type option;
+  probe: bool;
 }
 
 type binary_op =
@@ -671,9 +672,10 @@ let pp_print_port_mode ppf = function
   | In -> Format.fprintf ppf "In"
   | Out -> Format.fprintf ppf "Out"
 
-let pp_print_port ind ppf { name; mode; ptype } =
+let pp_print_port ind ppf { name; mode; ptype; probe } =
   Format.fprintf ppf "p.name = \"%s\" &&@," name;
   Format.fprintf ppf "p.mode = PortMode.%a &&@," pp_print_port_mode mode;
+  Format.fprintf ppf "p.probe = %B &&@," probe;
   match ptype with
   | None -> Format.fprintf ppf "p.ptype = mk_none<DataType>"
   | Some dt -> (

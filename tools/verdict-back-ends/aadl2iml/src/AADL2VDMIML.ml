@@ -33,6 +33,8 @@ let data_repr_qpref = AD.mk_full_qpref "Data_Model" "Data_Representation"
 
 let enumerators_qpref = AD.mk_full_qpref "Data_Model" "Enumerators"
 
+let app_property_set = "VERDICT_Properties"
+
 let get_bool_prop_value qpr properties =
   match AD.find_assoc qpr properties with
   | None -> None
@@ -154,14 +156,20 @@ let aadl_dir_to_iml_mode = function
   | AD.Out -> VI.Out
   | AD.InOut -> failwith "Input-Output ports are not supported"
 
-let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype } =
+let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype; AD.properties } =
   {VI.name = C.get_id name;
    VI.mode = aadl_dir_to_iml_mode dir;
    VI.ptype = (
      match dtype with
      | None -> None
      | Some qcr -> Some (get_data_type type_decls qcr)
-   )
+   );
+   VI.probe = (
+     let qpr = AD.mk_full_qpref app_property_set "probe" in
+     match get_bool_prop_value qpr properties with
+     | None -> false
+     | Some v -> v
+   ) 
   }
 
 let agree_data_type_to_data_type type_decls = function
@@ -544,8 +552,6 @@ let get_instance_index sys_impl iml_comp_types = function
     VI.Implementation (get_impl_index sys_impl comp_type comp_impl)
   )
   | _ -> assert false
-
-let app_property_set = "VERDICT_Properties"
 
 let get_manufacturer_prop_value properties =
   let manufacturer_qpr = AD.mk_full_qpref app_property_set "manufacturer" in
