@@ -320,6 +320,10 @@ let verdict_cyber_cia_to_iml = function
   | VE.CIA_I -> VI.CyberI
   | VE.CIA_A -> VI.CyberA
 
+let verdict_safety_ia_to_iml = function
+  | VE.IA_I -> VI.SafetyI
+  | VE.IA_A -> VI.SafetyA
+
 let opt_bind f = function
   | Some x -> Some (f x)
   | None -> None
@@ -342,6 +346,18 @@ let rec verdict_cyber_expr_to_iml = function
      VI.CyberOr (List.map verdict_cyber_expr_to_iml exprs)
   | VE.LNot expr -> VI.CyberNot (verdict_cyber_expr_to_iml expr)
 
+let verdict_safety_port_to_iml (name, ia) =
+  {VI.name; VI.ia = verdict_safety_ia_to_iml ia}
+
+let rec verdict_safety_expr_to_iml = function
+  | VE.SLPort port -> VI.SafetyPort (verdict_safety_port_to_iml port)
+  | VE.SLFault id -> VI.SafetyFault id
+  | VE.SLAnd exprs ->
+     VI.SafetyAnd (List.map verdict_safety_expr_to_iml exprs)
+  | VE.SLOr exprs ->
+     VI.SafetyOr (List.map verdict_safety_expr_to_iml exprs)
+  | VE.SLNot expr -> VI.SafetyNot (verdict_safety_expr_to_iml expr)
+
 let verdict_cyber_req_to_iml
       id cia severity condition comment description phases extern =
   let open VI in
@@ -351,6 +367,15 @@ let verdict_cyber_req_to_iml
     severity = verdict_cyber_severity_to_iml severity;
     condition = verdict_cyber_expr_to_iml condition;
     comment; description; phases; extern;
+  }
+
+let verdict_safety_req_to_iml
+      id condition comment description =
+  let open VI in
+  {
+    id;
+    condition = verdict_safety_expr_to_iml condition;
+    comment; description
   }
 
 let verdict_cyber_rel_to_iml
@@ -366,6 +391,26 @@ let verdict_cyber_rel_to_iml
     comment; description; phases; extern;
   }
 
+let verdict_safety_rel_to_iml
+      id output faultSrc comment description =
+  let open VI in
+  {
+    id;
+    output = verdict_safety_port_to_iml output;
+    faultSrc =
+      (match faultSrc with
+       | Some expr -> Some (verdict_safety_expr_to_iml expr)
+       | None -> None);
+    comment; description
+  }
+
+let verdict_safety_event_to_iml
+      id probability comment description =
+  let open VI in
+  {
+    id; probability; comment; description
+  }
+
 let verdict_annex_to_cyber_rels annex =
   let open VE in
   List.fold_left
@@ -378,6 +423,30 @@ let verdict_annex_to_cyber_rels annex =
       | _ -> acc
     end [] annex
 
+let verdict_annex_to_safety_rels annex =
+  let open VE in
+  List.fold_left
+    begin
+      fun acc st ->
+      match st with
+      | SafetyRel
+        {id; output; faultSrc; comment; description}
+        -> (verdict_safety_rel_to_iml id output faultSrc comment description) :: acc
+      | _ -> acc
+    end [] annex
+
+let verdict_annex_to_safety_events annex =
+  let open VE in
+  List.fold_left
+    begin
+      fun acc st ->
+      match st with
+      | SafetyEvent
+        {id; probability; comment; description}
+        -> (verdict_safety_event_to_iml id probability comment description) :: acc
+      | _ -> acc
+    end [] annex
+
 let verdict_annex_to_cyber_reqs annex =
   let open VE in
   List.fold_left
@@ -387,6 +456,18 @@ let verdict_annex_to_cyber_reqs annex =
       | CyberReq
         {id; cia; severity; condition; comment; description; phases; extern}
         -> (verdict_cyber_req_to_iml id cia severity condition comment description phases extern) :: acc
+      | _ -> acc
+    end [] annex
+
+let verdict_annex_to_safety_reqs annex =
+  let open VE in
+  List.fold_left
+    begin
+      fun acc st ->
+      match st with
+      | SafetyReq
+        {id; condition; comment; description}
+        -> (verdict_safety_req_to_iml id condition comment description) :: acc
       | _ -> acc
     end [] annex
 
@@ -409,10 +490,28 @@ let system_types_to_iml_comp_types type_decls sys_types =
            verdict_annex_to_cyber_rels annex
         | _ -> assert false
       end in
+    let safety_rels =
+      begin
+        match List.find_opt AD.is_verdict_annex annexes with
+        | None -> []
+        | Some (AD.VerdictAnnex (_, annex)) ->
+           verdict_annex_to_safety_rels annex
+        | _ -> assert false
+      end in
+    let safety_events =
+      begin
+        match List.find_opt AD.is_verdict_annex annexes with
+        | None -> []
+        | Some (AD.VerdictAnnex (_, annex)) ->
+           verdict_annex_to_safety_events annex
+        | _ -> assert false
+      end in
     {VI.name = C.get_id name;
      VI.ports = List.map (aadl_port_to_iml_port type_decls) ports;
      contract;
      cyber_rels;
+     safety_rels;
+     safety_events;
     }
   )
 
@@ -1051,6 +1150,21 @@ let verdict_cyber_reqs_of_system_types sys_types =
         end acc annexes
     end [] sys_types
 
+let verdict_safety_reqs_of_system_types sys_types =
+  (* we assume that there is only one system type with cyber reqs *)
+  List.fold_left
+    begin
+      fun acc ({annexes} : AD.system_type) ->
+      List.fold_left
+        begin
+          fun acc' annex ->
+                match annex with
+                | AD.VerdictAnnex (_, verdict)
+                  -> verdict_annex_to_safety_reqs verdict @ acc'
+                | _ -> acc'
+        end acc annexes
+    end [] sys_types
+
 let filter_opt (lst : 'a option list) : 'a list =
   List.fold_left
     (fun acc nxt ->
@@ -1173,6 +1287,8 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
   in
   let cyber_reqs = verdict_cyber_reqs_of_system_types sys_types
   in
+  let safety_reqs = verdict_safety_reqs_of_system_types sys_types
+  in
   let missions = missions_of_system_types sys_types
   in
   {VI.name = name;
@@ -1181,6 +1297,7 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
    dataflow_code;
    VI.comp_impl = iml_comp_impl;
    VI.cyber_reqs = cyber_reqs;
+   VI.safety_reqs = safety_reqs;
    VI.threat_models = threat_models_of_annexes annex_libs;
    VI.threat_defenses = threat_defenses_of_annexes annex_libs;
    VI.missions = missions

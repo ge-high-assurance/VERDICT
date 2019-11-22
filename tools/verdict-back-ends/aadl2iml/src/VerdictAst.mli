@@ -1,6 +1,8 @@
 
 type cia = CIA_C | CIA_I | CIA_A
 
+type ia = IA_I | IA_A
+
 type severity =
   | Severity_None
   | Severity_Minor
@@ -10,11 +12,20 @@ type severity =
 
 type port = string * cia
 
+type iaport = string * ia
+
 type lexpr =
   | LPort of port
   | LAnd of lexpr list
   | LOr of lexpr list
   | LNot of lexpr
+
+type slexpr =
+  | SLPort of iaport
+  | SLFault of string
+  | SLAnd of slexpr list
+  | SLOr of slexpr list
+  | SLNot of slexpr
 
 (* dot-separated strings *)
 type var = string list
@@ -43,6 +54,31 @@ type statement =
         description : string option;
         comment : string option;
         reqs : string list;
+      }
+
+  | SafetyReq of
+      {
+        id : string;
+        condition: slexpr;
+        description : string option;
+        comment : string option;      
+      }
+
+  | SafetyRel of
+      {
+        id : string;
+        output: iaport;
+        faultSrc: slexpr option;
+        description : string option;
+        comment : string option;      
+      }
+
+  | SafetyEvent of
+      {
+        id : string;
+        probability: string;
+        description : string option;
+        comment : string option;
       }
 
   | CyberReq of
