@@ -214,36 +214,49 @@ public
 			eq state: Data_Types::DeliveryPlannerState;
 			
 			guarantee "Output: delivery_cmd_out":
-				delivery_cmd_out = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
-									not no_clearance and 
-									(expensive_item => confirmation);
+				--delivery_cmd_out = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
+				--					not no_clearance and 
+				--					(expensive_item => confirmation);
+				delivery_cmd_out = (making_delivery_mode and not no_clearance and (expensive_item => confirmation));
 				
 			guarantee "Output: constellation_out":
-				constellation_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--constellation_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.constellation
+				--					else 
+				--						pre(constellation_out);
+				constellation_out = if init_mode then 
 										bus_in.constellation
 									else 
 										pre(constellation_out);
 			
 			guarantee "Output: dest_location":
-				dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
-										bus_in.order.target_position
+				--dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.order.target_position
+				--				else 
+				--						pre(dest_location);
+				dest_location = if init_mode then 
+									bus_in.order.target_position
 								else 
-										pre(dest_location);
+									pre(dest_location);
 				
 			guarantee "Output: launch_pos_out":
-				launch_pos_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
-										bus_in.launch_pos
+				--launch_pos_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.launch_pos
+				--				 else 
+				--						pre(launch_pos_out);
+				launch_pos_out = if init_mode then 
+									bus_in.launch_pos
 								 else 
-										pre(launch_pos_out);
+									pre(launch_pos_out);
 			
 			guarantee "Output: radio_cmd":
-				radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
-							expensive_item;
-			
-			eq init: bool = (state = enum(Data_Types::DeliveryPlannerState, INIT));
+				--radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
+				--			expensive_item;
+				radio_cmd = (making_delivery_mode and expensive_item);
 			
 			guarantee "Output: initialized_mode_out":
-				initialized_mode_out = init;
+				--initialized_mode_out = (state = enum(Data_Types::DeliveryPlannerState, INIT));
+				initialized_mode_out = init_mode;
 							
 			
 			guarantee "DeliveryPlannerFSM":
@@ -276,10 +289,52 @@ public
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)						
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected) then 
 							enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)		
 						else pre(state));
 			
+			
+			eq off_mode: bool = true -> 
+								(pre(off_mode) and (not (on_off and connected))) or
+								(pre(init_mode) and on_off and connected) or
+								(pre(ready_mode) and on_off and connected) or 
+								(pre(abort_mode) and on_off and connected);
+			
+			eq init_mode: bool = false ->
+								 (pre(init_mode) and (not (on_off and connected)) and (not (init_criteria_succeed and connected))) or
+								 (pre(off_mode) and on_off and connected) or
+								 (pre(ready_mode) and init_criteria_failed and connected) or
+								 (pre(return_to_truck_mode) and truck_location_reached and connected);
+			
+			eq ready_mode: bool = false ->
+								  (pre(ready_mode) and (not (init_criteria_failed and connected)) 
+								  		           and (not (on_off and connected)) 
+								  		           and (not (abort_cmd and connected)) 
+								  		           and (not (mission_store_release_sequence and connected))) or
+								  (pre(init_mode) and init_criteria_succeed and connected);
+			
+			eq launch_mode: bool = false ->
+								   (pre(launch_mode) and (not (abort_cmd and connected)) 
+								   					 and (not (package_secure and okay_to_launch and separation))) or
+								   (pre(ready_mode) and mission_store_release_sequence and connected);
+			
+			eq abort_mode: bool = false ->
+								  (pre(abort_mode) and (not (on_off and connected))) or
+								  (pre(init_mode) and abort_cmd and connected) or
+								  (pre(ready_mode) and abort_cmd and connected) or
+								  (pre(launch_mode) and abort_cmd and connected);
+			
+			eq flying_to_dest_mode: bool = false ->
+										   (pre(flying_to_dest_mode) and (not (destination_location_reached))) or
+										   (pre(launch_mode) and package_secure and okay_to_launch and separation);
+			
+			eq making_delivery_mode: bool = false ->
+											(pre(making_delivery_mode) and (not (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected))) or
+										    (pre(flying_to_dest_mode) and destination_location_reached);
+			
+			eq return_to_truck_mode: bool = false ->
+											(pre(return_to_truck_mode) and (not (truck_location_reached and connected))) or
+										    (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected));
 			
 			
 			-- old sections below	
