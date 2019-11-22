@@ -410,7 +410,7 @@ public
 			{
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::cType => Hardware;
+				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::controlSentToUntrusted => true;
 				VERDICT_Properties::heterogeneity => true;	
@@ -433,7 +433,7 @@ public
 			imu: system IMU
 			{ 
 				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::cType => Hybrid;
+				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => COTS;
 			};	
 		connections
@@ -503,7 +503,7 @@ public
 			{VERDICT_Properties::insideTrustedBoundary => true;
 			 VERDICT_Properties::manufacturer => ThirdParty;
 			 --VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
-			 VERDICT_Properties::cType => Software;
+			 VERDICT_Properties::componentType => Software;
 			 VERDICT_Properties::adversariallyTested => false;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
