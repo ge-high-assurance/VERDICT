@@ -8,6 +8,7 @@ type Port {
 	name: Identifier;
 	mode: PortMode;
 	ptype: Option<DataType>;
+	probe: Bool;
 };
 
 type ComponentType {

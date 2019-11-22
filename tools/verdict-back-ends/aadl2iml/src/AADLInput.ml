@@ -335,8 +335,8 @@ let merge_packages input =
       | Some qcr -> Some (flatten_qcref qcr)
     in
 
-    let flatten_data_port {AD.name; AD.dir; AD.dtype } =
-      { name; dir; AD.dtype = flatten_qcref_opt dtype }
+    let flatten_data_port {AD.name; AD.dir; AD.dtype; AD.properties } =
+      { name; dir; AD.dtype = flatten_qcref_opt dtype; properties}
     in
 
     let flatten_system_type {AD.name; AD.ports; AD.annexes} =

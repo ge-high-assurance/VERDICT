@@ -18,25 +18,6 @@
 
 open CommonAstTypes
 
-type aadl_annex =
-  | AGREEAnnex of Position.t * AGREEAst.t
-  | VerdictAnnex of Position.t * VerdictAst.t
-  | UnsupportedAnnex of Position.t * string
-
-type port_dir = In | Out | InOut
-
-type data_port = {
-  name: pid;
-  dir: port_dir;
-  dtype: qcref option;
-}
-
-type system_type = {
-  name: pid;
-  ports: data_port list;
-  annexes: aadl_annex list;
-}
-
 type qpref = pid option * pid (* (pid '::')? pid *)
 
 type property_expr =
@@ -54,6 +35,26 @@ type property_association = {
   bop: binding_op;
   const: bool;
   value: property_expr;
+}
+
+type aadl_annex =
+  | AGREEAnnex of Position.t * AGREEAst.t
+  | VerdictAnnex of Position.t * VerdictAst.t
+  | UnsupportedAnnex of Position.t * string
+
+type port_dir = In | Out | InOut
+
+type data_port = {
+  name: pid;
+  dir: port_dir;
+  dtype: qcref option;
+  properties: property_association list;
+}
+
+type system_type = {
+  name: pid;
+  ports: data_port list;
+  annexes: aadl_annex list;
 }
 
 type data_type = {
