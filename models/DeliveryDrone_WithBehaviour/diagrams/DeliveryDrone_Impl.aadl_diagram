@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="ASCII"?>
 <diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="5">
   <element id="0" manual="true">
-    <element id="144">
-      <element id="145">
-        <bo>
-          <seg>tag</seg>
-          <seg>unidirectional</seg>
-        </bo>
-        <contentFilters/>
-      </element>
-      <bo>
-        <seg>connection</seg>
-        <seg>c0</seg>
-      </bo>
-      <bendpoints>
-        <point x="705.0" y="748.0"/>
-        <point x="705.0" y="718.0"/>
-      </bendpoints>
-      <contentFilters/>
-    </element>
     <element id="1">
       <element id="2">
         <bo>
@@ -33,7 +15,7 @@
       </bo>
       <bendpoints>
         <point x="1779.0" y="415.0"/>
-        <point x="1779.0" y="630.5"/>
+        <point x="1779.0" y="631.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -284,7 +266,7 @@
         <seg>c24</seg>
       </bo>
       <bendpoints>
-        <point x="1789.0" y="680.5"/>
+        <point x="1789.0" y="681.0"/>
         <point x="1789.0" y="465.0"/>
       </bendpoints>
       <contentFilters/>
@@ -434,8 +416,8 @@
         <seg>c32</seg>
       </bo>
       <bendpoints>
-        <point x="2173.0" y="780.5"/>
-        <point x="2173.0" y="808.5"/>
+        <point x="2173.0" y="781.0"/>
+        <point x="2173.0" y="809.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -557,7 +539,7 @@
       </bo>
       <bendpoints>
         <point x="1245.0" y="893.0"/>
-        <point x="1245.0" y="908.5"/>
+        <point x="1245.0" y="909.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -575,7 +557,7 @@
       </bo>
       <bendpoints>
         <point x="1245.0" y="718.0"/>
-        <point x="1245.0" y="730.5"/>
+        <point x="1245.0" y="731.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -610,9 +592,23 @@
         <seg>c41</seg>
       </bo>
       <bendpoints>
-        <point x="1779.0" y="830.5"/>
-        <point x="1779.0" y="858.5"/>
+        <point x="1779.0" y="831.0"/>
+        <point x="1779.0" y="859.0"/>
       </bendpoints>
+      <contentFilters/>
+    </element>
+    <element id="180">
+      <element id="181">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+        <contentFilters/>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>c42</seg>
+      </bo>
       <contentFilters/>
     </element>
     <element id="49">
@@ -628,8 +624,8 @@
         <seg>c5</seg>
       </bo>
       <bendpoints>
-        <point x="1245.0" y="655.5"/>
-        <point x="1245.0" y="630.5"/>
+        <point x="1245.0" y="656.0"/>
+        <point x="1245.0" y="631.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -647,7 +643,7 @@
       </bo>
       <bendpoints>
         <point x="1245.0" y="184.0"/>
-        <point x="1245.0" y="455.5"/>
+        <point x="1245.0" y="456.0"/>
       </bendpoints>
       <contentFilters/>
     </element>
@@ -721,12 +717,12 @@
       <position x="2558.0" y="88.0"/>
       <contentFilters/>
     </element>
-    <element id="158" dockArea="left">
+    <element id="182" dockArea="right">
       <bo>
         <seg>feature</seg>
-        <seg>environmental_events</seg>
+        <seg>initialized_mode</seg>
       </bo>
-      <position y="704.0"/>
+      <position x="2572.0" y="1197.0"/>
       <contentFilters/>
     </element>
     <element id="175" dockArea="right">
@@ -783,14 +779,6 @@
         <seg>satellite1_sig_pos</seg>
       </bo>
       <position y="254.0"/>
-      <contentFilters/>
-    </element>
-    <element id="173" dockArea="right">
-      <bo>
-        <seg>feature</seg>
-        <seg>truck_mode_out</seg>
-      </bo>
-      <position x="2573.0" y="865.0"/>
       <contentFilters/>
     </element>
     <element id="65">
@@ -911,6 +899,14 @@
         <position y="10.0"/>
         <contentFilters/>
       </element>
+      <element id="179" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>package_secure</seg>
+        </bo>
+        <position x="384.0"/>
+        <contentFilters/>
+      </element>
       <bo>
         <seg>subcomponent</seg>
         <seg>deliveryitemmechanism</seg>
@@ -1006,14 +1002,6 @@
         <position x="378.0" y="310.0"/>
         <contentFilters/>
       </element>
-      <element id="127" dockArea="left">
-        <bo>
-          <seg>feature</seg>
-          <seg>environmental_events</seg>
-        </bo>
-        <position y="310.0"/>
-        <contentFilters/>
-      </element>
       <element id="129" dockArea="left">
         <bo>
           <seg>feature</seg>
@@ -1054,12 +1042,20 @@
         <position x="382.0" y="223.0"/>
         <contentFilters/>
       </element>
-      <element id="84" dockArea="left">
+      <element id="178" dockArea="left">
         <bo>
           <seg>feature</seg>
-          <seg>p</seg>
+          <seg>package_secure</seg>
         </bo>
-        <position y="610.0"/>
+        <position y="605.0"/>
+        <contentFilters/>
+      </element>
+      <element id="177" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>probe_safe_landing</seg>
+        </bo>
+        <position x="336.0" y="663.0"/>
         <contentFilters/>
       </element>
       <element id="85" dockArea="left">
@@ -1091,7 +1087,7 @@
         <seg>deliveryplanner</seg>
       </bo>
       <position x="743.0" y="364.0"/>
-      <size width="480.0" height="660.0"/>
+      <size width="480.0" height="703.0"/>
       <contentFilters>
         <filter>features</filter>
         <filter>internalFeatures</filter>
@@ -1443,7 +1439,7 @@
       <seg>deliverydronesystem.impl</seg>
     </bo>
     <position x="12.0" y="12.0"/>
-    <size width="2693.0" height="1204.0"/>
+    <size width="2693.0" height="1237.0"/>
     <contentFilters>
       <filter>features</filter>
       <filter>internalFeatures</filter>

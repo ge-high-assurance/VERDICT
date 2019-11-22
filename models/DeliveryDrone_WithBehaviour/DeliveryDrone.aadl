@@ -180,7 +180,8 @@ public
 			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
 			constellation_out: out data port Data_Types::Constellation; -- added
 			launch_pos_out: out data port Data_Types::Position.impl; -- added
-			initialized_mode_out: out data port Base_Types::Boolean; -- added
+			probe_init_mode_out: out data port Base_Types::Boolean; -- added
+			probe_abort_mode_out: out data port Base_Types::Boolean; -- added
 						
 		annex agree {**
 			-- variables
@@ -202,7 +203,6 @@ public
 			eq init_criteria_failed: bool = not init_criteria_succeed;
 			eq abort_cmd: bool = bus_in.abort_cmd;
 			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
-			--eq package_secure: bool = environmental_events.package_secure;
 			eq okay_to_launch: bool = not internal_error_detected;
 			eq separation: bool = not connected;
 			eq destination_location_reached: bool = Agree_Nodes.close_locations(nav_location, dest_position);
@@ -260,9 +260,15 @@ public
 				--			expensive_item;
 				radio_cmd = (making_delivery_mode and expensive_item);
 			
-			guarantee "Output: initialized_mode_out":
+			guarantee "Output: probe_init_mode_out":
 				--initialized_mode_out = (state = enum(Data_Types::DeliveryPlannerState, INIT));
-				initialized_mode_out = init_mode;
+				probe_init_mode_out = init_mode;
+				
+			guarantee "Output: probe_abort_mode_out":
+				probe_abort_mode_out = abort_mode;
+			
+			guarantee "Output: cmd_out | it sends signal to navigation only if it's in flying modes'":
+				cmd_out = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
 							
 			
 			guarantee "DeliveryPlannerFSM":
@@ -307,7 +313,9 @@ public
 								(pre(abort_mode) and on_off and connected);
 			
 			eq init_mode: bool = false ->
-								 (pre(init_mode) and (not (on_off and connected)) and (not (init_criteria_succeed and connected))) or
+								 (pre(init_mode) and (not (on_off and connected)) 
+								 				 and (not (init_criteria_succeed and connected)) 
+								 				 and (not (abort_cmd and connected))) or
 								 (pre(off_mode) and on_off and connected) or
 								 (pre(ready_mode) and init_criteria_failed and connected) or
 								 (pre(return_to_truck_mode) and truck_location_reached and connected);
@@ -342,6 +350,11 @@ public
 											(pre(return_to_truck_mode) and (not (truck_location_reached and connected))) or
 										    (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected));
 			
+			guarantee "Modes are mutually exclusive":
+				Agree_Nodes.ToInt(off_mode) + Agree_Nodes.ToInt(init_mode) + 
+				Agree_Nodes.ToInt(ready_mode) + Agree_Nodes.ToInt(launch_mode) +
+				Agree_Nodes.ToInt(abort_mode) + Agree_Nodes.ToInt(flying_to_dest_mode) +
+				Agree_Nodes.ToInt(making_delivery_mode) + Agree_Nodes.ToInt(return_to_truck_mode) = 1;
 			
 			-- old sections below	
 			
@@ -564,11 +577,13 @@ public
 			delivery_status_in: out data port Data_Types::DeliveryStatus; -- Probe Signal
 			delivery_cmd_out: out data port Base_Types::Boolean; -- Probe Signal
 			actuation_out: out data port Base_Types::Boolean;
-			initialized_mode: out data port Base_Types::Boolean; -- Probe Signal
+			probe_init_mode: out data port Base_Types::Boolean; -- Probe Signal
+			probe_abort_mode: out data port Base_Types::Boolean; -- Probe Signal
 			
 			probe_constellation: out data port Data_Types::Constellation;
 			probe_launch_location: out data port Data_Types::Position.impl;
 			probe_delivery_location: out data port Data_Types::Position.impl;
+			probe_cmd: out data port Base_Types::Boolean;
 			
 		annex agree {**
 			--eq have_order: bool = Agree_Nodes.HasHappened(bus1.connected and bus1.update_order);
@@ -603,15 +618,15 @@ public
       		--	(truck_mode_out and (not pre(isOn)) and isOn);
       			
       		
-      		eq most_recent_constellation: Data_Types::Constellation = if initialized_mode then 
+      		eq most_recent_constellation: Data_Types::Constellation = if probe_init_mode then 
       																  	bus1.constellation
       																  else pre(most_recent_constellation);
       		
-      		eq most_recent_launch_location: Data_Types::Position.impl = if initialized_mode then 
+      		eq most_recent_launch_location: Data_Types::Position.impl = if probe_init_mode then 
       																  		bus1.launch_pos
       																  	else pre(most_recent_launch_location);
       																  														  	
-      		eq most_recent_delivery_location: Data_Types::Position.impl = if initialized_mode then 
+      		eq most_recent_delivery_location: Data_Types::Position.impl = if probe_init_mode then 
       																  		bus1.order.target_position
       																  	else pre(most_recent_delivery_location);
       		
@@ -621,8 +636,11 @@ public
       		guarantee "P2: launch location for IMU is initialized properly": 
       			isOn => most_recent_launch_location = probe_launch_location;
       		
-      		guarantee "P3: delivery location for navigator is initialized properly": 
+      		guarantee "P3: delivery location for navigation is initialized properly": 
       			isOn => most_recent_delivery_location = probe_delivery_location;
+      			
+      		guarantee "P4: drone is flying only if since last off drone has not aborted": 
+      			 probe_cmd => Agree_Nodes.Since(not isOn, not (probe_abort_mode));
       		
 		**};
 			
@@ -827,7 +845,7 @@ public
 			c38: port gps.probe_constellation_out -> probe_constellation
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c39: port deliveryPlanner.initialized_mode_out -> initialized_mode
+			c39: port deliveryPlanner.probe_init_mode_out -> probe_init_mode
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c40: port IMU.probe_launch_location_out -> probe_launch_location
@@ -837,6 +855,12 @@ public
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c42: port deliveryItemMechanism.package_secure -> deliveryPlanner.package_secure
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c43: port deliveryPlanner.cmd_out -> probe_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c44: port deliveryPlanner.probe_abort_mode_out -> probe_abort_mode
 			{VERDICT_Properties::flowType => Xdata;};
 												
 	end DeliveryDroneSystem.impl;
