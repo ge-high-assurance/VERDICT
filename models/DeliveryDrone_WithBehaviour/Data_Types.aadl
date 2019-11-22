@@ -53,30 +53,20 @@ public
   			target_confirmed: data Base_Types::Boolean;
   	end RadioResponse.impl;
   	
-  	data ProbePlannerSignals
-  	end ProbePlannerSignals;
+  	data ProbeSafeLanding
+  	end ProbeSafeLanding;
   	
-  	data implementation ProbePlannerSignals.impl
+  	data implementation ProbeSafeLanding.impl
   		subcomponents
   			is_target_clear: data Base_Types::Boolean;
-  			is_target_location: data Base_Types::Boolean;
-  	end ProbePlannerSignals.impl;
+  			has_valid_marker: data Base_Types::Boolean;
+  	end ProbeSafeLanding.impl;
  
 	data DeliveryPlannerState
   		properties
 	    	Data_Model::Data_Representation => Enum;
 	    	Data_Model::Enumerators => ("OFF", "INIT", "READY", "LAUNCH", "ABORT", "FLYING_TO_DEST", "MAKING_DELIVERY", "RETURN_TO_TRUCK");
 	end DeliveryPlannerState; 
-	
-	data EnvironmentalEvents
-  	end EnvironmentalEvents;
-  	
-  	data implementation EnvironmentalEvents.impl
-  		subcomponents
-  			package_secure: data Base_Types::Boolean; -- TODO: comes from deliveryitemmechanism 
-  			no_clearance: data Base_Types::Boolean; -- TODO: From camera 
-  	end EnvironmentalEvents.impl; 
- 
   	
   	data Constellation
   		properties
