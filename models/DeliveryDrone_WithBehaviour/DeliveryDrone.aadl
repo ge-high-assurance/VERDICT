@@ -168,7 +168,7 @@ public
 			imu_health_check_in: in data port Base_Types::Boolean; -- added
 			rdo_health_check_in: in data port Base_Types::Boolean; -- added
 			cam_health_check_in: in data port Base_Types::Boolean; -- added
-			environmental_events: in data port Data_Types::EnvironmentalEvents.impl; -- added
+			package_secure: in data port Base_Types::Boolean; -- added
 			
 			-- outputs
 			radio_cmd: out data port Base_Types::Boolean;
@@ -177,7 +177,7 @@ public
 			bus_out: out data port Base_Types::Boolean; -- not used
 	        cmd_out: out data port Base_Types::Boolean;	-- not used						
 			camera_out: out data port Base_Types::Boolean;
-			p: out data port Data_Types::ProbePlannerSignals.impl;
+			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
 			constellation_out: out data port Data_Types::Constellation; -- added
 			launch_pos_out: out data port Data_Types::Position.impl; -- added
 			initialized_mode_out: out data port Base_Types::Boolean; -- added
@@ -192,6 +192,9 @@ public
 			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
 			eq delivery_failed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, FAILED));
 			eq delivery_completed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED));
+			eq target_clear: bool;
+			eq valid_marker: bool;
+			eq is_safe_landing: bool = (target_clear and valid_marker);
 			
 			-- events
 			eq on_off: bool = bus_in.on_off;
@@ -199,17 +202,20 @@ public
 			eq init_criteria_failed: bool = not init_criteria_succeed;
 			eq abort_cmd: bool = bus_in.abort_cmd;
 			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
-			eq package_secure: bool = environmental_events.package_secure;
+			--eq package_secure: bool = environmental_events.package_secure;
 			eq okay_to_launch: bool = not internal_error_detected;
 			eq separation: bool = not connected;
 			eq destination_location_reached: bool = Agree_Nodes.close_locations(nav_location, dest_position);
-			eq no_clearance: bool = environmental_events.no_clearance;
+			eq no_clearance: bool = not is_safe_landing;
 			eq successfull_delivery: bool = delivery_completed and destination_location_reached and not no_clearance;
 			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
-			eq internal_error_detected: bool = gps_health_check_in or imu_health_check_in or rdo_health_check_in or cam_health_check_in;
+			eq internal_error_detected: bool = not gps_health_check_in or not imu_health_check_in or not rdo_health_check_in or not cam_health_check_in;
 			eq truck_location_reached: bool = Agree_Nodes.close_locations(nav_location, truck_position);
 			eq connected: bool = bus_in.connected;
-				
+			
+			-- probe
+			 guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
+			
 			-- state transitions
 			eq state: Data_Types::DeliveryPlannerState;
 			
@@ -493,9 +499,12 @@ public
 	
 	system DeliveryItemMechanism
 		features
+			-- inputs
 			delivery_cmd_in : in data port Base_Types::Boolean;
 			
+			-- outputs
 			delivery_status_out: out data port Data_Types::DeliveryStatus;
+			package_secure: out data port Base_Types::Boolean;
 			
 		annex agree {**
 			guarantee "Initially, delivery status is NOT_STARTED":
@@ -546,8 +555,6 @@ public
 			satellite1_sig_pos: in data port Data_Types::Position.impl;
 			bus1: in data port Data_Types::InputBus.impl;
 			comm1: in data port Data_Types::RadioResponse.impl;
-			-- added
-			environmental_events: in data port Data_Types::EnvironmentalEvents.impl;
 			
 			comm2: out data port Base_Types::Boolean;
 			bus2: out data port Base_Types::Boolean;			
@@ -705,10 +712,6 @@ public
 			};
 			
 		connections
-			-- added
-			c0: port environmental_events -> deliveryplanner.environmental_events
-			{VERDICT_Properties::flowType => Xdata;};
-			
 			c1: port positionEstimator.est_pos_out -> navigation.pos_in
 			{VERDICT_Properties::flowType => Xdata;};
 			
@@ -831,6 +834,9 @@ public
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c41: port navigation.probe_dest_location_out -> probe_delivery_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c42: port deliveryItemMechanism.package_secure -> deliveryPlanner.package_secure
 			{VERDICT_Properties::flowType => Xdata;};
 												
 	end DeliveryDroneSystem.impl;
