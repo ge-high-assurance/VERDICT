@@ -40,6 +40,8 @@ public
   			abort_cmd: data Base_Types::Boolean; --Check if it makes sense to come from bus?
   			constellation: data Constellation;
   			launch_pos: data Position.impl;
+  			init_criteria_satisfied: data Base_Types::Boolean;
+  			mission_store_release_sequence: data Base_Types::Boolean;
   	end InputBus.impl;
   	
   	data RadioResponse
@@ -71,9 +73,7 @@ public
   	
   	data implementation EnvironmentalEvents.impl
   		subcomponents
-  			init_criteria_satisfied: data Base_Types::Boolean;
-  			mission_store_release_sequence: data Base_Types::Boolean;
-  			package_secure: data Base_Types::Boolean;
+  			package_secure: data Base_Types::Boolean; -- TODO: comes from deliveryitemmechanism 
   			no_clearance: data Base_Types::Boolean; -- TODO: From camera 
   	end EnvironmentalEvents.impl; 
  

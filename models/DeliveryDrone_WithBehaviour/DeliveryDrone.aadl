@@ -47,8 +47,13 @@ public
 			-- outputs
 			imu_pos_out: out data port Data_Types::Position.impl;
 			health_check_out: out data port Base_Types::Boolean;
+			probe_launch_location_out: out data port Data_Types::Position.impl;
 			
 			-- TODO: High-level spec is needed?
+		annex agree {**
+			-- probe
+			 guarantee "Output: probe_constellation_out": probe_launch_location_out = launch_pos_in;
+		**};
 		
 		annex verdict {**
 			CyberRel "imu_out_I" => imu_pos_out:I;
@@ -91,6 +96,7 @@ public
 			move_out: out data port Base_Types::Boolean;				
 			nav_location_out: out data port Data_Types::Position.impl;
 			pos_act_out: out data port Data_Types::Position.impl;
+			probe_dest_location_out: out data port Data_Types::Position.impl;
 			
 		annex agree {**
 			-- high-level specification
@@ -100,6 +106,9 @@ public
 			guarantee "Output: nav_location_out | Navigation location is computed from Estimated Position":
 				Agree_Nodes.close_locations(nav_location_out, pos_in);
 			
+			-- probe
+			 guarantee "Output: probe_constellation_out": probe_dest_location_out = dest_location_in;
+			 
 			-- TODO: Do we need to add high-level spec for move_out and/or pos_act_out
 		**};
 		
@@ -171,11 +180,12 @@ public
 			p: out data port Data_Types::ProbePlannerSignals.impl;
 			constellation_out: out data port Data_Types::Constellation; -- added
 			launch_pos_out: out data port Data_Types::Position.impl; -- added
+			initialized_mode_out: out data port Base_Types::Boolean; -- added
 						
 		annex agree {**
 			-- variables
 			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);	
-			eq dest_position: Data_Types::Position.impl = bus_in.order.target_position;
+			eq dest_position: Data_Types::Position.impl = dest_location;
 			eq expensive_item: bool = bus_in.order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
 			eq confirmation: bool = radio_response.target_confirmed;
 			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD); -- Correct?
@@ -185,10 +195,10 @@ public
 			
 			-- events
 			eq on_off: bool = bus_in.on_off;
-			eq init_criteria_satisfied: bool = environmental_events.init_criteria_satisfied;
-			eq init_criteria_failed: bool = not init_criteria_satisfied;
+			eq init_criteria_succeed: bool = bus_in.init_criteria_satisfied and not internal_error_detected;
+			eq init_criteria_failed: bool = not init_criteria_succeed;
 			eq abort_cmd: bool = bus_in.abort_cmd;
-			eq mission_store_release_sequence: bool = environmental_events.mission_store_release_sequence;
+			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
 			eq package_secure: bool = environmental_events.package_secure;
 			eq okay_to_launch: bool = not internal_error_detected;
 			eq separation: bool = not connected;
@@ -212,14 +222,29 @@ public
 				constellation_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
 										bus_in.constellation
 									else 
-										(enum(Data_Types::Constellation, Satellite0) -> pre(bus_in.constellation));
+										pre(constellation_out);
+			
+			guarantee "Output: dest_location":
+				dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+										bus_in.order.target_position
+								else 
+										pre(dest_location);
 				
 			guarantee "Output: launch_pos_out":
-				launch_pos_out = bus_in.launch_pos;
+				launch_pos_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+										bus_in.launch_pos
+								 else 
+										pre(launch_pos_out);
 			
 			guarantee "Output: radio_cmd":
 				radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
 							expensive_item;
+			
+			eq init: bool = (state = enum(Data_Types::DeliveryPlannerState, INIT));
+			
+			guarantee "Output: initialized_mode_out":
+				initialized_mode_out = init;
+							
 			
 			guarantee "DeliveryPlannerFSM":
 				state = (enum(Data_Types::DeliveryPlannerState, OFF) ->
@@ -231,9 +256,9 @@ public
 							enum(Data_Types::DeliveryPlannerState, OFF)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_satisfied then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_succeed and connected then 
 							enum(Data_Types::DeliveryPlannerState, READY)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
@@ -241,7 +266,7 @@ public
 							enum(Data_Types::DeliveryPlannerState, ABORT)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence then 
+						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence and connected then 
 							enum(Data_Types::DeliveryPlannerState, LAUNCH)
 						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_secure and okay_to_launch and separation) then 
 							enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST)
@@ -477,24 +502,27 @@ public
 			delivery_status_in: out data port Data_Types::DeliveryStatus; -- Probe Signal
 			delivery_cmd_out: out data port Base_Types::Boolean; -- Probe Signal
 			actuation_out: out data port Base_Types::Boolean;
+			initialized_mode: out data port Base_Types::Boolean; -- Probe Signal
 			
 			probe_constellation: out data port Data_Types::Constellation;
+			probe_launch_location: out data port Data_Types::Position.impl;
+			probe_delivery_location: out data port Data_Types::Position.impl;
 			
 		annex agree {**
-			eq have_order: bool = Agree_Nodes.HasHappened(bus1.connected and bus1.update_order);
+			--eq have_order: bool = Agree_Nodes.HasHappened(bus1.connected and bus1.update_order);
 			
-			eq order: Data_Types::DeliveryOrder.impl = bus1.order ->
-				if pre(have_order) then pre(order) else bus1.order;
+			--eq order: Data_Types::DeliveryOrder.impl = bus1.order ->
+			--	if pre(have_order) then pre(order) else bus1.order;
 			
-			eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
+			--eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
 			
-			eq target_confirmed: bool = Agree_Nodes.HasHappened(
-      			confirmation_requested and
-      			comm1.data_available and
-      			comm1.target_confirmed
-      		);
+			--eq target_confirmed: bool = Agree_Nodes.HasHappened(
+      		--	confirmation_requested and
+      		--	comm1.data_available and
+      		--	comm1.target_confirmed
+      		--);
 
-			eq delivery_started: bool = delivery_status_in <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+			--eq delivery_started: bool = delivery_status_in <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
 			
 			--guarantee "P1: A command to release a valuable package is issued only if drone has received confirmation from base":
     		--	true -> (delivery_cmd_out and 
@@ -504,14 +532,36 @@ public
     		--	true -> (delivery_started and
       		--		(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => confirmation_requested);
       		
-      		eq isOn: bool = false -> if bus1.on_off then not pre(isOn)
+      		
+      		
+      		eq isOn: bool = false -> if bus1.on_off and bus1.connected then not pre(isOn)
       								 else pre(isOn);
       		
-      		guarantee "P1": Agree_Nodes.Sofar(isOn) => bus1.constellation = probe_constellation;
+      		--eq initialized: bool = false ->
+      		--	(truck_mode_out and (not pre(isOn)) and isOn);
+      			
       		
-      		-- p2: launch_location for IMU is initialized properly
+      		eq most_recent_constellation: Data_Types::Constellation = if initialized_mode then 
+      																  	bus1.constellation
+      																  else pre(most_recent_constellation);
       		
-      		-- p3: like p2 for delivery location goes to navigator
+      		eq most_recent_launch_location: Data_Types::Position.impl = if initialized_mode then 
+      																  		bus1.launch_pos
+      																  	else pre(most_recent_launch_location);
+      																  														  	
+      		eq most_recent_delivery_location: Data_Types::Position.impl = if initialized_mode then 
+      																  		bus1.order.target_position
+      																  	else pre(most_recent_delivery_location);
+      		
+      		guarantee "P1: constellation for GPS is initialized properly": 
+      			isOn => (most_recent_constellation = probe_constellation);
+      		
+      		guarantee "P2: launch location for IMU is initialized properly": 
+      			isOn => most_recent_launch_location = probe_launch_location;
+      		
+      		guarantee "P3: delivery location for navigator is initialized properly": 
+      			isOn => most_recent_delivery_location = probe_delivery_location;
+      		
 		**};
 			
 		annex verdict{**
@@ -717,6 +767,15 @@ public
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c38: port gps.probe_constellation_out -> probe_constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c39: port deliveryPlanner.initialized_mode_out -> initialized_mode
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c40: port IMU.probe_launch_location_out -> probe_launch_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c41: port navigation.probe_dest_location_out -> probe_delivery_location
 			{VERDICT_Properties::flowType => Xdata;};
 												
 	end DeliveryDroneSystem.impl;
