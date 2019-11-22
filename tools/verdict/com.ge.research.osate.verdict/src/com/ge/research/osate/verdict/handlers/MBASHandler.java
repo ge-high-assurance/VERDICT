@@ -101,8 +101,8 @@ public class MBASHandler extends AbstractHandler {
 							// Run this code on the UI thread
 							mainThreadDisplay.asyncExec(() -> {
 								String soteriaOut = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
-								File applicableDefense = new File(soteriaOut, "ApplicableDefense.xml");
-								File implProperty = new File(soteriaOut, "ImplProperty.xml");
+								File applicableDefense = new File(soteriaOut, "ApplicableDefenseProperties.xml");
+								File implProperty = new File(soteriaOut, "ImplProperties.xml");
 								if (applicableDefense.exists() && implProperty.exists()) {
 									new MBASReportGenerator(applicableDefense.getAbsolutePath(),
 											implProperty.getAbsolutePath(), iWindow);

@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.EnumType;
 import verdict.vdm.vdm_data.PlainType;
@@ -1662,15 +1660,11 @@ public class VDMParser extends Parser {
         return cyberExprList;
     }
 
-    /**
-     * 
-     * Handle safety requirement expressions
-     * 
-     * */
+    /** Handle safety requirement expressions */
     public SafetyReqExpr safetyReqExpr() {
 
-    	SafetyReqExpr safetyReqExpr = new SafetyReqExpr();
-    	SafetyReqExprKind kind = null;
+        SafetyReqExpr safetyReqExpr = new SafetyReqExpr();
+        SafetyReqExprKind kind = null;
 
         while (this.token.type == Type.SAFETY_REQ_EXP) {
 
@@ -1691,12 +1685,12 @@ public class VDMParser extends Parser {
             }
             if (kind == SafetyReqExprKind.OR) {
 
-            	SafetyReqExprList or_exprs = safetyReqExprList();
-            	safetyReqExpr.setOr(or_exprs);
+                SafetyReqExprList or_exprs = safetyReqExprList();
+                safetyReqExpr.setOr(or_exprs);
             }
             if (kind == SafetyReqExprKind.AND) {
 
-            	SafetyReqExprList and_exprs = safetyReqExprList();
+                SafetyReqExprList and_exprs = safetyReqExprList();
                 safetyReqExpr.setAnd(and_exprs);
             }
             if (kind == SafetyReqExprKind.PORT) {
@@ -1709,7 +1703,7 @@ public class VDMParser extends Parser {
 
     public SafetyReqExprList safetyReqExprList() {
 
-    	SafetyReqExprList safetyReqExprList = new SafetyReqExprList();
+        SafetyReqExprList safetyReqExprList = new SafetyReqExprList();
 
         int array_length = 0;
 
@@ -1734,15 +1728,12 @@ public class VDMParser extends Parser {
         }
 
         return safetyReqExprList;
-    } 
-    
-    /**
-     * 
-     * Handle safety relations
-     * */
+    }
+
+    /** Handle safety relations */
     public SafetyRel safety_rel() {
 
-    	SafetyRel safetyRel = new SafetyRel();
+        SafetyRel safetyRel = new SafetyRel();
 
         while (this.token.type == Type.SAFETY_REL) {
 
@@ -1792,12 +1783,12 @@ public class VDMParser extends Parser {
         }
 
         return safetyRel;
-    }    
-    
+    }
+
     public SafetyRelExpr safetyRelExpr() {
 
-    	SafetyRelExpr safetyRelExpr = new SafetyRelExpr();
-    	SafetyRelExprKind kind = null;
+        SafetyRelExpr safetyRelExpr = new SafetyRelExpr();
+        SafetyRelExprKind kind = null;
 
         // Check length bound and terminate.
         int array_length = 0;
@@ -1821,30 +1812,29 @@ public class VDMParser extends Parser {
             }
             if (kind == SafetyRelExprKind.OR) {
 
-            	SafetyRelExprList or_exprs = safetyRelExprList();
-            	safetyRelExpr.setOr(or_exprs);
+                SafetyRelExprList or_exprs = safetyRelExprList();
+                safetyRelExpr.setOr(or_exprs);
             }
             if (kind == SafetyRelExprKind.AND) {
 
-            	SafetyRelExprList and_exprs = safetyRelExprList();
-            	safetyRelExpr.setAnd(and_exprs);
+                SafetyRelExprList and_exprs = safetyRelExprList();
+                safetyRelExpr.setAnd(and_exprs);
             }
             if (kind == SafetyRelExprKind.PORT) {
                 return safetyRelExpr();
             }
             if (kind == SafetyRelExprKind.EVENT) {
-            	EventHappens event = eventHappens();
-            	safetyRelExpr.setEvent(event);
+                EventHappens event = eventHappens();
+                safetyRelExpr.setEvent(event);
             }
         }
 
         return safetyRelExpr;
-    }    
-    
-    
+    }
+
     public SafetyRelExprList safetyRelExprList() {
 
-    	SafetyRelExprList safetyRelExprList = new SafetyRelExprList();
+        SafetyRelExprList safetyRelExprList = new SafetyRelExprList();
 
         int array_length = 0;
 
@@ -1869,7 +1859,7 @@ public class VDMParser extends Parser {
         }
 
         return safetyRelExprList;
-    }     
+    }
 
     /*
      * type CyberRel { id : String; output : CIAPort; inputs : Option<CyberExpr>;
@@ -2019,10 +2009,10 @@ public class VDMParser extends Parser {
 
         return cyberReq;
     }
-    
+
     public SafetyReq safety_req() {
 
-    	SafetyReq safetyReq = new SafetyReq();
+        SafetyReq safetyReq = new SafetyReq();
 
         while (this.token.type == Type.SAFETY_REQ) {
             consume(Type.SAFETY_REQ);
@@ -2033,8 +2023,8 @@ public class VDMParser extends Parser {
                 safetyReq.setId(identifier);
 
             } else if (token.type == Type.SAFETY_REQ_EXP) {
-            	SafetyReqExpr safetyExpr = safetyReqExpr();
-            	safetyReq.setCondition(safetyExpr);
+                SafetyReqExpr safetyExpr = safetyReqExpr();
+                safetyReq.setCondition(safetyExpr);
 
             } else if (token.type == Type.OPTION) {
 
@@ -2066,7 +2056,7 @@ public class VDMParser extends Parser {
         }
 
         return safetyReq;
-    }    
+    }
 
     public Mission mission() {
         Mission mission = new Mission();
@@ -2121,10 +2111,10 @@ public class VDMParser extends Parser {
 
         return mission;
     }
-    
+
     public Event event() {
 
-    	Event event = new Event();
+        Event event = new Event();
 
         while (this.token.type == Type.EVENT) {
 
@@ -2136,8 +2126,8 @@ public class VDMParser extends Parser {
                 event.setId(identifier);
 
             } else if (token.type == Type.PROBABILITY) {
-            	String prob = id_value();
-            	event.setProbability(prob);
+                String prob = id_value();
+                event.setProbability(prob);
 
             } else if (token.type == Type.OPTION) {
 
@@ -2154,13 +2144,12 @@ public class VDMParser extends Parser {
 
                     String description = str_value();
                     event.setDescription(description);
-
-                } 
+                }
             }
         }
 
         return event;
-    }    
+    }
 
     /*
      * type CIAPort { name: String; cia: CIA; }
@@ -2184,7 +2173,7 @@ public class VDMParser extends Parser {
 
         return ciaPort;
     }
-    
+
     // SAFETY
     public IAPort ia_port() {
         IAPort iaPort = new IAPort();
@@ -2204,24 +2193,24 @@ public class VDMParser extends Parser {
         }
 
         return iaPort;
-    }    
-    
+    }
+
     public EventHappens eventHappens() {
-    	EventHappens event = new EventHappens();
+        EventHappens event = new EventHappens();
 
         while (this.token.type == Type.HAPPENS) {
             consume(Type.HAPPENS);
-            
+
             if (token.type == Type.STRING) {
                 String identifier = id_value();
                 event.setEventName(identifier);
             } else {
-            	System.out.println("Event happens: toeken " + token);
+                System.out.println("Event happens: toeken " + token);
             }
         }
 
         return event;
-    }        
+    }
 
     /*
      * type CIA enum {Confidentiality, Integrity, Availability};
@@ -2238,7 +2227,7 @@ public class VDMParser extends Parser {
 
         return cia_type;
     }
-    
+
     public IA ia() {
 
         consume(Type.IA);
@@ -2250,7 +2239,7 @@ public class VDMParser extends Parser {
         consume();
 
         return ia_type;
-    }    
+    }
 
     /*
      * type Severity enum {None, Minor, Major, Hazardous, Catastrophic};
@@ -2284,7 +2273,7 @@ public class VDMParser extends Parser {
 
         return cyberExprKind;
     }
-    
+
     public SafetyReqExprKind safetyReqExprKind() {
 
         consume(Type.SAFETY_REQ_EXP_KIND);
@@ -2296,7 +2285,7 @@ public class VDMParser extends Parser {
         consume();
 
         return safetyReqExprKind;
-    }    
+    }
 
     public SafetyRelExprKind safetyRelExprKind() {
 
@@ -2309,8 +2298,8 @@ public class VDMParser extends Parser {
         consume();
 
         return safetyRelExprKind;
-    }     
-    
+    }
+
     // ComponentInstance?
     // Block
     // Connection
