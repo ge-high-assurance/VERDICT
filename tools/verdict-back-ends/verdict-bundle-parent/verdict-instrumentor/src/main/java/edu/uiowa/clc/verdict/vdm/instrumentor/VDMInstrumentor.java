@@ -147,9 +147,8 @@ public class VDMInstrumentor {
 
         int component_index = 1;
 
-        // Assume only One Block Implementation exits.
-        ComponentImpl componentImpl = vdm_model.getComponentImpl().get(0);
-
+        // Removed Once component Implemtation assumption.
+        ComponentImpl componentImpl = retrieve_cmp_impl();
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         Map<String, HashSet<Connection>> components_map =
@@ -232,7 +231,7 @@ public class VDMInstrumentor {
             Map<String, List<String>> connection_comp_map =
                     connection_mapper(connections_map, components_map);
 
-            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ComponentImpl compImpl = retrieve_cmp_impl();
 
             if (compImpl.getBlockImpl() == null) {
                 compImpl = retrieve_block(compImpl);
@@ -258,7 +257,7 @@ public class VDMInstrumentor {
             dec_var_const(connection_comp_map);
 
         } else if (blame_assignment && !component_level) {
-            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ComponentImpl compImpl = retrieve_cmp_impl();
 
             if (compImpl.getBlockImpl() == null) {
                 compImpl = retrieve_block(compImpl);
@@ -280,6 +279,17 @@ public class VDMInstrumentor {
                 contractSpec.getWeaklyassume().add(weakly_assume_item);
             }
         }
+    }
+
+    protected ComponentImpl retrieve_cmp_impl() {
+        ComponentImpl componentImpl = null;
+        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+            ComponentType cmpType = cImpl.getType();
+            if (cmpType.getContract() != null) {
+                componentImpl = cImpl;
+            }
+        }
+        return componentImpl;
     }
 
     protected ComponentImpl retrieve_block(ComponentImpl compImpl) {
@@ -415,13 +425,14 @@ public class VDMInstrumentor {
             assume_expr = add_assume_amo(vars_assumption);
         }
         // Adding Xor assumption for components.
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_cmp_impl();
+
         if (compImpl.getBlockImpl() == null) {
             compImpl = retrieve_block(compImpl);
         }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
-
+        System.out.println();
         ContractItem assume_item = new ContractItem();
 
         //        if (assume_expr == null) {
@@ -436,7 +447,7 @@ public class VDMInstrumentor {
             contractSpec.getAssume().add(assume_item);
         }
 
-        if (blame_assignment == false) {
+        if (blame_assignment == false && contractSpec != null) {
             contractSpec.getSymbol().addAll(vars_dec);
         }
     }
@@ -454,7 +465,8 @@ public class VDMInstrumentor {
             vars_dec.add(var_dec);
         }
 
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_cmp_impl();
+
         if (compImpl.getBlockImpl() == null) {
             compImpl = retrieve_block(compImpl);
         }
@@ -1051,7 +1063,8 @@ public class VDMInstrumentor {
     protected boolean retrieve_links(Connection connection, Port instrumented_port) {
 
         // Default Block Implementation
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_cmp_impl();
+
         // R.H.S
         ConnectionEnd src = connection.getSource();
         ComponentInstance src_componentInstance = new ComponentInstance();
@@ -1156,7 +1169,8 @@ public class VDMInstrumentor {
         // instrument_link(connection);
 
         // Default Block Implementation
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_cmp_impl();
+
         ComponentType instrumented_cmp = new ComponentType();
 
         // R.H.S
