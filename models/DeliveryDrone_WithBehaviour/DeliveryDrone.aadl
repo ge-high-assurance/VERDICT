@@ -234,9 +234,9 @@ public
 				--					else 
 				--						pre(constellation);
 				constellation = if init_mode then 
-										bus_in.constellation
-									else 
-										pre(constellation);
+									bus_in.constellation
+								else 
+									bus_in.constellation -> pre(constellation);
 			
 			guarantee "Output: dest_location":
 				--dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
@@ -246,7 +246,7 @@ public
 				dest_location = if init_mode then 
 									bus_in.order.target_position
 								else 
-									pre(dest_location);
+									bus_in.order.target_position -> pre(dest_location);
 				
 			guarantee "Output: launch_pos":
 				--launch_pos = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
@@ -256,7 +256,7 @@ public
 				launch_pos = if init_mode then 
 									bus_in.launch_pos
 								 else 
-									pre(launch_pos);
+									bus_in.launch_pos -> pre(launch_pos);
 			
 			guarantee "Output: radio_cmd":
 				--radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
@@ -621,15 +621,15 @@ public
       		
       		eq most_recent_constellation: Data_Types::Constellation = if probe_init_mode then 
       																  	bus1.constellation
-      																  else pre(most_recent_constellation);
+      																  else bus1.constellation -> pre(most_recent_constellation);
       		
       		eq most_recent_launch_location: Data_Types::Position.impl = if probe_init_mode then 
       																  		bus1.launch_pos
-      																  	else pre(most_recent_launch_location);
+      																  	else bus1.launch_pos -> pre(most_recent_launch_location);
       																  														  	
       		eq most_recent_delivery_location: Data_Types::Position.impl = if probe_init_mode then 
       																  		bus1.order.target_position
-      																  	else pre(most_recent_delivery_location);
+      																  	else bus1.order.target_position -> pre(most_recent_delivery_location);
       		
       		guarantee "P1: constellation for GPS is initialized properly": 
       			isOn => (most_recent_constellation = probe_constellation);
