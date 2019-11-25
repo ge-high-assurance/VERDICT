@@ -62,6 +62,42 @@ public
 		**};
 	end IMU;
 		
+	system GNC
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			gps_health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation;
+			imu_pos: out data port Data_Types::Position.impl;
+			imu_health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl;
+			
+		
+	end GNC;
+	
+	system implementation GNC.Impl
+		subcomponents
+			gps: system GPS;
+			imu: system IMU;
+		connections
+			i1: port constellation -> gps.constellation;
+			i2: port satellite0_pos -> gps.satellite0_pos;
+			i3: port satellite1_pos -> gps.satellite1_pos;
+			i4: port launch_pos -> imu.launch_pos;
+			i5: port gps.gps_pos -> gps_pos;
+			i6: port gps.health_status -> gps_health_status;
+			i7: port gps.probe_constellation -> probe_constellation;
+			i8: port imu.imu_pos -> imu_pos;
+			i9: port imu.health_status -> imu_health_status;
+			i10: port imu.probe_launch_pos -> probe_launch_pos;
+	end GNC.Impl;
+	
 	system PositionEstimator 
 		features
 			-- inputs
@@ -666,15 +702,16 @@ public
 	
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
-			gps: system GPS
-			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::broadcastFromOutsideTB => true;
-				VERDICT_Properties::heterogeneity => true;	
-				VERDICT_Properties::heterogeneityDAL => 7;	
+			gnc: system GNC.impl;
+			--gps: system GPS
+			--{
+			--	VERDICT_Properties::insideTrustedBoundary => true;
+			--	VERDICT_Properties::broadcastFromOutsideTB => true;
+			--	VERDICT_Properties::heterogeneity => true;	
+			--	VERDICT_Properties::heterogeneityDAL => 7;	
 --				VERDICT_Properties::antiJamming => true;
 --				VERDICT_Properties::antiJammingDAL => 7;
-			};
+			--};
 			radio: system Radio
 			{
 				VERDICT_Properties::insideTrustedBoundary => true;
@@ -688,10 +725,10 @@ public
 				VERDICT_Properties::encryption => true;
 				VERDICT_Properties::encryptionDAL => 7;
 			};
-			imu: system IMU
-			{ 
-				VERDICT_Properties::insideTrustedBoundary => true;
-			};
+			--imu: system IMU
+			--{ 
+			--	VERDICT_Properties::insideTrustedBoundary => true;
+			--};
 			positionEstimator: system PositionEstimator
 			{
 				VERDICT_Properties::insideTrustedBoundary => true;
@@ -734,7 +771,7 @@ public
 			c1: port positionEstimator.est_pos -> navigation.est_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c1b: port deliveryPlanner.launch_pos -> imu.launch_pos
+			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c2: port navigation.move -> fc.move
@@ -762,7 +799,7 @@ public
 			c11: port radio.radio_out -> deliveryPlanner.radio_response
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c12: port gps.gps_pos -> positionEstimator.gps_pos
+			c12: port gnc.gps_pos -> positionEstimator.gps_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c14a: port bus1 -> connector.bus_in
@@ -786,7 +823,7 @@ public
 			c17: port radio.comm_out -> comm2
 			{VERDICT_Properties::flowType => Xdata;};
 
-			c18a: port imu.imu_pos -> positionEstimator.imu_pos
+			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c19: port fc.motor_cmd -> actuation.motor_cmd
@@ -795,10 +832,10 @@ public
 			c20: port actuation.response -> fc.actuation_response
 			{VERDICT_Properties::flowType => Xdata;};	
 
-			c22: port satellite0_sig_pos -> gps.satellite0_pos
+			c22: port satellite0_sig_pos -> gnc.satellite0_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c23: port satellite1_sig_pos -> gps.satellite1_pos
+			c23: port satellite1_sig_pos -> gnc.satellite1_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			--c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
@@ -828,13 +865,13 @@ public
 			c32: port actuation.response -> actuation_out
 			{VERDICT_Properties::flowType => Xdata;};	
 			
-			c33: port deliveryPlanner.constellation -> gps.constellation
+			c33: port deliveryPlanner.constellation -> gnc.constellation
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c34: port gps.health_status -> deliveryPlanner.gps_health_status
+			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c35: port imu.health_status -> deliveryPlanner.imu_health_status
+			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
@@ -843,13 +880,13 @@ public
 			c37: port camera.health_status -> deliveryPlanner.cam_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c38: port gps.probe_constellation -> probe_constellation
+			c38: port gnc.probe_constellation -> probe_constellation
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c40: port IMU.probe_launch_pos -> probe_launch_location
+			c40: port gnc.probe_launch_pos -> probe_launch_location
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c41: port navigation.probe_dest_pos -> probe_delivery_location
