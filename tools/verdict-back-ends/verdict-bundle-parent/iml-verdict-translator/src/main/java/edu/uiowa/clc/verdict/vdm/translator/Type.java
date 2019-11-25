@@ -116,6 +116,8 @@ public enum Type {
     EVENT("Event"),
     SAFETY_EVENTS("safety_events"),
     PROBABILITY("probability"),
+    EVENT_ID("id"),
+    SAFETY_EVENT("SafetyEvent"),
 
     SAFETY_EXP("SafetyExpr"),
     SAFETY_EXP_KIND("SafetyExprKind"),
