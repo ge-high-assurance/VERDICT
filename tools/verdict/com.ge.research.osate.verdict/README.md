@@ -15,8 +15,8 @@
 
 4. [OSATE 2](https://osate-build.sei.cmu.edu/download/osate/stable/):
    AADL Tool Environment (The instructions are only tested on OSATE
-   version 2.3.2 and 2.5.0. With OSATE 2.5.0, you need to manually
-   install
+   version 2.3.2, 2.5.0, and 2.6.0. With OSATE 2.5.0 & 2.6.0, you need
+   to manually install
    [AGREE](https://osate-build.sei.cmu.edu/download/osate/stable/2.3.7/updates/))
 
 5. [Z3](https://github.com/Z3Prover/z3): The Z3 Theorem Prover (Make
@@ -83,9 +83,8 @@
      the plugin
    * Finish the installation
    * Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict
-     -> Verdict Bundle" and find the
-     "verdict-bundle-1.0-SNAPSHOT-capsule.jar" file in the "extern"
-     folder
+     -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" file in
+     the "extern" folder
    * In the same place, also set the STEM path to the extern/STEM
      folder, and then save and close the dialog
 
@@ -114,7 +113,7 @@
      the plugin
    * Finish the installation
    * Set VERDICT bundle path: Go to "Windows -> Preferences -> Verdict
-     -> Verdict Bundle" and find the
-     "verdict-bundle-1.0-SNAPSHOT-capsule.jar" in the "extern" folder
+     -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" in the
+     "extern" folder
    * In the same place, also set the STEM path to the extern/STEM
      folder, and then save and close the dialog
