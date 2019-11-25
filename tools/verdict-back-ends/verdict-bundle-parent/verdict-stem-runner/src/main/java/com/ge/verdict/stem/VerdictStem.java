@@ -84,7 +84,7 @@ public class VerdictStem {
                     defensesCsv,
                     rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
 
-            rs = srvr.query("http://sadl.org/STEM/Queries#Graph1");
+            rs = srvr.query("http://sadl.org/STEM/Queries#STEMGraph");
             graphsDir.mkdirs();
             GraphVizVisualizer visualizer = new GraphVizVisualizer();
             visualizer.initialize(
