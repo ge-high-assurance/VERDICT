@@ -97,6 +97,10 @@ public class VDMParser extends Parser {
         missions = model.getMission();
     }
 
+    private void log(String msg) {
+        System.out.println(msg);
+    }
+
     // Project Rules:
 
     // IDENTIFIER ::= IDENTIFIER:name String:value
@@ -1165,6 +1169,11 @@ public class VDMParser extends Parser {
             } else if (token.type == Type.PORT_MODE) {
                 PortMode portMode = portMode();
                 port.setMode(portMode);
+            } else if (token.type == Type.BOOL) {
+                consume(Type.BOOL);
+                boolean value = token.getTruthValue();
+                consume(Type.Boolean);
+                port.setProbe(value);
             } else if (token.type == Type.OPTION) {
                 consume(Type.OPTION);
 
@@ -1527,19 +1536,19 @@ public class VDMParser extends Parser {
                         ports.add(port_index, port);
                         // LOGGER.info("["+ port_index + "," + port.getName()+"]");
                     } else if (type == Type.CYBER_RELATIONS) {
-
+                        log("cyber_rel" + token);
                         int rel_index = arrayList_element();
 
                         CyberRel cyberRel = cyber_rel();
                         cyber_relations.add(rel_index, cyberRel);
-                    } else if (type == Type.SAFETY_REL) {
-
+                    } else if (type == Type.SAFETY_RELATIONS) {
+                        log("safety_rel: " + token);
                         int rel_index = arrayList_element();
 
                         SafetyRel safetyRel = safety_rel();
                         safety_relations.add(rel_index, safetyRel);
-                    } else if (type == Type.EVENT) {
-
+                    } else if (type == Type.SAFETY_EVENTS) {
+                        log("safety event: " + token);
                         int event_index = arrayList_element();
 
                         Event event = event();
@@ -1666,16 +1675,16 @@ public class VDMParser extends Parser {
         SafetyReqExpr safetyReqExpr = new SafetyReqExpr();
         SafetyReqExprKind kind = null;
 
-        while (this.token.type == Type.SAFETY_REQ_EXP) {
+        while (this.token.type == Type.SAFETY_EXP) {
 
-            consume(Type.SAFETY_REQ_EXP);
+            consume(Type.SAFETY_EXP);
 
             if (token.type == Type.IA_PORT) {
 
                 IAPort iaPort = ia_port();
                 safetyReqExpr.setPort(iaPort);
             }
-            if (token.type == Type.SAFETY_REQ_EXP_KIND) {
+            if (token.type == Type.SAFETY_EXP_KIND) {
                 kind = safetyReqExprKind();
             }
             if (kind == SafetyReqExprKind.NOT) {
@@ -1707,9 +1716,9 @@ public class VDMParser extends Parser {
 
         int array_length = 0;
 
-        while (this.token.type == Type.SAFETY_REQ_EXP) {
+        while (this.token.type == Type.SAFETY_EXP) {
 
-            consume(Type.SAFETY_REQ_EXP);
+            consume(Type.SAFETY_EXP);
             if (token.type == Type.ARRAY_LIST) {
                 if (peek().type == Type.INT) {
                     array_length = arrayList_length();
@@ -1793,16 +1802,16 @@ public class VDMParser extends Parser {
         // Check length bound and terminate.
         int array_length = 0;
 
-        while (this.token.type == Type.SAFETY_REL_EXP) {
+        while (this.token.type == Type.SAFETY_EXP) {
 
-            consume(Type.SAFETY_REL_EXP);
+            consume(Type.SAFETY_EXP);
 
             if (token.type == Type.IA_PORT) {
 
                 IAPort iaPort = ia_port();
                 safetyRelExpr.setPort(iaPort);
             }
-            if (token.type == Type.SAFETY_REL_EXP_KIND) {
+            if (token.type == Type.SAFETY_EXP_KIND) {
                 kind = safetyRelExprKind();
             }
             if (kind == SafetyRelExprKind.NOT) {
@@ -1838,9 +1847,9 @@ public class VDMParser extends Parser {
 
         int array_length = 0;
 
-        while (this.token.type == Type.SAFETY_REL_EXP) {
+        while (this.token.type == Type.SAFETY_EXP) {
 
-            consume(Type.SAFETY_REL_EXP);
+            consume(Type.SAFETY_EXP);
             if (token.type == Type.ARRAY_LIST) {
                 if (peek().type == Type.INT) {
                     array_length = arrayList_length();
@@ -2022,7 +2031,7 @@ public class VDMParser extends Parser {
                 String identifier = id_value();
                 safetyReq.setId(identifier);
 
-            } else if (token.type == Type.SAFETY_REQ_EXP) {
+            } else if (token.type == Type.SAFETY_EXP) {
                 SafetyReqExpr safetyExpr = safetyReqExpr();
                 safetyReq.setCondition(safetyExpr);
 
@@ -2276,7 +2285,7 @@ public class VDMParser extends Parser {
 
     public SafetyReqExprKind safetyReqExprKind() {
 
-        consume(Type.SAFETY_REQ_EXP_KIND);
+        consume(Type.SAFETY_EXP_KIND);
 
         String type_name = token.sd.getName();
 
@@ -2289,7 +2298,7 @@ public class VDMParser extends Parser {
 
     public SafetyRelExprKind safetyRelExprKind() {
 
-        consume(Type.SAFETY_REL_EXP_KIND);
+        consume(Type.SAFETY_EXP_KIND);
 
         String type_name = token.sd.getName();
 
@@ -3596,8 +3605,8 @@ public class VDMParser extends Parser {
                         CyberReq cyberReq = cyber_req();
                         cyberRequirements.add(cyberReq_index, cyberReq);
 
-                    } else if (type == Type.SAFETY_REQ) {
-
+                    } else if (type == Type.SAFETY_REQUIREMENTS) {
+                        log("safety_req: " + token);
                         int safetyReq_index = arrayList_element();
 
                         SafetyReq safetyReq = safety_req();

@@ -89,6 +89,7 @@ public enum Type {
     CYBER_REQS("reqs"),
 
     CYBER_REQUIREMENTS("cyber_requirements"),
+    SAFETY_REQUIREMENTS("safety_requirements"),
     CYB_REQ("CyberReq"),
 
     CYB_REL("CyberRel"),
@@ -113,13 +114,13 @@ public enum Type {
     HAPPENS("happens"),
     IA("IA"),
     EVENT("Event"),
+    SAFETY_EVENTS("safety_events"),
     PROBABILITY("probability"),
 
-    SAFETY_REQ_EXP("SafetyReqExpr"),
-    SAFETY_REQ_EXP_KIND("SafetyReqExprKind"),
+    SAFETY_EXP("SafetyExpr"),
+    SAFETY_EXP_KIND("SafetyExprKind"),
 
-    SAFETY_REL_EXP("SafetyRelExpr"),
-    SAFETY_REL_EXP_KIND("SafetyRelExprKind"),
+    PROBE("probe"),
     // Safety related stuff ends
 
     SEVERITY("Severity"),
@@ -133,6 +134,7 @@ public enum Type {
     PORTS("ports"),
 
     CYBER_RELATIONS("cyber_relations"),
+    SAFETY_RELATIONS("safety_relations"),
 
     ARRAY_LIST("ArrayList"),
 
