@@ -98,7 +98,7 @@ public class VDMParser extends Parser {
     }
 
     private void log(String msg) {
-        System.out.println(msg);
+        //        System.out.println(msg);
     }
 
     // Project Rules:
@@ -1493,6 +1493,15 @@ public class VDMParser extends Parser {
      * cyber_relations: ArrayList<CyberRel>;
      *
      */
+    //    type ComponentType {
+    //    	name: Identifier;
+    //    	ports: ArrayList<Port>;
+    //    	compCateg: Option<String>;
+    //        contract: Option<ContractSpec>;
+    //        cyber_relations: ArrayList<CyberRel>;
+    //        safety_relations: ArrayList<SafetyRel>;
+    //        safety_events: ArrayList<SafetyEvent>;
+    //    };
     public ComponentType componentType() {
 
         ComponentType componentType = new ComponentType();
@@ -1551,7 +1560,7 @@ public class VDMParser extends Parser {
                         log("safety event: " + token);
                         int event_index = arrayList_element();
 
-                        Event event = event();
+                        Event event = safetyevent();
                         events.add(event_index, event);
                     }
                 }
@@ -1794,6 +1803,14 @@ public class VDMParser extends Parser {
         return safetyRel;
     }
 
+    //    type SafetyExpr {
+    //    	kind: SafetyExprKind;
+    //    	port: IAPort;
+    //    	fault: String;
+    //    	and: ArrayList<SafetyExpr>;
+    //    	or: ArrayList<SafetyExpr>;
+    //    	not: SafetyExpr;
+    //    };
     public SafetyRelExpr safetyRelExpr() {
 
         SafetyRelExpr safetyRelExpr = new SafetyRelExpr();
@@ -1833,6 +1850,7 @@ public class VDMParser extends Parser {
                 return safetyRelExpr();
             }
             if (kind == SafetyRelExprKind.FAULT) {
+
                 EventHappens event = eventHappens();
                 safetyRelExpr.setFault(event);
             }
@@ -2121,22 +2139,32 @@ public class VDMParser extends Parser {
         return mission;
     }
 
-    public Event event() {
+    //    type SafetyEvent {
+    //    	id: String;
+    //    	probability: String;
+    //    	comment: Option<String>;
+    //        description : Option<String>;
+    //    };
+    public Event safetyevent() {
 
         Event event = new Event();
 
-        while (this.token.type == Type.EVENT) {
+        while (this.token.type == Type.SAFETY_EVENT) {
 
-            consume(Type.EVENT);
+            consume(Type.SAFETY_EVENT);
 
             if (token.type == Type.STRING) {
 
-                String identifier = id_value();
-                event.setId(identifier);
+                String str_type_value = token.sd.getName();
+                Type str_type = Type.get(str_type_value);
 
-            } else if (token.type == Type.PROBABILITY) {
-                String prob = id_value();
-                event.setProbability(prob);
+                if (str_type == Type.EVENT_ID) {
+                    String identifier = id_value();
+                    event.setId(identifier);
+                } else if (str_type == Type.PROBABILITY) {
+                    String prob = id_value();
+                    event.setProbability(prob);
+                }
 
             } else if (token.type == Type.OPTION) {
 
@@ -2207,16 +2235,17 @@ public class VDMParser extends Parser {
     public EventHappens eventHappens() {
         EventHappens event = new EventHappens();
 
-        while (this.token.type == Type.HAPPENS) {
-            consume(Type.HAPPENS);
-
-            if (token.type == Type.STRING) {
-                String identifier = id_value();
-                event.setEventName(identifier);
-            } else {
-                System.out.println("Event happens: toeken " + token);
-            }
+        //        while (this.token.type == Type.HAPPENS) {
+        //            consume(Type.HAPPENS);
+        consume();
+        if (token.type == Type.STRING) {
+            String identifier = id_value();
+            event.setEventName(identifier);
+            //            } else {
+            //                System.out.println("Event happens: toeken " + token);
+            //            }
         }
+        consume();
 
         return event;
     }
