@@ -92,6 +92,7 @@
             </element>
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
+        <attribute name="probe" type="boolean" use="required"></attribute>
     </complexType>
 
     <simpleType name="PortMode">
