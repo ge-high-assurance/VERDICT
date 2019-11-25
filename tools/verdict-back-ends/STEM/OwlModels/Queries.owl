@@ -33,7 +33,7 @@ where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s
 }
 </rdfs:isDefinedBy>
   </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="Graph1">
+  <j.0:NamedQuery rdf:ID="STEMGraph">
     <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?finallist as ?N1_tooltip) where
@@ -144,14 +144,14 @@ where {?CompInst &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?x
 . LET(?temp1 := lcase(str(?m1)))
 . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix
 . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
-           . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1
+           . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1
            . LET(?Prop1 := ?y2)}
 
 # get second mitigation dal
 . OPTIONAL {?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2) # can swap m1 and m2; but not doing that
             . LET(?temp7 := lcase(str(?m2)))
             . ?CompInst ?y8 ?z8 . LET(?temp8 := lcase(str(?y8)))
-            . FILTER(?temp7 = ?temp8) . ?z8 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal2
+            . FILTER(?temp7 = ?temp8) . ?z8 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z8 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal2
             . LET(?Prop2 := ?y8)}
 # do stripping, concat with null etc
 . LET(?strippedm2 := replace(str(?m2),'http.*#',''))
