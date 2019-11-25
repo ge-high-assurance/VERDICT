@@ -537,7 +537,7 @@ let get_impl_index sys_impl comp_type comp_impl =
   let ep =
     Utils.element_position
       (fun ({AD.name = ((_,id1), (_,id2))}: AD.system_impl) ->
-        id1=comp_type && id2=comp_impl)
+        (equal_ids id1 comp_type) && (equal_ids id2 comp_impl))
       sys_impl
   in
   match ep with
