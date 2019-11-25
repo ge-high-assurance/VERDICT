@@ -27,6 +27,12 @@ public
 	    	Data_Model::Enumerators => ("NOT_STARTED", "IN_PROGRESS", "COMPLETED", "FAILED");
 	end DeliveryStatus;
   	
+  	data Constellation
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("Satellite0", "Satellite1");
+	end Constellation;
+  	
   	data InputBus
   	end InputBus;
   	
@@ -67,10 +73,5 @@ public
 	    	Data_Model::Data_Representation => Enum;
 	    	Data_Model::Enumerators => ("OFF", "INIT", "READY", "LAUNCH", "ABORT", "FLYING_TO_DEST", "MAKING_DELIVERY", "RETURN_TO_TRUCK");
 	end DeliveryPlannerState; 
-  	
-  	data Constellation
-  		properties
-	    	Data_Model::Data_Representation => Enum;
-	    	Data_Model::Enumerators => ("Satellite0", "Satellite1");
-	end Constellation; 	
+ 	
 end Data_Types;
