@@ -170,6 +170,7 @@ public
 			cam_health_check_in: in data port Base_Types::Boolean; -- added
 			package_secure: in data port Base_Types::Boolean; -- added
 			
+			
 			-- outputs
 			radio_cmd: out data port Base_Types::Boolean;
 			delivery_cmd_out: out data port Base_Types::Boolean;
@@ -182,6 +183,8 @@ public
 			launch_pos_out: out data port Data_Types::Position.impl; -- added
 			probe_init_mode_out: out data port Base_Types::Boolean; -- added
 			probe_abort_mode_out: out data port Base_Types::Boolean; -- added
+			target_clear: out data port Base_Types::Boolean; -- added
+			valid_marker: out data port Base_Types::Boolean; -- added
 						
 		annex agree {**
 			-- variables
@@ -193,8 +196,6 @@ public
 			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
 			eq delivery_failed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, FAILED));
 			eq delivery_completed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED));
-			eq target_clear: bool;
-			eq valid_marker: bool;
 			eq is_safe_landing: bool = (target_clear and valid_marker);
 			
 			-- events
@@ -214,10 +215,7 @@ public
 			eq connected: bool = bus_in.connected;
 			
 			-- probe
-			 guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
-			
-			-- state transitions
-			eq state: Data_Types::DeliveryPlannerState;
+			guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
 			
 			guarantee "Output: delivery_cmd_out":
 				--delivery_cmd_out = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
@@ -270,40 +268,38 @@ public
 			guarantee "Output: cmd_out | it sends signal to navigation only if it's in flying modes'":
 				cmd_out = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
 							
-			
-			guarantee "DeliveryPlannerFSM":
-				state = (enum(Data_Types::DeliveryPlannerState, OFF) ->
-						if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off and connected then 
+			eq planner_state: Data_Types::DeliveryPlannerState = (enum(Data_Types::DeliveryPlannerState, OFF) ->
+						if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, OFF)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_succeed and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_succeed and connected then 
 							enum(Data_Types::DeliveryPlannerState, READY)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, INIT) and abort_cmd and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and abort_cmd and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and abort_cmd and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and abort_cmd and connected then 
 							enum(Data_Types::DeliveryPlannerState, ABORT)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence and connected then 
 							enum(Data_Types::DeliveryPlannerState, LAUNCH)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_secure and okay_to_launch and separation) then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_secure and okay_to_launch and separation) then 
 							enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST) and destination_location_reached then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST) and destination_location_reached then 
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and no_clearance then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and no_clearance then 
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)						
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected) then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected) then 
 							enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK)
-						else if pre(state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached and connected then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached and connected then 
 							enum(Data_Types::DeliveryPlannerState, INIT)		
-						else pre(state));
+						else pre(planner_state));
 			
 			
 			eq off_mode: bool = true -> 
