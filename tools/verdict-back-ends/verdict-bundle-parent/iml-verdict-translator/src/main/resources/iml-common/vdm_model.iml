@@ -216,12 +216,12 @@ type IAPort {
 };
 
 type SafetyExpr {
-	kind: CyberExprKind;
+	kind: SafetyExprKind;
 	port: IAPort;
 	fault: String;
-	and: ArrayList<CyberExpr>;
-	or: ArrayList<CyberExpr>;
-	not: CyberExpr;
+	and: ArrayList<SafetyExpr>;
+	or: ArrayList<SafetyExpr>;
+	not: SafetyExpr;
 };
 
 type SafetyReq {
