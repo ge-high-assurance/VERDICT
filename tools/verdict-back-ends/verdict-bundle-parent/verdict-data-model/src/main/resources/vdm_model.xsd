@@ -523,7 +523,7 @@
         <choice>
             <element name="kind" type="vdm_model:SafetyRelExprKind"></element>
             <element name="port" type="vdm_model:IAPort"></element>
-            <element name="event" type="vdm_model:EventHappens"></element>
+            <element name="fault" type="vdm_model:EventHappens"></element>
             <element name="and" type="vdm_model:SafetyRelExprList"></element>
             <element name="or" type="vdm_model:SafetyRelExprList"></element>
             <element name="not" type="vdm_model:SafetyRelExpr"></element>
@@ -540,7 +540,7 @@
     <simpleType name="SafetyRelExprKind">
         <restriction base="string">
             <enumeration value="Port"></enumeration>
-            <enumeration value="Event"></enumeration>
+            <enumeration value="Fault"></enumeration>
             <enumeration value="And"></enumeration>
             <enumeration value="Or"></enumeration>
             <enumeration value="Not"></enumeration>
