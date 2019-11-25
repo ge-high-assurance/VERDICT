@@ -610,7 +610,7 @@ public class VDM2CSV extends VdmTranslator {
                 for (int i = 0; i < props.length; i++) {
                     // Perform reflection. invokeMethod() handles most of the nasty bits.
                     // We checked the return types of the methods above, so this is type-safe.
-                    isProp = null;
+                    isProp = null; // this null value is used later
                     dal = invokeMethod(inst, getDalMethods[i], -1);
                     if (invokeMethod(inst, isPropMethods[i], null) != null) {
                         isProp = invokeMethod(inst, isPropMethods[i], false) ? "1" : "0";
@@ -1006,9 +1006,9 @@ public class VDM2CSV extends VdmTranslator {
             List<Object> ports = new ArrayList<>();
             ports.add(expr.getPort());
             allPortsEvents.add(ports);
-        } else if (expr.getEvent() != null) {
+        } else if (expr.getFault() != null) {
             List<Object> events = new ArrayList<>();
-            events.add(expr.getEvent());
+            events.add(expr.getFault());
             allPortsEvents.add(events);
         } else if (expr.getOr() != null) {
             for (SafetyRelExpr or : expr.getOr().getExpr()) {
@@ -1021,8 +1021,8 @@ public class VDM2CSV extends VdmTranslator {
             for (SafetyRelExpr andExpr : expr.getAnd().getExpr()) {
                 if (andExpr.getPort() != null) {
                     portsEvents.add(andExpr.getPort());
-                } else if (andExpr.getEvent() != null) {
-                    portsEvents.add(andExpr.getEvent());
+                } else if (andExpr.getFault() != null) {
+                    portsEvents.add(andExpr.getFault());
                 } else {
                     errAndExit(
                             "MBAA only supports a dijunction of conjunctions of ports' CIA in cyber relatioins! Something unexpected!");

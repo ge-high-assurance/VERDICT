@@ -2974,7 +2974,7 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiJammingDal(dal_value);
+                        componentInstance.setAntiJammingDAL(dal_value);
                     }
                 } else if (type == Type.ANTI_FLOODING_DAL) {
                     type = option();

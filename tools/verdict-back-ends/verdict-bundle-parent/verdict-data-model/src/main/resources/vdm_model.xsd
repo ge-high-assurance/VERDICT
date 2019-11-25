@@ -260,7 +260,7 @@
         <attribute name="userAuthentication" type="boolean"
             use="optional"></attribute>
         <attribute name="antiJamming" type="boolean" use="optional"></attribute>
-        <attribute name="antiJamming_dal" type="vdm_model:DalType"></attribute>
+        <attribute name="antiJammingDAL" type="vdm_model:DalType"></attribute>
         <attribute name="auditMessageResponsesDAL"
             type="vdm_model:DalType" use="optional">
         </attribute>
