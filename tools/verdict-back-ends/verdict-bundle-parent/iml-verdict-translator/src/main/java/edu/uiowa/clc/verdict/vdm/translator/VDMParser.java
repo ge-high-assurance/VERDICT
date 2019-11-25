@@ -1832,9 +1832,9 @@ public class VDMParser extends Parser {
             if (kind == SafetyRelExprKind.PORT) {
                 return safetyRelExpr();
             }
-            if (kind == SafetyRelExprKind.EVENT) {
+            if (kind == SafetyRelExprKind.FAULT) {
                 EventHappens event = eventHappens();
-                safetyRelExpr.setEvent(event);
+                safetyRelExpr.setFault(event);
             }
         }
 
