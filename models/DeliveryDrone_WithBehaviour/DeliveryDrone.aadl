@@ -11,148 +11,154 @@ public
 	system GPS
 		features
 			-- inputs
-			constellation_in: in data port Data_Types::Constellation;
-			satellite0_pos_in: in data port Data_Types::Position.impl;
-			satellite1_pos_in: in data port Data_Types::Position.impl;
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
 			
 			-- outputs
-			gps_pos_out: out data port Data_Types::Position.impl;
-			health_check_out: out data port Base_Types::Boolean;
-			probe_constellation_out: out data port Data_Types::Constellation;
+			gps_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation;
 			
 		annex agree {**
 			 -- variables
-			 eq satellite_pos_in: Data_Types::Position.impl = if constellation_in = enum(Data_Types::Constellation, Satellite0) then 
-			 												  	satellite0_pos_in 
-			 												  else satellite1_pos_in;
+			 eq satellite0_selected: bool = (constellation = enum(Data_Types::Constellation, Satellite0));
+			 eq selected_satellite_pos: Data_Types::Position.impl = if satellite0_selected then 
+			 												  			satellite0_pos 
+			 												  		else satellite1_pos;
 			 
 			 -- high-level specification
-			 guarantee "Output: gps_pos_out": Agree_Nodes.close_locations(gps_pos_out, satellite_pos_in);
+			 guarantee "Output: gps_pos": Agree_Nodes.close_locations(gps_pos, selected_satellite_pos);
 			 
-			 -- probe
-			 guarantee "Output: probe_constellation_out": probe_constellation_out = constellation_in;
+			 -- probe outputs
+			 guarantee "Output: probe_constellation": probe_constellation = constellation;
 		**};
 		
 		annex verdict {**
-			CyberRel "gps_out_I" => gps_pos_out:I;
-			CyberRel "gps_out_A" => gps_pos_out:A;
+			CyberRel "gps_out_I" => gps_pos:I;
+			CyberRel "gps_out_A" => gps_pos:A;
 		**};
 	end GPS;
 
 	system IMU
 		features
 			-- inputs
-			launch_pos_in: in data port Data_Types::Position.impl;
+			launch_pos: in data port Data_Types::Position.impl;
 			
 			-- outputs
-			imu_pos_out: out data port Data_Types::Position.impl;
-			health_check_out: out data port Base_Types::Boolean;
-			probe_launch_location_out: out data port Data_Types::Position.impl;
-			
-			-- TODO: High-level spec is needed?
+			imu_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl;
+		
+		-- TODO: High-level specification is needed?
 		annex agree {**
 			-- probe
-			 guarantee "Output: probe_constellation_out": probe_launch_location_out = launch_pos_in;
+			 guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
 		**};
 		
 		annex verdict {**
-			CyberRel "imu_out_I" => imu_pos_out:I;
-			CyberRel "imu_out_A" => imu_pos_out:A;
+			CyberRel "imu_out_I" => imu_pos:I;
+			CyberRel "imu_out_A" => imu_pos:A;
 		**};
 	end IMU;
 		
 	system PositionEstimator 
 		features
 			-- inputs
-			gps_pos_in: in data port Data_Types::Position.impl;
-			imu_pos_in: in data port Data_Types::Position.impl;	
-			pos_act_in: in data port Data_Types::Position.impl;
+			gps_pos: in data port Data_Types::Position.impl;
+			imu_pos: in data port Data_Types::Position.impl;	
+			--pos_act_in: in data port Data_Types::Position.impl; -- TODO: do we need this?
 			
 			-- outputs
-			est_pos_out: out data port Data_Types::Position.impl;
-
+			est_pos: out data port Data_Types::Position.impl;
+		
+		-- TODO: High-level specification to make use of IMU input?
 		annex agree {**
 			-- high-level specification
-			guarantee "Output: est_pos_out": Agree_Nodes.close_locations(est_pos_out, gps_pos_in);	
-			
-			-- TODO: High-level spec to make use of IMU input?		
+			guarantee "Output: est_pos": Agree_Nodes.close_locations(est_pos, gps_pos);	
 		**};
 		
 		annex verdict {**
-			CyberRel "pos_out_I" = imu_pos_in:I or gps_pos_in:I or pos_act_in:I => est_pos_out:I;
-			CyberRel "pos_out_A" = imu_pos_in:A or gps_pos_in:A or pos_act_in:A => est_pos_out:A;
+			CyberRel "pos_out_I" = imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
+			CyberRel "pos_out_A" = imu_pos:A or gps_pos:A or pos_act_in:A => est_pos:A;
 		**};
 	end PositionEstimator;
 
 	system Navigation
 		features
 			-- inputs
-			pos_in: in data port Data_Types::Position.impl; -- Current estimated position
-			dest_location_in: in data port Data_Types::Position.impl;
-			cmd_in: in data port Base_Types::Boolean;
-			state_in: in data port Base_Types::Boolean;
+			est_pos: in data port Data_Types::Position.impl; -- current estimated position
+			dest_pos: in data port Data_Types::Position.impl;
+			cmd: in data port Base_Types::Boolean;
+			flight_control_state: in data port Base_Types::Boolean;
 			
 			-- outputs
-			move_out: out data port Base_Types::Boolean;				
-			nav_location_out: out data port Data_Types::Position.impl;
-			pos_act_out: out data port Data_Types::Position.impl;
-			probe_dest_location_out: out data port Data_Types::Position.impl;
+			move: out data port Base_Types::Boolean;				
+			cur_pos: out data port Data_Types::Position.impl;
+			--pos_act_out: out data port Data_Types::Position.impl; -- TODO: do we need this?
+			probe_dest_pos: out data port Data_Types::Position.impl;
 			
+		-- TODO: add some environmental assumption for gps position to make sure it remains 
+		--		 the same if no command was issued by delivery planner then you can remove
+		--		 this guarantee: true -> (not (pre(cmd)) => cur_pos = pre(cur_pos));
 		annex agree {**
 			-- high-level specification
-			guarantee "Output: nav_location_out | Navigation location remains the same if no command was received": 
-				true -> (not (pre(cmd_in)) => nav_location_out = pre(nav_location_out));
+			guarantee "Output: cur_pos | Current location remains the same if no command was received": 
+				true -> (not (pre(cmd)) => cur_pos = pre(cur_pos));
 					
-			guarantee "Output: nav_location_out | Navigation location is computed from Estimated Position":
-				Agree_Nodes.close_locations(nav_location_out, pos_in);
+			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
+				Agree_Nodes.close_locations(cur_pos, est_pos);
 			
-			-- probe
-			 guarantee "Output: probe_constellation_out": probe_dest_location_out = dest_location_in;
-			 
-			-- TODO: Do we need to add high-level spec for move_out and/or pos_act_out
+			guarantee "Output: move":
+				move = cmd;
+			
+			-- probe outputs
+			guarantee "Output: probe_dest_pos": probe_dest_pos = dest_pos;
 		**};
 		
 		annex verdict {**
-			CyberRel "move_out_I" = pos_in:I or cmd_in:I or state_in:I => move_out:I;
-			CyberRel "move_out_A" = pos_in:A or cmd_in:A or state_in:A  => move_out:A;
-			CyberRel "nav_location_out_I" = pos_in:I or cmd_in:I or state_in:I => nav_location_out:I;
-			CyberRel "nav_location_out_A" = pos_in:A or cmd_in:A or state_in:A  => nav_location_out:A;
-			CyberRel "pos_act_out_I" = pos_in:I or cmd_in:I or state_in:I => pos_act_out:I;
-			CyberRel "pos_act_out_A" = pos_in:A or cmd_in:A or state_in:A  => pos_act_out:A;
+			CyberRel "move_out_I" = est_pos:I or cmd:I or flight_control_state:I => move:I;
+			CyberRel "move_out_A" = est_pos:A or cmd:A or flight_control_state:A  => move:A;
+			CyberRel "nav_location_out_I" = est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
+			CyberRel "nav_location_out_A" = est_pos:A or cmd:A or flight_control_state:A  => cur_pos:A;
+			CyberRel "pos_act_out_I" = est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
+			CyberRel "pos_act_out_A" = est_pos:A or cmd:A or flight_control_state:A  => pos_act_out:A;
 		**};
 	end Navigation;
 	
 	system FlightControl
 		features
 			-- inputs
-			response_in: in data port Base_Types::Boolean;
-			move_in: in data port Base_Types::Boolean;
+			actuation_response: in data port Base_Types::Boolean;
+			move: in data port Base_Types::Boolean;
 			
 			-- outputs
 			motor_cmd: out data port Base_Types::Boolean;
-			state_out: out data port Base_Types::Boolean;
+			fc_state: out data port Base_Types::Boolean;
 			
 			-- TODO: High-level specification is needed?
 		
 		annex verdict {**
-			CyberRel "state_out_I" = move_in:I or response_in:I => state_out:I;
-			CyberRel "state_out_A" = move_in:A or response_in:A => state_out:A;
-			CyberRel "fc_cmd_out_I" = move_in:I or response_in:I => motor_cmd:I;
-			CyberRel "fc_cmd_out_A" = move_in:A or response_in:A => motor_cmd:A;
+			CyberRel "state_out_I" = move:I or actuation_response:I => fc_state:I;
+			CyberRel "state_out_A" = move:A or actuation_response:A => fc_state:A;
+			CyberRel "fc_cmd_out_I" = move:I or actuation_response:I => motor_cmd:I;
+			CyberRel "fc_cmd_out_A" = move:A or actuation_response:A => motor_cmd:A;
 		**};
 	end FlightControl;
 	
 	system Actuation
 		features
 			-- inputs
-			motor_cmd_in: in data port Base_Types::Boolean;
+			motor_cmd: in data port Base_Types::Boolean;
 			
 			-- outputs
-			response_out: out data port Base_Types::Boolean;
-		
+			response: out data port Base_Types::Boolean;
+			
+			-- TODO: High-level specification is needed?
+			
 		annex verdict {**
-			CyberRel "response_out_I" = motor_cmd_in:I => response_out:I;
-			CyberRel "response_out_A" = motor_cmd_in:A => response_out:A;
+			CyberRel "response_out_I" = motor_cmd:I => response:I;
+			CyberRel "response_out_A" = motor_cmd:A => response:A;
 		**};
 	end Actuation;
 	
@@ -160,42 +166,41 @@ public
 		features
 			-- inputs
 			bus_in: in data port Data_Types::InputBus.impl;
-			nav_location: in data port Data_Types::Position.impl; -- Current location
-			delivery_status_in: in data port Data_Types::DeliveryStatus;
+			cur_pos: in data port Data_Types::Position.impl;
+			delivery_status: in data port Data_Types::DeliveryStatus;
 			radio_response: in data port Data_Types::RadioResponse.impl;
 			camera_result: in data port Base_Types::Integer;
-			gps_health_check_in: in data port Base_Types::Boolean; -- added
-			imu_health_check_in: in data port Base_Types::Boolean; -- added
-			rdo_health_check_in: in data port Base_Types::Boolean; -- added
-			cam_health_check_in: in data port Base_Types::Boolean; -- added
-			package_secure: in data port Base_Types::Boolean; -- added
-			
+			gps_health_status: in data port Base_Types::Boolean; 
+			imu_health_status: in data port Base_Types::Boolean;
+			rdo_health_status: in data port Base_Types::Boolean;
+			cam_health_status: in data port Base_Types::Boolean;
+			package_is_secure: in data port Base_Types::Boolean; 
 			
 			-- outputs
 			radio_cmd: out data port Base_Types::Boolean;
-			delivery_cmd_out: out data port Base_Types::Boolean;
+			delivery_cmd: out data port Base_Types::Boolean;
 			dest_location: out data port Data_Types::Position.impl;
 			bus_out: out data port Base_Types::Boolean; -- not used
-	        cmd_out: out data port Base_Types::Boolean;	-- not used						
-			camera_out: out data port Base_Types::Boolean;
+	        nav_cmd: out data port Base_Types::Boolean;					
+			camera: out data port Base_Types::Boolean;
 			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
-			constellation_out: out data port Data_Types::Constellation; -- added
-			launch_pos_out: out data port Data_Types::Position.impl; -- added
-			probe_init_mode_out: out data port Base_Types::Boolean; -- added
-			probe_abort_mode_out: out data port Base_Types::Boolean; -- added
+			constellation: out data port Data_Types::Constellation; -- added
+			launch_pos: out data port Data_Types::Position.impl; -- added
+			probe_init_mode: out data port Base_Types::Boolean; -- added
+			probe_abort_mode: out data port Base_Types::Boolean; -- added
 			target_clear: out data port Base_Types::Boolean; -- added
 			valid_marker: out data port Base_Types::Boolean; -- added
 						
 		annex agree {**
 			-- variables
-			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);	
+			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);	
 			eq dest_position: Data_Types::Position.impl = dest_location;
 			eq expensive_item: bool = bus_in.order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
-			eq confirmation: bool = radio_response.target_confirmed;
+			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
 			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD); -- Correct?
 			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
-			eq delivery_failed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, FAILED));
-			eq delivery_completed: bool = (delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED));
+			eq delivery_failed: bool = (delivery_status = enum(Data_Types::DeliveryStatus, FAILED));
+			eq delivery_completed: bool = (delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED));
 			eq is_safe_landing: bool = (target_clear and valid_marker);
 			
 			-- events
@@ -206,32 +211,32 @@ public
 			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
 			eq okay_to_launch: bool = not internal_error_detected;
 			eq separation: bool = not connected;
-			eq destination_location_reached: bool = Agree_Nodes.close_locations(nav_location, dest_position);
+			eq destination_location_reached: bool = Agree_Nodes.close_locations(cur_pos, dest_position);
 			eq no_clearance: bool = not is_safe_landing;
 			eq successfull_delivery: bool = delivery_completed and destination_location_reached and not no_clearance;
 			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
-			eq internal_error_detected: bool = not gps_health_check_in or not imu_health_check_in or not rdo_health_check_in or not cam_health_check_in;
-			eq truck_location_reached: bool = Agree_Nodes.close_locations(nav_location, truck_position);
+			eq internal_error_detected: bool = not gps_health_status or not imu_health_status or not rdo_health_status or not cam_health_status;
+			eq truck_location_reached: bool = Agree_Nodes.close_locations(cur_pos, truck_position);
 			eq connected: bool = bus_in.connected;
 			
 			-- probe
 			guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
 			
-			guarantee "Output: delivery_cmd_out":
-				--delivery_cmd_out = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
+			guarantee "Output: delivery_cmd":
+				--delivery_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
 				--					not no_clearance and 
 				--					(expensive_item => confirmation);
-				delivery_cmd_out = (making_delivery_mode and not no_clearance and (expensive_item => confirmation));
+				delivery_cmd = (making_delivery_mode and not no_clearance and (expensive_item => confirmation));
 				
-			guarantee "Output: constellation_out":
-				--constellation_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+			guarantee "Output: constellation":
+				--constellation = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
 				--						bus_in.constellation
 				--					else 
-				--						pre(constellation_out);
-				constellation_out = if init_mode then 
+				--						pre(constellation);
+				constellation = if init_mode then 
 										bus_in.constellation
 									else 
-										pre(constellation_out);
+										pre(constellation);
 			
 			guarantee "Output: dest_location":
 				--dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
@@ -243,30 +248,30 @@ public
 								else 
 									pre(dest_location);
 				
-			guarantee "Output: launch_pos_out":
-				--launch_pos_out = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+			guarantee "Output: launch_pos":
+				--launch_pos = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
 				--						bus_in.launch_pos
 				--				 else 
-				--						pre(launch_pos_out);
-				launch_pos_out = if init_mode then 
+				--						pre(launch_pos);
+				launch_pos = if init_mode then 
 									bus_in.launch_pos
 								 else 
-									pre(launch_pos_out);
+									pre(launch_pos);
 			
 			guarantee "Output: radio_cmd":
 				--radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
 				--			expensive_item;
 				radio_cmd = (making_delivery_mode and expensive_item);
 			
-			guarantee "Output: probe_init_mode_out":
+			guarantee "Output: probe_init_mode":
 				--initialized_mode_out = (state = enum(Data_Types::DeliveryPlannerState, INIT));
-				probe_init_mode_out = init_mode;
+				probe_init_mode = init_mode;
 				
-			guarantee "Output: probe_abort_mode_out":
-				probe_abort_mode_out = abort_mode;
+			guarantee "Output: probe_abort_mode":
+				probe_abort_mode = abort_mode;
 			
-			guarantee "Output: cmd_out | it sends signal to navigation only if it's in flying modes'":
-				cmd_out = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
+			guarantee "Output: nav_cmd | it sends signal to navigation only if it's in flying modes'":
+				nav_cmd = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
 							
 			eq planner_state: Data_Types::DeliveryPlannerState = (enum(Data_Types::DeliveryPlannerState, OFF) ->
 						if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off and connected then 
@@ -289,7 +294,7 @@ public
 							enum(Data_Types::DeliveryPlannerState, ABORT)
 						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence and connected then 
 							enum(Data_Types::DeliveryPlannerState, LAUNCH)
-						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_secure and okay_to_launch and separation) then 
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_is_secure and okay_to_launch and separation) then 
 							enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST)
 						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST) and destination_location_reached then 
 							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)
@@ -325,7 +330,7 @@ public
 			
 			eq launch_mode: bool = false ->
 								   (pre(launch_mode) and (not (abort_cmd and connected)) 
-								   					 and (not (package_secure and okay_to_launch and separation))) or
+								   					 and (not (package_is_secure and okay_to_launch and separation))) or
 								   (pre(ready_mode) and mission_store_release_sequence and connected);
 			
 			eq abort_mode: bool = false ->
@@ -336,7 +341,7 @@ public
 			
 			eq flying_to_dest_mode: bool = false ->
 										   (pre(flying_to_dest_mode) and (not (destination_location_reached))) or
-										   (pre(launch_mode) and package_secure and okay_to_launch and separation);
+										   (pre(launch_mode) and package_is_secure and okay_to_launch and separation);
 			
 			eq making_delivery_mode: bool = false ->
 											(pre(making_delivery_mode) and (not (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected))) or
@@ -354,7 +359,7 @@ public
 			
 			-- old sections below	
 			
-			--eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(nav_location);
+			--eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);
 			
 			--eq have_order: bool = Agree_Nodes.HasHappened(bus_in.connected and bus_in.update_order);
 			
@@ -383,7 +388,7 @@ public
       		--	  not p.is_target_clear or not p.is_target_location
     		--	) 
     		--	or
-    		--	delivery_status_in = enum(Data_Types::DeliveryStatus, FAILED)
+    		--	delivery_status = enum(Data_Types::DeliveryStatus, FAILED)
     		--	or
     		--	(radio_response.data_available and not radio_response.target_confirmed)
     		--	or
@@ -391,91 +396,91 @@ public
   			--);
   			
   			--eq proof_stored: bool = Agree_Nodes.HasHappened(
-    		--	delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED) and
-    		--	Agree_Nodes.close_locations(nav_location, order.target_position)
+    		--	delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED) and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position)
   			--);
   			
 			--eq delivered_or_aborted: bool =
-    		--	false -> pre (delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED) or delivery_aborted);
+    		--	false -> pre (delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED) or delivery_aborted);
 			
 			--eq connected_to_truck: bool = 
 			--    not delivered_or_aborted and
-    		--	Agree_Nodes.close_locations(nav_location, truck_position) and
+    		--	Agree_Nodes.close_locations(cur_pos, truck_position) and
     		--	bus_in.connected;
 			
 			--eq waiting_delivery_order: bool =
 			--	not delivered_or_aborted and
-			--	Agree_Nodes.close_locations(nav_location, truck_position) and
+			--	Agree_Nodes.close_locations(cur_pos, truck_position) and
     		--	not bus_in.connected and
     		--	not have_order;
     		
     		--eq flying_to_target: bool =
     		--	not delivered_or_aborted and
     		--	have_order and
-    		--	( Agree_Nodes.close_locations(nav_location, truck_position) and
+    		--	( Agree_Nodes.close_locations(cur_pos, truck_position) and
             --  	  not bus_in.connected
             --	) 
             --	or
-            --	( not Agree_Nodes.close_locations(nav_location, truck_position) and
-            --  	  not Agree_Nodes.close_locations(nav_location, order.target_position)
+            --	( not Agree_Nodes.close_locations(cur_pos, truck_position) and
+            --  	  not Agree_Nodes.close_locations(cur_pos, order.target_position)
             --	) ;
 			
 			--eq recognizing_location: bool = 
 			--	not delivered_or_aborted and
     		--	have_order and
-    		--	Agree_Nodes.close_locations(nav_location, order.target_position) and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
     		--	(false -> not pre(valid_recognition));
 			
 			--eq confirming_location: bool =
 			--	not delivered_or_aborted and
-    		--	Agree_Nodes.close_locations(nav_location, order.target_position) and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
     		--	(false -> pre(valid_recognition)) and
     		--	(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) and
     		--	(false -> not pre(target_confirmed));
 			
 			--eq dropping_package: bool =
 			--	not delivered_or_aborted and
-    		--	Agree_Nodes.close_locations(nav_location, order.target_position) and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
     		--	(false -> pre(valid_recognition)) and
     		--	(false -> ((order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => pre(target_confirmed)));
 			
 			--eq waiting_proof_of_delivery: bool =
-			--	(false -> pre(delivery_status_in = enum(Data_Types::DeliveryStatus, COMPLETED))) and 
-			--	Agree_Nodes.close_locations(nav_location, order.target_position) and
+			--	(false -> pre(delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED))) and 
+			--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
     		--	(false -> not pre(proof_stored));
     			
     		--eq returning_to_truck: bool =
     		--	delivered_or_aborted and
-			--	not (Agree_Nodes.close_locations(nav_location, truck_position)) and
+			--	not (Agree_Nodes.close_locations(cur_pos, truck_position)) and
     		--	not waiting_proof_of_delivery;
     		
     		--eq delivery_done: bool =
     		--	delivered_or_aborted and
-    		--	Agree_Nodes.close_locations(nav_location, truck_position);
+    		--	Agree_Nodes.close_locations(cur_pos, truck_position);
     		
     		--assume "Navigation location remains the same if no command was issued":
-    		--	true -> (not pre(cmd_out) => nav_location = pre(nav_location));
+    		--	true -> (not pre(nav_cmd) => cur_pos = pre(cur_pos));
 
 			--guarantee "Command is issued only if drone is disconnected and has order":
-			--	cmd_out => not bus_in.connected and have_order;
+			--	nav_cmd => not bus_in.connected and have_order;
 
   			--guarantee "radio_cmd_Def": radio_cmd = confirming_location;
 
-  			--guarantee "delivery_cmd_out_Def": delivery_cmd_out = dropping_package;
+  			--guarantee "delivery_cmd_out_Def": delivery_cmd = dropping_package;
     		
 		**};
 					
 		annex verdict {**
-			CyberRel "dp_bus_out_I" = nav_location:I or delivery_status_in:I or camera_result:I or radio_response:I => bus_out:I;
-			CyberRel "dp_bus_out_A" = nav_location:A or delivery_status_in:A or camera_result:A or radio_response:A => bus_out:A;
-			CyberRel "dp_cmd_out_I" = nav_location:I or delivery_status_in:I or camera_result:I or radio_response:I => cmd_out:I;
-			CyberRel "dp_cmd_out_A" = nav_location:A or delivery_status_in:A or camera_result:A or radio_response:A => cmd_out:A;
-			CyberRel "dp_delivery_status_I" = nav_location:I or delivery_status_in:I or camera_result:I or radio_response:I => delivery_cmd_out:I;
-			CyberRel "dp_delivery_status_A" = nav_location:A or delivery_status_in:A or camera_result:A or radio_response:A => delivery_cmd_out:A;
-			CyberRel "dp_camera_out_I" = nav_location:I or delivery_status_in:I or camera_result:I or radio_response:I => camera_out:I;
-			CyberRel "dp_camera_out_A" = nav_location:A or delivery_status_in:A or camera_result:A or radio_response:A => camera_out:A;
-			CyberRel "dp_radio_cmd_I" = nav_location:I or delivery_status_in:I or camera_result:I or radio_response:I => radio_cmd:I;
-			CyberRel "dp_radio_cmd_A" = nav_location:A or delivery_status_in:A or camera_result:A or radio_response:A => radio_cmd:A;
+			CyberRel "dp_bus_out_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			CyberRel "dp_bus_out_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			CyberRel "dp_cmd_out_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => nav_cmd:I;
+			CyberRel "dp_cmd_out_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => nav_cmd:A;
+			CyberRel "dp_delivery_status_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd:I;
+			CyberRel "dp_delivery_status_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd:A;
+			CyberRel "dp_camera_out_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => camera:I;
+			CyberRel "dp_camera_out_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => camera:A;
+			CyberRel "dp_radio_cmd_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			CyberRel "dp_radio_cmd_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
 		**};
 	end DeliveryPlanner;
 	
@@ -488,7 +493,7 @@ public
 			-- outputs
 			comm_out: out data port Base_Types::Boolean; -- TODO: remove? does not do anything
 			radio_out: out data port Data_Types::RadioResponse.impl;
-			health_check_out: out data port Base_Types::Boolean; -- added
+			health_status: out data port Base_Types::Boolean; -- added
 			
 		annex agree {**
 			guarantee "Radio receives data from remote communication channel":
@@ -513,7 +518,7 @@ public
 			
 			-- outputs
 			delivery_status_out: out data port Data_Types::DeliveryStatus;
-			package_secure: out data port Base_Types::Boolean;
+			package_is_secure: out data port Base_Types::Boolean;
 			
 		annex agree {**
 			guarantee "Initially, delivery status is NOT_STARTED":
@@ -536,7 +541,7 @@ public
 		features
 			camera_in: in data port Base_Types::Boolean;
 			camera_out: out data port Base_Types::Integer;
-			health_check_out: out data port Base_Types::Boolean;
+			health_status: out data port Base_Types::Boolean;
 
 		annex verdict {**
 			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
@@ -570,12 +575,12 @@ public
 			
 			radio_cmd: out data port Base_Types::Boolean; -- Probe Signal
 			radio_response: out data port Data_Types::RadioResponse.impl; -- Probe Signal
-			delivery_status_in: out data port Data_Types::DeliveryStatus; -- Probe Signal
-			delivery_cmd_out: out data port Base_Types::Boolean; -- Probe Signal
+			delivery_status: out data port Data_Types::DeliveryStatus; -- Probe Signal
+			
 			actuation_out: out data port Base_Types::Boolean;
 			probe_init_mode: out data port Base_Types::Boolean; -- Probe Signal
 			probe_abort_mode: out data port Base_Types::Boolean; -- Probe Signal
-			
+			probe_delivery_cmd: out data port Base_Types::Boolean; -- Probe Signal
 			probe_constellation: out data port Data_Types::Constellation;
 			probe_launch_location: out data port Data_Types::Position.impl;
 			probe_delivery_location: out data port Data_Types::Position.impl;
@@ -595,10 +600,10 @@ public
       		--	comm1.target_confirmed
       		--);
 
-			--eq delivery_started: bool = delivery_status_in <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+			--eq delivery_started: bool = delivery_status <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
 			
 			--guarantee "P1: A command to release a valuable package is issued only if drone has received confirmation from base":
-    		--	true -> (delivery_cmd_out and 
+    		--	true -> (probe_delivery_cmd and 
       		--		(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => target_confirmed); 
 
   			--guarantee "P2: The drone will always request a confirmation to base before starting delivery of a valuable package":
@@ -645,14 +650,14 @@ public
 			id = "MissionReq01"
 			description = "The drone shall be resilient to loss of ability to deliver a package to 
 			              the appropriate consumer location"
-			condition = actuation_out:I or actuation_out:A or delivery_status_in:I or delivery_status_in:A
+			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
 			cia = I
 			severity = Hazardous
 		};
 			CyberReq {
 			id = "MissionReq02"
 			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
-			condition = delivery_status_in:I 
+			condition = delivery_status:I 
 			cia = I
 			severity = Hazardous
 		};
@@ -726,26 +731,26 @@ public
 			};
 			
 		connections
-			c1: port positionEstimator.est_pos_out -> navigation.pos_in
+			c1: port positionEstimator.est_pos -> navigation.est_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c1b: port deliveryPlanner.launch_pos_out -> imu.launch_pos_in
+			c1b: port deliveryPlanner.launch_pos -> imu.launch_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c2: port navigation.move_out -> fc.move_in
+			c2: port navigation.move -> fc.move
 			{VERDICT_Properties::flowType => Xdata;};
 
-			c3: port fc.state_out -> navigation.state_in
+			c3: port fc.fc_state -> navigation.flight_control_state
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c4: port deliveryPlanner.dest_location -> navigation.dest_location_in
+			c4: port deliveryPlanner.dest_location -> navigation.dest_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c5: port navigation.nav_location_out -> deliveryPlanner.nav_location
+			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			
-			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status_in			
+			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status			
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c9: port camera.camera_out -> deliveryPlanner.camera_result			
@@ -757,7 +762,7 @@ public
 			c11: port radio.radio_out -> deliveryPlanner.radio_response
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c12: port gps.gps_pos_out -> positionEstimator.gps_pos_in
+			c12: port gps.gps_pos -> positionEstimator.gps_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c14a: port bus1 -> connector.bus_in
@@ -781,31 +786,31 @@ public
 			c17: port radio.comm_out -> comm2
 			{VERDICT_Properties::flowType => Xdata;};
 
-			c18a: port imu.imu_pos_out -> positionEstimator.imu_pos_in
+			c18a: port imu.imu_pos -> positionEstimator.imu_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c19: port fc.motor_cmd -> actuation.motor_cmd_in
+			c19: port fc.motor_cmd -> actuation.motor_cmd
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c20: port actuation.response_out -> fc.response_in
+			c20: port actuation.response -> fc.actuation_response
 			{VERDICT_Properties::flowType => Xdata;};	
 
-			c22: port satellite0_sig_pos -> gps.satellite0_pos_in
+			c22: port satellite0_sig_pos -> gps.satellite0_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c23: port satellite1_sig_pos -> gps.satellite1_pos_in
+			c23: port satellite1_sig_pos -> gps.satellite1_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
-			{VERDICT_Properties::flowType => Xdata;};
+			--c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
+			--{VERDICT_Properties::flowType => Xdata;};
 			
-			c25: port deliveryPlanner.delivery_cmd_out -> deliveryItemMechanism.delivery_cmd_in
+			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
 			{VERDICT_Properties::flowType => Xdata;};
 
-			c26: port deliveryPlanner.cmd_out -> navigation.cmd_in
+			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c27: port deliveryPlanner.camera_out -> camera.camera_in			
+			c27: port deliveryPlanner.camera -> camera.camera_in			
 			{VERDICT_Properties::flowType => Xdata;};
 			
 			c28: port deliveryPlanner.radio_cmd -> radio_cmd
@@ -814,49 +819,49 @@ public
 			c29: port radio.radio_out -> radio_response
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status_in
+			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c31: port deliveryPlanner.delivery_cmd_out -> delivery_cmd_out
+			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
 			{VERDICT_Properties::flowType => Xdata;}; 							
 			
-			c32: port actuation.response_out -> actuation_out
+			c32: port actuation.response -> actuation_out
 			{VERDICT_Properties::flowType => Xdata;};	
 			
-			c33: port deliveryPlanner.constellation_out -> gps.constellation_in
+			c33: port deliveryPlanner.constellation -> gps.constellation
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c34: port gps.health_check_out -> deliveryPlanner.gps_health_check_in
+			c34: port gps.health_status -> deliveryPlanner.gps_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c35: port imu.health_check_out -> deliveryPlanner.imu_health_check_in
+			c35: port imu.health_status -> deliveryPlanner.imu_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c36: port radio.health_check_out -> deliveryPlanner.rdo_health_check_in
+			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c37: port camera.health_check_out -> deliveryPlanner.cam_health_check_in
+			c37: port camera.health_status -> deliveryPlanner.cam_health_status
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c38: port gps.probe_constellation_out -> probe_constellation
+			c38: port gps.probe_constellation -> probe_constellation
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c39: port deliveryPlanner.probe_init_mode_out -> probe_init_mode
+			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c40: port IMU.probe_launch_location_out -> probe_launch_location
+			c40: port IMU.probe_launch_pos -> probe_launch_location
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c41: port navigation.probe_dest_location_out -> probe_delivery_location
+			c41: port navigation.probe_dest_pos -> probe_delivery_location
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c42: port deliveryItemMechanism.package_secure -> deliveryPlanner.package_secure
+			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c43: port deliveryPlanner.cmd_out -> probe_cmd
+			c43: port deliveryPlanner.nav_cmd -> probe_cmd
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			c44: port deliveryPlanner.probe_abort_mode_out -> probe_abort_mode
+			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
 			{VERDICT_Properties::flowType => Xdata;};
 												
 	end DeliveryDroneSystem.impl;
