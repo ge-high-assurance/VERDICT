@@ -854,7 +854,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
                   fprintf xml_oc "\t</Requirement> \n";
     	       | "Safety" -> let t = model_to_ftree lib mdl in
                   (* cutset metric file, in printbox format *)    
-                  saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
+                  saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
                   (* tree visualizations *)    
                   dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
                | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq");)
