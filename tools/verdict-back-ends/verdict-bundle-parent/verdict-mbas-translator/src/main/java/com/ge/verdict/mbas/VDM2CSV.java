@@ -275,7 +275,8 @@ public class VDM2CSV extends VdmTranslator {
                         table.addValue(isEncrypted ? "1#0" : "0#0");
                     }
                 } else if (connection.getEncryptedTransmissionDAL() != null) {
-                    table.addValue("null#" +String.valueOf(connection.getEncryptedTransmissionDAL()));
+                    table.addValue(
+                            "null#" + String.valueOf(connection.getEncryptedTransmissionDAL()));
                 } else {
                     table.addValue("");
                 }
@@ -835,8 +836,8 @@ public class VDM2CSV extends VdmTranslator {
                         "ModelVersion",
                         "MissionReqId",
                         "MissionReq",
-                        "CyberReqId",
-                        "CyberReq",
+                        "ReqId",
+                        "Req",
                         "MissionImpactCIA",
                         "Effect",
                         "Severity",
@@ -916,7 +917,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 if (mission == null) {
                     System.out.println(
-                            "Warning: CyberReq " + req.getId() + " does not belong to any mission");
+                            "Info: Requirement " + req.getId() + " does not belong to any mission");
                 }
 
                 for (List<CIAPort> andPortList : condPorts) {
