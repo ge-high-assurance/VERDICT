@@ -67,14 +67,14 @@ where {?CompInst <applicableCM> ?x
 . LET(?temp1 := lcase(str(?m1)))
 . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix
 . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
-           . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?dal1
+           . FILTER(?temp1 = ?temp2) . ?z4 <val> true . ?z4 <dal> ?dal1
            . LET(?Prop1 := ?y2)}
 
 # get second mitigation dal
 . OPTIONAL {?x <mitigation> ?m2 . FILTER(?m1 != ?m2) # can swap m1 and m2; but not doing that
             . LET(?temp7 := lcase(str(?m2)))
             . ?CompInst ?y8 ?z8 . LET(?temp8 := lcase(str(?y8)))
-            . FILTER(?temp7 = ?temp8) . ?z8 <dal> ?dal2
+            . FILTER(?temp7 = ?temp8) . ?z8 <val> true . ?z8 <dal> ?dal2
             . LET(?Prop2 := ?y8)}
 # do stripping, concat with null etc
 . LET(?strippedm2 := replace(str(?m2),'http.*#',''))
@@ -103,7 +103,7 @@ order by ?CompInst ?CAPEC ?ApplicableDefenseProperties
 //// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
 //// changed by dropping ". FILTER(?dal > 0)" in 2 places
 
-Ask Graph1: "
+Ask STEMGraph: "
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?finallist as ?N1_tooltip) where
 {  ?conn <rdf:type> <Connection>
  . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest

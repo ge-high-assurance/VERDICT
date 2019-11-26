@@ -270,35 +270,61 @@ let compEventsInfo name l_events = List.map (comp_find eventsH_Probability (comp
 (* - * - * - *)
 
 (* from l_comp_saf we get faults and fault_formulas *)
-let (compsafH_CompType, compsafH_IOrE,      compsafH_InputIA, compsafH_Out, compsafH_OutputIA) =
-	("Comp",            "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");;
+let (compType_S, inputOrEvent_S,     inputIAE_S,       outputPort_S, outputCIA_S) =
+	("Comp",     "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");;
 
-let compFaults name l_comp_saf = comp_find2 compsafH_InputIA (comp name l_comp_saf);;
+let compFaults name l_comp_saf = comp_find2 inputIAE_S (comp name l_comp_saf);;
 
-let compsaf_filter compName out ia l_comp_saf = compInfo ia compsafH_OutputIA (compInfo out compsafH_Out (comp compName l_comp_saf));;
+let compsaf_filter compName out ia l_comp_saf = compInfo ia outputCIA_S (compInfo out outputPort_S (comp compName l_comp_saf));;
+
 let compsafOut_In name out ia l_comp_saf = 
 	let f x tag =  List.Assoc.find_exn x tag ~equal:(=) in
     let l = compsaf_filter name out ia l_comp_saf in
-    	List.map l ~f:(fun x -> if (f x compsafH_IOrE) <> "" 
-        						then [ f x compsafH_IOrE ; f x compsafH_InputIA ] else []);;
+    	List.map l ~f:(fun x -> if (f x inputOrEvent_S) <> "" 
+        						then (match (f x inputIAE_S) with
+        						         "happens" -> [ f x inputOrEvent_S ; ]
+        						       | _         -> [ f x inputOrEvent_S ; f x inputIAE_S ])
+                                else []);;
 
-let formulaSafe_OrAnd listElement =
+let rec passOnlyAllowed l_formulas allowedList =
+   match l_formulas with
+       hd::tl -> ( match hd with
+                     | F[e;iae] -> if (List.exists allowedList ~f:(fun x -> x=e)) then F[e;iae] :: (passOnlyAllowed tl allowedList)
+                                   else passOnlyAllowed tl allowedList
+                     | A[e;cia] -> if (List.exists allowedList ~f:(fun x -> x=e)) then A[e;cia] :: (passOnlyAllowed tl allowedList)
+                                   else passOnlyAllowed tl allowedList
+                     | _ -> raise (Error "passOnlyAllowed exception") )
+     | [] -> [];;
+
+let formulaSafe_And listElement cinputs cevents =
 	match listElement with
 	 [e] -> F[e]
-	|[inList;iaList] -> 
-		let inList_split = String.split_on_chars inList ~on:[';'] 
-		and iaList_split = String.split_on_chars iaList ~on:[';'] 
+	|[inList;iaeList] -> 
+		let inList_split = String.split_on_chars inList ~on:[';']   (* inport list *)
+		and iaeList_split = String.split_on_chars iaeList ~on:[';'] (* I/A/Event list *)
 		in
-		let fList = (List.map2_exn inList_split iaList_split ~f:(fun i ia -> F (List.append [i] [ia]))) in
-		And fList ;;
-
-let formulaSafe_aux name out ia l_comp_saf = 
+		(* zip the list of inputs and IA/E *)
+		let fList = (List.map2_exn inList_split iaeList_split ~f:(fun i iae -> F (List.append [i] [iae]))) 
+		in
+		(* remove any F[*] that are not either inputs or events in the architecture *)
+        let fList_allowed = 
+           (let allowedList = List.append cinputs cevents in
+            passOnlyAllowed fList allowedList)
+        in
+		(* remove the text "happens"; turn F[e;"happens"] into F[e] *)
+		let fList_rmHappens = List.map fList_allowed ~f:(fun x -> match x with F[e;"happens"] -> F[e] | _ -> x) 
+		in
+		And fList_rmHappens
+	 |_ -> And[];;
+	 
+let formulaSafe_aux name out cinputs cevents ia l_comp_saf = 
 	let l = noEmptyList (compsafOut_In name out ia l_comp_saf)in
 	let l2 = List.map l ~f:(fun x -> List.filter x ~f:(fun e -> e<>"")) in
-	Or (List.map l2 ~f:(fun x -> formulaSafe_OrAnd x));;
+	let l3 = List.map l2 ~f:(fun x -> formulaSafe_And x cinputs cevents) in
+	Or (eliminateEmptyAnd l3);;
 
-let formulaSafe name coutputs l_arch l_comp_saf =
-    let formula_type name out ia = ([out; ia], formulaSafe_aux name out ia l_comp_saf) in
+let formulaSafe name coutputs cinputs cevents l_comp_saf  =
+    let formula_type name out ia = ([out; ia], formulaSafe_aux name out cinputs cevents ia l_comp_saf) in
     let formulaOut name out = List.map ["Integrity";"Availability"] ~f:(fun x-> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));; 
 
@@ -399,10 +425,9 @@ let massageArch arch =
 
 (* This function generates a sublist of CompDepen based on Arch to support hierarchy:
    - if in Arch a src port is of type "in", then make a new line where input port is the org name and output is the org name with "_dotO" (i.e., dot Out)
-   - if in Arch a des port is of type "out", then make a new line where input port is the org name with "_dotI" (i.e., dot In) and output port is the org name
-compType_C, inputPort_C, outputPort_C, inputCIA_C, outputCIA_C
+   - if in Arch a des port is of type "out", then make a new line where input port is the org name with "_dotI" (i.e., dot In) and output port is the org name.
 *)
-let rec makeCompDepen_subList arch cdL =
+let rec makeFormula_subList arch cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header =
     match arch with
     | hd::tl ->
        (let srcPortType = List.Assoc.find_exn hd ~equal:(=) srcPortType_Arc
@@ -413,36 +438,49 @@ let rec makeCompDepen_subList arch cdL =
         and desCompType = List.Assoc.find_exn hd ~equal:(=) desType_Arc 
         in
         match (srcPortType,desPortType) with
-            ("in","in")   -> let compA_list = compAttacks srcCompType cdL in
-                             (List.append (makeCompDepen_subList tl cdL) 
-                                         (List.map compA_list ~f:(fun a -> [(compType_C, srcCompType);
-                                                                            (inputPort_C, (String.chop_suffix_exn ~suffix:"_dotO" srcPortName));
-                                                                            (inputCIA_C, a);
-                                                                            (outputPort_C, srcPortName);
-                                                                            (outputCIA_C, a)])))            
-          | ("out","out") -> let compA_list = compAttacks desCompType cdL in
-                             (List.append (makeCompDepen_subList tl cdL) 
-                                         (List.map compA_list ~f:(fun a -> [(compType_C, desCompType);
-                                                                            (inputPort_C, desPortName);
-                                                                            (inputCIA_C, a);
-                                                                            (outputPort_C, (String.chop_suffix_exn ~suffix:"_dotI" desPortName));
-                                                                            (outputCIA_C, a)])))       
-          | _             -> makeCompDepen_subList tl cdL)
+            ("in","in")   -> let compA_list = f_attackOrEvent srcCompType cdL in (* <-- f_attackOrEvent is either the function compAttacks or compFaults *)
+                             (List.append (makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header) 
+                                         (List.map compA_list ~f:(fun a -> [(compType_header, srcCompType);
+                                                                            (input_header, (String.chop_suffix_exn ~suffix:"_dotO" srcPortName));
+                                                                            (inputCIA_header, a);
+                                                                            (output_header, srcPortName);
+                                                                            (outputCIA_header, a)])))            
+          | ("out","out") -> let compA_list = f_attackOrEvent desCompType cdL in (* <-- f_attackOrEvent is either the function compAttacks or compFaults *)
+                             (List.append (makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header) 
+                                         (List.map compA_list ~f:(fun a -> [(compType_header, desCompType);
+                                                                            (input_header, desPortName);
+                                                                            (inputCIA_header, a);
+                                                                            (output_header, (String.chop_suffix_exn ~suffix:"_dotI" desPortName));
+                                                                            (outputCIA_header, a)])))       
+          | _             -> makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header)
     | [] -> [] ;;
 
+(* massages the CompDepen file, calling makeFormula_subList with the headers from CompDepen *)
 let massageCompDepen compDepen arch =
-   let newCDs = makeCompDepen_subList arch compDepen in
+   let newCDs = makeFormula_subList arch compDepen compAttacks compType_C inputPort_C inputCIA_C outputPort_C outputCIA_C in
    List.append compDepen newCDs ;;
+
+(* massages the CompSafe file, calling makeFormula_subList with the headers from CompSafe *)
+let massageCompSafe compSafe arch =
+   let newCSs = makeFormula_subList arch compSafe compFaults compType_S inputOrEvent_S inputIAE_S outputPort_S outputCIA_S in
+   List.append compSafe newCSs ;;
+
 
 (* - * - * - *)
 
 (* from l_mission we get components, instances, connections, and top_attack*)
-let (modelVersion_M, missionReqId_M,  reqType_M, cyberReqId_M, cyberReq_M, compOutputDependency_M, missionImpactCIA_M, severity_M, compInstanceDependency_M, cia_M)=
-    ("ModelVersion", "MissionReqId", "ReqType", "CyberReqId", "CyberReq", "CompOutputDependency", "MissionImpactCIA", "Severity", "CompInstanceDependency", "DependentCompOutputCIA");;
+let (modelVersion_M, missionReqId_M,  reqType_M, reqId_M, req_M, compOutputDependency_M, missionImpactCIA_M, severity_M, compInstanceDependency_M, cia_M)=
+    ("ModelVersion", "MissionReqId", "ReqType", "ReqId",  "Req", "CompOutputDependency", "MissionImpactCIA", "Severity", "CompInstanceDependency", "DependentCompOutputCIA");;
 
-let compMission name l_mission = compInfo name cyberReqId_M l_mission;;
+let compMission name l_mission = compInfo name reqId_M l_mission;;
 let compReqType name l_mission = List.hd_exn( List.dedup_and_sort ~compare:compare (comp_find reqType_M (compMission name l_mission)));;
-let compInputMission name l_mission= comp_find compOutputDependency_M (compMission name l_mission);;
+
+let compInputMission name l_mission = 
+   let rawInputList = comp_find compOutputDependency_M (compMission name l_mission) in
+   (* remove duplicates from the concatenated, parsed list of inputs *)
+   List.dedup_and_sort ~compare:(compare) 
+    (List.concat (List.map rawInputList ~f:(fun iStr -> String.split_on_chars iStr ~on:[';'])));;
+
 let missionImpact name l_mission= comp_find missionImpactCIA_M (compMission name l_mission);;
 let compMissionCIA name cia l_mission= compInfo cia missionImpactCIA_M (compMission name l_mission) ;;
 
@@ -489,7 +527,7 @@ let compInstOut name l_mission =
 			List.map (compMission name l_mission) 
 			~f:(fun x -> List.map2_exn (compInsList x) (compOutList x) ~f:(fun inst o -> ((name, o),(inst,o)))))) ;;
 
-let missionIds l_mission  =  comp_find cyberReqId_M l_mission;;
+let missionIds l_mission  =  comp_find reqId_M l_mission;;
 let missionReqId l_mission = comp_find missionReqId_M l_mission;;
 
 (* - * - * - *)
@@ -512,45 +550,52 @@ let genComp name inp out fault b_events e_info f_formula attacks a_event a_info 
      defense_rigors   = d_rigors;
      defense_profiles = d_profiles};;
 (*generate component for component name *)
-let formula_aux name out cia l_comp_dep l_attack =  
-                               let compCIA name cia = noEmptyList (attack_cia name cia l_attack)in
-                                noEmptyList (List.concat [compCIA name cia;compOut_In name out cia l_comp_dep]);;   
-                                
-let formula_OrAnd_A listElement =
+	 
+let formula_And listElement cinputs =
 	match listElement with
 	 [a] -> A[a]
 	|[iList;ciaList] -> 
 		let iList_split = String.split_on_chars iList ~on:[';'] 
 		and ciaList_split = String.split_on_chars ciaList ~on:[';'] 
 		in
-		let aList = (List.map2_exn iList_split ciaList_split ~f:(fun i cia -> A (List.append [i] [cia]))) in
-		And aList ;;
+		(* zip the list of inputs and CIA *)
+		let aList = (List.map2_exn iList_split ciaList_split ~f:(fun i cia -> A (List.append [i] [cia]))) 
+		in
+		(* remove any A[*] that are not either inputs or events in the architecture *)
+        let aList_allowed = passOnlyAllowed aList cinputs
+        in
+		And aList_allowed 
+	 | _ -> And[] ;;
 
-let formula name coutputs l_arch l_comp_dep l_attack = 
-    (*let formula_Or_A name out cia =  Or (List.map (formula_aux name out cia l_comp_dep l_attack) ~f:(fun x-> A x)) in*)
-	let formula_Or_A name out cia = Or (List.map (formula_aux name out cia l_comp_dep l_attack) ~f:(fun x -> formula_OrAnd_A x)) in
-    let formula_type name out cia =  ([out; cia],formula_Or_A name out cia) in
-    (*let formulaOut name out = List.map (compAttacksOut name l_comp_dep) ~f:(fun x-> formula_type name out x) in *)
+let formula_aux name out cinputs cia l_comp_dep l_attack =  
+   let l = noEmptyList (attack_cia name cia l_attack) in
+   let l2 = noEmptyList (List.concat [l; compOut_In name out cia l_comp_dep]) in
+   let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
+   Or (eliminateEmptyAnd l3);;
+
+let formula name coutputs cinputs l_comp_dep l_attack = 
+    let formula_type name out cia =  ([out; cia],formula_aux name out cinputs cia l_comp_dep l_attack) in
     let formulaOut name out = List.map ["Confidentiality";"Integrity";"Availability"] ~f:(fun x-> formula_type name out x) in
-    (*let clean l = List.filter l ~f:(fun x->  snd x <> Or []) in*)
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
-                       
+
 let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
+	and cinputs = (compInputArch name l_arch)
+	and cevents = (compEvents name l_events)
 	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
 	and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) in
 	genComp (*name*)            name 
-			(*input_flows*)     (compInputArch name l_arch) 
+			(*input_flows*)     cinputs 
 			(*output_flows*)    coutputs
-			(*faults*)          ["Integrity";"Availability"] (*(List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
-			(*basic_events*)    (compEvents name l_events) 
+			(*faults*)          ["Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
+			(*basic_events*)    cevents 
 			(*event_info*)      (compEventsInfo name l_events) 
-			(*fault_formulas*)  (formulaSafe name coutputs l_arch l_comp_saf)
-			(*attacks*)         ["Confidentiality";"Integrity";"Availability"] (*(List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
+			(*fault_formulas*)  (formulaSafe name coutputs cinputs cevents l_comp_saf)
+			(*attacks*)         ["Confidentiality";"Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
 			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
 			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
-			(*attack_formula*)  (formula name coutputs l_arch l_comp_dep l_attack) 
+			(*attack_formula*)  (formula name coutputs cinputs l_comp_dep l_attack) 
 			(*defense_events*)  eventsList  (* (defenseEvents name defType l_defense) *)
 			(*defense_rigors*)  rigorsList  (* (defenseRigors name defType l_defense) *)
 			(*defense_profiles*)(defenseProfile name defType l_defense l_defense2nist);;
@@ -562,7 +607,7 @@ let changeName  = (fun x -> match x with
                               |"AVAILABILITY"->"loa"
                               |"Integrity"   ->"loi"
                               |"INTEGRITY"   ->"loi"
-                              |x->x);;
+                              |x->"lossOf");;
 let formulaMission name l_mission =  
 	let formulaCIA name cia l_mission=(["out";changeName cia],Or(compOut_InMission name cia l_mission))in
     List.map (missionImpact name l_mission) ~f:(fun x-> formulaCIA name x l_mission);;
@@ -605,8 +650,8 @@ let gen_CompSafety name l_mission =
 			(*defense_rigors*)  []
 			(*defense_profiles*)[];;
                             
-let topAttack cyberReqId l_mission= (cyberReqId, A["out";changeName (List.hd_exn(missionImpact cyberReqId l_mission))]);;                             
-let topFault cyberReqId l_mission= (cyberReqId, F["out";changeName (List.hd_exn(missionImpact cyberReqId l_mission))]);;                             
+let topAttack reqId l_mission= (reqId, A["out";changeName (List.hd_exn(missionImpact reqId l_mission))]);;                             
+let topFault reqId l_mission= (reqId, F["out";changeName (List.hd_exn(missionImpact reqId l_mission))]);;                             
 
 (**)     
 let genModel ins conn fault attack = 
@@ -615,25 +660,25 @@ let genModel ins conn fault attack =
       top_fault = fault;
       top_attack = attack 
       };;
-let instances cyberReqId l_arch = (makeInstance ~i:cyberReqId ~c:cyberReqId ())::(instancesArch l_arch);;
-let connections cyberReqId l_arch l_mission= List.append (connectionsArch l_arch) (compInstOut cyberReqId l_mission);;
-let gen_model cyberReqId l_arch l_mission = 
-	let rType = compReqType cyberReqId l_mission in
+let instances reqId l_arch = (makeInstance ~i:reqId ~c:reqId ())::(instancesArch l_arch);;
+let connections reqId l_arch l_mission= List.append (connectionsArch l_arch) (compInstOut reqId l_mission);;
+let gen_model reqId l_arch l_mission = 
+	let rType = compReqType reqId l_mission in
 	let (fault,attack) = 
 	    match rType with
-    	| "Cyber" -> (("", F["";""]),(topAttack cyberReqId l_mission))
-    	| "Safety" -> ((topFault cyberReqId l_mission), ("", A["";""]))
+    	| "Cyber" -> (("", F["";""]),(topAttack reqId l_mission))
+    	| "Safety" -> ((topFault reqId l_mission), ("", A["";""]))
     	| _ -> raise (Error "gen_model exception: req is neither CyberReq nor SafetyReq") 
     in
-	genModel (instances cyberReqId l_arch) (connections cyberReqId l_arch l_mission) fault attack;;
+	genModel (instances reqId l_arch) (connections reqId l_arch l_mission) fault attack;;
  
 (**)
-let gen_library cyberReqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission = 
+let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission = 
     let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events) in
-    let rType = compReqType cyberReqId l_mission in
+    let rType = compReqType reqId l_mission in
     match rType with
-    | "Cyber" -> List.append components [gen_CompMission cyberReqId l_mission]
-    | "Safety" -> List.append components [gen_CompSafety cyberReqId l_mission]
+    | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
+    | "Safety" -> List.append components [gen_CompSafety reqId l_mission]
     | _ -> raise (Error "gen_library exception: req is neither CyberReq nor SafetyReq");;
 
 
@@ -641,12 +686,13 @@ let gen_library cyberReqId defType l_comp_dep l_comp_saf l_attack l_events l_arc
 
 let libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist =
    let arch_prime = massageArch arch in
-   let compDepen_prime = massageCompDepen compDepen arch_prime in
+   let compDepen_prime = massageCompDepen compDepen arch_prime 
+   and compSafe_prime = massageCompSafe compSafe arch_prime in 
    List.map (missionReqId mission) ~f:(fun y ->
        (* find what reqIDs are under this missionReqID and iterate through those *)
-       let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) cyberReqId_M)) in
+       let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) reqId_M)) in
 	   (y, List.map reqL ~f:(fun x->
-	      (x,deftype),(( gen_library x deftype compDepen_prime compSafe attack events arch_prime defense defense2nist mission), 
+	      (x,deftype),(( gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission), 
                             gen_model x arch_prime mission 
                          )
           )
@@ -737,7 +783,7 @@ let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission =
    let infoList = cutSetsList (likelihoodCutImp tc_adtree) in
    (* internal functions *)
    let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
-   let cybReq_Severity lmission =  List.map l_mission ~f:(fun x->(getval x cyberReqId_M, getval x severity_M)) in
+   let cybReq_Severity lmission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
    let getSeverity_Of_cybReq req lmission = getval (cybReq_Severity l_mission) req 
    in
    fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
@@ -752,9 +798,9 @@ let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission =
    and modelVersion is the ModelVersion string from mission.csv 
 *)      
 let get_CyberReqText_Risk mission_al cyberReqID =
-  let al = List.find_exn mission_al ~f:(fun x -> cyberReqID = (List.Assoc.find_exn x ~equal:(=) cyberReqId_M)) in
+  let al = List.find_exn mission_al ~f:(fun x -> cyberReqID = (List.Assoc.find_exn x ~equal:(=) reqId_M)) in
      ( List.Assoc.find_exn al ~equal:(=) modelVersion_M,
-       List.Assoc.find_exn al ~equal:(=) cyberReq_M, 
+       List.Assoc.find_exn al ~equal:(=) req_M, 
        severity2risk (List.Assoc.find_exn al ~equal:(=) severity_M) ) ;;
        
 (* Analyze function - calls model_to_adtree and generates the artifacts *)
@@ -785,7 +831,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    (* iterate through the list of mission IDs *)
    List.iter l_librariesThreats ~f:(fun mID -> 
       let (missionReqIdStr, l_libmdl) = mID in
-      fprintf xml_oc "<Mission label=  \"%s\" >\n" missionReqIdStr;
+      fprintf xml_oc "<Mission label=  \"%s\">\n" missionReqIdStr;
 
       (* iterate through the list of requirements under each mission ID *)
       List.iter l_libmdl ~f:(fun x -> 
@@ -803,16 +849,16 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
                   (* tree visualizations *)    
                   dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
                   (*.xml file *)
-                  fprintf xml_oc "\t<Requirement label=  \"%s\"> " reqIDStr;
+                  fprintf xml_oc "\t<Requirement label=  \"%s\" " reqIDStr;
                   xml_gen xml_oc reqIDStr defenseTypeStr t mission;
-                  fprintf xml_oc "\t</Requirement > \n";
+                  fprintf xml_oc "\t</Requirement> \n";
     	       | "Safety" -> let t = model_to_ftree lib mdl in
                   (* tree visualizations *)    
                   dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
                | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq");)
 
       );
-    fprintf xml_oc "</Mission >\n";
+    fprintf xml_oc "</Mission>\n";
     );
     (* complete and close the xml file  *)
     fprintf xml_oc "</Results>\n";
