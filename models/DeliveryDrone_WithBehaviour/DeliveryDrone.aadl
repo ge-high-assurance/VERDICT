@@ -229,9 +229,13 @@ public
 						
 		annex agree {**
 			-- variables
+			eq recent_order: Data_Types::DeliveryOrder.impl = if init_mode then 
+															  	bus_in.order
+															  else
+															  	bus_in.order -> pre(recent_order);
 			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);	
 			eq dest_position: Data_Types::Position.impl = dest_location;
-			eq expensive_item: bool = bus_in.order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+			eq expensive_item: bool = recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
 			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
 			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD); -- Correct?
 			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
@@ -622,37 +626,22 @@ public
 			probe_delivery_location: out data port Data_Types::Position.impl;
 			probe_cmd: out data port Base_Types::Boolean;
 			
-		annex agree {**
-			--eq have_order: bool = Agree_Nodes.HasHappened(bus1.connected and bus1.update_order);
-			
-			--eq order: Data_Types::DeliveryOrder.impl = bus1.order ->
-			--	if pre(have_order) then pre(order) else bus1.order;
-			
-			--eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
-			
-			--eq target_confirmed: bool = Agree_Nodes.HasHappened(
-      		--	confirmation_requested and
-      		--	comm1.data_available and
-      		--	comm1.target_confirmed
-      		--);
+		annex agree {**			
 
 			--eq delivery_started: bool = delivery_status <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+      		
+      		eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
 			
-			--guarantee "P1: A command to release a valuable package is issued only if drone has received confirmation from base":
-    		--	true -> (probe_delivery_cmd and 
-      		--		(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => target_confirmed); 
-
-  			--guarantee "P2: The drone will always request a confirmation to base before starting delivery of a valuable package":
-    		--	true -> (delivery_started and
-      		--		(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => confirmation_requested);
+			eq target_confirmed: bool = Agree_Nodes.HasHappened(
+      			confirmation_requested and
+      			comm1.data_available and
+      			comm1.target_confirmed
+      		);
       		
-      		
+      		eq valuable_package: bool = most_recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
       		
       		eq isOn: bool = false -> if bus1.on_off and bus1.connected then not pre(isOn)
       								 else pre(isOn);
-      		
-      		--eq initialized: bool = false ->
-      		--	(truck_mode_out and (not pre(isOn)) and isOn);
       			
       		
       		eq most_recent_constellation: Data_Types::Constellation = if probe_init_mode then 
@@ -663,9 +652,11 @@ public
       																  		bus1.launch_pos
       																  	else bus1.launch_pos -> pre(most_recent_launch_location);
       																  														  	
-      		eq most_recent_delivery_location: Data_Types::Position.impl = if probe_init_mode then 
-      																  		bus1.order.target_position
-      																  	else bus1.order.target_position -> pre(most_recent_delivery_location);
+      		eq most_recent_order: Data_Types::DeliveryOrder.impl = if probe_init_mode then 
+      															   		bus1.order
+      															   else bus1.order -> pre(most_recent_order);
+      		
+      		eq most_recent_delivery_location: Data_Types::Position.impl = most_recent_order.target_position;
       		
       		guarantee "P1: constellation for GPS is initialized properly": 
       			isOn => (most_recent_constellation = probe_constellation);
@@ -678,7 +669,12 @@ public
       			
       		guarantee "P4: drone is flying only if since last off drone has not aborted": 
       			 probe_cmd => Agree_Nodes.Since(not isOn, not (probe_abort_mode));
-      		
+      			 
+      		guarantee "P5: a command to release a valuable package is issued only if drone has received confirmation from base":
+    			true -> (probe_delivery_cmd and valuable_package => target_confirmed);
+
+  			--guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
+    		--	true -> (delivery_started and valuable_package => confirmation_requested);
 		**};
 			
 		annex verdict{**
@@ -702,7 +698,7 @@ public
 	
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
-			gnc: system GNC.impl;
+			gnc: system GNC.Impl;
 			--gps: system GPS
 			--{
 			--	VERDICT_Properties::insideTrustedBoundary => true;
