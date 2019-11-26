@@ -53,7 +53,7 @@ public
 		-- TODO: High-level specification is needed?
 		annex agree {**
 			-- probe
-			 guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
+			guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
 		**};
 		
 		annex verdict {**
@@ -268,7 +268,7 @@ public
 				--					(expensive_item => confirmation);
 				delivery_cmd = if (making_delivery_mode and not no_clearance and (expensive_item => confirmation)) then
 							   		enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE)
-							   else if internal_error_detected then
+							   else if return_to_truck_mode and internal_error_detected then
 							   		enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY)
 							   else 
 							   		enum(Data_Types::PackageDeliveryCommand, NO_OPERATION);
@@ -573,14 +573,15 @@ public
 			guarantee "Initially, delivery status is NOT_STARTED":
 				Agree_Nodes.InitiallyX(delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
 				
-			guarantee "Delivery status remains the same if no delivery command is issued":
-				true -> (no_op_cmd => (delivery_status_out = pre (delivery_status_out)));
+			guarantee "Changed -- Delivery status remains the same if no delivery command is issued":
+				--true -> (no_op_cmd => (delivery_status_out = pre (delivery_status_out)));
+				true -> (no_op_cmd or abort_cmd => (delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED)));
 			
 			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
 				true -> (release_cmd => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED));
 			
-			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
-				true -> (abort_cmd => delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
+			--guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
+			--	true -> (abort_cmd => delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
 		**};
 			
 		annex verdict {**
@@ -640,7 +641,7 @@ public
 			
 		annex agree {**			
 
-			--eq delivery_started: bool = delivery_status <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+			eq delivery_started: bool = delivery_status <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
       		
       		eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
 			
@@ -687,8 +688,8 @@ public
       		guarantee "P5: a command to release a valuable package is issued only if drone has received confirmation from base":
     			true -> (release_cmd and valuable_package => target_confirmed);
 
-  			--guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
-    		--	true -> (delivery_started and valuable_package => confirmation_requested);
+  			guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
+    			true -> (delivery_started and valuable_package => confirmation_requested);
 		**};
 			
 		annex verdict{**
@@ -773,8 +774,11 @@ public
 			};
 			
 			connector: system Connector
-			{ 
+			{
 				VERDICT_Properties::insideTrustedBoundary => true;
+			 	VERDICT_Properties::manufacturer => ThirdParty;
+			 	VERDICT_Properties::componentType => Hybrid;
+			 	VERDICT_Properties::adversariallyTested => false;
 			};
 			
 		connections
