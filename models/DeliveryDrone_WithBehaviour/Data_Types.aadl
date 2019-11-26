@@ -73,5 +73,11 @@ public
 	    	Data_Model::Data_Representation => Enum;
 	    	Data_Model::Enumerators => ("OFF", "INIT", "READY", "LAUNCH", "ABORT", "FLYING_TO_DEST", "MAKING_DELIVERY", "RETURN_TO_TRUCK");
 	end DeliveryPlannerState; 
+	
+	data PackageDeliveryCommand
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("NO_OPERATION", "RELEASE_PACKAGE", "ABORT_DELIVERY");
+	end PackageDeliveryCommand;
  	
 end Data_Types;

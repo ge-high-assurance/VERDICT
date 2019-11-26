@@ -103,7 +103,7 @@ public
 			-- inputs
 			gps_pos: in data port Data_Types::Position.impl;
 			imu_pos: in data port Data_Types::Position.impl;	
-			--pos_act_in: in data port Data_Types::Position.impl; -- TODO: do we need this?
+			pos_act_in: in data port Data_Types::Position.impl; -- TODO: do we need this?
 			
 			-- outputs
 			est_pos: out data port Data_Types::Position.impl;
@@ -131,7 +131,7 @@ public
 			-- outputs
 			move: out data port Base_Types::Boolean;				
 			cur_pos: out data port Data_Types::Position.impl;
-			--pos_act_out: out data port Data_Types::Position.impl; -- TODO: do we need this?
+			pos_act_out: out data port Data_Types::Position.impl; -- TODO: do we need this?
 			probe_dest_pos: out data port Data_Types::Position.impl;
 			
 		-- TODO: add some environmental assumption for gps position to make sure it remains 
@@ -214,7 +214,7 @@ public
 			
 			-- outputs
 			radio_cmd: out data port Base_Types::Boolean;
-			delivery_cmd: out data port Base_Types::Boolean;
+			delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
 			dest_location: out data port Data_Types::Position.impl;
 			bus_out: out data port Base_Types::Boolean; -- not used
 	        nav_cmd: out data port Base_Types::Boolean;					
@@ -266,7 +266,12 @@ public
 				--delivery_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
 				--					not no_clearance and 
 				--					(expensive_item => confirmation);
-				delivery_cmd = (making_delivery_mode and not no_clearance and (expensive_item => confirmation));
+				delivery_cmd = if (making_delivery_mode and not no_clearance and (expensive_item => confirmation)) then
+							   		enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE)
+							   else if internal_error_detected then
+							   		enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY)
+							   else 
+							   		enum(Data_Types::PackageDeliveryCommand, NO_OPERATION);
 				
 			guarantee "Output: constellation":
 				--constellation = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
@@ -554,21 +559,28 @@ public
 	system DeliveryItemMechanism
 		features
 			-- inputs
-			delivery_cmd_in : in data port Base_Types::Boolean;
+			delivery_cmd_in : in data port Data_Types::PackageDeliveryCommand;
 			
 			-- outputs
 			delivery_status_out: out data port Data_Types::DeliveryStatus;
 			package_is_secure: out data port Base_Types::Boolean;
 			
 		annex agree {**
+			eq release_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE));
+			eq abort_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY));
+			eq no_op_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, NO_OPERATION));
+			
 			guarantee "Initially, delivery status is NOT_STARTED":
 				Agree_Nodes.InitiallyX(delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
 				
 			guarantee "Delivery status remains the same if no delivery command is issued":
-				true -> (not delivery_cmd_in => (delivery_status_out = pre (delivery_status_out)));
+				true -> (no_op_cmd => (delivery_status_out = pre (delivery_status_out)));
 			
 			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
-				true -> (delivery_cmd_in => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED));
+				true -> (release_cmd => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED));
+			
+			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
+				true -> (abort_cmd => delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
 		**};
 			
 		annex verdict {**
@@ -620,7 +632,7 @@ public
 			actuation_out: out data port Base_Types::Boolean;
 			probe_init_mode: out data port Base_Types::Boolean; -- Probe Signal
 			probe_abort_mode: out data port Base_Types::Boolean; -- Probe Signal
-			probe_delivery_cmd: out data port Base_Types::Boolean; -- Probe Signal
+			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand; -- Probe Signal
 			probe_constellation: out data port Data_Types::Constellation;
 			probe_launch_location: out data port Data_Types::Position.impl;
 			probe_delivery_location: out data port Data_Types::Position.impl;
@@ -658,6 +670,8 @@ public
       		
       		eq most_recent_delivery_location: Data_Types::Position.impl = most_recent_order.target_position;
       		
+      		eq release_cmd: bool = (probe_delivery_cmd = enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE));
+      		
       		guarantee "P1: constellation for GPS is initialized properly": 
       			isOn => (most_recent_constellation = probe_constellation);
       		
@@ -671,7 +685,7 @@ public
       			 probe_cmd => Agree_Nodes.Since(not isOn, not (probe_abort_mode));
       			 
       		guarantee "P5: a command to release a valuable package is issued only if drone has received confirmation from base":
-    			true -> (probe_delivery_cmd and valuable_package => target_confirmed);
+    			true -> (release_cmd and valuable_package => target_confirmed);
 
   			--guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
     		--	true -> (delivery_started and valuable_package => confirmation_requested);
@@ -834,8 +848,8 @@ public
 			c23: port satellite1_sig_pos -> gnc.satellite1_pos
 			{VERDICT_Properties::flowType => Xdata;};
 			
-			--c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
-			--{VERDICT_Properties::flowType => Xdata;};
+			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
+			{VERDICT_Properties::flowType => Xdata;};
 			
 			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
 			{VERDICT_Properties::flowType => Xdata;};
