@@ -215,7 +215,7 @@ public class Instrumentor extends VDMInstrumentor {
                 cmp_links.addAll(get_ports(con));
             }
         }
-
+        //        System.out.println(links);
         return vdm_links;
     }
 
@@ -353,6 +353,16 @@ public class Instrumentor extends VDMInstrumentor {
 
         ConnectionEnd con_end = link.getSource();
         Port dest_port = con_end.getComponentPort();
+
+        if (dest_port == null) {
+            CompInstancePort instance_port = con_end.getSubcomponentPort();
+            dest_port = instance_port.getPort();
+        }
+
+        ports.add(dest_port.getName());
+
+        con_end = link.getDestination();
+        dest_port = con_end.getComponentPort();
 
         if (dest_port == null) {
             CompInstancePort instance_port = con_end.getSubcomponentPort();
