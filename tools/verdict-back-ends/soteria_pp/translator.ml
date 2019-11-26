@@ -783,8 +783,8 @@ let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission =
    let infoList = cutSetsList (likelihoodCutImp tc_adtree) in
    (* internal functions *)
    let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
-   let cybReq_Severity lmission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
-   let getSeverity_Of_cybReq req lmission = getval (cybReq_Severity l_mission) req 
+   let cybReq_Severity l_mission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
+   let getSeverity_Of_cybReq req l_mission = getval (cybReq_Severity l_mission) req 
    in
    fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
                         (defenseTypeStr) (string_of_float (likelihoodCut tc_adtree)) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
@@ -853,6 +853,8 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
                   xml_gen xml_oc reqIDStr defenseTypeStr t mission;
                   fprintf xml_oc "\t</Requirement> \n";
     	       | "Safety" -> let t = model_to_ftree lib mdl in
+                  (* cutset metric file, in printbox format *)    
+                  saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
                   (* tree visualizations *)    
                   dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
                | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq");)
