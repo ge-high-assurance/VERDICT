@@ -1,0 +1,1736 @@
+<?xml version="1.0" encoding="ASCII"?>
+<instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" name="DeliveryDroneSystem_Impl_Instance" category="system">
+  <featureInstance name="satellite0_sig_pos">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.0"/>
+  </featureInstance>
+  <featureInstance name="satellite1_sig_pos">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.1"/>
+  </featureInstance>
+  <featureInstance name="bus1">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.2"/>
+  </featureInstance>
+  <featureInstance name="comm1">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.3"/>
+  </featureInstance>
+  <featureInstance name="comm2" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.4"/>
+  </featureInstance>
+  <featureInstance name="bus2" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.5"/>
+  </featureInstance>
+  <featureInstance name="radio_cmd" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.6"/>
+  </featureInstance>
+  <featureInstance name="radio_response" direction="out">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.7"/>
+  </featureInstance>
+  <featureInstance name="delivery_status" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="NOT_STARTED"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="IN_PROGRESS"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="COMPLETED"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="FAILED"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.8"/>
+  </featureInstance>
+  <featureInstance name="actuation_out" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.9"/>
+  </featureInstance>
+  <featureInstance name="probe_init_mode" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.10"/>
+  </featureInstance>
+  <featureInstance name="probe_abort_mode" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.11"/>
+  </featureInstance>
+  <featureInstance name="probe_delivery_cmd" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="NO_OPERATION"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="RELEASE_PACKAGE"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="ABORT_DELIVERY"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.12"/>
+  </featureInstance>
+  <featureInstance name="probe_constellation" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+          <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.13"/>
+  </featureInstance>
+  <featureInstance name="probe_launch_location" direction="out">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.14"/>
+  </featureInstance>
+  <featureInstance name="probe_delivery_location" direction="out">
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.15"/>
+  </featureInstance>
+  <featureInstance name="probe_cmd" direction="out">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedDataPort.16"/>
+  </featureInstance>
+  <componentInstance name="gnc" category="system">
+    <featureInstance name="constellation">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="satellite0_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="satellite1_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="launch_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.3"/>
+    </featureInstance>
+    <featureInstance name="gps_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.4"/>
+    </featureInstance>
+    <featureInstance name="gps_health_status" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.5"/>
+    </featureInstance>
+    <featureInstance name="probe_constellation" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.6"/>
+    </featureInstance>
+    <featureInstance name="imu_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.7"/>
+    </featureInstance>
+    <featureInstance name="imu_health_status" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.8"/>
+    </featureInstance>
+    <featureInstance name="probe_launch_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.2/@ownedDataPort.9"/>
+    </featureInstance>
+    <componentInstance name="gps" category="system">
+      <featureInstance name="constellation">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.0"/>
+      </featureInstance>
+      <featureInstance name="satellite0_pos">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.1"/>
+      </featureInstance>
+      <featureInstance name="satellite1_pos">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.2"/>
+      </featureInstance>
+      <featureInstance name="gps_pos" direction="out">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.3"/>
+      </featureInstance>
+      <featureInstance name="health_status" direction="out">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.4"/>
+      </featureInstance>
+      <featureInstance name="probe_constellation" direction="out">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedDataPort.5"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedSystemSubcomponent.0"/>
+      <index>0</index>
+      <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.GPS"/>
+    </componentInstance>
+    <componentInstance name="imu" category="system">
+      <featureInstance name="launch_pos">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedDataPort.0"/>
+      </featureInstance>
+      <featureInstance name="imu_pos" direction="out">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedDataPort.1"/>
+      </featureInstance>
+      <featureInstance name="health_status" direction="out">
+        <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+          <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+            </ownedValue>
+          </ownedValue>
+          <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedDataPort.2"/>
+      </featureInstance>
+      <featureInstance name="probe_launch_pos" direction="out">
+        <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedDataPort.3"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedSystemSubcomponent.1"/>
+      <index>0</index>
+      <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.IMU"/>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.0"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemImplementation" href="../DeliveryDrone.aadl#DeliveryDrone.GNC.Impl"/>
+  </componentInstance>
+  <componentInstance name="radio" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.wifiFromOutsideTB"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiJamming"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.2"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiJammingDAL"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" value="7"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.3"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiFuzzing"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.4"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiFuzzingDAL"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" value="7"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.5"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiFlooding"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.6"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.antiFloodingDAL"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" value="7"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.7"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.encryption"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.8"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.encryptionDAL"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" value="7"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1/@ownedPropertyAssociation.9"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="comm_in">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="radio_in">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="comm_out" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="radio_out" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.3"/>
+    </featureInstance>
+    <featureInstance name="health_status" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.4"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.1"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.Radio"/>
+  </componentInstance>
+  <componentInstance name="positionEstimator" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.2/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="gps_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="imu_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="pos_act_in">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="est_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedDataPort.3"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.2"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.PositionEstimator"/>
+  </componentInstance>
+  <componentInstance name="navigation" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.3/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="est_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="dest_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="cmd">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="flight_control_state">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.3"/>
+    </featureInstance>
+    <featureInstance name="move" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.4"/>
+    </featureInstance>
+    <featureInstance name="cur_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.5"/>
+    </featureInstance>
+    <featureInstance name="pos_act_out" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.6"/>
+    </featureInstance>
+    <featureInstance name="probe_dest_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.7"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.3"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.Navigation"/>
+  </componentInstance>
+  <componentInstance name="fc" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.4/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="actuation_response">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="move">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="motor_cmd" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="fc_state" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedDataPort.3"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.4"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.FlightControl"/>
+  </componentInstance>
+  <componentInstance name="actuation" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.5/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="motor_cmd">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="response" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.7/@ownedDataPort.1"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.5"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.Actuation"/>
+  </componentInstance>
+  <componentInstance name="deliveryPlanner" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.6/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.manufacturer"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.6/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.componentType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.6/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.6/@ownedPropertyAssociation.2"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.adversariallyTested"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.6/@ownedPropertyAssociation.3"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="bus_in">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="cur_pos">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="delivery_status">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="NOT_STARTED"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="IN_PROGRESS"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="COMPLETED"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="FAILED"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.2"/>
+    </featureInstance>
+    <featureInstance name="radio_response">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.3"/>
+    </featureInstance>
+    <featureInstance name="camera_result">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.4"/>
+    </featureInstance>
+    <featureInstance name="gps_health_status">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.5"/>
+    </featureInstance>
+    <featureInstance name="imu_health_status">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.6"/>
+    </featureInstance>
+    <featureInstance name="rdo_health_status">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.7"/>
+    </featureInstance>
+    <featureInstance name="cam_health_status">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.8"/>
+    </featureInstance>
+    <featureInstance name="package_is_secure">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.9"/>
+    </featureInstance>
+    <featureInstance name="radio_cmd" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.10"/>
+    </featureInstance>
+    <featureInstance name="delivery_cmd" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="NO_OPERATION"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="RELEASE_PACKAGE"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="ABORT_DELIVERY"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.11"/>
+    </featureInstance>
+    <featureInstance name="dest_location" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.12"/>
+    </featureInstance>
+    <featureInstance name="bus_out" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.13"/>
+    </featureInstance>
+    <featureInstance name="nav_cmd" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.14"/>
+    </featureInstance>
+    <featureInstance name="camera" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.15"/>
+    </featureInstance>
+    <featureInstance name="probe_safe_landing" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.16"/>
+    </featureInstance>
+    <featureInstance name="constellation" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite0"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="Satellite1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.17"/>
+    </featureInstance>
+    <featureInstance name="launch_pos" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.18"/>
+    </featureInstance>
+    <featureInstance name="probe_init_mode" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.19"/>
+    </featureInstance>
+    <featureInstance name="probe_abort_mode" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.20"/>
+    </featureInstance>
+    <featureInstance name="target_clear" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.21"/>
+    </featureInstance>
+    <featureInstance name="valid_marker" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.8/@ownedDataPort.22"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.6"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.DeliveryPlanner"/>
+  </componentInstance>
+  <componentInstance name="deliveryItemMechanism" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.7/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="delivery_cmd_in">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="NO_OPERATION"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="RELEASE_PACKAGE"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="ABORT_DELIVERY"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.13/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="delivery_status_out" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Enumerators"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="NOT_STARTED"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="IN_PROGRESS"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="COMPLETED"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="FAILED"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="../Data_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.4/@ownedPropertyAssociation.1"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="package_is_secure" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedDataPort.2"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.7"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.DeliveryItemMechanism"/>
+  </componentInstance>
+  <componentInstance name="camera" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.8/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="camera_in">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="camera_out" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.1/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="health_status" direction="out">
+      <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+        <property href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#Data_Model.Data_Representation"/>
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="platform:/plugin/org.osate.contribution.sei/resources/properties/Data_Model.aadl#/0/@ownedProperty.4/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+        <propertyAssociation href="platform:/plugin/org.osate.contribution.sei/resources/packages/Base_Types.aadl#/0/@ownedPublicSection/@ownedClassifier.0/@ownedPropertyAssociation.0"/>
+      </ownedPropertyAssociation>
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.11/@ownedDataPort.2"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.8"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.Camera"/>
+  </componentInstance>
+  <componentInstance name="connector" category="system">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.insideTrustedBoundary"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral" value="true"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.9/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <featureInstance name="bus_in">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="bus_out" direction="out">
+      <feature xsi:type="aadl2:DataPort" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.12/@ownedDataPort.1"/>
+    </featureInstance>
+    <subcomponent xsi:type="aadl2:SystemSubcomponent" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedSystemSubcomponent.9"/>
+    <index>0</index>
+    <classifier xsi:type="aadl2:SystemType" href="../DeliveryDrone.aadl#DeliveryDrone.Connector"/>
+  </componentInstance>
+  <connectionInstance name="satellite0_sig_pos -> gnc.gps.satellite0_pos" kind="portConnection" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.1" source="//@featureInstance.0">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.19/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@featureInstance.0" destination="//@componentInstance.0/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.19"/>
+    </connectionReference>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@featureInstance.1" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.1"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="satellite1_sig_pos -> gnc.gps.satellite1_pos" kind="portConnection" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.2" source="//@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.20/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@featureInstance.1" destination="//@componentInstance.0/@featureInstance.2">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.20"/>
+    </connectionReference>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@featureInstance.2" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.2">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.2"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="bus1 -> connector.bus_in" kind="portConnection" destination="//@componentInstance.9/@featureInstance.0" source="//@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.11/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@featureInstance.2" destination="//@componentInstance.9/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.11"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="comm1 -> radio.comm_in" kind="portConnection" destination="//@componentInstance.1/@featureInstance.0" source="//@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.14/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.connectionType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.1/@ownedPropertyType/@ownedLiteral.1"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.14/@ownedPropertyAssociation.1"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.authenticated"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.14/@ownedPropertyAssociation.2"/>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.dataEncrypted"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:BooleanLiteral"/>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.14/@ownedPropertyAssociation.3"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@featureInstance.3" destination="//@componentInstance.1/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.14"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.gps.gps_pos -> positionEstimator.gps_pos" complete="true" kind="portConnection" destination="//@componentInstance.2/@featureInstance.0" source="//@componentInstance.0/@componentInstance.0/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.10/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.0/@featureInstance.3" destination="//@componentInstance.0/@featureInstance.4">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.4"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.4" destination="//@componentInstance.2/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.10"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.gps.health_status -> deliveryPlanner.gps_health_status" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.5" source="//@componentInstance.0/@componentInstance.0/@featureInstance.4">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.31/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.0/@featureInstance.4" destination="//@componentInstance.0/@featureInstance.5">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.5"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.5" destination="//@componentInstance.6/@featureInstance.5">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.31"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.gps.probe_constellation -> probe_constellation" kind="portConnection" destination="//@featureInstance.13" source="//@componentInstance.0/@componentInstance.0/@featureInstance.5">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.35/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.0/@featureInstance.5" destination="//@componentInstance.0/@featureInstance.6">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.6"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.6" destination="//@featureInstance.13">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.35"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.imu.imu_pos -> positionEstimator.imu_pos" complete="true" kind="portConnection" destination="//@componentInstance.2/@featureInstance.1" source="//@componentInstance.0/@componentInstance.1/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.16/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.1/@featureInstance.1" destination="//@componentInstance.0/@featureInstance.7">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.7"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.7" destination="//@componentInstance.2/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.16"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.imu.health_status -> deliveryPlanner.imu_health_status" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.6" source="//@componentInstance.0/@componentInstance.1/@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.32/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.1/@featureInstance.2" destination="//@componentInstance.0/@featureInstance.8">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.8"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.8" destination="//@componentInstance.6/@featureInstance.6">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.32"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="gnc.imu.probe_launch_pos -> probe_launch_location" kind="portConnection" destination="//@featureInstance.14" source="//@componentInstance.0/@componentInstance.1/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.37/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@componentInstance.1/@featureInstance.3" destination="//@componentInstance.0/@featureInstance.9">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.9"/>
+    </connectionReference>
+    <connectionReference context="/" source="//@componentInstance.0/@featureInstance.9" destination="//@featureInstance.14">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.37"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="radio.comm_out -> comm2" kind="portConnection" destination="//@featureInstance.4" source="//@componentInstance.1/@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.15/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.1/@featureInstance.2" destination="//@featureInstance.4">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.15"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="radio.radio_out -> deliveryPlanner.radio_response" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.3" source="//@componentInstance.1/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.9/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.1/@featureInstance.3" destination="//@componentInstance.6/@featureInstance.3">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.9"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="radio.radio_out -> radio_response" kind="portConnection" destination="//@featureInstance.7" source="//@componentInstance.1/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.26/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.1/@featureInstance.3" destination="//@featureInstance.7">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.26"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="radio.health_status -> deliveryPlanner.rdo_health_status" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.7" source="//@componentInstance.1/@featureInstance.4">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.33/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.1/@featureInstance.4" destination="//@componentInstance.6/@featureInstance.7">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.33"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="positionEstimator.est_pos -> navigation.est_pos" complete="true" kind="portConnection" destination="//@componentInstance.3/@featureInstance.0" source="//@componentInstance.2/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.0/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.2/@featureInstance.3" destination="//@componentInstance.3/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.0"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="navigation.move -> fc.move" complete="true" kind="portConnection" destination="//@componentInstance.4/@featureInstance.1" source="//@componentInstance.3/@featureInstance.4">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.2/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.3/@featureInstance.4" destination="//@componentInstance.4/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.2"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="navigation.cur_pos -> deliveryPlanner.cur_pos" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.1" source="//@componentInstance.3/@featureInstance.5">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.5/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.3/@featureInstance.5" destination="//@componentInstance.6/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.5"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="navigation.pos_act_out -> positionEstimator.pos_act_in" complete="true" kind="portConnection" destination="//@componentInstance.2/@featureInstance.2" source="//@componentInstance.3/@featureInstance.6">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.21/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.3/@featureInstance.6" destination="//@componentInstance.2/@featureInstance.2">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.21"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="navigation.probe_dest_pos -> probe_delivery_location" kind="portConnection" destination="//@featureInstance.15" source="//@componentInstance.3/@featureInstance.7">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.38/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.3/@featureInstance.7" destination="//@featureInstance.15">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.38"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="fc.motor_cmd -> actuation.motor_cmd" complete="true" kind="portConnection" destination="//@componentInstance.5/@featureInstance.0" source="//@componentInstance.4/@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.17/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.4/@featureInstance.2" destination="//@componentInstance.5/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.17"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="fc.fc_state -> navigation.flight_control_state" complete="true" kind="portConnection" destination="//@componentInstance.3/@featureInstance.3" source="//@componentInstance.4/@featureInstance.3">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.3/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.4/@featureInstance.3" destination="//@componentInstance.3/@featureInstance.3">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.3"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="actuation.response -> fc.actuation_response" complete="true" kind="portConnection" destination="//@componentInstance.4/@featureInstance.0" source="//@componentInstance.5/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.18/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.5/@featureInstance.1" destination="//@componentInstance.4/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.18"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="actuation.response -> actuation_out" kind="portConnection" destination="//@featureInstance.9" source="//@componentInstance.5/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.29/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.5/@featureInstance.1" destination="//@featureInstance.9">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.29"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.radio_cmd -> radio.radio_in" complete="true" kind="portConnection" destination="//@componentInstance.1/@featureInstance.1" source="//@componentInstance.6/@featureInstance.10">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.8/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.10" destination="//@componentInstance.1/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.8"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.radio_cmd -> radio_cmd" kind="portConnection" destination="//@featureInstance.6" source="//@componentInstance.6/@featureInstance.10">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.25/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.10" destination="//@featureInstance.6">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.25"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in" complete="true" kind="portConnection" destination="//@componentInstance.7/@featureInstance.0" source="//@componentInstance.6/@featureInstance.11">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.22/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.11" destination="//@componentInstance.7/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.22"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.delivery_cmd -> probe_delivery_cmd" kind="portConnection" destination="//@featureInstance.12" source="//@componentInstance.6/@featureInstance.11">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.28/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.11" destination="//@featureInstance.12">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.28"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.dest_location -> navigation.dest_pos" complete="true" kind="portConnection" destination="//@componentInstance.3/@featureInstance.1" source="//@componentInstance.6/@featureInstance.12">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.4/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.12" destination="//@componentInstance.3/@featureInstance.1">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.4"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.bus_out -> bus2" kind="portConnection" destination="//@featureInstance.5" source="//@componentInstance.6/@featureInstance.13">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.13/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.13" destination="//@featureInstance.5">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.13"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.nav_cmd -> navigation.cmd" complete="true" kind="portConnection" destination="//@componentInstance.3/@featureInstance.2" source="//@componentInstance.6/@featureInstance.14">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.23/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.14" destination="//@componentInstance.3/@featureInstance.2">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.23"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.nav_cmd -> probe_cmd" kind="portConnection" destination="//@featureInstance.16" source="//@componentInstance.6/@featureInstance.14">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.40/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.14" destination="//@featureInstance.16">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.40"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.camera -> camera.camera_in" complete="true" kind="portConnection" destination="//@componentInstance.8/@featureInstance.0" source="//@componentInstance.6/@featureInstance.15">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.24/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.15" destination="//@componentInstance.8/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.24"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.constellation -> gnc.gps.constellation" complete="true" kind="portConnection" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.0" source="//@componentInstance.6/@featureInstance.17">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.30/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.17" destination="//@componentInstance.0/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.30"/>
+    </connectionReference>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@featureInstance.0" destination="//@componentInstance.0/@componentInstance.0/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.0"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.launch_pos -> gnc.imu.launch_pos" complete="true" kind="portConnection" destination="//@componentInstance.0/@componentInstance.1/@featureInstance.0" source="//@componentInstance.6/@featureInstance.18">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.1/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.18" destination="//@componentInstance.0/@featureInstance.3">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.1"/>
+    </connectionReference>
+    <connectionReference context="//@componentInstance.0" source="//@componentInstance.0/@featureInstance.3" destination="//@componentInstance.0/@componentInstance.1/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.3/@ownedPortConnection.3"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.probe_init_mode -> probe_init_mode" kind="portConnection" destination="//@featureInstance.10" source="//@componentInstance.6/@featureInstance.19">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.36/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.19" destination="//@featureInstance.10">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.36"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryPlanner.probe_abort_mode -> probe_abort_mode" kind="portConnection" destination="//@featureInstance.11" source="//@componentInstance.6/@featureInstance.20">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.41/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.6/@featureInstance.20" destination="//@featureInstance.11">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.41"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.2" source="//@componentInstance.7/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.6/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.7/@featureInstance.1" destination="//@componentInstance.6/@featureInstance.2">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.6"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryItemMechanism.delivery_status_out -> delivery_status" kind="portConnection" destination="//@featureInstance.8" source="//@componentInstance.7/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.27/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.7/@featureInstance.1" destination="//@featureInstance.8">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.27"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.9" source="//@componentInstance.7/@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.39/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.7/@featureInstance.2" destination="//@componentInstance.6/@featureInstance.9">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.39"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="camera.camera_out -> deliveryPlanner.camera_result" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.4" source="//@componentInstance.8/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.7/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.8/@featureInstance.1" destination="//@componentInstance.6/@featureInstance.4">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.7"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="camera.health_status -> deliveryPlanner.cam_health_status" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.8" source="//@componentInstance.8/@featureInstance.2">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.34/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.8/@featureInstance.2" destination="//@componentInstance.6/@featureInstance.8">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.34"/>
+    </connectionReference>
+  </connectionInstance>
+  <connectionInstance name="connector.bus_out -> deliveryPlanner.bus_in" complete="true" kind="portConnection" destination="//@componentInstance.6/@featureInstance.0" source="//@componentInstance.9/@featureInstance.1">
+    <ownedPropertyAssociation xsi:type="instance:PropertyAssociationInstance">
+      <property href="../VERDICT_Properties.aadl#VERDICT_Properties.flowType"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="../VERDICT_Properties.aadl#/0/@ownedProperty.0/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+      <propertyAssociation href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.12/@ownedPropertyAssociation.0"/>
+    </ownedPropertyAssociation>
+    <connectionReference context="/" source="//@componentInstance.9/@featureInstance.1" destination="//@componentInstance.6/@featureInstance.0">
+      <connection xsi:type="aadl2:PortConnection" href="../DeliveryDrone.aadl#/0/@ownedPublicSection/@ownedClassifier.14/@ownedPortConnection.12"/>
+    </connectionReference>
+  </connectionInstance>
+  <systemOperationMode name="No Modes"/>
+  <componentImplementation xsi:type="aadl2:SystemImplementation" href="../DeliveryDrone.aadl#DeliveryDrone.DeliveryDroneSystem.Impl"/>
+</instance:SystemInstance>
