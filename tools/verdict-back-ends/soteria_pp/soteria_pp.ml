@@ -120,7 +120,7 @@ let validate_input input_dir file_names =
        Ok "Success" 
      else (
        Format.printf "Error: Insufficient input files!@.";
-       Format.printf "       SOTERIA++ expects these input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Events.csv, Mission.csv, ScnArch.csv!@.";
+       Format.printf "       SOTERIA++ expects these input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Defenses2NIST.csv, Events.csv, Mission.csv, ScnArch.csv!@.";
        Error "Fail"
      )
     )
