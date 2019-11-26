@@ -6,6 +6,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,19 +267,19 @@ public class VDM2CSV extends VdmTranslator {
 
                 // add the value for encryptedTransmission
                 if (connection.isEncryptedTransmission() != null) {
-                    if (connection.isEncryptedTransmission()) {
-                        if (connection.getEncryptedTransmissionDAL() != null) {
-                            table.addValue(
-                                    "1#"
-                                            + String.valueOf(
-                                                    connection.getEncryptedTransmissionDAL()));
-                        }
+                    boolean isEncrypted = connection.isEncryptedTransmission();
+                    if (connection.getEncryptedTransmissionDAL() != null) {
+                        String dal = String.valueOf(connection.getEncryptedTransmissionDAL());
+                        table.addValue(isEncrypted ? ("1#" + dal) : ("0#" + dal));
                     } else {
-                        table.addValue("0");
+                        table.addValue(isEncrypted ? "1#0" : "0#0");
                     }
+                } else if (connection.getEncryptedTransmissionDAL() != null) {
+                    table.addValue("null#" +String.valueOf(connection.getEncryptedTransmissionDAL()));
                 } else {
                     table.addValue("");
                 }
+
                 table.capRow();
             }
         }
@@ -608,7 +609,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 table.addValue(scenario); // scenario
 
-                table.addValue(getCompTypeName(inst)); // comp type
+                table.addValue(getCompTypeName(inst)); // comp
                 table.addValue(
                         getStrNullChk(() -> inst.getImplementation().getName())); // // comp impl
 
@@ -630,8 +631,13 @@ public class VDM2CSV extends VdmTranslator {
                         // "1")
                         table.addValue(isProp + "#" + dal.toString());
                     } else if (isProp != null) {
-                        // No DAL information available
-                        table.addValue(isProp);
+                        // No DAL information available but need to check if a property
+                        // is a DAL property or not to accomadate Abha's needs
+                        if (isDALProp(props[i])) {
+                            table.addValue(isProp + "#0");
+                        } else {
+                            table.addValue(isProp);
+                        }
                     } else if (props[i].equals("pedigree")) {
                         if (inst.getPedigree() != null) {
                             table.addValue(inst.getPedigree().value());
@@ -654,6 +660,33 @@ public class VDM2CSV extends VdmTranslator {
         }
 
         return table;
+    }
+
+    private boolean isDALProp(String prop) {
+        List<String> dalProps =
+                Arrays.asList(
+                        "antiJamming",
+                        "auditMessageResponses",
+                        "deviceAuthentication",
+                        "dosProtection",
+                        "encryptedStorage",
+                        "heterogeneity",
+                        "inputValidation",
+                        "logging",
+                        "memoryProtection",
+                        "physicalAccessControl",
+                        "removeIdentifyingInformation",
+                        "resourceAvailability",
+                        "resourceIsolation",
+                        "secureBoot",
+                        "sessionAuthenticity",
+                        "staticCodeAnalysis",
+                        "strongCryptoAlgorithms",
+                        "supplyChainSecurity",
+                        "systemAccessControl",
+                        "tamperProtection",
+                        "userAuthentication");
+        return dalProps.contains(prop);
     }
 
     /**
@@ -802,8 +835,8 @@ public class VDM2CSV extends VdmTranslator {
                         "ModelVersion",
                         "MissionReqId",
                         "MissionReq",
-                        "ReqId",
-                        "Req",
+                        "CyberReqId",
+                        "CyberReq",
                         "MissionImpactCIA",
                         "Effect",
                         "Severity",
@@ -914,8 +947,7 @@ public class VDM2CSV extends VdmTranslator {
             }
         }
 
-        // also need to iterate over SafetyReq
-
+        // iterate over SafetyReq
         if (model.getSafetyReq() != null) {
             for (SafetyReq req : model.getSafetyReq()) {
                 List<List<IAPort>> condPorts = new ArrayList<>();
