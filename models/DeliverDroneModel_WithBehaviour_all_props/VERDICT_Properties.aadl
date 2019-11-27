@@ -1,4 +1,6 @@
 property set VERDICT_Properties is
+-- Port properties
+ probe: aadlboolean applies to (port);
 
 -- Connection properties, including defenses and DAL values
  flowType: enumeration (Xdata, Xcontrol, Xrequest) applies to (connection);
