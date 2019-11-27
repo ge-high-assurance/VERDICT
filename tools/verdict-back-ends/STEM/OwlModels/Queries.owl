@@ -33,7 +33,7 @@ where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s
 }
 </rdfs:isDefinedBy>
   </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="STEMGraph">
+  <j.0:NamedQuery rdf:ID="STEMgraph">
     <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?finallist as ?N1_tooltip) where
@@ -44,18 +44,14 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?
  . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')
  . OPTIONAL{?src &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?acm . LET(?N1_fillcolor := 'red')}
  . OPTIONAL{?dest &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?acm2 . LET(?N2_fillcolor := 'red')}
- . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionFlow&gt; ?flow # flowtype
- . LET(?strippedflow := replace(str(?flow),'^.*#',''))
  . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?connname # connection name
  . LET(?strippedcname := replace(str(?connname),'^.*#',''))
 # select what we want to show on links - so comment all but one LET(?link...
-# . LET(?link := concat(concat(str(?oport),':'),str(?iport))) .  # if we want to show port names at both ends
-# . LET(?link := ?strippedflow) .  								 # if we want to show flowtype
-#  . LET(?link := ' ') .										 # if we want to show nothing
- . LET(?link := ?strippedcname) . 								# if we want to show connection name
-# . LET(?link := concat(concat(concat(concat(str(?oport),':'),str(?iport)),':'),str(?strippedflow))) .  # if we want to show port names at both ends and control flow
+# . LET(?link := concat(concat(str(?oport),':'),str(?iport)))  # if we want to show port names at both ends
+# . LET(?link := ' ') 										   # if we want to show nothing
+ . LET(?link := ?strippedcname) 								# if we want to show connection name
 # now get list of CAPECs
-   OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &amp;#10;') as ?capeclist) where # use &amp;#10; for newline in tooltip
+ .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &amp;#10;') as ?capeclist) where # use &amp;#10; for newline in tooltip
       {?src &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?longcapec
        . ?longcapec &lt;http://sadl.org/STEM/BaseModel#id&gt; ?id . ?longcapec &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?desc
        . LET(?capec := concat(concat(concat('CAPEC-',str(?id)),':'),?desc))

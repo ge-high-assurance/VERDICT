@@ -27,5 +27,25 @@ public
   			are_close = p1 = p2;
 		tel;
 		
+		node Duration(p: bool) returns (r: int) ;
+		let   
+			r = (if p then 1 else 0) -> (if p then pre(r) + 1 else 0) ;
+		tel;
+		
+		node Sofar(X : bool ) returns ( Y : bool );
+		let
+ 			Y = X -> (X and (pre(Y)));
+		tel;
+		
+		node Since(X: bool, Y : bool ) returns ( Z : bool );
+		let
+  			Z =  X or (Y and (false -> pre(Z)));
+		tel;
+		
+		node ToInt(b: bool) returns (i: int);
+		let
+			i = if b then 1 else 0;
+		tel;
+		
 	**};
 end Agree_Nodes;

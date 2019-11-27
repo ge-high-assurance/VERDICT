@@ -2,7 +2,6 @@ package Thermostat
 public
 	with Base_Types;
 	with Data_Model;
-	with VERDICT_Properties;
 
 	annex agree {**
 			
@@ -181,29 +180,21 @@ public
 			set_desired_temperature: system SetDesiredTemperature;
 			control_temperature: system ControlTemperature;
 		connections
-			switch_conn: port switch -> control_temperature.switch
-			{VERDICT_Properties::flowType => Control;};
+			switch_conn: port switch -> control_temperature.switch;
 			
-			up_bth_conn: port up_button -> set_desired_temperature.up_button
-			{VERDICT_Properties::flowType => Control;};
+			up_bth_conn: port up_button -> set_desired_temperature.up_button;
 			
-			down_btn_conn: port down_button -> set_desired_temperature.down_button
-			{VERDICT_Properties::flowType => Control;};
+			down_btn_conn: port down_button -> set_desired_temperature.down_button;
 			
-			cur_temp_conn: port current_temperature -> control_temperature.current_temperature
-			{VERDICT_Properties::flowType => Xdata;};
+			cur_temp_conn: port current_temperature -> control_temperature.current_temperature;
 			
-			cool_sig_conn: port control_temperature.cool_act_signal -> cool_act_signal
-			{VERDICT_Properties::flowType => Request;};
+			cool_sig_conn: port control_temperature.cool_act_signal -> cool_act_signal;
 			
-			heat_sig_conn: port control_temperature.heat_act_signal -> heat_act_signal
-			{VERDICT_Properties::flowType => Request;};
+			heat_sig_conn: port control_temperature.heat_act_signal -> heat_act_signal;
 			
-			setpoint1_conn: port set_desired_temperature.setpoint -> control_temperature.setpoint
-			{VERDICT_Properties::flowType => Xdata;};
+			setpoint1_conn: port set_desired_temperature.setpoint -> control_temperature.setpoint;
 	
-			setpoint2_conn: port set_desired_temperature.setpoint -> setpoint
-			{VERDICT_Properties::flowType => Xdata;};
+			setpoint2_conn: port set_desired_temperature.setpoint -> setpoint;
 	end ThermostatController.Impl;
 	 
 	
