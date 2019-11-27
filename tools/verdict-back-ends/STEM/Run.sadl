@@ -20,6 +20,12 @@ import "http://sadl.org/STEM/Queries".
 // I am doing <ConnectionName>_<SrcComp> in ScnArch.tmpl to get unique connection name - that is in general not enough
 // 'underscore' in TA1 property names works fine when using Run.sadl. May not work when doing "import" of csv files
 
+// 11/22/2019: Moved the queries that generate the 3 output csv files and the graph into a separate
+//		file Queries.sadl. So, I am using named queries. This makes the VERDICT toolchain
+//		integration much simpler: previously had to create a java file with the queries and
+//		would have issues if all the comments (signified by '#') were not removed. Now in
+//		VERDICT toolchain VERDICTSTEM has to to send to SADL Server is the named query's uri, not the 
+//		entire query itself.
 // 11/21/2019: Altered ApplicableDefenseProperties in Defenses.csv as per SOTERIA++ request
 //		Now it always has two items separated by ';'
 // 11/19/2019: Now handling hierarchies - reading in 3 csv files and outputting 3 csv files. 
@@ -137,23 +143,18 @@ Ask: "select count(*) where {?x <applicableCM> ?z2 } ".
 //Print: "All the sorted CIA Issues".
 //Ask: "select * where {?x <applicableCM> ?z2 } order by ?x ?z2".
 
-Write: data {
-Ask: queries:Defenses2NIST.
-} to "/Output/Defenses2NIST.csv".
+Write: data {Ask: queries:Defenses2NIST.} to "/Output/Defenses2NIST.csv".
 
-Write: data {
-Ask: queries:CAPEC.
-} to "/Output/CAPEC.csv". 
+Write: data {Ask: queries:CAPEC.} to "/Output/CAPEC.csv". 
 
-Write: data {
-Ask: queries:Defenses.
-} to "/Output/Defenses.csv".
-
+Write: data {Ask: queries:Defenses.} to "/Output/Defenses.csv".
 //
 /////////////////////// GRAPHS ////////////////////////////
 ////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
+//// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
+//// changed by dropping ". FILTER(?dal > 0)" in 2 places
 
-Graph: queries:Graph1.
+Graph: queries:STEMgraph.
 
 /////////////////////// THE FOLLOWING TO GENERATE DATA FOR COMBINED VIEW //////////////////
 //// to get count for verification

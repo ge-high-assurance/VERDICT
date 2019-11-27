@@ -1,7 +1,6 @@
 package CruiseController
 public
 	with Base_Types;
-	with VERDICT_Properties;
 
 	annex agree {**
 			
@@ -54,19 +53,16 @@ public
 			eq set_condition: bool = set_speed and MIN_SPEED <= speed and speed <= MAX_SPEED;
 			
 			eq ready_mode: bool = false ->
-								  (pre(ready_mode) and not on_off) or
-								  (pre(ready_mode) and not set_condition) or
+								  (pre(ready_mode) and not on_off and not set_condition) or
 								  (pre(off_mode) and on_off);
 			
 			eq on_mode: bool = false ->
-							   (pre(on_mode) and not on_off) or
-							   (pre(on_mode) and not brake_cancel) or
+							   (pre(on_mode) and not on_off and not brake_cancel) or
 							   (pre(ready_mode) and set_condition) or
 							   (pre(paused_mode) and resume_speed);   
 			
 			eq paused_mode: bool = false ->
-								   (pre(paused_mode) and not on_off) or
-								   (pre(paused_mode) and not resume_speed) or
+								   (pre(paused_mode) and not on_off and not resume_speed) or
 								   (pre(on_mode) and brake_cancel);
 			
 			-- Assumptions
@@ -75,7 +71,7 @@ public
 			assume "Buttons are mutually exclusive": 
 					ToInt(on_off) + 
 					ToInt(resume_speed) + ToInt(set_speed) + 
-					ToInt(inc) + ToInt(dec) <= 1;
+					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;
 			
 			guarantee "Cruise control is enabled if and only if it is On":
 					  enabled = on_mode;
@@ -151,9 +147,8 @@ public
 					speed > 0.0;
 			
 			assume "Buttons are mutually exclusive": 
-					ToInt(on_off) +
-					ToInt(resume_speed) + ToInt(set_speed) + 
-					ToInt(inc) + ToInt(dec) <= 1;	
+					ToInt(on_off) + ToInt(resume_speed) + ToInt(set_speed) + 
+					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;	
 				
 			-- Properties
 			guarantee "1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed":
@@ -190,31 +185,19 @@ public
 			controlSpeed: system ControlSpeed;
 		
 		connections
-			c01: port on_off -> setSpeed.on_off
-			{VERDICT_Properties::flowType => Xdata;};
-			c02: port resume_speed -> setSpeed.resume_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c03: port set_speed -> setSpeed.set_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c04: port inc -> setSpeed.inc
-			{VERDICT_Properties::flowType => Xdata;};
-			c05: port dec -> setSpeed.dec
-			{VERDICT_Properties::flowType => Xdata;};
-			c06: port brake_cancel -> setSpeed.brake_cancel
-			{VERDICT_Properties::flowType => Xdata;};
-			c07: port speed -> setSpeed.speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c08: port speed -> controlSpeed.speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c09: port setSpeed.enabled -> enabled
-			{VERDICT_Properties::flowType => Xdata;};
-			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c11: port controlSpeed.force -> force
-			{VERDICT_Properties::flowType => Xdata;};
+			c01: port on_off -> setSpeed.on_off;
+			c02: port resume_speed -> setSpeed.resume_speed;
+			c03: port set_speed -> setSpeed.set_speed;
+			c04: port inc -> setSpeed.inc;
+			c05: port dec -> setSpeed.dec;
+			c06: port brake_cancel -> setSpeed.brake_cancel;
+			c07: port speed -> setSpeed.speed;
+			c08: port speed -> controlSpeed.speed;
+			c09: port setSpeed.enabled -> enabled;
+			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed;
+			c11: port controlSpeed.force -> force;
 			-- Virtual connection for the sake of analysis
-			v01: port setSpeed.desired_speed -> desired_speed
-			{VERDICT_Properties::flowType => Xdata;};
+			v01: port setSpeed.desired_speed -> desired_speed;
 	end CruiseControllerSystem.impl;
 	
 end CruiseController;

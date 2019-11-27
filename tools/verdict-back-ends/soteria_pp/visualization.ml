@@ -1030,7 +1030,36 @@ let rec sprint_each_csImp l_csImp csArray =
       sprint_each_csImp tl (Array.append csArray [| [| (string_of_float likelihood); attackStr; defenseStr |] |] ) )
    | [] -> csArray ;; 
 
-   
+(* This function generates a string of failure events *)
+let rec sprint_Events pexp =
+   let andStr = " ^ \n" 
+   and orStr = " v \n" in
+   match pexp with
+   | Var(comp, event) -> comp ^ ":" ^ event
+   | Pro l ->
+     (match l with 
+     | hd::tl -> 
+       (* if len tl = 1, then the ending is the defense *)
+       if List.length tl = 1 then sprint_Events hd 
+       else sprint_Events hd ^ andStr ^ sprint_Events (Pro tl)
+     | []  -> "")
+   | Sum l -> 
+     (match l with 
+     | hd::tl -> 
+       (* for Sum, have to see when len tl = 0 *)
+       if List.length tl = 0 then sprint_Events hd 
+       else sprint_Events hd ^ orStr ^ sprint_Events (Sum tl)
+     | []  -> "") 
+   | TRUE  -> "true"
+   | FALSE -> "false";;
+
+let rec sprint_each_safety_csImp l_csImp csArray =
+   match l_csImp with
+   | hd::tl -> 
+      (let (pexp, probability, _) = hd in 
+      sprint_each_safety_csImp tl (Array.append csArray [| [| (string_of_float probability); (sprint_Events pexp)|] |] ) )
+   | [] -> csArray ;; 
+     
 (**/**)
 
 (** This function generates a report with the top-level likelihood and a list of the 
@@ -1085,6 +1114,29 @@ let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file ad
    in
    (Out_channel.output_string ch ("\n");
     Out_channel.output_string ch ("Calculated likelihood of successful attack = " ^ (string_of_float likelihood) ^ "\n");
+    Out_channel.output_string ch (targetString);
+    Out_channel.output_string ch ("\n");
+    PrintBox_text.output ch box;
+    Out_channel.close ch ;
+    )
+;;
+
+(** This function generates a report with the top-level probability, the probability of 
+    each cutset, and the cutset list. *)
+let saveCutSetsToFile ?reqID:(cid="") ?risk:(r="") ?header:(h="") file ftree =
+   if (Sys.file_exists file = `Yes) then Sys.command_exn("rm " ^ file);
+   (* if header file is specified, then copy it as the cutset file *)
+   if (not(String.is_empty h) && (Sys.file_exists h = `Yes )) then Sys.command_exn("cp " ^ h ^ " " ^ file);
+   let ch = Out_channel.create ~append:true ~perm:777 file in
+   let csImp = probErrorCutImp ftree 
+   and (probability,_) = probErrorCut ftree 
+   and targetString = (if (String.is_empty r) then "\n" else ("Acceptable level of risk must be less than or equal to " ^ r))
+   in
+   let myArray = sprint_each_safety_csImp csImp [| [|"Cutset\nprobability: "; "Cutset: "|] |] in
+   let box = PrintBox.(hlist [ text ("Safety\nReqID: \n" ^ cid); grid_text myArray ]) |> PrintBox.frame
+   in
+   (Out_channel.output_string ch ("\n");
+    Out_channel.output_string ch ("Calculated probability of successful attack = " ^ (string_of_float probability) ^ "\n");
     Out_channel.output_string ch (targetString);
     Out_channel.output_string ch ("\n");
     PrintBox_text.output ch box;
