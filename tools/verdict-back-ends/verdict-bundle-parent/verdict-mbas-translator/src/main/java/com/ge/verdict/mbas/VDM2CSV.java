@@ -917,7 +917,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 if (mission == null) {
                     System.out.println(
-                            "Info: Requirement " + req.getId() + " does not belong to any mission");
+                            "Info: CyberReq " + req.getId() + " does not belong to any mission");
                 }
 
                 for (List<CIAPort> andPortList : condPorts) {
@@ -958,9 +958,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 if (mission == null) {
                     System.out.println(
-                            "Warning: SafetyReq "
-                                    + req.getId()
-                                    + " does not belong to any mission");
+                            "Info: SafetyReq " + req.getId() + " does not belong to any mission");
                 }
 
                 for (List<IAPort> andPortList : condPorts) {
