@@ -68,6 +68,7 @@ public class VerdictHandlersUtils {
 	// SVG graphs
 	static final String SVG = "svg";
 	static final String TXT = "txt";
+	static final String SAFETYTXT = "-safety.txt";
 
 	// Java command
 	static final String JAVA = "java";
@@ -339,6 +340,22 @@ public class VerdictHandlersUtils {
 
 			for (File f : graphFolder.listFiles()) {
 				if (f.getName().endsWith(TXT)) {
+					try {
+						open(f.toURI().toURL(), Display.getDefault());
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
+	static void openSafetyTxtInDir(String dirPath) {
+		if (isValidDir(dirPath)) {
+			File graphFolder = new File(dirPath);
+
+			for (File f : graphFolder.listFiles()) {
+				if (f.getName().endsWith(SAFETYTXT)) {
 					try {
 						open(f.toURI().toURL(), Display.getDefault());
 					} catch (MalformedURLException e) {
