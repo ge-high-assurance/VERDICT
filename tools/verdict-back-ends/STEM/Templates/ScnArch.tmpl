@@ -20,47 +20,47 @@ validate <DestPortName> not blank skip
 validate <DestPortType> not blank skip
 
 transform <SrcImpl> to <TEMPSrcImpl> replace .Impl$ : 
-// the above has a error marking; but that is a XText issue; so ignore it
-//transform <SrcImpl> to <def1[]> split "."
-//transform <hasSensitiveInfo> to <val1> replace "1" : true,"0" : false
+transform <TEMPSrcImpl> to <TEMP2SrcImpl> replace .impl$ : 
+transform <DestImpl> to <TEMPDestImpl> replace .Impl$ :
+transform <TEMPDestImpl> to <TEMP2DestImpl> replace .impl$ :
+// the above have error markings; but that is a XText issue; so ignore error markings
 
 <SrcComp> rdfs:subClassOf Subsystem
 <SrcCompInstance> rdf:type <SrcComp>
-<TEMPSrcImpl> rdf:type <SrcComp>  
-//<def1[1]> rdf:type <SrcComp>
+<TEMP2SrcImpl> rdf:type <SrcComp>  
 <DestComp> rdfs:subClassOf Subsystem
 <DestCompInstance> rdf:type <DestComp>
-<DestImpl> rdf:type <DestComp>
+<TEMP2DestImpl> rdf:type <DestComp>
 
-////// the following create new objects
-////<Scenario><SrcImpl> rdf:type <SrcComp>
-////<Scenario><DestImpl> rdf:type <DestComp>
 
-// sometimes SrcCompInstance is empty but in that case SrcImpl is present
-// need to make connection name unique; for the moment just concatenating SrcComp 
+
+// Sometimes SrcCompInstance is empty but in that case SrcImpl is present.
+// So in rules, I then set srcCompInst to be TEMP2SrcImpl where TEMP2SrcImpl is SrcImpl after stripping off .Impl / .impl
+// Similarly for destCompInstance.
+
+// I also need to make connection name unique; for the moment just concatenating SrcComp 
 // (had trouble with <ConnectionName>_<SrcCompInstance>_<DestCompInstance>)
-// which in general is not enough
-// ignoring SrcPortType and DestPortType
+// which in general is also not enough
+// ignoring SrcPortType and DestPortType as these were for SOTERIA++
+// ignoring SrcCompCategory and DestCompCategory as they are currently only 'system', eventually we will have 'bus' etc
+// note that I do not have 'system' in my model
 // concatenating with SrcComp as that is present in 1st and 3rd csv file
 <ConnectionName>_<SrcComp> rdf:type Connection
 <ConnectionName>_<SrcComp> connectionName <ConnectionName>
 <ConnectionName>_<SrcComp> srcCompType <SrcComp>
-<ConnectionName>_<SrcComp> srcCompType <SrcComp>
-<ConnectionName>_<SrcComp> srcCompImpl <TEMPSrcImpl> 
+<ConnectionName>_<SrcComp> srcCompImpl <TEMP2SrcImpl> 
 
 //<ConnectionName>_<SrcComp> srcCompCategory <SrcCompCategory>
 <ConnectionName>_<SrcComp> connectionSource <SrcCompInstance>
 <ConnectionName>_<SrcComp> outPort <SrcPortName>
 //<ConnectionName>_<SrcComp> srcPortType <SrcPortType>
 <ConnectionName>_<SrcComp> destCompType <DestComp>
-<ConnectionName>_<SrcComp> destCompImpl <DestImpl> 
+<ConnectionName>_<SrcComp> destCompImpl <TEMP2DestImpl> 
 //<ConnectionName>_<SrcComp> destCompCategory <DestCompCategory>
 <ConnectionName>_<SrcComp> connectionDestination <DestCompInstance>
 <ConnectionName>_<SrcComp> inPort <DestPortName>
 //<ConnectionName>_<SrcComp> destPortType <DestPortType>
 
-////<ConnectionName>_<SrcComp> connectionSource <Scenario><SrcImpl>
-////<ConnectionName>_<SrcComp> connectionDestination <Scenario><DestImpl>
 
 
 
