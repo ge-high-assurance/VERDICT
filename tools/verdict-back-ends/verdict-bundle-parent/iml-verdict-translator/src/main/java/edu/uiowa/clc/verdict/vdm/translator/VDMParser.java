@@ -98,7 +98,7 @@ public class VDMParser extends Parser {
     }
 
     private void log(String msg) {
-        System.out.println(msg);
+        //        System.out.println(msg);
     }
 
     // Project Rules:
@@ -1748,6 +1748,14 @@ public class VDMParser extends Parser {
         return safetyReqExprList;
     }
 
+    //    type SafetyRel {
+    //    	id: String;
+    //    	output: IAPort;
+    //    	faultSrc: Option<SafetyExpr>;
+    //    	comment: Option<String>;
+    //        description : Option<String>;
+    //    };
+
     /** Handle safety relations */
     public SafetyRel safety_rel() {
 
@@ -1772,6 +1780,7 @@ public class VDMParser extends Parser {
                 String type_value = token.sd.getName();
                 Type type = Type.get(type_value);
                 consume(Type.OPTION);
+
                 log("safety rel type_value = " + type_value);
 
                 if (type == Type.FAULTSRC) {
@@ -1855,7 +1864,7 @@ public class VDMParser extends Parser {
 
                 EventHappens event = eventHappens();
                 safetyRelExpr.setFault(event);
-                return safetyRelExpr();
+                safetyRelExpr();
             }
         }
 
