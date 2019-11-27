@@ -1748,6 +1748,14 @@ public class VDMParser extends Parser {
         return safetyReqExprList;
     }
 
+    //    type SafetyRel {
+    //    	id: String;
+    //    	output: IAPort;
+    //    	faultSrc: Option<SafetyExpr>;
+    //    	comment: Option<String>;
+    //        description : Option<String>;
+    //    };
+
     /** Handle safety relations */
     public SafetyRel safety_rel() {
 
@@ -1760,18 +1768,20 @@ public class VDMParser extends Parser {
             if (token.type == Type.STRING) {
 
                 String identifier = id_value();
+                log("safety_rel id = " + identifier);
                 safetyRel.setId(identifier);
 
             } else if (token.type == Type.IA_PORT) {
 
                 IAPort iaPort = ia_port();
                 safetyRel.setOutput(iaPort);
-
             } else if (token.type == Type.OPTION) {
 
                 String type_value = token.sd.getName();
                 Type type = Type.get(type_value);
                 consume(Type.OPTION);
+
+                log("safety rel type_value = " + type_value);
 
                 if (type == Type.FAULTSRC) {
                     SafetyRelExpr expr_value = safetyRelExpr();
@@ -1780,6 +1790,7 @@ public class VDMParser extends Parser {
                 } else if (type == Type.COMMENT) {
 
                     String comment = str_value();
+                    log("safety rel comment = " + comment);
                     safetyRel.setComment(comment);
 
                 } else if (type == Type.DESCRIPTION) {
@@ -1853,6 +1864,7 @@ public class VDMParser extends Parser {
 
                 EventHappens event = eventHappens();
                 safetyRelExpr.setFault(event);
+                safetyRelExpr();
             }
         }
 
@@ -2245,7 +2257,7 @@ public class VDMParser extends Parser {
             //                System.out.println("Event happens: toeken " + token);
             //            }
         }
-        consume();
+        //        consume();
 
         return event;
     }

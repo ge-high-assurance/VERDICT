@@ -6,6 +6,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.SafetyRel;
 import verdict.vdm.vdm_model.SafetyRelExpr;
+import verdict.vdm.vdm_model.SafetyReq;
+import verdict.vdm.vdm_model.SafetyReqExpr;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {
@@ -241,11 +244,16 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(""); // dest comp instance
                 }
 
-                String flow = connection.getFlowType().value();
+                // Fill in the flow type information
+                String flowType =
+                        connection.getFlowType() != null ? connection.getFlowType().value() : "";
 
-                table.addValue("xdata".equals(flow.toLowerCase()) ? "Xdata" : ""); // flow1
-                table.addValue("xcontrol".equals(flow.toLowerCase()) ? "Xcontrol" : ""); // flow2
-                table.addValue("xrequest".equals(flow.toLowerCase()) ? "Xrequest" : ""); // flow3
+                table.addValue("xdata".equals(flowType.toLowerCase()) ? "Xdata" : ""); // flow1
+                table.addValue(
+                        "xcontrol".equals(flowType.toLowerCase()) ? "Xcontrol" : ""); // flow2
+                table.addValue(
+                        "xrequest".equals(flowType.toLowerCase()) ? "Xrequest" : ""); // flow3
+
                 // add the value for trustedConnection
                 if (connection.isTrustedConnection() != null) {
                     if (connection.isTrustedConnection()) {
@@ -259,19 +267,20 @@ public class VDM2CSV extends VdmTranslator {
 
                 // add the value for encryptedTransmission
                 if (connection.isEncryptedTransmission() != null) {
-                    if (connection.isEncryptedTransmission()) {
-                        if (connection.getEncryptedTransmissionDAL() != null) {
-                            table.addValue(
-                                    "1#"
-                                            + String.valueOf(
-                                                    connection.getEncryptedTransmissionDAL()));
-                        }
+                    boolean isEncrypted = connection.isEncryptedTransmission();
+                    if (connection.getEncryptedTransmissionDAL() != null) {
+                        String dal = String.valueOf(connection.getEncryptedTransmissionDAL());
+                        table.addValue(isEncrypted ? ("1#" + dal) : ("0#" + dal));
                     } else {
-                        table.addValue("0");
+                        table.addValue(isEncrypted ? "1#0" : "0#0");
                     }
+                } else if (connection.getEncryptedTransmissionDAL() != null) {
+                    table.addValue(
+                            "null#" + String.valueOf(connection.getEncryptedTransmissionDAL()));
                 } else {
                     table.addValue("");
                 }
+
                 table.capRow();
             }
         }
@@ -601,7 +610,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 table.addValue(scenario); // scenario
 
-                table.addValue(getCompTypeName(inst)); // comp type
+                table.addValue(getCompTypeName(inst)); // comp
                 table.addValue(
                         getStrNullChk(() -> inst.getImplementation().getName())); // // comp impl
 
@@ -623,8 +632,13 @@ public class VDM2CSV extends VdmTranslator {
                         // "1")
                         table.addValue(isProp + "#" + dal.toString());
                     } else if (isProp != null) {
-                        // No DAL information available
-                        table.addValue(isProp);
+                        // No DAL information available but need to check if a property
+                        // is a DAL property or not to accomadate Abha's needs
+                        if (isDALProp(props[i])) {
+                            table.addValue(isProp + "#0");
+                        } else {
+                            table.addValue(isProp);
+                        }
                     } else if (props[i].equals("pedigree")) {
                         if (inst.getPedigree() != null) {
                             table.addValue(inst.getPedigree().value());
@@ -647,6 +661,33 @@ public class VDM2CSV extends VdmTranslator {
         }
 
         return table;
+    }
+
+    private boolean isDALProp(String prop) {
+        List<String> dalProps =
+                Arrays.asList(
+                        "antiJamming",
+                        "auditMessageResponses",
+                        "deviceAuthentication",
+                        "dosProtection",
+                        "encryptedStorage",
+                        "heterogeneity",
+                        "inputValidation",
+                        "logging",
+                        "memoryProtection",
+                        "physicalAccessControl",
+                        "removeIdentifyingInformation",
+                        "resourceAvailability",
+                        "resourceIsolation",
+                        "secureBoot",
+                        "sessionAuthenticity",
+                        "staticCodeAnalysis",
+                        "strongCryptoAlgorithms",
+                        "supplyChainSecurity",
+                        "systemAccessControl",
+                        "tamperProtection",
+                        "userAuthentication");
+        return dalProps.contains(prop);
     }
 
     /**
@@ -680,6 +721,41 @@ public class VDM2CSV extends VdmTranslator {
             // Terminate when we get to an AND expr, because of limitations of Soteria_pp
             List<CIAPort> andPorts = new ArrayList<>();
             for (CyberExpr and : expr.getAnd().getExpr()) {
+                if (and.getPort() != null) {
+                    andPorts.add(and.getPort());
+                } else {
+                    errAndExit(
+                            "MBAA only supports a dijunction of conjunctions of ports' CIA in cyber relatioins! Something unexpected!");
+                }
+            }
+            ports.add(andPorts);
+        } else if (expr.getNot() != null) {
+            System.err.println("Error: MBAS does not currently support NOT expressions");
+            throw new RuntimeException("NOT not supported");
+        } else {
+            throw new RuntimeException("We don't supported other operator yet: " + expr.getKind());
+        }
+    }
+
+    private void extractReqExprIAPorts(SafetyReqExpr expr, List<List<IAPort>> ports) {
+        if (expr == null) {
+            return;
+        }
+
+        // Note: the kind field is not currently being set properly
+        // The only case we will see an expr without any operator is the expr itself
+        if (expr.getPort() != null) {
+            List<IAPort> andPorts = new ArrayList<>();
+            andPorts.add(expr.getPort());
+            ports.add(andPorts);
+        } else if (expr.getOr() != null) {
+            for (SafetyReqExpr or : expr.getOr().getExpr()) {
+                extractReqExprIAPorts(or, ports);
+            }
+        } else if (expr.getAnd() != null) {
+            // Terminate when we get to an AND expr, because of limitations of Soteria_pp
+            List<IAPort> andPorts = new ArrayList<>();
+            for (SafetyReqExpr and : expr.getAnd().getExpr()) {
                 if (and.getPort() != null) {
                     andPorts.add(and.getPort());
                 } else {
@@ -760,8 +836,8 @@ public class VDM2CSV extends VdmTranslator {
                         "ModelVersion",
                         "MissionReqId",
                         "MissionReq",
-                        "CyberReqId",
-                        "CyberReq",
+                        "ReqId",
+                        "Req",
                         "MissionImpactCIA",
                         "Effect",
                         "Severity",
@@ -841,7 +917,7 @@ public class VDM2CSV extends VdmTranslator {
 
                 if (mission == null) {
                     System.out.println(
-                            "Warning: CyberReq " + req.getId() + " does not belong to any mission");
+                            "Info: CyberReq " + req.getId() + " does not belong to any mission");
                 }
 
                 for (List<CIAPort> andPortList : condPorts) {
@@ -872,7 +948,46 @@ public class VDM2CSV extends VdmTranslator {
             }
         }
 
-        // also need to iterate over SafetyReq
+        // iterate over SafetyReq
+        if (model.getSafetyReq() != null) {
+            for (SafetyReq req : model.getSafetyReq()) {
+                List<List<IAPort>> condPorts = new ArrayList<>();
+                extractReqExprIAPorts(req.getCondition(), condPorts);
+
+                Mission mission = missionMap.get(req.getId());
+
+                if (mission == null) {
+                    System.out.println(
+                            "Info: SafetyReq " + req.getId() + " does not belong to any mission");
+                }
+
+                for (List<IAPort> andPortList : condPorts) {
+                    table.addValue(scenario); // Scenario
+                    table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
+                    table.addValue(getStrNullChk(() -> mission.getName())); // mission req
+                    table.addValue(req.getId()); // cyber req ID
+                    table.addValue(getStrNullChk(() -> req.getName())); // cyber req
+                    table.addValue(""); // mission impact CIA
+                    table.addValue(""); // effect
+                    table.addValue(""); // Severity
+                    // Get the name of the component with this output port, determined above
+                    table.addValue(
+                            convertSafetyCompOrSrcPortDepToStr(
+                                    outportToDepComps,
+                                    andPortList)); // comp instance dependency (one layer inwards)
+                    table.addValue(
+                            convertSafetyCompOrSrcPortDepToStr(
+                                    outportToSrcCompPort,
+                                    andPortList)); // comp output dependency (one layer inwards)
+
+                    table.addValue(
+                            convertListOfPortIAToStr(
+                                    andPortList)); // Dependent Component Output CIA
+                    table.addValue("Safety"); // cyber for req type
+                    table.capRow();
+                }
+            }
+        }
 
         return table;
     }
@@ -918,6 +1033,26 @@ public class VDM2CSV extends VdmTranslator {
         return sb.toString();
     }
 
+    public String convertSafetyCompOrSrcPortDepToStr(
+            Map<String, String> portToDepCompOrPortmap, List<IAPort> andPortList) {
+        StringBuilder sb = new StringBuilder("");
+        List<String> compNames = new ArrayList<>();
+
+        for (IAPort port : andPortList) {
+            String portName = port.getName();
+            if (portToDepCompOrPortmap.containsKey(portName)) {
+                compNames.add(portToDepCompOrPortmap.get(portName));
+            }
+        }
+        for (int i = 0; i < compNames.size(); ++i) {
+            sb.append(compNames.get(i));
+            if (i < compNames.size() - 1) {
+                sb.append(";");
+            }
+        }
+        return sb.toString();
+    }
+
     /** convert a list ports' names to a string with ";" to indicate AND */
     private String convertListOfPortNameToStr(List<CIAPort> andPortList) {
         StringBuilder sb = new StringBuilder("");
@@ -935,6 +1070,17 @@ public class VDM2CSV extends VdmTranslator {
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < andPortList.size(); i++) {
             sb.append(andPortList.get(i).getCia().value());
+            if (i < andPortList.size() - 1) {
+                sb.append(";");
+            }
+        }
+        return sb.toString();
+    }
+
+    private String convertListOfPortIAToStr(List<IAPort> andPortList) {
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < andPortList.size(); i++) {
+            sb.append(andPortList.get(i).getIa().value());
             if (i < andPortList.size() - 1) {
                 sb.append(";");
             }
