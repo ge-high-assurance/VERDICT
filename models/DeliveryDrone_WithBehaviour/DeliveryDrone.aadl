@@ -18,7 +18,8 @@ public
 			-- outputs
 			gps_pos: out data port Data_Types::Position.impl;
 			health_status: out data port Base_Types::Boolean;
-			probe_constellation: out data port Data_Types::Constellation;
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
 			
 		annex agree {**
 			 -- variables
@@ -48,7 +49,8 @@ public
 			-- outputs
 			imu_pos: out data port Data_Types::Position.impl;
 			health_status: out data port Base_Types::Boolean;
-			probe_launch_pos: out data port Data_Types::Position.impl;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
 		
 		-- TODO: High-level specification is needed?
 		annex agree {**
@@ -73,29 +75,69 @@ public
 			-- outputs
 			gps_pos: out data port Data_Types::Position.impl;
 			gps_health_status: out data port Base_Types::Boolean;
-			probe_constellation: out data port Data_Types::Constellation;
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
 			imu_pos: out data port Data_Types::Position.impl;
 			imu_health_status: out data port Base_Types::Boolean;
-			probe_launch_pos: out data port Data_Types::Position.impl;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
 			
 		
 	end GNC;
 	
 	system implementation GNC.Impl
 		subcomponents
-			gps: system GPS;
-			imu: system IMU;
+			gps: system GPS
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::controlSentToUntrusted => true;
+				VERDICT_Properties::heterogeneity => true;	
+				VERDICT_Properties::heterogeneityDAL => 7;
+				VERDICT_Properties::auditMessageResponses => true;
+				VERDICT_Properties::auditMessageResponsesDAL => 7;
+				VERDICT_Properties::deviceAuthentication => true;
+				VERDICT_Properties::deviceAuthenticationDAL => 7;
+				VERDICT_Properties::dosProtection => true;
+				VERDICT_Properties::dosProtectionDAL => 7;	
+				VERDICT_Properties::encryptedStorage => true;
+				VERDICT_Properties::encryptedStorageDAL => 7;
+				VERDICT_Properties::inputValidation => true;
+				VERDICT_Properties::inputValidationDAL => 7;
+				VERDICT_Properties::logging => true;
+				VERDICT_Properties::loggingDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;																	
+			};
+			imu: system IMU
+			{ 
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => COTS;
+			};
 		connections
-			i1: port constellation -> gps.constellation;
-			i2: port satellite0_pos -> gps.satellite0_pos;
-			i3: port satellite1_pos -> gps.satellite1_pos;
-			i4: port launch_pos -> imu.launch_pos;
-			i5: port gps.gps_pos -> gps_pos;
-			i6: port gps.health_status -> gps_health_status;
-			i7: port gps.probe_constellation -> probe_constellation;
-			i8: port imu.imu_pos -> imu_pos;
-			i9: port imu.health_status -> imu_health_status;
-			i10: port imu.probe_launch_pos -> probe_launch_pos;
+			i1: port constellation -> gps.constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			i2: port satellite0_pos -> gps.satellite0_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i3: port satellite1_pos -> gps.satellite1_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i4: port launch_pos -> imu.launch_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i5: port gps.gps_pos -> gps_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i6: port gps.health_status -> gps_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			i7: port gps.probe_constellation -> probe_constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			i8: port imu.imu_pos -> imu_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i9: port imu.health_status -> imu_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			i10: port imu.probe_launch_pos -> probe_launch_pos
+			{VERDICT_Properties::flowType => Xdata;};
 	end GNC.Impl;
 	
 	system PositionEstimator 
@@ -132,7 +174,8 @@ public
 			move: out data port Base_Types::Boolean;				
 			cur_pos: out data port Data_Types::Position.impl;
 			pos_act_out: out data port Data_Types::Position.impl; -- TODO: do we need this?
-			probe_dest_pos: out data port Data_Types::Position.impl;
+			probe_dest_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
 			
 		-- TODO: add some environmental assumption for gps position to make sure it remains 
 		--		 the same if no command was issued by delivery planner then you can remove
@@ -219,11 +262,14 @@ public
 			bus_out: out data port Base_Types::Boolean; -- not used
 	        nav_cmd: out data port Base_Types::Boolean;					
 			camera: out data port Base_Types::Boolean;
-			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
+			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
+			{ VERDICT_Properties::probe => true; };
 			constellation: out data port Data_Types::Constellation; -- added
 			launch_pos: out data port Data_Types::Position.impl; -- added
-			probe_init_mode: out data port Base_Types::Boolean; -- added
-			probe_abort_mode: out data port Base_Types::Boolean; -- added
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; -- added
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; -- added
 			target_clear: out data port Base_Types::Boolean; -- added
 			valid_marker: out data port Base_Types::Boolean; -- added
 						
@@ -626,18 +672,28 @@ public
 			comm2: out data port Base_Types::Boolean;
 			bus2: out data port Base_Types::Boolean;			
 			
-			radio_cmd: out data port Base_Types::Boolean; -- Probe Signal
-			radio_response: out data port Data_Types::RadioResponse.impl; -- Probe Signal
-			delivery_status: out data port Data_Types::DeliveryStatus; -- Probe Signal
+			radio_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			radio_response: out data port Data_Types::RadioResponse.impl
+			{ VERDICT_Properties::probe => true; };
+			delivery_status: out data port Data_Types::DeliveryStatus
+			{ VERDICT_Properties::probe => true; };
 			
 			actuation_out: out data port Base_Types::Boolean;
-			probe_init_mode: out data port Base_Types::Boolean; -- Probe Signal
-			probe_abort_mode: out data port Base_Types::Boolean; -- Probe Signal
-			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand; -- Probe Signal
-			probe_constellation: out data port Data_Types::Constellation;
-			probe_launch_location: out data port Data_Types::Position.impl;
-			probe_delivery_location: out data port Data_Types::Position.impl;
-			probe_cmd: out data port Base_Types::Boolean;
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
+			{ VERDICT_Properties::probe => true; };
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
+			probe_launch_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
 			
 		annex agree {**			
 
@@ -714,35 +770,42 @@ public
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
 			gnc: system GNC.Impl;
-			--gps: system GPS
-			--{
-			--	VERDICT_Properties::insideTrustedBoundary => true;
-			--	VERDICT_Properties::broadcastFromOutsideTB => true;
-			--	VERDICT_Properties::heterogeneity => true;	
-			--	VERDICT_Properties::heterogeneityDAL => 7;	
---				VERDICT_Properties::antiJamming => true;
---				VERDICT_Properties::antiJammingDAL => 7;
-			--};
+			
 			radio: system Radio
 			{
 				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::wifiFromOutsideTB => true;
-				VERDICT_Properties::antiJamming => true;
-				VERDICT_Properties::antiJammingDAL => 7;
-				VERDICT_Properties::antiFuzzing => true;
-				VERDICT_Properties::antiFuzzingDAL => 7;
-				VERDICT_Properties::antiFlooding => true;
-				VERDICT_Properties::antiFloodingDAL => 7;
-				VERDICT_Properties::encryption => true;
-				VERDICT_Properties::encryptionDAL => 7;
+				VERDICT_Properties::pedigree => Sourced;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::removeIdentifyingInformation => true;
+				VERDICT_Properties::removeIdentifyingInformationDAL => 7;
+				VERDICT_Properties::resourceAvailability => true;
+				VERDICT_Properties::resourceAvailabilityDAL => 7;
+				VERDICT_Properties::resourceIsolation => true;
+				VERDICT_Properties::resourceIsolationDAL => 7;												
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::sessionAuthenticity => true;
+				VERDICT_Properties::sessionAuthenticityDAL => 7;
+				VERDICT_Properties::staticCodeAnalysis => true;
+				VERDICT_Properties::staticCodeAnalysisDAL => 7;
+				VERDICT_Properties::strongCryptoAlgorithms => true;
+				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;	
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				VERDICT_Properties::tamperProtection => true;
+				VERDICT_Properties::tamperProtectionDAL => 7;
+				VERDICT_Properties::userAuthentication => true;
+				VERDICT_Properties::userAuthenticationDAL => 7;	
 			};
-			--imu: system IMU
-			--{ 
-			--	VERDICT_Properties::insideTrustedBoundary => true;
-			--};
 			positionEstimator: system PositionEstimator
 			{
 				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::hasSensitiveInfo => true;
 			};
 			navigation: system Navigation
 			{
@@ -783,10 +846,16 @@ public
 			
 		connections
 			c1: port positionEstimator.est_pos -> navigation.est_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::flowType => Xcontrol;
+			 VERDICT_Properties::trustedConnection => true;	
+			 VERDICT_Properties::encryptedTransmission => true;
+			 VERDICT_Properties::encryptedTransmissionDAL => 6;
+			};
 			
 			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::flowType => Xrequest;
+			 VERDICT_Properties::trustedConnection => false;
+			};
 			
 			c2: port navigation.move -> fc.move
 			{VERDICT_Properties::flowType => Xdata;};
