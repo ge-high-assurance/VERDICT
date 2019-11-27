@@ -323,9 +323,9 @@ let formulaSafe_aux name out cinputs cevents ia l_comp_saf =
 	let l3 = List.map l2 ~f:(fun x -> formulaSafe_And x cinputs cevents) in
 	Or (eliminateEmptyAnd l3);;
 
-let formulaSafe name coutputs cinputs cevents l_comp_saf  =
+let formulaSafe name coutputs cinputs cevents l_comp_saf iaList =
     let formula_type name out ia = ([out; ia], formulaSafe_aux name out cinputs cevents ia l_comp_saf) in
-    let formulaOut name out = List.map ["Integrity";"Availability"] ~f:(fun x-> formula_type name out x) in
+    let formulaOut name out = List.map iaList ~f:(fun x-> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));; 
 
 (* - * - * - *)
@@ -427,7 +427,7 @@ let massageArch arch =
    - if in Arch a src port is of type "in", then make a new line where input port is the org name and output is the org name with "_dotO" (i.e., dot Out)
    - if in Arch a des port is of type "out", then make a new line where input port is the org name with "_dotI" (i.e., dot In) and output port is the org name.
 *)
-let rec makeFormula_subList arch cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header =
+let rec makeFormula_subList arch cdL ciaList compType_header input_header inputCIA_header output_header outputCIA_header =
     match arch with
     | hd::tl ->
        (let srcPortType = List.Assoc.find_exn hd ~equal:(=) srcPortType_Arc
@@ -438,31 +438,29 @@ let rec makeFormula_subList arch cdL f_attackOrEvent compType_header input_heade
         and desCompType = List.Assoc.find_exn hd ~equal:(=) desType_Arc 
         in
         match (srcPortType,desPortType) with
-            ("in","in")   -> let compA_list = f_attackOrEvent srcCompType cdL in (* <-- f_attackOrEvent is either the function compAttacks or compFaults *)
-                             (List.append (makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header) 
-                                         (List.map compA_list ~f:(fun a -> [(compType_header, srcCompType);
-                                                                            (input_header, (String.chop_suffix_exn ~suffix:"_dotO" srcPortName));
-                                                                            (inputCIA_header, a);
-                                                                            (output_header, srcPortName);
-                                                                            (outputCIA_header, a)])))            
-          | ("out","out") -> let compA_list = f_attackOrEvent desCompType cdL in (* <-- f_attackOrEvent is either the function compAttacks or compFaults *)
-                             (List.append (makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header) 
-                                         (List.map compA_list ~f:(fun a -> [(compType_header, desCompType);
-                                                                            (input_header, desPortName);
-                                                                            (inputCIA_header, a);
-                                                                            (output_header, (String.chop_suffix_exn ~suffix:"_dotI" desPortName));
-                                                                            (outputCIA_header, a)])))       
-          | _             -> makeFormula_subList tl cdL f_attackOrEvent compType_header input_header inputCIA_header output_header outputCIA_header)
+            ("in","in")   -> (List.append (makeFormula_subList tl cdL ciaList compType_header input_header inputCIA_header output_header outputCIA_header) 
+                                         (List.map ciaList ~f:(fun a -> [(compType_header, srcCompType);
+                                                                         (input_header, (String.chop_suffix_exn ~suffix:"_dotO" srcPortName));
+                                                                         (inputCIA_header, a);
+                                                                         (output_header, srcPortName);
+                                                                         (outputCIA_header, a)])))            
+          | ("out","out") -> (List.append (makeFormula_subList tl cdL ciaList compType_header input_header inputCIA_header output_header outputCIA_header) 
+                                         (List.map ciaList ~f:(fun a -> [(compType_header, desCompType);
+                                                                         (input_header, desPortName);
+                                                                         (inputCIA_header, a);
+                                                                         (output_header, (String.chop_suffix_exn ~suffix:"_dotI" desPortName));
+                                                                         (outputCIA_header, a)])))       
+          | _             -> makeFormula_subList tl cdL ciaList compType_header input_header inputCIA_header output_header outputCIA_header)
     | [] -> [] ;;
 
 (* massages the CompDepen file, calling makeFormula_subList with the headers from CompDepen *)
-let massageCompDepen compDepen arch =
-   let newCDs = makeFormula_subList arch compDepen compAttacks compType_C inputPort_C inputCIA_C outputPort_C outputCIA_C in
+let massageCompDepen compDepen arch ciaList =
+   let newCDs = makeFormula_subList arch compDepen ciaList compType_C inputPort_C inputCIA_C outputPort_C outputCIA_C in
    List.append compDepen newCDs ;;
 
 (* massages the CompSafe file, calling makeFormula_subList with the headers from CompSafe *)
-let massageCompSafe compSafe arch =
-   let newCSs = makeFormula_subList arch compSafe compFaults compType_S inputOrEvent_S inputIAE_S outputPort_S outputCIA_S in
+let massageCompSafe compSafe arch iaList =
+   let newCSs = makeFormula_subList arch compSafe iaList compType_S inputOrEvent_S inputIAE_S outputPort_S outputCIA_S in
    List.append compSafe newCSs ;;
 
 
@@ -573,29 +571,30 @@ let formula_aux name out cinputs cia l_comp_dep l_attack =
    let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
    Or (eliminateEmptyAnd l3);;
 
-let formula name coutputs cinputs l_comp_dep l_attack = 
+let formula name coutputs cinputs l_comp_dep l_attack ciaList = 
     let formula_type name out cia =  ([out; cia],formula_aux name out cinputs cia l_comp_dep l_attack) in
-    let formulaOut name out = List.map ["Confidentiality";"Integrity";"Availability"] ~f:(fun x-> formula_type name out x) in
+    let formulaOut name out = List.map ciaList ~f:(fun x-> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
-let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events = 
+let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
 	and cinputs = (compInputArch name l_arch)
 	and cevents = (compEvents name l_events)
 	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
-	and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) in
+	and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) 
+	in 
 	genComp (*name*)            name 
 			(*input_flows*)     cinputs 
 			(*output_flows*)    coutputs
-			(*faults*)          ["Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
+			(*faults*)          iaList (* (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
 			(*basic_events*)    cevents 
 			(*event_info*)      (compEventsInfo name l_events) 
-			(*fault_formulas*)  (formulaSafe name coutputs cinputs cevents l_comp_saf)
-			(*attacks*)         ["Confidentiality";"Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
+			(*fault_formulas*)  (formulaSafe name coutputs cinputs cevents l_comp_saf iaList)
+			(*attacks*)         ciaList (*  (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
 			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
 			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
-			(*attack_formula*)  (formula name coutputs cinputs l_comp_dep l_attack) 
+			(*attack_formula*)  (formula name coutputs cinputs l_comp_dep l_attack ciaList) 
 			(*defense_events*)  eventsList  (* (defenseEvents name defType l_defense) *)
 			(*defense_rigors*)  rigorsList  (* (defenseRigors name defType l_defense) *)
 			(*defense_profiles*)(defenseProfile name defType l_defense l_defense2nist);;
@@ -673,8 +672,8 @@ let gen_model reqId l_arch l_mission =
 	genModel (instances reqId l_arch) (connections reqId l_arch l_mission) fault attack;;
  
 (**)
-let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission = 
-    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events) in
+let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission ciaList iaList = 
+    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList) in
     let rType = compReqType reqId l_mission in
     match rType with
     | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
@@ -685,16 +684,19 @@ let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_d
 (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
 
 let libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist =
-   let arch_prime = massageArch arch in
-   let compDepen_prime = massageCompDepen compDepen arch_prime 
-   and compSafe_prime = massageCompSafe compSafe arch_prime in 
+   let ciaList = ["Confidentiality";"Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; *)
+   and iaList = ["Integrity";"Availability"]  (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; *)
+   and arch_prime = massageArch arch 
+   in
+   let compDepen_prime = massageCompDepen compDepen arch_prime ciaList
+   and compSafe_prime = massageCompSafe compSafe arch_prime iaList
+   in 
    List.map (missionReqId mission) ~f:(fun y ->
        (* find what reqIDs are under this missionReqID and iterate through those *)
        let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) reqId_M)) in
 	   (y, List.map reqL ~f:(fun x->
-	      (x,deftype),(( gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission), 
-                            gen_model x arch_prime mission 
-                         )
+	      (x,deftype),((gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission ciaList iaList), 
+                        gen_model x arch_prime mission)
           )
        )
    ) ;;
