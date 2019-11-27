@@ -1,7 +1,6 @@
 package CruiseController
 public
 	with Base_Types;
-	with VERDICT_Properties;
 
 	annex agree {**
 			
@@ -186,31 +185,19 @@ public
 			controlSpeed: system ControlSpeed;
 		
 		connections
-			c01: port on_off -> setSpeed.on_off
-			{VERDICT_Properties::flowType => Xdata;};
-			c02: port resume_speed -> setSpeed.resume_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c03: port set_speed -> setSpeed.set_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c04: port inc -> setSpeed.inc
-			{VERDICT_Properties::flowType => Xdata;};
-			c05: port dec -> setSpeed.dec
-			{VERDICT_Properties::flowType => Xdata;};
-			c06: port brake_cancel -> setSpeed.brake_cancel
-			{VERDICT_Properties::flowType => Xdata;};
-			c07: port speed -> setSpeed.speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c08: port speed -> controlSpeed.speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c09: port setSpeed.enabled -> enabled
-			{VERDICT_Properties::flowType => Xdata;};
-			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed
-			{VERDICT_Properties::flowType => Xdata;};
-			c11: port controlSpeed.force -> force
-			{VERDICT_Properties::flowType => Xdata;};
+			c01: port on_off -> setSpeed.on_off;
+			c02: port resume_speed -> setSpeed.resume_speed;
+			c03: port set_speed -> setSpeed.set_speed;
+			c04: port inc -> setSpeed.inc;
+			c05: port dec -> setSpeed.dec;
+			c06: port brake_cancel -> setSpeed.brake_cancel;
+			c07: port speed -> setSpeed.speed;
+			c08: port speed -> controlSpeed.speed;
+			c09: port setSpeed.enabled -> enabled;
+			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed;
+			c11: port controlSpeed.force -> force;
 			-- Virtual connection for the sake of analysis
-			v01: port setSpeed.desired_speed -> desired_speed
-			{VERDICT_Properties::flowType => Xdata;};
+			v01: port setSpeed.desired_speed -> desired_speed;
 	end CruiseControllerSystem.impl;
 	
 end CruiseController;
