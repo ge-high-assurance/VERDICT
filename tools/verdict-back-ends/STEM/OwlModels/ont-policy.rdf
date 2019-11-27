@@ -8,12 +8,6 @@
     <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run.metrics"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Defenses2NIST.metrics"/>
-    <j.0:altURL rdf:resource="file:/C:/New/STEM/OwlModels/Defenses2NIST.sadl.metrics.owl"/>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >defenses2NIST</j.0:prefix>
     <j.0:createdBy>SADL</j.0:createdBy>
