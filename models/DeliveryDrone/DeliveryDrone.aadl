@@ -1,0 +1,1122 @@
+package DeliveryDrone
+
+public
+	with Base_Types;
+    with Data_Types;
+    with Agree_Constants;
+    with Agree_Nodes;
+    with Agree_Constants;
+	with VERDICT_Properties;
+	with GNC;
+
+	system PositionEstimator 
+		features
+			-- inputs
+			gps_pos: in data port Data_Types::Position.impl;
+			imu_pos: in data port Data_Types::Position.impl;	
+			pos_act_in: in data port Data_Types::Position.impl; -- TODO: do we need this?
+			
+			-- outputs
+			est_pos: out data port Data_Types::Position.impl;
+		
+		-- TODO: High-level specification to make use of IMU input?
+		annex agree {**
+			-- high-level specification
+			guarantee "Output: est_pos": Agree_Nodes.close_locations(est_pos, gps_pos);	
+		**};
+		
+		annex verdict {**
+			CyberRel "pos_out_I" = imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
+			CyberRel "pos_out_A" = imu_pos:A or gps_pos:A or pos_act_in:A => est_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the PositionEstimator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the PositionEstimator"
+				description = "UED"
+			}
+			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos:A and gps_pos:A) or pos_act_in:A => est_pos:A;
+			SafetyRel "pos_out_UED" = happens("ued_event") or imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
+		**};
+	end PositionEstimator;
+
+	system Navigation
+		features
+			-- inputs
+			est_pos: in data port Data_Types::Position.impl; -- current estimated position
+			dest_pos: in data port Data_Types::Position.impl;
+			cmd: in data port Base_Types::Boolean;
+			flight_control_state: in data port Base_Types::Boolean;
+			
+			-- outputs
+			move: out data port Base_Types::Boolean;				
+			cur_pos: out data port Data_Types::Position.impl;
+			pos_act_out: out data port Data_Types::Position.impl; -- TODO: do we need this?
+			probe_dest_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			
+		-- TODO: add some environmental assumption for gps position to make sure it remains 
+		--		 the same if no command was issued by delivery planner then you can remove
+		--		 this guarantee: true -> (not (pre(cmd)) => cur_pos = pre(cur_pos));
+		annex agree {**
+			-- high-level specification
+			guarantee "Output: cur_pos | Current location remains the same if no command was received": 
+				true -> (not (pre(cmd)) => cur_pos = pre(cur_pos));
+					
+			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
+				Agree_Nodes.close_locations(cur_pos, est_pos);
+			
+			guarantee "Output: move":
+				move = cmd;
+			
+			-- probe outputs
+			guarantee "Output: probe_dest_pos": probe_dest_pos = dest_pos;
+		**};
+		
+		annex verdict {**
+			CyberRel "move_out_I"         = est_pos:I or cmd:I or flight_control_state:I => move:I;
+			CyberRel "move_out_A"         = est_pos:A or cmd:A or flight_control_state:A => move:A;
+			CyberRel "nav_location_out_I" = est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
+			CyberRel "nav_location_out_A" = est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
+			CyberRel "pos_act_out_I"      = est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
+			CyberRel "pos_act_out_A"      = est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Navigator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Navigator"
+				description = "UED"
+			}
+			SafetyRel "move_out_LOA"         = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => move:A;
+			SafetyRel "move_out_UED"         = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => move:I;
+			SafetyRel "nav_location_out_LOA" = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
+			SafetyRel "nav_location_out_UED" = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
+			SafetyRel "pos_act_out_LOA"      = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
+			SafetyRel "pos_act_out_UED"      = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
+		**};
+	end Navigation;
+	
+	system FlightControl
+		features
+			-- inputs
+			actuation_response: in data port Base_Types::Boolean;
+			move: in data port Base_Types::Boolean;
+			
+			-- outputs
+			motor_cmd: out data port Base_Types::Boolean;
+			fc_state: out data port Base_Types::Boolean;
+			
+			-- TODO: High-level specification is needed?
+		
+		annex verdict {**
+			CyberRel "state_out_I"  = move:I or actuation_response:I => fc_state:I;
+			CyberRel "state_out_A"  = move:A or actuation_response:A => fc_state:A;
+			CyberRel "fc_cmd_out_I" = move:I or actuation_response:I => motor_cmd:I;
+			CyberRel "fc_cmd_out_A" = move:A or actuation_response:A => motor_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the FlightControl"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the FlightControl"
+				description = "UED"
+			}
+			SafetyRel "motor_out_LOA" = happens("loa_event") or actuation_response:A or move:A => motor_cmd:A;
+			SafetyRel "motor_out_UED" = happens("ued_event") or actuation_response:I or move:I => motor_cmd:I;
+		**};
+	end FlightControl;
+	
+	system Actuation
+		features
+			-- inputs
+			motor_cmd: in data port Base_Types::Boolean;
+			
+			-- outputs
+			response: out data port Base_Types::Boolean;
+			
+			-- TODO: High-level specification is needed?
+			
+		annex verdict {**
+			CyberRel "response_out_I" = motor_cmd:I => response:I;
+			CyberRel "response_out_A" = motor_cmd:A => response:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Actuation"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Actuation"
+				description = "UED"
+			}
+			SafetyRel "response_out_LOA" = happens("loa_event") or motor_cmd:A => response:A;
+			SafetyRel "response_out_UED" = happens("ued_event") or motor_cmd:I => response:I;
+		**};
+	end Actuation;
+	
+	system DeliveryPlanner
+		features
+			-- inputs
+			bus_in: in data port Data_Types::InputBus.impl;
+			cur_pos: in data port Data_Types::Position.impl;
+			delivery_status: in data port Data_Types::DeliveryStatus;
+			radio_response: in data port Data_Types::RadioResponse.impl;
+			camera_result: in data port Base_Types::Integer;
+			gps_health_status: in data port Base_Types::Boolean; 
+			imu_health_status: in data port Base_Types::Boolean;
+			rdo_health_status: in data port Base_Types::Boolean;
+			cam_health_status: in data port Base_Types::Boolean;
+			package_is_secure: in data port Base_Types::Boolean; 
+			
+			-- outputs
+			radio_cmd: out data port Base_Types::Boolean;
+			delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
+			dest_location: out data port Data_Types::Position.impl;
+			bus_out: out data port Base_Types::Boolean; -- not used
+	        nav_cmd: out data port Base_Types::Boolean;					
+			camera: out data port Base_Types::Boolean;
+			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
+			{ VERDICT_Properties::probe => true; };
+			constellation: out data port Data_Types::Constellation; -- added
+			launch_pos: out data port Data_Types::Position.impl; -- added
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; -- added
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; -- added
+			target_clear: out data port Base_Types::Boolean; -- added
+			valid_marker: out data port Base_Types::Boolean; -- added
+						
+		annex agree {**
+			-- variables
+			eq recent_order: Data_Types::DeliveryOrder.impl = if init_mode then 
+															  	bus_in.order
+															  else
+															  	bus_in.order -> pre(recent_order);
+			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);	
+			eq dest_position: Data_Types::Position.impl = dest_location;
+			eq expensive_item: bool = recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
+			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD); -- Correct?
+			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
+			eq delivery_failed: bool = (delivery_status = enum(Data_Types::DeliveryStatus, FAILED));
+			eq delivery_completed: bool = (delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED));
+			eq is_safe_landing: bool = (target_clear and valid_marker);
+			
+			-- events
+			eq on_off: bool = bus_in.on_off;
+			eq init_criteria_succeed: bool = bus_in.init_criteria_satisfied and not internal_error_detected;
+			eq init_criteria_failed: bool = not init_criteria_succeed;
+			eq abort_cmd: bool = bus_in.abort_cmd;
+			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
+			eq okay_to_launch: bool = not internal_error_detected;
+			eq separation: bool = not connected;
+			eq destination_location_reached: bool = Agree_Nodes.close_locations(cur_pos, dest_position);
+			eq no_clearance: bool = not is_safe_landing;
+			eq successfull_delivery: bool = delivery_completed and destination_location_reached and not no_clearance;
+			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
+			eq internal_error_detected: bool = not gps_health_status or not imu_health_status or not rdo_health_status or not cam_health_status;
+			eq truck_location_reached: bool = Agree_Nodes.close_locations(cur_pos, truck_position);
+			eq connected: bool = bus_in.connected;
+			
+			-- probe
+			guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
+			
+			guarantee "Output: delivery_cmd":
+				--delivery_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
+				--					not no_clearance and 
+				--					(expensive_item => confirmation);
+				delivery_cmd = if (making_delivery_mode and not no_clearance and (expensive_item => confirmation)) then
+							   		enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE)
+							   else if return_to_truck_mode and internal_error_detected then
+							   		enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY)
+							   else 
+							   		enum(Data_Types::PackageDeliveryCommand, NO_OPERATION);
+				
+			guarantee "Output: constellation":
+				--constellation = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.constellation
+				--					else 
+				--						pre(constellation);
+				constellation = if init_mode then 
+									bus_in.constellation
+								else 
+									bus_in.constellation -> pre(constellation);
+			
+			guarantee "Output: dest_location":
+				--dest_location = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.order.target_position
+				--				else 
+				--						pre(dest_location);
+				dest_location = if init_mode then 
+									bus_in.order.target_position
+								else 
+									bus_in.order.target_position -> pre(dest_location);
+				
+			guarantee "Output: launch_pos":
+				--launch_pos = if (state = enum(Data_Types::DeliveryPlannerState, INIT)) then 
+				--						bus_in.launch_pos
+				--				 else 
+				--						pre(launch_pos);
+				launch_pos = if init_mode then 
+									bus_in.launch_pos
+								 else 
+									bus_in.launch_pos -> pre(launch_pos);
+			
+			guarantee "Output: radio_cmd":
+				--radio_cmd = (state = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)) and 
+				--			expensive_item;
+				radio_cmd = (making_delivery_mode and expensive_item);
+			
+			guarantee "Output: probe_init_mode":
+				--initialized_mode_out = (state = enum(Data_Types::DeliveryPlannerState, INIT));
+				probe_init_mode = init_mode;
+				
+			guarantee "Output: probe_abort_mode":
+				probe_abort_mode = abort_mode;
+			
+			guarantee "Output: nav_cmd | it sends signal to navigation only if it's in flying modes'":
+				nav_cmd = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
+							
+			eq planner_state: Data_Types::DeliveryPlannerState = (enum(Data_Types::DeliveryPlannerState, OFF) ->
+						if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and on_off and connected then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, ABORT) and on_off and connected then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and on_off and connected then 
+							enum(Data_Types::DeliveryPlannerState, OFF)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, OFF) and on_off and connected then 
+							enum(Data_Types::DeliveryPlannerState, INIT)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and init_criteria_succeed and connected then 
+							enum(Data_Types::DeliveryPlannerState, READY)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and init_criteria_failed and connected then 
+							enum(Data_Types::DeliveryPlannerState, INIT)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, INIT) and abort_cmd and connected then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and abort_cmd and connected then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and abort_cmd and connected then 
+							enum(Data_Types::DeliveryPlannerState, ABORT)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, READY) and mission_store_release_sequence and connected then 
+							enum(Data_Types::DeliveryPlannerState, LAUNCH)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, LAUNCH) and (package_is_secure and okay_to_launch and separation) then 
+							enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, FLYING_TO_DEST) and destination_location_reached then 
+							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and no_clearance then 
+							enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY)						
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, MAKING_DELIVERY) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected) then 
+							enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK)
+						else if pre(planner_state) = enum(Data_Types::DeliveryPlannerState, RETURN_TO_TRUCK) and truck_location_reached and connected then 
+							enum(Data_Types::DeliveryPlannerState, INIT)		
+						else pre(planner_state));
+			
+			
+			eq off_mode: bool = true -> 
+								(pre(off_mode) and (not (on_off and connected))) or
+								(pre(init_mode) and on_off and connected) or
+								(pre(ready_mode) and on_off and connected) or 
+								(pre(abort_mode) and on_off and connected);
+			
+			eq init_mode: bool = false ->
+								 (pre(init_mode) and (not (on_off and connected)) 
+								 				 and (not (init_criteria_succeed and connected)) 
+								 				 and (not (abort_cmd and connected))) or
+								 (pre(off_mode) and on_off and connected) or
+								 (pre(ready_mode) and init_criteria_failed and connected) or
+								 (pre(return_to_truck_mode) and truck_location_reached and connected);
+			
+			eq ready_mode: bool = false ->
+								  (pre(ready_mode) and (not (init_criteria_failed and connected)) 
+								  		           and (not (on_off and connected)) 
+								  		           and (not (abort_cmd and connected)) 
+								  		           and (not (mission_store_release_sequence and connected))) or
+								  (pre(init_mode) and init_criteria_succeed and connected);
+			
+			eq launch_mode: bool = false ->
+								   (pre(launch_mode) and (not (abort_cmd and connected)) 
+								   					 and (not (package_is_secure and okay_to_launch and separation))) or
+								   (pre(ready_mode) and mission_store_release_sequence and connected);
+			
+			eq abort_mode: bool = false ->
+								  (pre(abort_mode) and (not (on_off and connected))) or
+								  (pre(init_mode) and abort_cmd and connected) or
+								  (pre(ready_mode) and abort_cmd and connected) or
+								  (pre(launch_mode) and abort_cmd and connected);
+			
+			eq flying_to_dest_mode: bool = false ->
+										   (pre(flying_to_dest_mode) and (not (destination_location_reached))) or
+										   (pre(launch_mode) and package_is_secure and okay_to_launch and separation);
+			
+			eq making_delivery_mode: bool = false ->
+											(pre(making_delivery_mode) and (not (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected))) or
+										    (pre(flying_to_dest_mode) and destination_location_reached);
+			
+			eq return_to_truck_mode: bool = false ->
+											(pre(return_to_truck_mode) and (not (truck_location_reached and connected))) or
+										    (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected));
+			
+			guarantee "Modes are mutually exclusive":
+				Agree_Nodes.ToInt(off_mode) + Agree_Nodes.ToInt(init_mode) + 
+				Agree_Nodes.ToInt(ready_mode) + Agree_Nodes.ToInt(launch_mode) +
+				Agree_Nodes.ToInt(abort_mode) + Agree_Nodes.ToInt(flying_to_dest_mode) +
+				Agree_Nodes.ToInt(making_delivery_mode) + Agree_Nodes.ToInt(return_to_truck_mode) = 1;
+			
+			-- old sections below	
+			
+			--eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);
+			
+			--eq have_order: bool = Agree_Nodes.HasHappened(bus_in.connected and bus_in.update_order);
+			
+			--eq order: Data_Types::DeliveryOrder.impl = bus_in.order ->
+			--	if pre(have_order) then pre(order) else bus_in.order;
+			
+			--eq valid_recognition: bool = Agree_Nodes.HasHappened(
+            --	recognizing_location and
+            --	p.is_target_clear and p.is_target_location
+            --);
+			
+			--eq target_confirmed: bool = Agree_Nodes.HasHappened(
+    		--	confirming_location and 
+            --	radio_response.data_available and
+            --	radio_response.target_confirmed
+            --);
+			
+			--eq steps_in_confirming_mode: int =
+    		--	if confirming_location then
+      		--		(1 -> pre(steps_in_confirming_mode) + 1)
+    		--	else
+      		--		(0 -> pre(steps_in_confirming_mode));
+			
+			--eq delivery_aborted: bool = Agree_Nodes.HasHappened(
+            --	( recognizing_location and
+      		--	  not p.is_target_clear or not p.is_target_location
+    		--	) 
+    		--	or
+    		--	delivery_status = enum(Data_Types::DeliveryStatus, FAILED)
+    		--	or
+    		--	(radio_response.data_available and not radio_response.target_confirmed)
+    		--	or
+    		--	( steps_in_confirming_mode > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD ) 
+  			--);
+  			
+  			--eq proof_stored: bool = Agree_Nodes.HasHappened(
+    		--	delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED) and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position)
+  			--);
+  			
+			--eq delivered_or_aborted: bool =
+    		--	false -> pre (delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED) or delivery_aborted);
+			
+			--eq connected_to_truck: bool = 
+			--    not delivered_or_aborted and
+    		--	Agree_Nodes.close_locations(cur_pos, truck_position) and
+    		--	bus_in.connected;
+			
+			--eq waiting_delivery_order: bool =
+			--	not delivered_or_aborted and
+			--	Agree_Nodes.close_locations(cur_pos, truck_position) and
+    		--	not bus_in.connected and
+    		--	not have_order;
+    		
+    		--eq flying_to_target: bool =
+    		--	not delivered_or_aborted and
+    		--	have_order and
+    		--	( Agree_Nodes.close_locations(cur_pos, truck_position) and
+            --  	  not bus_in.connected
+            --	) 
+            --	or
+            --	( not Agree_Nodes.close_locations(cur_pos, truck_position) and
+            --  	  not Agree_Nodes.close_locations(cur_pos, order.target_position)
+            --	) ;
+			
+			--eq recognizing_location: bool = 
+			--	not delivered_or_aborted and
+    		--	have_order and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
+    		--	(false -> not pre(valid_recognition));
+			
+			--eq confirming_location: bool =
+			--	not delivered_or_aborted and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
+    		--	(false -> pre(valid_recognition)) and
+    		--	(order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) and
+    		--	(false -> not pre(target_confirmed));
+			
+			--eq dropping_package: bool =
+			--	not delivered_or_aborted and
+    		--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
+    		--	(false -> pre(valid_recognition)) and
+    		--	(false -> ((order.item_value > Agree_Constants.ITEM_VALUE_THRESHOLD) => pre(target_confirmed)));
+			
+			--eq waiting_proof_of_delivery: bool =
+			--	(false -> pre(delivery_status = enum(Data_Types::DeliveryStatus, COMPLETED))) and 
+			--	Agree_Nodes.close_locations(cur_pos, order.target_position) and
+    		--	(false -> not pre(proof_stored));
+    			
+    		--eq returning_to_truck: bool =
+    		--	delivered_or_aborted and
+			--	not (Agree_Nodes.close_locations(cur_pos, truck_position)) and
+    		--	not waiting_proof_of_delivery;
+    		
+    		--eq delivery_done: bool =
+    		--	delivered_or_aborted and
+    		--	Agree_Nodes.close_locations(cur_pos, truck_position);
+    		
+    		--assume "Navigation location remains the same if no command was issued":
+    		--	true -> (not pre(nav_cmd) => cur_pos = pre(cur_pos));
+
+			--guarantee "Command is issued only if drone is disconnected and has order":
+			--	nav_cmd => not bus_in.connected and have_order;
+
+  			--guarantee "radio_cmd_Def": radio_cmd = confirming_location;
+
+  			--guarantee "delivery_cmd_out_Def": delivery_cmd = dropping_package;
+    		
+		**};
+					
+		annex verdict {**
+			CyberRel "dp_bus_out_I"         = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			CyberRel "dp_bus_out_A"         = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			CyberRel "dp_cmd_out_I"         = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => nav_cmd:I;
+			CyberRel "dp_cmd_out_A"         = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => nav_cmd:A;
+			CyberRel "dp_delivery_status_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd:I;
+			CyberRel "dp_delivery_status_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd:A;
+			CyberRel "dp_camera_out_I"      = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => camera:I;
+			CyberRel "dp_camera_out_A"      = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => camera:A;
+			CyberRel "dp_radio_cmd_I"       = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			CyberRel "dp_radio_cmd_A"       = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the DeliveryPlanner"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the DeliveryPlanner"
+				description = "UED"
+			}
+			SafetyRel "dp_bus_out_UED"         = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			SafetyRel "dp_bus_out_LOA"         = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			SafetyRel "dp_cmd_out_UED"         = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => nav_cmd:I;
+			SafetyRel "dp_cmd_out_LOA"         = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => nav_cmd:A;
+			SafetyRel "dp_delivery_status_UED" = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd:I;
+			SafetyRel "dp_delivery_status_LOA" = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd:A;
+			SafetyRel "dp_camera_out_UED"      = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => camera:I;
+			SafetyRel "dp_camera_out_LOA"      = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => camera:A;
+			SafetyRel "dp_radio_cmd_UED"       = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			SafetyRel "dp_radio_cmd_LOA"       = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
+		**};
+	end DeliveryPlanner;
+	
+	system Radio
+		features
+			-- inputs
+			comm_in: in data port Data_Types::RadioResponse.impl;
+			radio_in: in data port Base_Types::Boolean;
+			
+			-- outputs
+			comm_out: out data port Base_Types::Boolean; -- TODO: remove? does not do anything
+			radio_out: out data port Data_Types::RadioResponse.impl;
+			health_status: out data port Base_Types::Boolean; -- added
+			
+		annex agree {**
+			guarantee "Radio receives data from remote communication channel":
+    			(comm_in.data_available = radio_out.data_available and
+     			 comm_in.target_confirmed = radio_out.target_confirmed);
+			guarantee "Without a request, no radio data is available":
+				not radio_in => not radio_out.data_available;
+		**};
+		
+		annex verdict {**
+			CyberRel "comm_out_I" = comm_in:I => comm_out:I;
+			CyberRel "comm_out_A" = comm_in:A => comm_out:A;
+			CyberRel "plan_out_I" = radio_in:I => radio_out:I;
+			CyberRel "plan_out_A" = radio_in:A => radio_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Radio"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Radio"
+				description = "UED"
+			}
+			SafetyRel "comm_out_UED" = happens("ued_event") or comm_in:I => comm_out:I;
+			SafetyRel "comm_out_LOA" = happens("loa_event") or comm_in:A => comm_out:A;
+			SafetyRel "plan_out_UED" = happens("ued_event") or radio_in:I => radio_out:I;
+			SafetyRel "plan_out_LOA" = happens("loa_event") or radio_in:A => radio_out:A;
+		**};
+	end Radio;
+	
+	system DeliveryItemMechanism
+		features
+			-- inputs
+			delivery_cmd_in : in data port Data_Types::PackageDeliveryCommand;
+			
+			-- outputs
+			delivery_status_out: out data port Data_Types::DeliveryStatus;
+			package_is_secure: out data port Base_Types::Boolean;
+			
+		annex agree {**
+			eq release_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE));
+			eq abort_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY));
+			eq no_op_cmd: bool = (delivery_cmd_in = enum(Data_Types::PackageDeliveryCommand, NO_OPERATION));
+			
+			guarantee "Initially, delivery status is NOT_STARTED":
+				Agree_Nodes.InitiallyX(delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
+				
+			guarantee "Changed -- Delivery status remains the same if no delivery command is issued":
+				--true -> (no_op_cmd => (delivery_status_out = pre (delivery_status_out)));
+				true -> (no_op_cmd or abort_cmd => (delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED)));
+			
+			guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
+				true -> (release_cmd => delivery_status_out <> enum(Data_Types::DeliveryStatus, NOT_STARTED));
+			
+			--guarantee "If delivery command is issued, delivery status cannot be NOT_STARTED": 
+			--	true -> (abort_cmd => delivery_status_out = enum(Data_Types::DeliveryStatus, NOT_STARTED));
+		**};
+			
+		annex verdict {**
+			CyberRel "delivery_status_out_I" = delivery_cmd_in:I => delivery_status_out:I;
+			CyberRel "delivery_status_out_A" = delivery_cmd_in:A => delivery_status_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the DeliveryItemMechanism"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the DeliveryItemMechanism"
+				description = "UED"
+			}
+			SafetyRel "delivery_status_out_UED" = happens("ued_event") or delivery_cmd_in:I => delivery_status_out:I;
+			SafetyRel "delivery_status_out_LOA" = happens("loa_event") or delivery_cmd_in:A => delivery_status_out:A;
+		**};
+	end DeliveryItemMechanism;
+	
+	system Camera
+		features
+			camera_in: in data port Base_Types::Boolean;
+			camera_out: out data port Base_Types::Integer;
+			health_status: out data port Base_Types::Boolean;
+
+		annex verdict {**
+			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
+			CyberRel "camera_out_A" = camera_in:A => camera_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Camera"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Camera"
+				description = "UED"
+			}
+			SafetyRel "camera_out_UED" = happens("ued_event") or camera_in:I => camera_out:I;
+			SafetyRel "camera_out_LOA" = happens("loa_event") or camera_in:A => camera_out:A;
+		**};		
+	end Camera;
+			
+	system Connector
+		features
+			-- inputs
+				bus_in: in data port Data_Types::InputBus.impl;
+					
+			-- outputs
+				bus_out: out data port Data_Types::InputBus.impl;
+			
+		annex agree {**
+			-- high-level specification
+			guarantee "Output: bus_out": bus_out = bus_in;
+		**};
+	annex verdict {**
+            CyberRel "bus_out_I" = bus_in:I => bus_out:I;
+            CyberRel "bus_out_A" = bus_in:A => bus_out:A;
+            Event {
+                   id = "loa_event"
+                   probability = 1.0e-5
+                   comment = "loss of availability of the connector"
+                   description = "LOA"
+                  }
+            Event {
+                   id = "ued_event"
+                   probability = 1.0e-6
+                   comment = "undetected erroneous data of the connector"
+                   description = "UED"
+                  }
+            SafetyRel "bus_out_LOA" = happens("loa_event") => bus_out:A;
+            SafetyRel "bus_out_UED" = happens("ued_event") => bus_out:I;
+        **};
+		
+	end Connector;
+	
+	system DeliveryDroneSystem
+		features
+			satellite0_sig_pos: in data port Data_Types::Position.impl;
+			satellite1_sig_pos: in data port Data_Types::Position.impl;
+			bus1: in data port Data_Types::InputBus.impl;
+			comm1: in data port Data_Types::RadioResponse.impl;
+			
+			comm2: out data port Base_Types::Boolean;
+			bus2: out data port Base_Types::Boolean;			
+			
+			radio_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			radio_response: out data port Data_Types::RadioResponse.impl
+			{ VERDICT_Properties::probe => true; };
+			delivery_status: out data port Data_Types::DeliveryStatus
+			{ VERDICT_Properties::probe => true; };
+			
+			actuation_out: out data port Base_Types::Boolean;
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
+			{ VERDICT_Properties::probe => true; };
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
+			probe_launch_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			
+		annex agree {**			
+
+			eq delivery_started: bool = delivery_status <> enum(Data_Types::DeliveryStatus, NOT_STARTED);
+      		
+      		eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
+			
+			eq target_confirmed: bool = Agree_Nodes.HasHappened(
+      			confirmation_requested and
+      			comm1.data_available and
+      			comm1.target_confirmed
+      		);
+      		
+      		eq valuable_package: bool = most_recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+      		
+      		eq isOn: bool = false -> if bus1.on_off and bus1.connected then not pre(isOn)
+      								 else pre(isOn);
+      			
+      		
+      		eq most_recent_constellation: Data_Types::Constellation = if probe_init_mode then 
+      																  	bus1.constellation
+      																  else bus1.constellation -> pre(most_recent_constellation);
+      		
+      		eq most_recent_launch_location: Data_Types::Position.impl = if probe_init_mode then 
+      																  		bus1.launch_pos
+      																  	else bus1.launch_pos -> pre(most_recent_launch_location);
+      																  														  	
+      		eq most_recent_order: Data_Types::DeliveryOrder.impl = if probe_init_mode then 
+      															   		bus1.order
+      															   else bus1.order -> pre(most_recent_order);
+      		
+      		eq most_recent_delivery_location: Data_Types::Position.impl = most_recent_order.target_position;
+      		
+      		eq release_cmd: bool = (probe_delivery_cmd = enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE));
+      		
+      		guarantee "P1: constellation for GPS is initialized properly": 
+      			isOn => (most_recent_constellation = probe_constellation);
+      		
+      		guarantee "P2: launch location for IMU is initialized properly": 
+      			isOn => most_recent_launch_location = probe_launch_location;
+      		
+      		guarantee "P3: delivery location for navigation is initialized properly": 
+      			isOn => most_recent_delivery_location = probe_delivery_location;
+      			
+      		guarantee "P4: drone is flying only if since last off drone has not aborted": 
+      			 probe_cmd => Agree_Nodes.Since(not isOn, not (probe_abort_mode));
+      			 
+      		guarantee "P5: a command to release a valuable package is issued only if drone has received confirmation from base":
+    			true -> (release_cmd and valuable_package => target_confirmed);
+
+  			guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
+    			true -> (delivery_started and valuable_package => confirmation_requested);
+		**};
+			
+		annex verdict{**
+			CyberReq {
+			id = "MissionReq01"
+			description = "The drone shall be resilient to loss of ability to deliver a package to 
+			              the appropriate consumer location"
+			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
+			cia = I
+			severity = Hazardous
+		};
+			CyberReq {
+			id = "MissionReq02"
+			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
+			condition = delivery_status:I 
+			cia = I
+			severity = Hazardous
+			};
+			SafetyReq {
+			id = "SafetyReq01" 
+			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
+		    };	
+			SafetyReq {
+			id = "SafetyReq02" 
+			condition = actuation_out:I and actuation_out:A 
+		    };	
+		**};
+	end DeliveryDroneSystem;
+	
+	system implementation DeliveryDroneSystem.Impl
+		subcomponents
+			gnc: system GNC::GNC.Impl;
+			
+			radio: system Radio
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;
+			};
+			positionEstimator: system PositionEstimator
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+				
+				-- CRV Properties
+				VERDICT_Properties::manufacturer => ThirdParty;
+			 	--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
+			 	VERDICT_Properties::adversariallyTested => false;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;
+			};
+			navigation: system Navigation
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;	
+			};
+			fc: system FlightControl
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;
+			};
+			actuation: system Actuation
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+			};
+			deliveryPlanner: system DeliveryPlanner
+			{	
+			 	-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+				
+				-- CRV Properties
+				VERDICT_Properties::manufacturer => ThirdParty;
+				--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
+			
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;	
+			};
+			deliveryItemMechanism: system DeliveryItemMechanism
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				
+			};
+			camera: system Camera
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				
+				-- Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+			};
+			
+			connector: system Connector
+			{
+				-- System Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+			 	VERDICT_Properties::componentType => Hybrid;
+			 	
+			 	--CRV Properties
+			 	VERDICT_Properties::manufacturer => ThirdParty;
+			 	VERDICT_Properties::adversariallyTested => false;
+			};
+			
+		connections
+			c1: port positionEstimator.est_pos -> navigation.est_pos
+			{VERDICT_Properties::flowType => Xcontrol;
+			 VERDICT_Properties::trustedConnection => true;	
+			 VERDICT_Properties::encryptedTransmission => true;
+			 VERDICT_Properties::encryptedTransmissionDAL => 6;
+			};
+			
+			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
+			{VERDICT_Properties::flowType => Xrequest;
+			 VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c2: port navigation.move -> fc.move
+			{VERDICT_Properties::flowType => Xdata;};
+
+			c3: port fc.fc_state -> navigation.flight_control_state
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c4: port deliveryPlanner.dest_location -> navigation.dest_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			
+			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status			
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c9: port camera.camera_out -> deliveryPlanner.camera_result			
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c10: port deliveryPlanner.radio_cmd -> radio.radio_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c11: port radio.radio_out -> deliveryPlanner.radio_response
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c12: port gnc.gps_pos -> positionEstimator.gps_pos
+			{
+			VERDICT_Properties::flowType => Xdata;
+			-- VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c14a: port bus1 -> connector.bus_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c14b: port connector.bus_out -> DeliveryPlanner.bus_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c15: port deliveryPlanner.bus_out -> bus2
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c16: port comm1 -> radio.comm_in
+			{VERDICT_Properties::flowType => Xdata;
+		     VERDICT_Properties::connectionType => Remote;
+			 VERDICT_Properties::authenticated => false;
+			 VERDICT_Properties::dataEncrypted => false;
+			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
+			 --VERDICT_Properties::dataEncrypted => true; -- Fix for Network Injection
+			};
+			
+			c17: port radio.comm_out -> comm2
+			{VERDICT_Properties::flowType => Xdata;};
+
+			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c19: port fc.motor_cmd -> actuation.motor_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c20: port actuation.response -> fc.actuation_response
+			{VERDICT_Properties::flowType => Xdata;};	
+
+			c22: port satellite0_sig_pos -> gnc.satellite0_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c23: port satellite1_sig_pos -> gnc.satellite1_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
+			{VERDICT_Properties::flowType => Xdata;};
+
+			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c27: port deliveryPlanner.camera -> camera.camera_in			
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c28: port deliveryPlanner.radio_cmd -> radio_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c29: port radio.radio_out -> radio_response
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
+			{VERDICT_Properties::flowType => Xdata;}; 							
+			
+			c32: port actuation.response -> actuation_out
+			{VERDICT_Properties::flowType => Xdata;};	
+			
+			c33: port deliveryPlanner.constellation -> gnc.constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
+			{
+			VERDICT_Properties::flowType => Xdata;
+			--VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c37: port camera.health_status -> deliveryPlanner.cam_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c38: port gnc.probe_constellation -> probe_constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c40: port gnc.probe_launch_pos -> probe_launch_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c41: port navigation.probe_dest_pos -> probe_delivery_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c43: port deliveryPlanner.nav_cmd -> probe_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
+			{VERDICT_Properties::flowType => Xdata;};
+												
+	end DeliveryDroneSystem.impl;
+	
+end DeliveryDrone;
