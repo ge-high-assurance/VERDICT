@@ -23,6 +23,20 @@ public
 		annex verdict {**
 			CyberRel "gps_out_I" => gps_pos_out:I;
 			CyberRel "gps_out_A" => gps_pos_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the GPS"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the GPS"
+				description = "UED"
+			}
+			SafetyRel "gps_out_LOA" = happens("loa_event") => gps_pos_out:A;
+			SafetyRel "gps_out_UED" = happens("ued_event") => gps_pos_out:I;
 		**};
 	end GPS;
 
@@ -34,6 +48,20 @@ public
 		annex verdict {**
 			CyberRel "imu_out_I" => imu_pos_out:I;
 			CyberRel "imu_out_A" => imu_pos_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the IMU"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the IMU"
+				description = "UED"
+			}
+			SafetyRel "imu_out_LOA" = happens("loa_event") => imu_pos_out:A;
+			SafetyRel "imu_out_UED" = happens("ued_event") => imu_pos_out:I;			
 		**};
 	end IMU;
 	
@@ -55,6 +83,20 @@ public
 		annex verdict {**
 			CyberRel "pos_out_I" = imu_pos_in:I or gps_pos_in:I or pos_act_in:I => est_pos_out:I;
 			CyberRel "pos_out_A" = imu_pos_in:A or gps_pos_in:A or pos_act_in:A => est_pos_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the PositionEstimator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the PositionEstimator"
+				description = "UED"
+			}
+			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos_in:A and gps_pos_in:A) or pos_act_in:A => est_pos_out:A;
+			SafetyRel "pos_out_UED" = happens("ued_event") or imu_pos_in:I or gps_pos_in:I or pos_act_in:I => est_pos_out:I;
 		**};
 	end PositionEstimator;
 
@@ -91,6 +133,25 @@ public
 			CyberRel "nav_location_out_A" = pos_in:A or cmd_in:A or state_in:A  => nav_location_out:A;
 			CyberRel "pos_act_out_I" = pos_in:I or cmd_in:I or state_in:I => pos_act_out:I;
 			CyberRel "pos_act_out_A" = pos_in:A or cmd_in:A or state_in:A  => pos_act_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Navigator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Navigator"
+				description = "UED"
+			}
+			SafetyRel "move_out_LOA" = happens("loa_event") or pos_in:A or cmd_in:A or state_in:A => move_out:A;
+			SafetyRel "move_out_UED" = happens("ued_event") or pos_in:I or cmd_in:I or state_in:I => move_out:I;
+			SafetyRel "nav_location_out_LOA" = happens("loa_event") or pos_in:A or cmd_in:A or state_in:A => nav_location_out:A;
+			SafetyRel "nav_location_out_UED" = happens("ued_event") or pos_in:I or cmd_in:I or state_in:I => nav_location_out:I;
+			SafetyRel "pos_act_out_LOA" = happens("loa_event") or pos_in:A or cmd_in:A or state_in:A => pos_act_out:A;
+			SafetyRel "pos_act_out_UED" = happens("ued_event") or pos_in:I or cmd_in:I or state_in:I => pos_act_out:I;
+
 		**};
 	end Navigation;
 	
@@ -109,6 +170,20 @@ public
 			CyberRel "state_out_A" = move_in:A or response_in:A => state_out:A;
 			CyberRel "fc_cmd_out_I" = move_in:I or response_in:I => motor_cmd:I;
 			CyberRel "fc_cmd_out_A" = move_in:A or response_in:A => motor_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the FlightControl"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the FlightControl"
+				description = "UED"
+			}
+			SafetyRel "motor_out_LOA" = happens("loa_event") or response_in:A or move_in:A => motor_cmd:A;
+			SafetyRel "motor_out_UED" = happens("ued_event") or response_in:I or move_in:I => motor_cmd:I;
 		**};
 	end FlightControl;
 	
@@ -121,6 +196,20 @@ public
 		annex verdict {**
 			CyberRel "response_out_I" = motor_cmd_in:I => response_out:I;
 			CyberRel "response_out_A" = motor_cmd_in:A => response_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Actuation"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Actuation"
+				description = "UED"
+			}
+			SafetyRel "response_out_LOA" = happens("loa_event") or motor_cmd_in:A => response_out:A;
+			SafetyRel "response_out_UED" = happens("ued_event") or motor_cmd_in:I => response_out:I;
 		**};
 	end Actuation;
 	
@@ -276,6 +365,28 @@ public
 			CyberRel "dp_camera_out_A" = nav_location:A or delivery_status:A or camera_result:A or radio_response:A => camera_out:A;
 			CyberRel "dp_radio_cmd_I" = nav_location:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
 			CyberRel "dp_radio_cmd_A" = nav_location:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the DeliveryPlanner"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the DeliveryPlanner"
+				description = "UED"
+			}
+			SafetyRel "dp_bus_out_UED" = happens("ued_event") or nav_location:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			SafetyRel "dp_bus_out_LOA" = happens("loa_event") or nav_location:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			SafetyRel "dp_cmd_out_UED" = happens("ued_event") or nav_location:I or delivery_status:I or camera_result:I or radio_response:I => cmd_out:I;
+			SafetyRel "dp_cmd_out_LOA" = happens("loa_event") or nav_location:A or delivery_status:A or camera_result:A or radio_response:A => cmd_out:A;
+			SafetyRel "dp_delivery_status_UED" = happens("ued_event") or nav_location:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd_out:I;
+			SafetyRel "dp_delivery_status_LOA" = happens("loa_event") or nav_location:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd_out:A;
+			SafetyRel "dp_camera_out_UED" = happens("ued_event") or nav_location:I or delivery_status:I or camera_result:I or radio_response:I => camera_out:I;
+			SafetyRel "dp_camera_out_LOA" = happens("loa_event") or nav_location:A or delivery_status:A or camera_result:A or radio_response:A => camera_out:A;
+			SafetyRel "dp_radio_cmd_UED" = happens("ued_event") or nav_location:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			SafetyRel "dp_radio_cmd_LOA" = happens("loa_event") or nav_location:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
 		**};
 	end DeliveryPlanner;
 	
@@ -299,6 +410,22 @@ public
 			CyberRel "comm_out_A" = comm_in:A => comm_out:A;
 			CyberRel "plan_out_I" = radio_in:I => radio_out:I;
 			CyberRel "plan_out_A" = radio_in:A => radio_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Radio"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Radio"
+				description = "UED"
+			}
+			SafetyRel "comm_out_UED" = happens("ued_event") or comm_in:I => comm_out:I;
+			SafetyRel "comm_out_LOA" = happens("loa_event") or comm_in:A => comm_out:A;
+			SafetyRel "plan_out_UED" = happens("ued_event") or radio_in:I => radio_out:I;
+			SafetyRel "plan_out_LOA" = happens("loa_event") or radio_in:A => radio_out:A;
 		**};
 	end Radio;
 	
@@ -322,6 +449,20 @@ public
 		annex verdict {**
 			CyberRel "delivery_status_out_I" = delivery_cmd_in:I => delivery_status_out:I;
 			CyberRel "delivery_status_out_A" = delivery_cmd_in:A => delivery_status_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the DeliveryItemMechanism"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the DeliveryItemMechanism"
+				description = "UED"
+			}
+			SafetyRel "delivery_status_out_UED" = happens("ued_event") or delivery_cmd_in:I => delivery_status_out:I;
+			SafetyRel "delivery_status_out_LOA" = happens("loa_event") or delivery_cmd_in:A => delivery_status_out:A;
 		**};
 	end DeliveryItemMechanism;
 	
@@ -333,6 +474,20 @@ public
 		annex verdict {**
 			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
 			CyberRel "camera_out_A" = camera_in:A => camera_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-5
+				comment = "loss of availability of the Camera"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-6
+				comment = "undetected erroneous data of the Camera"
+				description = "UED"
+			}
+			SafetyRel "camera_out_UED" = happens("ued_event") or camera_in:I => camera_out:I;
+			SafetyRel "camera_out_LOA" = happens("loa_event") or camera_in:A => camera_out:A;
 		**};		
 	end Camera;
 	
@@ -379,20 +534,29 @@ public
 			
 		annex verdict{**
 			CyberReq {
-			id = "MissionReq01"
+			id = "CyberReq01"
 			description = "The drone shall be resilient to loss of ability to deliver a package to 
 			              the appropriate consumer location"
 			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
 			cia = I
 			severity = Hazardous
-		};
+		    };
 			CyberReq {
-			id = "MissionReq02"
+			id = "CyberReq02"
 			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
 			condition = delivery_status:I 
 			cia = I
 			severity = Hazardous
-		};
+		    };
+			SafetyReq {
+			id = "SafetyReq01" 
+			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
+		    };	
+			SafetyReq {
+			id = "SafetyReq02" 
+			condition = actuation_out:I and actuation_out:A 
+		    };	
+		
 		**};
 	end DeliveryDroneSystem;
 	
