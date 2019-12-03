@@ -33,235 +33,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="strongCryptoAlgorithms"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="removeIdentifyingInformation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="deviceAuthentication"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="supplyChainSecurity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="antiJamming"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="hasSensitiveInfo"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="secureBoot"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="resourceAvailability"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Class rdf:ID="Thing"/>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="insideTrustedBoundary"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="inputValidation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="controlSentToUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="XdeviceAuthentication"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="encryptedStorage"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:about="#deviceAuthentication"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="logging"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="ta1_Deadlock"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="dataSentToUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="ta1_NewProp"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="systemAccessControl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="antiFlooding"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="controlReceivedFromUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="sessionAuthenticity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="broadcast"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="dosProtection"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="canReceiveConfigUpdate"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="XphysicalAccessControl"/>
+          <owl:ObjectProperty rdf:ID="auditMessageResponses"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -279,7 +51,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:about="#secureBoot"/>
+          <owl:ObjectProperty rdf:ID="saticCodeAnalysis"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -306,7 +78,19 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="canReceiveSWUpdate"/>
+          <owl:ObjectProperty rdf:ID="secureBoot"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Thing"/>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="deviceAuthentication"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -324,7 +108,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="resourceIsolation"/>
+          <owl:DatatypeProperty rdf:ID="dataReceivedFromUntrusted"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -342,15 +126,6 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="tamperProtection"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
           <owl:ObjectProperty rdf:ID="antiFuzzing"/>
         </owl:onProperty>
       </owl:Restriction>
@@ -360,25 +135,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="dataReceivedFromUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="saticCodeAnalysis"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="broadcastFromOutsideTB"/>
+          <owl:ObjectProperty rdf:ID="tamperProtection"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -396,7 +153,115 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="auditMessageResponses"/>
+          <owl:DatatypeProperty rdf:ID="wifiFromOutsideTB"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#deviceAuthentication"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="encryptedStorage"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="strongCryptoAlgorithms"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="removeIdentifyingInformation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="insideTrustedBoundary"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="antiJamming"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="XdeviceAuthentication"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="supplyChainSecurity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="ta1_NewProp"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="controlSentToUntrusted"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#secureBoot"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="resourceAvailability"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -414,7 +279,142 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="wifiFromOutsideTB"/>
+          <owl:ObjectProperty rdf:ID="resourceIsolation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="broadcast"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="dataSentToUntrusted"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="canReceiveConfigUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="sessionAuthenticity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="XphysicalAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="hasSensitiveInfo"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="logging"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="inputValidation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="ta1_Deadlock"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="canReceiveSWUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="controlReceivedFromUntrusted"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="antiFlooding"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="systemAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="dosProtection"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="broadcastFromOutsideTB"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -597,7 +597,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destPortType"/>
+          <owl:ObjectProperty rdf:ID="srcPortType"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -615,7 +615,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompCategory"/>
+          <owl:ObjectProperty rdf:ID="destCompType"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -627,7 +627,16 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcCompType"/>
+          <owl:DatatypeProperty rdf:ID="outPort"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="connectionDestination"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -654,24 +663,6 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompType"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="trustedConnection"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="infoFlowSeverity"/>
         </owl:onProperty>
       </owl:Restriction>
@@ -681,7 +672,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompImpl"/>
+          <owl:ObjectProperty rdf:ID="srcCompCategory"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -699,7 +690,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="connectionDestination"/>
+          <owl:ObjectProperty rdf:ID="destCompImpl"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -726,7 +717,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="outPort"/>
+          <owl:DatatypeProperty rdf:ID="trustedConnection"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -735,7 +726,7 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcPortType"/>
+          <owl:ObjectProperty rdf:ID="destCompCategory"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -744,7 +735,16 @@
         <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
         >1</owl:cardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcCompCategory"/>
+          <owl:ObjectProperty rdf:ID="destPortType"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+        >1</owl:cardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="srcCompType"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -765,8 +765,6 @@
     <rdfs:subClassOf rdf:resource="#System"/>
   </owl:Class>
   <owl:ObjectProperty rdf:about="#antiFlooding">
-    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
@@ -783,6 +781,8 @@
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="#systemAccessControl">
+    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
@@ -801,6 +801,8 @@
     <rdfs:range rdf:resource="#Thing"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="#userAuthentication">
+    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
@@ -835,6 +837,8 @@
     <rdfs:range rdf:resource="#System"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="#strongCryptoAlgorithms">
+    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
@@ -863,8 +867,6 @@
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="#antiFuzzing">
-    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
-    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
@@ -967,6 +969,8 @@
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
   <owl:ObjectProperty rdf:about="#sessionAuthenticity">
+    <base:tooltipProp rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >true</base:tooltipProp>
     <rdfs:domain rdf:resource="#System"/>
     <rdfs:range rdf:resource="#ImplProperty"/>
   </owl:ObjectProperty>
