@@ -32,36 +32,25 @@ transform <TEMPDestImpl> to <TEMP2DestImpl> replace .impl$ :
 <DestCompInstance> rdf:type <DestComp>
 <TEMP2DestImpl> rdf:type <DestComp>
 
-
-
 // Sometimes SrcCompInstance is empty but in that case SrcImpl is present.
 // So in rules, I then set srcCompInst to be TEMP2SrcImpl where TEMP2SrcImpl is SrcImpl after stripping off .Impl / .impl
 // Similarly for destCompInstance.
 
-// I also need to make connection name unique; for the moment just concatenating SrcComp 
-// (had trouble with <ConnectionName>_<SrcCompInstance>_<DestCompInstance>)
-// which in general is also not enough
+// I also need to make connection name unique; doing that by concatenating row number of input csv file 
 // ignoring SrcPortType and DestPortType as these were for SOTERIA++
 // ignoring SrcCompCategory and DestCompCategory as they are currently only 'system', eventually we will have 'bus' etc
 // note that I do not have 'system' in my model
-// concatenating with SrcComp as that is present in 1st and 3rd csv file
-<ConnectionName>_<SrcComp> rdf:type Connection
-<ConnectionName>_<SrcComp> connectionName <ConnectionName>
-<ConnectionName>_<SrcComp> srcCompType <SrcComp>
-<ConnectionName>_<SrcComp> srcCompImpl <TEMP2SrcImpl> 
 
-//<ConnectionName>_<SrcComp> srcCompCategory <SrcCompCategory>
-<ConnectionName>_<SrcComp> connectionSource <SrcCompInstance>
-<ConnectionName>_<SrcComp> outPort <SrcPortName>
-//<ConnectionName>_<SrcComp> srcPortType <SrcPortType>
-<ConnectionName>_<SrcComp> destCompType <DestComp>
-<ConnectionName>_<SrcComp> destCompImpl <TEMP2DestImpl> 
-//<ConnectionName>_<SrcComp> destCompCategory <DestCompCategory>
-<ConnectionName>_<SrcComp> connectionDestination <DestCompInstance>
-<ConnectionName>_<SrcComp> inPort <DestPortName>
-//<ConnectionName>_<SrcComp> destPortType <DestPortType>
-
-
+<ConnectionName>row() rdf:type Connection
+<ConnectionName>row() connectionName <ConnectionName>
+<ConnectionName>row() srcCompType <SrcComp>
+<ConnectionName>row() srcCompImpl <TEMP2SrcImpl> 
+<ConnectionName>row() connectionSource <SrcCompInstance>
+<ConnectionName>row() outPort <SrcPortName>
+<ConnectionName>row() destCompType <DestComp>
+<ConnectionName>row() destCompImpl <TEMP2DestImpl> 
+<ConnectionName>row() connectionDestination <DestCompInstance>
+<ConnectionName>row() inPort <DestPortName>
 
 
 
