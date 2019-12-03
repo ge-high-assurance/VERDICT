@@ -247,11 +247,17 @@ public class VDMInstrumentor {
                 not_wkexpr.setNot(wk_expr);
 
                 // Adding weakly assume variables
+
                 ContractItem weakly_assume_item = new ContractItem();
 
                 weakly_assume_item.setName(key + " is not instrumented");
                 weakly_assume_item.setExpression(not_wkexpr);
-                contractSpec.getWeaklyassume().add(weakly_assume_item);
+                // Checking connection before adding assumption
+                HashSet<Connection> empty_connection_check = components_map.get(key);
+
+                if (empty_connection_check.size() > 0) {
+                    contractSpec.getWeaklyassume().add(weakly_assume_item);
+                }
             }
 
             dec_var_const(connection_comp_map);
@@ -320,7 +326,15 @@ public class VDMInstrumentor {
             if (cmpImpl.getBlockImpl() != null) {
                 blockImpl = cmpImpl.getBlockImpl();
                 for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
-                    ComponentType enumType = cmpInstance.getImplementation().getType();
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
                     if (compType.getId().equals(enumType.getId())) {
                         return blockImpl;
                     }
@@ -405,10 +419,11 @@ public class VDMInstrumentor {
             // Declaration global variables for instrumented links.
             List<String> connections = connection_comp_map.get(var);
             SymbolDefinition var_dec = add_vars_assume(var, connections);
-            vars_dec.add(var_dec);
-            //            default_var = var;
 
-            var_links.addAll(connections);
+            if (!connections.isEmpty()) {
+                vars_dec.add(var_dec);
+                var_links.addAll(connections);
+            }
         }
 
         String vars_assumption[] = new String[vars.size()];
@@ -489,7 +504,9 @@ public class VDMInstrumentor {
             var_stack.push(expr);
         }
 
-        var_expr = or_expr(var_stack);
+        if (!var_stack.isEmpty()) {
+            var_expr = or_expr(var_stack);
+        }
 
         if (var_expr == null) {
             var_expr = new Expression();
