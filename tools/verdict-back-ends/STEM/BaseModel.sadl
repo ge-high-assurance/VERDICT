@@ -97,8 +97,8 @@ canReceiveSWUpdate has tooltipProp true.
 canReceiveConfigUpdate has tooltipProp true.
 pedigree has tooltipProp true.
 antiJamming has tooltipProp true.	
-antiFlooding has tooltipProp true.
-antiFuzzing has tooltipProp true.
+//antiFlooding has tooltipProp true.
+//antiFuzzing has tooltipProp true.
 staticCodeAnalysis has tooltipProp true.  
 removeIdentifyingInformation has tooltipProp true.	
 inputValidation has tooltipProp true.
@@ -111,9 +111,13 @@ logging has tooltipProp true.
 secureBoot has tooltipProp true.
 memoryProtection has tooltipProp true.	 	
 resourceAvailability has tooltipProp true.
-resourceIsolation has tooltipProp true.  
-supplyChainSecurity has tooltipProp true.	
+resourceIsolation has tooltipProp true. 
+sessionAuthenticity has tooltipProp true.
+strongCryptoAlgorithms has tooltipProp true. 
+supplyChainSecurity has tooltipProp true.
+systemAccessControl has tooltipProp true.	
 tamperProtection has tooltipProp true.
+userAuthentication has tooltipProp true.
 
 ta1_Deadlock has tooltipProp true.
 ta1_NewProp has tooltipProp true.
