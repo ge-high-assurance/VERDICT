@@ -343,6 +343,7 @@ public class App {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
 
+        // Try to produce the XML file if debugDir is given
         debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
 
         logHeader("VDM2CSV");
