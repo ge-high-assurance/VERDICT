@@ -582,14 +582,11 @@ public
       		
       		guarantee "P3: delivery location for navigation is initialized properly": 
       			isOn => most_recent_delivery_location = probe_delivery_location;
-      			
-      		guarantee "P4: drone is flying only if it did not abort in the recent power cycle": 
-      			 probe_fly_cmd => Agree_Nodes.Since(turned_on, not (probe_abort_mode));
 
-      		guarantee "P5: a command to release a valuable package is issued only if drone has received confirmation from base":
+      		guarantee "P4: a command to release a valuable package is issued only if drone has received confirmation from base":
     			true -> (release_cmd and valuable_package => target_confirmed);
 
-  			guarantee "P6: The drone will always request a confirmation to base before starting delivery of a valuable package":
+  			guarantee "P5: The drone will always request a confirmation to base before starting delivery of a valuable package":
     			true -> (delivery_started and valuable_package => confirmation_requested);
 		**};
 			
