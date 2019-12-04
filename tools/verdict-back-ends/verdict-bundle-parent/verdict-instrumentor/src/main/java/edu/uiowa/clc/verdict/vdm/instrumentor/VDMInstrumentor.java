@@ -243,6 +243,18 @@ public class VDMInstrumentor {
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
+                } else if (threats.contains("NI")) {
+                    // Network Injection Case when no Components are present
+                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
+
+                    cmpID = cmpImpl.getType().getId();
+
+                    blockImpl = retrieve_block(cmpImpl);
+                    String constant = instrument_link(cmpID, connection, blockImpl);
+
+                    global_constants.add(constant);
+
+                    connections_map.put(connection, constant);
                 }
             }
         } else {
@@ -424,9 +436,11 @@ public class VDMInstrumentor {
         return componentImpl;
     }
 
-    protected ComponentImpl retrieve_block(ComponentImpl compImpl) {
+    protected ComponentImpl retrieve_block_impl(ComponentImpl compImpl) {
+
         BlockImpl blockImpl = null;
         String cmpID = compImpl.getType().getId();
+
         for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
             if (cImpl.getBlockImpl() != null) {
                 blockImpl = cImpl.getBlockImpl();
@@ -451,6 +465,35 @@ public class VDMInstrumentor {
             }
         }
         return compImpl;
+    }
+
+    protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+
+        BlockImpl blockImpl = null;
+
+        String cmpID = compImpl.getType().getId();
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (cmpID.equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
     }
 
     protected BlockImpl retrieve_block(ComponentType compType) {
@@ -578,7 +621,7 @@ public class VDMInstrumentor {
         ComponentImpl compImpl = retrieve_main_cmp_impl();
 
         if (compImpl.getBlockImpl() == null) {
-            compImpl = retrieve_block(compImpl);
+            compImpl = retrieve_block_impl(compImpl);
         }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
@@ -618,7 +661,7 @@ public class VDMInstrumentor {
         ComponentImpl compImpl = retrieve_main_cmp_impl();
 
         //        if (compImpl.getBlockImpl() == null) {
-        compImpl = retrieve_block(compImpl);
+        compImpl = retrieve_block_impl(compImpl);
         //        }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
@@ -1322,7 +1365,16 @@ public class VDMInstrumentor {
         // instrument_link(connection);
         //        System.out.println("Instrumented Link ***" + connection.getName());
         // Default Block Implementation
-        ComponentImpl compImpl = retrieve_cmp_impl(compID);
+        ComponentImpl compImpl = null;
+
+        if (compID != null) {
+            compImpl = retrieve_cmp_impl(compID);
+        }
+
+        // Connections without Components Instrumentation.
+        if (compImpl == null) {
+            compImpl = retrieve_main_cmp_impl();
+        }
 
         ComponentType instrumented_cmp = new ComponentType();
 
