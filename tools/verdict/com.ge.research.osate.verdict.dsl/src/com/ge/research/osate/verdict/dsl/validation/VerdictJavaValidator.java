@@ -64,6 +64,7 @@ import com.google.inject.Inject;
 public class VerdictJavaValidator extends PropertiesJavaValidator {
 	@Inject
 	private ResourceDescriptionsProvider indexProvider;
+	Set<SubcomponentType> subcomponents = new HashSet<>();
 
 	// This overridden method is crucial
 	@Override
@@ -169,13 +170,30 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 
 			/*
 			 * A system is a top-level system if it is not a subcomponent
-			 * of any other system (cyber requirements are valid).
+			 * of any other system (cyber/safety requirements are valid).
 			 *
 			 * If it is a subcomponent of another system, then it is a
-			 * subcomponent (cyber relations are valid).
+			 * subcomponent (cyber/safety relations are valid).
 			 */
-			Set<SubcomponentType> subcomponents = new HashSet<>();
+
 			PublicPackageSection pack = (PublicPackageSection) container;
+
+//			for (ModelUnit mu : pack.getImportedUnits()) {
+//				if (mu.getFullName().equalsIgnoreCase("Base_Types")) {
+//					continue;
+//				}
+//				System.out.println("Model unit: " + mu.getFullName());
+//				for (Element e : mu.getOwnedElements()) {
+//					if (e instanceof PublicPackageSectionImpl) {
+//						for (Classifier cls : ((PublicPackageSectionImpl) e).getOwnedClassifiers()) {
+//
+//						}
+//					} else {
+//						System.out.println("********** ((ComponentImplementation)e).getFullName() = "
+//								+ ((ComponentImplementation) e).getFullName());
+//					}
+//				}
+//			}
 			// Find all system impls
 			for (Classifier cls : pack.getOwnedClassifiers()) {
 				if (cls instanceof SystemImplementation) {
@@ -194,9 +212,9 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 			boolean isSubcomponent = subcomponents.contains(currentSystem);
 
 			if (isSubcomponent && !shouldBeSubcomponent) {
-				error(statementType + " not allowed in subcomponent system");
+				warning(statementType + " not allowed in subcomponent system");
 			} else if (!isSubcomponent && shouldBeSubcomponent) {
-				error(statementType + " not allowed in top-level system");
+				warning(statementType + " not allowed in top-level system");
 			}
 
 			if (otherIds.contains(statement.getId())) {

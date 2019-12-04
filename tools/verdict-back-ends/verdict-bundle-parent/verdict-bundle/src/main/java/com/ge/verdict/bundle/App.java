@@ -343,6 +343,7 @@ public class App {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
 
+        // Try to produce the XML file if debugDir is given
         debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
 
         logHeader("VDM2CSV");
@@ -374,12 +375,14 @@ public class App {
                 .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
             throw new VerdictRunException("STEM failed to generate all required files");
         }
+        log("STEM is running. Be patient...");
         log("STEM finished!");
 
         logHeader("Soteria++");
 
         log("Soteria++ input directory: " + stemOutputDir);
         log("Soteria++ output directory: " + soteriaPpOutputDir);
+        log("Soteria++ is running. Be patient...");
 
         try {
             SOTERIA_PP.invoke(
@@ -527,10 +530,11 @@ public class App {
         VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
         lustreOutputer.marshalToLustre(lustreModel, new File(lustrePath));
 
-        logHeader("KIND2");
+        logHeader("Kind2");
 
         log("Running Kind2 model checker");
         log("Output XML file: " + outputPath);
+        log("Kind2 is running. Be patient...");
 
         if (atg) {
             log("Test cases are embedded in XML");
