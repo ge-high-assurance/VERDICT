@@ -96,25 +96,21 @@ public class CRVResultsView extends ViewPart {
 		if (showCompromisedComponents) {
 			TableColumn columnFour = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnFour.setText("Critical Components");
-			columnFour.setImage(getIcon("false.png"));
 			columnsToShow.add(3);
 		}
 		if (showCompromisedLinks) {
 			TableColumn columnFive = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnFive.setText("Critical Links (Ports)");
-			columnFive.setImage(getIcon("false.png"));
 			columnsToShow.add(4);
 		}
 		if (showUncompromisedComponents) {
 			TableColumn columnSix = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnSix.setText("Selected Components");
-			columnSix.setImage(getIcon("fail.png"));
 			columnsToShow.add(5);
 		}
 		if (showUncompromisedLinks) {
 			TableColumn columnSeven = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnSeven.setText("Selected Links (Ports)");
-			columnSeven.setImage(getIcon("fail.png"));
 			columnsToShow.add(6);
 		}
 
