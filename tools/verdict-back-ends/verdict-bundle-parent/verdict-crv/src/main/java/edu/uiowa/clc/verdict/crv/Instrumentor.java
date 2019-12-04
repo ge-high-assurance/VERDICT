@@ -194,7 +194,7 @@ public class Instrumentor extends VDMInstrumentor {
                 // instrument_link(port, blockImpl);
                 if (blockImpl != null) {
                     for (Connection connection : blockImpl.getConnection()) {
-                        if (retrieve_links(connection, port)) {
+                        if (retrieve_links(component, connection, port)) {
                             vdm_links.add(connection);
                             links.add(connection.getName());
                             //                        links.add(get_ports(vdm_links));
