@@ -375,14 +375,14 @@ public class App {
                 .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
             throw new VerdictRunException("STEM failed to generate all required files");
         }
-        log("STEM is running. Be patient...");
+        log("STEM is running. Please be patient...");
         log("STEM finished!");
 
         logHeader("Soteria++");
 
         log("Soteria++ input directory: " + stemOutputDir);
         log("Soteria++ output directory: " + soteriaPpOutputDir);
-        log("Soteria++ is running. Be patient...");
+        log("Soteria++ is running. Please be patient...");
 
         try {
             SOTERIA_PP.invoke(
@@ -534,7 +534,7 @@ public class App {
 
         log("Running Kind2 model checker");
         log("Output XML file: " + outputPath);
-        log("Kind2 is running. Be patient...");
+        log("Kind2 is running. Please be patient...");
 
         if (atg) {
             log("Test cases are embedded in XML");
