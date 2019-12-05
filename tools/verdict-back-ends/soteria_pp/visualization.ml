@@ -55,11 +55,11 @@ Updates: 7/24/2018, Kit Siu, added dot_gen_show_direct_adtree_file and dot_gen_s
    of) red edge(s) is added from that event to the output(s) along which the
    basic event propogates.
    
-   - {b report_gen_cutsets_ad} : This function generates a report with the top-level 
-   likelihood and a list of the cutsets.
+   - {b saveADCutSetsToFile} : This function generates a report with the top-level 
+   likelihood (of success of attack) and a list of the cutsets.
    
-   - {b report_gen_likelihoodCutImp} : This function generates a report with the top-level likelihood, the likelihood 
-   of each cutset, and the cutset list. 
+   - {b saveCutSetsToFile} : This function generates a report with the top-level 
+   probability (of failure) and a list of the cutsets. 
 
    Here is an example of how the above functions can be used to visualize and
    analyze the example library and model given above.
@@ -970,37 +970,16 @@ let rec print_each_csImp l ch =
    | [] -> Out_channel.output_char ch '\n';; 
 
 
-(* This function generates a string of CAPEC attacks *)
-let rec sprint_CAPEC adexp =
-   let andStr = " ^ \n" 
-   and orStr = " v \n" in
-   match adexp with
-   | AVar(comp, event) -> comp ^ ":" ^ event
-   | APro l ->
-     (match l with 
-     | hd::tl -> 
-       (* if len tl = 1, then the ending is the defense *)
-       if List.length tl = 1 then sprint_CAPEC hd 
-       else sprint_CAPEC hd ^ andStr ^ sprint_CAPEC (APro tl)
-     | []  -> "")
-   | ASum l -> 
-     (match l with 
-     | hd::tl -> 
-       (* for Sum, have to see when len tl = 0 *)
-       if List.length tl = 0 then sprint_CAPEC hd 
-       else sprint_CAPEC hd ^ orStr ^ sprint_CAPEC (ASum tl)
-     | []  -> "") ;;
-
 (* This function generates a string representation of the defense profiles *)
 let rec sprint_defenseProfile adexp =
    let andStr = " ^ \n" 
-   and orStr = " v \n" in
+   and orStr = " v " in
    match adexp with
    | AVar(comp, event) -> comp ^ ":" ^ event
    | DPro l -> 
      (match l with 
      | hd::tl -> 
-       if List.length tl = 0 then sprint_defenseProfile hd 
+       if List.length tl = 0 then sprint_defenseProfile hd
        else sprint_defenseProfile hd ^ andStr ^ sprint_defenseProfile (DPro tl)
      | []  -> "")
    | DSum l -> 
@@ -1010,38 +989,54 @@ let rec sprint_defenseProfile adexp =
        else sprint_defenseProfile hd ^ orStr ^ sprint_defenseProfile (DSum tl)
      | []  -> "")
    | ANot form -> "Not(" ^ sprint_defenseProfile form ^ ")"
-   | _ -> "";;
+   | _ -> "" ;; 
 
-let sprint_AProAVar adexp str =
-   let (attackStr, defenseStr) = str in
+
+(* This function generates 2 strings: attackStr, defenseStr *)
+let rec sprint_AProAVar2 adexp str =
+   let andStr = " ^ \n" 
+   and orStr = " v " 
+   and (attackStr, defenseStr) = str in
    match adexp with
+   | AVar (comp, event) -> (comp ^ ":" ^ event, defenseStr)
    | APro l -> 
      (match l with
-     | hd::tl -> (attackStr ^ sprint_CAPEC hd, defenseStr ^ sprint_defenseProfile (List.hd_exn tl))
-     | [] -> (attackStr, defenseStr))
-   | AVar x -> (attackStr ^ sprint_CAPEC (AVar x), defenseStr)
+        | hd::tl -> 
+           (match hd with
+              | AVar(comp, event) -> 
+              		let aStr = (if attackStr = "" then (comp ^ ":" ^ event) else (attackStr ^ andStr ^ comp ^ ":" ^ event)) in
+              		sprint_AProAVar2 (APro tl) (aStr, defenseStr )
+              | DSum l -> 
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DSum l)) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DSum l)))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr )
+              | DPro l -> 
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DPro l)) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DPro l)))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr )
+              | ANot x -> 
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (ANot x)) else (defenseStr ^ andStr ^ (sprint_defenseProfile (ANot x)))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr )
+              | _ -> str)
+        | [] -> (attackStr, defenseStr))
    | _ -> str;;
 
+(* Given the list of cutset from likelihoodCutImp, generates an output to use with PrintBox *)
 let rec sprint_each_csImp l_csImp csArray =
    match l_csImp with
    | hd::tl -> 
       (let (adexp_APro, likelihood, _) = hd in 
-      let (attackStr, defenseStr) = sprint_AProAVar adexp_APro ("","") in
+      let (attackStr, defenseStr) = sprint_AProAVar2 adexp_APro ("","") in
       sprint_each_csImp tl (Array.append csArray [| [| (string_of_float likelihood); attackStr; defenseStr |] |] ) )
    | [] -> csArray ;; 
 
 (* This function generates a string of failure events *)
 let rec sprint_Events pexp =
    let andStr = " ^ \n" 
-   and orStr = " v \n" in
+   and orStr = " v " in
    match pexp with
    | Var(comp, event) -> comp ^ ":" ^ event
    | Pro l ->
      (match l with 
-     | hd::tl -> 
-       (* if len tl = 1, then the ending is the defense *)
-       if List.length tl = 1 then sprint_Events hd 
-       else sprint_Events hd ^ andStr ^ sprint_Events (Pro tl)
+     | hd::tl -> sprint_Events hd ^ andStr ^ sprint_Events (Pro tl)
      | []  -> "")
    | Sum l -> 
      (match l with 
@@ -1053,6 +1048,7 @@ let rec sprint_Events pexp =
    | TRUE  -> "true"
    | FALSE -> "false";;
 
+(* Given the list of cutset from probErrorCutImp, generates an output to use with PrintBox *)
 let rec sprint_each_safety_csImp l_csImp csArray =
    match l_csImp with
    | hd::tl -> 
@@ -1062,44 +1058,8 @@ let rec sprint_each_safety_csImp l_csImp csArray =
      
 (**/**)
 
-(** This function generates a report with the top-level likelihood and a list of the 
-    cutsets. *)
-let report_gen_cutsets_ad adtree file =
-   let ch = Out_channel.create file 
-   and cs = cutsets_ad adtree 
-   and likelihood = likelihoodCut adtree in
-   (Out_channel.output_string ch ("Cut Set Listing file: " ^ file ^ "\n");
-    Out_channel.output_string ch ("Top-level likelihood = " ^ (string_of_float likelihood) ^ "\n");
-    Out_channel.output_char ch '\n';
-    print_each_cs cs ch ;
-    Out_channel.close ch ;
-    )
-;; 
-
-
 (** This function generates a report with the top-level likelihood, the likelihood of 
     each cutset, and the cutset list. The cutset list is printed in a frame. *)
-let report_gen_likelihoodCutImp ?risk:(r="") ?header:(h="") file adtree =
-   let ch = Out_channel.create file 
-   and csImp = likelihoodCutImp adtree 
-   and likelihood = likelihoodCut adtree 
-   and targetString = (if (String.is_empty r) then "\n" else ("Acceptable level of risk must be less than or equal to " ^ r))
-   in
-   (Out_channel.output_string ch (h);
-    Out_channel.output_string ch ("\n");
-    Out_channel.output_string ch ("Calculated likelihood of successful attack = " ^ (string_of_float likelihood) ^ "\n");
-    Out_channel.output_string ch (targetString);
-    Out_channel.output_string ch ("\n");
-    Out_channel.output_string ch ("-----------------------------------------------------------------\n"); 
-    Out_channel.output_string ch ("likelihood | cut sets (component:vulnerability conjunctions that impact the top-level cyber requirement)\n");
-    Out_channel.output_string ch ("-----------------------------------------------------------------\n"); 
-    print_each_csImp csImp ch ;
-    Out_channel.close ch ;
-    )
-;; 
-
-(** This function generates a report with the top-level likelihood, the likelihood of 
-    each cutset, and the cutset list. *)
 let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtree =
    if (Sys.file_exists file = `Yes) then Sys.command_exn("rm " ^ file);
    (* if header file is specified, then copy it as the cutset file *)
@@ -1136,62 +1096,10 @@ let saveCutSetsToFile ?reqID:(cid="") ?risk:(r="") ?header:(h="") file ftree =
    let box = PrintBox.(hlist [ text ("Safety\nReqID: \n" ^ cid); grid_text myArray ]) |> PrintBox.frame
    in
    (Out_channel.output_string ch ("\n");
-    Out_channel.output_string ch ("Calculated probability of successful attack = " ^ (string_of_float probability) ^ "\n");
+    Out_channel.output_string ch ("Calculated probability of failure = " ^ (string_of_float probability) ^ "\n");
     Out_channel.output_string ch (targetString);
     Out_channel.output_string ch ("\n");
     PrintBox_text.output ch box;
-    Out_channel.close ch ;
-    )
-;;
-
-let rec get_comp_name adexpL =
-   match adexpL with
-   | hd::tl -> 
-      (match hd with
-      | AVar (comp, _) -> comp :: get_comp_name tl
-      | APro l         -> get_comp_name l
-      | DPro l         -> get_comp_name l
-      | _              -> get_comp_name tl)
-   | [] -> [];;
-
-let rec find_comp_above_risk l risk compList =
-   match l with
-   | hd::tl -> let (adexp, likelihood, _) = hd in
-      (if likelihood > risk then ( find_comp_above_risk tl risk (List.append (get_comp_name [adexp]) compList) )
-       else find_comp_above_risk tl risk compList) 
-   | [] -> List.dedup compare compList ;; 
-   
-let rec print_each_component compList ch =
-   match compList with
-   | hd::tl -> Out_channel.output_string ch (hd ^ ",\n"); print_each_component tl ch;
-   | []     -> Out_channel.output_char ch '\n';; 
-
-
-(** This function generates a csv file with only the components from the cut set list that
-    are at or above the risk level *)
-let csv_gen_likelihoodCutImp ?risk:(r="") file adtree =
-   let ch = Out_channel.create file 
-   and csImp = likelihoodCutImp adtree in
-   let risk = (if String.is_empty r then 1. else float_of_string r) in
-   let compList = find_comp_above_risk csImp risk []
-   in
-   (Out_channel.output_string ch "Component,\n";
-    print_each_component compList ch ;
-    Out_channel.close ch;
-    )
-;;
-
-(** This function generates a csv file with the following fields 
-    CyberReq, likelihood, risk *)
-let csv_gen_forUserOutput ?risk:(r="") cyberReq file adtree =
-   let ch = Out_channel.create file 
-   and likelihood = likelihoodCut adtree 
-   in
-   (Out_channel.output_string ch ("CyberReq, Calculated, Acceptable,\n");
-    Out_channel.output_string ch (cyberReq ^ ", ");
-    Out_channel.output_string ch ((string_of_float likelihood) ^ ", ");
-    Out_channel.output_string ch (r ^ ", ");
-    Out_channel.output_string ch ("\n");
     Out_channel.close ch ;
     )
 ;;

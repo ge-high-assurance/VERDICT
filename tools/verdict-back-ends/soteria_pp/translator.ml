@@ -39,7 +39,8 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
 	# let deftype = "ApplicableDefenseProperties";;
 	#
 	# let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense;;
-	# let ((reqIDStr, defenseTypeStr), (lib,mdl)) = List.hd_exn l_librariesThreats;;
+    # let (missionReqIDStr, holdme) = List.hd_exn l_librariesThreats;;
+    # let ((reqIDStr,defenseTypeStr), (lib,mdl)) = List.hd_exn holdme;;
 	# 
 	# checkLibrary lib;;
 	# checkModel lib mdl;;
@@ -56,6 +57,8 @@ open Validation ;;
 open TreeSynthesis ;;
 open Visualization ;;
 open TranslatorPrint ;;
+
+exception Error_csv2soteria of string ;;
 
 let noEmptyList l = List.filter l ~f:(fun x->x<>[]);;
 let listgen_aux list = List.map list ~f:(fun x-> String.filter  x ~f:(fun x-> x<>'\"'));;
@@ -293,7 +296,7 @@ let rec passOnlyAllowed l_formulas allowedList =
                                    else passOnlyAllowed tl allowedList
                      | A[e;cia] -> if (List.exists allowedList ~f:(fun x -> x=e)) then A[e;cia] :: (passOnlyAllowed tl allowedList)
                                    else passOnlyAllowed tl allowedList
-                     | _ -> raise (Error "passOnlyAllowed exception") )
+                     | _ -> raise (Error_csv2soteria "passOnlyAllowed exception") )
      | [] -> [];;
 
 let formulaSafe_And listElement cinputs cevents =
@@ -496,7 +499,7 @@ let conjuncAtckFltList l rType =
 	match rType with
 	  "Cyber" -> And (makeAttackList l)
 	| "Safety" -> And (makeFaultList l) 
-	| _ -> raise (Error "conjuncAtckFltList exception");;
+	| _ -> raise (Error_csv2soteria "conjuncAtckFltList exception");;
 
 let listConjuncAtckFltList str1 str2 rType =
 	let split_str1 = String.split_on_chars str1 ~on:[';'] 
@@ -506,9 +509,12 @@ let listConjuncAtckFltList str1 str2 rType =
 let compOut_InMission name cia l_mission =
 	let missionImpact_list = compMissionCIA name cia l_mission in
 	let outputs_list = List.map missionImpact_list ~f:(fun x -> List.Assoc.find_exn x compOutputDependency_M ~equal:(=)) in
-	let outputscia_list = List.map missionImpact_list ~f:(fun x -> List.Assoc.find_exn x cia_M ~equal:(=)) in
-	let rType = compReqType name l_mission in
-	List.map2_exn outputs_list outputscia_list ~f:(fun outputStr ciaStr -> listConjuncAtckFltList outputStr ciaStr rType);;
+	(* Raise an error if outputs_list is empty, because then there's nothing to analyze. *)
+    match outputs_list with
+        [""] -> raise (Error_csv2soteria "compOut_InMission exception: no output to analyze")
+       | _ -> (let outputscia_list = List.map missionImpact_list ~f:(fun x -> List.Assoc.find_exn x cia_M ~equal:(=)) in
+	           let rType = compReqType name l_mission in
+	           List.map2_exn outputs_list outputscia_list ~f:(fun outputStr ciaStr -> listConjuncAtckFltList outputStr ciaStr rType) );;
 
 let compAtckFltMission name cia l_mission =
 	let missionImpact_list = compMissionCIA name cia l_mission in
@@ -667,7 +673,7 @@ let gen_model reqId l_arch l_mission =
 	    match rType with
     	| "Cyber" -> (("", F["";""]),(topAttack reqId l_mission))
     	| "Safety" -> ((topFault reqId l_mission), ("", A["";""]))
-    	| _ -> raise (Error "gen_model exception: req is neither CyberReq nor SafetyReq") 
+    	| _ -> raise (Error_csv2soteria "gen_model exception: req is neither CyberReq nor SafetyReq") 
     in
 	genModel (instances reqId l_arch) (connections reqId l_arch l_mission) fault attack;;
  
@@ -678,7 +684,7 @@ let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_d
     match rType with
     | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
     | "Safety" -> List.append components [gen_CompSafety reqId l_mission]
-    | _ -> raise (Error "gen_library exception: req is neither CyberReq nor SafetyReq");;
+    | _ -> raise (Error_csv2soteria "gen_library exception: req is neither CyberReq nor SafetyReq");;
 
 
 (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
@@ -859,7 +865,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
                   saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
                   (* tree visualizations *)    
                   dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
-               | _ -> raise (Error "analyze exception: req is neither CyberReq nor SafetyReq");)
+               | _ -> raise (Error_csv2soteria "analyze exception: req is neither CyberReq nor SafetyReq");)
 
       );
     fprintf xml_oc "</Mission>\n";
