@@ -592,15 +592,15 @@ public
 			
 		annex verdict{**
 			CyberReq {
-			id = "MissionReq01"
+			id = "CyberReq01"
 			description = "The drone shall be resilient to loss of ability to deliver a package to 
 			              the appropriate consumer location"
 			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
 			cia = I
 			severity = Hazardous
-		};
+		    	};
 			CyberReq {
-			id = "MissionReq02"
+			id = "CyberReq02"
 			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
 			condition = delivery_status:I 
 			cia = I
@@ -609,11 +609,15 @@ public
 			SafetyReq {
 			id = "SafetyReq01" 
 			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
-		    };	
+		    	};	
 			SafetyReq {
 			id = "SafetyReq02" 
 			condition = actuation_out:I and actuation_out:A 
-		    };	
+		    	};	
+		    	MissionReq {
+		    	id ="MReq01"
+		    	cyberReqs = "CyberReq01","CyberReq02"
+		    	};
 		**};
 	end DeliveryDroneSystem;
 	
