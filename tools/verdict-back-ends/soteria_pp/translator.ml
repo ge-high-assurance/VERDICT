@@ -811,6 +811,36 @@ let get_CyberReqText_Risk mission_al cyberReqID =
        List.Assoc.find_exn al ~equal:(=) req_M, 
        severity2risk (List.Assoc.find_exn al ~equal:(=) severity_M) ) ;;
        
+(* *)
+let rec extractCyberReq l_libmdl l_mission = 
+   match l_libmdl with
+      | hd::tl -> let ((reqIDStr, defenseTypeStr), (lib,mdl)) = hd in
+                  let rType = compReqType reqIDStr l_mission in
+          	         (match rType with  
+          	         | "Cyber" -> hd :: extractCyberReq tl l_mission
+          	         | _ -> extractCyberReq tl l_mission)
+      | [] -> [];;
+
+let rec extractSafetyReq l_libmdl l_mission = 
+   match l_libmdl with
+      | hd::tl -> let ((reqIDStr, defenseTypeStr), (lib,mdl)) = hd in
+                  let rType = compReqType reqIDStr l_mission in
+          	         (match rType with  
+          	         | "Safety" -> hd :: extractSafetyReq tl l_mission
+          	         | _ -> extractSafetyReq tl l_mission)
+      | [] -> [];;
+
+let rec removeMissionsWithNoReq l_librariesThreats =
+   match l_librariesThreats with
+     | hd::tl -> let (_, l_libmdl) = hd in
+         (match l_libmdl with
+         | [] -> removeMissionsWithNoReq tl
+         | _  -> hd::removeMissionsWithNoReq tl)
+     | [] -> [];;
+
+(* *)
+
+       
 (* Analyze function - calls model_to_adtree and generates the artifacts *)
 let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath =
    let compDepen =  mainListtag comp_dep_ch  
@@ -822,6 +852,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    and defense = mainListtag defense_ch 
    and defense2nist = mainListtag defense2nist_ch
    and xml_oc = Out_channel.create (fpath^deftype^".xml")  
+   and xml_safety_oc = Out_channel.create (fpath^deftype^"-safety.xml")  
    in
 
    (* check if there's anything to analyze *)
@@ -831,52 +862,86 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
    let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist
 
    in
+   
+   (* separate into a lists based on Cyber reqs and Safety reqs, because they will be handled differently *)
+   let l_librariesThreats_Cyber = 
+      removeMissionsWithNoReq (
+      List.map l_librariesThreats ~f:(fun mID -> let (missionReqIdStr, l_libmdl) = mID in
+            (missionReqIdStr, extractCyberReq l_libmdl mission) ) )
+   and l_librariesThreats_Safety = 
+      removeMissionsWithNoReq (
+      List.map l_librariesThreats ~f:(fun mID -> let (missionReqIdStr, l_libmdl) = mID in
+            (missionReqIdStr, extractSafetyReq l_libmdl mission) ) )
 
+   in
+
+   (* [CYBER] iterate through the list of Cyber reqs *)
    (* start the xml formatted results file *)
    fprintf xml_oc "<?xml version=\"1.0\"?>\n";
    fprintf xml_oc "<Results xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
 
-   (* iterate through the list of mission IDs *)
-   List.iter l_librariesThreats ~f:(fun mID -> 
+   List.iter l_librariesThreats_Cyber ~f:(fun mID -> 
       let (missionReqIdStr, l_libmdl) = mID in
+      (* iterate through the list of Cyber requirements under each mission ID *)
       fprintf xml_oc "<Mission label=  \"%s\">\n" missionReqIdStr;
-
-      (* iterate through the list of requirements under each mission ID *)
       List.iter l_libmdl ~f:(fun x -> 
-         (let ((reqIDStr, defenseTypeStr), (lib,mdl)) = x in
+         (let ((reqIDStr, defenseTypeStr), (lib, mdl)) = x in
+            let t = model_to_adtree lib mdl 
             (* -- extract some text info -- *)
-            let (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
-            (* -- save .ml file of the lib and mdl for reference -- *)    
-            saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
-            (* -- determine whether to perform cyber or safety analysis -- *)
-            let rType = compReqType reqIDStr mission in
-          	   match rType with
-         	   | "Cyber" -> let t = model_to_adtree lib mdl in
-                  (* cutset metric file, in printbox format *)    
-                  saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
-                  (* tree visualizations *)    
-                  dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
-                  (*.xml file *)
-                  fprintf xml_oc "\t<Requirement label=  \"%s\" " reqIDStr;
-                  xml_gen xml_oc reqIDStr defenseTypeStr t mission;
-                  fprintf xml_oc "\t</Requirement> \n";
-    	       | "Safety" -> let t = model_to_ftree lib mdl in
-                  (* cutset metric file, in printbox format *)    
-                  saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
-                  (* tree visualizations *)    
-                  dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
-               | _ -> raise (Error_csv2soteria "analyze exception: req is neither CyberReq nor SafetyReq");)
-
+            and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
+            (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
+            (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ; *)
+            (* -- cutset metric file, in printbox format -- *)    
+            saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
+            (* -- save .svg tree visualizations -- *)    
+            dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
+            (* -- print requirement info into .xml file -- *)
+            fprintf xml_oc "\t<Requirement label=  \"%s\" " reqIDStr;
+            xml_gen xml_oc reqIDStr defenseTypeStr t mission;
+            fprintf xml_oc "\t</Requirement> \n";
+         )
       );
-    fprintf xml_oc "</Mission>\n";
-    );
-    (* complete and close the xml file  *)
-    fprintf xml_oc "</Results>\n";
-    Out_channel.close xml_oc    
+      fprintf xml_oc "</Mission>\n";
+   );
+   (* complete and close the xml file  *)
+   fprintf xml_oc "</Results>\n";
+   Out_channel.close xml_oc;    
+            
+   (* [SAFETY] iterate through the list of Safety reqs *)
+   (* start the xml formatted results file *)
+   fprintf xml_safety_oc "<?xml version=\"1.0\"?>\n";
+   fprintf xml_safety_oc "<Results xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
+
+   List.iter l_librariesThreats_Safety ~f:(fun mID -> 
+      let (missionReqIdStr, l_libmdl) = mID in
+      (* iterate through the list of Safety requirements under each mission ID *)
+      fprintf xml_safety_oc "<Mission label=  \"%s\">\n" missionReqIdStr;
+      List.iter l_libmdl ~f:(fun x -> 
+         (let ((reqIDStr, defenseTypeStr), (lib, mdl)) = x in
+            let t = model_to_ftree lib mdl
+            (* -- extract some text info -- *)
+            and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
+            (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
+            (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ; *)
+            (* -- cutset metric file, in printbox format -- *)    
+            saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
+            (* -- save .svg tree visualizations -- *)    
+            dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
+            (* -- print requirement info into .xml file -- *)
+            fprintf xml_safety_oc "\t<Requirement label=  \"%s\" " reqIDStr;
+            (* xml_safety_gen xml_safety_oc reqIDStr defenseTypeStr t mission; <-- function goes here when done *)
+            fprintf xml_safety_oc "\t</Requirement> \n";
+         )
+      );
+      fprintf xml_safety_oc "</Mission>\n";
+   );
+   (* complete and close the xml file  *)
+   fprintf xml_safety_oc "</Results>\n";
+   Out_channel.close xml_safety_oc; 
+
 ;;
 
-(* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
-
+(* this function iterates through the following: ApplicableDefenseProperties and ImplProperties*)
 let do_arch_analysis comp_dep comp_saf attack events arch mission defense defense2nist fpath =
   List.iter [applProps_D; implProps_D] ~f:(fun x-> analyze x comp_dep comp_saf attack events arch mission defense defense2nist fpath);  
 ;;
