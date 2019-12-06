@@ -291,8 +291,8 @@ public class VerdictUtil {
 	 * @param obj
 	 * @return
 	 */
-	public static Set<String> getCyberReqs(EObject obj) {
-		Set<String> cyberReqs = new LinkedHashSet<>();
+	public static Set<String> getAllReqs(EObject obj) {
+		Set<String> reqs = new LinkedHashSet<>();
 
 		// Find public package section
 		EObject container = obj;
@@ -314,7 +314,9 @@ public class VerdictUtil {
 							// Get all cyber req IDs
 							for (Statement statement : subclause.getElements()) {
 								if (statement instanceof CyberReq) {
-									cyberReqs.add(statement.getId());
+									reqs.add(statement.getId());
+								} else if (statement instanceof SafetyReq) {
+									reqs.add(statement.getId());
 								}
 							}
 						}
@@ -323,7 +325,7 @@ public class VerdictUtil {
 			}
 		}
 
-		return cyberReqs;
+		return reqs;
 	}
 
 	/**
