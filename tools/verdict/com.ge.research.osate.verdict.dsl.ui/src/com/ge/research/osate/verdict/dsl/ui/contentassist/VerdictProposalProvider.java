@@ -86,7 +86,7 @@ public class VerdictProposalProvider extends AbstractVerdictProposalProvider {
 		// Available cyber requirements
 
 		if (model != null) {
-			Set<String> cyberReqs = VerdictUtil.getCyberReqs(model);
+			Set<String> cyberReqs = VerdictUtil.getAllReqs(model);
 			for (String req : cyberReqs) {
 				acceptor.accept(createCompletionProposal("\"" + req + "\"", context));
 			}

@@ -163,7 +163,7 @@ class VerdictFormatter extends PropertiesFormatter {
 		
 		// "id", etc.
 		mission.regionFor.keyword(cyberMissionBlockAccess.idKeyword_1_0_0).prepend[setSpace(NEWLINE_INDENT)]
-		mission.regionFor.keyword(cyberMissionBlockAccess.cyberReqsKeyword_1_1_0).prepend[setSpace(NEWLINE_INDENT)]
+		mission.regionFor.keyword(cyberMissionBlockAccess.reqsKeyword_1_1_0).prepend[setSpace(NEWLINE_INDENT)]
 		mission.regionFor.keyword(cyberMissionBlockAccess.commentKeyword_1_3_0).prepend[setSpace(NEWLINE_INDENT)]
 		mission.regionFor.keyword(cyberMissionBlockAccess.descriptionKeyword_1_2_0).prepend[setSpace(NEWLINE_INDENT)]
 		

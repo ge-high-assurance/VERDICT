@@ -242,7 +242,7 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 	 */
 	private void checkMission(CyberMission mission) {
 		// Get all cyber reqs defined
-		Set<String> cyberReqs = VerdictUtil.getCyberReqs(mission);
+		Set<String> allReqs = VerdictUtil.getAllReqs(mission);
 
 		// Count reqs to check for duplicates
 		Map<String, Integer> reqCounts = new HashMap<>();
@@ -256,10 +256,10 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 
 		int pos = 0;
 		for (String req : mission.getCyberReqs()) {
-			if (!cyberReqs.contains(req)) {
-				error("Undefined cyber requirement: " + req, VerdictPackage.Literals.CYBER_MISSION__CYBER_REQS, pos);
+			if (!allReqs.contains(req)) {
+				error("Undefined requirement: " + req, VerdictPackage.Literals.CYBER_MISSION__CYBER_REQS, pos);
 			} else if (reqCounts.get(req) > 1) {
-				warning("Duplicate cyber requirement: " + req, VerdictPackage.Literals.CYBER_MISSION__CYBER_REQS, pos);
+				warning("Duplicate requirement: " + req, VerdictPackage.Literals.CYBER_MISSION__CYBER_REQS, pos);
 			}
 			pos++;
 		}
