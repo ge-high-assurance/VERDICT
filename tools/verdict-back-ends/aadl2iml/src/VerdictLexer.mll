@@ -52,7 +52,7 @@ rule token = parse
   | "assumptions" { P.ASSUMPTIONS }
   | "reference" { P.REFERENCE }
   | "threats" { P.THREATS }
-  | "cyberReqs" { P.CYBER_REQS }
+  | "reqs" { P.CYBER_REQS }
   | "C" | "Confidentiality" { P.CIA_C }
   | "I" | "Integrity" { P.CIA_I }
   | "A" | "Availability" { P.CIA_A }
