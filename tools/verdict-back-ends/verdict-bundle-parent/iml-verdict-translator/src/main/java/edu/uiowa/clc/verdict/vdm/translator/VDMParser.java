@@ -536,6 +536,11 @@ public class VDMParser extends Parser {
             if (type == Type.BOOL_Lit) {
                 return boolExpr();
             }
+            if (type == Type.NEG) {
+                Expression neg_expr = expression();
+                expression.setNegative(neg_expr);
+                return expression;
+            }
             if (type == Type.NOT) {
                 Expression not_expr = expression();
                 expression.setNot(not_expr);

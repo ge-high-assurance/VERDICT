@@ -339,6 +339,9 @@ public enum Type {
     ARROW("Arrow"),
     IMPLIES("Implies"),
     PLUS("Plus"),
+
+    NEG("Negative"),
+
     MINUS("Minus"),
     TIMES("Times"),
     DIV("Div"),
