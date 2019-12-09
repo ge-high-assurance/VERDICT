@@ -180,19 +180,19 @@ public
 			radio_cmd: out data port Base_Types::Boolean;
 			delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
 			dest_location: out data port Data_Types::Position.impl;
-			bus_out: out data port Base_Types::Boolean; -- not used
+			bus_out: out data port Base_Types::Boolean;
 	        nav_cmd: out data port Base_Types::Boolean;					
 			camera: out data port Base_Types::Boolean;
 			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
 			{ VERDICT_Properties::probe => true; };
-			constellation: out data port Data_Types::Constellation; -- added
-			launch_pos: out data port Data_Types::Position.impl; -- added
+			constellation: out data port Data_Types::Constellation; 
+			launch_pos: out data port Data_Types::Position.impl;
 			probe_init_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; -- added
+			{ VERDICT_Properties::probe => true; }; 
 			probe_abort_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; -- added
-			target_clear: out data port Base_Types::Boolean; -- added
-			valid_marker: out data port Base_Types::Boolean; -- added
+			{ VERDICT_Properties::probe => true; }; 
+			target_clear: out data port Base_Types::Boolean;
+			valid_marker: out data port Base_Types::Boolean;
 						
 		annex agree {**
 			-- variables
@@ -204,8 +204,8 @@ public
 			eq dest_position: Data_Types::Position.impl = dest_location;
 			eq expensive_item: bool = recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
 			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
-			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD); -- Correct?
-			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES); -- Correct?
+			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD);
+			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES);
 			eq delivery_failed: bool = (delivery_status = Agree_Constants.FAILED_STATUS);
 			eq delivery_completed: bool = (delivery_status = Agree_Constants.COMPLETED_STATUS);
 			eq is_safe_landing: bool = (target_clear and valid_marker);
@@ -454,7 +454,7 @@ public
 			CyberRel "camera_out_A" = camera_in:A => camera_out:A;
 			Event {
 				id = "loa_event"
-				probability = 1.0e-5
+				probability = 1.0e-8
 				comment = "loss of availability of the Camera"
 				description = "LOA"
 			}
@@ -486,7 +486,7 @@ public
             CyberRel "bus_out_A" = bus_in:A => bus_out:A;
             Event {
                    id = "loa_event"
-                   probability = 1.0e-5
+                   probability = 1.0e-6
                    comment = "loss of availability of the connector"
                    description = "LOA"
                   }
@@ -628,39 +628,57 @@ public
 			
 			radio: system Radio
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
 				VERDICT_Properties::physicalAccessControlDAL => 7;
 				VERDICT_Properties::systemAccessControl => true;
 				VERDICT_Properties::systemAccessControlDAL => 7;
-
 				VERDICT_Properties::secureBoot => true;
 				VERDICT_Properties::secureBootDAL => 7;
 				VERDICT_Properties::memoryProtection => true;
 				VERDICT_Properties::memoryProtectionDAL => 7;
+				VERDICT_Properties::staticCodeAnalysis => true;
+				VERDICT_Properties::staticCodeAnalysisDAL => 7;
+				VERDICT_Properties::resourceAvailability => true;
+				VERDICT_Properties::resourceAvailabilityDAL => 7;
+				VERDICT_Properties::antiJamming => true;
+				VERDICT_Properties::antiJammingDAL => 7;
+				VERDICT_Properties::dosProtection => true;
+				VERDICT_Properties::dosProtectionDAL => 7;
+				VERDICT_Properties::deviceAuthentication => true;
+				VERDICT_Properties::deviceAuthenticationDAL => 7;
+				VERDICT_Properties::inputValidation => true;
+				VERDICT_Properties::inputValidationDAL => 7;
+				VERDICT_Properties::sessionAuthenticity => true;
+				VERDICT_Properties::sessionAuthenticityDAL => 7;
+				VERDICT_Properties::strongCryptoAlgorithms => true;
+				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;
+				
+							
 			};
 			positionEstimator: system PositionEstimator
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
-				
-				-- CRV Properties
+		
 				VERDICT_Properties::manufacturer => ThirdParty;
 			 	--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
 			 	VERDICT_Properties::adversariallyTested => false;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -675,14 +693,14 @@ public
 			};
 			navigation: system Navigation
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -697,14 +715,14 @@ public
 			};
 			fc: system FlightControl
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -719,13 +737,13 @@ public
 			};
 			actuation: system Actuation
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -735,18 +753,19 @@ public
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
-			 	-- System Properties
+			 	-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
 				
-				-- CRV Properties
 				VERDICT_Properties::manufacturer => ThirdParty;
 				--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
 			
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -758,16 +777,32 @@ public
 				VERDICT_Properties::secureBootDAL => 7;
 				VERDICT_Properties::memoryProtection => true;
 				VERDICT_Properties::memoryProtectionDAL => 7;	
+				VERDICT_Properties::staticCodeAnalysis => true;
+				VERDICT_Properties::staticCodeAnalysisDAL => 7;
+				VERDICT_Properties::resourceAvailability => true;
+				VERDICT_Properties::resourceAvailabilityDAL => 7;
+				VERDICT_Properties::antiJamming => true;
+				VERDICT_Properties::antiJammingDAL => 7;
+				VERDICT_Properties::dosProtection => true;
+				VERDICT_Properties::dosProtectionDAL => 7;
+				VERDICT_Properties::deviceAuthentication => true;
+				VERDICT_Properties::deviceAuthenticationDAL => 7;
+				VERDICT_Properties::inputValidation => true;
+				VERDICT_Properties::inputValidationDAL => 7;
+				VERDICT_Properties::sessionAuthenticity => true;
+				VERDICT_Properties::sessionAuthenticityDAL => 7;
+				VERDICT_Properties::strongCryptoAlgorithms => true;
+				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -778,13 +813,13 @@ public
 			};
 			camera: system Camera
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::hasSensitiveInfo => true;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
@@ -795,11 +830,10 @@ public
 			
 			connector: system Connector
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 			 	VERDICT_Properties::componentType => Hybrid;
 			 	
-			 	--CRV Properties
 			 	VERDICT_Properties::manufacturer => ThirdParty;
 			 	VERDICT_Properties::adversariallyTested => false;
 			};

@@ -3,10 +3,8 @@ package GNC
 public
 	with Base_Types;
     with Data_Types;
-    with Agree_Constants;
     with Agree_Nodes;
-    with Agree_Constants;
-	with VERDICT_Properties;
+    with VERDICT_Properties;
 
 	system GPS
 		features
@@ -66,7 +64,6 @@ public
 			probe_launch_pos: out data port Data_Types::Position.impl
 			{ VERDICT_Properties::probe => true; };
 		
-		-- TODO: High-level specification is needed?
 		annex agree {**
 			-- probe
 			guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
@@ -117,37 +114,52 @@ public
 		subcomponents
 			gps: system GPS
 			{
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with trustedConnection for c12 and c34 to false
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => COTS;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
 				
-				-- CRV Properties
-				--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
+				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
 				VERDICT_Properties::manufacturer => ThirdParty;	
 				VERDICT_Properties::adversariallyTested => false;
 
-                -- Mitigations
+                -- VERDICT Cyber Defenses & DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
 				VERDICT_Properties::physicalAccessControlDAL => 7;
 				VERDICT_Properties::systemAccessControl => true;
 				VERDICT_Properties::systemAccessControlDAL => 7;
-			
 				VERDICT_Properties::secureBoot => true;
 				VERDICT_Properties::secureBootDAL => 7;
 				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;																
+				VERDICT_Properties::memoryProtectionDAL => 7;
+				VERDICT_Properties::staticCodeAnalysis => true;
+				VERDICT_Properties::staticCodeAnalysisDAL => 7;
+				VERDICT_Properties::resourceAvailability => true;
+				VERDICT_Properties::resourceAvailabilityDAL => 7;
+				VERDICT_Properties::antiJamming => true;
+				VERDICT_Properties::antiJammingDAL => 7;
+				VERDICT_Properties::dosProtection => true;
+				VERDICT_Properties::dosProtectionDAL => 7;
+				VERDICT_Properties::deviceAuthentication => true;
+				VERDICT_Properties::deviceAuthenticationDAL => 7;
+				VERDICT_Properties::inputValidation => true;
+				VERDICT_Properties::inputValidationDAL => 7;
+				VERDICT_Properties::sessionAuthenticity => true;
+				VERDICT_Properties::sessionAuthenticityDAL => 7;
+				VERDICT_Properties::strongCryptoAlgorithms => true;
+				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;																
 			};
 			imu: system IMU
 			{ 
-				-- System Properties
+				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => Sourced;
 				
-				-- Mitigations
+				-- VERDICT Cyber Defenses & DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
 				VERDICT_Properties::supplyChainSecurityDAL => 7;
 				VERDICT_Properties::physicalAccessControl => true;
