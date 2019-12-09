@@ -143,6 +143,16 @@ public class VDMInstrumentor {
 
     //    protected String getComponentImpl(String componentID, Connection con) {}
 
+    protected boolean isSourceComponent(Connection con) {
+        if (con != null) {
+            ConnectionEnd src = con.getSource();
+            if (src.getSubcomponentPort() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void retrieve_component_and_channels(
             Model vdm_model,
             List<String> threats,
@@ -152,10 +162,6 @@ public class VDMInstrumentor {
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
 
-        if (threats.contains("NI")) {
-            System.out.println("Network Injection Instrumentation");
-            networkInjection(vdm_links);
-        }
         if (threats.contains("LS")) {
             System.out.println("Location Spoofing Instrumentation");
             locationSpoofing(vdm_components);
@@ -184,6 +190,22 @@ public class VDMInstrumentor {
             System.out.println("Hardware Trojans");
             hardwareTrojan(vdm_components);
         }
+
+        if (threats.contains("NI")) {
+            System.out.println("Network Injection Instrumentation");
+            networkInjection(vdm_links);
+
+            // Snoozing option for component level.
+            if (component_level & vdm_components.size() > 0) {
+                for (Connection con : vdm_links) {
+                    if (isSourceComponent(con)) {
+                        //
+                        vdm_links.remove(con);
+                    }
+                }
+            }
+        }
+
         if (threats.contains("BG")) {
             System.out.println("Benign");
             vdm_components.clear();
@@ -200,10 +222,11 @@ public class VDMInstrumentor {
                 new HashMap<String, HashSet<Connection>>();
 
         if (vdm_components.size() > 0) {
-            System.out.println("Selected Components:");
+            //            System.out.println("Selected Components:");
 
             for (ComponentType component : vdm_components) {
-                System.out.println("(" + component_index++ + ") " + component.getId());
+                //                System.out.println("(" + component_index++ + ") " +
+                // component.getId());
 
                 //                if (blockImpl == null) {
                 blockImpl = retrieve_block(component);
@@ -215,9 +238,10 @@ public class VDMInstrumentor {
                 components_map.put(component.getId(), vdm_cmp_links);
                 // if (component.getName().equals("GPS")) {}
             }
-        } else {
-            System.out.println("No Component found!");
         }
+        //        else {
+        //           System.out.println("No Component found!");
+        //        }
 
         int connection_index = 1;
 
@@ -227,10 +251,11 @@ public class VDMInstrumentor {
 
         if (vdm_links.size() > 0) {
 
-            System.out.println("Selected Links:");
+            //            System.out.println("Selected Links:");
 
             for (Connection connection : vdm_links) {
-                System.out.println("(" + connection_index++ + ") " + connection.getName());
+                //                System.out.println("(" + connection_index++ + ") " +
+                // connection.getName());
                 // instrument_link(connection, blockImpl);
 
                 String cmpID = getComponentID(components_map, connection);
@@ -257,9 +282,9 @@ public class VDMInstrumentor {
                     connections_map.put(connection, constant);
                 }
             }
-        } else {
-            System.out.println("No Links found!");
-        }
+        } // else {
+        //            System.out.println("No Links found!");
+        //        }
 
         // Declare Global Constants
         for (String comp_id : global_constants) {
