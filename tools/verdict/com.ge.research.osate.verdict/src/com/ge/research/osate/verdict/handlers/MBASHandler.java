@@ -112,7 +112,7 @@ public class MBASHandler extends AbstractHandler {
 									new MBASReportGenerator(applicableDefense.getAbsolutePath(),
 											implProperty.getAbsolutePath(), iWindow);
 								} else {
-									System.err.println("Error: No Soteria++ output generated!");
+									System.err.println("Info: No Soteria++ output generated!");
 								}
 							});
 							// Display safety related text.

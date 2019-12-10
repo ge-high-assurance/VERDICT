@@ -66,36 +66,49 @@ public class VerdictStem {
             srvr.loadCsvData(
                     connCsv.toUri().toString(), csvIncludesHeader, connTemplate.toUri().toString());
 
-            ResultSet rs = srvr.query("http://sadl.org/STEM/Queries#Defenses2NIST");
+            // Create output and graph directories
             outputDir.mkdirs();
-            Files.write(
-                    defenses2NistCsv,
-                    rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
+            graphsDir.mkdirs();
+
+            ResultSet rs = srvr.query("http://sadl.org/STEM/Queries#Defenses2NIST");
+            if (rs != null) {
+                Files.write(
+                        defenses2NistCsv,
+                        rs.toString()
+                                .replaceAll(anyNamespace, "")
+                                .getBytes(StandardCharsets.UTF_8));
+            }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#CAPEC");
-            outputDir.mkdirs();
-            Files.write(
-                    capecCsv,
-                    rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
+            if (rs != null) {
+                Files.write(
+                        capecCsv,
+                        rs.toString()
+                                .replaceAll(anyNamespace, "")
+                                .getBytes(StandardCharsets.UTF_8));
+            }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#Defenses");
-            outputDir.mkdirs();
-            Files.write(
-                    defensesCsv,
-                    rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
+            if (rs != null) {
+                Files.write(
+                        defensesCsv,
+                        rs.toString()
+                                .replaceAll(anyNamespace, "")
+                                .getBytes(StandardCharsets.UTF_8));
+            }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#STEMgraph");
-            graphsDir.mkdirs();
-            GraphVizVisualizer visualizer = new GraphVizVisualizer();
-            visualizer.initialize(
-                    graphsDir.getPath(),
-                    graphName,
-                    graphName,
-                    null,
-                    Orientation.TD,
-                    "Cmd 13  (Graph)");
-            visualizer.graphResultSetData(rs);
-            LOGGER.info("Run finished");
+            if (rs != null) {
+                GraphVizVisualizer visualizer = new GraphVizVisualizer();
+                visualizer.initialize(
+                        graphsDir.getPath(),
+                        graphName,
+                        graphName,
+                        null,
+                        Orientation.TD,
+                        "Cmd 13  (Graph)");
+                visualizer.graphResultSetData(rs);
+            }
         } catch (IOException
                 | InvalidNameException
                 | SessionNotFoundException
