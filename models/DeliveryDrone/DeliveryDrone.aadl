@@ -674,8 +674,8 @@ public
 				VERDICT_Properties::canReceiveSWUpdate => true;
 		
 				VERDICT_Properties::manufacturer => ThirdParty;
-			 	--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
 			 	VERDICT_Properties::adversariallyTested => false;
+			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
@@ -834,6 +834,7 @@ public
 			 	VERDICT_Properties::componentType => Hybrid;
 			 	
 			 	VERDICT_Properties::manufacturer => ThirdParty;
+			 	-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
 			 	VERDICT_Properties::adversariallyTested => false;
 			};
 			

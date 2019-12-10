@@ -120,7 +120,7 @@ public
 				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::dataReceivedFromUntrusted => true;
 				
-				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
+				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
 				VERDICT_Properties::manufacturer => ThirdParty;	
 				VERDICT_Properties::adversariallyTested => false;
 
