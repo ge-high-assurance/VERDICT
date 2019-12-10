@@ -581,10 +581,10 @@ public
       			isOn => most_recent_delivery_location = probe_delivery_location;
 
       		guarantee "P4: a command to release a valuable package is issued only if drone has received confirmation from base":
-    			true -> (release_cmd and valuable_package => target_confirmed);
+    			release_cmd and valuable_package => target_confirmed;
 
   			guarantee "P5: The drone will always request a confirmation to base before starting delivery of a valuable package":
-    			true -> (delivery_started and valuable_package => confirmation_requested);
+    			delivery_started and valuable_package => confirmation_requested;
 
     		guarantee "P6: The drone is flying only if since last initialization, it has not got aborted": 
       			probe_fly_cmd => Agree_Nodes.Since(probe_init_mode, not (probe_abort_mode));
