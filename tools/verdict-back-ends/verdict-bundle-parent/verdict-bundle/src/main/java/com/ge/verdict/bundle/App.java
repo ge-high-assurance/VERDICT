@@ -265,9 +265,9 @@ public class App {
         action.run();
 
         // TODO: do this when the thing fails so that we still get the error output
-        //		System.err.println(new String(store.toByteArray()));
+        System.err.println(new String(store.toByteArray()));
 
-        System.setErr(systemErr);
+        //        System.setErr(systemErr);
     }
 
     private static final List<String> soteria_pngs =
@@ -362,20 +362,21 @@ public class App {
         log("STEM output directory: " + stemOutputDir);
         log("STEM graphs directory: " + stemGraphsDir);
 
-        hideErrorStream(
-                () -> {
-                    VerdictStem stemRunner = new VerdictStem();
-                    stemRunner.runStem(
-                            new File(stemProjectDir),
-                            new File(stemOutputDir),
-                            new File(stemGraphsDir));
-                });
-
-        if (!stem_output_csv.stream()
-                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
-            throw new VerdictRunException("STEM failed to generate all required files");
-        }
+        //        hideErrorStream(
+        //                () -> {
+        //
+        //                });
         log("STEM is running. Please be patient...");
+
+        VerdictStem stemRunner = new VerdictStem();
+        stemRunner.runStem(
+                new File(stemProjectDir), new File(stemOutputDir), new File(stemGraphsDir));
+
+        //        if (!stem_output_csv.stream()
+        //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
+        //            throw new VerdictRunException("STEM failed to generate all required files");
+        //        }
+
         log("STEM finished!");
 
         logHeader("Soteria++");
