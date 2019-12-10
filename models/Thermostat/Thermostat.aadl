@@ -2,6 +2,7 @@ package Thermostat
 public
 	with Base_Types;
 	with Data_Model;
+	with VERDICT_Properties;
 
 	annex agree {**
 			
@@ -50,6 +51,12 @@ public
 			guarantee "Setpoint invariance":
 				not (increment_condition or decrement_condition) => setpoint = prev_setpoint;		
 		**};
+		
+		annex verdict {**
+			CyberRel "heat_signal_out_I" = down_button:I or up_button:I => setpoint:I;
+		**};
+		
+		
 	end SetDesiredTemperature;
 
 	system ControlTemperature
@@ -94,6 +101,13 @@ public
 			
 			guarantee "Heating activation": heat_act_signal = heat_mode;
 		**};
+		
+		
+		annex verdict {**
+			CyberRel "heat_signal_out_I" = switch:I or current_temperature:I or setpoint:I => heat_act_signal:I;
+			CyberRel "cool_signal_out_I" = switch:I or current_temperature:I or setpoint:I => cool_act_signal:I;
+		**};
+		
 	end ControlTemperature;
 
 	system ThermostatController
@@ -173,12 +187,47 @@ public
 				Since(heat_act_signal, switch = enum(SwitchPosition, Heat) and current_temperature < setpoint) => 
 					heat_act_signal;
 		**};
+		
+			annex verdict {**
+								
+						CyberReq {
+							id = "CyberReq01"
+							description = "The thermostat shall be resilient to Control Temperature algorithm integrity"
+							condition = heat_act_signal:I or cool_act_signal:I
+							cia = I
+							severity = Minor
+		    					};
+			**};	
+		
 	end ThermostatController;
 	
 	system implementation ThermostatController.Impl
 		subcomponents
 			set_desired_temperature: system SetDesiredTemperature;
-			control_temperature: system ControlTemperature;
+			
+			control_temperature: system ControlTemperature
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => COTS;
+				
+				-- VRERDICT Cyber Defense Properties and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 3;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 3;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 3;
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 3;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 3;
+				
+			};
+			
+			
+			
 		connections
 			switch_conn: port switch -> control_temperature.switch;
 			

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="a53b8e36-8146-4ef6-8e31-f2a3ff770794" manual="true">
+    <element uuid="6d952e84-ebb0-4fd5-bb4b-56d929b7cc7d" manual="true">
+      <element uuid="0b234bb8-ddf3-4273-b43d-e466b0ee6f80" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>cool_sig_conn</seg>
+      </bo>
+    </element>
+    <element uuid="ac60a40d-071f-4756-be28-d15b52e4e2b8" manual="true">
+      <element uuid="74de1c96-9cef-4602-91a7-da4cf080de34" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>cur_temp_conn</seg>
+      </bo>
+    </element>
+    <element uuid="75c0e075-94b3-4936-93c7-0966c04655d2" manual="true">
+      <element uuid="b991c810-437c-4099-86f7-6926bb1bb9da" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>down_btn_conn</seg>
+      </bo>
+    </element>
+    <element uuid="0cbeb664-fa2f-4fc6-b4d5-07f49b392d97" manual="true">
+      <element uuid="da5ce22c-c471-4141-a525-dcb8e5759cee" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>heat_sig_conn</seg>
+      </bo>
+    </element>
+    <element uuid="d8dcce1f-142c-4612-b616-7f14f9583dc9" manual="true">
+      <element uuid="346bc81f-0e54-473a-8fca-e16dc250ec3d" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>setpoint1_conn</seg>
+      </bo>
+      <bendpoints>
+        <point x="600.0" y="225.33333333333334"/>
+        <point x="600.0" y="192.0"/>
+      </bendpoints>
+    </element>
+    <element uuid="c32b4a99-947d-4f45-9a82-9b3a705394f2" manual="true">
+      <element uuid="8019a55c-4fab-4082-ac87-9e9623876821" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>setpoint2_conn</seg>
+      </bo>
+    </element>
+    <element uuid="e948847a-451f-4608-97d6-75765168fc46" manual="true">
+      <element uuid="a60d44a2-5ae0-441a-8281-7ff1446618cd" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>switch_conn</seg>
+      </bo>
+    </element>
+    <element uuid="9c6687dc-0575-48cc-b14c-ec9b3ec029f6" manual="true">
+      <element uuid="c0d06077-7e70-4dcb-b754-61aefc30f201" manual="true">
+        <bo>
+          <seg>tag</seg>
+          <seg>unidirectional</seg>
+        </bo>
+      </element>
+      <bo>
+        <seg>connection</seg>
+        <seg>up_bth_conn</seg>
+      </bo>
+    </element>
+    <element uuid="11a98b19-8fbf-421f-a86d-920cdbde8b6c" manual="true" dockArea="right">
+      <bo>
+        <seg>feature</seg>
+        <seg>cool_act_signal</seg>
+      </bo>
+      <position x="1094.0" y="65.0"/>
+    </element>
+    <element uuid="1b3ee188-3260-43ef-b2eb-ff6dfdfe8370" manual="true" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>current_temperature</seg>
+      </bo>
+      <position y="98.0"/>
+    </element>
+    <element uuid="00bc90c8-ac92-442e-a2b6-fe092ca897dc" manual="true" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>down_button</seg>
+      </bo>
+      <position y="156.0"/>
+    </element>
+    <element uuid="d3b4259d-5382-48ca-8102-df779ab94761" manual="true" dockArea="right">
+      <bo>
+        <seg>feature</seg>
+        <seg>heat_act_signal</seg>
+      </bo>
+      <position x="1095.0" y="131.0"/>
+    </element>
+    <element uuid="ddbd873e-65c0-4179-a464-3f555889cc57" manual="true" dockArea="right">
+      <bo>
+        <seg>feature</seg>
+        <seg>setpoint</seg>
+      </bo>
+      <position x="1141.0" y="181.0"/>
+    </element>
+    <element uuid="5377dec5-ffff-4309-8a68-61bf5ccfca9c" manual="true" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>switch</seg>
+      </bo>
+      <position y="48.0"/>
+    </element>
+    <element uuid="5e6f0022-e992-4404-9a44-cbd429a9c401" manual="true" dockArea="left">
+      <bo>
+        <seg>feature</seg>
+        <seg>up_button</seg>
+      </bo>
+      <position y="206.0"/>
+    </element>
+    <element uuid="11aa4b98-884f-4893-b134-25130b56624c" manual="true">
+      <element uuid="21f98293-63bd-42fb-b602-ff53095598a7" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>cool_act_signal</seg>
+        </bo>
+        <position x="369.0" y="27.0"/>
+      </element>
+      <element uuid="f43e3305-e66a-4c4a-9d14-7e429c8891ac" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>current_temperature</seg>
+        </bo>
+        <position y="60.0"/>
+      </element>
+      <element uuid="cbe8b088-853b-41c4-8b9d-e84a85799fb3" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>heat_act_signal</seg>
+        </bo>
+        <position x="370.0" y="93.0"/>
+      </element>
+      <element uuid="060aad1c-cd72-4a2e-b6ea-1e7e55242bc6" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>setpoint</seg>
+        </bo>
+        <position y="110.0"/>
+      </element>
+      <element uuid="6009825c-1972-44e6-9db6-fa5feede2b06" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>switch</seg>
+        </bo>
+        <position y="10.0"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>control_temperature</seg>
+      </bo>
+      <position x="598.0" y="38.0"/>
+      <size width="484.0" height="160.0"/>
+    </element>
+    <element uuid="1babc874-0a51-4d05-8c1d-7f952cbb2656" manual="true">
+      <element uuid="05a2c9be-9bcc-4548-912d-c313ab03f1ff" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>down_button</seg>
+        </bo>
+        <position y="10.0"/>
+      </element>
+      <element uuid="0db1898b-5e2f-42a2-8beb-bb5128d9868a" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>setpoint</seg>
+        </bo>
+        <position x="351.0" y="35.0"/>
+      </element>
+      <element uuid="278d0b1e-99dd-4ffe-9a56-240c7655b371" manual="true" dockArea="left">
+        <bo>
+          <seg>feature</seg>
+          <seg>up_button</seg>
+        </bo>
+        <position y="60.0"/>
+      </element>
+      <bo>
+        <seg>subcomponent</seg>
+        <seg>set_desired_temperature</seg>
+      </bo>
+      <position x="159.0" y="146.0"/>
+      <size width="419.0" height="110.0"/>
+    </element>
+    <bo>
+      <seg>classifier</seg>
+      <seg>thermostatcontroller.impl</seg>
+    </bo>
+    <position x="12.0" y="12.0"/>
+    <size width="1209.0" height="268.0"/>
+  </element>
+  <config type="structure" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>classifier</seg>
+      <seg>thermostat::thermostatcontroller.impl</seg>
+    </context>
+  </config>
+</diagram:Diagram>
