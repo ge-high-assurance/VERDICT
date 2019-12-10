@@ -61,8 +61,6 @@ public
 			
 		annex agree {**
 			-- high-level specification
-			guarantee "Output: cur_pos | Current location remains the same if no command was received": 
-				true -> (not (pre(cmd)) => cur_pos = pre(cur_pos));
 					
 			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
 				Agree_Nodes.close_locations(cur_pos, est_pos);
@@ -365,12 +363,13 @@ public
 			-- outputs
 			comm_out: out data port Base_Types::Boolean;
 			radio_out: out data port Data_Types::RadioResponse.impl;
-			health_status: out data port Base_Types::Boolean; -- added
+			health_status: out data port Base_Types::Boolean;
 			
 		annex agree {**
-			guarantee "Radio receives data from remote communication channel":
-    			(comm_in.data_available = radio_out.data_available and
-     			 comm_in.target_confirmed = radio_out.target_confirmed);
+     	 	guarantee "Radio receives data from remote communication channel if there is a request":
+     	 		radio_in => (radio_out.data_available = comm_in.data_available and
+     	 			         comm_in.target_confirmed = radio_out.target_confirmed);
+     	 	
 			guarantee "Without a request, no radio data is available":
 				not radio_in => not radio_out.data_available;
 		**};
