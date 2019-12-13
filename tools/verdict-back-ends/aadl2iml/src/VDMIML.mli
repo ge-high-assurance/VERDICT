@@ -41,7 +41,8 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode; 
-  ptype: data_type option
+  ptype: data_type option;
+  probe: bool;
 }
 
 type binary_op =
@@ -162,17 +163,28 @@ type dataflow_model = {
 
 type cyber_cia = CyberC | CyberI | CyberA
 
+type safety_ia = SafetyI | SafetyA
+
 type cyber_severity =
   CyberNone | CyberMinor | CyberMajor
   | CyberHazardous | CyberCatastrophic
 
 type cyber_port = {name: string; cia: cyber_cia}
 
+type safety_port = {name: string; ia: safety_ia}
+
 type cyber_expr =
   | CyberPort of cyber_port
   | CyberAnd of cyber_expr list
   | CyberOr of cyber_expr list
   | CyberNot of cyber_expr
+
+type safety_expr =
+  | SafetyPort of safety_port
+  | SafetyFault of string
+  | SafetyAnd of safety_expr list
+  | SafetyOr of safety_expr list
+  | SafetyNot of safety_expr
 
 type cyber_req = {
     id: string;
@@ -185,6 +197,13 @@ type cyber_req = {
     extern: string option;
   }
 
+type safety_req = {
+    id: string;
+    condition: safety_expr;
+    comment: string option;
+    description: string option;
+  }
+
 type cyber_rel = {
     id: string;
     output: cyber_port;
@@ -193,6 +212,21 @@ type cyber_rel = {
     description: string option;
     phases: string option;
     extern: string option;
+  }
+
+type safety_rel = {
+    id: string;
+    output: safety_port;
+    faultSrc: safety_expr option;
+    comment: string option;
+    description: string option;
+  }
+
+type safety_event = {
+    id: string;
+    probability: string;
+    comment: string option;
+    description: string option;
   }
 
 type mission = {
@@ -207,6 +241,8 @@ type component_type = {
   ports: port list;
   contract: contract_spec option;
   cyber_rels: cyber_rel list;
+  safety_rels: safety_rel list;
+  safety_events: safety_event list;
 }
 
 type comp_type_ref = int
@@ -223,31 +259,97 @@ type kind_of_component = Software | Hardware | Human | Hybrid
 
 type situated_type = OnBoard | Remote
 
+type pedigree_type = InternallyDeveloped | COTS | Sourced
+
 type component_instance = {
   name: identifier;
   itype: instance_type;
+
   manufacturer: manufacturer_type option;
+  pedigree: pedigree_type option;
   category: string option;
   component_type: kind_of_component option;
   situated: situated_type option;
   adversarially_tested: bool option;
   has_sensitive_info: bool option;
   inside_trusted_boundary: bool option;
+  canReceiveConfigUpdate: bool option;
+  canReceiveSWUpdate: bool option;
+  controlReceivedFromUntrusted: bool option;
+  controlSentToUntrusted: bool option;
+  dataReceivedFromUntrusted: bool option;
+  dataSentToUntrusted: bool option;
+
+  configuration_Attack: bool option;
+  physical_Theft_Attack: bool option;
+  interception_Attack: bool option;
+  hardware_Integrity_Attack: bool option;
+  supply_Chain_Attack: bool option;
+  brute_Force_Attack: bool option;
+  fault_Injection_Attack: bool option;
+  identity_Spoofing_Attack: bool option;
+  excessive_Allocation_Attack: bool option;
+  sniffing_Attack: bool option;
+  buffer_Attack: bool option;
+  flooding_Attack: bool option;
+
+  anti_jamming: bool option;
+  auditMessageResponses: bool option;
+  deviceAuthentication: bool option;
+  dosProtection: bool option;
+  encryptedStorage: bool option;
+  heterogeneity: bool option;
+  inputValidation: bool option;
+  logging: bool option;
+  memoryProtection: bool option;
+  physicalAccessControl: bool option;
+  removeIdentifyingInformation: bool option;
+  resourceAvailability: bool option;
+  resourceIsolation: bool option;
+  secureBoot: bool option;
+  sessionAuthenticity: bool option;
+  staticCodeAnalysis: bool option;
+  strongCryptoAlgorithms: bool option;
+  supplyChainSecurity: bool option;
+  systemAccessControl: bool option;
+  tamperProtection: bool option;
+  userAuthentication: bool option;
+
+  anti_jamming_dal: integer option;
+  auditMessageResponsesDAL: integer option;
+  deviceAuthenticationDAL: integer option;
+  dosProtectionDAL: integer option;
+  encryptedStorageDAL: integer option;
+  heterogeneity_dal: integer option;
+  inputValidationDAL: integer option;
+  loggingDAL: integer option;
+  memoryProtectionDAL: integer option;
+  physicalAccessControlDAL: integer option;
+  removeIdentifyingInformationDAL: integer option;
+  resourceAvailabilityDAL: integer option;
+  resourceIsolationDAL: integer option;
+  secureBootDAL: integer option;
+  sessionAuthenticityDAL: integer option;
+  staticCodeAnalysisDAL: integer option;
+  strongCryptoAlgorithmsDAL: integer option;
+  supplyChainSecurityDAL: integer option;
+  systemAccessControlDAL: integer option;
+  tamperProtectionDAL: integer option;
+  userAuthenticationDAL: integer option;
+
+  (*
   broadcast_from_outside_tb: bool option;
   wifi_from_outside_tb: bool option;
-  heterogeneity: bool option;
   encryption: bool option;
-  anti_jamming: bool option;
   anti_flooding: bool option;
   anti_fuzzing: bool option;
-  heterogeneity_dal: integer option;
   encryption_dal: integer option;
-  anti_jamming_dal: integer option;
   anti_flooding_dal: integer option;
   anti_fuzzing_dal: integer option;
+  *)
 }
 
-type flow_type = Xdata | Control | Request
+type flow_type = Xdata | Xcontrol | Xrequest
 
 type port_ref = int
 
@@ -261,10 +363,14 @@ type connection_type = Local | Remote
 
 type connection = {
   name: identifier;
-  ftype: flow_type;
+  ftype: flow_type option;
   conn_type: connection_type option;
   authenticated: bool option;
   data_encrypted: bool option;
+  trustedConnection: bool option;
+  encryptedTransmission: bool option;
+  encryptedTransmissionDAL: integer option;
+  replayProtection: bool option;
   source: connection_end;
   destination: connection_end;
 }
@@ -339,6 +445,7 @@ type model = {
   dataflow_code: dataflow_model option;
   comp_impl: component_impl list;
   cyber_reqs: cyber_req list;
+  safety_reqs: safety_req list;
   missions: mission list;
   threat_models: threat_model list;
   threat_defenses: threat_defense list;

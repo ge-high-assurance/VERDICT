@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.EnumType;
 import verdict.vdm.vdm_data.PlainType;
@@ -51,19 +49,30 @@ import verdict.vdm.vdm_model.CyberExprKind;
 import verdict.vdm.vdm_model.CyberExprList;
 import verdict.vdm.vdm_model.CyberRel;
 import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.Event;
+import verdict.vdm.vdm_model.EventHappens;
 import verdict.vdm.vdm_model.Flow;
+import verdict.vdm.vdm_model.IA;
+import verdict.vdm.vdm_model.IAPort;
 import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.ManufacturerType;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
+import verdict.vdm.vdm_model.SafetyRel;
+import verdict.vdm.vdm_model.SafetyRelExpr;
+import verdict.vdm.vdm_model.SafetyRelExprKind;
+import verdict.vdm.vdm_model.SafetyRelExprList;
+import verdict.vdm.vdm_model.SafetyReq;
+import verdict.vdm.vdm_model.SafetyReqExpr;
+import verdict.vdm.vdm_model.SafetyReqExprKind;
+import verdict.vdm.vdm_model.SafetyReqExprList;
 import verdict.vdm.vdm_model.Severity;
 import verdict.vdm.vdm_model.SituatedType;
 
 public class VDMParser extends Parser {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(VDMParser.class);
 
     private Model model;
 
@@ -71,6 +80,7 @@ public class VDMParser extends Parser {
     private List<ComponentType> componentTypes;
     private List<ComponentImpl> componentImpls;
     private List<CyberReq> cyberRequirements;
+    private List<SafetyReq> safetyRequirements;
     private List<Mission> missions;
 
     private ComponentImpl componentImpl;
@@ -83,7 +93,12 @@ public class VDMParser extends Parser {
         componentTypes = model.getComponentType();
         componentImpls = model.getComponentImpl();
         cyberRequirements = model.getCyberReq();
+        safetyRequirements = model.getSafetyReq();
         missions = model.getMission();
+    }
+
+    private void log(String msg) {
+        //        System.out.println(msg);
     }
 
     // Project Rules:
@@ -520,6 +535,11 @@ public class VDMParser extends Parser {
             }
             if (type == Type.BOOL_Lit) {
                 return boolExpr();
+            }
+            if (type == Type.NEG) {
+                Expression neg_expr = expression();
+                expression.setNegative(neg_expr);
+                return expression;
             }
             if (type == Type.NOT) {
                 Expression not_expr = expression();
@@ -1154,6 +1174,11 @@ public class VDMParser extends Parser {
             } else if (token.type == Type.PORT_MODE) {
                 PortMode portMode = portMode();
                 port.setMode(portMode);
+            } else if (token.type == Type.BOOL) {
+                consume(Type.BOOL);
+                boolean value = token.getTruthValue();
+                consume(Type.Boolean);
+                port.setProbe(value);
             } else if (token.type == Type.OPTION) {
                 consume(Type.OPTION);
 
@@ -1473,11 +1498,22 @@ public class VDMParser extends Parser {
      * cyber_relations: ArrayList<CyberRel>;
      *
      */
+    //    type ComponentType {
+    //    	name: Identifier;
+    //    	ports: ArrayList<Port>;
+    //    	compCateg: Option<String>;
+    //        contract: Option<ContractSpec>;
+    //        cyber_relations: ArrayList<CyberRel>;
+    //        safety_relations: ArrayList<SafetyRel>;
+    //        safety_events: ArrayList<SafetyEvent>;
+    //    };
     public ComponentType componentType() {
 
         ComponentType componentType = new ComponentType();
         List<Port> ports = componentType.getPort();
         List<CyberRel> cyber_relations = componentType.getCyberRel();
+        List<SafetyRel> safety_relations = componentType.getSafetyRel();
+        List<Event> events = componentType.getEvent();
 
         int list_size = 0;
         Type type;
@@ -1514,11 +1550,23 @@ public class VDMParser extends Parser {
                         ports.add(port_index, port);
                         // LOGGER.info("["+ port_index + "," + port.getName()+"]");
                     } else if (type == Type.CYBER_RELATIONS) {
-
+                        log("cyber_rel" + token);
                         int rel_index = arrayList_element();
 
                         CyberRel cyberRel = cyber_rel();
                         cyber_relations.add(rel_index, cyberRel);
+                    } else if (type == Type.SAFETY_RELATIONS) {
+                        log("safety_rel: " + token);
+                        int rel_index = arrayList_element();
+
+                        SafetyRel safetyRel = safety_rel();
+                        safety_relations.add(rel_index, safetyRel);
+                    } else if (type == Type.SAFETY_EVENTS) {
+                        log("safety event: " + token);
+                        int event_index = arrayList_element();
+
+                        Event event = safetyevent();
+                        events.add(event_index, event);
                     }
                 }
                 // Confirm length of ports match with elements.
@@ -1533,6 +1581,10 @@ public class VDMParser extends Parser {
                     if (token.type == Type.CONTRACT_SPEC) {
                         ContractSpec contract = contractSpec();
                         componentType.setContract(contract);
+                    } else if (token.type == Type.String) {
+                        String categ = token.getStringValue();
+                        componentType.setCompCateg(categ);
+                        consume(Type.String);
                     }
                 }
                 // Skip None
@@ -1552,9 +1604,6 @@ public class VDMParser extends Parser {
         CyberExpr cyberExpr = new CyberExpr();
         CyberExprKind kind = null;
 
-        // Check length bound and terminate.
-        int array_length = 0;
-
         while (this.token.type == Type.CYBER_EXP) {
 
             consume(Type.CYBER_EXP);
@@ -1566,12 +1615,8 @@ public class VDMParser extends Parser {
             }
             if (token.type == Type.CYBER_EXP_KIND) {
                 kind = cyberExprKind();
-                //                cyberExpr.setKind(kind);
             }
 
-            //            if (token.type == Type.ARRAY_LIST) {
-            //                System.out.println("!!!!!!!!!!!! in Array List");
-            //            }
             if (kind == CyberExprKind.NOT) {
                 CyberExpr not_expr = new CyberExpr();
                 not_expr.setNot(not_expr);
@@ -1637,47 +1682,228 @@ public class VDMParser extends Parser {
 
         return cyberExprList;
     }
-    //
-    // public CyberExprList cyberExprList() {
-    //
-    // CyberExprList cyberExprList = new CyberExprList();
-    // int list_length = 0;
-    // Type type = this.token.type;
-    //
-    // while (type == Type.ARRAY_LIST) {
-    //
-    // consume(Type.ARRAY_LIST);
-    //
-    // // length
-    // if (this.token.type == Type.INT) {
-    //
-    // consume(Type.INT);
-    //
-    // Token token = this.token;
-    // NumberLiteral enumLength_literal = (NumberLiteral) token.value;
-    // list_length = enumLength_literal.getValue();
-    //
-    // consume();
-    //
-    // while (list_length > 0) {
-    //
-    // // NULL:element
-    // consume(Type.NULL);
-    // list_length--;
-    // // element Index
-    // token = this.token;
-    // NumberLiteral element_index = (NumberLiteral) token.value;
-    // consume(Type.INT);
-    //
-    // // //element Value : Expression
-    // CyberExpr expr = cyberExpr();
-    // cyberExprList.getExpr().add(element_index.getValue(), expr);
-    // }
-    // }
-    // }
-    //
-    // return cyberExprList;
-    // }
+
+    /** Handle safety requirement expressions */
+    public SafetyReqExpr safetyReqExpr() {
+
+        SafetyReqExpr safetyReqExpr = new SafetyReqExpr();
+        SafetyReqExprKind kind = null;
+
+        while (this.token.type == Type.SAFETY_EXP) {
+
+            consume(Type.SAFETY_EXP);
+
+            if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyReqExpr.setPort(iaPort);
+            }
+            if (token.type == Type.SAFETY_EXP_KIND) {
+                kind = safetyReqExprKind();
+            }
+            if (kind == SafetyReqExprKind.NOT) {
+                SafetyReqExpr not_expr = new SafetyReqExpr();
+                not_expr.setNot(not_expr);
+                return not_expr;
+            }
+            if (kind == SafetyReqExprKind.OR) {
+
+                SafetyReqExprList or_exprs = safetyReqExprList();
+                safetyReqExpr.setOr(or_exprs);
+            }
+            if (kind == SafetyReqExprKind.AND) {
+
+                SafetyReqExprList and_exprs = safetyReqExprList();
+                safetyReqExpr.setAnd(and_exprs);
+            }
+            if (kind == SafetyReqExprKind.PORT) {
+                return safetyReqExpr();
+            }
+        }
+
+        return safetyReqExpr;
+    }
+
+    public SafetyReqExprList safetyReqExprList() {
+
+        SafetyReqExprList safetyReqExprList = new SafetyReqExprList();
+
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_EXP) {
+
+            consume(Type.SAFETY_EXP);
+            if (token.type == Type.ARRAY_LIST) {
+                if (peek().type == Type.INT) {
+                    array_length = arrayList_length();
+                } else {
+
+                    while (array_length > 0) {
+
+                        array_length--;
+
+                        int element_index = arrayList_element();
+                        SafetyReqExpr reqExpr = safetyReqExpr();
+                        safetyReqExprList.getExpr().add(element_index, reqExpr);
+                    }
+                }
+            }
+        }
+
+        return safetyReqExprList;
+    }
+
+    //    type SafetyRel {
+    //    	id: String;
+    //    	output: IAPort;
+    //    	faultSrc: Option<SafetyExpr>;
+    //    	comment: Option<String>;
+    //        description : Option<String>;
+    //    };
+
+    /** Handle safety relations */
+    public SafetyRel safety_rel() {
+
+        SafetyRel safetyRel = new SafetyRel();
+
+        while (this.token.type == Type.SAFETY_REL) {
+
+            consume(Type.SAFETY_REL);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                log("safety_rel id = " + identifier);
+                safetyRel.setId(identifier);
+
+            } else if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyRel.setOutput(iaPort);
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                log("safety rel type_value = " + type_value);
+
+                if (type == Type.FAULTSRC) {
+                    SafetyRelExpr expr_value = safetyRelExpr();
+                    safetyRel.setFaultSrc(expr_value);
+
+                } else if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    log("safety rel comment = " + comment);
+                    safetyRel.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    safetyRel.setDescription(description);
+
+                } else if (type == Type.PHASES) {
+
+                    String phases = str_value();
+                    safetyRel.setPhases(phases);
+
+                } else if (type == Type.EXTERN) {
+
+                    String extern = str_value();
+                    safetyRel.setExtern(extern);
+                }
+            }
+        }
+
+        return safetyRel;
+    }
+
+    //    type SafetyExpr {
+    //    	kind: SafetyExprKind;
+    //    	port: IAPort;
+    //    	fault: String;
+    //    	and: ArrayList<SafetyExpr>;
+    //    	or: ArrayList<SafetyExpr>;
+    //    	not: SafetyExpr;
+    //    };
+    public SafetyRelExpr safetyRelExpr() {
+
+        SafetyRelExpr safetyRelExpr = new SafetyRelExpr();
+        SafetyRelExprKind kind = null;
+
+        // Check length bound and terminate.
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_EXP) {
+
+            consume(Type.SAFETY_EXP);
+
+            if (token.type == Type.IA_PORT) {
+
+                IAPort iaPort = ia_port();
+                safetyRelExpr.setPort(iaPort);
+            }
+            if (token.type == Type.SAFETY_EXP_KIND) {
+                kind = safetyRelExprKind();
+            }
+            if (kind == SafetyRelExprKind.NOT) {
+                SafetyRelExpr not_expr = new SafetyRelExpr();
+                not_expr.setNot(not_expr);
+                return not_expr;
+            }
+            if (kind == SafetyRelExprKind.OR) {
+
+                SafetyRelExprList or_exprs = safetyRelExprList();
+                safetyRelExpr.setOr(or_exprs);
+            }
+            if (kind == SafetyRelExprKind.AND) {
+
+                SafetyRelExprList and_exprs = safetyRelExprList();
+                safetyRelExpr.setAnd(and_exprs);
+            }
+            if (kind == SafetyRelExprKind.PORT) {
+                return safetyRelExpr();
+            }
+            if (kind == SafetyRelExprKind.FAULT) {
+
+                EventHappens event = eventHappens();
+                safetyRelExpr.setFault(event);
+                safetyRelExpr();
+            }
+        }
+
+        return safetyRelExpr;
+    }
+
+    public SafetyRelExprList safetyRelExprList() {
+
+        SafetyRelExprList safetyRelExprList = new SafetyRelExprList();
+
+        int array_length = 0;
+
+        while (this.token.type == Type.SAFETY_EXP) {
+
+            consume(Type.SAFETY_EXP);
+            if (token.type == Type.ARRAY_LIST) {
+                if (peek().type == Type.INT) {
+                    array_length = arrayList_length();
+                } else {
+
+                    while (array_length > 0) {
+
+                        array_length--;
+
+                        int element_index = arrayList_element();
+                        SafetyRelExpr relExpr = safetyRelExpr();
+                        safetyRelExprList.getExpr().add(element_index, relExpr);
+                    }
+                }
+            }
+        }
+
+        return safetyRelExprList;
+    }
 
     /*
      * type CyberRel { id : String; output : CIAPort; inputs : Option<CyberExpr>;
@@ -1828,6 +2054,54 @@ public class VDMParser extends Parser {
         return cyberReq;
     }
 
+    public SafetyReq safety_req() {
+
+        SafetyReq safetyReq = new SafetyReq();
+
+        while (this.token.type == Type.SAFETY_REQ) {
+            consume(Type.SAFETY_REQ);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                safetyReq.setId(identifier);
+
+            } else if (token.type == Type.SAFETY_EXP) {
+                SafetyReqExpr safetyExpr = safetyReqExpr();
+                safetyReq.setCondition(safetyExpr);
+
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    safetyReq.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    safetyReq.setDescription(description);
+
+                } else if (type == Type.PHASES) {
+
+                    String phases = str_value();
+                    safetyReq.setPhases(phases);
+
+                } else if (type == Type.EXTERN) {
+
+                    String extern = str_value();
+                    safetyReq.setExtern(extern);
+                }
+            }
+        }
+
+        return safetyReq;
+    }
+
     public Mission mission() {
         Mission mission = new Mission();
 
@@ -1882,6 +2156,55 @@ public class VDMParser extends Parser {
         return mission;
     }
 
+    //    type SafetyEvent {
+    //    	id: String;
+    //    	probability: String;
+    //    	comment: Option<String>;
+    //        description : Option<String>;
+    //    };
+    public Event safetyevent() {
+
+        Event event = new Event();
+
+        while (this.token.type == Type.SAFETY_EVENT) {
+
+            consume(Type.SAFETY_EVENT);
+
+            if (token.type == Type.STRING) {
+
+                String str_type_value = token.sd.getName();
+                Type str_type = Type.get(str_type_value);
+
+                if (str_type == Type.EVENT_ID) {
+                    String identifier = id_value();
+                    event.setId(identifier);
+                } else if (str_type == Type.PROBABILITY) {
+                    String prob = id_value();
+                    event.setProbability(prob);
+                }
+
+            } else if (token.type == Type.OPTION) {
+
+                String type_value = token.sd.getName();
+                Type type = Type.get(type_value);
+                consume(Type.OPTION);
+
+                if (type == Type.COMMENT) {
+
+                    String comment = str_value();
+                    event.setComment(comment);
+
+                } else if (type == Type.DESCRIPTION) {
+
+                    String description = str_value();
+                    event.setDescription(description);
+                }
+            }
+        }
+
+        return event;
+    }
+
     /*
      * type CIAPort { name: String; cia: CIA; }
      */
@@ -1905,6 +2228,45 @@ public class VDMParser extends Parser {
         return ciaPort;
     }
 
+    // SAFETY
+    public IAPort ia_port() {
+        IAPort iaPort = new IAPort();
+
+        while (this.token.type == Type.IA_PORT) {
+            consume(Type.IA_PORT);
+
+            if (token.type == Type.STRING) {
+
+                String identifier = id_value();
+                iaPort.setName(identifier);
+
+            } else if (token.type == Type.IA) {
+                IA ia = ia();
+                iaPort.setIa(ia);
+            }
+        }
+
+        return iaPort;
+    }
+
+    public EventHappens eventHappens() {
+        EventHappens event = new EventHappens();
+
+        //        while (this.token.type == Type.HAPPENS) {
+        //            consume(Type.HAPPENS);
+        consume();
+        if (token.type == Type.STRING) {
+            String identifier = id_value();
+            event.setEventName(identifier);
+            //            } else {
+            //                System.out.println("Event happens: toeken " + token);
+            //            }
+        }
+        //        consume();
+
+        return event;
+    }
+
     /*
      * type CIA enum {Confidentiality, Integrity, Availability};
      */
@@ -1919,6 +2281,19 @@ public class VDMParser extends Parser {
         consume();
 
         return cia_type;
+    }
+
+    public IA ia() {
+
+        consume(Type.IA);
+
+        String type_name = token.sd.getName();
+
+        IA ia_type = IA.fromValue(type_name);
+
+        consume();
+
+        return ia_type;
     }
 
     /*
@@ -1954,6 +2329,32 @@ public class VDMParser extends Parser {
         return cyberExprKind;
     }
 
+    public SafetyReqExprKind safetyReqExprKind() {
+
+        consume(Type.SAFETY_EXP_KIND);
+
+        String type_name = token.sd.getName();
+
+        SafetyReqExprKind safetyReqExprKind = SafetyReqExprKind.fromValue(type_name);
+
+        consume();
+
+        return safetyReqExprKind;
+    }
+
+    public SafetyRelExprKind safetyRelExprKind() {
+
+        consume(Type.SAFETY_EXP_KIND);
+
+        String type_name = token.sd.getName();
+
+        SafetyRelExprKind safetyRelExprKind = SafetyRelExprKind.fromValue(type_name);
+
+        consume();
+
+        return safetyRelExprKind;
+    }
+
     // ComponentInstance?
     // Block
     // Connection
@@ -1974,22 +2375,48 @@ public class VDMParser extends Parser {
                 String identifier = Identifier();
                 connection.setName(identifier);
 
-            } else if (token.type == Type.FLOW_TYPE) {
-
-                Flow flow_value = flow();
-                connection.setFlow(flow_value);
-
             } else if (token.type == Type.OPTION) {
 
                 boolean encrption_status = false;
                 boolean authenticated_status = false;
+                boolean trusted_connection = false;
+                boolean encrypted_transmission = false;
+                boolean replay_protection = false;
+
+                int dal_value = 0;
 
                 String type_value = token.sd.getName();
                 Type type = Type.get(type_value);
                 // consume(Type.BOOL);
                 consume(Type.OPTION);
 
-                if (type == Type.DATA_ENCRYPTED) {
+                if (type == Type.ENCRYPTED_TRANSMISSION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        encrypted_transmission = truthValue();
+                        connection.setEncryptedTransmission(encrypted_transmission);
+                    }
+                } else if (type == Type.REPLAY_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        replay_protection = truthValue();
+                        connection.setReplayProtection(replay_protection);
+                    }
+                } else if (type == Type.ENCRYPTED_TRAMISSION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        connection.setEncryptedTransmissionDAL(dal_value);
+                    }
+
+                } else if (type == Type.TRUSTED_CONNECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        trusted_connection = truthValue();
+                        connection.setTrustedConnection(trusted_connection);
+                    }
+                } else if (type == Type.DATA_ENCRYPTED) {
                     type = option();
                     if (type == Type.SOME) {
                         encrption_status = truthValue();
@@ -2002,10 +2429,21 @@ public class VDMParser extends Parser {
                         connection.setAuthenticated(authenticated_status);
                     }
                 } else if (type == Type.CONN_TYPE) {
+
                     type = option();
+
                     if (type == Type.SOME) {
                         ConnectionType conn_type = connectionType();
                         connection.setConnType(conn_type);
+                    }
+                } else if (type == Type.FLOW_TYPE) {
+
+                    type = option();
+
+                    if (type == Type.SOME) {
+
+                        Flow flow_value = flow();
+                        connection.setFlowType(flow_value);
                     }
                 }
 
@@ -2032,7 +2470,7 @@ public class VDMParser extends Parser {
     // type FlowType enum { Xdata, Control, Request };
     public Flow flow() {
 
-        consume(Type.FLOW_TYPE);
+        //        consume(Type.FLOWTYPE);
         String flow_type = token.sd.getName();
 
         Flow flow = Flow.fromValue(flow_type);
@@ -2214,6 +2652,265 @@ public class VDMParser extends Parser {
                         componentInstance.setInsideTrustedBoundary(value);
                     }
 
+                } else if (type == Type.CAN_RECEIVE_CONFIG_UPDATE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setCanReceiveConfigUpdate(value);
+                    }
+
+                } else if (type == Type.CAN_RECEIVE_SW_UPDATE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setCanReceiveSWUpdate(value);
+                    }
+
+                } else if (type == Type.CONTROL_RECEIVED_FROM_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setControlReceivedFromUntrusted(value);
+                    }
+
+                } else if (type == Type.CONTROL_SENT_TO_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setControlSentToUntrusted(value);
+                    }
+
+                } else if (type == Type.DATA_RECEIVED_FROM_UNTUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDataReceivedFromUntrusted(value);
+                    }
+
+                } else if (type == Type.DATA_SENT_TO_UNTRUSTED) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDataSentToUntrusted(value);
+                    }
+
+                } else if (type == Type.CONFIG_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setConfigurationAttack(value);
+                    }
+
+                } else if (type == Type.PHY_THEFT_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setPhysicalTheftAttack(value);
+                    }
+
+                } else if (type == Type.INTERCEPTION_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setInterceptionAttack(value);
+                    }
+
+                } else if (type == Type.HARDWARE_INTEGRITY_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setHardwareIntegrityAttack(value);
+                    }
+
+                } else if (type == Type.SUPPLY_CHAIN_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSupplyChainAttack(value);
+                    }
+
+                } else if (type == Type.BRUTE_FORCE_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setBruteForceAttack(value);
+                    }
+
+                } else if (type == Type.FAULT_INJEC_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setFaultInjectionAttack(value);
+                    }
+
+                } else if (type == Type.IDENTITY_SPOOFING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setIdentitySpoofingAttack(value);
+                    }
+
+                } else if (type == Type.EXPRESSIVE_ALLOC_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setExcessiveAllocationAttack(value);
+                    }
+
+                } else if (type == Type.SNIFFING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSniffingAttack(value);
+                    }
+
+                } else if (type == Type.BUFFER_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setBufferAttack(value);
+                    }
+
+                } else if (type == Type.FLOODING_ATTACK) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setFloodingAttack(value);
+                    }
+
+                } else if (type == Type.AUDIT_MESSAGE_RESPONSES) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setAuditMessageResponses(value);
+                    }
+
+                } else if (type == Type.DEVICE_AUTHENTICATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDeviceAuthentication(value);
+                    }
+
+                } else if (type == Type.DOS_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setDosProtection(value);
+                    }
+
+                } else if (type == Type.ENCRYPTED_STORAGE) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setEncryptedStorage(value);
+                    }
+
+                } else if (type == Type.INPUT_VALIDATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setInputValidation(value);
+                    }
+
+                } else if (type == Type.LOGGING) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setLogging(value);
+                    }
+
+                } else if (type == Type.MEMORY_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setMemoryProtection(value);
+                    }
+
+                } else if (type == Type.PHY_ACCESS_CONTROL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setPhysicalAccessControl(value);
+                    }
+
+                } else if (type == Type.REMOVE_IDEN_INFO) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setRemoveIdentifyingInformation(value);
+                    }
+
+                } else if (type == Type.RESOURCE_AVAILABILITY) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setResourceAvailability(value);
+                    }
+
+                } else if (type == Type.RESOURCE_ISOLATION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setResourceIsolation(value);
+                    }
+
+                } else if (type == Type.SECURE_BOOT) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSecureBoot(value);
+                    }
+
+                } else if (type == Type.SESSION_AUTH) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSessionAuthenticity(value);
+                    }
+
+                } else if (type == Type.STATIC_CODE_ANALYSIS) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setStaticCodeAnalysis(value);
+                    }
+
+                } else if (type == Type.STRONG_CRYPTO_ALGO) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setStrongCryptoAlgorithms(value);
+                    }
+
+                } else if (type == Type.SUPPLY_CHAIN_SECURITY) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSupplyChainSecurity(value);
+                    }
+
+                } else if (type == Type.SYS_ACCESS_CONTROL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setSystemAccessControl(value);
+                    }
+
+                } else if (type == Type.TAMPER_PROTECTION) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setTamperProtection(value);
+                    }
+
+                } else if (type == Type.USER_AUTH) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        value = truthValue();
+                        componentInstance.setUserAuthentication(value);
+                    }
+
                 } else if (type == Type.INTERACT_OUTSIDE_TB) {
                     type = option();
                     if (type == Type.SOME) {
@@ -2237,7 +2934,7 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-                        componentInstance.setEncryption(value);
+                        //                        componentInstance.setEncryption(value);
                     }
                 } else if (type == Type.ANTI_JAMMING) {
                     type = option();
@@ -2249,13 +2946,13 @@ public class VDMParser extends Parser {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-                        componentInstance.setAntiFuzzing(value);
+                        //                        componentInstance.setAntiFuzzing(value);
                     }
                 } else if (type == Type.ANTI_FLOODING) {
                     type = option();
                     if (type == Type.SOME) {
                         value = truthValue();
-                        componentInstance.setAntiFlooding(value);
+                        //                        componentInstance.setAntiFlooding(value);
                     }
                 } else if (type == Type.MANUFACTURER) {
                     type = option();
@@ -2264,6 +2961,15 @@ public class VDMParser extends Parser {
                         // IN_HOUSE vs THIRD_PARTY
                         ManufacturerType manf_type = manufacturerType();
                         componentInstance.setManufacturer(manf_type);
+                    }
+
+                } else if (type == Type.PEDIGREE) {
+                    type = option();
+
+                    if (type == Type.SOME) {
+                        // IN_HOUSE vs THIRD_PARTY
+                        PedigreeType pedigree_type = pedigreeType();
+                        componentInstance.setPedigree(pedigree_type);
                     }
 
                 } else if (type == Type.ADV_TESTED) {
@@ -2281,11 +2987,11 @@ public class VDMParser extends Parser {
                         SituatedType situated_type = situatedType();
                         componentInstance.setSituated(situated_type);
                     }
-                } else if (type == Type.COMP_TYPE) {
+                } else if (type == Type.COMP_KIND) {
                     type = option();
                     if (type == Type.SOME) {
                         KindOfComponent kind_type = kindOfComponent();
-                        componentInstance.setComponentType(kind_type);
+                        componentInstance.setComponentKind(kind_type);
                     }
 
                 } else if (type == Type.CATEGORY) {
@@ -2299,14 +3005,14 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setHeterogeneityDal(dal_value);
+                        componentInstance.setHeterogeneityDAL(dal_value);
                     }
                 } else if (type == Type.ENCRYPTION_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setEncryptionDal(dal_value);
+                        //                        componentInstance.setEncryptionDal(dal_value);
                     }
 
                 } else if (type == Type.ANTI_JAMMING_DAL) {
@@ -2314,21 +3020,154 @@ public class VDMParser extends Parser {
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiJammingDal(dal_value);
+                        componentInstance.setAntiJammingDAL(dal_value);
                     }
                 } else if (type == Type.ANTI_FLOODING_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiFloodingDal(dal_value);
+                        //                        componentInstance.setAntiFloodingDal(dal_value);
                     }
                 } else if (type == Type.ANTI_FUZZING_DAL) {
                     type = option();
                     if (type == Type.SOME) {
                         dal_value = token.getNumberValue();
                         consume(Type.Int);
-                        componentInstance.setAntiFuzzingDal(dal_value);
+                        //                        componentInstance.setAntiFuzzingDal(dal_value);
+                    }
+                } else if (type == Type.AUDIT_MESSAGE_RESPONSE_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setAuditMessageResponsesDAL(dal_value);
+                    }
+                } else if (type == Type.DEVICE_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setDeviceAuthenticationDAL(dal_value);
+                    }
+                } else if (type == Type.DOS_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setDosProtectionDAL(dal_value);
+                    }
+                } else if (type == Type.ENCRYPTED_STORAGTE_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setEncryptedStorageDAL(dal_value);
+                    }
+                } else if (type == Type.INPUT_VALIDATION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setInputValidationDAL(dal_value);
+                    }
+                } else if (type == Type.LOGGING_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setLoggingDAL(dal_value);
+                    }
+                } else if (type == Type.MEMORY_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setMemoryProtectionDAL(dal_value);
+                    }
+                } else if (type == Type.PHY_ACCESS_CONTROL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setPhysicalAccessControlDAL(dal_value);
+                    }
+                } else if (type == Type.REMOVE_IDEN_INFO_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setRemoveIdentifyingInformationDAL(dal_value);
+                    }
+                } else if (type == Type.RESOURCE_AVAIL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setResourceAvailabilityDAL(dal_value);
+                    }
+                } else if (type == Type.RESOURCE_ISO_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setResourceIsolationDAL(dal_value);
+                    }
+                } else if (type == Type.SECURE_BOOT_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSecureBootDAL(dal_value);
+                    }
+                } else if (type == Type.SESSION_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSessionAuthenticityDAL(dal_value);
+                    }
+                } else if (type == Type.STATIC_CODE_ANALYSIS_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setStaticCodeAnalysisDAL(dal_value);
+                    }
+                } else if (type == Type.STRONG_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setStrongCryptoAlgorithmsDAL(dal_value);
+                    }
+                } else if (type == Type.SUPPLY_CHAIN_SECURITY_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSupplyChainSecurityDAL(dal_value);
+                    }
+                } else if (type == Type.SYSTEM_ACCESS_CONTROL_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setSystemAccessControlDAL(dal_value);
+                    }
+                } else if (type == Type.TAMPER_PROTECTION_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setTamperProtectionDAL(dal_value);
+                    }
+                } else if (type == Type.USER_AUTH_DAL) {
+                    type = option();
+                    if (type == Type.SOME) {
+                        dal_value = token.getNumberValue();
+                        consume(Type.Int);
+                        componentInstance.setUserAuthenticationDAL(dal_value);
                     }
                 }
             }
@@ -2372,6 +3211,17 @@ public class VDMParser extends Parser {
 
         String type_name = token.sd.getName();
         SituatedType type = SituatedType.fromValue(type_name);
+
+        consume();
+
+        return type;
+    }
+
+    // type PedigreeType enum { InternallyDeveloped, COTS, Sourced };
+    public PedigreeType pedigreeType() {
+
+        String type_name = token.sd.getName();
+        PedigreeType type = PedigreeType.fromValue(type_name);
 
         consume();
 
@@ -2800,6 +3650,13 @@ public class VDMParser extends Parser {
 
                         CyberReq cyberReq = cyber_req();
                         cyberRequirements.add(cyberReq_index, cyberReq);
+
+                    } else if (type == Type.SAFETY_REQUIREMENTS) {
+                        log("safety_req: " + token);
+                        int safetyReq_index = arrayList_element();
+
+                        SafetyReq safetyReq = safety_req();
+                        safetyRequirements.add(safetyReq_index, safetyReq);
 
                     } else if (type == Type.MISSIONS) {
 

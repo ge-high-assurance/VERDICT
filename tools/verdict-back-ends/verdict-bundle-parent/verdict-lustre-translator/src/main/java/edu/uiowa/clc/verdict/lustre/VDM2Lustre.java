@@ -66,6 +66,10 @@ public class VDM2Lustre {
         // II) Copying exiting DataFlow code
         LustreProgram lustre_program = vdm_model.getDataflowCode();
 
+        if (lustre_program == null) {
+            lustre_program = new LustreProgram();
+        }
+
         visit(vdm_model, lustre_program);
 
         dataFlowModel.setDataflowCode(lustre_program);

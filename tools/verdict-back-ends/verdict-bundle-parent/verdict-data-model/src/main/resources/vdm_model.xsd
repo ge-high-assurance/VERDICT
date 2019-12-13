@@ -28,6 +28,9 @@
             <element name="dataflowCode" type="vdm_lustre:LustreProgram"
                 maxOccurs="1" minOccurs="0">
             </element>
+            <element name="safetyReq" type="vdm_model:SafetyReq"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
             <element name="cyberReq" type="vdm_model:CyberReq"
                 minOccurs="0" maxOccurs="unbounded">
             </element>
@@ -47,9 +50,14 @@
             </element>
             <element name="cyberRel" type="vdm_model:CyberRel"
                 minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="safetyRel" type="vdm_model:SafetyRel"
+                minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="event" type="vdm_model:Event" minOccurs="0"
+                maxOccurs="unbounded"></element>
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
+        <attribute name="compCateg" type="string"></attribute>
     </complexType>
 
     <complexType name="ComponentImpl">
@@ -84,6 +92,7 @@
             </element>
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
+        <attribute name="probe" type="boolean" use="required"></attribute>
     </complexType>
 
     <simpleType name="PortMode">
@@ -118,21 +127,7 @@
         </choice>
         <attribute name="id" type="ID"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
-        <attributeGroup ref="vdm_model:STEMComponentProperties" />
-        <attribute name="heterogeneity" type="boolean"></attribute>
-        <attribute name="encryption" type="boolean"></attribute>
-        <attribute name="anti_jamming" type="boolean"></attribute>
-        <attribute name="anti_flooding" type="boolean"></attribute>
-        <attribute name="anti_fuzzing" type="boolean"></attribute>
-        <attribute name="heterogeneity_dal" type="int"></attribute>
-        <attribute name="encryption_dal" type="int"></attribute>
-        <attribute name="anti_jamming_dal" type="int"></attribute>
-        <attribute name="anti_flooding_dal" type="int"></attribute>
-        <attribute name="anti_fuzzing_dal" type="int"></attribute>
-        <attributeGroup
-            ref="vdm_model:InstrumentedComponentProperties">
-        </attributeGroup>
-        <attribute name="adversariallyTested" type="boolean"></attribute>
+        <attributeGroup ref="vdm_model:ComponentProperties" />
     </complexType>
 
     <complexType name="BlockImpl">
@@ -156,17 +151,27 @@
         <attribute name="name" type="vdm_data:Identifier"
             use="required">
         </attribute>
-        <attribute name="flow" type="vdm_model:Flow" use="optional"></attribute>
-        <attribute name="data_encrypted" type="boolean"
+        <attribute name="replayProtection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="flowType" type="vdm_model:Flow"
+            use="optional"></attribute>
+        <attribute name="dataEncrypted" type="boolean"
             use="optional">
         </attribute>
+        <attribute name="encryption" type="boolean" use="optional"></attribute>
         <attribute name="authenticated" type="boolean"
             use="optional"></attribute>
         <attribute name="conn_type" type="vdm_model:ConnectionType"
             use="optional"></attribute>
+        <attribute name="trustedConnection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedTransmission" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedTransmissionDAL"
+            type="vdm_model:DalType" use="optional" />
     </complexType>
 
-    <attributeGroup name="STEMComponentProperties">
+    <attributeGroup name="ComponentProperties">
         <attribute name="hasSensitiveInfo" type="boolean"
             use="optional">
         </attribute>
@@ -177,13 +182,153 @@
             use="optional"></attribute>
         <attribute name="wifiFromOutsideTB" type="boolean"
             use="optional"></attribute>
+        <attribute name="pedigree" type="vdm_model:PedigreeType"
+            use="optional"></attribute>
+        <attribute name="manufacturer"
+            type="vdm_model:ManufacturerType" use="optional"></attribute>
+
+        <attribute name="canReceiveConfigUpdate" type="boolean"
+            use="optional"></attribute>
+        <attribute name="canReceiveSWUpdate" type="boolean"
+            use="optional"></attribute>
+        <attribute name="controlReceivedFromUntrusted"
+            type="boolean" use="optional"></attribute>
+        <attribute name="controlSentToUntrusted" type="boolean"
+            use="optional"></attribute>
+        <attribute name="dataReceivedFromUntrusted" type="boolean"
+            use="optional"></attribute>
+        <attribute name="dataSentToUntrusted" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Configuration_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Physical_Theft_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Interception_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Hardware_Integrity_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Supply_Chain_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Brute_Force_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Fault_Injection_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Identity_Spoofing_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Excessive_Allocation_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Sniffing_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Buffer_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="Flooding_Attack" type="boolean"
+            use="optional"></attribute>
+        <attribute name="auditMessageResponses" type="boolean"
+            use="optional"></attribute>
+        <attribute name="deviceAuthentication" type="boolean"
+            use="optional"></attribute>
+        <attribute name="dosProtection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="encryptedStorage" type="boolean"
+            use="optional"></attribute>
+        <attribute name="inputValidation" type="boolean"
+            use="optional"></attribute>
+        <attribute name="logging" type="boolean" use="optional"></attribute>
+        <attribute name="memoryProtection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="physicalAccessControl" type="boolean"
+            use="optional"></attribute>
+        <attribute name="removeIdentifyingInformation"
+            type="boolean" use="optional"></attribute>
+        <attribute name="resourceAvailability" type="boolean"
+            use="optional"></attribute>
+        <attribute name="resourceIsolation" type="boolean"
+            use="optional"></attribute>
+        <attribute name="secureBoot" type="boolean" use="optional"></attribute>
+        <attribute name="sessionAuthenticity" type="boolean"
+            use="optional"></attribute>
+        <attribute name="staticCodeAnalysis" type="boolean"
+            use="optional"></attribute>
+        <attribute name="strongCryptoAlgorithms" type="boolean"
+            use="optional"></attribute>
+        <attribute name="supplyChainSecurity" type="boolean"
+            use="optional"></attribute>
+        <attribute name="systemAccessControl" type="boolean"
+            use="optional"></attribute>
+        <attribute name="tamperProtection" type="boolean"
+            use="optional"></attribute>
+        <attribute name="userAuthentication" type="boolean"
+            use="optional"></attribute>
+        <attribute name="antiJamming" type="boolean" use="optional"></attribute>
+        <attribute name="antiJammingDAL" type="vdm_model:DalType"></attribute>
+        <attribute name="auditMessageResponsesDAL"
+            type="vdm_model:DalType" use="optional">
+        </attribute>
+        <attribute name="deviceAuthenticationDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="dosProtectionDAL" type="vdm_model:DalType"
+            use="optional"></attribute>
+        <attribute name="encryptedStorageDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="heterogeneityDAL" type="vdm_model:DalType"
+            use="optional"></attribute>
+        <attribute name="inputValidationDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="loggingDAL" type="vdm_model:DalType"
+            use="optional"></attribute>
+        <attribute name="memoryProtectionDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="physicalAccessControlDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="removeIdentifyingInformationDAL"
+            type="vdm_model:DalType" use="optional">
+        </attribute>
+        <attribute name="resourceAvailabilityDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="resourceIsolationDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="secureBootDAL" type="vdm_model:DalType"
+            use="optional"></attribute>
+        <attribute name="sessionAuthenticityDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="staticCodeAnalysisDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="strongCryptoAlgorithmsDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="supplyChainSecurityDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="systemAccessControlDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="tamperProtectionDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="userAuthenticationDAL"
+            type="vdm_model:DalType" use="optional"></attribute>
+        <attribute name="heterogeneity" type="boolean"
+            use="optional"></attribute>
+        <!-- CRV props below -->
+        <attribute name="category" type="string" use="optional"></attribute>
+        <attribute name="componentKind"
+            type="vdm_model:KindOfComponent" use="optional">
+        </attribute>
+        <attribute name="situated" type="vdm_model:SituatedType"
+            use="optional">
+        </attribute>
+        <attribute name="adversariallyTested" type="boolean"
+            use="optional"></attribute>
     </attributeGroup>
+
+    <simpleType name="DalType">
+        <restriction base="int">
+            <minInclusive value="0"></minInclusive>
+            <maxInclusive value="9"></maxInclusive>
+        </restriction>
+    </simpleType>
 
     <simpleType name="Flow">
         <restriction base="string">
             <enumeration value="Xdata"></enumeration>
-            <enumeration value="Control"></enumeration>
-            <enumeration value="Request"></enumeration>
+            <enumeration value="Xcontrol"></enumeration>
+            <enumeration value="Xrequest"></enumeration>
         </restriction>
     </simpleType>
 
@@ -228,19 +373,6 @@
         </sequence>
     </complexType>
 
-    <attributeGroup name="InstrumentedComponentProperties">
-        <attribute name="category" type="string" use="optional"></attribute>
-        <attribute name="component_type"
-            type="vdm_model:KindOfComponent" use="optional">
-        </attribute>
-        <attribute name="situated" type="vdm_model:SituatedType"
-            use="optional">
-        </attribute>
-        <attribute name="manufacturer"
-            type="vdm_model:ManufacturerType" use="optional"></attribute>
-    </attributeGroup>
-
-
     <simpleType name="KindOfComponent">
         <restriction base="string">
             <enumeration value="Software"></enumeration>
@@ -264,13 +396,6 @@
         </restriction>
     </simpleType>
 
-    <simpleType name="ManufacturerType">
-        <restriction base="string">
-            <enumeration value="ThirdParty"></enumeration>
-            <enumeration value="InHouse"></enumeration>
-        </restriction>
-    </simpleType>
-
     <complexType name="CIAPort">
         <sequence>
             <element name="name" type="string" minOccurs="1"
@@ -287,6 +412,7 @@
             <enumeration value="Availability"></enumeration>
         </restriction>
     </simpleType>
+
 
     <simpleType name="CyberExprKind">
         <restriction base="string">
@@ -364,6 +490,147 @@
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
 
+
+    <!-- Safety related stuff -->
+
+
+    <!-- Safety relation expression -->
+    <complexType name="IAPort">
+        <sequence>
+            <element name="name" type="string" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="ia" type="vdm_model:IA" minOccurs="1"
+                maxOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <complexType name="EventHappens">
+        <sequence>
+            <element name="happens"></element>
+            <element name="eventName" type="string" minOccurs="1"
+                maxOccurs="1"></element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="IA">
+        <restriction base="string">
+            <enumeration value="Integrity"></enumeration>
+            <enumeration value="Availability"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="SafetyRelExpr">
+        <choice>
+            <element name="kind" type="vdm_model:SafetyRelExprKind"></element>
+            <element name="port" type="vdm_model:IAPort"></element>
+            <element name="fault" type="vdm_model:EventHappens"></element>
+            <element name="and" type="vdm_model:SafetyRelExprList"></element>
+            <element name="or" type="vdm_model:SafetyRelExprList"></element>
+            <element name="not" type="vdm_model:SafetyRelExpr"></element>
+        </choice>
+    </complexType>
+
+    <complexType name="SafetyRelExprList">
+        <sequence>
+            <element name="expr" type="vdm_model:SafetyRelExpr"
+                minOccurs="1" maxOccurs="unbounded"></element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="SafetyRelExprKind">
+        <restriction base="string">
+            <enumeration value="Port"></enumeration>
+            <enumeration value="Fault"></enumeration>
+            <enumeration value="And"></enumeration>
+            <enumeration value="Or"></enumeration>
+            <enumeration value="Not"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <!-- Safety requirements expression -->
+
+    <simpleType name="SafetyReqExprKind">
+        <restriction base="string">
+            <enumeration value="Port"></enumeration>
+            <enumeration value="And"></enumeration>
+            <enumeration value="Or"></enumeration>
+            <enumeration value="Not"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <complexType name="SafetyReqExpr">
+        <choice>
+            <element name="kind" type="vdm_model:SafetyReqExprKind"></element>
+            <element name="port" type="vdm_model:IAPort"></element>
+            <element name="and" type="vdm_model:SafetyReqExprList"></element>
+            <element name="or" type="vdm_model:SafetyReqExprList"></element>
+            <element name="not" type="vdm_model:SafetyReqExpr"></element>
+        </choice>
+    </complexType>
+
+    <complexType name="SafetyReqExprList">
+        <sequence>
+            <element name="expr" type="vdm_model:SafetyReqExpr"
+                minOccurs="1" maxOccurs="unbounded"></element>
+        </sequence>
+    </complexType>
+
+
+    <complexType name="SafetyRel">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="output" type="vdm_model:IAPort" minOccurs="1"
+                maxOccurs="1"></element>
+            <element name="faultSrc" type="vdm_model:SafetyRelExpr"
+                minOccurs="0" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <complexType name="SafetyReq">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="condition" type="vdm_model:SafetyReqExpr"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="phases" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <complexType name="Event">
+        <sequence>
+            <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
+            <element name="probability" type="vdm_model:Prop"
+                minOccurs="1" maxOccurs="1"></element>
+            <element name="comment" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+        </sequence>
+        <attribute name="name" type="vdm_data:Identifier"></attribute>
+    </complexType>
+
+    <simpleType name="Prop">
+        <restriction base="string">
+            <pattern value="[0-9]+[.]?[0-9]+e[-][0-9]+"></pattern>
+        </restriction>
+    </simpleType>
+
     <complexType name="Mission">
         <sequence>
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
@@ -377,4 +644,18 @@
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
 
+    <simpleType name="ManufacturerType">
+        <restriction base="string">
+            <enumeration value="ThirdParty"></enumeration>
+            <enumeration value="InHouse"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="PedigreeType">
+        <restriction base="string">
+            <enumeration value="InternallyDeveloped"></enumeration>
+            <enumeration value="COTS"></enumeration>
+            <enumeration value="Sourced"></enumeration>
+        </restriction>
+    </simpleType>
 </schema>

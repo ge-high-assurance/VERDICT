@@ -1,0 +1,23 @@
+package Agree_Constants
+public
+	with Data_Types;
+	
+	annex agree {**
+			
+		const ITEM_VALUE_THRESHOLD: real = 100.0;
+		
+		const WAITING_CONFIRMATION_THRESHOLD: int = 10;
+		
+		const MAXIMUM_NUMBER_OF_RETRIES: int = 3;
+		
+		-- enums
+		const RELEASE_PACKAGE_CMD: Data_Types::PackageDeliveryCommand = enum(Data_Types::PackageDeliveryCommand, RELEASE_PACKAGE);
+		const ABORT_DELIVERY_CMD: Data_Types::PackageDeliveryCommand = enum(Data_Types::PackageDeliveryCommand, ABORT_DELIVERY);
+		const NO_OPERATION_CMD: Data_Types::PackageDeliveryCommand = enum(Data_Types::PackageDeliveryCommand, NO_OPERATION);
+		const NOT_STARTED_STATUS: Data_Types::DeliveryStatus = enum(Data_Types::DeliveryStatus, NOT_STARTED);
+		const FAILED_STATUS: Data_Types::DeliveryStatus = enum(Data_Types::DeliveryStatus, FAILED);
+		const COMPLETED_STATUS: Data_Types::DeliveryStatus = enum(Data_Types::DeliveryStatus, COMPLETED);
+		
+		
+	**};
+end Agree_Constants;

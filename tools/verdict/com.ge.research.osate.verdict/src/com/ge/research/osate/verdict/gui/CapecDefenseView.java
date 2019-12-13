@@ -61,7 +61,7 @@ public class CapecDefenseView extends ViewPart {
 		TableColumn col5 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 		col5.setText("Suggested Defense");
 		TableColumn col6 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col6.setText("Suggested Defense Implementation");
+		col6.setText("Implemented Defenses");
 
 		int itemCount = tableContents.size();
 		for (int i = 0; i < itemCount; i++) {
@@ -72,7 +72,6 @@ public class CapecDefenseView extends ViewPart {
 				itemSeq[j] = currRow.get(j);
 			}
 			item.setText(itemSeq);
-//			item.setFont(new Font(display, new FontData("Times New Roman", 10, SWT.NORMAL)));
 		}
 
 		for (int i = 0; i < table.getColumnCount(); i++) {

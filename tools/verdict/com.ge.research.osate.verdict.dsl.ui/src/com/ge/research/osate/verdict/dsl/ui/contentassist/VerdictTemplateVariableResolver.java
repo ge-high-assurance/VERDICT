@@ -57,6 +57,6 @@ public class VerdictTemplateVariableResolver extends AbstractTemplateVariableRes
 	}
 
 	private List<String> resolveReqs(EObject model) {
-		return VerdictUtil.getCyberReqs(model).stream().map(req -> "\"" + req + "\"").collect(Collectors.toList());
+		return VerdictUtil.getAllReqs(model).stream().map(req -> "\"" + req + "\"").collect(Collectors.toList());
 	}
 }

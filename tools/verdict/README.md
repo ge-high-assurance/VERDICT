@@ -16,11 +16,11 @@ Currently our OSATE plugin sources do not have a Maven Tycho build (we
 have not written the pom.xml files yet).  You will need to import the
 OSATE plugin sources into an OSATE development environment, which is
 an Eclipse IDE based on the Eclipse Modeling Tools package, and
-manually export the VERDICT plugin feature into a deployable archive.
+manually export the VERDICT plugin into a deployable feature archive.
 
 If you try to build our plugin sources in a regular Eclipse IDE (even
 one that can build Eclipse plugins), the Eclipse IDE will not have the
-OSATE development tools.  OSATE does have an [update
+OSATE plugin software development kits.  OSATE does have an [update
 site](https://osate-build.sei.cmu.edu/download/osate/stable/latest/updates/)
 so you can install the OSATE AADL Tool Environment feature using
 Eclipse's Install New Software wizard.  However, you also may have to
@@ -29,11 +29,11 @@ Complete SDK using Eclipse's Install New Software Wizard to ensure
 your Eclipse IDE can build the VERDICT plugin sources.
 
 If you try to build our plugin sources in an OSATE release, the OSATE
-release will not have some of the necessary software development
-tools.  As with a regular Eclipse IDE, you still will have to
-find and install all the software development tools using Eclipse's
-Install New Software wizard to ensure your OSATE release can build the
-VERDICT plugin sources.
+release will not have all of the necessary plugin software development
+kits.  As with a regular Eclipse IDE, you still will have to identify
+and install all the necessary plugin software development kits using
+Eclipse's Install New Software wizard to ensure your OSATE release can
+build the VERDICT plugin sources.
 
 Therefore, the first step we recommend is to follow the instructions
 in [Setting up an OSATE development

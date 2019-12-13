@@ -1,6 +1,8 @@
 
 type cia = CIA_C | CIA_I | CIA_A
 
+type ia = IA_I | IA_A
+
 type severity =
   | Severity_None
   | Severity_Minor
@@ -10,11 +12,20 @@ type severity =
 
 type port = string * cia
 
+type iaport = string * ia
+
 type lexpr =
   | LPort of port
   | LAnd of lexpr list
   | LOr of lexpr list
   | LNot of lexpr
+
+type slexpr =
+  | SLPort of iaport
+  | SLFault of string
+  | SLAnd of slexpr list
+  | SLOr of slexpr list
+  | SLNot of slexpr
 
 (* dot-separated strings *)
 type var = string list
@@ -43,6 +54,31 @@ type statement =
         description : string option;
         comment : string option;
         reqs : string list;
+      }
+
+  | SafetyReq of
+      {
+        id : string;
+        condition: slexpr;
+        description : string option;
+        comment : string option;      
+      }
+
+  | SafetyRel of
+      {
+        id : string;
+        output: iaport;
+        faultSrc: slexpr option;
+        description : string option;
+        comment : string option;      
+      }
+
+  | SafetyEvent of
+      {
+        id : string;
+        probability: string;
+        description : string option;
+        comment : string option;
       }
 
   | CyberReq of
@@ -108,6 +144,10 @@ let pp_print_cia ppf = function
   | CIA_I -> Format.fprintf ppf "I"
   | CIA_A -> Format.fprintf ppf "A"
 
+let pp_print_ia ppf = function
+  | IA_I -> Format.fprintf ppf "I"
+  | IA_A -> Format.fprintf ppf "A"
+
 let pp_print_severity ppf = function
   | Severity_None -> Format.fprintf ppf "None"
   | Severity_Minor -> Format.fprintf ppf "Minor"
@@ -117,6 +157,9 @@ let pp_print_severity ppf = function
 
 let pp_print_port ppf (port, cia) =
   Format.fprintf ppf "%s:%a" port pp_print_cia cia
+
+let pp_print_iaport ppf (port, ia) =
+  Format.fprintf ppf "%s:%a" port pp_print_ia ia
 
 let rec pp_print_list_join join pp_printer ppf = function
   | [] -> ()
@@ -140,6 +183,46 @@ let rec pp_print_lexpr ppf = function
   | LNot expr ->
      pp_print_wrap_parens ppf
        (fun p -> Format.fprintf p "not %a" pp_print_lexpr) expr
+
+let pp_print_fault ppf id =
+  Format.fprintf ppf "happens(%s)" id
+
+let rec pp_print_slexpr ppf = function
+  | SLPort port -> pp_print_iaport ppf port
+  | SLFault id -> pp_print_fault ppf id
+  | SLAnd exprs ->
+     pp_print_wrap_parens ppf
+       (pp_print_list_join "and" pp_print_slexpr) exprs
+  | SLOr exprs ->
+     pp_print_wrap_parens ppf
+       (pp_print_list_join "or" pp_print_slexpr) exprs
+  | SLNot expr ->
+     pp_print_wrap_parens ppf
+       (fun p -> Format.fprintf p "not %a" pp_print_slexpr) expr
+
+let pp_print_safety_req_body ind ppf
+      (id, condition, description, comment) =
+  Format.fprintf ppf
+    "{id=%s; condition=%a%a%a}" id
+    pp_print_slexpr condition
+    (pp_print_option "; comment=%s") comment
+    (pp_print_option "; description=%s") description 
+
+let pp_print_safety_rel_body ind ppf
+      (id, output, faultSrc, description, comment) =
+  Format.fprintf ppf
+    "{id=%s; output=%a%a%a%a}"
+    id pp_print_iaport output
+    (pp_print_option_a "; faultSrc=%a" pp_print_slexpr) faultSrc
+    (pp_print_option "; comment=%s") comment
+    (pp_print_option "; description=%s") description 
+
+let pp_print_safety_event_body ind ppf
+      (id, probability, description, comment) =
+  Format.fprintf ppf
+    "{id=%s; probability=%s%a%a}" id probability
+    (pp_print_option "; comment=%s") comment
+    (pp_print_option "; description=%s") description
 
 let pp_print_cyber_req_body ind ppf
       (id, cia, severity, condition, comment) =
@@ -201,6 +284,18 @@ let pp_print_threat_model ind ppf
 let pp_print_statement ind ppf = function
   | Mission {id; description; reqs} ->
      Format.fprintf ppf "Mission \"%s\"" id (* TODO *)
+  | SafetyReq {id; condition; description; comment} ->
+     Format.fprintf ppf "SafetyReq %a"
+       (pp_print_safety_req_body ind)
+       (id, condition, description, comment)
+  | SafetyRel {id; output; faultSrc; description; comment} ->
+     Format.fprintf ppf "SafetyRel %a"
+       (pp_print_safety_rel_body ind)
+       (id, output, faultSrc, description, comment)
+  | SafetyEvent {id; probability; description; comment} ->
+     Format.fprintf ppf "SafetyEvent %a"
+       (pp_print_safety_event_body ind)
+       (id, probability, description, comment)
   | CyberReq {id; cia; severity; condition; comment} ->
      Format.fprintf ppf "CyberReq %a"
        (pp_print_cyber_req_body ind)

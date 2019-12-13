@@ -1,9 +1,19 @@
 uri "http://sadl.org/STEM/BaseModel" alias base.
 
-SL (note "Security Level") is a type of int [1,5].  
+// Has 2 Cyber Attack Properties from TA1 for which we hand generated declarations and rules.
+// In the data, gps has a new attack and radio has an attack similar to our CAPEC 25
+// gps shows CAPEC 1000 (what we called the new attack) and radio has CAPEC 25 even when we comment 
+// out our CAPEC 25 rules.
+
 DAL (note "Design Assurance Level") is a type of int [0,9]. // 0 for DAL in case the implementation property is not present
-Thing (alias "super class of everything") is a class.  
+ComponentType is a class, must be one of {Software, Hardware, Hybrid, Human}.
+Pedigree is a class, must be one of {InternallyDeveloped, COTS, Sourced}.
+
+Thing (alias "super class of everything") is a class
+	described by cType with a single value of type ComponentType.
+
 Person is a type of Thing.
+cType of Person must be one of {Human}. 
 
 // As (implementation) property may have a DAL, we need to define a Property class instead of just having it as a string
 ImplProperty is a class
@@ -11,110 +21,921 @@ ImplProperty is a class
 	described by val with a single value of type boolean
 	described by dal with a single value of type DAL. 
 
+//DataType is a class, must be one of {Control, yData}.	
 System is a type of Thing
 	described by component with values of type Subsystem
 	described by inputPort with values of type string 
 	described by outputPort with values of type string 
-	described by dependency with values of type Dependency
-	described by secLevel with a single value of type SL //int range 1-5 
+	described by applicableCM with values of type CAPEC //has capec and mitigation
+//	described by dependency with values of type Dependency
+//	described by secLevel with a single value of type SL //int range 1-5 
 	// properties
-	described by isHardware with a single value of type boolean
 	described by insideTrustedBoundary with a single value of type boolean
 	described by broadcast with a single value of type boolean
 	described by broadcastFromOutsideTB with a single value of type boolean
 	described by wifiFromOutsideTB with a single value of type boolean
-//	described by canBeSpoofed with a single value of type boolean
-//	described by canBeJammed with a single value of type boolean
-//	described by canBeBlinded with a single value of type boolean  
 	described by hasSensitiveInfo with a single value of type boolean
-	// implementation properties related to mitigations
-	described by encryption with a single value of type ImplProperty 	
+	described by controlReceivedFromUntrusted with a single value of type boolean
+	described by dataReceivedFromUntrusted with a single value of type boolean
+	described by controlSentToUntrusted with a single value of type boolean
+	described by dataSentToUntrusted with a single value of type boolean
+	described by canReceiveSWUpdate with a single value of type boolean
+	described by canReceiveConfigUpdate with a single value of type boolean
+	described by pedigree with a single value of type Pedigree		
+			
+	// implementation properties related to mitigations 	
 	described by heterogeneity with a single value of type ImplProperty 
 	described by antiJamming with a single value of type ImplProperty 	
 	described by antiFlooding with a single value of type ImplProperty
-	described by antiFuzzing with a single value of type ImplProperty	 	
-	// threats, protections
-	described by cia with values of type SecurityIssueLabel // not used
-	described by capecString with values of type string
-	described by protection with values of type Protection. 
+	described by antiFuzzing with a single value of type ImplProperty
+	described by physicalAccessControl with a single value of type ImplProperty  
+	described by deviceAuthentication with a single value of type ImplProperty
+	described by XdeviceAuthentication with a single value of type boolean  
+	described by XphysicalAccessControl with a single value of type boolean
+
+	described by staticCodeAnalysis with a single value of type ImplProperty  
+	described by removeIdentifyingInformation with a single value of type ImplProperty	
+	described by inputValidation with a single value of type ImplProperty  
+	described by dosProtection with a single value of type ImplProperty
+	described by physicalAccessControl with a single value of type ImplProperty	 	
+	described by deviceAuthentication with a single value of type ImplProperty
+	described by auditMessageResponses with a single value of type ImplProperty  
+	described by encryptedStorage with a single value of type ImplProperty	
+	described by logging with a single value of type ImplProperty  
+	described by secureBoot with a single value of type ImplProperty
+	described by memoryProtection with a single value of type ImplProperty	 	
+	described by resourceAvailability with a single value of type ImplProperty
+	described by resourceIsolation with a single value of type ImplProperty
+	described by secureBoot with a single value of type ImplProperty  
+	described by sessionAuthenticity with a single value of type ImplProperty
+	described by saticCodeAnalysis with a single value of type ImplProperty
+	described by strongCryptoAlgorithms with a single value of type ImplProperty
+	described by supplyChainSecurity with a single value of type ImplProperty
+	described by systemAccessControl with a single value of type ImplProperty	
+	described by tamperProtection with a single value of type ImplProperty  //AM 7/24 made it and next one boolean for the moment
+    described by userAuthentication with a single value of type ImplProperty
+
+	described by ta1_Deadlock with a single value of type boolean
+	described by ta1_NewProp with a single value of type boolean
+. 
 
 // the following would also work so that we can filter on the properties we want to show as tooltip, but is not as clean as using annotations
 //tooltipProp is a property with values of type data.
 //{heterogeneity, insideTrustedBoundary, unencWifiFromOutsideTB, hasSensitiveInfo, broadcastFromOutsideTB} are types of tooltipProp.
 
+// note that we display boolean properties and not the enumerated ones
 tooltipProp is a type of annotation.	// all the component properties we want to display will have tooltipProp annotation set to true
 heterogeneity has tooltipProp true.
 insideTrustedBoundary has tooltipProp true.	
-wifiFromOutsideTB has tooltipProp true.
 hasSensitiveInfo has tooltipProp true.	
-broadcastFromOutsideTB has tooltipProp true.
-encryption has tooltipProp true.
+controlReceivedFromUntrusted has tooltipProp true.
+dataReceivedFromUntrusted has tooltipProp true.
+controlSentToUntrusted has tooltipProp true.
+dataSentToUntrusted has tooltipProp true.
+cType has tooltipProp true.  // But we do not display it in graph as we look for value to be true or false
+canReceiveSWUpdate has tooltipProp true.
+canReceiveConfigUpdate has tooltipProp true.
+pedigree has tooltipProp true.
 antiJamming has tooltipProp true.	
-antiFlooding has tooltipProp true.
-antiFuzzing has tooltipProp true.
+//antiFlooding has tooltipProp true.
+//antiFuzzing has tooltipProp true.
+staticCodeAnalysis has tooltipProp true.  
+removeIdentifyingInformation has tooltipProp true.	
+inputValidation has tooltipProp true.
+dosProtection has tooltipProp true.
+physicalAccessControl has tooltipProp true.	 	
+deviceAuthentication has tooltipProp true.
+auditMessageResponses has tooltipProp true.  
+encryptedStorage has tooltipProp true.	
+logging has tooltipProp true.  
+secureBoot has tooltipProp true.
+memoryProtection has tooltipProp true.	 	
+resourceAvailability has tooltipProp true.
+resourceIsolation has tooltipProp true. 
+sessionAuthenticity has tooltipProp true.
+strongCryptoAlgorithms has tooltipProp true. 
+supplyChainSecurity has tooltipProp true.
+systemAccessControl has tooltipProp true.	
+tamperProtection has tooltipProp true.
+userAuthentication has tooltipProp true.
+
+ta1_Deadlock has tooltipProp true.
+ta1_NewProp has tooltipProp true.
 
 Subsystem is a type of System.
-Dependency is a class // for an output identify the input ports 
-	described by comp with a single value of type Subsystem
-	described by input with a single value of type string  
-	described by inputCIA with a single value of type SecurityIssueLabel 
-	described by output with a single value of type string
-	described by outputCIA with a single value of type SecurityIssueLabel. 
-Protection is a class //I have not put in a slot for CAPEC Description
-  described by capecMitigated with a single value of type string
-  described by capecDescription with a single value of type string
-  described by ciaIssue with a single value of type SecurityIssueLabel
-  described by affectedComponent with a single value of type Subsystem 
-  described by defense with a single value of type string  // using NIST defenses
-  described by protectionDescription with a single value of type string 
-  described by implProperty with a single value of type string
-  described by dal with a single value of type DAL
-  described by addressed with a single value of type boolean  
-  . 
-//ProtectionType is a class.  
-//RateLimit is a type of ProtectionType.
-//PhysicalSecurity is a type of ProtectionType.
-Connection is a type of Subsystem 
+  
+PortType is a class, must be one of {inport, outport}.
+
+Connection is a type of Subsystem // just for reading in the tabular data; some properties will be from the 3rd csv file
+	described by connectionName with a single value of type string
 	described by connectionFlow with values of type ContentType
-	described by connectionSource with a single value of type Thing 
+	described by encryptedTransmission with a single value of type ImplProperty // this line gives NullPointerException
+	described by XencryptedTransmission with a single value of type boolean
+	described by trustedConnection with a single value of type boolean
+    described by srcCompType with a single value of type Thing // SrcCompType
+    described by srcCompImpl with a single value of type System // SrcCompImpl
+    described by srcCompCategory with a single value of type System // SrcCompCategory
+	described by connectionSource with a single value of type Thing //SrcCompInstance
 	described by outPort with a single value of type string //outPort is on the "source"
+	described by srcPortType with a single value of type PortType // SrcPortType
+	described by destCompType with a single value of type Thing // DestCompType
+    described by destCompImpl with a single value of type System // DestCompImpl
+    described by destCompCategory with a single value of type System // DestCompCategory
 	described by connectionDestination with a single value of type Thing
 	described by inPort with a single value of type string // inPort is on the "destination"
-	described by infoFlowSeverity with a single value of type int.  
-
-ContentType is a class, must be one of {Xdata, Control, Request}.
-SecurityIssueLabel is a class, must be one of {Confidentiality, Integrity, Availability}.
-CIAIssue is a class
-  described by depth with a single value of type int
-  described by causingCIAIssue with a single value of type CIAIssue
-  described by ciaIssue with a single value of type SecurityIssueLabel
-  described by affectedComponent with a single value of type Subsystem  
-  described by causingComponent with a single value of type Thing   
-  described by capec with a single value of type string 
-  described by capecDescription with a single value of type string
-  described by likelihoodOfSuccess with a single value of type float. 
-
-Severity is a class, must be one of {NoSafetyEffect, Minor, Major, Hazardous, Catastrophic}. //from DO-356A
-
-// One Mission Requirement may get mapped to multiple Cyber Requirements
-// Each Cyber Requirement has 
-//		mission impact in terms of CIA (one value only???)
-//		effect
-//		severity
-//		multiple <comp instance, CIA value> - more than 1 CIA value allowed
-
-MissionReq is a class
-	described by id with a single value of type string	// can we avoid string	
-	described by description with a single value of type string
-	described by cyberReq with values of type CyberReq.
+	described by destPortType with a single value of type PortType // DestPortType
+    described by infoFlowSeverity with a single value of type int.
 	
-CyberReq is a class
-	described by id with a single value of type string		
-	described by description with a single value of type string
-	described by missionImpact with a single value of type SecurityIssueLabel  //do we need multiple CIA values?
-	described by effect with a single value of type string
-	described by severity with a single value of type Severity	
-	described by compOutputDependency with a single value of type string  // output port name
-	described by confidentialityImpactedBy with values of type Subsystem //this plus next two specify for one comp instance that impacts the cyber req
-	described by integrityImpactedBy with values of type Subsystem 
-	described by availabilityImpactedBy with values of type Subsystem.
+ContentType is a class, must be one of {Xdata, Xcontrol, Xrequest}.
+SecurityIssueLabel is a class, must be one of {Confidentiality, Integrity, Availability}.
+CAPEC is a class  
+	described by id with a single value of type integer
+	described by capecDesc with a single value of type string
+	described by ciaIssue with a single value of type SecurityIssueLabel
+	described by likelihoodOfSuccess with a single value of type float
+	described by mitigation with values of type Mitigation. 
+
+NISTControl is a class
+	described by nistId with a single value of type string
+	described by nistDesc with a single value of type string.
+	
+Mitigation is a class // could we relate it to ImplProperty
+	described by implProperty with a single value of type string 
+	described by nistControl with values of type NISTControl. 
+
+/////////////////////////// manually generated for unmapped Cyber Attack Property ta1_NewProp
+// using dummy CAPECs numbered from 1000 for CAP that do not match to any CAPEC
+// and the also generating new Mitigation and NISTCoontrol structures to be edited as needed
+
+CAPEC-1000-ta1NewProp is a CAPEC
+   with id 1000
+   with capecDesc "TA1 NewProp"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation NewDefenseForta1NewProp.
+   
+NewDefenseForta1NewProp is a Mitigation 
+   with implProperty "newDefenseForta1NewProp"
+   with nistControl Nist-x1.   
+   
+Nist-x1 is a NISTControl
+   with nistId "Nist-x1"
+   with nistDesc "Description of Nist-x1". 
+
+////////////////////// following generated from Excel: CAPEC, NIST, mitigation declarations /////////////////
+
+CAPEC-21I-SessionAuthenticity is a CAPEC
+   with id 21
+   with capecDesc "Exploitation of Trusted Credentials"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SessionAuthenticity.
+CAPEC-21C-SessionAuthenticity is a CAPEC
+   with id 21
+   with capecDesc "Exploitation of Trusted Credentials"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SessionAuthenticity.
+CAPEC-22I-DeviceAuthentication is a CAPEC
+   with id 22
+   with capecDesc "Exploiting Trust in Client"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-22C-DeviceAuthentication is a CAPEC
+   with id 22
+   with capecDesc "Exploiting Trust in Client"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-22A-DeviceAuthentication is a CAPEC
+   with id 22
+   with capecDesc "Exploiting Trust in Client"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-25A-StaticCodeAnalysis is a CAPEC
+   with id 25
+   with capecDesc "Forced Deadlock"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-26I-StaticCodeAnalysis is a CAPEC
+   with id 26
+   with capecDesc "Leveraging Race Conditions"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-26C-StaticCodeAnalysis is a CAPEC
+   with id 26
+   with capecDesc "Leveraging Race Conditions"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-28I-InputValidation is a CAPEC
+   with id 28
+   with capecDesc "Fuzzing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation.
+CAPEC-28C-InputValidation is a CAPEC
+   with id 28
+   with capecDesc "Fuzzing"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation.
+CAPEC-28A-InputValidation is a CAPEC
+   with id 28
+   with capecDesc "Fuzzing"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation.
+CAPEC-74I-InputValidation-StaticCodeAnalysis is a CAPEC
+   with id 74
+   with capecDesc "Manipulating User State"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation StaticCodeAnalysis.
+CAPEC-74C-InputValidation-StaticCodeAnalysis is a CAPEC
+   with id 74
+   with capecDesc "Manipulating User State"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation StaticCodeAnalysis.
+CAPEC-112I-StrongCryptoAlgorithms is a CAPEC
+   with id 112
+   with capecDesc "Brute Force"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation StrongCryptoAlgorithms.
+CAPEC-112C-StrongCryptoAlgorithms is a CAPEC
+   with id 112
+   with capecDesc "Brute Force"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation StrongCryptoAlgorithms.
+CAPEC-112A-StrongCryptoAlgorithms is a CAPEC
+   with id 112
+   with capecDesc "Brute Force"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation StrongCryptoAlgorithms.
+CAPEC-114I-StaticCodeAnalysis is a CAPEC
+   with id 114
+   with capecDesc "Authentication Abuse"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-114C-StaticCodeAnalysis is a CAPEC
+   with id 114
+   with capecDesc "Authentication Abuse"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-114A-StaticCodeAnalysis is a CAPEC
+   with id 114
+   with capecDesc "Authentication Abuse"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-115I-StaticCodeAnalysis is a CAPEC
+   with id 115
+   with capecDesc "Authentication Bypass"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-115C-StaticCodeAnalysis is a CAPEC
+   with id 115
+   with capecDesc "Authentication Bypass"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-115A-StaticCodeAnalysis is a CAPEC
+   with id 115
+   with capecDesc "Authentication Bypass"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-116C-RemoveIdentifyingInformation is a CAPEC
+   with id 116
+   with capecDesc "Excavation"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation RemoveIdentifyingInformation.
+CAPEC-117C-EncryptedTransmission is a CAPEC
+   with id 117
+   with capecDesc "Interception"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation EncryptedTransmission.
+CAPEC-123I-StaticCodeAnalysis is a CAPEC
+   with id 123
+   with capecDesc "Buffer Manipulation"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-123C-StaticCodeAnalysis is a CAPEC
+   with id 123
+   with capecDesc "Buffer Manipulation"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-123A-StaticCodeAnalysis is a CAPEC
+   with id 123
+   with capecDesc "Buffer Manipulation"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation StaticCodeAnalysis.
+CAPEC-125A-DosProtection is a CAPEC
+   with id 125
+   with capecDesc "Flooding"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DosProtection.
+CAPEC-130A-ResourceAvailability is a CAPEC
+   with id 130
+   with capecDesc "Excessive Allocation"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation ResourceAvailability.
+CAPEC-131A-ResourceAvailability is a CAPEC
+   with id 131
+   with capecDesc "Resource Leak Exposure"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation ResourceAvailability.
+CAPEC-137I-DeviceAuthentication is a CAPEC
+   with id 137
+   with capecDesc "Parameter Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-137I-InputValidation-Logging is a CAPEC
+   with id 137
+   with capecDesc "Parameter Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-148I-Heterogeneity is a CAPEC
+   with id 148
+   with capecDesc "Content Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation Heterogeneity.
+CAPEC-148I-PhysicalAccessControl is a CAPEC
+   with id 148
+   with capecDesc "Content Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-148I-DeviceAuthentication is a CAPEC
+   with id 148
+   with capecDesc "Content Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-151I-Heterogeneity is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation Heterogeneity.
+CAPEC-151I-PhysicalAccessControl is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-151I-DeviceAuthentication is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-151C-Heterogeneity is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation Heterogeneity.
+CAPEC-151C-PhysicalAccessControl is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-151C-DeviceAuthentication is a CAPEC
+   with id 151
+   with capecDesc "Identity Spoofing"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-169C-RemoveIdentifyingInformation is a CAPEC
+   with id 169
+   with capecDesc "Footprinting"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation RemoveIdentifyingInformation.
+CAPEC-175I-DeviceAuthentication is a CAPEC
+   with id 175
+   with capecDesc "Code Inclusion"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-175I-InputValidation-Logging is a CAPEC
+   with id 175
+   with capecDesc "Code Inclusion"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-176I-SecureBoot-MemoryProtection is a CAPEC
+   with id 176
+   with capecDesc "Configuration/Environment Manipulation"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SecureBoot
+   with mitigation MemoryProtection.
+CAPEC-184I-SecureBoot-MemoryProtection is a CAPEC
+   with id 184
+   with capecDesc "Software Integrity Attack"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SecureBoot
+   with mitigation MemoryProtection.
+CAPEC-188C-PhysicalAccessControl is a CAPEC
+   with id 188
+   with capecDesc "Reverse Engineering"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-188C-TamperProtection is a CAPEC
+   with id 188
+   with capecDesc "Reverse Engineering"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation TamperProtection.
+CAPEC-188C-EncryptedStorage is a CAPEC
+   with id 188
+   with capecDesc "Reverse Engineering"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation EncryptedStorage.
+CAPEC-192C-EncryptedTransmission is a CAPEC
+   with id 192
+   with capecDesc "Protocol Analysis"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation EncryptedTransmission.
+CAPEC-192C-PhysicalAccessControl is a CAPEC
+   with id 192
+   with capecDesc "Protocol Analysis"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-224C-AuditMessageResponses is a CAPEC
+   with id 224
+   with capecDesc "Fingerprinting"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation AuditMessageResponses.
+CAPEC-242I-DeviceAuthentication is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-242I-InputValidation-Logging is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-242C-DeviceAuthentication is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-242C-InputValidation-Logging is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-242A-DeviceAuthentication is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-242A-InputValidation-Logging is a CAPEC
+   with id 242
+   with capecDesc "Code Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-248I-DeviceAuthentication is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-248I-InputValidation-Logging is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-248C-DeviceAuthentication is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-248C-InputValidation-Logging is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-248A-DeviceAuthentication is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-248A-InputValidation-Logging is a CAPEC
+   with id 248
+   with capecDesc "Command Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-390I-SystemAccessControl is a CAPEC
+   with id 390
+   with capecDesc "Bypassing Physical Security"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
+CAPEC-390C-SystemAccessControl is a CAPEC
+   with id 390
+   with capecDesc "Bypassing Physical Security"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
+CAPEC-390A-SystemAccessControl is a CAPEC
+   with id 390
+   with capecDesc "Bypassing Physical Security"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
+CAPEC-438I-SupplyChainSecurity is a CAPEC
+   with id 438
+   with capecDesc "Modification During Manufacture"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SupplyChainSecurity.
+CAPEC-439I-SupplyChainSecurity is a CAPEC
+   with id 439
+   with capecDesc "Manipulation During Distribution"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SupplyChainSecurity.
+CAPEC-440I-TamperProtection is a CAPEC
+   with id 440
+   with capecDesc "Hardware Integrity Attack"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation TamperProtection.
+CAPEC-440I-PhysicalAccessControl is a CAPEC
+   with id 440
+   with capecDesc "Hardware Integrity Attack"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-507I-PhysicalAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-507C-PhysicalAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-507A-PhysicalAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-549I-SecureBoot-MemoryProtection is a CAPEC
+   with id 549
+   with capecDesc "Local Execution of Code"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SecureBoot
+   with mitigation MemoryProtection.
+CAPEC-549C-SecureBoot-MemoryProtection is a CAPEC
+   with id 549
+   with capecDesc "Local Execution of Code"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SecureBoot
+   with mitigation MemoryProtection.
+CAPEC-549A-SecureBoot-MemoryProtection is a CAPEC
+   with id 549
+   with capecDesc "Local Execution of Code"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation SecureBoot
+   with mitigation MemoryProtection.
+CAPEC-586I-DeviceAuthentication is a CAPEC
+   with id 586
+   with capecDesc "Object Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-586I-InputValidation-Logging is a CAPEC
+   with id 586
+   with capecDesc "Object Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-586A-DeviceAuthentication is a CAPEC
+   with id 586
+   with capecDesc "Object Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-586A-InputValidation-Logging is a CAPEC
+   with id 586
+   with capecDesc "Object Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-594I-DeviceAuthentication is a CAPEC
+   with id 594
+   with capecDesc "Traffic Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-594I-InputValidation-Logging is a CAPEC
+   with id 594
+   with capecDesc "Traffic Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-594A-DeviceAuthentication is a CAPEC
+   with id 594
+   with capecDesc "Traffic Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation DeviceAuthentication.
+CAPEC-594A-InputValidation-Logging is a CAPEC
+   with id 594
+   with capecDesc "Traffic Injection"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation InputValidation
+   with mitigation Logging.
+CAPEC-607A-AntiJamming is a CAPEC
+   with id 607
+   with capecDesc "Obstruction"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation AntiJamming.
+CAPEC-624I-PhysicalAccessControl is a CAPEC
+   with id 624
+   with capecDesc "Fault Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-624C-PhysicalAccessControl is a CAPEC
+   with id 624
+   with capecDesc "Fault Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+
+
+   
+AU-12 is a NISTControl
+   with nistId "AU-12"
+   with nistDesc "Audit Generation".
+AU-12-1 is a NISTControl
+   with nistId "AU-12-1"
+   with nistDesc "System-wide / Time-correlated Audit Trail".
+AU-12-3 is a NISTControl
+   with nistId "AU-12-3"
+   with nistDesc "Changes By Authorized Individuals".
+AU-9 is a NISTControl
+   with nistId "AU-9"
+   with nistDesc "Protection Of Audit Information".
+AU-9-3 is a NISTControl
+   with nistId "AU-9-3"
+   with nistDesc "Cryptographic Protection".
+IA-2 is a NISTControl
+   with nistId "IA-2"
+   with nistDesc "Identification and Authentication (Organizational Users)".
+IA-2-1 is a NISTControl
+   with nistId "IA-2-1"
+   with nistDesc "Network Access to Privileged Accounts".
+IA-2-2 is a NISTControl
+   with nistId "IA-2-2"
+   with nistDesc "Network Access to Non-Privileged Accounts".
+IA-2-3 is a NISTControl
+   with nistId "IA-2-3"
+   with nistDesc "Local Access to Privileged Accounts".
+IA-2-4 is a NISTControl
+   with nistId "IA-2-4"
+   with nistDesc "Local Access to Non-Privileged Accounts".
+IA-2-8 is a NISTControl
+   with nistId "IA-2-8"
+   with nistDesc "Network Access to Privileged Accounts - Replay Resistant".
+IA-2-9 is a NISTControl
+   with nistId "IA-2-9"
+   with nistDesc "Network Access to Non-Privileged Accounts - Replay Resistant".
+IA-2-11 is a NISTControl
+   with nistId "IA-2-11"
+   with nistDesc "Remote Access - Separate Device".
+IA-2-12 is a NISTControl
+   with nistId "IA-2-12"
+   with nistDesc "Acceptance of PIV Credentials".
+IA-3 is a NISTControl
+   with nistId "IA-3"
+   with nistDesc "Device Identification And Authentication".
+IA-3-1 is a NISTControl
+   with nistId "IA-3-1"
+   with nistDesc "Cryptographic Bidirectional Authentication".
+PE-3 is a NISTControl
+   with nistId "PE-3"
+   with nistDesc "Physical Access Control".
+PE-3-1 is a NISTControl
+   with nistId "PE-3-1"
+   with nistDesc "Information System Access Control".
+PE-3-5 is a NISTControl
+   with nistId "PE-3-5"
+   with nistDesc "Tamper Protection".
+SA-11-1 is a NISTControl
+   with nistId "SA-11-1"
+   with nistDesc "Static Code Analysis".
+SA-12 is a NISTControl
+   with nistId "SA-12"
+   with nistDesc "Supply Chain Protection".
+SC-13 is a NISTControl
+   with nistId "SC-13"
+   with nistDesc "Cryptographic Protection".
+SC-23 is a NISTControl
+   with nistId "SC-23"
+   with nistDesc "Session Authenticity".
+SC-28 is a NISTControl
+   with nistId "SC-28"
+   with nistDesc "Protection Of Information At Rest".
+SC-29 is a NISTControl
+   with nistId "SC-29"
+   with nistDesc "Heterogeneity".
+SC-4 is a NISTControl
+   with nistId "SC-4"
+   with nistDesc "Information in Shared Resources".
+SC-40 is a NISTControl
+   with nistId "SC-40"
+   with nistDesc "Wireless Link Protection".
+SC-5 is a NISTControl
+   with nistId "SC-5"
+   with nistDesc "Denial of Service Protection".
+SC-5-2 is a NISTControl
+   with nistId "SC-5-2"
+   with nistDesc "Excess Capacity/Bandwidth/Redundancy".
+SC-6 is a NISTControl
+   with nistId "SC-6"
+   with nistDesc "Resource Availability".
+SC-7-16 is a NISTControl
+   with nistId "SC-7-16"
+   with nistDesc "Prevent Discovery of Components/Devices".
+SC-8 is a NISTControl
+   with nistId "SC-8"
+   with nistDesc "Transmission Integrity".
+SI-10 is a NISTControl
+   with nistId "SI-10"
+   with nistDesc "Information Input Validation".
+SI-10-5 is a NISTControl
+   with nistId "SI-10-5"
+   with nistDesc "Restrict Inputs to Trusted Sources and Approved Formats".
+SI-11 is a NISTControl
+   with nistId "SI-11"
+   with nistDesc "Error Handling".
+SI-16 is a NISTControl
+   with nistId "SI-16"
+   with nistDesc "Memory Protection".
+SI-7-15 is a NISTControl
+   with nistId "SI-7-15"
+   with nistDesc "Code Authentication".
+SI-7-5 is a NISTControl
+   with nistId "SI-7-5"
+   with nistDesc "Automated Response To Integrity Violations".
+SI-7-6 is a NISTControl
+   with nistId "SI-7-6"
+   with nistDesc "Cryptographic Protection".
+SI-7-9 is a NISTControl
+   with nistId "SI-7-9"
+   with nistDesc "Verify Boot Process".
+
+AntiJamming is a Mitigation
+   with implProperty "antiJamming"
+   with nistControl SC-40.
+AuditMessageResponses is a Mitigation
+   with implProperty "auditMessageResponses"
+   with nistControl SI-11.
+DeviceAuthentication is a Mitigation
+   with implProperty "deviceAuthentication"
+   with nistControl IA-3
+   with nistControl IA-3-1.
+DosProtection is a Mitigation
+   with implProperty "dosProtection"
+   with nistControl SC-5
+   with nistControl SC-5-2.
+EncryptedStorage is a Mitigation
+   with implProperty "encryptedStorage"
+   with nistControl SC-28.
+EncryptedTransmission is a Mitigation
+   with implProperty "encryptedTransmission"
+   with nistControl SC-8.
+Heterogeneity is a Mitigation
+   with implProperty "heterogeneity"
+   with nistControl SC-29.
+InputValidation is a Mitigation
+   with implProperty "inputValidation"
+   with nistControl SI-10
+   with nistControl SI-10-5.
+Logging is a Mitigation
+   with implProperty "logging"
+   with nistControl AU-12
+   with nistControl AU-12-1
+   with nistControl AU-12-3
+   with nistControl AU-9
+   with nistControl AU-9-3.
+MemoryProtection is a Mitigation
+   with implProperty "memoryProtection"
+   with nistControl SI-16.
+PhysicalAccessControl is a Mitigation
+   with implProperty "physicalAccessControl"
+   with nistControl PE-3.
+RemoveIdentifyingInformation is a Mitigation
+   with implProperty "removeIdentifyingInformation"
+   with nistControl SC-7-16.
+ResourceAvailability is a Mitigation
+   with implProperty "resourceAvailability"
+   with nistControl SC-6.
+ResourceIsolation is a Mitigation
+   with implProperty "resourceIsolation"
+   with nistControl SC-4.
+SecureBoot is a Mitigation
+   with implProperty "secureBoot"
+   with nistControl SI-7-5
+   with nistControl SI-7-6
+   with nistControl SI-7-9
+   with nistControl SI-7-15.
+SessionAuthenticity is a Mitigation
+   with implProperty "sessionAuthenticity"
+   with nistControl SC-23.
+StaticCodeAnalysis is a Mitigation
+   with implProperty "staticCodeAnalysis"
+   with nistControl SA-11-1.
+StrongCryptoAlgorithms is a Mitigation
+   with implProperty "strongCryptoAlgorithms"
+   with nistControl SC-13.
+SupplyChainSecurity is a Mitigation
+   with implProperty "supplyChainSecurity"
+   with nistControl SA-12.
+SystemAccessControl is a Mitigation
+   with implProperty "systemAccessControl"
+   with nistControl PE-3-1.
+TamperProtection is a Mitigation
+   with implProperty "tamperProtection"
+   with nistControl PE-3-5.
+UserAuthentication is a Mitigation
+   with implProperty "userAuthentication"
+   with nistControl IA-2
+   with nistControl IA-2-1
+   with nistControl IA-2-2
+   with nistControl IA-2-3
+   with nistControl IA-2-4
+   with nistControl IA-2-8
+   with nistControl IA-2-9
+   with nistControl IA-2-11
+   with nistControl IA-2-12.

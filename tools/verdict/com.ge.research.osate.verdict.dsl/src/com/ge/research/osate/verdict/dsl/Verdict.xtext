@@ -58,7 +58,7 @@ CyberMission: 'MissionReq' CyberMissionBlock;
 CyberMissionBlock returns CyberMission:
 	'{' (
 	('id' '=' id=STRING DELIMETER_OPT) &
-	('cyberReqs' '=' cyberReqs+=STRING (',' cyberReqs+=STRING)* DELIMETER_OPT) &
+	('reqs' '=' cyberReqs+=STRING (',' cyberReqs+=STRING)* DELIMETER_OPT) &
 	('description' '=' description=STRING DELIMETER_OPT)? &
 	// Why note instead of comment? Because Xtext is stupid.
 	// Try changing it and see that it generates two fields with the same name in VerdictPackage...
@@ -193,7 +193,7 @@ SafetyRelBlock returns SafetyRel:
 ;
 
 SafetyRelShort returns SafetyRel:
-	id=STRING ('=' inputs=SafetyRelInputLogic)? ('=>' | '->') output=SafetyRelOutputLogic
+	id=STRING ('=' faultSrc=SafetyRelInputLogic)? ('=>' | '->') output=SafetyRelOutputLogic
 ;
 
 SafetyRelInputLogic: value=SLExpr;
