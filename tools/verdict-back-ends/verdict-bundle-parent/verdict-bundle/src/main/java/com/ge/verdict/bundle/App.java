@@ -265,9 +265,9 @@ public class App {
         action.run();
 
         // TODO: do this when the thing fails so that we still get the error output
-        //		System.err.println(new String(store.toByteArray()));
+        System.err.println(new String(store.toByteArray()));
 
-        System.setErr(systemErr);
+        //        System.setErr(systemErr);
     }
 
     private static final List<String> soteria_pngs =
@@ -343,6 +343,7 @@ public class App {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
 
+        // Try to produce the XML file if debugDir is given
         debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
 
         logHeader("VDM2CSV");
@@ -361,24 +362,28 @@ public class App {
         log("STEM output directory: " + stemOutputDir);
         log("STEM graphs directory: " + stemGraphsDir);
 
-        hideErrorStream(
-                () -> {
-                    VerdictStem stemRunner = new VerdictStem();
-                    stemRunner.runStem(
-                            new File(stemProjectDir),
-                            new File(stemOutputDir),
-                            new File(stemGraphsDir));
-                });
+        //        hideErrorStream(
+        //                () -> {
+        //
+        //                });
+        log("STEM is running. Please be patient...");
 
-        if (!stem_output_csv.stream()
-                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
-            throw new VerdictRunException("STEM failed to generate all required files");
-        }
+        VerdictStem stemRunner = new VerdictStem();
+        stemRunner.runStem(
+                new File(stemProjectDir), new File(stemOutputDir), new File(stemGraphsDir));
+
+        //        if (!stem_output_csv.stream()
+        //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
+        //            throw new VerdictRunException("STEM failed to generate all required files");
+        //        }
+
+        log("STEM finished!");
 
         logHeader("Soteria++");
 
         log("Soteria++ input directory: " + stemOutputDir);
         log("Soteria++ output directory: " + soteriaPpOutputDir);
+        log("Soteria++ is running. Please be patient...");
 
         try {
             SOTERIA_PP.invoke(
@@ -526,10 +531,11 @@ public class App {
         VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
         lustreOutputer.marshalToLustre(lustreModel, new File(lustrePath));
 
-        logHeader("KIND2");
+        logHeader("Kind2");
 
         log("Running Kind2 model checker");
         log("Output XML file: " + outputPath);
+        log("Kind2 is running. Please be patient...");
 
         if (atg) {
             log("Test cases are embedded in XML");

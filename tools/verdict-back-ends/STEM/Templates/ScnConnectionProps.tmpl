@@ -1,0 +1,35 @@
+uri "http://sadl.org/STEM/Scenario" alias scn
+import "http://sadl.org/STEM/BaseModel".
+
+//log "c:/tmp/scnconnprops.log"
+
+validate <Scenario> not blank skip
+validate <ConnectionName> not blank skip
+validate <SrcComp> not blank skip
+validate <SrcImpl> not blank skip
+validate <SrcCompInstance> not blank skip
+validate <DestComp> not blank skip
+validate <DestImpl> not blank skip
+validate <DestCompInstance> not blank skip
+validate <Flow1> not blank skip
+validate <Flow2> not blank skip
+validate <Flow3> not blank skip
+validate <trustedConnection> not blank skip
+validate <encryptedTransmission> not blank skip
+
+transform <trustedConnection> to <trusted> replace "1" : true,"0" : false
+transform <encryptedTransmission> to <def1A[]> split "#"
+transform <def1A[1]> to <def1> replace "1" : true,"0" : false
+
+<ConnectionName>_<SrcComp> connectionFlow <Flow1>
+<ConnectionName>_<SrcComp> connectionFlow <Flow2>
+<ConnectionName>_<SrcComp> connectionFlow <Flow3>
+<ConnectionName>_<SrcComp> trustedConnection <trusted>
+<ConnectionName>_<SrcComp> XencryptedTransmission <def1>
+
+<1> rdf:type ImplProperty
+<1> name "encryptedTransmission"
+<1> val <def1>
+<1> dal <def1A[2]>
+<ConnectionName>_<SrcComp> encryptedTransmission <1>
+

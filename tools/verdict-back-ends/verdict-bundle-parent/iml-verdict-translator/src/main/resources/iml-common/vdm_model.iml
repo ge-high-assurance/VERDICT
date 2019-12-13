@@ -8,13 +8,17 @@ type Port {
 	name: Identifier;
 	mode: PortMode;
 	ptype: Option<DataType>;
+	probe: Bool;
 };
 
 type ComponentType {
 	name: Identifier;
 	ports: ArrayList<Port>;
+	compCateg: Option<String>;
     contract: Option<ContractSpec>;
     cyber_relations: ArrayList<CyberRel>;
+    safety_relations: ArrayList<SafetyRel>;
+    safety_events: ArrayList<SafetyEvent>;
 };
 
 type ComponentImplKind enum { Block_Impl, Dataflow_Impl };
@@ -27,30 +31,94 @@ type KindOfComponent enum { Software, Hardware, Human, Hybrid };
 
 type SituatedType enum { OnBoard, Remote };
 
+type PedigreeType enum { InternallyDeveloped, COTS, Sourced };
+
 type ComponentInstance {
 	name: Identifier;
 	kind: ComponentInstanceKind;
 	specification: ComponentType;
 	implementation: ComponentImpl;
-	adversarially_tested : Option<Bool>;
+	
 	manufacturer: Option<ManufacturerType>;
+	pedigree: Option<PedigreeType>;
 	category: Option<String>;
 	component_type: Option<KindOfComponent>;
 	situated: Option<SituatedType>;
+	adversarially_tested : Option<Bool>;
 	has_sensitive_info: Option<Bool>;
 	inside_trusted_boundary: Option<Bool>;
-	broadcast_from_outside_tb: Option<Bool>;
-	wifi_from_outside_tb: Option<Bool>;
-	heterogeneity: Option<Bool>;
-	encryption: Option<Bool>;
+	canReceiveConfigUpdate: Option<Bool>;
+	canReceiveSWUpdate: Option<Bool>;
+ 	controlReceivedFromUntrusted: Option<Bool>;
+ 	controlSentToUntrusted: Option<Bool>;
+ 	dataReceivedFromUntrusted: Option<Bool>;
+ 	dataSentToUntrusted: Option<Bool>;
+
+	Configuration_Attack: Option<Bool>;
+ 	Physical_Theft_Attack: Option<Bool>;
+ 	Interception_Attack: Option<Bool>;
+ 	Hardware_Integrity_Attack: Option<Bool>;
+ 	Supply_Chain_Attack: Option<Bool>;
+ 	Brute_Force_Attack: Option<Bool>;
+ 	Fault_Injection_Attack: Option<Bool>;
+ 	Identity_Spoofing_Attack: Option<Bool>;
+ 	Excessive_Allocation_Attack: Option<Bool>;
+ 	Sniffing_Attack: Option<Bool>;
+ 	Buffer_Attack: Option<Bool>;
+ 	Flooding_Attack: Option<Bool>;
+
 	anti_jamming: Option<Bool>;
-	anti_flooding: Option<Bool>;
-	anti_fuzzing: Option<Bool>;
+	auditMessageResponses: Option<Bool>;
+ 	deviceAuthentication: Option<Bool>;
+ 	dosProtection: Option<Bool>;
+ 	encryptedStorage: Option<Bool>;
+ 	heterogeneity: Option<Bool>;
+ 	inputValidation: Option<Bool>;
+ 	logging: Option<Bool>;
+ 	memoryProtection: Option<Bool>;
+ 	physicalAccessControl: Option<Bool>;
+ 	removeIdentifyingInformation: Option<Bool>;
+ 	resourceAvailability: Option<Bool>;
+ 	resourceIsolation: Option<Bool>;
+ 	secureBoot: Option<Bool>;
+ 	sessionAuthenticity: Option<Bool>;
+ 	staticCodeAnalysis: Option<Bool>;
+ 	strongCryptoAlgorithms: Option<Bool>;
+ 	supplyChainSecurity: Option<Bool>;
+ 	systemAccessControl: Option<Bool>;
+ 	tamperProtection: Option<Bool>;
+ 	userAuthentication: Option<Bool>;
+
+	anti_jamming_dal: Option<Int>;
+	auditMessageResponsesDAL: Option<Int>;
+ 	deviceAuthenticationDAL: Option<Int>;
+ 	dosProtectionDAL: Option<Int>;
+ 	encryptedStorageDAL: Option<Int>;
 	heterogeneity_dal: Option<Int>;
+	inputValidationDAL: Option<Int>;
+ 	loggingDAL: Option<Int>;
+ 	memoryProtectionDAL: Option<Int>;
+ 	physicalAccessControlDAL: Option<Int>;
+ 	removeIdentifyingInformationDAL: Option<Int>;
+ 	resourceAvailabilityDAL: Option<Int>;
+ 	resourceIsolationDAL: Option<Int>;
+ 	secureBootDAL: Option<Int>;
+ 	sessionAuthenticityDAL: Option<Int>;
+ 	staticCodeAnalysisDAL: Option<Int>;
+ 	strongCryptoAlgorithmsDAL: Option<Int>;
+ 	supplyChainSecurityDAL: Option<Int>;
+ 	systemAccessControlDAL: Option<Int>;
+ 	tamperProtectionDAL: Option<Int>;
+ 	userAuthenticationDAL: Option<Int>;
+	/*
     encryption_dal: Option<Int>;
-    anti_jamming_dal: Option<Int>;
     anti_flooding_dal: Option<Int>;
     anti_fuzzing_dal: Option<Int>;
+    broadcast_from_outside_tb: Option<Bool>;
+	wifi_from_outside_tb: Option<Bool>;
+	encryption: Option<Bool>;
+	anti_flooding: Option<Bool>;
+	anti_fuzzing: Option<Bool>;*/
 };
 
 type ConnectionEndKind enum { ComponentCE, SubcomponentCE };
@@ -66,16 +134,20 @@ type ConnectionEnd {
 	subcomponent_port: CompInstPort;
 };
 
-type FlowType enum  { Xdata, Control, Request };
+type FlowType enum  { Xdata, Xcontrol, Xrequest };
 
 type ConnectionType enum { Local, Remote }; 
 
 type Connection {
 	name: Identifier;
 	conn_type: Option<ConnectionType>;
-	flow_type: FlowType;
+	flow_type: Option<FlowType>;
 	authenticated: Option<Bool>;
 	data_encrypted: Option<Bool>;
+	trustedConnection: Option<Bool>;
+ 	encryptedTransmission: Option<Bool>;
+ 	encryptedTransmissionDAL: Option<Int>;
+ 	replayProtection: Option<Bool>;
 	source: ConnectionEnd;
 	destination: ConnectionEnd;
 };
@@ -123,6 +195,7 @@ type CyberReq {
     extern : Option<String>;
 };
 
+
 type CyberRel {
     id : String;
     output : CIAPort;
@@ -131,6 +204,46 @@ type CyberRel {
     description : Option<String>;
     phases : Option<String>;
     extern : Option<String>;
+};
+
+type SafetyExprKind enum {Port, Fault, And, Or, Not};
+
+type IA enum {Integrity, Availability};
+
+type IAPort {
+	name: String;
+	ia: IA;
+};
+
+type SafetyExpr {
+	kind: SafetyExprKind;
+	port: IAPort;
+	fault: String;
+	and: ArrayList<SafetyExpr>;
+	or: ArrayList<SafetyExpr>;
+	not: SafetyExpr;
+};
+
+type SafetyReq {
+	id: String;
+	condition: SafetyExpr;
+	comment: Option<String>;
+    description : Option<String>;
+};
+
+type SafetyRel {
+	id: String;
+	output: IAPort;
+	faultSrc: Option<SafetyExpr>;
+	comment: Option<String>;
+    description : Option<String>;
+};
+
+type SafetyEvent {
+	id: String;
+	probability: String;
+	comment: Option<String>;
+    description : Option<String>;
 };
 
 type Mission {
@@ -200,7 +313,8 @@ type Model {
 	component_impl: ArrayList<ComponentImpl>;
 	dataflow_code: Option<LustreProgram>;
 	cyber_requirements: ArrayList<CyberReq>;
-        missions: ArrayList<Mission>;
-        threat_models: ArrayList<ThreatModel>;
-        threat_defenses: ArrayList<ThreatDefense>;
+	safety_requirements: ArrayList<SafetyReq>;
+	missions: ArrayList<Mission>;
+	threat_models: ArrayList<ThreatModel>;
+	threat_defenses: ArrayList<ThreatDefense>;
 };

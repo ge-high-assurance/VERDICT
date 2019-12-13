@@ -1,0 +1,40 @@
+"CompType","CompInst","CAPEC","CAPECDescription","Confidentiality","Integrity","Availability","LikelihoodOfSuccess"
+"Actuation","actuation","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Camera","camera","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Connector","connector","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"Connector","connector","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"Connector","connector","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Connector","connector","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"PositionEstimator","positionEstimator","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Radio","radio","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"Radio","radio","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"Radio","radio","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Radio","radio","CAPEC-507","Physical Theft",null,null,"Availability",1.0

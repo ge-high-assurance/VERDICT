@@ -98,6 +98,61 @@ public class VDMInstrumentor {
         return instrument(vdm_model, threats, blameAssignment, false);
     }
 
+    protected String getComponentID(
+            Map<String, HashSet<Connection>> components_map, Connection con) {
+        String ComponentID = null;
+
+        for (String cmpID : components_map.keySet()) {
+            HashSet<Connection> con_set = components_map.get(cmpID);
+
+            if (con_set.contains(con)) {
+                ComponentID = cmpID;
+                break;
+            }
+        }
+
+        return ComponentID;
+    }
+
+    protected BlockImpl getBlockID(String componentID) {
+
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (componentID.equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
+    }
+
+    //    protected String getComponentImpl(String componentID, Connection con) {}
+
+    protected boolean isSourceComponent(Connection con) {
+        if (con != null) {
+            ConnectionEnd src = con.getSource();
+            if (src.getSubcomponentPort() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void retrieve_component_and_channels(
             Model vdm_model,
             List<String> threats,
@@ -107,10 +162,6 @@ public class VDMInstrumentor {
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
 
-        if (threats.contains("NI")) {
-            System.out.println("Network Injection Instrumentation");
-            networkInjection(vdm_links);
-        }
         if (threats.contains("LS")) {
             System.out.println("Location Spoofing Instrumentation");
             locationSpoofing(vdm_components);
@@ -139,6 +190,22 @@ public class VDMInstrumentor {
             System.out.println("Hardware Trojans");
             hardwareTrojan(vdm_components);
         }
+
+        if (threats.contains("NI")) {
+            System.out.println("Network Injection Instrumentation");
+            networkInjection(vdm_links);
+
+            // Snoozing option for component level.
+            if (component_level & vdm_components.size() > 0) {
+                for (Connection con : vdm_links) {
+                    if (isSourceComponent(con)) {
+                        //
+                        vdm_links.remove(con);
+                    }
+                }
+            }
+        }
+
         if (threats.contains("BG")) {
             System.out.println("Benign");
             vdm_components.clear();
@@ -147,23 +214,23 @@ public class VDMInstrumentor {
 
         int component_index = 1;
 
-        // Assume only One Block Implementation exits.
-        ComponentImpl componentImpl = vdm_model.getComponentImpl().get(0);
-
+        // Removed Once component Implemtation assumption.
+        ComponentImpl componentImpl = retrieve_main_cmp_impl();
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         Map<String, HashSet<Connection>> components_map =
                 new HashMap<String, HashSet<Connection>>();
 
         if (vdm_components.size() > 0) {
-            System.out.println("Selected Components:");
+            //            System.out.println("Selected Components:");
 
             for (ComponentType component : vdm_components) {
-                System.out.println("(" + component_index++ + ") " + component.getId());
+                //                System.out.println("(" + component_index++ + ") " +
+                // component.getId());
 
-                if (blockImpl == null) {
-                    blockImpl = retrieve_block(component);
-                }
+                //                if (blockImpl == null) {
+                blockImpl = retrieve_block(component);
+                //                }
 
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
                 vdm_links.addAll(vdm_cmp_links);
@@ -171,9 +238,10 @@ public class VDMInstrumentor {
                 components_map.put(component.getId(), vdm_cmp_links);
                 // if (component.getName().equals("GPS")) {}
             }
-        } else {
-            System.out.println("No Component found!");
         }
+        //        else {
+        //           System.out.println("No Component found!");
+        //        }
 
         int connection_index = 1;
 
@@ -183,19 +251,40 @@ public class VDMInstrumentor {
 
         if (vdm_links.size() > 0) {
 
-            System.out.println("Selected Links:");
+            //            System.out.println("Selected Links:");
 
             for (Connection connection : vdm_links) {
-                System.out.println("(" + connection_index++ + ") " + connection.getName());
+                //                System.out.println("(" + connection_index++ + ") " +
+                // connection.getName());
                 // instrument_link(connection, blockImpl);
-                String constant = instrument_link(connection, blockImpl);
-                global_constants.add(constant);
 
-                connections_map.put(connection, constant);
+                String cmpID = getComponentID(components_map, connection);
+
+                if (cmpID != null) {
+                    blockImpl = getBlockID(cmpID);
+
+                    String constant = instrument_link(cmpID, connection, blockImpl);
+
+                    global_constants.add(constant);
+
+                    connections_map.put(connection, constant);
+                } else if (threats.contains("NI")) {
+                    // Network Injection Case when no Components are present
+                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
+
+                    cmpID = cmpImpl.getType().getId();
+
+                    blockImpl = retrieve_block(cmpImpl);
+                    String constant = instrument_link(cmpID, connection, blockImpl);
+
+                    global_constants.add(constant);
+
+                    connections_map.put(connection, constant);
+                }
             }
-        } else {
-            System.out.println("No Links found!");
-        }
+        } // else {
+        //            System.out.println("No Links found!");
+        //        }
 
         // Declare Global Constants
         for (String comp_id : global_constants) {
@@ -232,11 +321,11 @@ public class VDMInstrumentor {
             Map<String, List<String>> connection_comp_map =
                     connection_mapper(connections_map, components_map);
 
-            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ComponentImpl compImpl = retrieve_main_cmp_impl();
 
-            if (compImpl.getBlockImpl() == null) {
-                compImpl = retrieve_block(compImpl);
-            }
+            //            if (compImpl.getBlockImpl() == null) {
+            //            compImpl = retrieve_block(compImpl);
+            //            }
 
             ContractSpec contractSpec = compImpl.getType().getContract();
 
@@ -248,21 +337,27 @@ public class VDMInstrumentor {
                 not_wkexpr.setNot(wk_expr);
 
                 // Adding weakly assume variables
+
                 ContractItem weakly_assume_item = new ContractItem();
 
                 weakly_assume_item.setName(key + " is not instrumented");
                 weakly_assume_item.setExpression(not_wkexpr);
-                contractSpec.getWeaklyassume().add(weakly_assume_item);
+                // Checking connection before adding assumption
+                HashSet<Connection> empty_connection_check = components_map.get(key);
+
+                if (empty_connection_check.size() > 0) {
+                    contractSpec.getWeaklyassume().add(weakly_assume_item);
+                }
             }
 
             dec_var_const(connection_comp_map);
 
         } else if (blame_assignment && !component_level) {
-            ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+            ComponentImpl compImpl = retrieve_main_cmp_impl();
 
-            if (compImpl.getBlockImpl() == null) {
-                compImpl = retrieve_block(compImpl);
-            }
+            //            if (compImpl.getBlockImpl() == null) {
+            //            compImpl = retrieve_block(compImpl);
+            //            }
 
             ContractSpec contractSpec = compImpl.getType().getContract();
 
@@ -282,15 +377,110 @@ public class VDMInstrumentor {
         }
     }
 
-    protected ComponentImpl retrieve_block(ComponentImpl compImpl) {
+    //    protected ComponentImpl retrieve_cmp_impl(ComponentType componentType) {
+    //        ComponentImpl componentImpl = null;
+    //        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+    //            ComponentType cmpType = cImpl.getType();
+    //            if (cmpType.getId().equalsIgnoreCase(componentType.getId())) {
+    //                componentImpl = cImpl;
+    //            }
+    //        }
+    //        return componentImpl;
+    //    }
+
+    protected ComponentImpl retrieve_cmp_impl(String componentID) {
+
+        ComponentImpl componentImpl = null;
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+
+            if (cImpl.getBlockImpl() != null) {
+
+                blockImpl = cImpl.getBlockImpl();
+
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (componentID.equals(enumType.getId())) {
+                        componentImpl = cImpl;
+                        return cImpl;
+                    }
+                }
+            }
+        }
+
+        return componentImpl;
+    }
+
+    protected ComponentImpl retrieve_cmp_impl(ComponentType componentType) {
+        ComponentImpl componentImpl = null;
+        BlockImpl blockImpl = null;
+
+        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+
+            if (cImpl.getBlockImpl() != null) {
+
+                blockImpl = cImpl.getBlockImpl();
+
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (componentType.getId().equals(enumType.getId())) {
+                        componentImpl = cImpl;
+                        return cImpl;
+                    }
+                }
+            }
+        }
+        return componentImpl;
+    }
+
+    protected ComponentImpl retrieve_main_cmp_impl() {
+        ComponentImpl componentImpl = null;
+        for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
+            ComponentType cmpType = cImpl.getType();
+            if (cmpType.getContract() != null) {
+                componentImpl = cImpl;
+            }
+        }
+        return componentImpl;
+    }
+
+    protected ComponentImpl retrieve_block_impl(ComponentImpl compImpl) {
+
         BlockImpl blockImpl = null;
         String cmpID = compImpl.getType().getId();
+
         for (ComponentImpl cImpl : vdm_model.getComponentImpl()) {
             if (cImpl.getBlockImpl() != null) {
                 blockImpl = cImpl.getBlockImpl();
 
                 for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
-                    ComponentType enumType = cmpInstance.getImplementation().getType();
+
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
                     if (cmpID.equals(enumType.getId())) {
                         //                        System.out.println(cImpl.getId() + " == " +
                         // compImpl.getId());
@@ -302,6 +492,35 @@ public class VDMInstrumentor {
         return compImpl;
     }
 
+    protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+
+        BlockImpl blockImpl = null;
+
+        String cmpID = compImpl.getType().getId();
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (cmpID.equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
+    }
+
     protected BlockImpl retrieve_block(ComponentType compType) {
 
         BlockImpl blockImpl = null;
@@ -310,7 +529,15 @@ public class VDMInstrumentor {
             if (cmpImpl.getBlockImpl() != null) {
                 blockImpl = cmpImpl.getBlockImpl();
                 for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
-                    ComponentType enumType = cmpInstance.getImplementation().getType();
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
                     if (compType.getId().equals(enumType.getId())) {
                         return blockImpl;
                     }
@@ -395,10 +622,11 @@ public class VDMInstrumentor {
             // Declaration global variables for instrumented links.
             List<String> connections = connection_comp_map.get(var);
             SymbolDefinition var_dec = add_vars_assume(var, connections);
-            vars_dec.add(var_dec);
-            //            default_var = var;
 
-            var_links.addAll(connections);
+            if (!connections.isEmpty()) {
+                vars_dec.add(var_dec);
+                var_links.addAll(connections);
+            }
         }
 
         String vars_assumption[] = new String[vars.size()];
@@ -415,13 +643,14 @@ public class VDMInstrumentor {
             assume_expr = add_assume_amo(vars_assumption);
         }
         // Adding Xor assumption for components.
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_main_cmp_impl();
+
         if (compImpl.getBlockImpl() == null) {
-            compImpl = retrieve_block(compImpl);
+            compImpl = retrieve_block_impl(compImpl);
         }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
-
+        System.out.println();
         ContractItem assume_item = new ContractItem();
 
         //        if (assume_expr == null) {
@@ -436,7 +665,7 @@ public class VDMInstrumentor {
             contractSpec.getAssume().add(assume_item);
         }
 
-        if (blame_assignment == false) {
+        if (blame_assignment == false && contractSpec != null) {
             contractSpec.getSymbol().addAll(vars_dec);
         }
     }
@@ -454,10 +683,11 @@ public class VDMInstrumentor {
             vars_dec.add(var_dec);
         }
 
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
-        if (compImpl.getBlockImpl() == null) {
-            compImpl = retrieve_block(compImpl);
-        }
+        ComponentImpl compImpl = retrieve_main_cmp_impl();
+
+        //        if (compImpl.getBlockImpl() == null) {
+        compImpl = retrieve_block_impl(compImpl);
+        //        }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
 
@@ -477,7 +707,9 @@ public class VDMInstrumentor {
             var_stack.push(expr);
         }
 
-        var_expr = or_expr(var_stack);
+        if (!var_stack.isEmpty()) {
+            var_expr = or_expr(var_stack);
+        }
 
         if (var_expr == null) {
             var_expr = new Expression();
@@ -694,7 +926,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -756,7 +988,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -836,7 +1068,7 @@ public class VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     // Option 1) Specification
                     if (componentType != null) {
@@ -910,7 +1142,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     componentType = getType(componentInstance);
@@ -947,7 +1179,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 
@@ -982,7 +1214,7 @@ public class VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 
@@ -1035,7 +1267,7 @@ public class VDMInstrumentor {
                 // Block Implementation Component Selection.
                 if (blockImpl != null) {
                     for (Connection connection : blockImpl.getConnection()) {
-                        if (retrieve_links(connection, port)) {
+                        if (retrieve_links(component, connection, port)) {
                             vdm_links.add(connection);
                         }
                     }
@@ -1048,10 +1280,12 @@ public class VDMInstrumentor {
         return vdm_links;
     }
 
-    protected boolean retrieve_links(Connection connection, Port instrumented_port) {
+    protected boolean retrieve_links(
+            ComponentType component, Connection connection, Port instrumented_port) {
 
         // Default Block Implementation
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = retrieve_cmp_impl(component);
+
         // R.H.S
         ConnectionEnd src = connection.getSource();
         ComponentInstance src_componentInstance = new ComponentInstance();
@@ -1152,11 +1386,21 @@ public class VDMInstrumentor {
     //
     // }
 
-    public String instrument_link(Connection connection, BlockImpl blockImpl) {
+    public String instrument_link(String compID, Connection connection, BlockImpl blockImpl) {
         // instrument_link(connection);
-
+        //        System.out.println("Instrumented Link ***" + connection.getName());
         // Default Block Implementation
-        ComponentImpl compImpl = vdm_model.getComponentImpl().get(0);
+        ComponentImpl compImpl = null;
+
+        if (compID != null) {
+            compImpl = retrieve_cmp_impl(compID);
+        }
+
+        // Connections without Components Instrumentation.
+        if (compImpl == null) {
+            compImpl = retrieve_main_cmp_impl();
+        }
+
         ComponentType instrumented_cmp = new ComponentType();
 
         // R.H.S
@@ -1365,7 +1609,7 @@ public class VDMInstrumentor {
         // Copying connection related artifacts
         new_con.setName(connection.getName() + "_instrumented_channel");
         new_con.setConnType(connection.getConnType());
-        new_con.setFlow(connection.getFlow());
+        new_con.setFlowType(connection.getFlowType());
         new_con.setDataEncrypted(connection.isDataEncrypted());
         new_con.setAuthenticated(connection.isAuthenticated());
 

@@ -194,7 +194,7 @@ public class Instrumentor extends VDMInstrumentor {
                 // instrument_link(port, blockImpl);
                 if (blockImpl != null) {
                     for (Connection connection : blockImpl.getConnection()) {
-                        if (retrieve_links(connection, port)) {
+                        if (retrieve_links(component, connection, port)) {
                             vdm_links.add(connection);
                             links.add(connection.getName());
                             //                        links.add(get_ports(vdm_links));
@@ -215,7 +215,7 @@ public class Instrumentor extends VDMInstrumentor {
                 cmp_links.addAll(get_ports(con));
             }
         }
-
+        //        System.out.println(links);
         return vdm_links;
     }
 
@@ -361,6 +361,16 @@ public class Instrumentor extends VDMInstrumentor {
 
         ports.add(dest_port.getName());
 
+        con_end = link.getDestination();
+        dest_port = con_end.getComponentPort();
+
+        if (dest_port == null) {
+            CompInstancePort instance_port = con_end.getSubcomponentPort();
+            dest_port = instance_port.getPort();
+        }
+
+        ports.add(dest_port.getName());
+
         //        }
 
         return ports;
@@ -396,7 +406,7 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -466,7 +476,7 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
@@ -553,7 +563,7 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     // Option 1) Specification
                     if (componentType != null) {
@@ -634,7 +644,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
                     ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     componentType = getType(componentInstance);
@@ -679,7 +689,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 
@@ -721,7 +731,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentType();
+                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
 
                     componentType = getType(componentInstance);
 

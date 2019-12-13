@@ -1,0 +1,6 @@
+ModelVersion,MissionReqId,MissionReq,CyberReqId,CyberReq,MissionImpactCIA,Effect,Severity,CompInstanceDependency,CompOutputDependency,DependentCompOutputCIA,ReqType
+verdict,,,MissionReq02,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Integrity,Cyber
+verdict,,,MissionReq01,,Integrity,,Hazardous,actuation,response_out,Integrity,Cyber
+verdict,,,MissionReq01,,Integrity,,Hazardous,actuation,response_out,Availability,Cyber
+verdict,,,MissionReq01,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Integrity,Cyber
+verdict,,,MissionReq01,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Availability,Cyber

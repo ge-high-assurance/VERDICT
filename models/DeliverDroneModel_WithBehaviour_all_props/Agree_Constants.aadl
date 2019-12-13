@@ -1,0 +1,10 @@
+package Agree_Constants
+public
+	annex agree {**
+			
+		const ITEM_VALUE_THRESHOLD: real = 100.0;
+		
+		const WAITING_CONFIRMATION_THRESHOLD: int = 10;
+		
+	**};
+end Agree_Constants;

@@ -31,6 +31,52 @@
     | c -> c
 
   let string_buf = Buffer.create 1024
+
+  (* Create and populate a keyword hashtable *)
+  let mk_hashtbl keywords =
+    let tbl =
+      Hashtbl.create (List.length keywords)
+    in
+    keywords |> List.iter (fun (k, v) -> Hashtbl.add tbl k v) ;
+    tbl
+
+  let keyword_table = mk_hashtbl [
+    "aadlboolean",    P.AADLBOOLEAN ;
+    "aadlstring",     P.AADLSTRING ;
+    "aadlinteger",    P.AADLINTEGER ;
+    "aadlreal",       P.AADLREAL ;
+    "enumeration",    P.ENUMERATION ;
+    "property",       P.PROPERTY ;
+    "package",        P.PACKAGE ;
+    "system",         P.SYSTEM ;
+    "implementation", P.IMPLEMENTATION ;
+    "features",       P.FEATURES ;
+    "properties",     P.PROPERTIES ;
+    "subcomponents",  P.SUBCOMPONENTS ;
+    "connections",    P.CONNECTIONS ;
+    "public",         P.PUBLIC ;
+    "private",        P.PRIVATE ;
+    "constant",       P.CONSTANT ;
+    "type",           P.TYPE ;
+    "none",           P.NONE ;
+    "inherit",        P.INHERIT ;
+    "applies",        P.APPLIES ;
+    "units",          P.UNITS ;
+    "with",           P.WITH ;
+    "list",           P.LIST ;
+    "data",           P.DATA ;
+    "port",           P.PORT ;
+    "end",            P.END ;
+    "set",            P.SET ;
+    "all",            P.ALL ;
+    "out",            P.OUT ;
+    "in",             P.IN ;
+    "is",             P.IS ;
+    "to",             P.TO ;
+    "of",             P.OF ;
+    "true",           P.TRUE ;
+    "false",          P.FALSE ;
+  ]
 }
 
 let whitespace = [' ' '\t']
@@ -54,43 +100,8 @@ let real_lit = digit+ ('_' digit+)* '.' digit+ ('_' digit+)* exponent?
 (* let id = '^'? ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '_' '0'-'9']* *)
 let id = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 
+
 rule token = parse
-  | "aadlboolean"    { P.AADLBOOLEAN }
-  | "aadlstring"     { P.AADLSTRING }
-  | "aadlinteger"    { P.AADLINTEGER }
-  | "aadlreal"       { P.AADLREAL }
-  | "enumeration"    { P.ENUMERATION }
-  | "property"       { P.PROPERTY }
-  | "package"        { P.PACKAGE }
-  | "system"         { P.SYSTEM }
-  | "implementation" { P.IMPLEMENTATION }
-  | "features"       { P.FEATURES }
-  | "properties"     { P.PROPERTIES }
-  | "subcomponents"  { P.SUBCOMPONENTS }
-  | "connections"    { P.CONNECTIONS }
-  | "public"         { P.PUBLIC }
-  | "private"        { P.PRIVATE }
-  | "constant"       { P.CONSTANT }
-  | "type"           { P.TYPE }
-  | "none"           { P.NONE }
-  | "inherit"        { P.INHERIT }
-  | "applies"        { P.APPLIES }
-  | "units"          { P.UNITS }
-  | "with"           { P.WITH }
-  | "list"           { P.LIST }
-  | "data"           { P.DATA }
-  | "port"           { P.PORT }
-  | "annex"          { P.ANNEX lexbuf }
-  | "end"            { P.END }
-  | "set"            { P.SET }
-  | "all"            { P.ALL }
-  | "out"            { P.OUT }
-  | "in"             { P.IN }
-  | "is"             { P.IS }
-  | "to"             { P.TO }
-  | "of"             { P.OF }
-  | "true"           { P.TRUE }
-  | "false"          { P.FALSE }
 
   | "{**"            { P.ANNEX_BLOCK_START }
   | "->"             { P.R_ARROW }
@@ -120,7 +131,19 @@ rule token = parse
   | integer_lit as l { P.INTEGER_LIT l }
   | real_lit as l    { P.REAL_LIT l }
 
-  | id as name       { P.ID name }
+  | id as s          { 
+
+    let lwc_s = String.lowercase_ascii s in
+    try
+      Hashtbl.find keyword_table lwc_s
+    with Not_found -> (
+      if String.equal lwc_s "annex" then
+        P.ANNEX lexbuf
+      else
+        P.ID s
+    )
+
+  }
 
   | whitespace       { token lexbuf }
   | newline          { Lexing.new_line lexbuf ; token lexbuf }

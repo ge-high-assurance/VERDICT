@@ -83,8 +83,8 @@ public class MBASResultsView extends ViewPart {
 			table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Cyber Requirement");
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Acceptable Failure Likelihood");
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Computed Failure Likelihood");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Acceptable Likelihood of Successful Attack");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Calculated Likelihood of Successful Attack");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Analysis Result");
 
 			List<String> keys = new ArrayList<String>();

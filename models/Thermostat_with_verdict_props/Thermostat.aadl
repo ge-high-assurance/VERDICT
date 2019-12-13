@@ -1,0 +1,250 @@
+package Thermostat
+public
+	with Base_Types;
+	with Data_Model;
+	with VERDICT_Properties;
+
+	annex agree {**
+			
+		const MIN_TEMPERATURE: real = 40.0;
+		const MAX_TEMPERATURE: real = 100.0;
+		const INITIAL_TEMPERATURE: real = 70.0;
+		
+		const DEADBAND: real = 3.0;
+		const DIFF: real = 1.0;
+		
+		-- Since(X,Y) is true precisely when X has been true at some point,
+		-- and Y has been continuously true afterwards
+		node Since( X: bool, Y : bool ) returns ( Z : bool );
+		let
+  			Z =  X or (Y and (false -> pre(Z)));
+		tel;
+		
+	**};
+
+	data SwitchPosition
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("Cool", "Off", "Heat");
+	end SwitchPosition;
+
+	system SetDesiredTemperature
+		features
+			up_button: in data port Base_Types::Boolean;
+			down_button: in data port Base_Types::Boolean;
+			setpoint: out data port Base_Types::Float;
+		annex agree {**
+			eq prev_setpoint: real = INITIAL_TEMPERATURE -> pre(setpoint);	
+				
+			assume "Up/Down button signals are mutually exclusive": not (up_button and down_button);
+			
+			eq increment_condition: bool = up_button and prev_setpoint <= (MAX_TEMPERATURE - DIFF);
+			
+			guarantee "Setpoint increment":
+				increment_condition => setpoint = prev_setpoint + DIFF;
+			
+			eq decrement_condition: bool = down_button and prev_setpoint >= (MIN_TEMPERATURE + DIFF);
+			
+			guarantee "Setpoint decrement":
+				decrement_condition => setpoint = prev_setpoint - DIFF;
+				
+			guarantee "Setpoint invariance":
+				not (increment_condition or decrement_condition) => setpoint = prev_setpoint;		
+		**};
+		
+		annex verdict {**
+			CyberRel "heat_signal_out_I" = down_button:I or up_button:I => setpoint:I;
+		**};
+		
+		
+	end SetDesiredTemperature;
+
+	system ControlTemperature
+		features
+			-- Control Panel Input
+			switch: in data port SwitchPosition;
+			-- Thermometer Input
+			current_temperature: in data port Base_Types::Float;
+			-- Reference temperature provided by SetDesiredTemperature
+			setpoint: in data port Base_Types::Float;
+			-- AC on/off activation signal
+			cool_act_signal: out data port Base_Types::Boolean;
+			-- Furnace on/off activation signal
+			heat_act_signal: out data port Base_Types::Boolean;
+	
+		annex agree {**
+			eq cooling_start_condition: bool =
+				switch = enum(SwitchPosition, Cool) and
+				current_temperature > setpoint + DEADBAND;
+			
+			eq cool_mode: bool = cooling_start_condition ->
+				cooling_start_condition or (
+					pre (cool_mode) and
+					switch = enum(SwitchPosition, Cool) and
+					current_temperature > setpoint
+				);
+			
+			eq heating_start_condition: bool =
+				switch = enum(SwitchPosition, Heat) and
+				current_temperature < setpoint - DEADBAND; 
+			
+			eq heat_mode: bool = heating_start_condition ->
+				heating_start_condition or (
+					pre (heat_mode) and
+					switch = enum(SwitchPosition, Heat) and
+					current_temperature < setpoint
+				);
+			
+			eq off_mode: bool = not cool_mode and not heat_mode;
+			
+			guarantee "Cooling activation": cool_act_signal = cool_mode;
+			
+			guarantee "Heating activation": heat_act_signal = heat_mode;
+		**};
+		
+		
+		annex verdict {**
+			CyberRel "heat_signal_out_I" = switch:I or current_temperature:I or setpoint:I => heat_act_signal:I;
+			CyberRel "cool_signal_out_I" = switch:I or current_temperature:I or setpoint:I => cool_act_signal:I;
+		**};
+		
+	end ControlTemperature;
+
+	system ThermostatController
+		features
+			-- Control Panel Input
+			switch: in data port SwitchPosition;
+			up_button: in data port Base_Types::Boolean;
+			down_button: in data port Base_Types::Boolean;
+			-- Thermometer Input
+			current_temperature: in data port Base_Types::Float;
+			-- AC on/off activation signal
+			cool_act_signal: out data port Base_Types::Boolean;
+			-- Furnace on/off activation signal
+			heat_act_signal: out data port Base_Types::Boolean;
+			-- Reference temperature
+			setpoint: out data port Base_Types::Float;
+		annex agree {**
+				
+			-- Sanity Checks [BEGIN]
+			guarantee "Initial temperature is in range":
+				MIN_TEMPERATURE <= INITIAL_TEMPERATURE and INITIAL_TEMPERATURE <= MAX_TEMPERATURE;
+				
+			guarantee "Deadband and Diff are positive values": DEADBAND > 0.0 and DIFF > 0.0;
+			-- Sanity Checks [END]
+
+			assume "Up/Down button signals are mutually exclusive": not (up_button and down_button);	
+			
+			guarantee "No activation signal is enabled if switch is in Off":
+				switch = enum(SwitchPosition, Off) => not cool_act_signal and not heat_act_signal;
+				
+			guarantee "Cooling system is turned On only if switch is in Cool":
+				cool_act_signal => switch = enum(SwitchPosition, Cool);
+				
+			guarantee "Heating system is turned On only if switch is in Heat":
+				heat_act_signal => switch = enum(SwitchPosition, Heat);
+				
+			guarantee "Activation signals are never enabled at the same time":
+				not (cool_act_signal and heat_act_signal);
+				
+			guarantee "Setpoint is always in range":
+				MIN_TEMPERATURE <= setpoint and setpoint <= MAX_TEMPERATURE;
+				
+			guarantee "Setpoint doesn't change if no button is pressed":
+				not up_button and not down_button => setpoint = (INITIAL_TEMPERATURE -> pre (setpoint));
+			
+			guarantee "Setpoint doesn't decrease if the up button is pressed":
+				up_button => not (setpoint < (INITIAL_TEMPERATURE -> pre(setpoint)));
+				
+			guarantee "Setpoint doesn't increase if the down button is pressed":
+				down_button => not (setpoint > (INITIAL_TEMPERATURE -> pre(setpoint)));
+			
+			eq current_temperature_in_deadzone: bool =
+				setpoint - DEADBAND <= current_temperature and current_temperature <= setpoint + DEADBAND;
+				
+			eq system_is_off: bool = not cool_act_signal and not heat_act_signal;
+			
+			guarantee "System is Off if current temperature is in the dead zone and system was Off in the previous step":
+				true -> current_temperature_in_deadzone and pre(system_is_off) => system_is_off;
+			
+			guarantee "Cooling system is On only if current temperature is higher than setpoint":
+				cool_act_signal => current_temperature > setpoint;
+				
+			guarantee "Heating system is On only if current temperature is lower than setpoint":
+				heat_act_signal => current_temperature < setpoint;
+			
+			guarantee "Cooling system is On if switch is in Cool and temperature is higher than setpoint plus deadband":
+				switch = enum(SwitchPosition, Cool) and current_temperature > setpoint + DEADBAND => cool_act_signal;
+				
+			guarantee "Heating system is On if switch is in Heat and temperature is lower than setpoint minus deadband":
+				switch = enum(SwitchPosition, Heat) and current_temperature < setpoint - DEADBAND => heat_act_signal;
+				
+			guarantee "Once cooling system is On, it remains On as long as setpoint hasn't reached and switch is in Cool":
+				Since(cool_act_signal, switch = enum(SwitchPosition, Cool) and current_temperature > setpoint) => 
+					cool_act_signal;
+			
+			guarantee "Once heating system is On, it remains On as long as setpoint hasn't reached and switch is in Heat":
+				Since(heat_act_signal, switch = enum(SwitchPosition, Heat) and current_temperature < setpoint) => 
+					heat_act_signal;
+		**};
+		
+			annex verdict {**
+								
+						CyberReq {
+							id = "CyberReq01"
+							description = "The thermostat shall be resilient to Control Temperature algorithm integrity"
+							condition = heat_act_signal:I or cool_act_signal:I
+							cia = I
+							severity = Minor
+		    					};
+			**};	
+		
+	end ThermostatController;
+	
+	system implementation ThermostatController.Impl
+		subcomponents
+			set_desired_temperature: system SetDesiredTemperature;
+			
+			control_temperature: system ControlTemperature
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => COTS;
+				
+				-- VRERDICT Cyber Defense Properties and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 3;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 3;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 3;
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 3;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 3;
+				
+			};
+			
+			
+			
+		connections
+			switch_conn: port switch -> control_temperature.switch;
+			
+			up_bth_conn: port up_button -> set_desired_temperature.up_button;
+			
+			down_btn_conn: port down_button -> set_desired_temperature.down_button;
+			
+			cur_temp_conn: port current_temperature -> control_temperature.current_temperature;
+			
+			cool_sig_conn: port control_temperature.cool_act_signal -> cool_act_signal;
+			
+			heat_sig_conn: port control_temperature.heat_act_signal -> heat_act_signal;
+			
+			setpoint1_conn: port set_desired_temperature.setpoint -> control_temperature.setpoint;
+	
+			setpoint2_conn: port set_desired_temperature.setpoint -> setpoint;
+	end ThermostatController.Impl;
+	 
+	
+end Thermostat;
