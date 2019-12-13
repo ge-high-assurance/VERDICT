@@ -1,6 +1,7 @@
 package CruiseController
 public
 	with Base_Types;
+	with VERDICT_Properties;
 
 	annex agree {**
 			
@@ -39,7 +40,8 @@ public
 			dec: in data port Base_Types::Boolean;
 			brake_cancel: in data port Base_Types::Boolean;
 			speed: in data port Base_Types::Float;
-			desired_speed: out data port Base_Types::Float;
+			desired_speed: out data port Base_Types::Float
+			{VERDICT_Properties::probe => true;};
 			enabled: out data port Base_Types::Boolean;
 		annex agree {**
 			
