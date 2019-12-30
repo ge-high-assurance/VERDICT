@@ -1,0 +1,102 @@
+package iml.systems ;
+import iml.lang.* ;
+
+
+type Direction enum {IN, OUT, INOUT} ;
+
+trait Connectable {
+
+}
+
+
+/** This is going to be reused in any definition of a port type.
+ * It makes sense to have it as a trait.
+ */
+trait Port refines (Connectable) {
+	direction : Direction ;
+}
+trait In refines (Port){
+	assert {direction = Direction.IN} ;
+}
+trait Out refines (Port) {
+	assert {direction = Direction.OUT} ;
+}
+
+trait InOut refines (Port) {
+	assert {direction = Direction.INOUT} ;
+}
+/** It might be useful to define a empty simple port that just has the
+ * direction property
+ */
+type InPort exhibits (In);
+type OutPort exhibits (Out);
+type InOutPort exhibits (InOut);
+
+/*This is the trait of a type that carries and event */
+trait EventCarrier<EventType> {
+	event : EventType ;
+}
+
+/*This is the trait of a type that carries data */
+trait DataCarrier<DataType> {
+	data : DataType ;
+}
+
+
+type InEventPort<EventType> exhibits(In, EventCarrier<EventType>);
+type InDataPort<DateType> exhibits(In, DataCarrier<DateType>);
+type InEventDataPort<EventType,DataType> exhibits(In, EventCarrier<EventType>,DataCarrier<DataType>);
+
+type OutEventPort<EventType> exhibits(Out, EventCarrier<EventType>);
+type OutDataPort<DateType> exhibits(Out, DataCarrier<DateType>);
+type OutEventDataPort<EventType,DataType> exhibits(Out, EventCarrier<EventType>,DataCarrier<DataType>);
+
+type InOutEventPort<EventType> exhibits(InOut, EventCarrier<EventType>);
+type InOutDataPort<DateType> exhibits(InOut, DataCarrier<DateType>);
+type InOutEventDataPort<EventType,DataType> exhibits(InOut, EventCarrier<EventType>,DataCarrier<DataType>);
+
+
+trait Component { 
+	subComponents<T exhibits(Component)> : Int -> T ; 
+	ports<T exhibits(Port)> : Int -> T ;
+	isRoot : Bool ;
+};
+
+
+trait System refines(Component) {
+	assert {isRoot = true} ;
+}
+
+
+type Connector<SourceType exhibits(Connectable),TargetType exhibits(Connectable)> {
+	source : SourceType ;
+	target : TargetType ;
+};
+
+type EqualityConnector<Type exhibits(Connectable)> {
+	source : Type ;
+	target : Type ;
+	assert {source = target} ;
+};
+
+
+
+
+connect<SourceType exhibits(Connectable),TargetType exhibits(Connectable)> : (SourceType,TargetType) -> Connector<SourceType,TargetType> :=
+fun(source:SourceType, target:TargetType) {
+	some(c:Connector<SourceType,TargetType>){c.source=source && c.target=target} ;
+}
+;
+
+connectEqual<Type exhibits(Connectable)> : (Type,Type) -> EqualityConnector<Type> :=
+fun(source:Type, target:Type) {
+	some(c:EqualityConnector<Type>){c.source=source && c.target=target} ;
+}
+;
+
+
+delegate<PortType exhibits(Connectable)> : (PortType,PortType) -> Connector<PortType,PortType> :=
+fun(source:PortType, target:PortType) {
+	some(c:Connector<PortType,PortType>){c.source=source && c.target=target} ;
+}
+;

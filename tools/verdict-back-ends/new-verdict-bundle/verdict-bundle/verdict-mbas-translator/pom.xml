@@ -1,0 +1,102 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.ge.verdict</groupId>
+    <artifactId>verdict-bundle</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>verdict-mbas-translator</artifactId>
+
+    <name>Verdict Intermediate Model Language Translator</name>
+
+    <dependencies>  
+	<dependency>
+	    <groupId>com.ge.verdict</groupId>
+	    <artifactId>verdict-utils</artifactId>
+	    <version>${project.version}</version>
+	</dependency>    
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.utc.utrc.hermes.iml</groupId>
+            <artifactId>com.utc.utrc.hermes.iml</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.emf</groupId>
+            <artifactId>org.eclipse.emf.common</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.emf</groupId>
+            <artifactId>org.eclipse.emf.ecore</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.xtext</groupId>
+            <artifactId>org.eclipse.xtext</artifactId>
+            <version>2.16.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.xtext/org.eclipse.xtext.testing -->
+        <dependency>
+            <groupId>org.eclipse.xtext</groupId>
+            <artifactId>org.eclipse.xtext.testing</artifactId>
+            <version>2.16.0</version>           
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.8.0-beta4</version>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.8.0-beta4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.platform</groupId>
+            <artifactId>org.eclipse.core.runtime</artifactId>
+            <version>3.15.100</version>
+        </dependency>
+		<dependency>
+			<groupId>org.alloytools</groupId>
+			<artifactId>org.alloytools.alloy.dist</artifactId>
+			<version>5.1.0-SNAPSHOT</version>
+		</dependency>
+        
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.chrisdchristo</groupId>
+                <artifactId>capsule-maven-plugin</artifactId>
+                <configuration>
+                    <appClass>com.ge.verdict.mbas.App</appClass>
+                    <includeApp>true</includeApp>
+                    <includeAppDep>true</includeAppDep>
+                    <includePluginDep>false</includePluginDep>
+                    <includeTransitiveDep>true</includeTransitiveDep>
+                    <includeCompileDep>true</includeCompileDep>
+                    <includeRuntimeDep>true</includeRuntimeDep>
+                    <includeProvidedDep>false</includeProvidedDep>
+                    <includeSystemDep>false</includeSystemDep>
+                    <includeTestDep>true</includeTestDep>
+                    <includeOptionalDep>false</includeOptionalDep>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>    

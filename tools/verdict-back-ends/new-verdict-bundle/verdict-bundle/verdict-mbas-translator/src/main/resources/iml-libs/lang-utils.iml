@@ -1,0 +1,27 @@
+package iml.lang.utils ;
+import iml.lang.*;
+
+ datatype List<T> ( nil, cons(T, List<T>) )
+ {
+   head : T := match (self) {
+             cons(h,t): h ;
+           };
+   tail : List<T> := match (self) {
+             cons(h,t): t ;
+           };
+   len : Int := match (self) {
+            cons(h,t): 1 + t.len ;
+            nil: 0 ;
+          };
+ }
+ 
+ datatype Tree<T> ( empty, node(Tree<T>, T, Tree<T>) )
+ {
+   root : T := match (self) { node(t1, r, t2): r; };
+   left : Tree<T> := match (self) { node(t1, r, t2): t1; };
+   right : Tree<T> := match (self) { node(t1, r, t2): t2; };
+   size : Int := match (self) { 
+             node(t1,r,t2): t1.size + 1 + t2.size; 
+             empty: 0;
+           };
+ }

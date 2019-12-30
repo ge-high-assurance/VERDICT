@@ -1,0 +1,8 @@
+package iml.queries ;
+
+trait Property {
+	holds : Bool ;
+}
+
+query<T exhibits(Property)> : Bool := forall(x:T){x.holds};
+

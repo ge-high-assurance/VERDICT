@@ -1,0 +1,41 @@
+package iml.synchdf.ontological ;
+
+
+annotation Let ;
+
+trait Synchronous {
+
+}
+pre<T> : T -> T ;
+init<T> : (T,T) -> T ;
+current<T> : (T,T) -> T ;
+when<T> : (T,T) -> T ;
+
+
+// Node Example
+//node Counter(x0, d:int; r:bool) returns (n:int)
+//let
+//n = x0 -> if r then x0 else pre(n) + d
+//tel
+
+//type Counter exhibits(Component, Synchronous) {
+//	x0: InDataPort<Int>;
+//	d: InDataPort<Int>;
+//	r: InDataPort<Int>;
+//	n: OutDataPort<Int>;
+//
+//	
+//	assert {ports<InDataPort<IntStream>>(0) = x0} ;
+//	
+//	
+//	[Let] l:Bool:= 
+//	{ 
+//		n.data = init<Int>( x0.data , if (r.data) { x0.data } else { pre<Int>(n.data) + d.data } 
+//	} ;
+//	
+//}
+//
+
+
+
+	

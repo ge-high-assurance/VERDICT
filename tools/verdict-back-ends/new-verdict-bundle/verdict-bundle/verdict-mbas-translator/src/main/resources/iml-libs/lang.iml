@@ -1,0 +1,32 @@
+package iml.lang;
+
+annotation Doc {
+	text : String ;
+}
+
+type Int;
+type Real;
+type Bool;
+type Char ;
+type String { 
+	concat : String -> String ;
+	length : Int ;
+	contains : String -> Bool ;
+	indexOf : (String,Int) -> Int ;
+	replace : (String,String) -> String ;
+	replaceAll : (String,String) -> String ;
+	charAt : Int -> Char ;
+	subStr : (Int,Int) -> String ;
+	prefixOf : String -> Bool ;
+	suffixOf : String -> Bool ;
+	
+};
+int2str : Int -> String ;
+re2str : Real -> String ; 
+str2int : String -> Int ;
+str2re : String->Real ;
+emptyString : String := some(x:String) {x.length = 0}; 
+
+
+
+
