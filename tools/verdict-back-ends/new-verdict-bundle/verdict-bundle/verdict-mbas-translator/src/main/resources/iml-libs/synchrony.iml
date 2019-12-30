@@ -1,0 +1,81 @@
+package iml.synchrony ;
+import iml.systems.* ;
+annotation Let ;
+
+trait Synchronous ;
+
+trait Stream<T> {
+	pre : Self ;
+	init : Self -> Self ;
+	then : Self->Self ;
+	current : Self;
+	when : Self->Self;
+	value : T[] ;
+	eq : Self->Stream<Bool> ;
+}
+ 
+trait NumericType  {
+	plus : Self->Self; 
+	minus : Self->Self; 
+	div : Self->Self; 
+	mult : Self->Self; 
+	leq : Self->Stream<Bool>; 
+	geq : Self->Stream<Bool>; 
+	le : Self->Stream<Bool>; 
+	gr : Self->Stream<Bool>; 
+}
+
+
+
+type RealStream  exhibits (NumericType,Stream<Real>);
+type IntStream  exhibits (NumericType,Stream<Int>);
+type BoolStream exhibits (Stream<Bool>);
+
+toIntStream : Int -> IntStream := fun(x:Int):IntStream {  some(y:IntStream){forall(i:Int){y.value[i] = x}}  } ;
+toRealStream : Real -> RealStream := fun(x:Real):RealStream {  some(y:RealStream){forall(i:Int){y.value[i] = x}}  } ;
+toBoolStream : Bool -> BoolStream := fun(x:Bool):BoolStream {  some(y:BoolStream){forall(i:Int){y.value[i] = x}}  } ;
+
+toStream<T, T1 exhibits(Stream<T>)> : T -> T1 := fun(x:T):T1 {  some(y:T1){forall(i:Int){y.value[i] = x}}  } ;
+
+plus<T1 exhibits(NumericType)> : (T1,T1) -> T1 ; 
+
+
+and : (BoolStream,BoolStream)->BoolStream;
+or : (BoolStream,BoolStream)->BoolStream;
+not : BoolStream->BoolStream;
+
+ite<D,S exhibits(Stream<D>) > : (BoolStream,S,S) -> S ;
+
+
+// Node Example
+//node Counter(x0, d:int; r:bool) returns (n:int)
+//let
+//n = x0 -> if r then x0 else pre(n) + d
+//tel
+
+//type Counter exhibits(Component, Synchronous) {
+//	x0: InDataPort<IntStream>;
+//	d: InDataPort<IntStream>;
+//	r: InDataPort<BoolStream>;
+//	n: OutDataPort<IntStream>;
+//
+//	
+//	assert {ports<InDataPort<IntStream>>(0) = x0} ;
+//	
+//	
+//	[Let] l:Stream<Bool> := 
+//	{ 
+//		n.data.eq( x0.data.then( ite<Int,IntStream>(r.data, x0.data, n.data.pre.plus(d.data) ) ) ) ;
+//	} ;
+//	
+//}
+
+
+
+
+
+
+
+
+
+

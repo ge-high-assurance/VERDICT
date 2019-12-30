@@ -1,0 +1,16 @@
+package iml.graphs;
+import iml.lang.utils.* ;
+
+type Vertex ;
+
+type Edge is (Vertex,Vertex);
+
+type Graph {
+	edges : List<Edge> ;
+//	add : Edge -> Graph := fun(x:Edge) {
+//		some(g : Graph) {g.edges = List<Edge>.cons(x,edges)}
+//	} ;
+}
+
+
+

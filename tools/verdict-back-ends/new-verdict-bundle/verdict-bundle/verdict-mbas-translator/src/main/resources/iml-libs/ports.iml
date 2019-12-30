@@ -1,0 +1,117 @@
+package iml.ports ;
+import iml.lang.utils.* ;
+import iml.systems.* ;
+import iml.sms.* ;
+
+type Port;
+
+type FlowPoint {
+	event : Bool ;
+	upperBound : Real ;
+	lowerBound : Real ;
+}
+
+type FlowPath {
+	start : FlowPoint ;
+	end : FlowPoint ;
+	upperBound : Real ;
+	lowerBound : Real ;
+	//assert { (end.upperBound = start.upperBound + upperBound) && 
+	//		 (end.lowerBound = start.lowerBound + lowerBound) };
+}
+
+flowpathspec : (FlowPoint,FlowPoint,Real,Real) -> FlowPath :=
+fun(x:FlowPoint,y:FlowPoint,l:Real,u:Real) {
+	some(fp: FlowPath) { fp.start = x && fp.end = y && fp.lowerBound = l && fp.upperBound = u }	
+}  ;
+
+
+flowpath : (FlowPoint,FlowPoint) -> FlowPath :=
+fun(x:FlowPoint,y:FlowPoint) {
+	some(fp: FlowPath) { fp.start = x && fp.end = y }	
+}  ;
+
+
+type EndToEndFlow {
+	start : FlowPoint ;
+	end : FlowPoint ;
+	append : FlowPath -> EndToEndFlow := 
+	fun(x:FlowPath){
+		some(e: EndToEndFlow) {
+			e.start = self.start && 
+			e.end.lowerBound = self.end.lowerBound + x.end.lowerBound &&
+			e.end.upperBound = self.end.upperBound + x.end.upperBound 
+		} 
+	};
+}
+
+source : FlowPath -> EndToEndFlow :=
+	fun(x:FlowPath){
+		some(e: EndToEndFlow) { e.start = x.start && e.end = x.end}
+	};
+
+	
+type DataPort<T> includes (Port) {
+	data : T ;
+	flowpoint : FlowPoint ;
+} 
+
+type EventPort includes (Port) {
+	event : Bool ;
+	flowpoint : FlowPoint ;
+}
+
+type EventDataPort<T> includes (Port) {
+	event : Bool ;
+	data : T ;
+	flowpoint : FlowPoint ;
+}
+
+type FlowConnector<T> {
+	connector : Connector<T,T>;
+	flow:FlowPath ;
+}
+
+flowconnect<T> : (T,T)->FlowConnector<T> :=
+fun(x:T,y:T) {
+	some(fc: FlowConnector<T>) { fc.connector.source = x && fc.connector.target = y}
+} ;
+
+flowdelaybound : (EndToEndFlow,Real,Real) -> Bool :=
+fun(x:EndToEndFlow,u:Real,l:Real){
+	x.end.upperBound - x.start.lowerBound <= u &&
+	x.end.lowerBound - x.start.upperBound >= l
+};
+
+type ThreeState enum {s0,s1,s2}; 
+type DelayState  {
+	state : ThreeState ;
+	i : Int;
+}
+
+type  delay exhibits(StateMachine<DelayState>){
+	f : InDataPort<FlowPath> ;
+	n : InDataPort<Int> ;
+	holds : OutDataPort<Bool> ; 
+	init : DelayState -> Bool := fun(x:DelayState):Bool { (x.i = 1) && (x.state = ThreeState.s0)} ;
+	transition : (DelayState, DelayState) -> Bool := fun(x:DelayState,y:DelayState){
+		y.state = 
+			case {
+				x.state = ThreeState.s0 && f.data.end.event : ThreeState.s2;
+				x.state = ThreeState.s0 && f.data.start.event : ThreeState.s1 ;
+				x.state = ThreeState.s1 && f.data.end.event : ThreeState.s0 ;
+				x.state = ThreeState.s1 && x.i >= n.data : ThreeState.s2 ;
+				true : x.state ;
+			} 	
+		&&
+		y.i =
+		case {
+			x.state = ThreeState.s0 :  1 ;
+			x.state = ThreeState.s1 : x.i + 1 ;
+			true : x.i ;	
+		}
+	};
+	invariant : DelayState -> Bool := fun(x:DelayState){holds.data = (x.state = ThreeState.s0 || x.state = ThreeState.s1)} ;
+}
+
+
