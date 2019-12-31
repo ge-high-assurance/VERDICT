@@ -231,7 +231,7 @@
 	<extension point="org.eclipse.ui.preferencePages">
 		<page id="com.ge.research.osate.verdict.bundle"
 			class="com.ge.research.osate.verdict.gui.BundlePreferences"
-			name="Verdict Bundle"
+			name="Verdict Settings"
 			category="com.ge.research.osate.verdict.dsl.Verdict"/>
 	</extension>
       

@@ -51,8 +51,9 @@ public class App {
             Arrays.asList(new String[] {"LS", "NI", "LB", "IT", "OT", "RI", "SV", "HT"});
 
     private static Options buildOptions() {
-        OptionBuilder.hasArgs(1);
-        OptionBuilder.withArgName("AADL input directory");
+        OptionBuilder.hasArgs(2);
+        // OptionBuilder.withArgName("AADL input directory");
+        // OptionBuilder.withArgName("aadl2iml binary");
         OptionBuilder.withLongOpt("aadl");
         Option aadl = OptionBuilder.create();
 
@@ -66,14 +67,16 @@ public class App {
         inputGroup.addOption(iml);
         inputGroup.setRequired(true);
 
-        OptionBuilder.hasArgs(1);
-        OptionBuilder.withArgName("STEM project dir");
+        OptionBuilder.hasArgs(2);
+        // OptionBuilder.withArgName("STEM project dir");
+        // OptionBuilder.withArgName("Soteria++ binary");
         OptionBuilder.withDescription("Run MBAS");
         OptionBuilder.withLongOpt("mbas");
         Option mbas = OptionBuilder.create();
 
-        OptionBuilder.hasArgs(1);
-        OptionBuilder.withArgName("Kind2 output file (.xml or .json)");
+        OptionBuilder.hasArgs(2);
+        // OptionBuilder.withArgName("Kind2 output file (.xml or .json)");
+        // OptionBuilder.withArgName("kind2 binary");
         OptionBuilder.withDescription("Run CRV");
         OptionBuilder.withLongOpt("crv");
         Option crv = OptionBuilder.create();
@@ -127,31 +130,35 @@ public class App {
         helpLine("       (--mbas <args> | --crv <args>) [-d, --debug <args>]");
         helpLine();
         helpLine("Input: AADL or IML");
-        helpLine("  --aadl <dir> ...... AADL project input");
-        helpLine("      <dir> ......... project directory");
+        helpLine("  --aadl <dir> <aadl2iml> .. AADL project input");
+        helpLine("      <dir> ................ project directory");
         helpLine();
-        helpLine("  --iml <file> ...... IML file input");
-        helpLine("      <file> ........ file");
+        helpLine("  --iml <file> ............. IML file input");
+        helpLine("      <file> ............... file");
         helpLine();
         helpLine("Toolchain: MBAS (Model Based Architecture & Synthesis)");
         helpLine("           or CRV (Cyber Resiliency Verifier)");
-        helpLine("  --mbas <stem_dir>");
-        helpLine("      <stem_dir> .... STEM project directory");
+        helpLine("  --mbas <stem_dir> <soteria++ bin>");
+        helpLine("      <stem_dir> ........... STEM project directory");
+        helpLine("      <soteria++ bin> ...... Soteria++ binary");
         helpLine();
-        helpLine("  --crv <out> [-ATG] [-BA [-C]] <threats>");
-        helpLine("      <out> ......... CRV output file (.xml or .json)");
-        helpLine("      -ATG .......... automatic test-case generation (ATG)");
-        helpLine("      -BA ........... blame assignment");
-        helpLine("      -C ............ component-level blame assignment (default link-level)");
+        helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
+        helpLine("      <out> ................ CRV output file (.xml or .json)");
+        helpLine("      <kind2 bin> .......... Kind2 binary");
+
+        helpLine("      -ATG ................. automatic test-case generation (ATG)");
+        helpLine("      -BA .................. blame assignment");
         helpLine(
-                "      <threats> ..... any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-OT]");
+                "      -C ................... component-level blame assignment (default link-level)");
+        helpLine(
+                "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-OT]");
         helpLine();
-        helpLine("-d, --debug <dir> ... debug output directory");
+        helpLine("-d, --debug <dir> .......... debug output directory");
     }
 
-    private static Binary AADL2IML = new Binary("aadl2iml");
-    private static Binary KIND2 = new Binary("kind2");
-    private static Binary SOTERIA_PP = new Binary("soteria_pp");
+    //    private static Binary AADL2IML = new Binary("aadl2iml");
+    //    private static Binary KIND2 = new Binary("kind2");
+    //    private static Binary SOTERIA_PP = new Binary("soteria_pp");
 
     public static void main(String[] args) throws IOException {
         Options options = buildOptions();
@@ -175,15 +182,18 @@ public class App {
     private static void handleOpts(CommandLine opts) throws VerdictRunException {
         String debugDir = opts.hasOption('d') ? opts.getOptionValue('d') : null;
 
-        String aadlPath, imlPath;
+        String aadlPath, imlPath, aadl2imlBin;
 
         if (opts.hasOption("aadl")) {
-            aadlPath = opts.getOptionValue("aadl");
+            String[] aadlOpts = opts.getOptionValues("aadl");
+            aadlPath = aadlOpts[0];
+            aadl2imlBin = aadlOpts[1];
             imlPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.iml")
                             .getAbsolutePath();
         } else if (opts.hasOption("iml")) {
             aadlPath = null;
+            aadl2imlBin = null;
             imlPath = opts.getOptionValue("iml");
         } else {
             throw new VerdictRunException("Must specifiy either AADL or IML input");
@@ -192,8 +202,9 @@ public class App {
         if (opts.hasOption("mbas")) {
             String[] mbasOpts = opts.getOptionValues("mbas");
             String stemProjectDir = mbasOpts[0];
+            String soteriaPpBin = mbasOpts[1];
 
-            runMbas(aadlPath, imlPath, stemProjectDir, debugDir);
+            runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
         } else if (opts.hasOption("crv")) {
             String instrPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml")
@@ -211,11 +222,14 @@ public class App {
             boolean componentLevel = opts.hasOption("C");
             boolean atg = opts.hasOption("ATG");
 
-            String outputPath = opts.getOptionValue("crv");
+            String[] crvOpts = opts.getOptionValues("crv");
+            String outputPath = crvOpts[0];
+            String kind2Bin = crvOpts[1];
             String outputBaPath = outputPath.replace(".xml", "").replace(".json", "") + "_ba.xml";
 
             runCrv(
                     aadlPath,
+                    aadl2imlBin,
                     imlPath,
                     instrPath,
                     lustrePath,
@@ -225,7 +239,8 @@ public class App {
                     atg,
                     outputPath,
                     outputBaPath,
-                    debugDir);
+                    debugDir,
+                    kind2Bin);
         }
     }
 
@@ -286,7 +301,12 @@ public class App {
      * @throws VerdictRunException
      */
     public static void runMbas(
-            String aadlPath, String imlPath, String stemProjectDir, String debugDir)
+            String aadlPath,
+            String aadl2imlBin,
+            String imlPath,
+            String stemProjectDir,
+            String debugDir,
+            String soteriaPpBin)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -295,11 +315,12 @@ public class App {
         String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
         String soteriaPpOutputDir = (new File(stemOutputDir, "Soteria_Output")).getAbsolutePath();
 
-        checkFile(stemCsvDir, true, true, true, null);
-        checkFile(stemOutputDir, true, true, true, null);
-        checkFile(stemGraphsDir, true, true, true, null);
-        checkFile(stemSadlFile, true, false, false, null);
-        checkFile(soteriaPpOutputDir, true, true, true, null);
+        checkFile(stemCsvDir, true, true, true, false, null);
+        checkFile(stemOutputDir, true, true, true, false, null);
+        checkFile(stemGraphsDir, true, true, true, false, null);
+        checkFile(stemSadlFile, true, false, false, false, null);
+        checkFile(soteriaPpOutputDir, true, true, true, false, null);
+        checkFile(soteriaPpBin, true, false, false, true, null);
 
         deleteDirectoryContents(stemCsvDir);
         deleteDirectoryContents(stemOutputDir);
@@ -323,11 +344,12 @@ public class App {
         }
 
         if (aadlPath != null) {
-            checkFile(aadlPath, true, true, false, null);
+            checkFile(aadlPath, true, true, false, false, null);
+            checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
-            runAadl2iml(aadlPath, imlPath);
+            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
         } else {
-            checkFile(imlPath, true, false, false, ".iml");
+            checkFile(imlPath, true, false, false, false, ".iml");
         }
 
         logHeader("IML2VDM");
@@ -386,7 +408,8 @@ public class App {
         log("Soteria++ is running. Please be patient...");
 
         try {
-            SOTERIA_PP.invoke(
+            Binary.invokeBin(
+                    soteriaPpBin,
                     soteriaPpOutputDir,
                     new PumpStreamHandler(),
                     "-o",
@@ -411,6 +434,7 @@ public class App {
      */
     public static void runCrv(
             String aadlPath,
+            String aadl2imlBin,
             String imlPath,
             String instrPath,
             String lustrePath,
@@ -420,11 +444,12 @@ public class App {
             boolean atg,
             String outputPath,
             String outputBaPath,
-            String debugDir)
+            String debugDir,
+            String kind2Bin)
             throws VerdictRunException {
 
-        checkFile(lustrePath, false, false, true, ".lus");
-        checkFile(outputPath, false, false, true, null);
+        checkFile(lustrePath, false, false, true, false, ".lus");
+        checkFile(outputPath, false, false, true, false, null);
 
         String outputFormat;
 
@@ -441,10 +466,11 @@ public class App {
         deleteFile(outputPath);
 
         if (aadlPath != null) {
-            checkFile(aadlPath, true, true, false, null);
+            checkFile(aadlPath, true, true, false, false, null);
+            checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
         } else {
-            checkFile(imlPath, true, false, false, ".iml");
+            checkFile(imlPath, true, false, false, false, ".iml");
         }
 
         if (outputBaPath != null) {
@@ -456,7 +482,7 @@ public class App {
         }
 
         if (aadlPath != null) {
-            runAadl2iml(aadlPath, imlPath);
+            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
         }
 
         log("Loading IML into Verdict data model");
@@ -547,7 +573,8 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            KIND2.invoke(
+            Binary.invokeBin(
+                    kind2Bin,
                     null,
                     redirect,
                     outputFormat,
@@ -621,7 +648,8 @@ public class App {
         }
     }
 
-    private static void runAadl2iml(String aadlPath, String imlPath) throws VerdictRunException {
+    private static void runAadl2iml(String aadlPath, String imlPath, String aadl2imlBin)
+            throws VerdictRunException {
         logHeader("AADL2IML");
 
         log("Converting AADL to IML");
@@ -629,7 +657,7 @@ public class App {
         log("Output IML file: " + imlPath);
 
         try {
-            AADL2IML.invoke("-o", imlPath, aadlPath);
+            Binary.invokeBin(aadl2imlBin, "-o", imlPath, aadlPath);
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute aadl2iml", e);
         }
@@ -654,7 +682,12 @@ public class App {
      *     assertions
      */
     private static void checkFile(
-            String path, boolean exists, boolean dir, boolean write, String extension)
+            String path,
+            boolean exists,
+            boolean dir,
+            boolean write,
+            boolean execute,
+            String extension)
             throws VerdictRunException {
 
         // If the file need not exist, then at least its parent should exist
@@ -677,6 +710,10 @@ public class App {
 
         if (write && !existingFile.canWrite()) {
             throw new VerdictRunException(fileOrDir + " is not writable: " + path);
+        }
+
+        if (execute && !existingFile.canExecute()) {
+            throw new VerdictRunException(fileOrDir + " is not executable: " + path);
         }
 
         if (extension != null && !path.endsWith(extension)) {

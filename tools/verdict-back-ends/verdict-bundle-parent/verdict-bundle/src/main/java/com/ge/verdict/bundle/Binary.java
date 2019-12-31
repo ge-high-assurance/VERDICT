@@ -156,25 +156,21 @@ public class Binary {
     }
 
     /**
-     * Invoke the binary with the given arguments, first unpacking from resources if necessary.
+     * Invoke the binary at the specified path with the given arguments.
      *
      * <p>Waits for the spawned process to terminate.
      *
+     * @param binPath the path to the binary to invoke
      * @param wd working directory, may be null
      * @param streamHandler stream redirect targets (Apache)
      * @param args
      * @throws ExecutionException
      */
-    public void invoke(String wd, ExecuteStreamHandler streamHandler, String... args)
+    public static void invokeBin(
+            String binPath, String wd, ExecuteStreamHandler streamHandler, String... args)
             throws ExecutionException {
-        File file = getFile();
-
-        // We can just unpack every time
-        // This way we don't have to worry if we update the binary
-        unpack(file);
-
         List<String> argsList = new ArrayList<>();
-        argsList.add(file.getAbsolutePath());
+        argsList.add(binPath);
         argsList.addAll(Arrays.asList(args));
 
         String[] env;
@@ -208,6 +204,40 @@ public class Binary {
         } catch (IOException e) {
             throw new ExecutionException(e);
         }
+    }
+
+    /**
+     * Invoke the binary at the specified path with the given arguments.
+     *
+     * <p>Waits for the spawned process to terminate.
+     *
+     * @param binPath the path to the binary to invoke
+     * @param args
+     * @throws ExecutionException
+     */
+    public static void invokeBin(String binPath, String... args) throws ExecutionException {
+        invokeBin(binPath, null, new PumpStreamHandler(), args);
+    }
+
+    /**
+     * Invoke the binary with the given arguments, first unpacking from resources if necessary.
+     *
+     * <p>Waits for the spawned process to terminate.
+     *
+     * @param wd working directory, may be null
+     * @param streamHandler stream redirect targets (Apache)
+     * @param args
+     * @throws ExecutionException
+     */
+    public void invoke(String wd, ExecuteStreamHandler streamHandler, String... args)
+            throws ExecutionException {
+        File file = getFile();
+
+        // We can just unpack every time
+        // This way we don't have to worry if we update the binary
+        unpack(file);
+
+        invokeBin(file.getAbsolutePath(), wd, streamHandler, args);
     }
 
     /**

@@ -68,9 +68,29 @@ public class MBASHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
+						String bundleJar = BundlePreferences.getBundleJar();
+						if (bundleJar.length() == 0) {
+							System.out.println("Please set Verdict Bundle Jar path in Preferences");
+							return;
+						}
+						String aadl2imlBin = BundlePreferences.getAadl2imlBin();
+						if (aadl2imlBin.length() == 0) {
+							System.out.println("Please set aadl2iml binary path in Preferences");
+							return;
+						}
+						String stemProjPath = BundlePreferences.getStemDir();
+						if (stemProjPath.length() == 0) {
+							System.out.println("Please set STEM directory path in Preferences");
+							return;
+						}
+						String soteriaPpBin = BundlePreferences.getSoteriaPpBin();
+						if (soteriaPpBin.length() == 0) {
+							System.out.println("Please set soteria++ binary path in Preferences");
+							return;
+						}
+
 						VerdictHandlersUtils.printGreeting();
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
-						String stemProjPath = BundlePreferences.getSTEM();
 
 						// Create CSVData, Output, Graphs folders if they don't exist
 						// If they exist, delete all the csv and svg files
@@ -94,7 +114,7 @@ public class MBASHandler extends AbstractHandler {
 							graphsFolder.mkdir();
 						}
 
-						if (runBundle(selection.get(0), stemProjPath)) {
+						if (runBundle(bundleJar, selection.get(0), aadl2imlBin, stemProjPath, soteriaPpBin)) {
 							// Soteria++ output directory
 							String soteriaOut = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
 
@@ -128,13 +148,8 @@ public class MBASHandler extends AbstractHandler {
 		return null;
 	}
 
-	public static boolean runBundle(String inputPath, String stemProjectDir) {
-		String bundleJar = BundlePreferences.getBundleJar();
-		if (bundleJar.length() == 0) {
-			System.out.println("Please set Verdict Bundle Jar path in Preferences");
-			return false;
-		}
-
+	public static boolean runBundle(String bundleJar, String inputPath, String aadl2imlBin, String stemProjectDir,
+			String soteriaPpBin) {
 		List<String> args = new ArrayList<>();
 
 		args.add(VerdictHandlersUtils.JAVA);
@@ -143,9 +158,11 @@ public class MBASHandler extends AbstractHandler {
 
 		args.add("--aadl");
 		args.add(inputPath);
+		args.add(aadl2imlBin);
 
 		args.add("--mbas");
 		args.add(stemProjectDir);
+		args.add(soteriaPpBin);
 
 		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null);
 

@@ -56,6 +56,22 @@ public class CRVHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
+						String bundleJar = BundlePreferences.getBundleJar();
+						if (bundleJar.length() == 0) {
+							System.out.println("Please set Verdict Bundle Jar path in Preferences");
+							return;
+						}
+						String aadl2imlBin = BundlePreferences.getAadl2imlBin();
+						if (aadl2imlBin.length() == 0) {
+							System.out.println("Please set aadl2iml binary path in Preferences");
+							return;
+						}
+						String kind2Bin = BundlePreferences.getKind2Bin();
+						if (kind2Bin.length() == 0) {
+							System.out.println("Please set kind2 binary path in Preferences");
+							return;
+						}
+
 						VerdictHandlersUtils.printGreeting();
 
 						String outputPath = new File(System.getProperty("java.io.tmpdir"), "crv_output.xml")
@@ -65,7 +81,7 @@ public class CRVHandler extends AbstractHandler {
 
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 
-						if (runBundle(selection.get(0), outputPath)) {
+						if (runBundle(bundleJar, selection.get(0), outputPath, aadl2imlBin, kind2Bin)) {
 							// Run this code on the UI thread
 							mainThreadDisplay.asyncExec(() -> {
 								new CRVReportGenerator(outputPath, outputPathBa, iWindow);
@@ -81,13 +97,8 @@ public class CRVHandler extends AbstractHandler {
 		return null;
 	}
 
-	public static boolean runBundle(String inputPath, String outputPath) {
-		String bundleJar = BundlePreferences.getBundleJar();
-		if (bundleJar.length() == 0) {
-			System.out.println("Please set Verdict Bundle Jar path in Preferences");
-			return false;
-		}
-
+	public static boolean runBundle(String bundleJar, String inputPath, String outputPath, String aadl2imlbin,
+			String kind2bin) {
 		List<String> args = new ArrayList<>();
 
 		args.add(VerdictHandlersUtils.JAVA);
@@ -96,9 +107,11 @@ public class CRVHandler extends AbstractHandler {
 
 		args.add("--aadl");
 		args.add(inputPath);
+		args.add(aadl2imlbin);
 
 		args.add("--crv");
 		args.add(outputPath);
+		args.add(kind2bin);
 
 		args.addAll(CRVSettingsPanel.selectedThreats);
 
