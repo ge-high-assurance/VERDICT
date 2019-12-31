@@ -3,6 +3,7 @@ package com.ge.research.osate.verdict.gui;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
@@ -15,8 +16,12 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class BundlePreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+	// preference keys
 	private static final String BUNDLE_JAR = "verdict_bundle_jar";
-	private static final String STEM = "STEM";
+	private static final String STEM_DIR = "STEM";
+	private static final String AADL2IML_BIN = "aadl2iml_bin";
+	private static final String KIND2_BIN = "kind2_bin";
+	private static final String SOTERIA_PP_BIN = "soteria_pp_bin";
 
 	public BundlePreferences() {
 		super();
@@ -35,8 +40,20 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		return getVerdictPreferenceStore().getString(BUNDLE_JAR);
 	}
 
-	public static String getSTEM() {
-		return getVerdictPreferenceStore().getString(STEM);
+	public static String getStemDir() {
+		return getVerdictPreferenceStore().getString(STEM_DIR);
+	}
+
+	public static String getAadl2imlBin() {
+		return getVerdictPreferenceStore().getString(AADL2IML_BIN);
+	}
+
+	public static String getKind2Bin() {
+		return getVerdictPreferenceStore().getString(KIND2_BIN);
+	}
+
+	public static String getSoteriaPpBin() {
+		return getVerdictPreferenceStore().getString(SOTERIA_PP_BIN);
 	}
 
 	@Override
@@ -46,42 +63,35 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		this.noDefaultAndApplyButton();
 	}
 
-	@Override
-	protected void createFieldEditors() {
-		FileFieldEditor bundleJar = new FileFieldEditor(BUNDLE_JAR, "Bundle JAR:", true,
-				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
-		DirectoryFieldEditor stem = new DirectoryFieldEditor(STEM, "STEM Project Path:", getFieldEditorParent());
-
-		bundleJar.setFileExtensions(new String[] { "*.jar" });
-		bundleJar.setStringValue(getBundleJar());
-		addField(bundleJar);
-
-		stem.setStringValue(getSTEM());
-		addField(stem);
-
-
+	/**
+	 * Make it so that a file/directory text field gets saved when modified.
+	 *
+	 * @param editor the text field
+	 * @param pref_key the preferences key for storing the path
+	 * @param validator only save if the file passes this validation predicate
+	 */
+	private void addSaveHandler(StringFieldEditor editor, String pref_key, Predicate<File> validator) {
 		// The preferences won't save any other way
 		// This is really ugly, and it makes it save even if the user doesn't press "Apply and Close"
 		// But at least it saves the preferences instead of not saving them at all
 
-		Text bundleTxt = null;
+		Text textField = null;
 
 		try {
 			Field field = StringFieldEditor.class.getDeclaredField("textField");
 			field.setAccessible(true);
 
-			bundleTxt = (Text) field.get(bundleJar);
+			textField = (Text) field.get(editor);
 		} catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
 			e.printStackTrace();
 		}
 
-		if (bundleTxt != null) {
-			bundleTxt.addModifyListener(event -> {
-				String path = bundleJar.getStringValue();
-				File file = new File(path);
-				if (file.exists() && file.isFile() && path.endsWith(".jar")) {
+		if (textField != null) {
+			textField.addModifyListener(event -> {
+				String path = editor.getStringValue();
+				if (validator.test(new File(path))) {
 					ScopedPreferenceStore prefs = getVerdictPreferenceStore();
-					prefs.putValue(BUNDLE_JAR, path);
+					prefs.putValue(pref_key, path);
 					try {
 						prefs.save();
 					} catch (IOException e) {
@@ -90,34 +100,39 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 				}
 			});
 		}
+	}
 
+	@Override
+	protected void createFieldEditors() {
+		FileFieldEditor bundleJar = new FileFieldEditor(BUNDLE_JAR, "Bundle JAR:", true,
+				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
+		bundleJar.setFileExtensions(new String[] { "*.jar" });
+		bundleJar.setStringValue(getBundleJar());
+		addField(bundleJar);
+		addSaveHandler(bundleJar, BUNDLE_JAR,
+				file -> file.exists() && file.isFile() && file.getAbsolutePath().endsWith(".jar"));
 
-		// Set STEM project path
-		Text stemTxt = null;
+		DirectoryFieldEditor stemDir = new DirectoryFieldEditor(STEM_DIR, "STEM Project Path:", getFieldEditorParent());
+		stemDir.setStringValue(getStemDir());
+		addField(stemDir);
+		addSaveHandler(stemDir, STEM_DIR, file -> file.exists() && file.isDirectory());
 
-		try {
-			Field stemField = StringFieldEditor.class.getDeclaredField("textField");
-			stemField.setAccessible(true);
+		FileFieldEditor aadl2imlBin = new FileFieldEditor(AADL2IML_BIN, "aadl2iml binary:", true,
+				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
+		aadl2imlBin.setStringValue(getAadl2imlBin());
+		addField(aadl2imlBin);
+		addSaveHandler(aadl2imlBin, AADL2IML_BIN, file -> file.exists() && file.isFile());
 
-			stemTxt = (Text) stemField.get(stem);
-		} catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
-			e.printStackTrace();
-		}
+		FileFieldEditor kind2Bin = new FileFieldEditor(KIND2_BIN, "Kind2 binary:", true,
+				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
+		kind2Bin.setStringValue(getKind2Bin());
+		addField(kind2Bin);
+		addSaveHandler(kind2Bin, KIND2_BIN, file -> file.exists() && file.isFile());
 
-		if (stemTxt != null) {
-			stemTxt.addModifyListener(event -> {
-				String path = stem.getStringValue();
-				File stemProj = new File(path);
-				if (stemProj.exists() && stemProj.isDirectory()) {
-					ScopedPreferenceStore prefs = getVerdictPreferenceStore();
-					prefs.putValue(STEM, path);
-					try {
-						prefs.save();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			});
-		}
+		FileFieldEditor soteriaPpBin = new FileFieldEditor(SOTERIA_PP_BIN, "Soteria++ binary:", true,
+				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
+		soteriaPpBin.setStringValue(getSoteriaPpBin());
+		addField(soteriaPpBin);
+		addSaveHandler(soteriaPpBin, SOTERIA_PP_BIN, file -> file.exists() && file.isFile());
 	}
 }
