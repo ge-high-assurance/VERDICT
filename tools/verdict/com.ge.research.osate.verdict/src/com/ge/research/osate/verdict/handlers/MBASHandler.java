@@ -141,26 +141,6 @@ public class MBASHandler extends AbstractHandler {
 		return code == 0;
 	}
 
-
-	/**
-	 * Check if a directory has any csv files;
-	 * Returns true, if it has at least one csv file; otherwise return false;
-	 * */
-	private static boolean hasCsvFiles(File dir) {
-		if(dir != null && dir.exists()) {
-			if(dir.isDirectory()) {
-				for(File file : dir.listFiles()) {
-					if (file.isFile()) {
-						if (getFileExtension(file).equals("csv")) {
-							return true;
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * Delete all csv files in a folder
 	 * */

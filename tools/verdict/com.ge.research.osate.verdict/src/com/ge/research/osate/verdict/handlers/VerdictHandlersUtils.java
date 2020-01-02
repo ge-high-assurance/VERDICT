@@ -36,8 +36,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class VerdictHandlersUtils {
 	// System parameters
-	static final String EXTERN = System.getenv("VERDICT_EXTERN") != null ? System.getenv("VERDICT_EXTERN")
-			: System.getenv("HOME");
 	static final String SEP = File.separator;
 
 	// Platform temporary directory
@@ -50,20 +48,6 @@ public class VerdictHandlersUtils {
 	static final String OS = MACHINEOS.startsWith("mac") ? "osx"
 			: (MACHINEOS.startsWith("win") ? "win" : ((MACHINEOS.startsWith("linux") ? "glnx" : "unknown")));
 
-	// File extensions
-	static final String IML = ".iml";
-	static final String XML = ".xml";
-	static final String AADL = "aadl";
-	static final String VERDICTOUTPUT = "VERDICT_output";
-
-	// Translators' directories and their working directories
-	static final String BINDIR = EXTERN + SEP;
-	static final String OSDIR = EXTERN + SEP + OS + SEP;
-	static final String AADL2IML = OSDIR + "aadl2iml";
-	static final String IML2VDM = BINDIR + "iml2vdm.jar";
-
-	// Bundle JAR
-	static final String BUNDLE = EXTERN + SEP + "verdict-bundle.jar";
 
 	// SVG graphs
 	static final String SVG = "svg";
@@ -190,94 +174,12 @@ public class VerdictHandlersUtils {
 		return err;
 	}
 
-	public static String translateAADL2VDM(ExecutionEvent event) {
-		// AADL2IML
-		String imlFilePath = invokeAadl2Iml(getCurrentSelection(event));
 
-		if (isValidNonemptyFile(imlFilePath)) {
-			// IML2VDM
-			return invokeIml2Vdm(new File(imlFilePath));
-		}
-		return null;
-	}
-
-	/**
-	 *
-	 * @param aadlFile
-	 * 			input AADL file
-	 * @return The path to the generated IML file.
-	 * 		   It returns null if encounters some runtime error.
-	 */
-	public static String invokeAadl2Iml(List<String> paths) {
-		if (!isValidExecutable(AADL2IML)) {
-			return null;
-		}
-
-		// Print header
-		VerdictLogger.printHeader("AADL2IML", "an AADL project");
-
-		String outputImlFilePath = TEMPDIR + VERDICTOUTPUT + IML;
-		String[] cmds = new String[3 + paths.size()];
-		cmds[0] = AADL2IML;
-		cmds[1] = "-o";
-		cmds[2] = outputImlFilePath;
-		for (int i = 0; i < paths.size(); ++i) {
-			cmds[i + 3] = paths.get(i);
-		}
-
-		// Delete any file with the same name as outputImlFilePath before the run
-		File outputFile = new File(outputImlFilePath);
-		deleteFileIfExists(outputFile);
-
-		// Execute the commands
-		if (run(cmds, null) != 0) {
-			outputImlFilePath = null;
-		} else if (outputFile.exists()) {
-			VerdictLogger.info("AADL2IML translator generates an IML model: " + outputImlFilePath + "\n\n");
-
-		}
-		return outputImlFilePath;
-	}
 
 	static void deleteFileIfExists(File outputFile) {
 		if (outputFile.exists()) {
 			outputFile.delete();
 		}
-	}
-
-	/**
-	 *
-	 * @param imlFile
-	 *			input IML file
-	 * @return The path to the generated VDM (XML) file.
-	 * 		   It returns null if encounters some runtime error.
-	 */
-	public static String invokeIml2Vdm(File imlFile) {
-		if (!isValidExecutable(IML2VDM)) {
-			return null;
-		}
-
-		// Print header
-		VerdictLogger.printHeader("IML2VDM", imlFile.getAbsolutePath());
-
-		// Output XML file path
-		String outputXmlFilePath = TEMPDIR + imlFile.getName() + XML;
-
-		// Construct the running command
-		String[] cmds = new String[] { JAVA, JAR, IML2VDM, imlFile.getAbsolutePath(), outputXmlFilePath };
-
-		// Delete any file with the name as outputXmlFilePath before the run
-		File outputFile = new File(outputXmlFilePath);
-		deleteFileIfExists(outputFile);
-
-		// Execute the commands
-		if (run(cmds, null) != 0) {
-			outputXmlFilePath = null;
-		} else if (outputFile.exists()) {
-			VerdictLogger.info("IML2VDM translator generates an XML model: " + outputXmlFilePath + "\n\n");
-
-		}
-		return outputXmlFilePath;
 	}
 
 	/**
