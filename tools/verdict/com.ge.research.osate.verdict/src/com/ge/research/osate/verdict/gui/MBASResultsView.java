@@ -1,7 +1,9 @@
 package com.ge.research.osate.verdict.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
@@ -42,6 +44,7 @@ public class MBASResultsView extends ViewPart {
 	private Composite composite;
 	public static final String ID = "com.ge.research.osate.verdict.gui.mbasResultsView";
 	public static List<MissionAttributes> missions = new ArrayList<MissionAttributes>();
+	public static Map<String, List<MBASSafetyResult>> safetyResults;
 
 
 	public MBASResultsView() {
@@ -53,6 +56,11 @@ public class MBASResultsView extends ViewPart {
 		if (composite != null) {
 			composite.setFocus();
 		}
+	}
+
+	private Image getSuccessOrFailImage(boolean success) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict",
+				success ? "icons/valid.png" : "icons/false.png").createImage();
 	}
 
 	@Override
@@ -87,6 +95,24 @@ public class MBASResultsView extends ViewPart {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Calculated Likelihood of Successful Attack");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Analysis Result");
 
+			String missionName = missions.get(ii).getMission();
+			List<MBASSafetyResult> safetyItems;
+			if (safetyResults.containsKey(missionName)) {
+				safetyItems = safetyResults.get(missionName);
+			} else {
+				safetyItems = Collections.emptyList();
+			}
+
+			Table safetyTable = new Table(composite, SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL);
+			safetyTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+			safetyTable.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+			safetyTable.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
+
+			new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Safety Requirement");
+			new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Acceptable Likelihood of Failure");
+			new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Calculated Likelihood of Failure");
+			new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Analysis Result");
+
 			List<String> keys = new ArrayList<String>();
 			List<String> answers = new ArrayList<String>();
 
@@ -99,6 +125,12 @@ public class MBASResultsView extends ViewPart {
 				answers.add(currRow.get(3));
 			}
 
+			for (MBASSafetyResult safetyItem : safetyItems) {
+				TableItem item = new TableItem(safetyTable, SWT.NONE);
+				item.setText(new String[] { safetyItem.getReqName(), safetyItem.getAcceptableLikelihood(),
+						safetyItem.getComputedLikelihood(), " " });
+			}
+
 			// this listener center-aligns the pictorial results in table
 			table.addListener(SWT.PaintItem, event -> {
 				if (event.index == 3) {
@@ -107,13 +139,7 @@ public class MBASResultsView extends ViewPart {
 						List<RequirementAttributes> requirements = missions.get(i).getRequirements();
 						for (int j = 0; j < requirements.size(); j++) {
 							if (requirements.get(j).getRequirement().equals(((TableItem) event.item).getText(0))) {
-								if (!requirements.get(j).hasSucceeded()) {
-									image = AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict",
-											"icons/false.png").createImage();
-								} else {
-									image = AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict",
-											"icons/valid.png").createImage();
-								}
+								image = getSuccessOrFailImage(requirements.get(j).hasSucceeded());
 								break;
 							}
 						}
@@ -123,6 +149,43 @@ public class MBASResultsView extends ViewPart {
 					int tmpY = 0;
 
 					int tmpWidth = table.getColumn(event.index).getWidth();
+					int tmpHeight = ((TableItem) event.item).getBounds().height;
+
+					tmpX = image.getBounds().width;
+					tmpX = (tmpWidth / 2 - tmpX / 2);
+					tmpY = image.getBounds().height;
+					tmpY = (tmpHeight / 2 - tmpY / 2);
+					if (tmpX <= 0) {
+						tmpX = event.x;
+					} else {
+						tmpX += event.x;
+					}
+					if (tmpY <= 0) {
+						tmpY = event.y;
+					} else {
+						tmpY += event.y;
+					}
+
+					event.gc.drawImage(image, tmpX, tmpY);
+				}
+			});
+
+			safetyTable.addListener(SWT.PaintItem, event -> {
+				if (event.index == 3) {
+					Image image = null;
+					for (MBASSafetyResult safetyResult : safetyItems) {
+						// This is screwy but it appears to be the best we can do?
+						// There will only be issues if there are requirements with duplicate names
+						if (safetyResult.getReqName().equals(((TableItem) event.item).getText(0))) {
+							image = getSuccessOrFailImage(safetyResult.isSuccessful());
+							break;
+						}
+					}
+
+					int tmpX = 0;
+					int tmpY = 0;
+
+					int tmpWidth = safetyTable.getColumn(event.index).getWidth();
 					int tmpHeight = ((TableItem) event.item).getBounds().height;
 
 					tmpX = image.getBounds().width;
@@ -203,13 +266,68 @@ public class MBASResultsView extends ViewPart {
 				}
 			});
 
+			safetyTable.addMouseListener(new MouseListener() {
+				@Override
+				public void mouseDoubleClick(MouseEvent e) {
+				}
+
+				@Override
+				public void mouseDown(MouseEvent e) {
+					if (safetyTable.getSelectionIndex() == -1) {
+						// Table is empty
+						return;
+					}
+					if (e.button == 3) {
+						Menu menu = new Menu(safetyTable.getShell(), SWT.POP_UP);
+						MenuItem viewFailurePaths = new MenuItem(menu, SWT.PUSH);
+						viewFailurePaths.setText("View failure paths");
+						viewFailurePaths.setEnabled(!safetyItems.get(safetyTable.getSelectionIndex()).isSuccessful());
+						viewFailurePaths.addSelectionListener(new SelectionListener() {
+							@Override
+							public void widgetSelected(SelectionEvent e) {
+								if (safetyTable.getSelectionIndex() >= 0) {
+									List<MBASSafetyResult.CutsetResult> cutsets = safetyItems
+											.get(safetyTable.getSelectionIndex()).getCutsets();
+									IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+											.getActivePage();
+									IViewPart view = wp.findView(SafetyCutsetsView.ID);
+									if (view != null) {
+										wp.hideView(view);
+									}
+									showSafetyView(MBASReportGenerator.window, cutsets);
+								}
+							}
+
+							@Override
+							public void widgetDefaultSelected(SelectionEvent e) {
+							}
+						});
+
+						Point point = safetyTable.toDisplay(new Point(e.x, e.y));
+						menu.setLocation(point);
+						menu.setVisible(true);
+					}
+				}
+
+				@Override
+				public void mouseUp(MouseEvent e) {
+				}
+			});
+
 			table.setHeaderVisible(true);
 			table.setLinesVisible(true);
-
-			for (int col = 0; col < 4; col++) {
+			for (int col = 0; col < table.getColumnCount(); col++) {
 				table.getColumn(col).pack();
 			}
 			table.pack();
+
+			safetyTable.setHeaderVisible(true);
+			safetyTable.setLinesVisible(true);
+			for (int col = 0; col < safetyTable.getColumnCount(); col++) {
+				safetyTable.getColumn(col).pack();
+			}
+			safetyTable.pack();
+
 			composite.pack();
 		}
 	}
@@ -220,6 +338,17 @@ public class MBASResultsView extends ViewPart {
 			try {
 				CapecDefenseView.tableContents = cd;
 				window.getActivePage().showView(CapecDefenseView.ID);
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	protected void showSafetyView(IWorkbenchWindow window, List<MBASSafetyResult.CutsetResult> cutsets) {
+		window.getShell().getDisplay().asyncExec(() -> {
+			try {
+				SafetyCutsetsView.cutsets = cutsets;
+				window.getActivePage().showView(SafetyCutsetsView.ID);
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
