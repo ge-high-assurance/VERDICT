@@ -38,7 +38,8 @@ public class MBASReadXMLFile {
 				MissionAttributes newMission = new MissionAttributes();
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
-					newMission.setMission(eElement.getAttribute("label"));
+					String missionName = eElement.getAttribute("label");
+					newMission.setMission(missionName);
 					newMission.setRequirements(extractRequirements(nNode));
 
 					list.add(newMission);

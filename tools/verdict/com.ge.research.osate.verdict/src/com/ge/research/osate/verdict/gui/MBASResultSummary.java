@@ -2,6 +2,7 @@ package com.ge.research.osate.verdict.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.ge.research.osate.verdict.handlers.VerdictHandlersUtils;
 
@@ -149,5 +150,13 @@ public class MBASResultSummary {
 
 	public List<MissionAttributes> getMissions() {
 		return missions;
+	}
+
+	public void updateMissionsWithSafety(Map<String, List<MBASSafetyResult>> safetyResults) {
+		for (MissionAttributes mission : missions) {
+			if (safetyResults.containsKey(mission.getMission())) {
+				mission.updateSuccessWithSafety(safetyResults.get(mission.getMission()));
+			}
+		}
 	}
 }
