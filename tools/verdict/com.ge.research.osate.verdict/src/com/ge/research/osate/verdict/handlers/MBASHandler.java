@@ -126,17 +126,20 @@ public class MBASHandler extends AbstractHandler {
 
 								File applicableDefense = new File(soteriaOut, "ApplicableDefenseProperties.xml");
 								File implProperty = new File(soteriaOut, "ImplProperties.xml");
+								File safetyApplicableDefense = new File(soteriaOut, "ApplicableDefenseProperties-safety.xml");
+								File safetyImplProperty = new File(soteriaOut, "ImplProperties-safety.xml");
 
 								// Display cyber related xml
 								if (applicableDefense.exists() && implProperty.exists()) {
 									new MBASReportGenerator(applicableDefense.getAbsolutePath(),
-											implProperty.getAbsolutePath(), iWindow);
+											implProperty.getAbsolutePath(), safetyApplicableDefense.getAbsolutePath(),
+											safetyImplProperty.getAbsolutePath(), iWindow);
 								} else {
 									System.err.println("Info: No Soteria++ output generated!");
 								}
 							});
 							// Display safety related text.
-							VerdictHandlersUtils.openSafetyTxtInDir(soteriaOut);
+//							VerdictHandlersUtils.openSafetyTxtInDir(soteriaOut);
 						}
 					} finally {
 						VerdictHandlersUtils.finishRun();

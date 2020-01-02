@@ -223,8 +223,12 @@
 		class="com.ge.research.osate.verdict.gui.MBASResultsView"
 		icon="icons/search.png"/>
 	<view id="com.ge.research.osate.verdict.gui.capecDefenseView"
-		name="Failure Paths"
+		name="Security Failure Paths"
 		class="com.ge.research.osate.verdict.gui.CapecDefenseView"
+		icon="icons/danger.png"/>	
+	<view id="com.ge.research.osate.verdict.gui.safetyCutsetsView"
+		name="Safety Failure Paths"
+		class="com.ge.research.osate.verdict.gui.SafetyCutsetsView"
 		icon="icons/danger.png"/>	
 	</extension>
 	
