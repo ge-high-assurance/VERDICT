@@ -16,7 +16,7 @@ public class MissionAttributes implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	private String mission;
-	private String missionStatus;
+	private boolean missionSuccess;
 	private List<RequirementAttributes> requirements = new ArrayList<RequirementAttributes>();
 	private List<MBASSummaryRow> tableContents = new ArrayList<MBASSummaryRow>();
 
@@ -29,23 +29,29 @@ public class MissionAttributes implements Serializable, Cloneable {
 	}
 
 	public String getMissionStatus() {
-		return missionStatus;
+		return missionSuccess ? "Succeeded" : "Failed";
 	}
 
 	// determines whether mission has succeeded of failed
 	public void setRequirements(List<RequirementAttributes> rq) {
-		Boolean success = true;
+		missionSuccess = true;
 		requirements = rq;
 		for (int i = 0; i < requirements.size(); i++) {
 			if (!requirements.get(i).hasSucceeded()) {
-				success = false;
+				missionSuccess = false;
 				break;
 			}
 		}
-		if (success) {
-			missionStatus = "Succeeded";
-		} else {
-			missionStatus = "Failed";
+	}
+
+	public void updateSuccessWithSafety(List<MBASSafetyResult> safetyResults) {
+		if (missionSuccess) {
+			for (MBASSafetyResult safetyResult : safetyResults) {
+				if (!safetyResult.isSuccessful()) {
+					missionSuccess = false;
+					break;
+				}
+			}
 		}
 	}
 
