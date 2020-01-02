@@ -85,8 +85,8 @@
    * Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict
      -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" file in
      the "extern" folder
-   * In the same place, also set the STEM path to the extern/STEM
-     folder, and then save and close the dialog
+   * In the same place, also set the STEM project, aadl2iml, Kind 2 and 
+     Soteria++ binary paths respectively, and then save and close the dialog
 
 ## Setup Instructions on Ubuntu
 
@@ -115,5 +115,5 @@
    * Set VERDICT bundle path: Go to "Windows -> Preferences -> Verdict
      -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" in the
      "extern" folder
-   * In the same place, also set the STEM path to the extern/STEM
-     folder, and then save and close the dialog
+   * In the same place, also set the STEM project, aadl2iml, Kind 2 and 
+     Soteria++ binary paths respectively, and then save and close the dialog
