@@ -25,21 +25,6 @@ import com.ge.research.osate.verdict.gui.CRVSettingsPanel;
 */
 
 public class CRVHandler extends AbstractHandler {
-
-	static final String VDMINST = VerdictHandlersUtils.BINDIR + "vdminstrumentor.jar";
-	static final String VDM2LUS = VerdictHandlersUtils.BINDIR + "vdm2lus.jar";
-
-	// Kind2 related command line arguments
-	static final String KIND2 = VerdictHandlersUtils.OSDIR + "kind2";
-	static final String COLOR = "--color";
-	static final String FALSE = "false";
-	static final String TRUE = "true";
-
-	static final String LUS = ".lus";
-	static final String XML = ".xml";
-	static final String BA = "-B";
-	static final String BAOPT = "--max_weak_assumptions";
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (VerdictHandlersUtils.startRun()) {
