@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ge.verdict</groupId>
+        <artifactId>tools</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ge.research.osate.verdict</groupId>
+    <artifactId>verdict</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>com.ge.research.osate.verdict</module>
+        <module>com.ge.research.osate.verdict.dsl</module>
+        <module>com.ge.research.osate.verdict.dsl.ide</module>
+        <module>com.ge.research.osate.verdict.dsl.ui</module>
+        <module>com.ge.research.osate.verdict.feature</module>
+        <module>com.ge.research.osate.verdict.target</module>
+        <module>com.ge.research.osate.verdict.updatesite</module>
+    </modules>
+
+    <!-- Disable unusable repositories, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478 -->
+    <repositories>
+        <repository>
+            <id>ossrh-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>ossrh-snapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <!-- Use Tycho to build our Eclipse plugin code -->
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-maven-plugin</artifactId>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <configuration>
+                    <environments>
+                        <environment>
+                            <os>win32</os>
+                            <ws>win32</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>linux</os>
+                            <ws>gtk</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                        <environment>
+                            <os>macosx</os>
+                            <ws>cocoa</ws>
+                            <arch>x86_64</arch>
+                        </environment>
+                    </environments>
+                    <target>
+                        <artifact>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>com.ge.research.osate.verdict.target</artifactId>
+                            <version>${project.version}</version>
+                        </artifact>
+                    </target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
