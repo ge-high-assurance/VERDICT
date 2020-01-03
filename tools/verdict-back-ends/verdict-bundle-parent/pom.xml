@@ -191,8 +191,8 @@
         </dependencies>
     </dependencyManagement>
 
-    <build><!-- Make sure every module has automatically formatted code and source
-            jars -->
+    <build><!-- Make sure every module has automatically formatted code and
+            source jars -->
         <plugins>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>

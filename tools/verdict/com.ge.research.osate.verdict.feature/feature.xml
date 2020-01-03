@@ -21,7 +21,8 @@
          id="com.ge.research.osate.verdict"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.ge.research.osate.verdict.dsl"
@@ -34,7 +35,8 @@
          id="com.ge.research.osate.verdict.dsl.ide"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.ge.research.osate.verdict.dsl.ui"
@@ -42,5 +44,10 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <!-- OSATE product lacks this feature, so let's bundle it with our plugins -->
+   <includes
+         id="de.itemis.xtext.antlr.sdk"
+         version="0.0.0"/>
 
 </feature>
