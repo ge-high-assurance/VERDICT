@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="com.ge.research.osate.verdict.feature">
+      <category name="verdict"/>
+   </feature>
+   <category-def name="verdict" label="VERDICT for OSATE">
+      <description>
+         VERDICT
+      </description>
+   </category-def>
+</site>
