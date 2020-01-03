@@ -5,7 +5,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.emf.common.util.URI;
@@ -42,7 +41,7 @@ import com.ge.research.osate.verdict.gui.WzrdDashboard;;
 
 public class WzrdHandler extends AbstractHandler {
 
-	public IPath fileModel = null;
+	public IFile fileModel = null;
 	private static boolean isRunningNow = false;
 
 	@Override
@@ -97,7 +96,7 @@ public class WzrdHandler extends AbstractHandler {
 				if (e instanceof SystemTypeImpl) {
 					SystemTypeImpl selectedSys = (SystemTypeImpl) e;
 					setModelPath(e);
-						StatementEditor editor = new StatementEditor(selectedSys, fileModel, shell,
+						StatementEditor editor = new StatementEditor(selectedSys, fileModel.getFullPath(), shell,
 								window.getShell().getBounds(), "osate");
 						if (editor.isValid()) {
 						editor.run();
@@ -124,7 +123,7 @@ public class WzrdHandler extends AbstractHandler {
 				if (selectedObject instanceof SystemTypeImpl) {
 					SystemTypeImpl selectedSys = (SystemTypeImpl) selectedObject;
 					setModelPath(selectedObject);
-						StatementEditor editor = new StatementEditor(selectedSys, fileModel, shell,
+						StatementEditor editor = new StatementEditor(selectedSys, fileModel.getFullPath(), shell,
 								window.getShell().getBounds(), "osate");
 						if (editor.isValid()) {
 						editor.run();
@@ -139,7 +138,7 @@ public class WzrdHandler extends AbstractHandler {
 				return null;
 			});
 		} else if (selection.getFirstElement() instanceof IFile) {
-			fileModel = ((IFile) selection.getFirstElement()).getFullPath();
+				fileModel = (IFile) selection.getFirstElement();
 			if (!fileModel.getFileExtension().equals("aadl")) {
 				MessageDialog.openError(window.getShell(), "VERDICT Wizard Launcher",
 						"Wizard can be launched from files only with .aadl extension.");
@@ -171,7 +170,7 @@ public class WzrdHandler extends AbstractHandler {
 //					}
 //				}
 
-			WzrdDashboard dashboard = new WzrdDashboard(resource, shell, fileModel);
+				WzrdDashboard dashboard = new WzrdDashboard(resource, shell, fileModel.getFullPath());
 			if (dashboard.isValid()) {
 				dashboard.run();
 			}
@@ -188,6 +187,6 @@ public class WzrdHandler extends AbstractHandler {
 	private void setModelPath(EObject root) {
 		Resource res = root.eResource();
 		URI uri = res.getURI();
-		fileModel = OsateResourceUtil.getOsatePath(uri);
+		fileModel = OsateResourceUtil.toIFile(uri);
 	}
 }
