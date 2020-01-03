@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.ge.research.osate.verdict"
+      id="com.ge.research.osate.verdict.feature"
       label="DARPA CASE VERDICT Feature"
       version="1.0.0.qualifier"
       provider-name="GE">
