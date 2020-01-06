@@ -27,7 +27,6 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.impl.SystemTypeImpl;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import com.ge.research.osate.verdict.gui.StatementEditor;
 import com.ge.research.osate.verdict.gui.WzrdDashboard;;
@@ -187,6 +186,6 @@ public class WzrdHandler extends AbstractHandler {
 	private void setModelPath(EObject root) {
 		Resource res = root.eResource();
 		URI uri = res.getURI();
-		fileModel = OsateResourceUtil.toIFile(uri);
+		// fileModel = OsateResourceUtil.toIFile(uri); // TODO fix me
 	}
 }

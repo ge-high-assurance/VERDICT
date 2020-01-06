@@ -1,8 +1,11 @@
 package com.ge.research.osate.verdict.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ge.research.osate.verdict.handlers.VerdictHandlersUtils;
 
@@ -153,9 +156,21 @@ public class MBASResultSummary {
 	}
 
 	public void updateMissionsWithSafety(Map<String, List<MBASSafetyResult>> safetyResults) {
+		Set<String> coveredMissions = new HashSet<>();
 		for (MissionAttributes mission : missions) {
 			if (safetyResults.containsKey(mission.getMission())) {
 				mission.updateSuccessWithSafety(safetyResults.get(mission.getMission()));
+				coveredMissions.add(mission.getMission());
+			}
+		}
+		for (String mission : safetyResults.keySet()) {
+			if (!coveredMissions.contains(mission)) {
+				MissionAttributes att = new MissionAttributes();
+				att.setMission(mission);
+				att.setRequirements(Collections.emptyList());
+				att.setTableContents(Collections.emptyList());
+				att.updateSuccessWithSafety(safetyResults.get(mission));
+				missions.add(att);
 			}
 		}
 	}
