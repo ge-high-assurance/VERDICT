@@ -1036,12 +1036,15 @@ let rec sprint_Events pexp =
    | Var(comp, event) -> comp ^ ":" ^ event
    | Pro l ->
      (match l with 
-     | hd::tl -> sprint_Events hd ^ andStr ^ sprint_Events (Pro tl)
+     | hd::tl -> 
+       (* have to see when len tl = 0, so that you don't print a trailing andStr *)
+       if List.length tl = 0 then sprint_Events hd 
+       else sprint_Events hd ^ andStr ^ sprint_Events (Pro tl)
      | []  -> "")
    | Sum l -> 
      (match l with 
      | hd::tl -> 
-       (* for Sum, have to see when len tl = 0 *)
+       (* have to see when len tl = 0, so that you don't print a trailing orStr *)
        if List.length tl = 0 then sprint_Events hd 
        else sprint_Events hd ^ orStr ^ sprint_Events (Sum tl)
      | []  -> "") 

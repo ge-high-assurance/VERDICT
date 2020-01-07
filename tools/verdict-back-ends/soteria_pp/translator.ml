@@ -717,7 +717,7 @@ let severity2risk severity =
   | "Minor"        -> "1e-03"
   | _              -> "1"    ;;
 
-(* function that saves to a .ml file the library and the model as an artifact for the end-user *)
+(* function that saves the library and model (to .ml file) for debugging *)
 let saveLibraryAndModelToFile filename lib mdl =
       let oc = Out_channel.create filename in
       print_filename oc filename;
@@ -778,14 +778,6 @@ let cutSetsList cutSetList = List.map cutSetList ~f:(fun x-> cutSets x);;
 
 let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) ;;
 
-(*let compAttackDefense name  attack defType l_defense l_defense2nist = 
-   let listDefn = defenseProfileAux name defType l_defense l_defense2nist in
-   let listcapecDefenAux = List.Assoc.find_exn (listDefn) attack ~equal:(=) in 
-   let listcapecDefen = List.map (listcapecDefenAux) ~f:(fun x->String.split_on_chars x ~on:[';']) in
-   let listAND = List.map (listcapecDefen) ~f:(fun x-> ("("^ (concat_And_Or "and" x))^")") in
-   concat_And_Or "or" listAND;;
-*)
-
 let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission = 
    (* list of cutsets to print *)
    let infoList = cutSetsList (likelihoodCutImp tc_adtree) in
@@ -796,10 +788,48 @@ let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission =
    in
    fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
                         (defenseTypeStr) (string_of_float (likelihoodCut tc_adtree)) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
-   List.iter infoList ~f:(fun x-> cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") (getval x "defense" ) );
+   List.iter infoList ~f:(fun x-> fprintf_cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") (getval x "defense" ) );
+;;
+
+(*   
+let takeVar v = 
+   match v with
+       Var (a,b) -> [("comp",a);("event",b)]
+     | _         -> [("comp","");("event","")];;
+
+let rec cutSetsSafetyToView cOpe = 
+      match cOpe with 
+      | Var v -> [takeVar (Var v)]
+      | Pro (h::tl) -> (takeVar h) :: (cutSetsSafetyToView (Pro tl))
+      | _ -> [] ;;
+*)
+
+let rec cutSetsSafetyToView cOpe = 
+      match cOpe with 
+      | Var (a,b) -> [[("comp",a);("event",b)]]
+      | Pro (h::tl) -> List.append (cutSetsSafetyToView h) (cutSetsSafetyToView (Pro tl))
+      | _ -> [] ;;
+
+let cutSetsSafety cutSet =     
+    let (cut,pro1,_) = cutSet in
+    (("prob",(string_of_float pro1)), (cutSetsSafetyToView cut));;
+
+let cutSetsSafetyList cutSetList = List.map cutSetList ~f:(fun x-> cutSetsSafety x);;
+
+let xml_gen_safety filename_ch reqIDStr defenseTypeStr tc_ftree l_mission = 
+   (* list of cutsets to print *)
+   let infoList = cutSetsSafetyList (probErrorCutImp tc_ftree) 
+   and (p,_) = probErrorCut tc_ftree in
+   (* internal functions *)
+   let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
+   let cybReq_Safety l_mission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
+   let getSafety_Of_cybReq req l_mission = getval (cybReq_Safety l_mission) req 
+   in
+   fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
+                       (defenseTypeStr) (string_of_float p) (getSafety_Of_cybReq reqIDStr l_mission);
+   List.iter infoList ~f:(fun ((_,p),l) -> fprintf_cutSetSafety filename_ch p l );
 ;;
    
-
 (* This function returns the following tuple given the CyberReqID: (modelVersion, cyberReq, risk) 
    where cyberReq is the textual cyber requirement returned as a string  
    and risk is the severity, converted to risk returned as a string 
@@ -929,7 +959,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
             dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
             (* -- print requirement info into .xml file -- *)
             fprintf xml_safety_oc "\t<Requirement label=  \"%s\" " reqIDStr;
-            (* xml_safety_gen xml_safety_oc reqIDStr defenseTypeStr t mission; <-- function goes here when done *)
+            xml_gen_safety xml_safety_oc reqIDStr defenseTypeStr t mission;
             fprintf xml_safety_oc "\t</Requirement> \n";
          )
       );
