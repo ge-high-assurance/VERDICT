@@ -60,6 +60,11 @@ public class MBASHandler extends AbstractHandler {
 							System.out.println("Please set soteria++ binary path in Preferences");
 							return;
 						}
+						String graphVizPath = BundlePreferences.getGraphVizPath();
+						if (graphVizPath.length() == 0) {
+							System.out.println("Please set GraphViz path in Preferences");
+							return;
+						}
 
 						VerdictHandlersUtils.printGreeting();
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
@@ -86,7 +91,8 @@ public class MBASHandler extends AbstractHandler {
 							graphsFolder.mkdir();
 						}
 
-						if (runBundle(bundleJar, selection.get(0), aadl2imlBin, stemProjPath, soteriaPpBin)) {
+						if (runBundle(bundleJar, selection.get(0), aadl2imlBin, stemProjPath, soteriaPpBin,
+								graphVizPath)) {
 							// Soteria++ output directory
 							String soteriaOut = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
 
@@ -124,7 +130,7 @@ public class MBASHandler extends AbstractHandler {
 	}
 
 	public static boolean runBundle(String bundleJar, String inputPath, String aadl2imlBin, String stemProjectDir,
-			String soteriaPpBin) {
+			String soteriaPpBin, String graphVizPath) {
 		List<String> args = new ArrayList<>();
 
 		args.add(VerdictHandlersUtils.JAVA);
@@ -139,7 +145,9 @@ public class MBASHandler extends AbstractHandler {
 		args.add(stemProjectDir);
 		args.add(soteriaPpBin);
 
-		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null);
+		String[] env = { "GraphVizPath=" + graphVizPath };
+
+		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null, env);
 
 		return code == 0;
 	}

@@ -227,7 +227,7 @@ type SafetyExpr {
 type SafetyReq {
 	id: String;
 	condition: SafetyExpr;
-	severity: Option<String>;
+	targetProbability: Option<String>;
 	comment: Option<String>;
     description : Option<String>;
 };

@@ -200,7 +200,7 @@ type cyber_req = {
 type safety_req = {
     id: string;
     condition: safety_expr;
-    severity: string;
+    target_probability: string;
     comment: string option;
     description: string option;
   }

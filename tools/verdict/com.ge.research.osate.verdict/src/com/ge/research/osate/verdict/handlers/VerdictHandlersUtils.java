@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.tools.ant.taskdefs.Execute;
@@ -131,10 +132,20 @@ public class VerdictHandlersUtils {
 	 *            command line arguments
 	 * @return output of process
 	 */
-	public static int run(String[] cmdline, String workingDir) {
+	public static int run(String[] cmdline, String workingDir, String[] env) {
 		OutputStream outStream = System.out;
 		OutputStream errStream = System.err;
 		Execute executor = new Execute(new PumpStreamHandler(outStream, errStream));
+		if (env != null) {
+			String[] prevEnv = executor.getEnvironment();
+			if (prevEnv != null) {
+				String[] newEnv = Arrays.copyOf(prevEnv, prevEnv.length + env.length);
+				System.arraycopy(env, 0, newEnv, prevEnv.length, env.length);
+				executor.setEnvironment(newEnv);
+			} else {
+				executor.setEnvironment(env);
+			}
+		}
 		return antRun(executor, cmdline, workingDir);
 	}
 

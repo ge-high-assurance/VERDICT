@@ -172,7 +172,7 @@ SafetyReqBlock returns SafetyReq:
 	'{' (
 	('id' '=' id=STRING DELIMETER_OPT) &
 	('condition' '=' condition=SafetyReqConditionLogic DELIMETER_OPT) &
-	('severity' '=' severity=PROP DELIMETER_OPT) &
+	('targetProbability' '=' severity=PROP DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)?
 	) '}'
