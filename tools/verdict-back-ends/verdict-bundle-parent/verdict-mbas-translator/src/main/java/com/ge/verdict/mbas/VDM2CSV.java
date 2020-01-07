@@ -969,7 +969,7 @@ public class VDM2CSV extends VdmTranslator {
                     table.addValue(getStrNullChk(() -> req.getName())); // cyber req
                     table.addValue(""); // mission impact CIA
                     table.addValue(""); // effect
-                    table.addValue(""); // Severity
+                    table.addValue(req.getSeverity()); // Severity
                     // Get the name of the component with this output port, determined above
                     table.addValue(
                             convertSafetyCompOrSrcPortDepToStr(

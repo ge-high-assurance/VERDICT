@@ -378,10 +378,10 @@ let verdict_cyber_req_to_iml
   }
 
 let verdict_safety_req_to_iml
-      id condition comment description =
+      id condition severity comment description =
   let open VI in
   {
-    id;
+    id; severity;
     condition = verdict_safety_expr_to_iml condition;
     comment; description
   }
@@ -474,8 +474,8 @@ let verdict_annex_to_safety_reqs annex =
       fun acc st ->
       match st with
       | SafetyReq
-        {id; condition; comment; description}
-        -> (verdict_safety_req_to_iml id condition comment description) :: acc
+        {id; condition; severity; comment; description}
+        -> (verdict_safety_req_to_iml id condition severity comment description) :: acc
       | _ -> acc
     end [] annex
 

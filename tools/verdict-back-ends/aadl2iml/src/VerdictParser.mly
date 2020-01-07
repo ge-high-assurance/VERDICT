@@ -52,6 +52,7 @@
     type safety_req_param =
       | SReq_ID of string
       | SReq_CONDITION of slexpr
+      | SReq_SEVERITY of string
       | SReq_COMMENT of string
       | SReq_DESCRIPTION of string
 
@@ -67,6 +68,11 @@
                                 | _ -> false) params) with
                 | Some (SReq_CONDITION condition) -> condition
                 | _ -> failwith "no condition specified");
+          severity = (match (List.find_opt
+                        (function SReq_SEVERITY _ -> true
+                                | _ -> false) params) with
+                | Some (SReq_SEVERITY severity) -> severity
+                | _ -> failwith "no severity specified");
           comment = (match (List.find_opt
                         (function SReq_COMMENT _ -> true
                                 | _ -> false) params) with
@@ -402,6 +408,7 @@ safety_req:
 safety_req_param:
   | PARAM_ID "=" id = STRING { SReq_ID id }
   | CONDITION "=" condition = slexpr { SReq_CONDITION condition }
+  | SEVERITY "=" severity = DECIMAL { SReq_SEVERITY severity }
   | COMMENT "=" comment = STRING { SReq_COMMENT comment }
   | DESCRIPTION "=" description = STRING { SReq_DESCRIPTION description }
 
