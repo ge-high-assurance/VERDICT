@@ -2067,6 +2067,7 @@ public class VDMParser extends Parser {
                 safetyReq.setId(identifier);
 
             } else if (token.type == Type.SAFETY_EXP) {
+
                 SafetyReqExpr safetyExpr = safetyReqExpr();
                 safetyReq.setCondition(safetyExpr);
 
@@ -2095,6 +2096,11 @@ public class VDMParser extends Parser {
 
                     String extern = str_value();
                     safetyReq.setExtern(extern);
+
+                } else if (type == Type.SEVERITY_FIELD) {
+
+                    String severity = str_value();
+                    safetyReq.setSeverity(severity);
                 }
             }
         }

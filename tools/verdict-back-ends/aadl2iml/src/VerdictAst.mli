@@ -60,6 +60,7 @@ type statement =
       {
         id : string;
         condition: slexpr;
+        severity : string;
         description : string option;
         comment : string option;      
       }

@@ -600,6 +600,8 @@
             <element name="id" type="string" minOccurs="1" maxOccurs="1"></element>
             <element name="condition" type="vdm_model:SafetyReqExpr"
                 minOccurs="1" maxOccurs="1"></element>
+            <element name="severity" type="string" minOccurs="1"
+                maxOccurs="1"></element>
             <element name="comment" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="description" type="string" minOccurs="0"
