@@ -22,6 +22,7 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 	private static final String AADL2IML_BIN = "aadl2iml_bin";
 	private static final String KIND2_BIN = "kind2_bin";
 	private static final String SOTERIA_PP_BIN = "soteria_pp_bin";
+	private static final String GRAPH_VIZ_PATH = "graph_viz_path";
 
 	public BundlePreferences() {
 		super();
@@ -54,6 +55,10 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 
 	public static String getSoteriaPpBin() {
 		return getVerdictPreferenceStore().getString(SOTERIA_PP_BIN);
+	}
+
+	public static String getGraphVizPath() {
+		return getVerdictPreferenceStore().getString(GRAPH_VIZ_PATH);
 	}
 
 	@Override
@@ -134,5 +139,11 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		soteriaPpBin.setStringValue(getSoteriaPpBin());
 		addField(soteriaPpBin);
 		addSaveHandler(soteriaPpBin, SOTERIA_PP_BIN, file -> file.exists() && file.isFile());
+
+		DirectoryFieldEditor graphVizPath = new DirectoryFieldEditor(GRAPH_VIZ_PATH, "GraphViz path:",
+				getFieldEditorParent());
+		graphVizPath.setStringValue(getGraphVizPath());
+		addField(graphVizPath);
+		addSaveHandler(graphVizPath, GRAPH_VIZ_PATH, file -> file.exists() && file.isDirectory());
 	}
 }

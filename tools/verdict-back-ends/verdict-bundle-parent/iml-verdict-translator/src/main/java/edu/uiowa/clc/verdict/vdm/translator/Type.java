@@ -118,7 +118,7 @@ public enum Type {
     PROBABILITY("probability"),
     EVENT_ID("id"),
     SAFETY_EVENT("SafetyEvent"),
-    SEVERITY_FIELD("severity"),
+    TARGET_PROBABILITY("targetProbability"),
 
     SAFETY_EXP("SafetyExpr"),
     SAFETY_EXP_KIND("SafetyExprKind"),

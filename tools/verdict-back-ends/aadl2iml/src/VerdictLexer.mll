@@ -48,6 +48,7 @@ rule token = parse
   | "phases" { P.PHASES }
   | "external" { P.EXTERNAL }
   | "targetLikelihood" { P.TARGET_LIKELIHOOD }
+  | "targetProbability" { P.TARGET_PROBABILITY }
   | "entities" { P.ENTITIES }
   | "assumptions" { P.ASSUMPTIONS }
   | "reference" { P.REFERENCE }

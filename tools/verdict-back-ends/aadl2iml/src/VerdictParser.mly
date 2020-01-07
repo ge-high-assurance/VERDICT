@@ -52,7 +52,7 @@
     type safety_req_param =
       | SReq_ID of string
       | SReq_CONDITION of slexpr
-      | SReq_SEVERITY of string
+      | SReq_TARGET_PROBABILITY of string
       | SReq_COMMENT of string
       | SReq_DESCRIPTION of string
 
@@ -68,11 +68,11 @@
                                 | _ -> false) params) with
                 | Some (SReq_CONDITION condition) -> condition
                 | _ -> failwith "no condition specified");
-          severity = (match (List.find_opt
-                        (function SReq_SEVERITY _ -> true
+          target_probability = (match (List.find_opt
+                        (function SReq_TARGET_PROBABILITY _ -> true
                                 | _ -> false) params) with
-                | Some (SReq_SEVERITY severity) -> severity
-                | _ -> failwith "no severity specified");
+                | Some (SReq_TARGET_PROBABILITY target) -> target
+                | _ -> failwith "no target probability specified");
           comment = (match (List.find_opt
                         (function SReq_COMMENT _ -> true
                                 | _ -> false) params) with
@@ -339,7 +339,7 @@
 
 %token MISSION SAFETY_REQ SAFETY_REL SAFETY_EV CYBER_REQ CYBER_REL THREAT_MODEL THREAT_DEFENSE THREAT_DATABASE
 %token PARAM_ID CIA SEVERITY CONDITION COMMENT OUTPUT INPUTS DESCRIPTION PHASES EXTERNAL ENTITIES ASSUMPTIONS REFERENCE THREATS
-%token FAULT_SRC HAPPENS PROBABILITY CYBER_REQS TARGET_LIKELIHOOD
+%token FAULT_SRC HAPPENS PROBABILITY CYBER_REQS TARGET_LIKELIHOOD TARGET_PROBABILITY
 %token FORALL EXISTS CONTAINS
 %token CIA_C CIA_I CIA_A
 %token SEVERITY_NONE SEVERITY_MINOR SEVERITY_MAJOR SEVERITY_HAZARDOUS SEVERITY_CATASTROPHIC
@@ -408,7 +408,7 @@ safety_req:
 safety_req_param:
   | PARAM_ID "=" id = STRING { SReq_ID id }
   | CONDITION "=" condition = slexpr { SReq_CONDITION condition }
-  | SEVERITY "=" severity = DECIMAL { SReq_SEVERITY severity }
+  | TARGET_PROBABILITY "=" target = DECIMAL { SReq_TARGET_PROBABILITY target }
   | COMMENT "=" comment = STRING { SReq_COMMENT comment }
   | DESCRIPTION "=" description = STRING { SReq_DESCRIPTION description }
 

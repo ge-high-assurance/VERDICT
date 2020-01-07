@@ -200,7 +200,7 @@ type cyber_req = {
 type safety_req = {
     id: string;
     condition: safety_expr;
-    severity: string;
+    target_probability: string;
     comment: string option;
     description: string option;
   }
@@ -886,9 +886,9 @@ let pp_print_cyber_req_body ind ppf
   | None -> ()
 
 let pp_print_safety_req_body ind ppf
-      {id; condition; severity; comment; description} =
+      {id; condition; target_probability; comment; description} =
   Format.fprintf ppf "req.id = \"%s\" &&@," id;
-  Format.fprintf ppf "req.severity = \"%s\" &&@," severity;
+  Format.fprintf ppf "req.targetProbability = \"%s\" &&@," target_probability;
   Format.fprintf ppf "@[<v %d>req.condition = %a &&@]@," ind
     (pp_print_safety_expr ind) condition;
   pp_print_opt ppf "req.comment = \"%s\" &&@," comment;

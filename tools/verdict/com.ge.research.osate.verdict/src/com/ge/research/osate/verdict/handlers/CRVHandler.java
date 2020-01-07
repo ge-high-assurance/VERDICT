@@ -112,7 +112,7 @@ public class CRVHandler extends AbstractHandler {
 			args.add("-C");
 		}
 
-		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null);
+		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null, null);
 
 		return code == 0;
 	}

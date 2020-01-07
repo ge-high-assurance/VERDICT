@@ -235,8 +235,8 @@ public class MBASResultsView extends ViewPart {
 				safetyTable.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
 				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Safety Requirement");
-				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Acceptable Likelihood of Failure");
-				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Calculated Likelihood of Failure");
+				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Acceptable Probability of Failure");
+				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Calculated Probability of Failure");
 				new TableColumn(safetyTable, SWT.CENTER | SWT.WRAP).setText("Analysis Result");
 
 				for (MBASSafetyResult safetyItem : safetyItems) {

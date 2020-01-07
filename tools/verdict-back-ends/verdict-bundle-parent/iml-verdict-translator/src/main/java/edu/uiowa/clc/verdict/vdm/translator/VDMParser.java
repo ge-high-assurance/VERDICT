@@ -2097,10 +2097,10 @@ public class VDMParser extends Parser {
                     String extern = str_value();
                     safetyReq.setExtern(extern);
 
-                } else if (type == Type.SEVERITY_FIELD) {
+                } else if (type == Type.TARGET_PROBABILITY) {
 
-                    String severity = str_value();
-                    safetyReq.setSeverity(severity);
+                    String targetProbability = str_value();
+                    safetyReq.setTargetProbability(targetProbability);
                 }
             }
         }
