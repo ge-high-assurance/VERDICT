@@ -144,9 +144,9 @@ let print_filename oc fn =
      fprintf oc "(* filename: %s *)\n\n" fn;
 ;; 
 
-(*Print xml data*)
 
-let cutSet oc cutSetlikelihood comp attack defense = 
+(* Prints xml formatted data for an attack-defense cut set *)
+let fprintf_cutSet oc cutSetlikelihood comp attack defense = 
 fprintf oc "\t  <Cutset likelihood=\"%s\"> \n" cutSetlikelihood;
 fprintf oc "\t     <Component name=\"%s\"> \n" comp;
 fprintf oc "\t       <Capec name=\"%s\" defense=\"%s\"> \n" attack defense;
@@ -154,9 +154,15 @@ fprintf oc "\t       </Capec>\n";
 fprintf oc "\t     </Component> \n";     
 fprintf oc "\t  </Cutset> \n";;
  
-(* 
-let xmlReq oc reqId  = 
-     fprintf oc "< Requirement label=  %s  computed_p= %s acceptable_p = %s >\n" reqId reqId reqId;
-     fprintf oc "< /Requirement > \n" 
-*) 
- 
+(* Prints xml formatted data for an fault cut set *)
+let fprintf_cutSetSafety_aux oc comp event = 
+fprintf oc "\t     <Component name=\"%s\"> \n" comp;
+fprintf oc "\t       <Event name=\"%s\"> \n" event;
+fprintf oc "\t       </Event>\n";
+fprintf oc "\t     </Component> \n";;     
+
+let fprintf_cutSetSafety oc cutSetprobability comp_event_List = 
+   let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
+   fprintf oc "\t  <Cutset probability=\"%s\"> \n" cutSetprobability;
+   List.iter comp_event_List ~f:(fun x -> fprintf_cutSetSafety_aux oc (getval x "comp") (getval x "event"));
+   fprintf oc "\t  </Cutset> \n";;

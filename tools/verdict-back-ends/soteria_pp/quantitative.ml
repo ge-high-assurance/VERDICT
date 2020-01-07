@@ -358,7 +358,7 @@ let likelihoodCutCImp t cutset =
              | AVar _ -> [cutset]
              | AFALSE -> [AFALSE]
              | ASum s -> s
-             | APro [a;d] -> [cutset]  (* for the case where the cutset is C(a,d) *)
+             | APro s -> s  (* for the case where the cutset contains C(a,d) *)
              | _ -> raise (Error "likelihoodCutCImp exception") 
              in 
       let clikeli = List.map cs ~f:(fun x -> likelihoodCutCalc x likeAlist) 
