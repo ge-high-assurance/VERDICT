@@ -172,7 +172,7 @@ SafetyReqBlock returns SafetyReq:
 	'{' (
 	('id' '=' id=STRING DELIMETER_OPT) &
 	('condition' '=' condition=SafetyReqConditionLogic DELIMETER_OPT) &
-	('targetProbability' '=' severity=PROP DELIMETER_OPT) &
+	('targetProbability' '=' severity=Prob DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)?
 	) '}'
@@ -205,7 +205,7 @@ Event: 'Event' EventBlock;
 EventBlock returns Event:
 	'{' (
 	('id' '=' id=STRING DELIMETER_OPT) &
-	('probability' '=' probability=PROP DELIMETER_OPT)? &
+	('probability' '=' probability=Prob DELIMETER_OPT)? &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)?
 	) '}'
@@ -240,6 +240,8 @@ terminal MINUS : '-';
 terminal PROP: DOUBLE E MINUS INTEGER;	
 terminal DOUBLE:
     INTEGER ('.' INTEGER)?;
+    
+Prob returns Prob: prop=PROP | targetLikelihood=TargetLikelihood;
 
 
 // ===== THREAT MODELS =====
