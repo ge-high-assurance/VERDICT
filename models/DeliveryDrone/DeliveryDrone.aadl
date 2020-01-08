@@ -609,10 +609,12 @@ public
 			SafetyReq {
 			id = "SafetyReq01" 
 			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
+			targetProbability = 1e-06
 		    	};	
 			SafetyReq {
 			id = "SafetyReq02" 
-			condition = actuation_out:I and actuation_out:A 
+			condition = actuation_out:I and actuation_out:A
+			targetProbability = 1e-06 
 		    	};	
 	    	MissionReq {
 		    	id ="MReq01"
