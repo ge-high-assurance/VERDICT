@@ -5,6 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.emf.common.util.URI;
@@ -27,7 +28,6 @@ import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
 import org.eclipse.xtext.ui.editor.utils.EditorUtils;
 import org.osate.aadl2.impl.SystemTypeImpl;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
 import com.ge.research.osate.verdict.gui.StatementEditor;
 import com.ge.research.osate.verdict.gui.WzrdDashboard;;
@@ -187,6 +187,6 @@ public class WzrdHandler extends AbstractHandler {
 	private void setModelPath(EObject root) {
 		Resource res = root.eResource();
 		URI uri = res.getURI();
-		fileModel = OsateResourceUtil.toIFile(uri);
+		fileModel = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(uri.toPlatformString(true)));
 	}
 }
