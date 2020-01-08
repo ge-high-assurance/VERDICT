@@ -68,6 +68,7 @@ public class MBASResultsView extends ViewPart {
 	public void createPartControl(Composite parent) {
 
 		ScrolledComposite scrollArea = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+		scrollArea.setExpandHorizontal(true);
 
 		composite = new Composite(scrollArea, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));

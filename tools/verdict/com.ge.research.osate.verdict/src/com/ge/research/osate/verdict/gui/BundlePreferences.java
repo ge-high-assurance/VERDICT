@@ -122,25 +122,25 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		addField(stemDir);
 		addSaveHandler(stemDir, STEM_DIR, file -> file.exists() && file.isDirectory());
 
-		FileFieldEditor aadl2imlBin = new FileFieldEditor(AADL2IML_BIN, "aadl2iml binary:", true,
+		FileFieldEditor aadl2imlBin = new FileFieldEditor(AADL2IML_BIN, "Aadl2iml Binary:", true,
 				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
 		aadl2imlBin.setStringValue(getAadl2imlBin());
 		addField(aadl2imlBin);
 		addSaveHandler(aadl2imlBin, AADL2IML_BIN, file -> file.exists() && file.isFile());
 
-		FileFieldEditor kind2Bin = new FileFieldEditor(KIND2_BIN, "Kind2 binary:", true,
+		FileFieldEditor kind2Bin = new FileFieldEditor(KIND2_BIN, "Kind2 Binary:", true,
 				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
 		kind2Bin.setStringValue(getKind2Bin());
 		addField(kind2Bin);
 		addSaveHandler(kind2Bin, KIND2_BIN, file -> file.exists() && file.isFile());
 
-		FileFieldEditor soteriaPpBin = new FileFieldEditor(SOTERIA_PP_BIN, "Soteria++ binary:", true,
+		FileFieldEditor soteriaPpBin = new FileFieldEditor(SOTERIA_PP_BIN, "Soteria++ Binary:", true,
 				StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
 		soteriaPpBin.setStringValue(getSoteriaPpBin());
 		addField(soteriaPpBin);
 		addSaveHandler(soteriaPpBin, SOTERIA_PP_BIN, file -> file.exists() && file.isFile());
 
-		DirectoryFieldEditor graphVizPath = new DirectoryFieldEditor(GRAPH_VIZ_PATH, "GraphViz path:",
+		DirectoryFieldEditor graphVizPath = new DirectoryFieldEditor(GRAPH_VIZ_PATH, "GraphViz Path:",
 				getFieldEditorParent());
 		graphVizPath.setStringValue(getGraphVizPath());
 		addField(graphVizPath);

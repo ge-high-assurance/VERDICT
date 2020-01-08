@@ -14,6 +14,7 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -420,10 +421,13 @@ public class VerdictHandlersUtils {
 			for (Object selObj : selObjs) {
 				if (selObj instanceof IFile) {
 					IFile selIFile = (IFile) selObj;
-					paths.add(selIFile.getLocation().toFile().getAbsolutePath());
+					paths.add(selIFile.getProject().getLocation().toFile().getAbsolutePath());
 				} else if (selObj instanceof IProject) {
 					IProject selIProject = (IProject) selObj;
 					paths.add(selIProject.getLocation().toFile().getAbsolutePath());
+				} else if (selObj instanceof IFolder) {
+					IFolder selIFolder = (IFolder) selObj;
+					paths.add(selIFolder.getProject().getLocation().toFile().getAbsolutePath());
 				} else {
 					VerdictLogger.warning("Selection is not recognized!");
 				}

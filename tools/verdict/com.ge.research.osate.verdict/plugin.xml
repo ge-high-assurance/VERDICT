@@ -133,11 +133,17 @@
 	               <iterate
 	                     ifEmpty="false"
 	                     operator="and">
-	                  <and>
+	                  <or>
 		                  <instanceof
 		                        value="org.eclipse.core.resources.IProject">
-		                  </instanceof>	  
-	                  </and>                
+		                  </instanceof>
+		                  <instanceof
+		                        value="org.eclipse.core.resources.IFile">
+		                  </instanceof>
+		                  <instanceof
+		                        value="org.eclipse.core.resources.IFolder">
+		                  </instanceof>
+	                  </or>
 	               </iterate>
 	            </and>  
 	         </with>
