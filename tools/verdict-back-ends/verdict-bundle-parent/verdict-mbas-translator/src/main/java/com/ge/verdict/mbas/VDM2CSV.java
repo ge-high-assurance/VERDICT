@@ -462,6 +462,10 @@ public class VDM2CSV extends VdmTranslator {
         return Character.toUpperCase(str.charAt(0)) + str.substring(1);
     }
 
+    private String replaceUnderscoreWithSpace(String str) {
+        return str.replaceAll("_", "");
+    }
+
     /**
      * Invokes a method (using reflection) on an object. Handles failure cases.
      *
@@ -569,11 +573,15 @@ public class VDM2CSV extends VdmTranslator {
 
         // Find methods for all properties
         Class<ComponentInstance> cls = ComponentInstance.class;
+
         for (int i = 0; i < props.length; i++) {
+
             String propName = props[i];
             // Find isXxx method
             try {
-                Method method = cls.getDeclaredMethod("is" + capitalizeFirstLetter(propName));
+                Method method =
+                        cls.getDeclaredMethod(
+                                "is" + replaceUnderscoreWithSpace(capitalizeFirstLetter(propName)));
                 // Check return type
                 if (Boolean.class.equals(method.getReturnType())) {
                     isPropMethods[i] = method;
