@@ -93,28 +93,72 @@ then dataSentToUntrusted of the Subsystem is true.
 // if all the relevant links are encrypted then that component would not have that capec because the rule would not fire
 
 //////////////////// Manually created rules to address Cyber Attack Properties (CAP) from TA1 ////////////
-// There are 2 possible cases to consider - the supplied CAP is equivalent or not to an existing CAPEC.
-// Case 1: Consider CAP "Deadlock". It maps to CAPEC-25 (Forced Deadlock) which is applicable to radio.
-//		So, we will add rules to handle receiving "Deadlock" applicable to radio from TA1
-//		where we comment out out CAPEC-25 rules. We should see CAPEC-25 be applicable to radio
-//		altered input csv file, the template file, BaseModel.sadl
-//		To test, do 2 runs
-//			In Run 1: comment out rule TA1-1 but keep rules Vul-CAPEC-25-1 and Vul-CAPEC-25-2
-//			In Run 2: toggle the comments on these 3 rules
-//			Both runs should show radio to have 1 capec, note the TA1 properties displayed 
-//	Case 2: This is where the CAP does not match with any capecs currently handled. 
-//		Consider CAP ta1_NewProp, we introduce the structure of CAPEC, Mitigation and NIST
-//		that would be needed to handle this. To test, keep rule TA1-2, this will produce a Capec for gps
 
-// for testing we should be able to comment out rules for CAPEC-25 and still see deadlock being identified - which works
-Rule TA1-1 // in general there may be additional rules for Confidentiality, Integrity and if "or" of defenses
-	if ta1_Deadlock of a Subsystem is true
-	then applicableCM of the Subsystem is CAPEC-25A-StaticCodeAnalysis.
+// if TA1 add a property that does not map to an existing CAPEC then 
+//		introduce for example CAPEC-1000-ta1NewProp, NewDefenseForta1NewProp, Nist-x1 in BaseModel.sadl
+//		set its tooltipProp to be true
+//		and have rule as follows
+//Rule TA1-2
+//	if ta1_NewProp of a Subsystem is true
+//	then applicableCM of the Subsystem is CAPEC-1000-ta1NewProp.
 
-Rule TA1-2
-	if ta1_NewProp of a Subsystem is true
-	then applicableCM of the Subsystem is CAPEC-1000-ta1NewProp.
+Rule TA1-Brute_Force_Attack 
+	if Brute_Force_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-112C-StrongCryptoAlgorithms
+		 and applicableCM of the Subsystem is CAPEC-112I-StrongCryptoAlgorithms
+		 and applicableCM of the Subsystem is CAPEC-112A-StrongCryptoAlgorithms.	
 
+Rule TA1-Buffer_Attack 
+	if Buffer_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-123C-StaticCodeAnalysis
+		 and applicableCM of the Subsystem is CAPEC-123I-StaticCodeAnalysis
+		 and applicableCM of the Subsystem is CAPEC-123A-StaticCodeAnalysis.
+
+Rule TA1-Configuration_Attack 
+	if Configuration_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-176I-SecureBoot-MemoryProtection.
+
+Rule TA1-Excessive_Allocation_Attack 
+	if Excessive_Allocation_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-130A-ResourceAvailability.
+
+Rule TA1-Fault_Injection_Attack 
+	if Fault_Injection_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-624C-PhysicalAccessControl
+		 and applicableCM of the Subsystem is CAPEC-624I-PhysicalAccessControl.
+
+Rule TA1-Flooding_Attack 
+	if Flooding_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-125A-DosProtection.
+
+Rule TA1-Hardware_Integrity_Attack 
+	if Hardware_Integrity_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-440I-TamperProtection.
+
+Rule TA1-Identity_Spoofing_Attack 
+	if Identity_Spoofing_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-151C-DeviceAuthentication
+		 and applicableCM of the Subsystem is CAPEC-151I-DeviceAuthentication.	
+
+Rule TA1-Interception_Attack 
+	if Interception_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-117C-EncryptedTransmission.
+
+Rule TA1-Physical_Theft_Attack 
+	if Physical_Theft_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-507C-PhysicalAccessControl
+		 and applicableCM of the Subsystem is CAPEC-507I-PhysicalAccessControl
+		 and applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.
+
+Rule TA1-Sniffing_Attack 
+	if Sniffing_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-169C-RemoveIdentifyingInformation.
+
+Rule TA1-Supply_Chain_Attack 
+	if Supply_Chain_Attack of a Subsystem is true
+	then     applicableCM of the Subsystem is CAPEC-438I-SupplyChainSecurity
+		 and applicableCM of the Subsystem is CAPEC-439I-SupplyChainSecurity.
+		 		 		 		 		 		 		 		 		 
 // Generated Rules
 Rule Vul-CAPEC-21-1
    if cType of a Subsystem is not Human
