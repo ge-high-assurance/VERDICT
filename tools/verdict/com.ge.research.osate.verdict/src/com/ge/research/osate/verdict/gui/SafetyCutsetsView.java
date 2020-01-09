@@ -50,7 +50,7 @@ public class SafetyCutsetsView extends ViewPart {
 		TableColumn pathLikelihood = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 		pathLikelihood.setText("Path Likelihood");
 		TableColumn events = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		events.setText("Events");
+		events.setText("Safety Failure Cutsets");
 
 		for (int i = 0; i < cutsets.size(); i++) {
 			TableItem item = new TableItem(table, SWT.NONE);
