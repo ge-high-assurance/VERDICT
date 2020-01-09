@@ -75,8 +75,22 @@ System is a type of Thing
 	described by tamperProtection with a single value of type ImplProperty  //AM 7/24 made it and next one boolean for the moment
     described by userAuthentication with a single value of type ImplProperty
 
-	described by ta1_Deadlock with a single value of type boolean
+//	described by ta1_Deadlock with a single value of type boolean
 	described by ta1_NewProp with a single value of type boolean
+	
+	// TA1 properties, all of them end with "_Attack"; each one maps to one or more CAPECS
+	described by Brute_Force_Attack with a single value of type boolean  // CAPEC-112
+	described by Buffer_Attack with a single value of type boolean // CAPEC-123
+	described by Configuration_Attack with a single value of type boolean // CAPEC-176
+	described by Excessive_Allocation_Attack with a single value of type boolean // CAPEC-130
+	described by Fault_Injection_Attack with a single value of type boolean // CAPEC-624
+	described by Flooding_Attack with a single value of type boolean // CAPEC-125
+	described by Hardware_Integrity_Attack with a single value of type boolean // CAPEC-440
+	described by Identity_Spoofing_Attack with a single value of type boolean // CAPEC-151
+	described by Interception_Attack with a single value of type boolean // CAPEC-117
+	described by Physical_Theft_Attack with a single value of type boolean // CAPEC-507
+	described by Sniffing_Attack with a single value of type boolean // CAPEC-169
+	described by Supply_Chain_Attack with a single value of type boolean // CAPEC-438, CAPEC-439
 . 
 
 // the following would also work so that we can filter on the properties we want to show as tooltip, but is not as clean as using annotations
@@ -119,15 +133,28 @@ systemAccessControl has tooltipProp true.
 tamperProtection has tooltipProp true.
 userAuthentication has tooltipProp true.
 
-ta1_Deadlock has tooltipProp true.
-ta1_NewProp has tooltipProp true.
+//ta1_NewProp has tooltipProp true.
+Configuration_Attack has tooltipProp true.
+Physical_Theft_Attack has tooltipProp true.
+Interception_Attack has tooltipProp true.
+Hardware_Integrity_Attack has tooltipProp true.
+Supply_Chain_Attack has tooltipProp true.
+Brute_Force_Attack has tooltipProp true.
+Fault_Injection_Attack has tooltipProp true.
+Identity_Spoofing_Attack has tooltipProp true.
+Excessive_Allocation_Attack has tooltipProp true.
+Sniffing_Attack has tooltipProp true.
+Buffer_Attack has tooltipProp true.
+Flooding_Attack has tooltipProp true.
 
 Subsystem is a type of System.
   
 PortType is a class, must be one of {inport, outport}.
+Bus is a type of System. //AM: added 12/11
 
 Connection is a type of Subsystem // just for reading in the tabular data; some properties will be from the 3rd csv file
 	described by connectionName with a single value of type string
+	described by binding with a single value of type Bus //AM: added 12/11
 	described by connectionFlow with values of type ContentType
 	described by encryptedTransmission with a single value of type ImplProperty // this line gives NullPointerException
 	described by XencryptedTransmission with a single value of type boolean
@@ -167,20 +194,20 @@ Mitigation is a class // could we relate it to ImplProperty
 // using dummy CAPECs numbered from 1000 for CAP that do not match to any CAPEC
 // and the also generating new Mitigation and NISTCoontrol structures to be edited as needed
 
-CAPEC-1000-ta1NewProp is a CAPEC
-   with id 1000
-   with capecDesc "TA1 NewProp"
-   with ciaIssue Availability
-   with likelihoodOfSuccess 1
-   with mitigation NewDefenseForta1NewProp.
-   
-NewDefenseForta1NewProp is a Mitigation 
-   with implProperty "newDefenseForta1NewProp"
-   with nistControl Nist-x1.   
-   
-Nist-x1 is a NISTControl
-   with nistId "Nist-x1"
-   with nistDesc "Description of Nist-x1". 
+//CAPEC-1000-ta1NewProp is a CAPEC
+//   with id 1000
+//   with capecDesc "TA1 NewProp"
+//   with ciaIssue Availability
+//   with likelihoodOfSuccess 1
+//   with mitigation NewDefenseForta1NewProp.
+//   
+//NewDefenseForta1NewProp is a Mitigation 
+//   with implProperty "newDefenseForta1NewProp"
+//   with nistControl Nist-x1.   
+//   
+//Nist-x1 is a NISTControl
+//   with nistId "Nist-x1"
+//   with nistDesc "Description of Nist-x1". 
 
 ////////////////////// following generated from Excel: CAPEC, NIST, mitigation declarations /////////////////
 
