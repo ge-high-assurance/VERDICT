@@ -905,94 +905,99 @@ public class VDM2CSV extends VdmTranslator {
             }
         }
 
-        // Collect the mappings between mission and reqs
-        Map<String, Mission> missionMap = new HashMap<>();
+        // Allow us to look up requirements by name
+        Map<String, CyberReq> cyberReqMap = new HashMap<>();
+        Map<String, SafetyReq> safetyReqMap = new HashMap<>();
+        if (model.getCyberReq() != null) {
+            for (CyberReq req : model.getCyberReq()) {
+                cyberReqMap.put(req.getId(), req);
+            }
+        }
+        if (model.getSafetyReq() != null) {
+            for (SafetyReq req : model.getSafetyReq()) {
+                safetyReqMap.put(req.getId(), req);
+            }
+        }
+
+        // We only care about requirements that are part of a mission
         if (model.getMission() != null) {
             for (Mission mission : model.getMission()) {
                 for (String reqId : mission.getCyberReqs()) {
-                    missionMap.put(reqId, mission);
-                }
-            }
-        }
+                    if (cyberReqMap.containsKey(reqId)) {
+                        CyberReq req = cyberReqMap.get(reqId);
 
-        // Iterate over all the cyber reqs
-        if (model.getCyberReq() != null) {
-            for (CyberReq req : model.getCyberReq()) {
-                List<List<CIAPort>> condPorts = new ArrayList<>();
-                extractCIAPorts(req.getCondition(), condPorts);
+                        List<List<CIAPort>> condPorts = new ArrayList<>();
+                        extractCIAPorts(req.getCondition(), condPorts);
 
-                Mission mission = missionMap.get(req.getId());
+                        for (List<CIAPort> andPortList : condPorts) {
+                            table.addValue(scenario); // Scenario
+                            table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
+                            table.addValue(getStrNullChk(() -> mission.getName())); // mission req
+                            table.addValue(req.getId()); // cyber req ID
+                            table.addValue(getStrNullChk(() -> req.getName())); // cyber req
+                            table.addValue(
+                                    getStrNullChk(
+                                            () -> req.getCia().value())); // mission impact CIA
+                            table.addValue(""); // effect
+                            table.addValue(req.getSeverity().value()); // Severity
+                            // Get the name of the component with this output port, determined above
+                            table.addValue(
+                                    convertCompOrSrcPortDepToStr(
+                                            outportToDepComps,
+                                            andPortList)); // comp instance dependency (one layer
+                            // inwards)
+                            table.addValue(
+                                    convertCompOrSrcPortDepToStr(
+                                            outportToSrcCompPort,
+                                            andPortList)); // comp output dependency (one layer
+                            // inwards)
 
-                if (mission == null) {
-                    System.out.println(
-                            "Info: CyberReq " + req.getId() + " does not belong to any mission");
-                }
+                            table.addValue(
+                                    convertListOfPortCIAToStr(
+                                            andPortList)); // Dependent Component Output CIA
+                            table.addValue("Cyber"); // cyber for req type
+                            table.capRow();
+                        }
+                    } else if (safetyReqMap.containsKey(reqId)) {
+                        SafetyReq req = safetyReqMap.get(reqId);
 
-                for (List<CIAPort> andPortList : condPorts) {
-                    table.addValue(scenario); // Scenario
-                    table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
-                    table.addValue(getStrNullChk(() -> mission.getName())); // mission req
-                    table.addValue(req.getId()); // cyber req ID
-                    table.addValue(getStrNullChk(() -> req.getName())); // cyber req
-                    table.addValue(getStrNullChk(() -> req.getCia().value())); // mission impact CIA
-                    table.addValue(""); // effect
-                    table.addValue(req.getSeverity().value()); // Severity
-                    // Get the name of the component with this output port, determined above
-                    table.addValue(
-                            convertCompOrSrcPortDepToStr(
-                                    outportToDepComps,
-                                    andPortList)); // comp instance dependency (one layer inwards)
-                    table.addValue(
-                            convertCompOrSrcPortDepToStr(
-                                    outportToSrcCompPort,
-                                    andPortList)); // comp output dependency (one layer inwards)
+                        List<List<IAPort>> condPorts = new ArrayList<>();
+                        extractReqExprIAPorts(req.getCondition(), condPorts);
 
-                    table.addValue(
-                            convertListOfPortCIAToStr(
-                                    andPortList)); // Dependent Component Output CIA
-                    table.addValue("Cyber"); // cyber for req type
-                    table.capRow();
-                }
-            }
-        }
+                        for (List<IAPort> andPortList : condPorts) {
+                            table.addValue(scenario); // Scenario
+                            table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
+                            table.addValue(getStrNullChk(() -> mission.getName())); // mission req
+                            table.addValue(req.getId()); // cyber req ID
+                            table.addValue(getStrNullChk(() -> req.getName())); // cyber req
+                            table.addValue(""); // mission impact CIA
+                            table.addValue(""); // effect
+                            table.addValue(req.getTargetProbability()); // Severity
+                            // Get the name of the component with this output port, determined above
+                            table.addValue(
+                                    convertSafetyCompOrSrcPortDepToStr(
+                                            outportToDepComps,
+                                            andPortList)); // comp instance dependency (one layer
+                            // inwards)
+                            table.addValue(
+                                    convertSafetyCompOrSrcPortDepToStr(
+                                            outportToSrcCompPort,
+                                            andPortList)); // comp output dependency (one layer
+                            // inwards)
 
-        // iterate over SafetyReq
-        if (model.getSafetyReq() != null) {
-            for (SafetyReq req : model.getSafetyReq()) {
-                List<List<IAPort>> condPorts = new ArrayList<>();
-                extractReqExprIAPorts(req.getCondition(), condPorts);
-
-                Mission mission = missionMap.get(req.getId());
-
-                if (mission == null) {
-                    System.out.println(
-                            "Info: SafetyReq " + req.getId() + " does not belong to any mission");
-                }
-
-                for (List<IAPort> andPortList : condPorts) {
-                    table.addValue(scenario); // Scenario
-                    table.addValue(getStrNullChk(() -> mission.getId())); // mission req ID
-                    table.addValue(getStrNullChk(() -> mission.getName())); // mission req
-                    table.addValue(req.getId()); // cyber req ID
-                    table.addValue(getStrNullChk(() -> req.getName())); // cyber req
-                    table.addValue(""); // mission impact CIA
-                    table.addValue(""); // effect
-                    table.addValue(req.getTargetProbability()); // Severity
-                    // Get the name of the component with this output port, determined above
-                    table.addValue(
-                            convertSafetyCompOrSrcPortDepToStr(
-                                    outportToDepComps,
-                                    andPortList)); // comp instance dependency (one layer inwards)
-                    table.addValue(
-                            convertSafetyCompOrSrcPortDepToStr(
-                                    outportToSrcCompPort,
-                                    andPortList)); // comp output dependency (one layer inwards)
-
-                    table.addValue(
-                            convertListOfPortIAToStr(
-                                    andPortList)); // Dependent Component Output CIA
-                    table.addValue("Safety"); // cyber for req type
-                    table.capRow();
+                            table.addValue(
+                                    convertListOfPortIAToStr(
+                                            andPortList)); // Dependent Component Output CIA
+                            table.addValue("Safety"); // cyber for req type
+                            table.capRow();
+                        }
+                    } else {
+                        errAndExit(
+                                "Missing requirement \""
+                                        + reqId
+                                        + "\" defined in mission "
+                                        + mission.getId());
+                    }
                 }
             }
         }
