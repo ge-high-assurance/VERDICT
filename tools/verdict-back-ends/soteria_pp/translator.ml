@@ -268,7 +268,17 @@ let (eventsH_CompType, eventsH_Event, eventsH_Probability) =
 	("Comp",           "Event",       "Probability");;
 		
 let compEvents name l_events = comp_find eventsH_Event (compInfo name eventsH_CompType l_events);;
-let compEventsInfo name l_events = List.map (comp_find eventsH_Probability (compInfo name eventsH_CompType l_events)) ~f:(fun x -> (float_of_string x, 1.0));;
+
+(* compEventsInfo must take list of compEvents to construct the list of probabilities in the same order as compEvents *)
+let rec compEventsInfo name l_events l_compEvents = 
+   match l_compEvents with
+   | hd::tl -> 
+       (let searchList = compInfo name eventsH_CompType l_events in
+        let searchSubList = compInfo hd eventsH_Event searchList in
+        let tempList = (comp_find eventsH_Probability searchSubList) in
+        List.append (List.map tempList ~f:(fun x -> (float_of_string x,1.0))) (compEventsInfo name l_events tl) )
+   | [] -> [];;
+
 
 (* - * - * - *)
 
@@ -595,7 +605,7 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defe
 			(*output_flows*)    coutputs
 			(*faults*)          iaList (* (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
 			(*basic_events*)    cevents 
-			(*event_info*)      (compEventsInfo name l_events) 
+			(*event_info*)      (compEventsInfo name l_events cevents) 
 			(*fault_formulas*)  (formulaSafe name coutputs cinputs cevents l_comp_saf iaList)
 			(*attacks*)         ciaList (*  (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
 			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
