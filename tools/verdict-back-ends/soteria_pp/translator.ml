@@ -708,14 +708,15 @@ let libraries_threatConditions deftype compDepen compSafe attack events arch mis
    ) ;;
 
     
-(* translate mission severity to level of risk *)
+(* translate mission severity to level of risk 
+   if a probability is given, then just print that number *)
 let severity2risk severity =
   match severity with
   | "Catastrophic" -> "1e-09"
   | "Hazardous"    -> "1e-07"
   | "Major"        -> "1e-05"
   | "Minor"        -> "1e-03"
-  | _              -> "1"    ;;
+  | prob           -> prob    ;;
 
 (* function that saves the library and model (to .ml file) for debugging *)
 let saveLibraryAndModelToFile filename lib mdl =
@@ -752,6 +753,7 @@ let takeDefenseAnd l =
    |ANot (AVar (_,b))->[b]
    |DSum l -> clean( List.map l ~f:(fun x->"("^(concat_And_Or "and" (List.map l ~f:(fun x->get_defense x)))^")" ))
    |_->["No support"] ;;  
+
 let takeDefenseAndOr l =
   let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) in
   let clean x =  List.dedup_and_sort ~compare:compare x in 
@@ -760,10 +762,15 @@ let takeDefenseAndOr l =
    |DPro l ->  List.map l ~f:(fun x-> takeDefenseAnd x)
    |DSum l -> clean( List.map l ~f:(fun x->["("^(concat_And_Or "and" (List.map l ~f:(fun x->get_defense x)))^")" ]))
    |_->[["No support"]] ;;  
+
 let takeDefense l = 
    let clean x =  List.dedup_and_sort ~compare:compare x in  
    let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) in
    clean ([("defense",concat_And_Or "or" (List.concat (takeDefenseAndOr l)))]);;
+
+let takeDefense2 l = 
+   let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) in
+   concat_And_Or "or" (List.concat (takeDefenseAndOr l));;
 
 let cutSets cutSet =     
   let cutSetToView cOpe = 
@@ -778,31 +785,50 @@ let cutSetsList cutSetList = List.map cutSetList ~f:(fun x-> cutSets x);;
 
 let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) ;;
 
+let rec attacksToView cOpe = 
+      match cOpe with 
+      | APro (h::tl) -> List.append (attacksToView h) (attacksToView (APro tl))
+      | AVar (c,a) -> [[("comp",c);("capec",a)]]
+      | _ -> [] ;;
+
+let rec defenseCompToView cOpe = 
+      match cOpe with 
+      | ANot( AVar (c,d) ) -> c
+      | DSum l -> defenseCompToView (List.hd_exn l)
+      | DPro l -> defenseCompToView (List.hd_exn l)
+      | _ -> "" ;;
+
+let rec defenseToView cOpe = 
+      match cOpe with 
+      | APro (h::tl) -> List.append (defenseToView h) (defenseToView (APro tl))
+      | ANot( AVar (c,d) ) -> [[("comp",c);("profile",d)]]
+      | DSum l -> [[("comp",(defenseCompToView (DSum l))); ("profile",takeDefense2 (DSum l))]]
+      | DPro l -> [[("comp",(defenseCompToView (DPro l))); ("profile",takeDefense2 (DPro l))]]
+      | _ -> [] ;;
+
+let make_cutSetTuples cs =     
+   let (cut,pro1,_) = cs in
+   ( ("prob",(string_of_float pro1) ), 
+      ("attacks", attacksToView cut),
+      ("defense", defenseToView cut)
+   );;
+
+let cutSetsList csList = List.map csList ~f:(fun x-> make_cutSetTuples x);;
+
 let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission = 
    (* list of cutsets to print *)
-   let infoList = cutSetsList (likelihoodCutImp tc_adtree) in
+   let infoList = cutSetsList (likelihoodCutImp tc_adtree) 
+   and likely = likelihoodCut tc_adtree in
    (* internal functions *)
    let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
    let cybReq_Severity l_mission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
    let getSeverity_Of_cybReq req l_mission = getval (cybReq_Severity l_mission) req 
    in
-   fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
-                        (defenseTypeStr) (string_of_float (likelihoodCut tc_adtree)) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
-   List.iter infoList ~f:(fun x-> fprintf_cutSet filename_ch (getval x "prob") (getval x "comp") (getval x "attack") (getval x "defense" ) );
+   fprintf filename_ch "defenseType=\"%s\" computed_p=\"%s\" acceptable_p =\"%s\" >\n" 
+                        (defenseTypeStr) (string_of_float likely) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
+   List.iter infoList ~f:(fun ((_,p),(_,aL),(_,dL)) -> fprintf_cutSet filename_ch p aL dL);
 ;;
 
-(*   
-let takeVar v = 
-   match v with
-       Var (a,b) -> [("comp",a);("event",b)]
-     | _         -> [("comp","");("event","")];;
-
-let rec cutSetsSafetyToView cOpe = 
-      match cOpe with 
-      | Var v -> [takeVar (Var v)]
-      | Pro (h::tl) -> (takeVar h) :: (cutSetsSafetyToView (Pro tl))
-      | _ -> [] ;;
-*)
 
 let rec cutSetsSafetyToView cOpe = 
       match cOpe with 
@@ -819,14 +845,14 @@ let cutSetsSafetyList cutSetList = List.map cutSetList ~f:(fun x-> cutSetsSafety
 let xml_gen_safety filename_ch reqIDStr defenseTypeStr tc_ftree l_mission = 
    (* list of cutsets to print *)
    let infoList = cutSetsSafetyList (probErrorCutImp tc_ftree) 
-   and (p,_) = probErrorCut tc_ftree in
+   and (pr,_) = probErrorCut tc_ftree in
    (* internal functions *)
    let getval l tag =  List.Assoc.find_exn l tag ~equal:(=) in
    let cybReq_Safety l_mission =  List.map l_mission ~f:(fun x->(getval x reqId_M, getval x severity_M)) in
    let getSafety_Of_cybReq req l_mission = getval (cybReq_Safety l_mission) req 
    in
-   fprintf filename_ch "defenseType= \"%s\" computed_p= \"%s\" acceptable_p = \"%s\" >\n" 
-                       (defenseTypeStr) (string_of_float p) (getSafety_Of_cybReq reqIDStr l_mission);
+   fprintf filename_ch "defenseType=\"%s\" computed_p=\"%s\" acceptable_p =\"%s\" >\n" 
+                       (defenseTypeStr) (string_of_float pr) (getSafety_Of_cybReq reqIDStr l_mission);
    List.iter infoList ~f:(fun ((_,p),l) -> fprintf_cutSetSafety filename_ch p l );
 ;;
    
@@ -926,7 +952,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
             (* -- save .svg tree visualizations -- *)    
             dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
             (* -- print requirement info into .xml file -- *)
-            fprintf xml_oc "\t<Requirement label=  \"%s\" " reqIDStr;
+            fprintf xml_oc "\t<Requirement label=\"%s\" " reqIDStr;
             xml_gen xml_oc reqIDStr defenseTypeStr t mission;
             fprintf xml_oc "\t</Requirement> \n";
          )
@@ -958,7 +984,7 @@ let analyze deftype comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_
             (* -- save .svg tree visualizations -- *)    
             dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
             (* -- print requirement info into .xml file -- *)
-            fprintf xml_safety_oc "\t<Requirement label=  \"%s\" " reqIDStr;
+            fprintf xml_safety_oc "\t<Requirement label=\"%s\" " reqIDStr;
             xml_gen_safety xml_safety_oc reqIDStr defenseTypeStr t mission;
             fprintf xml_safety_oc "\t</Requirement> \n";
          )
