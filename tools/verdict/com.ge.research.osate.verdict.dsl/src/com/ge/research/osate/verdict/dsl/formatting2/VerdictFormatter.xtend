@@ -96,8 +96,6 @@ class VerdictFormatter extends PropertiesFormatter {
 		cyberreq.regionFor.keyword(cyberReqBlockAccess.severityKeyword_1_2_0).prepend[setSpace(NEWLINE_INDENT)]
 		cyberreq.regionFor.keyword(cyberReqBlockAccess.commentKeyword_1_4_0).prepend[setSpace(NEWLINE_INDENT)]
 		cyberreq.regionFor.keyword(cyberReqBlockAccess.descriptionKeyword_1_5_0).prepend[setSpace(NEWLINE_INDENT)]
-		cyberreq.regionFor.keyword(cyberReqBlockAccess.phasesKeyword_1_6_0).prepend[setSpace(NEWLINE_INDENT)]
-		cyberreq.regionFor.keyword(cyberReqBlockAccess.externalKeyword_1_7_0).prepend[setSpace(NEWLINE_INDENT)]
 		
 		// "}"
 		cyberreq.regionFor.keyword(cyberReqBlockAccess.rightCurlyBracketKeyword_2).prepend[newLine]
@@ -131,8 +129,6 @@ class VerdictFormatter extends PropertiesFormatter {
 		cyberrel.regionFor.keyword(cyberRelBlockAccess.outputKeyword_1_1_0).prepend[setSpace(NEWLINE_INDENT)]
 		cyberrel.regionFor.keyword(cyberRelBlockAccess.commentKeyword_1_3_0).prepend[setSpace(NEWLINE_INDENT)]
 		cyberrel.regionFor.keyword(cyberRelBlockAccess.descriptionKeyword_1_4_0).prepend[setSpace(NEWLINE_INDENT)]
-		cyberrel.regionFor.keyword(cyberRelBlockAccess.phasesKeyword_1_5_0).prepend[setSpace(NEWLINE_INDENT)]
-		cyberrel.regionFor.keyword(cyberRelBlockAccess.externalKeyword_1_6_0).prepend[setSpace(NEWLINE_INDENT)]
 		
 		// "}"
 		cyberrel.regionFor.keyword(cyberRelBlockAccess.rightCurlyBracketKeyword_2).prepend[newLine]
@@ -237,7 +233,7 @@ class VerdictFormatter extends PropertiesFormatter {
 	
 	def dispatch void format(ThreatModel threat, extension IFormattableDocument document) {
 		// "ThreatEffectModel"
-		threat.regionFor.keyword(threatModelAccess.threatEffectModelKeyword_0).append[oneSpace]
+		threat.regionFor.keyword(threatModelAccess.threatEffectKeyword_0).append[oneSpace]
 		
 		// "="
 		threat.regionFor.keyword(threatModelBlockAccess.equalsSignKeyword_1_0_1).surround[oneSpace]
@@ -305,8 +301,8 @@ class VerdictFormatter extends PropertiesFormatter {
 		// "id", etc.
 		defense.regionFor.keyword(threatDefenseBlockAccess.idKeyword_1_0_0).prepend[setSpace(NEWLINE_INDENT)]
 		defense.regionFor.keyword(threatDefenseBlockAccess.threatsKeyword_1_1_0).prepend[setSpace(NEWLINE_INDENT)]
-		defense.regionFor.keyword(threatDefenseBlockAccess.descriptionKeyword_1_2_0).prepend[setSpace(NEWLINE_INDENT)]
-		defense.regionFor.keyword(threatDefenseBlockAccess.commentKeyword_1_3_0).prepend[setSpace(NEWLINE_INDENT)]
+		defense.regionFor.keyword(threatDefenseBlockAccess.descriptionKeyword_1_3_0).prepend[setSpace(NEWLINE_INDENT)]
+		defense.regionFor.keyword(threatDefenseBlockAccess.commentKeyword_1_4_0).prepend[setSpace(NEWLINE_INDENT)]
 		
 		// "}"
 		defense.regionFor.keyword(threatDefenseBlockAccess.rightCurlyBracketKeyword_2).prepend[newLine]
