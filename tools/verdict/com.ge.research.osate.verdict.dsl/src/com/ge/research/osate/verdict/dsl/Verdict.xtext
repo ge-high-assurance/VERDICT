@@ -7,7 +7,7 @@ import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 // NOTE: And has a higher precedence than Or. This is a limitation of LL(*) parsers.
 
-// The syntactic predicate ("=>") resolves the ambiguity in the case of an empty annex
+// The syntactic predicate ('=>') resolves the ambiguity in the case of an empty annex
 // Note that this rule is not used directly, but it is necessary
 Model returns aadl2::Element:
 	AnnexSubclause
@@ -77,8 +77,6 @@ CyberReqBlock returns CyberReq:
 	('condition' '=' condition=CyberReqConditionLogic DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)? &
-	('phases' '=' phases=STRING DELIMETER_OPT)? &
-	('external' '=' external=STRING DELIMETER_OPT)? &
 	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)?
 	) '}'
 ;
@@ -92,9 +90,7 @@ CyberRelBlock returns CyberRel:
 	('output' '=' output=CyberRelOutputLogic DELIMETER_OPT) &
 	('inputs' '=' inputs=CyberRelInputLogic DELIMETER_OPT)? &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
-	('description' '=' description=STRING DELIMETER_OPT)? &
-	('phases' '=' phases=STRING DELIMETER_OPT)? &
-	('external' '=' external=STRING DELIMETER_OPT)?
+	('description' '=' description=STRING DELIMETER_OPT)? 
 	) '}'
 ;
 
@@ -156,11 +152,11 @@ enum TargetLikelihood:
 	| TL_Minor = '1e-3'
 	| TL_Minor = '1e-03'
 	| TL_Major = '1e-5'
-	| TL_Major = '1e-05'
+	| TL_Major = '1e-05'	
 	| TL_Hazardous = '1e-7'
-	| TL_Hazardous = '1e-07'
+	| TL_Hazardous = '1e-07'	
 	| TL_Catastrophic = '1e-9'
-	| TL_Catastrophic = '1e-09'
+	| TL_Catastrophic = '1e-09'	
 	;
 	
 	
@@ -251,43 +247,44 @@ VerdictThreatModels: {VerdictThreatModels} (statements+=ThreatStatement)*;
 
 ThreatStatement: (ThreatModel | ThreatDefense | ThreatDatabase) DELIMETER_OPT;
 
-ThreatModel: "ThreatEffectModel" ThreatModelBlock;
+ThreatModel: 'ThreatEffect' ThreatModelBlock;
 
 ThreatModelBlock returns ThreatModel:
-	"{" (
-	("id" "=" id=STRING DELIMETER_OPT) &
-	("entities" "=" "{" intro=Intro "|" expr=ThreatExpr "}" DELIMETER_OPT) &
-	("cia" "=" cia=CIA DELIMETER_OPT)? &
-	("reference" "=" reference=STRING DELIMETER_OPT)? &
-	("assumptions" "=" assumptions+=CRVAssumption ("," assumptions+=CRVAssumption)* DELIMETER_OPT)? &
-	("description" "=" description=STRING DELIMETER_OPT)? &
-	("comment" "=" comment=STRING DELIMETER_OPT)?
-	) "}"
+	'{' (
+	('id' '=' id=STRING DELIMETER_OPT) &
+	('entities' '=' '{' intro=Intro '|' expr=ThreatExpr '}' DELIMETER_OPT) &
+	('cia' '=' cia=CIA DELIMETER_OPT)? &
+	('reference' '=' reference=STRING DELIMETER_OPT)? &
+	('assumptions' '=' assumptions+=CRVAssumption (',' assumptions+=CRVAssumption)* DELIMETER_OPT)? &
+	('description' '=' description=STRING DELIMETER_OPT)? &
+	('comment' '=' comment=STRING DELIMETER_OPT)?
+	) '}'
 ;
 
-ThreatDefense: "ThreatDefense" ThreatDefenseBlock;
+ThreatDefense: 'ThreatDefense' ThreatDefenseBlock;
 
 ThreatDefenseBlock returns ThreatDefense:
 	'{' (
 	('id' '=' name=STRING DELIMETER_OPT) &
 	('threats' '=' threats+=STRING (',' threats+=STRING)* DELIMETER_OPT) &
+	('reference' '=' reference=STRING DELIMETER_OPT)? &
 	('description' '=' desc=STRING DELIMETER_OPT)? &
 	('comment' '=' note=STRING DELIMETER_OPT)?
 	) '}'
 ;
 
-ThreatDatabase: "ThreatDatabase" id=STRING;
+ThreatDatabase: 'ThreatDatabase' id=STRING;
 
 enum CRVAssumption:
-	Mutually_Exclusive = "mutuallyExclusive"
+	Mutually_Exclusive = 'mutuallyExclusive'
 ;
 
 // We include this here so that we can perform syntax coloring
-BuiltInType: "system" | "port";
+BuiltInType: 'system' | 'port';
 
 // Introduce a new quantified variable
 // Note: presently only built-in types are supported, but this can change
-Intro: id=ID ":" type=(ID | BuiltInType);
+Intro: id=ID ':' type=(ID | BuiltInType);
 
 // The expression grammar is left-factored
 ThreatExpr:
@@ -302,19 +299,19 @@ ThreatExprTerm returns ThreatExpr:
 // Values that variables can have
 Const: ID | QuotedString | INTEGER_LIT | REAL_LIT | 'true' | 'false' | 'in' | 'out';
 
-BuiltInField: "connections" | "subcomponents";
+BuiltInField: 'connections' | 'subcomponents';
 
 // Either a variable with dotted fields (e.g. mySystem.field1.field2) or a value constant (e.g. Local)
 // Note that a single variable (e.g. just mySystem) will be parsed the same way as a value constant
-Var: (id=ID ("." ids+=(ID | BuiltInField))+) | (id=Const);
+Var: (id=ID ('.' ids+=(ID | BuiltInField))+) | (id=Const);
 
-// Either equality (mySystem.name="foobar") or contains (e.g. "mySystem.ports contains myPort")
-ThreatEqualContains: left=Var (equal?="=" | contains?="contains") right=Var;
+// Either equality (mySystem.name='foobar') or contains (e.g. 'mySystem.ports contains myPort')
+ThreatEqualContains: left=Var (equal?='=' | contains?='contains') right=Var;
 
 // This grammar is left-factored, so there can be things parsed as implications
 // that aren't actually implications because they only have one child,
 // just like ThreatAnd and ThreatOr.
-Implies: antecedent=ThreatOr (("=>" | "->") consequent=ThreatOr)?;
+Implies: antecedent=ThreatOr (('=>' | '->') consequent=ThreatOr)?;
 
 ThreatOr: exprs+=ThreatAnd (OR exprs+=ThreatAnd)*;
 
@@ -322,9 +319,9 @@ ThreatAnd: exprs+=ThreatExprTerm (AND exprs+=ThreatExprTerm)*;
 
 ThreatNot: NOT expr=ThreatExprTerm;
 
-Forall: "forall" intro=Intro "," expr=ThreatExpr;
+Forall: 'forall' intro=Intro ',' expr=ThreatExpr;
 
-Exists: "exists" intro=Intro "," expr=ThreatExpr;
+Exists: 'exists' intro=Intro ',' expr=ThreatExpr;
 
 // We don't use STRING directly because Xtext strips the quotes from the string;
 // we want to preserve them to perform our own validation

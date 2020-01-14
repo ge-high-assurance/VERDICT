@@ -85,8 +85,8 @@ public class WzrdTableLoader {
 
 		tableRow.setComment(((CyberRelImpl) stmt).getComment());
 		tableRow.setDescription(((CyberRelImpl) stmt).getDescription());
-		tableRow.setExternal(((CyberRelImpl) stmt).getExternal());
-		tableRow.setPhase(((CyberRelImpl) stmt).getPhases());
+//		tableRow.setExternal(((CyberRelImpl) stmt).getExternal());
+//		tableRow.setPhase(((CyberRelImpl) stmt).getPhases());
 
 		List<EObject> objList = stmt.eContents();
 
@@ -121,8 +121,8 @@ public class WzrdTableLoader {
 
 		tableRow.setComment(((CyberReqImpl) stmt).getComment());
 		tableRow.setDescription(((CyberReqImpl) stmt).getDescription());
-		tableRow.setExternal(((CyberReqImpl) stmt).getExternal());
-		tableRow.setPhase(((CyberReqImpl) stmt).getPhases());
+//		tableRow.setExternal(((CyberReqImpl) stmt).getExternal());
+//		tableRow.setPhase(((CyberReqImpl) stmt).getPhases());
 
 		tableRow.setFirstElement(drpdn.findIndex(drpdn.CIA_ABBREV, stmt.getCia().getLiteral()));
 		tableRow.setSecondElement(drpdn.findIndex(drpdn.SEVERITY, stmt.getSeverity().getLiteral()));

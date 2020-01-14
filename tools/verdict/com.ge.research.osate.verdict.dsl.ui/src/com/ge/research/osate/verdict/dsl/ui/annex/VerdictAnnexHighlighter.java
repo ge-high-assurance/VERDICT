@@ -72,8 +72,6 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		stylesSubclause.put("kw_inputs", KEYWORD_ID);
 		stylesSubclause.put("kw_output", KEYWORD_ID);
 		stylesSubclause.put("kw_description", KEYWORD_ID);
-		stylesSubclause.put("kw_phases", KEYWORD_ID);
-		stylesSubclause.put("kw_external", KEYWORD_ID);
 		stylesSubclause.put("kw_targetLikelihood", KEYWORD_ID);
 		stylesSubclause.put("kw_targetProbability", KEYWORD_ID);
 		stylesSubclause.put("kw_reqs", KEYWORD_ID);
