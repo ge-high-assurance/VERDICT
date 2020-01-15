@@ -55,13 +55,11 @@ public class CapecDefenseView extends ViewPart {
 		TableColumn col2 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 		col2.setText("Path Likelihood");
 		TableColumn col3 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col3.setText("Attacked Component");
+		col3.setText("Attack Type");
 		TableColumn col4 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col4.setText("Attack Type");
+		col4.setText("Suggested Defense");
 		TableColumn col5 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col5.setText("Suggested Defense");
-		TableColumn col6 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col6.setText("Implemented Defenses");
+		col5.setText("Implemented Defenses");
 
 		int itemCount = tableContents.size();
 		for (int i = 0; i < itemCount; i++) {

@@ -87,16 +87,22 @@ public class MBASReadXMLFile {
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
 				newPath.setLikelihood(eElement.getAttribute("likelihood"));
-				newPath.setComponents(extractComponents(nNode));
+				NodeList attacks = eElement.getElementsByTagName("Attack");
+				if (attacks.getLength() > 0) {
+					newPath.setComponentCapecs(extractComponents(attacks.item(0), "capec"));
+				}
+				NodeList defenses = eElement.getElementsByTagName("Defense");
+				if (defenses.getLength() > 0) {
+					newPath.setComponentDefenses(extractComponents(defenses.item(0), "profile"));
+				}
 				list.add(newPath);
 			}
 		}
 		return list;
 	}
-
-	// reads and stores contents of the "Component" elements
-	protected List<ComponentAttributes> extractComponents(Node node) {
-		List<ComponentAttributes> list = new ArrayList<ComponentAttributes>();
+	
+	protected List<PathAttributes.ComponentData> extractComponents(Node node, String dataLabel) {
+		List<PathAttributes.ComponentData> data = new ArrayList<>();
 		if (node.getNodeType() != Node.ELEMENT_NODE) {
 			System.out.println("Something wrong in the xml");
 			return null;
@@ -104,33 +110,13 @@ public class MBASReadXMLFile {
 		NodeList nList = ((Element) node).getElementsByTagName("Component");
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
-			ComponentAttributes newComponent = new ComponentAttributes();
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				newComponent.setComponent(eElement.getAttribute("name"));
-				newComponent = extractCapecDefense(newComponent, nNode);
-				list.add(newComponent);
+				Element elem = (Element) nNode;
+				data.add(new PathAttributes.ComponentData(elem.getAttribute("name"),
+						elem.getAttribute(dataLabel)));
 			}
 		}
-		return list;
-	}
-
-	// reads and stores contents of the "Capec" elements
-	protected ComponentAttributes extractCapecDefense(ComponentAttributes comp, Node node) {
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
-			System.out.println("Something wrong in the xml");
-			return null;
-		}
-		NodeList nList = ((Element) node).getElementsByTagName("Capec");
-		for (int temp = 0; temp < nList.getLength(); temp++) {
-			Node nNode = nList.item(temp);
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				comp.addCapec(eElement.getAttribute("name"));
-				comp.addDefense(eElement.getAttribute("defense"));
-			}
-		}
-		return comp;
+		return data;
 	}
 
 	protected List<MissionAttributes> getContent() {
