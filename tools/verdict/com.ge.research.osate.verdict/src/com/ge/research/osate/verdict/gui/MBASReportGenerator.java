@@ -34,9 +34,10 @@ public class MBASReportGenerator implements Runnable {
 	public static IWorkbenchWindow window;
 	private List<MissionAttributes> missions = new ArrayList<MissionAttributes>();
 	private Map<String, List<MBASSafetyResult>> safetyResults;
+	private Map<String, String> attackDesc, defenseDesc;
 
 	public MBASReportGenerator(String applicableDefense, String implProperty, String safetyApplicableDefense,
-			String safetyImplProperty, IWorkbenchWindow window) {
+			String safetyImplProperty, IWorkbenchWindow window, String capecFile, String nistFile) {
 		this.fileName1 = applicableDefense;
 		this.fileName2 = implProperty;
 		MBASReportGenerator.window = window;
@@ -57,6 +58,10 @@ public class MBASReportGenerator implements Runnable {
 		missions = result.getMissions();
 		safetyResults = loadSafetyResults(safetyApplicableDefense, safetyImplProperty);
 		result.updateMissionsWithSafety(safetyResults);
+		
+		// Load maps from CAPECs and NISTS to descriptions (for tooltips)
+		attackDesc = CsvMapReader.readCsvMap(new File(capecFile), "\"CAPEC\"", "\"CAPECDescription\"");
+		defenseDesc = CsvMapReader.readCsvMap(new File(nistFile), "\"NISTProfile\"", "\"DefenseDescription\"");
 
 		showView(window);
 	}
@@ -77,6 +82,8 @@ public class MBASReportGenerator implements Runnable {
 			try {
 				MBASResultsView.missions = missions;
 				MBASResultsView.safetyResults = safetyResults;
+				MBASResultsView.attackDesc = attackDesc;
+				MBASResultsView.defenseDesc = defenseDesc;
 				window.getActivePage().showView(MBASResultsView.ID);
 			} catch (PartInitException e) {
 				e.printStackTrace();

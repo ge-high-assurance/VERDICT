@@ -106,12 +106,17 @@ public class MBASHandler extends AbstractHandler {
 								File implProperty = new File(soteriaOut, "ImplProperties.xml");
 								File safetyApplicableDefense = new File(soteriaOut, "ApplicableDefenseProperties-safety.xml");
 								File safetyImplProperty = new File(soteriaOut, "ImplProperties-safety.xml");
+								
+								File stemOut = new File(stemProjPath, "Output");
+								File capecFile = new File(stemOut, "CAPEC.csv");
+								File nistFile = new File(stemOut, "Defenses2NIST.csv");
 
 								// Display cyber related xml
 								if (applicableDefense.exists() && implProperty.exists()) {
 									new MBASReportGenerator(applicableDefense.getAbsolutePath(),
 											implProperty.getAbsolutePath(), safetyApplicableDefense.getAbsolutePath(),
-											safetyImplProperty.getAbsolutePath(), iWindow);
+											safetyImplProperty.getAbsolutePath(), iWindow,
+											capecFile.getAbsolutePath(), nistFile.getAbsolutePath());
 								} else {
 									System.err.println("Info: No Soteria++ output generated!");
 								}
