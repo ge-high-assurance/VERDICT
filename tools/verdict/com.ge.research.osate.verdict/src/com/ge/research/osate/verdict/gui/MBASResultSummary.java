@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.ge.research.osate.verdict.handlers.VerdictHandlersUtils;
@@ -88,37 +89,19 @@ public class MBASResultSummary {
 				checkSameSizeOfTwoLists(paths1, paths2);
 
 				for (int k = 0; k < paths1.size(); k++) {
-					List<ComponentAttributes> components1 = paths1.get(k).getComponents();
-					for (int ii = 0; ii < components1.size(); ii++) {
-						String comp1Name = components1.get(ii).getComponent();
-						List<String> comp1Capes = components1.get(ii).getCapecs();
-						components1.get(ii).setDescriptions(findImplDefenseFromPath2(paths2, comp1Name, comp1Capes));
+					PathAttributes path = paths1.get(k);
+					Optional<PathAttributes> other = paths1.stream().filter(o -> path.compareCutset(o)).findFirst();
+					if (other.isPresent()) {
+						path.setComponentImplDefense(other.get().getComponentDefenses());
+					} else {
+						System.err.println("Missing impl defenses");
+						path.setComponentImplDefense(Collections.emptyList());
 					}
 				}
 			}
 		}
 		// --------------------------------------------------------------------------------------
 		return missions1;
-	}
-
-	private List<String> findImplDefenseFromPath2(List<PathAttributes> paths2, String comp1Name,
-			List<String> comp1Capes) {
-
-		for (int i = 0; i < paths2.size(); ++i) {
-			PathAttributes path = paths2.get(i);
-			List<ComponentAttributes> compAttrs = path.getComponents();
-
-			for (int j = 0; j < compAttrs.size(); ++j) {
-				String comp2Name = compAttrs.get(j).getComponent();
-
-				if (comp1Name.equals(comp2Name)) {
-					if (comp1Capes.equals(compAttrs.get(j).getCapecs())) {
-						return compAttrs.get(j).getDefenses();
-					}
-				}
-			}
-		}
-		return new ArrayList<String>();
 	}
 
 	/*
