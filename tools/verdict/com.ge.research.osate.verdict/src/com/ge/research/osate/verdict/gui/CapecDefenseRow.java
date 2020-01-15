@@ -13,7 +13,9 @@ import java.util.List;
 //This class stores the contents of a row in Vulnerability/Defense table
 
 public class CapecDefenseRow {
-	private List<String> rowContents = new ArrayList<String>();
+	private List<String> rowContents = new ArrayList<>();
+	private List<String> attackHoverText = new ArrayList<>();
+	private List<String> defenseHoverText = new ArrayList<>();
 
 	public void addToRow(String str) {
 		rowContents.add(str);
@@ -21,5 +23,21 @@ public class CapecDefenseRow {
 
 	public List<String> getRowContents() {
 		return rowContents;
+	}
+	
+	public void addAttackHoverText(String hoverTextItem) {
+		attackHoverText.add(hoverTextItem);
+	}
+	
+	public List<String> getAttackHoverText() {
+		return attackHoverText;
+	}
+	
+	public void addDefenseHoverText(String hoverTextItem) {
+		defenseHoverText.add(hoverTextItem);
+	}
+	
+	public List<String> getDefenseHoverText() {
+		return defenseHoverText;
 	}
 }
