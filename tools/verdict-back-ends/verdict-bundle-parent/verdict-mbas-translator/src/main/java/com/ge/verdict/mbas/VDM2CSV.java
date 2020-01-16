@@ -64,7 +64,7 @@ public class VDM2CSV extends VdmTranslator {
                     "Error: Input path is not in the correct format. Scenario name is empty.");
         }
 
-        Table scnArchTable = buildScnArchTable(model, scenario);
+        Table scnConnectionsTable = buildScnConnectionsTable(model, scenario);
         Table scnCompPropsTable = buildScnCompPropsTable(model, scenario);
         Table compDepTable = buildCompDepTable(model);
         Table missionTable = buildMissionTable(model, scenario);
@@ -74,12 +74,12 @@ public class VDM2CSV extends VdmTranslator {
         Table eventsTable = buildEventsTable(model, scenario);
 
         // Generate STEM input
-        scnArchTable.toCsvFile(new File(stemOutputPath, "ScnArch.csv"));
+        scnConnectionsTable.toCsvFile(new File(stemOutputPath, "ScnArch.csv"));
         scnCompPropsTable.toCsvFile(new File(stemOutputPath, "ScnCompProps.csv"));
         scnConnectionPropsTable.toCsvFile(new File(stemOutputPath, "ScnConnectionProps.csv"));
 
         // Generate Soteria_pp input
-        scnArchTable.toCsvFile(new File(soteriaOutputPath, "ScnArch.csv"));
+        scnConnectionsTable.toCsvFile(new File(soteriaOutputPath, "ScnArch.csv"));
         compDepTable.toCsvFile(new File(soteriaOutputPath, "CompDep.csv"));
         missionTable.toCsvFile(new File(soteriaOutputPath, "Mission.csv"));
         compSafTable.toCsvFile(new File(soteriaOutputPath, "CompSaf.csv"));
@@ -323,7 +323,7 @@ public class VDM2CSV extends VdmTranslator {
      * @param scenario
      * @return
      */
-    private Table buildScnArchTable(Model model, String scenario) {
+    private Table buildScnConnectionsTable(Model model, String scenario) {
         Table table =
                 new Table(
                         "Scenario",
@@ -339,14 +339,12 @@ public class VDM2CSV extends VdmTranslator {
                         "DestCompInstance", // added
                         "DestCompCategory",
                         "DestPortName",
-                        "DestPortType" // added
-                        //                        "Flow1",
-                        //                        "Flow2",
-                        //                        "Flow3"
-
-                        /* ,
-                         * "FlowType"
-                         */ );
+                        "DestPortType",
+                        "Flow1",
+                        "Flow2",
+                        "Flow3",
+                        "trustedConnection",
+                        "encryptedTransmission");
         // 14 columns
 
         for (ComponentImpl comp : model.getComponentImpl()) {
@@ -445,6 +443,44 @@ public class VDM2CSV extends VdmTranslator {
                                     .getMode()
                                     .value()); // dest port mode: in or out
                 }
+
+                // Fill in the flow type information
+                String flowType =
+                        connection.getFlowType() != null ? connection.getFlowType().value() : "";
+
+                table.addValue("xdata".equals(flowType.toLowerCase()) ? "Xdata" : ""); // flow1
+                table.addValue(
+                        "xcontrol".equals(flowType.toLowerCase()) ? "Xcontrol" : ""); // flow2
+                table.addValue(
+                        "xrequest".equals(flowType.toLowerCase()) ? "Xrequest" : ""); // flow3
+
+                // add the value for trustedConnection
+                if (connection.isTrustedConnection() != null) {
+                    if (connection.isTrustedConnection()) {
+                        table.addValue("1");
+                    } else {
+                        table.addValue("0");
+                    }
+                } else {
+                    table.addValue("");
+                }
+
+                // add the value for encryptedTransmission
+                if (connection.isEncryptedTransmission() != null) {
+                    boolean isEncrypted = connection.isEncryptedTransmission();
+                    if (connection.getEncryptedTransmissionDAL() != null) {
+                        String dal = String.valueOf(connection.getEncryptedTransmissionDAL());
+                        table.addValue(isEncrypted ? ("1#" + dal) : ("0#" + dal));
+                    } else {
+                        table.addValue(isEncrypted ? "1#0" : "0#0");
+                    }
+                } else if (connection.getEncryptedTransmissionDAL() != null) {
+                    table.addValue(
+                            "null#" + String.valueOf(connection.getEncryptedTransmissionDAL()));
+                } else {
+                    table.addValue("");
+                }
+
                 table.capRow();
             }
         }
