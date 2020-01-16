@@ -46,6 +46,7 @@ public class MBASResultsView extends ViewPart {
 	public static final String ID = "com.ge.research.osate.verdict.gui.mbasResultsView";
 	public static List<MissionAttributes> missions = new ArrayList<MissionAttributes>();
 	public static Map<String, List<MBASSafetyResult>> safetyResults;
+	public static Map<String, String> attackDesc, defenseDesc;
 
 
 	public MBASResultsView() {
@@ -194,7 +195,8 @@ public class MBASResultsView extends ViewPart {
 									if (!(table.getSelectionIndex() < 0)) {
 										CapecDefenseTable cd = new CapecDefenseTable(Display.getCurrent(),
 												parent.getShell(),
-												tableContents.get(table.getSelectionIndex()).getPaths());
+												tableContents.get(table.getSelectionIndex()).getPaths(),
+												attackDesc, defenseDesc);
 										IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 												.getActivePage();
 										IViewPart myView = wp.findView(CapecDefenseView.ID);
