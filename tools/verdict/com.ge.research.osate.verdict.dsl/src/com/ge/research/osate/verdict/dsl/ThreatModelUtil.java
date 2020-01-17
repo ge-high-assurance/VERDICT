@@ -140,9 +140,9 @@ public class ThreatModelUtil {
 		addBuiltin(types, system);
 
 		// Connection fields
-		connection.addField("inPort", port);
-		connection.addField("outPort", port);
-		connection.addField("source", system);
+		connection.addField("srcPort", port);
+		connection.addField("destPort", port);
+		connection.addField("src", system);
 		connection.addField("dest", system);
 
 		// Port direction
