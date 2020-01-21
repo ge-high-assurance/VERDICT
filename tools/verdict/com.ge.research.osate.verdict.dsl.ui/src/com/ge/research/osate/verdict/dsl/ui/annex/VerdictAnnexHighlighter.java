@@ -98,7 +98,7 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		stylesAll.put("kw_not", KEYWORD_ID);
 		stylesAll.put("kw_!", KEYWORD_ID);
 
-		stylesLibrary.put("kw_ThreatEffectModel", KEYWORD_ID);
+		stylesLibrary.put("kw_ThreatEffect", KEYWORD_ID);
 		stylesLibrary.put("kw_ThreatDefense", KEYWORD_ID);
 		stylesLibrary.put("kw_ThreatDatabase", KEYWORD_ID);
 		stylesLibrary.put("kw_contains", KEYWORD_ID);
