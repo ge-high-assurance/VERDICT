@@ -20,6 +20,17 @@ import "http://sadl.org/STEM/Queries".
 // I am doing <ConnectionName>_<SrcComp> in ScnArch.tmpl to get unique connection name - that is in general not enough
 // 'underscore' in TA1 property names works fine when using Run.sadl. May not work when doing "import" of csv files
 
+// 1/21/2020: Notes
+//		* can I output which connection is the reason for a capec (specifically capec-148)
+//			this would involve one additional column and splitting an existing row into multiple rows
+//		* rationalize the property names
+//		* I introduced "vulnerable" - currently not using it but could be used to
+//			mark inferred properties based on binding to same bus in order to provide mitigation
+//			May want to rename the property name
+//		* Currently in rule like InferDataReceivedFromUntrusted etc., the inference is applied to 
+//			"implementations" do we want to avoid that?
+// 1/21/2020 Functionality in place
+//		* handling bus, we now have 2 input csv files only
 // 11/22/2019: Moved the queries that generate the 3 output csv files and the graph into a separate
 //		file Queries.sadl. So, I am using named queries. This makes the VERDICT toolchain
 //		integration much simpler: previously had to create a java file with the queries and
@@ -127,14 +138,14 @@ import "http://sadl.org/STEM/Queries".
 
 // 12/14/2018: WE NO LONGER DROP CAPEC EVEN IF DEFENSE IS IN PLACE
 	
-Read: data from "ScnArch.csv" using "ScnArch.tmpl".  //connections and ports
+Read: data from "ScnConnections.csv" using "ScnConnections.tmpl".  //connections and ports
 Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
-Read: data from "ScnConnectionProps.csv" using "ScnConnectionProps.tmpl". //scenario specific properties of connection instances
+//Read: data from "ScnConnectionProps.csv" using "ScnConnectionProps.tmpl". //scenario specific properties of connection instances
 
 // the following has 2 TA1 CAPs; if using this, comment out the read of ScnCompProps.csv above
 //Read: data from "ScnCompPropsTA1.csv" using "ScnCompPropsTA1.tmpl".
 
-//Explain: Rule Vul-CAPEC-25-1.
+//Explain: Rule InferConnectionDestination.
 // note this count may be larger than the number of entries in CAPEC.csv as there may be 
 // multiple mitigations for a capec (e.g. capec-148 etc.)
 Print: "Just get the counts of all CIA Issues".
@@ -229,3 +240,27 @@ Graph: queries:STEMgraph.
 //           . FILTER(?tx1 = ?tx2) . ?val <dal> ?DAL }
 //
 //} order by ?CompInst ?CAPEC ?mit ".
+
+//Ask: "select * where
+//{?x <trustedConnection> false} ".
+//
+//Ask: "select ?x (?z0 as ?pedigree) (?z1 as ?controlReceivedFromUntrusted) (?z2 as ?controlSentToUntrusted)
+//(?z3 as ?dataReceivedFromUntrusted) (?z4 as ?dataSentToUntrusted) where
+//{ OPTIONAL{?x <pedigree> ?z0} 
+//. OPTIONAL{?x <controlReceivedFromUntrusted> ?z1}
+//. OPTIONAL{?x <controlSentToUntrusted> ?z2}
+//. OPTIONAL{?x <dataReceivedFromUntrusted> ?z3}
+//. OPTIONAL{?x <dataSentToUntrusted> ?z4}
+//} order by ?x ".
+//
+//Ask: "select ?x (?z0 as ?pedigree) (?z1 as ?controlReceivedFromUntrusted) (?z2 as ?controlSentToUntrusted)
+//(?z3 as ?dataReceivedFromUntrusted) (?z4 as ?dataSentToUntrusted) where
+//{ OPTIONAL{?x <pedigree> ?z0} 
+//. OPTIONAL{?x <controlReceivedFromUntrusted> ?z1}
+//. OPTIONAL{?x <controlSentToUntrusted> ?z2}
+//. OPTIONAL{?x <dataSentToUntrusted> ?z4}
+//. OPTIONAL{?x <dataReceivedFromUntrusted> ?z3}
+//} order by ?x ".
+
+//Ask: "select * where {?x <dataSentToUntrusted> ?z4} order by ?x".
+

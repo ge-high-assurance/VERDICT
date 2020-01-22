@@ -155,6 +155,8 @@ Bus is a type of System. //AM: added 12/11
 Connection is a type of Subsystem // just for reading in the tabular data; some properties will be from the 3rd csv file
 	described by connectionName with a single value of type string
 	described by binding with a single value of type Bus //AM: added 12/11
+	described by connectionType with values of type ConnectionType //AM: added 1/14
+	described by vulnerable with a single value of type boolean //AM: added 1/14; may need it later for distinguishing when a property is being inferred because of bus binding 
 	described by connectionFlow with values of type ContentType
 	described by encryptedTransmission with a single value of type ImplProperty // this line gives NullPointerException
 	described by XencryptedTransmission with a single value of type boolean
@@ -172,7 +174,8 @@ Connection is a type of Subsystem // just for reading in the tabular data; some 
 	described by inPort with a single value of type string // inPort is on the "destination"
 	described by destPortType with a single value of type PortType // DestPortType
     described by infoFlowSeverity with a single value of type int.
-	
+
+ConnectionType is a class, must be one of {Local, Remote}.	
 ContentType is a class, must be one of {Xdata, Xcontrol, Xrequest}.
 SecurityIssueLabel is a class, must be one of {Confidentiality, Integrity, Availability}.
 CAPEC is a class  

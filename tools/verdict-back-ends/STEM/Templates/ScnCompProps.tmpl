@@ -43,6 +43,19 @@ validate <supplyChainSecurity> not blank skip
 validate <systemAccessControl> not blank skip
 validate <tamperProtection> not blank skip
 validate <userAuthentication> not blank skip
+validate <Configuration_Attack> not blank skip
+validate <Physical_Theft_Attack> not blank skip
+validate <Interception_Attack> not blank skip
+validate <Hardware_Integrity_Attack> not blank skip
+validate <Supply_Chain_Attack> not blank skip
+validate <Brute_Force_Attack> not blank skip
+validate <Fault_Injection_Attack> not blank skip
+validate <Identity_Spoofing_Attack> not blank skip
+validate <Excessive_Allocation_Attack> not blank skip
+validate <Sniffing_Attack> not blank skip
+validate <Buffer_Attack> not blank skip
+validate <Flooding_Attack> not blank skip
+
 
 transform <hasSensitiveInfo> to <val1> replace "1" : true,"0" : false
 transform <insideTrustedBoundary> to <val2> replace "1" : true,"0" : false
@@ -99,6 +112,19 @@ transform <def21A[1]> to <def21> replace "1" : true,"0" : false
 transform <userAuthentication> to <def22A[]> split "#"
 transform <def22A[1]> to <def22> replace "1" : true,"0" : false
 
+transform <Configuration_Attack> to <val13> replace "1" : true,"0" : false
+transform <Physical_Theft_Attack> to <val14> replace "1" : true,"0" : false
+transform <Interception_Attack> to <val15> replace "1" : true,"0" : false
+transform <Hardware_Integrity_Attack> to <val16> replace "1" : true,"0" : false
+transform <Supply_Chain_Attack> to <val17> replace "1" : true,"0" : false
+transform <Brute_Force_Attack> to <val18> replace "1" : true,"0" : false
+transform <Fault_Injection_Attack> to <val19> replace "1" : true,"0" : false
+transform <Identity_Spoofing_Attack> to <val20> replace "1" : true,"0" : false
+transform <Excessive_Allocation_Attack> to <val21> replace "1" : true,"0" : false
+transform <Sniffing_Attack> to <val22> replace "1" : true,"0" : false
+transform <Buffer_Attack> to <val23> replace "1" : true,"0" : false
+transform <Flooding_Attack> to <val24> replace "1" : true,"0" : false
+
 <CompInstance> hasSensitiveInfo <val1> 
 <CompInstance> insideTrustedBoundary <val2> 
 <CompInstance> cType <componentType>
@@ -109,6 +135,19 @@ transform <def22A[1]> to <def22> replace "1" : true,"0" : false
 <CompInstance> canReceiveSWUpdate <val11> 
 <CompInstance> canReceiveConfigUpdate <val12> 
 <CompInstance> pedigree <pedigree> 
+
+<CompInstance> Configuration_Attack <val13>
+<CompInstance> Physical_Theft_Attack <val14>
+<CompInstance> Interception_Attack <val15>
+<CompInstance> Hardware_Integrity_Attack <val16>
+<CompInstance> Supply_Chain_Attack <val17>
+<CompInstance> Brute_Force_Attack <val18>
+<CompInstance> Fault_Injection_Attack <val19>
+<CompInstance> Identity_Spoofing_Attack <val20>
+<CompInstance> Excessive_Allocation_Attack <val21>
+<CompInstance> Sniffing_Attack <val22>
+<CompInstance> Buffer_Attack <val23>
+<CompInstance> Flooding_Attack <val24>
 
 <1> rdf:type ImplProperty
 <1> name "antiJamming"
