@@ -9,8 +9,8 @@ public
 		const Boolean_cia_I: bool = false;
 		const Boolean_cia_A: bool = false;
 
-		const Integer_cia_I: Base_Types::Integer = 0;
-		const Integer_cia_A: Base_Types::Integer = 0;
+		const Integer_cia_I: int = 0;
+		const Integer_cia_A: int = 0;
 
 		const UAVState_cia_I: Data_Types::UAVState = enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH);
 		const UAVState_cia_A: Data_Types::UAVState = enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH);

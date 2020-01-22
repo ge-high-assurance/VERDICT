@@ -1,5 +1,5 @@
 property set VERDICT_Properties is
- flowType: enumeration (Xdata, Control, Request) applies to (connection);
+ flowType: enumeration (Xdata, Xcontrol, Xrequest) applies to (connection);
  connectionType: enumeration (Local, Remote) applies to (connection);
  authenticated: aadlboolean applies to (connection);
  dataEncrypted: aadlboolean applies to (connection);
