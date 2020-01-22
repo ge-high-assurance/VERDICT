@@ -6,14 +6,12 @@ import "http://sadl.org/STEM/BaseModel".
 Rule InferConnectionSource
 if n1 is connectionName of a Connection
    and noValue(the Connection, connectionSource)
-   and n2 is srcCompType of the Connection
    and n3 is srcCompImpl of the Connection  
 then connectionSource of the Connection is n3.  
 
 Rule InferConnectionDestination
 if n1 is connectionName of a Connection
    and noValue(the Connection, connectionDestination)
-   and n2 is destCompType of the Connection
    and n3 is destCompImpl of the Connection 
 then connectionDestination of the Connection is n3.
 
@@ -42,55 +40,60 @@ if inst is a Subsystem
 then inst is a System.
 
 // Other Hand generated rules
-Rule DefaultPedigree
-if insideTrustedBoundary of a Subsystem is true  
-   and noValue(the Subsystem, pedigree)
-then pedigree of the Subsystem is InternallyDeveloped.
+Rule InferInsideTrustedBoundary1
+if pedigree of a Subsystem is InternallyDeveloped
+   and noValue(the Subsystem, insideTrustedBoundary)
+then insideTrustedBoundary of the Subsystem is true.
 
-Rule InferTrustedConnectionProp
-if pedigree of a Subsystem is COTS
-   and the Subsystem is the connectionSource of a Connection
+Rule InferInsideTrustedBoundary2
+if pedigree of a Subsystem is Sourced
+   and noValue(the Subsystem, insideTrustedBoundary)
+then insideTrustedBoundary of the Subsystem is true.
+
+// No need to define rule for setting trustedConnection to true as in the
+// generated rules trustedConnection only present for CAPEC-148 where its value is false.
+// Note that we are currently not addressing where in the input AADL model most
+// connections are set to be true. We may need to have duplicates of the following 2 rules where 
+// we do not check noValue condition and set "vulnerable" to be true?
+Rule InferTrustedConnectionFalse1
+if connectionType of a Connection is Remote
    and noValue(the Connection, trustedConnection)
+then trustedConnection of the Connection is false. 
+
+Rule InferTrustedConnectionFalse2
+if trustedConnection of a Connection is false
+   and binding of the Connection is b1
+   and binding of a second Connection is b1
+   and noValue(the second Connection, trustedConnection)
+then trustedConnection of the second Connection is false.   
+
+Rule InferTrustedConnectionFalse3
+if connectionDestination of a Connection is a Subsystem   
+   and insideTrustedBoundary of the Subsystem is false   
+   and noValue(the Connection, trustedConnection) 
 then trustedConnection of the Connection is false.   
 
-// rules to infer 4 properties controlReceivedFromUntrusted, dataReceivedFromUntrusted, controlSentToUntrusted and dataSentToUntrusted
-// We may need to modify these rules - currently we are setting the properties when it is not COTS
+Rule InferTrustedConnectionFalse4
+if connectionSource of a Connection is a Subsystem   
+   and insideTrustedBoundary of the Subsystem is false   
+   and noValue(the Connection, trustedConnection) 
+then trustedConnection of the Connection is false.   
+
+// rules to infer 2 properties controlReceivedFromUntrusted, dataReceivedFromUntrusted
+// we do not infer controlSentToUntrusted and dataSentToUntrusted
 Rule InferControlReceivedFromUntrusted
 if trustedConnection of a Connection is false
-   and connectionDestination of the Connection is a Subsystem
-   and pedigree of the Subsystem is not COTS
+   and connectionDestination of the Connection is a Subsystem   
    and connectionFlow of the Connection is Xcontrol
+   and noValue(the Subsystem, controlReceivedFromUntrusted) 
 then controlReceivedFromUntrusted of the Subsystem is true.   
 
 Rule InferDataReceivedFromUntrusted
 if trustedConnection of a Connection is false
-   and connectionDestination of the Connection is a Subsystem
-   and pedigree of the Subsystem is not COTS   
+   and connectionDestination of the Connection is a Subsystem  
    and connectionFlow of the Connection is Xdata
+   and noValue(the Subsystem, dataReceivedFromUntrusted) 
 then dataReceivedFromUntrusted of the Subsystem is true. 
-
-Rule InferControlSentToUntrusted
-if trustedConnection of a Connection is false
-   and connectionSource of the Connection is a Subsystem
-   and pedigree of the Subsystem is not COTS   
-   and connectionFlow of the Connection is Xcontrol
-then controlSentToUntrusted of the Subsystem is true.   
-
-Rule InferDataSentToUntrusted
-if trustedConnection of a Connection is false
-   and connectionSource of the Connection is a Subsystem
-   and pedigree of the Subsystem is not COTS   
-   and connectionFlow of the Connection is Xdata
-then dataSentToUntrusted of the Subsystem is true. 
-
-// to handle causingComponent - if based on properties of comp1 we need encryption on link1
-// then we would have CapeccType-Encryption on comp1 and CapeccType-Encryption on link1
-// and queries would figure out how to write it out
-// and we would not need causingComponent?
-// suppose a component has 2 external links that both need to be encrypted - how would we handle that?
-// we would set addressed if there is a (relevant) link that is encrypted
-// in defenses we do not need the new column that was added but instead have rows for each relevant link
-// if all the relevant links are encrypted then that component would not have that capec because the rule would not fire
 
 //////////////////// Manually created rules to address Cyber Attack Properties (CAP) from TA1 ////////////
 

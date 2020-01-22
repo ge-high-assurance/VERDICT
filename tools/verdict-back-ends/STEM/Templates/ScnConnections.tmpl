@@ -2,10 +2,11 @@ uri "http://sadl.org/STEM/Scenario" alias scn
 import "http://sadl.org/STEM/BaseModel".
 
 
-//log "c:/tmp/scnarch.log"
+//log "c:/tmp/scnconnections.log"
 
 validate <Scenario> not blank skip
 validate <ConnectionName> not blank skip
+validate <ActualConnectionBinding> not blank skip
 validate <SrcComp> not blank skip
 validate <SrcImpl> not blank skip
 validate <SrcCompInstance> not blank skip
@@ -18,19 +19,30 @@ validate <DestCompInstance> not blank skip
 validate <DestCompCategory> not blank skip
 validate <DestPortName> not blank skip
 validate <DestPortType> not blank skip
+validate <Flow1> not blank skip
+validate <Flow2> not blank skip
+validate <Flow3> not blank skip
+validate <trustedConnection> not blank skip
+validate <encryptedTransmission> not blank skip
 
-transform <SrcImpl> to <TEMPSrcImpl> replace .Impl$ : 
-transform <TEMPSrcImpl> to <TEMP2SrcImpl> replace .impl$ : 
-transform <DestImpl> to <TEMPDestImpl> replace .Impl$ :
-transform <TEMPDestImpl> to <TEMP2DestImpl> replace .impl$ :
+//transform <SrcImpl> to <TEMPSrcImpl> replace .Impl$ : 
+//transform <TEMPSrcImpl> to <TEMP2SrcImpl> replace .impl$ : 
+//transform <DestImpl> to <TEMPDestImpl> replace .Impl$ :
+//transform <TEMPDestImpl> to <TEMP2DestImpl> replace .impl$ :
 // the above have error markings; but that is a XText issue; so ignore error markings
+
+transform <trustedConnection> to <trusted> replace "1" : true,"0" : false
+transform <encryptedTransmission> to <def1A[]> split "#"
+transform <def1A[1]> to <def1> replace "1" : true,"0" : false
+
 
 <SrcComp> rdfs:subClassOf Subsystem
 <SrcCompInstance> rdf:type <SrcComp>
-<TEMP2SrcImpl> rdf:type <SrcComp>  
+<SrcImpl> rdf:type <SrcComp>  
 <DestComp> rdfs:subClassOf Subsystem
 <DestCompInstance> rdf:type <DestComp>
-<TEMP2DestImpl> rdf:type <DestComp>
+<DestImpl> rdf:type <DestComp>
+<ActualConnectionBinding> rdf:type Bus
 
 // Sometimes SrcCompInstance is empty but in that case SrcImpl is present.
 // So in rules, I then set srcCompInst to be TEMP2SrcImpl where TEMP2SrcImpl is SrcImpl after stripping off .Impl / .impl
@@ -44,14 +56,25 @@ transform <TEMPDestImpl> to <TEMP2DestImpl> replace .impl$ :
 <ConnectionName>row() rdf:type Connection
 <ConnectionName>row() connectionName <ConnectionName>
 <ConnectionName>row() srcCompType <SrcComp>
-<ConnectionName>row() srcCompImpl <TEMP2SrcImpl> 
+<ConnectionName>row() srcCompImpl <SrcImpl> 
 <ConnectionName>row() connectionSource <SrcCompInstance>
+<ConnectionName>row() binding <ActualConnectionBinding>
 <ConnectionName>row() outPort <SrcPortName>
 <ConnectionName>row() destCompType <DestComp>
-<ConnectionName>row() destCompImpl <TEMP2DestImpl> 
+<ConnectionName>row() destCompImpl <DestImpl> 
 <ConnectionName>row() connectionDestination <DestCompInstance>
 <ConnectionName>row() inPort <DestPortName>
+<ConnectionName>row() connectionFlow <Flow1>
+<ConnectionName>row() connectionFlow <Flow2>
+<ConnectionName>row() connectionFlow <Flow3>
+<ConnectionName>row() trustedConnection <trusted>
+<ConnectionName>row() XencryptedTransmission <def1>
 
+<1> rdf:type ImplProperty
+<1> name "encryptedTransmission"
+<1> val <def1>
+<1> dal <def1A[2]>
+<ConnectionName>row() encryptedTransmission <1>
 
 
 
