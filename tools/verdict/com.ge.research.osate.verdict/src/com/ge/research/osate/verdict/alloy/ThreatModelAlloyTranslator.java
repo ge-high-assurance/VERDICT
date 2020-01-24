@@ -39,14 +39,14 @@ public class ThreatModelAlloyTranslator {
 				.collect(Collectors.toList());
 	}
 	
+	/**
+	 * Translate each threat
+	 * */
 	protected static Func translateThreat(ThreatModel threat) {
-		String id = threat.getId();
-		
-		Map<String, Pair<ExprHasName, Sig>> env = new HashMap<>();
-		
-		List<Decl> intro = translateIntro(threat.getIntro(), env);
+		String id = threat.getId();		
+		Map<String, Pair<ExprHasName, Sig>> env = new HashMap<>();		
+		List<Decl> intro = translateIntro(threat.getIntro(), env);		
 		Expr expr = translateExpr(threat.getExpr(), env);
-		
 		return new Func(Pos.UNKNOWN, id, intro, null, expr);
 	}
 	
@@ -68,21 +68,24 @@ public class ThreatModelAlloyTranslator {
 	
 	/**
 	 * Translate an intro and add the introduced variable to the environment (mutating).
-	 * 
+	 * Assumption: The intro part can only talk about one var at a time
 	 * @param intro
 	 * @param env
 	 * @return
 	 */
 	protected static List<Decl> translateIntro(Intro intro, Map<String, Pair<ExprHasName, Sig>> env) {
 		Sig typeSig;
-		if (AlloyModel.typeMap.containsKey(intro.getType())) {
-			typeSig = AlloyModel.typeMap.get(intro.getType());
+		
+		if (SysArchAlloyModel.compNameToSigMap.containsKey(intro.getType())) {
+			typeSig = SysArchAlloyModel.compNameToSigMap.get(intro.getType());
 		} else {
 			throw new RuntimeException("Missing type: " + intro.getType());
 		}
 		
 		List<ExprVar> introVars = new ArrayList<>();
+		
 		introVars.add(ExprVar.make(Pos.UNKNOWN, intro.getId(), typeSig.type()));
+		
 		Decl introDecl = new Decl(Pos.UNKNOWN, Pos.UNKNOWN, Pos.UNKNOWN, introVars, typeSig);
 		List<Decl> introParams = new ArrayList<>();
 		introParams.add(introDecl);
@@ -162,27 +165,27 @@ public class ThreatModelAlloyTranslator {
 	}
 	
 	protected static Expr translateVar(Var var, Map<String, Pair<ExprHasName, Sig>> env) {
-		Expr expr;
+		Expr expr =null;
 		Sig sig;
 		
-		if (env.containsKey(var.getId())) {
-			Pair<ExprHasName, Sig> pair = env.get(var.getId());
-			expr = pair.a;
-			sig = pair.b;
-		} else if (AlloyModel.valueMap.containsKey(var.getId())) {
-			expr = AlloyModel.valueMap.get(var.getId());
-			sig = null;
-		} else {
-			throw new RuntimeException("Unbound variable or constant: " + var.getId());
-		}
+//		if (env.containsKey(var.getId())) {
+//			Pair<ExprHasName, Sig> pair = env.get(var.getId());
+//			expr = pair.a;
+//			sig = pair.b;
+//		} else if (AlloyModel.valueMap.containsKey(var.getId())) {
+//			expr = AlloyModel.valueMap.get(var.getId());
+//			sig = null;
+//		} else {
+//			throw new RuntimeException("Unbound variable or constant: " + var.getId());
+//		}
 		
 		for (String id : var.getIds()) {
-			Pair<Sig, String> lookup = new Pair<>(sig, id);
-			if (AlloyModel.fieldMap.containsKey(lookup)) {
-				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, AlloyModel.fieldMap.get(lookup));
-			} else {
-				throw new RuntimeException("Unbound field: " + id);
-			}
+//			Pair<Sig, String> lookup = new Pair<>(sig, id);
+//			if (AlloyModel.sigToFieldMap.containsKey(lookup)) {
+//				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, AlloyModel.sigToFieldMap.get(lookup));
+//			} else {
+//				throw new RuntimeException("Unbound field: " + id);
+//			}
 		}
 		
 		return expr;

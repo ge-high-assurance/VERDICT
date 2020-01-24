@@ -32,6 +32,15 @@
 	         </enabledWhen>               
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.AlloyTranslator"
+             commandId="com.ge.research.osate.verdict.commands.runAlloyTranslation">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>       
+       <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
@@ -51,7 +60,15 @@
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
 	            style="push"
 	            tooltip="Run MBAA">
-	      </command>    
+	      </command>  
+	      <command
+	            commandId="com.ge.research.osate.verdict.commands.runAlloyTranslation"
+	            disabledIcon="icons/noCrvMbas.gif"
+	            icon="icons/mbas.ico"
+	            label="&amp;Run Alloy Translation"
+	            style="push"
+	            tooltip="Run Alloy Translation">
+	      </command>  	        
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 icon="icons/wzrd.ico"
@@ -107,7 +124,12 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
              name="Run MBAS">
-       </command>     
+       </command> 
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.runAlloyTranslation"
+             name="Run Alloy Translation">
+       </command>            
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.crvSettings"

@@ -3,14 +3,14 @@ package com.ge.research.osate.verdict.alloy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.Connection;
+import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.Property;
@@ -20,7 +20,6 @@ import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
 import org.osate.aadl2.impl.PropertyImpl;
-
 import edu.mit.csail.sdg.alloy4.Pair;
 import edu.mit.csail.sdg.alloy4.Pos;
 import edu.mit.csail.sdg.ast.Attr;
@@ -28,39 +27,11 @@ import edu.mit.csail.sdg.ast.Expr;
 import edu.mit.csail.sdg.ast.ExprBinary;
 import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.Field;
-import edu.mit.csail.sdg.ast.Sig.SubsetSig;
+import edu.mit.csail.sdg.ast.Sig.PrimSig;
 
 public class AadlAlloyTranslator {
-	protected static final List<String> systemProperties =
-			Arrays.asList("category", "componentType", "manufacturer", "insideTrustedBoundary");
-	protected static final List<String> connectionProperties =
-			Arrays.asList("connectionType", "dataEncrypted", "authenticated");
-	
-	public static class Result {
-		public int system, connection, port;
-		public List<Sig> sigs;
-		public List<Expr> facts;
-		
-		protected Map<String, Sig> systemMap;
-		protected Map<Pair<String, String>, Field> fieldMap;
-		
-		protected Result() {
-			system = 0;
-			connection = 0;
-			port = 0;
-			sigs = new ArrayList<>();
-			facts = new ArrayList<>();
-			
-			systemMap = new LinkedHashMap<>();
-			fieldMap = new LinkedHashMap<>();
-		}
-	}
-	
-	protected static String sanitizeName(String name) {
-		return name != null ? name.replace("\\.", "_") : "";
-	}
-	
-	public static Result fromObjects(Collection<EObject> objects) {
+
+	public static void translateFromAADLObjects(Collection<EObject> objects) {
 		List<PublicPackageSection> models = objects.stream()
 				.map(AadlAlloyTranslator::getModel)
 				.flatMap(Util::streamOfOptional)
@@ -69,6 +40,7 @@ public class AadlAlloyTranslator {
 		List<SystemType> systems = new ArrayList<>();
 		List<SystemImplementation> systemImpls = new ArrayList<>();
 		
+		// Collect component type and implementation 
 		for (PublicPackageSection model : models) {
 			TreeIterator<EObject> it = model.eAllContents();
 			while (it.hasNext()) {
@@ -83,47 +55,51 @@ public class AadlAlloyTranslator {
 			}
 		}
 		
-		Result result = new Result();
-		
 		for (SystemType system : systems) {
-			translateSystem(system, result);
+			translateSystem(system);
 		}
 		for (SystemImplementation systemImpl : systemImpls) {
-			translateSystemImpl(systemImpl, result);
+			translateSystemImpl(systemImpl);
+			translateSystemImplSubcomponents(systemImpl);
+			translateSystemImplConnections(systemImpl);
 		}
 		
 		// TODO state disjunction of all ports
-		
-		return result;
 	}
 	
 	protected static Optional<PublicPackageSection> getModel(EObject obj) {
 		return Util.searchEObject(obj, PublicPackageSection.class);
 	}
 	
-	protected static void translateSystem(SystemType system, Result result) {
-		Sig systemSig = new SubsetSig(sanitizeName(system.getName()),
-				Arrays.asList(AlloyModel.Component), new Attr[] {});
+	/**
+	 * 
+	 * Translate a System Type 
+	 * */
+	protected static void translateSystem(SystemType system) {
+		String sanitizedSysName = sanitizeName(system.getName());
+		Sig compTypeSig = new PrimSig(sanitizedSysName, SysArchAlloyModel.COMPTYPE, new Attr[] {});
 		
-		Expr inportsExpr = null, outportsExpr = null;;
+		Expr allInportsUnionExpr = null, allOutportsUnionExpr = null;;
 		
-		for (DataPort port : system.getOwnedDataPorts()) {
+		for (DataPort port : system.getOwnedDataPorts()) {			
 			Field field;
+			String sanitizedPortName = sanitizeName(port.getName());
+			
 			switch (port.getDirection()) {
 			case IN:
-				field = systemSig.addField(sanitizeName(port.getName()), AlloyModel.InPort.oneOf());
-				if (inportsExpr == null) {
-					inportsExpr = field;
+				field = compTypeSig.addField(sanitizedPortName, SysArchAlloyModel.INPORT.oneOf());
+				if (allInportsUnionExpr == null) {
+					allInportsUnionExpr = field;
 				} else {
-					inportsExpr = ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, inportsExpr, field);
+					allInportsUnionExpr = union(allInportsUnionExpr, field);
 				}
 				break;
 			case OUT:
-				field = systemSig.addField(sanitizeName(port.getName()), AlloyModel.OutPort.oneOf());
-				if (outportsExpr == null) {
-					outportsExpr = field;
+				field = compTypeSig.addField(sanitizedPortName, SysArchAlloyModel.OUTPORT.oneOf());
+				if (allOutportsUnionExpr == null) {
+					allOutportsUnionExpr = field;
 				} else {
-					outportsExpr = ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, outportsExpr, field);
+					allOutportsUnionExpr = union(allOutportsUnionExpr, field);
 				}
 				break;
 			case IN_OUT:
@@ -131,74 +107,78 @@ public class AadlAlloyTranslator {
 				throw new RuntimeException("In/out port not supported");
 			}
 			
-			result.fieldMap.put(new Pair<>(sanitizeName(system.getName()), sanitizeName(port.getName())), field);
-			result.port++;
+			SysArchAlloyModel.compSigFdNameToFdMap.put(new Pair<>(compTypeSig, sanitizedPortName), field);
+			SysArchAlloyModel.port++;
 		}
 		
-		if (inportsExpr != null) {
-			systemSig.addFact(ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN,
-					AlloyModel.joinThis(systemSig, AlloyModel.System_.inports),
-					AlloyModel.joinThis(systemSig, inportsExpr)));
+		// The union of all inports and outports should be equal to 
+		// the component type field's inports and outports respectively 
+		if (allInportsUnionExpr != null) {
+			compTypeSig.addFact(equal(join(compTypeSig, SysArchAlloyModel.SYSINPORTS),
+					join(compTypeSig, allInportsUnionExpr)));
 		}
-		if (outportsExpr != null) {
-			systemSig.addFact(ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN,
-					AlloyModel.joinThis(systemSig, AlloyModel.System_.outports),
-					AlloyModel.joinThis(systemSig, outportsExpr)));
+		if (allOutportsUnionExpr != null) {
+			compTypeSig.addFact(equal(join(compTypeSig, SysArchAlloyModel.SYSOUTPORTS), join(compTypeSig, allOutportsUnionExpr)));
 		}
 		
 		// Ignoring category because it is unclear how to implement it
 		
-		result.sigs.add(systemSig);
-		result.systemMap.put(sanitizeName(system.getName()), systemSig);
+		SysArchAlloyModel.compNameToSigMap.put(sanitizeName(system.getName()), compTypeSig);
 	}
 	
-	protected static void translateSystemImpl(SystemImplementation systemImpl, Result result) {
-		String systemName = sanitizeName(systemImpl.getName().split("\\.")[0]);
-		String systemImplName = sanitizeName(systemImpl.getName());
-		if (!result.systemMap.containsKey(systemName)) {
-			throw new RuntimeException("Missing system " + systemName + " for system impl " + systemImpl.getName());
-		}
-		Sig systemSig = result.systemMap.get(systemName);
-		Sig systemImplSig = new Sig.SubsetSig(systemImplName, Arrays.asList(AlloyModel.ComponentImpl, systemSig), Attr.ONE);
+	/**
+	 * Translate system implementations
+	 * 
+	 * */
+	protected static void translateSystemImpl(SystemImplementation systemImpl) {
+		String sanitizedSystemImplName = sanitizeName(systemImpl.getName());
+		Sig systemImplSig = new PrimSig(sanitizedSystemImplName, SysArchAlloyModel.COMPIMPL);
 		
-		Expr subcomponentsExpr = null;
+		SysArchAlloyModel.compNameToSigMap.put(sanitizedSystemImplName, systemImplSig);
+	}
+	
+	/**
+	 * Translate subcomponents of a system implementation 
+	 * TODO subcomponent sigs' names need to be unique
+	 * */
+	protected static void translateSystemImplSubcomponents(SystemImplementation systemImpl) {
+		// An implementation name usually has two parts divided by "." 
+		String sanitizedSystemName = sanitizeName(systemImpl.getName().split("\\.")[0]);
+		String sanitizedSysImplName = sanitizeName(systemImpl.getName());
 		
-		for (Subcomponent comp : systemImpl.getOwnedSubcomponents()) {
-			Sig typeSig = null;
-			if (comp.getComponentType() != null) {
-				typeSig = result.systemMap.get(sanitizeName(comp.getComponentType().getName()));
-			} else if (comp.getSubcomponentType() != null) {
-				typeSig = result.systemMap.get(sanitizeName(comp.getSubcomponentType().getName()));
+		Sig compTypeSig = SysArchAlloyModel.compNameToSigMap.get(sanitizedSystemName);
+		Sig compImplSig = SysArchAlloyModel.compNameToSigMap.get(sanitizedSysImplName);
+		
+		Expr allSubcompsUnionExpr = null;
+		
+		// subcomponents field of a system impl = the sum of all subcomponents 
+		for (Subcomponent subcomp : systemImpl.getOwnedSubcomponents()) {
+			Sig subcompTypeSig = null;
+			
+			if (subcomp.getComponentType() != null) {
+				subcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(sanitizeName(subcomp.getComponentType().getName()));
+			} else if (subcomp.getSubcomponentType() != null) {
+				subcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(sanitizeName(subcomp.getSubcomponentType().getName()));
 			}
-			if (typeSig == null) {
-				System.err.println("Could not find system type for subcomponent: " + comp.getName());
+			if (subcompTypeSig == null) {
+				System.err.println("Could not find system type for subcomponent: " + subcomp.getName());
 				continue;
 			}
-			Sig compSig = new Sig.SubsetSig(sanitizeName(comp.getName()), Arrays.asList(typeSig), Attr.ONE);
+			// Make an instance (one sig subcomp) for the subcomponent
+			String subcompName = sanitizeName(subcomp.getName());
+			Sig subcompSig = new Sig.SubsetSig(subcompName, Arrays.asList(subcompTypeSig), Attr.ONE);
 			
-			if (subcomponentsExpr == null) {
-				subcomponentsExpr = compSig;
+			// Make the union of all subcomponents sigs
+			if (allSubcompsUnionExpr == null) {
+				allSubcompsUnionExpr = subcompSig;
 			} else {
-				subcomponentsExpr = ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, subcomponentsExpr, compSig);
+				allSubcompsUnionExpr = ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, allSubcompsUnionExpr, subcompSig);
 			}
 			
-			// TODO properties
+			System.out.println("translating subcomponent: " + subcomp.getName());
 			
-			// Will 2020-01-17:
-			// I haven't figured out how to get property key-value pairs.
-			// We know the set of valid properties - systemProperties.
-			// We can also get the list of properties - see below.
-			// But upon inspection of the property objects, I haven't figured out how to recover
-			// the names of the properties, so I can't match up keys to values.
-			// I only spent 20 minutes or so trying to figure this out,
-			// so it might be pretty simple.
-			
-			System.out.println("translating subcomponent: " + comp.getName());
-			
-			for (String propName : systemProperties) {
-				
-			}
-			for (PropertyAssociation prop : comp.getOwnedPropertyAssociations()) {
+
+			for (PropertyAssociation prop : subcomp.getOwnedPropertyAssociations()) {
 				System.out.println("propery name: " + prop.getProperty().getName());
 				for (ModalPropertyValue val : prop.getOwnedValues()) {
 					System.out.println("value name: " + val.getName());
@@ -206,24 +186,96 @@ public class AadlAlloyTranslator {
 				}
 			}
 			
-			result.sigs.add(compSig);
-			result.system++;
+			SysArchAlloyModel.compNameToSigMap.put(subcompName, subcompSig);
+			SysArchAlloyModel.system++;
 		}
 		
-		// TODO connections
-		
-		// Will 2020-01-17:
-		// Need to instantiate "one sig" for each connection.
-		// Also need to state facts about each field for each connection.
-		
-		if (subcomponentsExpr != null) {
-			systemImplSig.addFact(ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN,
-					AlloyModel.joinThis(systemSig, AlloyModel.ComponentImpl_.subcomponents),
-					subcomponentsExpr));
-		}
-		
-		result.sigs.add(systemImplSig);
-		result.systemMap.put(systemImplName, systemImplSig);
-		result.system++;
+		// The union of all subcomponent expression is equal to the system 
+		// join with its "subcomponents" field 
+		if (allSubcompsUnionExpr != null) {
+			compImplSig.addFact(equal(join(compTypeSig, SysArchAlloyModel.COMPIMPLSUBCOMPS),
+					allSubcompsUnionExpr));
+		}		
 	}
+	
+	/**
+	 * 	Translate connections of a system implementation
+ 	 *  TODO: Need to make sure the connection name is unique
+	 * */
+	protected static void translateSystemImplConnections(SystemImplementation systemImpl) {
+		String sysImplName = sanitizeName(systemImpl.getFullName());
+		Sig sysImplSig = SysArchAlloyModel.compNameToSigMap.get(sysImplName);
+		
+		for(Connection conn : systemImpl.getOwnedConnections()) {			
+			Sig srcSubcompSig = null;
+			Sig srcSubcompTypeSig = null;
+			Sig destSubcompSig = null;
+			Sig destSubcompTypeSig = null;
+			
+			String connName = sanitizeName(conn.getFullName());
+			Sig connSig = new PrimSig(connName, SysArchAlloyModel.CONNECTION, Attr.ONE);			
+			
+			ConnectionEnd srcConnectionEnd = conn.getAllSource();
+			ConnectionEnd destConnectionEnd = conn.getAllDestination();
+			
+			// Obtain the src and dest subcomponent sig and their type sigs 
+			if(conn.getAllDestinationContext() != null) {
+				String srcConnectionSubcompName = sanitizeName(conn.getAllSourceContext().getFullName());
+				String srcSubcompTypeName = sanitizeName(srcConnectionEnd.getContainingClassifier().getFullName());
+				
+				srcSubcompSig = SysArchAlloyModel.compNameToSigMap.get(srcConnectionSubcompName);
+				srcSubcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(srcSubcompTypeName);
+			} else {
+				srcSubcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(sanitizeName(srcConnectionEnd.getContainingClassifier().getFullName()));
+			}
+			if(conn.getAllDestinationContext() != null) {
+				String destConnectionSubcompName = conn.getAllDestinationContext().getFullName();
+				String destSubcompTypeName = sanitizeName(destConnectionEnd.getContainingClassifier().getFullName());
+				
+				destSubcompSig = SysArchAlloyModel.compNameToSigMap.get(destConnectionSubcompName);
+				destSubcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(destSubcompTypeName);
+			} else {
+				destSubcompTypeSig = SysArchAlloyModel.compNameToSigMap.get(sanitizeName(destConnectionEnd.getContainingClassifier().getFullName()));;
+			}
+
+			
+			String srcPortName = sanitizeName(srcConnectionEnd.getFullName());			
+			String destPortName = sanitizeName(destConnectionEnd.getFullName());
+			Field srcPortField = SysArchAlloyModel.compSigFdNameToFdMap.get(new Pair<>(srcSubcompTypeSig, srcPortName));
+			Field destPortField = SysArchAlloyModel.compSigFdNameToFdMap.get(new Pair<>(destSubcompTypeSig, destPortName));
+			
+			// Alloy Encoding:
+			// connectionSig.srcPort = subcomponentSig/systemImplSig.srcPort
+			Expr connSrcPortExpr = join(connSig, SysArchAlloyModel.CONNECTIONSRCPORT);
+			Expr actualConnSrcPortExpr = join(srcSubcompSig != null ? srcSubcompSig : sysImplSig, srcPortField);			
+		    // connectionSig.destPort = subcomponentSig/systemImplSig.destPort
+			Expr connDestPortExpr = join(connSig, SysArchAlloyModel.CONNECTIONDESTPORT);
+			Expr actualConnDestPortExpr = join(destSubcompSig != null ? destSubcompSig : sysImplSig, destPortField);
+			
+			SysArchAlloyModel.facts.add(equal(connSrcPortExpr, actualConnSrcPortExpr));
+			SysArchAlloyModel.facts.add(equal(connDestPortExpr, actualConnDestPortExpr));
+			SysArchAlloyModel.connection++;
+		}		
+	}
+	
+	
+	protected static String sanitizeName(String name) {
+		return name != null ? name.replace("\\.", "_") : "";
+	}
+	
+ 	/**
+	 * Aux functions to create expressions
+	 * */
+	public static final Expr join(Expr expr1, Expr expr2) {
+		return ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
+	}
+	
+	public static final Expr union(Expr expr1, Expr expr2) {
+		return ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
+	}	
+	
+	public static final Expr equal(Expr expr1, Expr expr2) {
+		return ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
+	}	
+	
 }

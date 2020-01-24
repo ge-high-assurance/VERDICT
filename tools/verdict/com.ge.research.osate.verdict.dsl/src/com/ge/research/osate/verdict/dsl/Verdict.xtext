@@ -280,7 +280,7 @@ enum CRVAssumption:
 ;
 
 // We include this here so that we can perform syntax coloring
-BuiltInType: 'system' | 'port';
+BuiltInType: 'system' | 'port' | 'connection';
 
 // Introduce a new quantified variable
 // Note: presently only built-in types are supported, but this can change

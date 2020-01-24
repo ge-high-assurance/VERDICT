@@ -18,3 +18,5 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,
  com.ge.research.osate.verdict.handlers
+Bundle-ClassPath: .,
+ /Users/a212461047/Downloads/org.alloytools.alloy.dist.jar
