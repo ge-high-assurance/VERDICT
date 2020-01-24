@@ -21,7 +21,7 @@ public
 		
 		annex agree {**
 			-- high-level specification
-			guarantee "Output: est_pos": Agree_Nodes.close_locations(est_pos, gps_pos);	
+			guarantee "Output: est_pos": Agree_Nodes::close_locations(est_pos, gps_pos);	
 		**};
 		
 		annex verdict {**
@@ -63,7 +63,7 @@ public
 			-- high-level specification
 					
 			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
-				Agree_Nodes.close_locations(cur_pos, est_pos);
+				Agree_Nodes::close_locations(cur_pos, est_pos);
 			
 			guarantee "Output: move":
 				move = cmd;
@@ -198,14 +198,14 @@ public
 															  	bus_in.order
 															  else
 															  	bus_in.order -> pre(recent_order);
-			eq truck_position: Data_Types::Position.impl = Agree_Nodes.FirstLocation(cur_pos);	
+			eq truck_position: Data_Types::Position.impl = Agree_Nodes::FirstLocation(cur_pos);	
 			eq dest_position: Data_Types::Position.impl = dest_location;
-			eq expensive_item: bool = recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+			eq expensive_item: bool = recent_order.item_value >= Agree_Constants::ITEM_VALUE_THRESHOLD;
 			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
-			eq confirmation_timeout: bool = (Agree_Nodes.Duration(not confirmation) > Agree_Constants.WAITING_CONFIRMATION_THRESHOLD);
-			eq get_clearance_timeout: bool = (Agree_Nodes.Duration(no_clearance) >= Agree_Constants.MAXIMUM_NUMBER_OF_RETRIES);
-			eq delivery_failed: bool = (delivery_status = Agree_Constants.FAILED_STATUS);
-			eq delivery_completed: bool = (delivery_status = Agree_Constants.COMPLETED_STATUS);
+			eq confirmation_timeout: bool = (Agree_Nodes::Duration(not confirmation) > Agree_Constants::WAITING_CONFIRMATION_THRESHOLD);
+			eq get_clearance_timeout: bool = (Agree_Nodes::Duration(no_clearance) >= Agree_Constants::MAXIMUM_NUMBER_OF_RETRIES);
+			eq delivery_failed: bool = (delivery_status = Agree_Constants::FAILED_STATUS);
+			eq delivery_completed: bool = (delivery_status = Agree_Constants::COMPLETED_STATUS);
 			eq is_safe_landing: bool = (target_clear and valid_marker);
 			
 			-- events
@@ -216,12 +216,12 @@ public
 			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
 			eq okay_to_launch: bool = not internal_error_detected;
 			eq separation: bool = not connected;
-			eq destination_location_reached: bool = Agree_Nodes.close_locations(cur_pos, dest_position);
+			eq destination_location_reached: bool = Agree_Nodes::close_locations(cur_pos, dest_position);
 			eq no_clearance: bool = not is_safe_landing;
 			eq successfull_delivery: bool = delivery_completed and destination_location_reached and not no_clearance;
 			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
 			eq internal_error_detected: bool = not gps_health_status or not imu_health_status or not rdo_health_status or not cam_health_status;
-			eq truck_location_reached: bool = Agree_Nodes.close_locations(cur_pos, truck_position);
+			eq truck_location_reached: bool = Agree_Nodes::close_locations(cur_pos, truck_position);
 			eq connected: bool = bus_in.connected;
 			
 			-- probe
@@ -229,11 +229,11 @@ public
 			
 			guarantee "Output: delivery_cmd":
 				delivery_cmd = if (making_delivery_mode and not no_clearance and (expensive_item => confirmation)) then
-							   		Agree_Constants.RELEASE_PACKAGE_CMD
+							   		Agree_Constants::RELEASE_PACKAGE_CMD
 							   else if return_to_truck_mode and internal_error_detected then
-							   		Agree_Constants.ABORT_DELIVERY_CMD
+							   		Agree_Constants::ABORT_DELIVERY_CMD
 							   else 
-							   		Agree_Constants.NO_OPERATION_CMD;
+							   		Agree_Constants::NO_OPERATION_CMD;
 				
 			guarantee "Output: constellation":
 				constellation = if init_mode then 
@@ -311,10 +311,10 @@ public
 										    (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected));
 			
 			guarantee "Modes are mutually exclusive":
-				Agree_Nodes.ToInt(off_mode) + Agree_Nodes.ToInt(init_mode) + 
-				Agree_Nodes.ToInt(ready_mode) + Agree_Nodes.ToInt(launch_mode) +
-				Agree_Nodes.ToInt(abort_mode) + Agree_Nodes.ToInt(flying_to_dest_mode) +
-				Agree_Nodes.ToInt(making_delivery_mode) + Agree_Nodes.ToInt(return_to_truck_mode) = 1;
+				Agree_Nodes::ToInt(off_mode) + Agree_Nodes::ToInt(init_mode) + 
+				Agree_Nodes::ToInt(ready_mode) + Agree_Nodes::ToInt(launch_mode) +
+				Agree_Nodes::ToInt(abort_mode) + Agree_Nodes::ToInt(flying_to_dest_mode) +
+				Agree_Nodes::ToInt(making_delivery_mode) + Agree_Nodes::ToInt(return_to_truck_mode) = 1;
     		
 		**};
 					
@@ -408,18 +408,18 @@ public
 			package_is_secure: out data port Base_Types::Boolean;
 			
 		annex agree {**
-			eq release_cmd: bool = (delivery_cmd_in = Agree_Constants.RELEASE_PACKAGE_CMD);
-			eq abort_cmd: bool = (delivery_cmd_in = Agree_Constants.ABORT_DELIVERY_CMD);
-			eq no_op_cmd: bool = (delivery_cmd_in = Agree_Constants.NO_OPERATION_CMD);
+			eq release_cmd: bool = (delivery_cmd_in = Agree_Constants::RELEASE_PACKAGE_CMD);
+			eq abort_cmd: bool = (delivery_cmd_in = Agree_Constants::ABORT_DELIVERY_CMD);
+			eq no_op_cmd: bool = (delivery_cmd_in = Agree_Constants::NO_OPERATION_CMD);
 			
 			guarantee "Initially, delivery status is NOT_STARTED":
-				Agree_Nodes.InitiallyX(delivery_status_out = Agree_Constants.NOT_STARTED_STATUS);
+				Agree_Nodes::InitiallyX(delivery_status_out = Agree_Constants::NOT_STARTED_STATUS);
 				
 			guarantee "if no op or abort command have received then delivery status gets re-started":
-				true -> (no_op_cmd or abort_cmd => (delivery_status_out = Agree_Constants.NOT_STARTED_STATUS));
+				true -> (no_op_cmd or abort_cmd => (delivery_status_out = Agree_Constants::NOT_STARTED_STATUS));
 			
 			guarantee "If delivery command is issued, delivery status is different from NOT_STARTED": 
-				true -> (release_cmd => delivery_status_out <> Agree_Constants.NOT_STARTED_STATUS);
+				true -> (release_cmd => delivery_status_out <> Agree_Constants::NOT_STARTED_STATUS);
 		**};
 			
 		annex verdict {**
@@ -536,18 +536,18 @@ public
 			
 		annex agree {**			
 
-			eq delivery_started: bool = delivery_status <> Agree_Constants.NOT_STARTED_STATUS;
+			eq delivery_started: bool = delivery_status <> Agree_Constants::NOT_STARTED_STATUS;
       		
-      		eq confirmation_requested: bool = Agree_Nodes.HasHappened(radio_cmd); 
+      		eq confirmation_requested: bool = Agree_Nodes::HasHappened(radio_cmd); 
 			
 			eq acknowledge_received: bool = comm1.data_available and comm1.target_confirmed;
 			
-			eq target_confirmed: bool = Agree_Nodes.HasHappened(
+			eq target_confirmed: bool = Agree_Nodes::HasHappened(
       			confirmation_requested and
       			acknowledge_received
       		);
       		
-      		eq valuable_package: bool = most_recent_order.item_value >= Agree_Constants.ITEM_VALUE_THRESHOLD;
+      		eq valuable_package: bool = most_recent_order.item_value >= Agree_Constants::ITEM_VALUE_THRESHOLD;
       		
       		eq power_signal: bool = bus1.on_off and bus1.connected;
       		
@@ -569,7 +569,7 @@ public
       		
       		eq most_recent_delivery_location: Data_Types::Position.impl = most_recent_order.target_position;
       		
-      		eq release_cmd: bool = (probe_delivery_cmd = Agree_Constants.RELEASE_PACKAGE_CMD);
+      		eq release_cmd: bool = (probe_delivery_cmd = Agree_Constants::RELEASE_PACKAGE_CMD);
       		
       		guarantee "P1: constellation for GPS is initialized properly": 
       			isOn => (most_recent_constellation = probe_constellation);
@@ -587,7 +587,7 @@ public
     			delivery_started and valuable_package => confirmation_requested;
 
     		guarantee "P6: The drone is flying only if since last initialization, it has not got aborted": 
-      			probe_fly_cmd => Agree_Nodes.Since(probe_init_mode, not (probe_abort_mode));
+      			probe_fly_cmd => Agree_Nodes::Since(probe_init_mode, not (probe_abort_mode));
 		**};
 			
 		annex verdict{**
