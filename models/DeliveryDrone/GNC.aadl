@@ -27,7 +27,7 @@ public
 			 												  		else satellite1_pos;
 			 
 			 -- high-level specification
-			 guarantee "Output: gps_pos": Agree_Nodes.close_locations(gps_pos, selected_satellite_pos);
+			 guarantee "Output: gps_pos": Agree_Nodes::close_locations(gps_pos, selected_satellite_pos);
 			 
 			 -- probe outputs
 			 guarantee "Output: probe_constellation": probe_constellation = constellation;

@@ -20,7 +20,7 @@ public
 			    else payloadCmdFC;
 			
 			eq prev_battery_level: int =
-				(Agree_Constants.INITIAL_BATTERY_LEVEL -> pre (battery_level));
+				(Agree_Constants::INITIAL_BATTERY_LEVEL -> pre (battery_level));
 			
 			eq battery4pos_consumed: bool =
 			    cmd = enum(Data_Types::MotorCommand, IncreaseY) or
@@ -47,21 +47,21 @@ public
 			
 			guarantee "battery_level_Def2":
 				battery_consumed =>
-					(Agree_Constants.BATTERY_CONSUMPTION_LOWER_BOUND <= battery_level_diff and
-				     battery_level_diff <= Agree_Constants.BATTERY_CONSUMPTION_UPPER_BOUND);
+					(Agree_Constants::BATTERY_CONSUMPTION_LOWER_BOUND <= battery_level_diff and
+				     battery_level_diff <= Agree_Constants::BATTERY_CONSUMPTION_UPPER_BOUND);
 
---			guarantee "battery_level_Def:Formula":  cmd = Agree_Constants.MotorCommand_cia_I or payloadCmdFC = Agree_Constants.Action_cia_I
---			                                           or mstate = Agree_Constants.UAVState_cia_I or payloadCmdRC = Agree_Constants.Action_cia_I
---			                                           => battery_level = Agree_Constants.Integer_cia_I;
---			guarantee "battery_level_Def:Formula":  cmd = Agree_Constants.MotorCommand_cia_A or payloadCmdFC = Agree_Constants.Action_cia_A
---			                                           or mstate = Agree_Constants.UAVState_cia_A or payloadCmdRC = Agree_Constants.Action_cia_A
---			                                           => battery_level = Agree_Constants.Integer_cia_A;
---			guarantee "payload_performed_Def:Formula":  cmd = Agree_Constants.MotorCommand_cia_I or payloadCmdFC = Agree_Constants.Action_cia_I
---			                                           or mstate = Agree_Constants.UAVState_cia_I or payloadCmdRC = Agree_Constants.Action_cia_I
---			                                           => payload_performed = Agree_Constants.Boolean_cia_I;
---			guarantee "payload_performed_Def:Formula":  cmd = Agree_Constants.MotorCommand_cia_A or payloadCmdFC = Agree_Constants.Action_cia_A
---			                                           or mstate = Agree_Constants.UAVState_cia_A or payloadCmdRC = Agree_Constants.Action_cia_A
---			                                           => payload_performed = Agree_Constants.Boolean_cia_A;				     
+--			guarantee "battery_level_Def:Formula":  cmd = Agree_Constants::MotorCommand_cia_I or payloadCmdFC = Agree_Constants::Action_cia_I
+--			                                           or mstate = Agree_Constants::UAVState_cia_I or payloadCmdRC = Agree_Constants::Action_cia_I
+--			                                           => battery_level = Agree_Constants::Integer_cia_I;
+--			guarantee "battery_level_Def:Formula":  cmd = Agree_Constants::MotorCommand_cia_A or payloadCmdFC = Agree_Constants::Action_cia_A
+--			                                           or mstate = Agree_Constants::UAVState_cia_A or payloadCmdRC = Agree_Constants::Action_cia_A
+--			                                           => battery_level = Agree_Constants::Integer_cia_A;
+--			guarantee "payload_performed_Def:Formula":  cmd = Agree_Constants::MotorCommand_cia_I or payloadCmdFC = Agree_Constants::Action_cia_I
+--			                                           or mstate = Agree_Constants::UAVState_cia_I or payloadCmdRC = Agree_Constants::Action_cia_I
+--			                                           => payload_performed = Agree_Constants::Boolean_cia_I;
+--			guarantee "payload_performed_Def:Formula":  cmd = Agree_Constants::MotorCommand_cia_A or payloadCmdFC = Agree_Constants::Action_cia_A
+--			                                           or mstate = Agree_Constants::UAVState_cia_A or payloadCmdRC = Agree_Constants::Action_cia_A
+--			                                           => payload_performed = Agree_Constants::Boolean_cia_A;				     
 		**};
 		annex verdict {**
 			CyberRel "battery_level_Integrity" = cmd:I or payloadCmdFC:I or mstate:I or payloadCmdRC:I => battery_level:I
@@ -77,15 +77,15 @@ public
 			ATE7: out data port Data_Types::ATE7Type;
 		annex agree {**
 			eq next_ATE7: Data_Types::ATE7Type =
-				if battery_level > Agree_Constants.BATTERY_LEVEL_THRESHOLD then
+				if battery_level > Agree_Constants::BATTERY_LEVEL_THRESHOLD then
 					enum(Data_Types::ATE7Type, Adequate)
 				else
 					enum(Data_Types::ATE7Type, Inadequate);
 
 			guarantee "ATE7_Def": ATE7 = (enum(Data_Types::ATE7Type, Adequate) -> pre (next_ATE7));
 
---			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants.Integer_cia_I => ATE7 = Agree_Constants.ATE7Type_cia_I;
---			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants.Integer_cia_A => ATE7 = Agree_Constants.ATE7Type_cia_A;
+--			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants::Integer_cia_I => ATE7 = Agree_Constants::ATE7Type_cia_I;
+--			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants::Integer_cia_A => ATE7 = Agree_Constants::ATE7Type_cia_A;
 
 		**};
 		annex verdict {**
@@ -104,10 +104,10 @@ public
 			guarantee "pos_Def": pos = location_source_pos;
             guarantee "dir_Def": dir = location_source_dir;
 
---			guarantee "pos_Def:Formula": Agree_Constants.NoInput_cia_I => pos = Agree_Constants.Position_impl_cia_I;
---			guarantee "pos_Def:Formula": Agree_Constants.NoInput_cia_A => pos = Agree_Constants.Position_impl_cia_A;
---          guarantee "dir_Def:Formula": Agree_Constants.NoInput_cia_I => dir = Agree_Constants.Direction_cia_I;
---          guarantee "dir_Def:Formula": Agree_Constants.NoInput_cia_A => dir = Agree_Constants.Direction_cia_A;
+--			guarantee "pos_Def:Formula": Agree_Constants::NoInput_cia_I => pos = Agree_Constants::Position_impl_cia_I;
+--			guarantee "pos_Def:Formula": Agree_Constants::NoInput_cia_A => pos = Agree_Constants::Position_impl_cia_A;
+--          guarantee "dir_Def:Formula": Agree_Constants::NoInput_cia_I => dir = Agree_Constants::Direction_cia_I;
+--          guarantee "dir_Def:Formula": Agree_Constants::NoInput_cia_A => dir = Agree_Constants::Direction_cia_A;
 		**};
 		annex verdict{**
 			CyberRel {
@@ -245,16 +245,16 @@ public
 				         s_auto_task3_successful or s_auto_task3_aborted) then
 				    task3.waypoint
 				else if mstate = enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH) then
-					Agree_Constants.LAUNCH_POS
+					Agree_Constants::LAUNCH_POS
 				else
-					(Agree_Constants.LAUNCH_POS -> pre (waypoint))
+					(Agree_Constants::LAUNCH_POS -> pre (waypoint))
 			); 
 			
 			eq upd_task1: Data_Types::Task.impl =
 				if s_auto_task1_started then
-					Agree_Nodes.set_task_status(task1, enum(Data_Types::TaskStatus, InProgress))
+					Agree_Nodes::set_task_status(task1, enum(Data_Types::TaskStatus, InProgress))
 				else if s_auto_task1_successful then
-					Agree_Nodes.set_task_status(task1, enum(Data_Types::TaskStatus, Successful))
+					Agree_Nodes::set_task_status(task1, enum(Data_Types::TaskStatus, Successful))
 				else if s_auto_task1_inprogress or s_auto_task2_started or s_auto_task2_inprogress or
 				        s_auto_task2_successful or s_auto_task2_aborted or s_auto_task3_started or
 				        s_auto_task3_inprogress or s_auto_task3_successful or s_auto_task3_aborted or
@@ -263,13 +263,13 @@ public
 						s_manual_mode then
 					task1
 			    else
-			    	Agree_Nodes.set_task_status(task1, enum(Data_Types::TaskStatus, Aborted));
+			    	Agree_Nodes::set_task_status(task1, enum(Data_Types::TaskStatus, Aborted));
 			
 			eq upd_task2: Data_Types::Task.impl =
 				if s_auto_task2_started then
-					Agree_Nodes.set_task_status(task2, enum(Data_Types::TaskStatus, InProgress))
+					Agree_Nodes::set_task_status(task2, enum(Data_Types::TaskStatus, InProgress))
 				else if s_auto_task2_successful then
-					Agree_Nodes.set_task_status(task2, enum(Data_Types::TaskStatus, Successful))
+					Agree_Nodes::set_task_status(task2, enum(Data_Types::TaskStatus, Successful))
 				else if s_auto_task2_inprogress or s_auto_task1_started or s_auto_task1_inprogress or
 				        s_auto_task1_successful or s_auto_task1_aborted or s_auto_task3_started or
 				        s_auto_task3_inprogress or s_auto_task3_successful or s_auto_task3_aborted or
@@ -278,13 +278,13 @@ public
 						s_manual_mode then
 					task2
 			    else
-			    	Agree_Nodes.set_task_status(task2, enum(Data_Types::TaskStatus, Aborted));
+			    	Agree_Nodes::set_task_status(task2, enum(Data_Types::TaskStatus, Aborted));
 			
 			eq upd_task3: Data_Types::Task.impl =
 				if s_auto_task3_started then
-					Agree_Nodes.set_task_status(task3, enum(Data_Types::TaskStatus, InProgress))
+					Agree_Nodes::set_task_status(task3, enum(Data_Types::TaskStatus, InProgress))
 				else if s_auto_task3_successful then
-					Agree_Nodes.set_task_status(task3, enum(Data_Types::TaskStatus, Successful))
+					Agree_Nodes::set_task_status(task3, enum(Data_Types::TaskStatus, Successful))
 				else if s_auto_task3_inprogress or s_auto_task1_started or s_auto_task1_inprogress or
 				        s_auto_task1_successful or s_auto_task1_aborted or s_auto_task2_started or
 				        s_auto_task2_inprogress or s_auto_task2_successful or s_auto_task2_aborted or
@@ -293,7 +293,7 @@ public
 						s_manual_mode then
 					task3
 			    else
-			    	Agree_Nodes.set_task_status(task3, enum(Data_Types::TaskStatus, Aborted));
+			    	Agree_Nodes::set_task_status(task3, enum(Data_Types::TaskStatus, Aborted));
 			
 			guarantee "payloadCMD_Def": payloadCmd = (
 		      if mstate = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE) and
@@ -318,18 +318,18 @@ public
 		      )
 		      else enum(Data_Types::Action, None));
 
---			guarantee "payloadCMD_Def:Formula":  mstate = Agree_Constants.UAVState_cia_A or dest_reached = Agree_Constants.Boolean_cia_A 
---			                                     or payload_performed = Agree_Constants.Boolean_cia_A or tasks = Agree_Constants.Tasks_impl_cia_A 
---			                                     => payloadCmd = Agree_Constants.Action_cia_A;
---			guarantee "payloadCMD_Def:Formula":  mstate = Agree_Constants.UAVState_cia_I or dest_reached = Agree_Constants.Boolean_cia_I 
---			                                     or payload_performed = Agree_Constants.Boolean_cia_I or tasks = Agree_Constants.Tasks_impl_cia_I 
---			                                     => payloadCmd = Agree_Constants.Action_cia_I;
---			guarantee "waypoint:Formula":  mstate = Agree_Constants.UAVState_cia_A or dest_reached = Agree_Constants.Boolean_cia_A 
---			                               or payload_performed = Agree_Constants.Boolean_cia_A or tasks = Agree_Constants.Tasks_impl_cia_A 
---			                               => waypoint = Agree_Constants.Position_impl_cia_A;
---			guarantee "waypoint:Formula":  mstate = Agree_Constants.UAVState_cia_I or dest_reached = Agree_Constants.Boolean_cia_I 
---			                               or payload_performed = Agree_Constants.Boolean_cia_I or tasks = Agree_Constants.Tasks_impl_cia_I 
---			                               => waypoint = Agree_Constants.Position_impl_cia_I;
+--			guarantee "payloadCMD_Def:Formula":  mstate = Agree_Constants::UAVState_cia_A or dest_reached = Agree_Constants::Boolean_cia_A 
+--			                                     or payload_performed = Agree_Constants::Boolean_cia_A or tasks = Agree_Constants::Tasks_impl_cia_A 
+--			                                     => payloadCmd = Agree_Constants::Action_cia_A;
+--			guarantee "payloadCMD_Def:Formula":  mstate = Agree_Constants::UAVState_cia_I or dest_reached = Agree_Constants::Boolean_cia_I 
+--			                                     or payload_performed = Agree_Constants::Boolean_cia_I or tasks = Agree_Constants::Tasks_impl_cia_I 
+--			                                     => payloadCmd = Agree_Constants::Action_cia_I;
+--			guarantee "waypoint:Formula":  mstate = Agree_Constants::UAVState_cia_A or dest_reached = Agree_Constants::Boolean_cia_A 
+--			                               or payload_performed = Agree_Constants::Boolean_cia_A or tasks = Agree_Constants::Tasks_impl_cia_A 
+--			                               => waypoint = Agree_Constants::Position_impl_cia_A;
+--			guarantee "waypoint:Formula":  mstate = Agree_Constants::UAVState_cia_I or dest_reached = Agree_Constants::Boolean_cia_I 
+--			                               or payload_performed = Agree_Constants::Boolean_cia_I or tasks = Agree_Constants::Tasks_impl_cia_I 
+--			                               => waypoint = Agree_Constants::Position_impl_cia_I;
 		**};
 		annex verdict{**
 			CyberRel "payloadCMD_Integrity" = mstate:I or dest_reached:I or payload_performed:I or tasks:I => payloadCmd:I;
@@ -349,10 +349,10 @@ public
 			guarantee "pos_Def": pos = location_source_pos;
             guarantee "dir_Def": dir = location_source_dir;
 
---			guarantee "pos_Def:Formula":  Agree_Constants.NoInput_cia_I => pos = Agree_Constants.Position_impl_cia_I;
---			guarantee "pos_Def:Formula":  Agree_Constants.NoInput_cia_A => pos = Agree_Constants.Position_impl_cia_A;
---          guarantee "dir_Def:Formula":  Agree_Constants.NoInput_cia_I => dir = Agree_Constants.Direction_cia_I;
---          guarantee "dir_Def:Formula":  Agree_Constants.NoInput_cia_A => dir = Agree_Constants.Direction_cia_A;
+--			guarantee "pos_Def:Formula":  Agree_Constants::NoInput_cia_I => pos = Agree_Constants::Position_impl_cia_I;
+--			guarantee "pos_Def:Formula":  Agree_Constants::NoInput_cia_A => pos = Agree_Constants::Position_impl_cia_A;
+--          guarantee "dir_Def:Formula":  Agree_Constants::NoInput_cia_I => dir = Agree_Constants::Direction_cia_I;
+--          guarantee "dir_Def:Formula":  Agree_Constants::NoInput_cia_A => dir = Agree_Constants::Direction_cia_A;
             
 		**};
 		annex verdict{**
@@ -374,10 +374,10 @@ public
 			guarantee "pos_Def": pos = location_source_pos;
             guarantee "dir_Def": dir = location_source_dir;
 
---			guarantee "pos_Def:Formula":  Agree_Constants.NoInput_cia_I => pos = Agree_Constants.Position_impl_cia_I ;
---			guarantee "pos_Def:Formula":  Agree_Constants.NoInput_cia_A => pos = Agree_Constants.Position_impl_cia_A ;
---			guarantee "dir_Def:Formula":  Agree_Constants.NoInput_cia_I => dir = Agree_Constants.Direction_cia_I ;
---			guarantee "dir_Def:Formula":  Agree_Constants.NoInput_cia_A => dir = Agree_Constants.Direction_cia_A ;
+--			guarantee "pos_Def:Formula":  Agree_Constants::NoInput_cia_I => pos = Agree_Constants::Position_impl_cia_I ;
+--			guarantee "pos_Def:Formula":  Agree_Constants::NoInput_cia_A => pos = Agree_Constants::Position_impl_cia_A ;
+--			guarantee "dir_Def:Formula":  Agree_Constants::NoInput_cia_I => dir = Agree_Constants::Direction_cia_I ;
+--			guarantee "dir_Def:Formula":  Agree_Constants::NoInput_cia_A => dir = Agree_Constants::Direction_cia_A ;
 		**};		
 		annex verdict{**
 			CyberRel {
@@ -421,8 +421,8 @@ public
     		guarantee "tasks_Def": tasks =
     			Data_Types::Tasks.impl { task1 = t1; task2 = t2; task3 = t3 };
 
---          guarantee "tasks_Def:Formula":  Agree_Constants.NoInput_cia_I => tasks = Agree_Constants.Tasks_impl_cia_I;
---			guarantee "tasks_Def:Formula":  Agree_Constants.NoInput_cia_A => tasks = Agree_Constants.Tasks_impl_cia_A;
+--          guarantee "tasks_Def:Formula":  Agree_Constants::NoInput_cia_I => tasks = Agree_Constants::Tasks_impl_cia_I;
+--			guarantee "tasks_Def:Formula":  Agree_Constants::NoInput_cia_A => tasks = Agree_Constants::Tasks_impl_cia_A;
 
 		**};
 		annex verdict{**
@@ -456,12 +456,12 @@ public
 			     else if move = enum(Data_Types::Movement, Turn_Left) and currentDir = enum(Data_Types::Direction, East) then enum(Data_Types::MotorCommand, DecreaseYaw)
 			     else enum(Data_Types::MotorCommand, NoChange);
 
---			guarantee "cmd_Def:Formula": mstate = Agree_Constants.UAVState_cia_I or moveRC = Agree_Constants.Movement_cia_I 
---			                             or moveNav = Agree_Constants.Movement_cia_I or currentDir = Agree_Constants.Direction_cia_I 
---			                             => cmd =  Agree_Constants.MotorCommand_cia_I;
---			guarantee "cmd_Def:Formula": mstate = Agree_Constants.UAVState_cia_A or moveRC = Agree_Constants.Movement_cia_A 
---			                             or moveNav = Agree_Constants.Movement_cia_A or currentDir = Agree_Constants.Direction_cia_A 
---			                             => cmd =  Agree_Constants.MotorCommand_cia_A;
+--			guarantee "cmd_Def:Formula": mstate = Agree_Constants::UAVState_cia_I or moveRC = Agree_Constants::Movement_cia_I 
+--			                             or moveNav = Agree_Constants::Movement_cia_I or currentDir = Agree_Constants::Direction_cia_I 
+--			                             => cmd =  Agree_Constants::MotorCommand_cia_I;
+--			guarantee "cmd_Def:Formula": mstate = Agree_Constants::UAVState_cia_A or moveRC = Agree_Constants::Movement_cia_A 
+--			                             or moveNav = Agree_Constants::Movement_cia_A or currentDir = Agree_Constants::Direction_cia_A 
+--			                             => cmd =  Agree_Constants::MotorCommand_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "cmd_Integrity" = mstate:I or moveRC:I or moveNav:I or currentDir:I => cmd:I;
@@ -500,18 +500,18 @@ public
 			guarantee "dest_reached_Def":
 				dest_reached = (currentPos.x = waypoint.x and currentPos.y = waypoint.y);
 	
---			guarantee "dest_reached_Def:Formula": currentDir = Agree_Constants.Direction_cia_A or currentPos = Agree_Constants.Position_impl_cia_A 
---			                                      or waypoint = Agree_Constants.Position_impl_cia_A  
---          	                                      => dest_reached =  Agree_Constants.Boolean_cia_A;
---			guarantee "dest_reached_Def:Formula": currentDir = Agree_Constants.Direction_cia_I or currentPos = Agree_Constants.Position_impl_cia_I 
---			                                      or waypoint = Agree_Constants.Position_impl_cia_I  
---           	                                      => dest_reached =  Agree_Constants.Boolean_cia_I;
---			guarantee "move_Def:Formula": currentDir = Agree_Constants.Direction_cia_I or currentPos = Agree_Constants.Position_impl_cia_I 
---			                              or waypoint = Agree_Constants.Position_impl_cia_I  
---           	                              => move =  Agree_Constants.Movement_cia_I;
---			guarantee "move_Def:Formula": currentDir = Agree_Constants.Direction_cia_A or currentPos = Agree_Constants.Position_impl_cia_A 
---			                              or waypoint = Agree_Constants.Position_impl_cia_A  
---           	                              => move =  Agree_Constants.Movement_cia_A;
+--			guarantee "dest_reached_Def:Formula": currentDir = Agree_Constants::Direction_cia_A or currentPos = Agree_Constants::Position_impl_cia_A 
+--			                                      or waypoint = Agree_Constants::Position_impl_cia_A  
+--          	                                      => dest_reached =  Agree_Constants::Boolean_cia_A;
+--			guarantee "dest_reached_Def:Formula": currentDir = Agree_Constants::Direction_cia_I or currentPos = Agree_Constants::Position_impl_cia_I 
+--			                                      or waypoint = Agree_Constants::Position_impl_cia_I  
+--           	                                      => dest_reached =  Agree_Constants::Boolean_cia_I;
+--			guarantee "move_Def:Formula": currentDir = Agree_Constants::Direction_cia_I or currentPos = Agree_Constants::Position_impl_cia_I 
+--			                              or waypoint = Agree_Constants::Position_impl_cia_I  
+--           	                              => move =  Agree_Constants::Movement_cia_I;
+--			guarantee "move_Def:Formula": currentDir = Agree_Constants::Direction_cia_A or currentPos = Agree_Constants::Position_impl_cia_A 
+--			                              or waypoint = Agree_Constants::Position_impl_cia_A  
+--           	                              => move =  Agree_Constants::Movement_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "dest_reached_Integrity" = currentDir:I or currentPos:I or waypoint:I => dest_reached:I;
@@ -531,10 +531,10 @@ public
 			guarantee "currentPos_Def": currentPos = voted_pos;
             guarantee "currentDir_Def": currentDir = voted_dir;
 
---			guarantee "currentPos_Def:Formula": voted_pos = Agree_Constants.Position_impl_cia_I => currentPos = Agree_Constants.Position_impl_cia_I;
---			guarantee "currentPos_Def:Formula": voted_pos = Agree_Constants.Position_impl_cia_A => currentPos = Agree_Constants.Position_impl_cia_A;
---            guarantee "currentDir_Def:Formula": voted_dir = Agree_Constants.Direction_cia_I => currentDir = Agree_Constants.Direction_cia_I;
---            guarantee "currentDir_Def:Formula": voted_dir = Agree_Constants.Direction_cia_A => currentDir = Agree_Constants.Direction_cia_A;
+--			guarantee "currentPos_Def:Formula": voted_pos = Agree_Constants::Position_impl_cia_I => currentPos = Agree_Constants::Position_impl_cia_I;
+--			guarantee "currentPos_Def:Formula": voted_pos = Agree_Constants::Position_impl_cia_A => currentPos = Agree_Constants::Position_impl_cia_A;
+--            guarantee "currentDir_Def:Formula": voted_dir = Agree_Constants::Direction_cia_I => currentDir = Agree_Constants::Direction_cia_I;
+--            guarantee "currentDir_Def:Formula": voted_dir = Agree_Constants::Direction_cia_A => currentDir = Agree_Constants::Direction_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "currentPos_Integrity" = voted_pos:I => currentPos:I;
@@ -559,14 +559,14 @@ public
 			guarantee "uavMode_Def": uavMode = rcv_uavMode;
 			guarantee "normal_Def": normal = true;
 
---          guarantee "payloadCMD_Def:Formula": Agree_Constants.NoInput_cia_I => payloadCMD = Agree_Constants.Action_cia_I;
---          guarantee "payloadCMD_Def:Formula": Agree_Constants.NoInput_cia_A => payloadCMD = Agree_Constants.Action_cia_A;
---          guarantee "move_Def:Formula": Agree_Constants.NoInput_cia_I => move = Agree_Constants.Movement_cia_I;
---          guarantee "move_Def:Formula": Agree_Constants.NoInput_cia_A => move = Agree_Constants.Movement_cia_A;
---          guarantee "uavMode_Def:Formula": Agree_Constants.NoInput_cia_I => uavMode = Agree_Constants.UAVState_cia_I;
---          guarantee "uavMode_Def:Formula": Agree_Constants.NoInput_cia_A => uavMode = Agree_Constants.UAVState_cia_A;
---          guarantee "normal_Def:Formula": Agree_Constants.NoInput_cia_I => normal = Agree_Constants.Boolean_cia_I;
---          guarantee "normal_Def:Formula": Agree_Constants.NoInput_cia_A => normal = Agree_Constants.Boolean_cia_A;
+--          guarantee "payloadCMD_Def:Formula": Agree_Constants::NoInput_cia_I => payloadCMD = Agree_Constants::Action_cia_I;
+--          guarantee "payloadCMD_Def:Formula": Agree_Constants::NoInput_cia_A => payloadCMD = Agree_Constants::Action_cia_A;
+--          guarantee "move_Def:Formula": Agree_Constants::NoInput_cia_I => move = Agree_Constants::Movement_cia_I;
+--          guarantee "move_Def:Formula": Agree_Constants::NoInput_cia_A => move = Agree_Constants::Movement_cia_A;
+--          guarantee "uavMode_Def:Formula": Agree_Constants::NoInput_cia_I => uavMode = Agree_Constants::UAVState_cia_I;
+--          guarantee "uavMode_Def:Formula": Agree_Constants::NoInput_cia_A => uavMode = Agree_Constants::UAVState_cia_A;
+--          guarantee "normal_Def:Formula": Agree_Constants::NoInput_cia_I => normal = Agree_Constants::Boolean_cia_I;
+--          guarantee "normal_Def:Formula": Agree_Constants::NoInput_cia_A => normal = Agree_Constants::Boolean_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "RC_normal_Integrity" => normal:I
@@ -586,15 +586,15 @@ public
 			ATE6: out data port Data_Types::ATE6Type;
 		annex agree {**
 			eq next_ATE6: Data_Types::ATE6Type = 
-		      if Agree_Nodes.duration (normal) <= Agree_Constants.RC_RECEIVER_TOLERANCE_LEVEL then
+		      if Agree_Nodes::duration (normal) <= Agree_Constants::RC_RECEIVER_TOLERANCE_LEVEL then
 		        enum(Data_Types::ATE6Type, RC_Normal)
 		      else
 		        enum(Data_Types::ATE6Type, RC_Abnormal);
 		        
 		    guarantee "ATE6_Def": ATE6 = (enum(Data_Types::ATE6Type, RC_Normal) -> pre (next_ATE6));
 
---          guarantee "ATE6_Def:Formula": normal = Agree_Constants.Boolean_cia_I => ATE6 = Agree_Constants.ATE6Type_cia_I;
---          guarantee "ATE6_Def:Formula": normal = Agree_Constants.Boolean_cia_I => ATE6 = Agree_Constants.ATE6Type_cia_A;
+--          guarantee "ATE6_Def:Formula": normal = Agree_Constants::Boolean_cia_I => ATE6 = Agree_Constants::ATE6Type_cia_I;
+--          guarantee "ATE6_Def:Formula": normal = Agree_Constants::Boolean_cia_I => ATE6 = Agree_Constants::ATE6Type_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "RC_ATE6_Integrity" = normal:I => ATE6:I;
@@ -615,12 +615,12 @@ public
 			    else
 			    	enum(Data_Types::UAVState, s_RETURN_TO_LAUNCH));
 
---			guarantee "mstate_Def:Formula": ATE6 = Agree_Constants.ATE6Type_cia_I or ATE7 = Agree_Constants.ATE7Type_cia_I 
---			                              or uavMode = Agree_Constants.UAVState_cia_I  
---           	                              => mstate =  Agree_Constants.UAVState_cia_I;
---			guarantee "mstate_Def:Formula": ATE6 = Agree_Constants.ATE6Type_cia_A or ATE7 = Agree_Constants.ATE7Type_cia_A 
---			                              or uavMode = Agree_Constants.UAVState_cia_A  
---           	                              => mstate =  Agree_Constants.UAVState_cia_A;
+--			guarantee "mstate_Def:Formula": ATE6 = Agree_Constants::ATE6Type_cia_I or ATE7 = Agree_Constants::ATE7Type_cia_I 
+--			                              or uavMode = Agree_Constants::UAVState_cia_I  
+--           	                              => mstate =  Agree_Constants::UAVState_cia_I;
+--			guarantee "mstate_Def:Formula": ATE6 = Agree_Constants::ATE6Type_cia_A or ATE7 = Agree_Constants::ATE7Type_cia_A 
+--			                              or uavMode = Agree_Constants::UAVState_cia_A  
+--           	                              => mstate =  Agree_Constants::UAVState_cia_A;
 		**};
 		annex verdict {**
 			CyberRel "mstate_Integrity" = ATE6:I or ATE7:I or uavMode:I => mstate:I ;
@@ -640,8 +640,8 @@ public
 			voted_dir: out data port Data_Types::Direction;
 		annex agree {**
 			guarantee "voted_pos_Def": voted_pos = (
-				if (Agree_Nodes.is_equal(gps_pos, dme_vor_pos)) then gps_pos
-    			else if (Agree_Nodes.is_equal(gps_pos, iru_pos)) then gps_pos
+				if (Agree_Nodes::is_equal(gps_pos, dme_vor_pos)) then gps_pos
+    			else if (Agree_Nodes::is_equal(gps_pos, iru_pos)) then gps_pos
     			else dme_vor_pos
 			);
 			guarantee "voted_dir_Def": voted_dir = (
@@ -650,18 +650,18 @@ public
 				else dme_vor_dir
 			);
 			
---			guarantee "voted_pos_Def:Formula": gps_pos = Agree_Constants.Position_impl_cia_I or dme_vor_pos = Agree_Constants.Position_impl_cia_I 
---			                              or iru_pos = Agree_Constants.Position_impl_cia_I  
---           	                              => voted_pos =  Agree_Constants.Position_impl_cia_I;
---			guarantee "voted_pos_Def:Formula": gps_pos = Agree_Constants.Position_impl_cia_A or dme_vor_pos = Agree_Constants.Position_impl_cia_A 
---			                              or iru_pos = Agree_Constants.Position_impl_cia_A  
---           	                              => voted_pos =  Agree_Constants.Position_impl_cia_A;
---			guarantee "voted_dir_Def:Formula": gps_dir = Agree_Constants.Direction_cia_I or dme_vor_dir = Agree_Constants.Direction_cia_I 
---			                              or iru_dir = Agree_Constants.Direction_cia_I  
---           	                              => voted_dir =  Agree_Constants.Direction_cia_I;
---			guarantee "voted_dir_Def:Formula": gps_dir = Agree_Constants.Direction_cia_A or dme_vor_dir = Agree_Constants.Direction_cia_A 
---			                              or iru_dir = Agree_Constants.Direction_cia_A  
---          	                              => voted_dir =  Agree_Constants.Direction_cia_A;
+--			guarantee "voted_pos_Def:Formula": gps_pos = Agree_Constants::Position_impl_cia_I or dme_vor_pos = Agree_Constants::Position_impl_cia_I 
+--			                              or iru_pos = Agree_Constants::Position_impl_cia_I  
+--           	                              => voted_pos =  Agree_Constants::Position_impl_cia_I;
+--			guarantee "voted_pos_Def:Formula": gps_pos = Agree_Constants::Position_impl_cia_A or dme_vor_pos = Agree_Constants::Position_impl_cia_A 
+--			                              or iru_pos = Agree_Constants::Position_impl_cia_A  
+--           	                              => voted_pos =  Agree_Constants::Position_impl_cia_A;
+--			guarantee "voted_dir_Def:Formula": gps_dir = Agree_Constants::Direction_cia_I or dme_vor_dir = Agree_Constants::Direction_cia_I 
+--			                              or iru_dir = Agree_Constants::Direction_cia_I  
+--           	                              => voted_dir =  Agree_Constants::Direction_cia_I;
+--			guarantee "voted_dir_Def:Formula": gps_dir = Agree_Constants::Direction_cia_A or dme_vor_dir = Agree_Constants::Direction_cia_A 
+--			                              or iru_dir = Agree_Constants::Direction_cia_A  
+--          	                              => voted_dir =  Agree_Constants::Direction_cia_A;
 		**};
 		annex verdict{**
 			CyberRel {
@@ -722,28 +722,28 @@ public
 	    **};
 	    annex agree {**
 --     		guarantee "1_1:Integrity:Hazardous":
---	    		payloadCmdFC = Agree_Constants.Action_cia_I or payloadCmdFC = Agree_Constants.Action_cia_A 
---		    	or currentPos = Agree_Constants.Position_impl_cia_I or currentPos = Agree_Constants.Position_impl_cia_A
---		    	or currentDir = Agree_Constants.Direction_cia_I or currentDir = Agree_Constants.Direction_cia_A;				
+--	    		payloadCmdFC = Agree_Constants::Action_cia_I or payloadCmdFC = Agree_Constants::Action_cia_A 
+--		    	or currentPos = Agree_Constants::Position_impl_cia_I or currentPos = Agree_Constants::Position_impl_cia_A
+--		    	or currentDir = Agree_Constants::Direction_cia_I or currentDir = Agree_Constants::Direction_cia_A;				
 --      		
 --		    guarantee "1_2:Integrity:Major":
---			    payloadCmdFC = Agree_Constants.Action_cia_I or currentPos = Agree_Constants.Position_impl_cia_I or currentDir = Agree_Constants.Direction_cia_I;				
+--			    payloadCmdFC = Agree_Constants::Action_cia_I or currentPos = Agree_Constants::Position_impl_cia_I or currentDir = Agree_Constants::Direction_cia_I;				
 
 	    		
 	    	assume "location_source_Pos_Simulated_Value":
-	    		location_source_pos = Agree_Nodes.LocationSource_Pos(cmd);
+	    		location_source_pos = Agree_Nodes::LocationSource_Pos(cmd);
 	    		
 	    	assume "location_source_Dir_Simulated_Value":
-	    		location_source_dir = Agree_Nodes.LocationSource_Dir(cmd);
+	    		location_source_dir = Agree_Nodes::LocationSource_Dir(cmd);
 	    		
 	    	assume "rcv_uavMode_Simulated_Value":
 	    		rcv_uavMode = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE);
 	    	
 	    	assume "rcv_payloadCMD_Simulated_Value":
-	    		rcv_payloadCMD = Agree_Nodes.RemoteOperatorController_payloadCMD();
+	    		rcv_payloadCMD = Agree_Nodes::RemoteOperatorController_payloadCMD();
 	    		
 	    	assume "rcv_move_Simulated_Value":
-	    		rcv_move = Agree_Nodes.RemoteOperatorController_Move();
+	    		rcv_move = Agree_Nodes::RemoteOperatorController_Move();
 	    		
 	    	eq picture_waypoint: Data_Types::Position.impl = tasks.task1.waypoint;
 			eq bomb_waypoint: Data_Types::Position.impl = tasks.task2.waypoint;
@@ -757,25 +757,25 @@ public
       		-- In autonomous mode, the UAV takes a picture only when it reaches the waypoint specified in Task 1
     		guarantee "a_picture_only_in_task1_waypoint":
         		mstate = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE) and payload_performed and
-        		payloadCMD = enum(Data_Types::Action, Camera) => Agree_Nodes.is_equal (location_source_pos, picture_waypoint);
+        		payloadCMD = enum(Data_Types::Action, Camera) => Agree_Nodes::is_equal (location_source_pos, picture_waypoint);
     
     		-- Property b
     		-- In autonomous mode, the UAV releases a weapon only when it reaches the waypoint specified in Task 2
     		guarantee "b_weapon_only_in_task2_waypoint":
         		mstate = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE) and payload_performed and
-        		payloadCMD = enum(Data_Types::Action, Weapon) => Agree_Nodes.is_equal (location_source_pos, bomb_waypoint);
+        		payloadCMD = enum(Data_Types::Action, Weapon) => Agree_Nodes::is_equal (location_source_pos, bomb_waypoint);
 
     		-- Property c
     		-- In autonomous mode, the UAV does not take a picture at location (x = 1, y = 2)
     		guarantee "c_not_taking_picture_on_arbitrary_location":
         		mstate = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE) and payload_performed and
-        		payloadCMD = enum(Data_Types::Action, Camera) => not Agree_Nodes.is_equal (location_source_pos, Data_Types::Position.impl {x=1; y=2});
+        		payloadCMD = enum(Data_Types::Action, Camera) => not Agree_Nodes::is_equal (location_source_pos, Data_Types::Position.impl {x=1; y=2});
 
     		-- Property d
     		-- In autonomous mode, the UAV does not release weapons at location (x = 2, y = 2)
     		guarantee "d_not_releasing_weapon_on_arbitrary_location":
        			mstate = enum(Data_Types::UAVState, s_AUTO_FLIGHT_MODE) and payload_performed and
-       			payloadCMD = enum(Data_Types::Action, Weapon) => not Agree_Nodes.is_equal (location_source_pos, Data_Types::Position.impl {x=2; y=2});
+       			payloadCMD = enum(Data_Types::Action, Weapon) => not Agree_Nodes::is_equal (location_source_pos, Data_Types::Position.impl {x=2; y=2});
 
     		-- Property e
     		-- The UAV changes its position only if it is oriented in the right direction
@@ -797,13 +797,13 @@ public
     		-- Property f
     		-- In manual mode, the UAV will take a picture only if it is at the intended location
     		guarantee "f_picture_only_in_PILOT_TARGET_POSITION":
-        		Agree_Nodes.sofar(mstate = enum(Data_Types::UAVState, s_MANUAL_FLIGHT_MODE)) and payload_performed and payloadCMD = enum(Data_Types::Action, Camera)
-        		=> Agree_Nodes.is_equal (location_source_pos, Agree_Constants.PILOT_TARGET_POSITION);
+        		Agree_Nodes::sofar(mstate = enum(Data_Types::UAVState, s_MANUAL_FLIGHT_MODE)) and payload_performed and payloadCMD = enum(Data_Types::Action, Camera)
+        		=> Agree_Nodes::is_equal (location_source_pos, Agree_Constants::PILOT_TARGET_POSITION);
         
     		-- Property g
     		-- In manual mode (where we are assuming the pilot never instructs the UAV to drop a bomb), the only payload action that can be taken by the UAV is to take a picture
     		guarantee "g_pilot_only_takes_picture":
-        		Agree_Nodes.sofar(mstate = enum(Data_Types::UAVState, s_MANUAL_FLIGHT_MODE)) and payload_performed
+        		Agree_Nodes::sofar(mstate = enum(Data_Types::UAVState, s_MANUAL_FLIGHT_MODE)) and payload_performed
         		=> payloadCMD = enum(Data_Types::Action, Camera);
       		
 	    **};
@@ -962,14 +962,14 @@ public
 			{ 
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 				VERDICT_Properties::dataEncrypted => true;
 			};
 			wireless2: port rcv_move -> RC_receiver.rcv_move
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 				VERDICT_Properties::dataEncrypted => true;
 			};
 			wireless3: port rcv_uavMode -> RC_receiver.rcv_uavMode
@@ -1083,7 +1083,7 @@ public
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true;		 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet9: port mission_planner.tasks -> flight_controller.tasks
 			{
@@ -1118,7 +1118,7 @@ public
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true;		 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet14: port actuators.battery_level -> battery_health_check.battery_level
 			{
@@ -1139,21 +1139,21 @@ public
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true;
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet17: port RC_receiver.payloadCmd -> actuators.payloadCmdRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet18: port RC_receiver.move -> mixer.moveRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet19: port RC_receiver.uavMode -> state_controller.uavMode
 			{
@@ -1182,7 +1182,7 @@ public
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet23: port position_estimator.currentPos -> currentPos
 			{
@@ -1196,14 +1196,14 @@ public
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet25: port RC_receiver.payloadCmd -> payloadCmdRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::dataEncrypted => true; 
-				VERDICT_Properties::flowType => Control;
+				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet26: port state_controller.mstate -> mstate
 			{

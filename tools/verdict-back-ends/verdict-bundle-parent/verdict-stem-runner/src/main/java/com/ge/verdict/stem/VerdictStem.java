@@ -38,18 +38,16 @@ public class VerdictStem {
             final Path knowledgeBaseDir = projectDir.toPath();
             final Path csvDataDir = knowledgeBaseDir.resolve("CSVData");
             final boolean csvIncludesHeader = true;
-            final Path archCsv = csvDataDir.resolve("ScnArch.csv");
             final Path compCsv = csvDataDir.resolve("ScnCompProps.csv");
-            final Path connCsv = csvDataDir.resolve("ScnConnectionProps.csv");
+            final Path connCsv = csvDataDir.resolve("ScnConnections.csv");
             final Path capecCsv = outputDir.toPath().resolve("CAPEC.csv");
             final Path defensesCsv = outputDir.toPath().resolve("Defenses.csv");
             final Path defenses2NistCsv = outputDir.toPath().resolve("Defenses2NIST.csv");
-            final String graphName = "Run_sadl11";
+            final String graphName = "Run_sadl10";
             final Path modelsDir = knowledgeBaseDir.resolve("OwlModels");
             final Path templatesDir = knowledgeBaseDir.resolve("Templates");
-            final Path archTemplate = templatesDir.resolve("ScnArch.tmpl");
             final Path compTemplate = templatesDir.resolve("ScnCompProps.tmpl");
-            final Path connTemplate = templatesDir.resolve("ScnConnectionProps.tmpl");
+            final Path connTemplate = templatesDir.resolve("ScnConnections.tmpl");
 
             final String modelName = "http://sadl.org/STEM/Run";
             final String instanceDataNamespace = "http://sadl.org/STEM/Scenario#";
@@ -59,8 +57,6 @@ public class VerdictStem {
             srvr.selectServiceModel(modelsDir.toString(), modelName);
             srvr.setInstanceDataNamespace(instanceDataNamespace);
 
-            srvr.loadCsvData(
-                    archCsv.toUri().toString(), csvIncludesHeader, archTemplate.toUri().toString());
             srvr.loadCsvData(
                     compCsv.toUri().toString(), csvIncludesHeader, compTemplate.toUri().toString());
             srvr.loadCsvData(
@@ -106,7 +102,7 @@ public class VerdictStem {
                         graphName,
                         null,
                         Orientation.TD,
-                        "Cmd 13  (Graph)");
+                        "Cmd 11  (Graph)");
                 visualizer.graphResultSetData(rs);
             }
         } catch (IOException
