@@ -6,7 +6,7 @@ import "http://sadl.org/STEM/BaseModel".
 
 validate <Scenario> not blank skip
 validate <ConnectionName> not blank skip
-validate <ActualConnectionBinding> not blank skip
+//validate <ActualConnectionBinding> not blank skip
 validate <SrcComp> not blank skip
 validate <SrcImpl> not blank skip
 validate <SrcCompInstance> not blank skip
@@ -42,7 +42,7 @@ transform <def1A[1]> to <def1> replace "1" : true,"0" : false
 <DestComp> rdfs:subClassOf Subsystem
 <DestCompInstance> rdf:type <DestComp>
 <DestImpl> rdf:type <DestComp>
-<ActualConnectionBinding> rdf:type Bus
+//<ActualConnectionBinding> rdf:type Bus
 
 // Sometimes SrcCompInstance is empty but in that case SrcImpl is present.
 // So in rules, I then set srcCompInst to be TEMP2SrcImpl where TEMP2SrcImpl is SrcImpl after stripping off .Impl / .impl
@@ -58,7 +58,7 @@ transform <def1A[1]> to <def1> replace "1" : true,"0" : false
 <ConnectionName>row() srcCompType <SrcComp>
 <ConnectionName>row() srcCompImpl <SrcImpl> 
 <ConnectionName>row() connectionSource <SrcCompInstance>
-<ConnectionName>row() binding <ActualConnectionBinding>
+//<ConnectionName>row() binding <ActualConnectionBinding>
 <ConnectionName>row() outPort <SrcPortName>
 <ConnectionName>row() destCompType <DestComp>
 <ConnectionName>row() destCompImpl <DestImpl> 
