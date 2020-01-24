@@ -32,7 +32,7 @@ Checks:
 
    - {b check_SelectedDefenses_file} : check_SelectedDefenses_file compAD.
 
-   - {b check_ScnArch_file} : check_SelectedDefenses_file arch.
+   - {b check_ScnConnections_file} : check_ScnConnections_file arch.
 
    - {b check_Mission_file} : check_Mission_file mission.
 
@@ -149,12 +149,12 @@ let check_SelectedDefenses_file compAD =
 ;;
 
 
-(* file:            ScnArch.csv 
+(* file:            ScnConnections.csv 
    description:     This file lists the output component instance and output port and maps it to 
                     the input component instance and input port.
    expected header: CompOut | PortOut | CompIn | PortIn *)
    
-let check_ScnArch_file arch =
+let check_ScnConnections_file arch =
   let expectedHeader = ["CompOut"; "PortOut"; "CompIn"; "PortIn"; ]
   and inChannelHeader = List.hd_exn arch
   in 

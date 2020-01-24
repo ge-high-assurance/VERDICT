@@ -92,8 +92,8 @@ let rec populate_hashtable input_dir file_names =
      | "CompSaf.csv" 
        -> add_to_input_hashtable "CompSaf.csv" input_file_path;
           populate_hashtable input_dir fns      
-     | "ScnArch.csv" 
-       -> add_to_input_hashtable "ScnArch.csv" input_file_path;
+     | "ScnConnections.csv" 
+       -> add_to_input_hashtable "ScnConnections.csv" input_file_path;
           populate_hashtable input_dir fns      
      | "Defenses.csv" 
        -> add_to_input_hashtable "Defenses.csv" input_file_path; 
@@ -120,7 +120,7 @@ let validate_input input_dir file_names =
        Ok "Success" 
      else (
        Format.printf "Error: Insufficient input files!@.";
-       Format.printf "       SOTERIA++ expects these input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Defenses2NIST.csv, Events.csv, Mission.csv, ScnArch.csv!@.";
+       Format.printf "       SOTERIA++ expects these input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Defenses2NIST.csv, Events.csv, Mission.csv, ScnConnections.csv!@.";
        Error "Fail"
      )
     )
@@ -166,7 +166,7 @@ let execute input_dir output_dir =
     match validate_input input_dir input_files with
     | Ok _ -> (
       Format.printf 
-        "Info: Got all input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Defenses2NIST.csv, Events.csv, Mission.csv, ScnArch.csv@."; 
+        "Info: Got all input files: CAPEC.csv, CompDep.csv, CompSaf.csv, Defenses.csv, Defenses2NIST.csv, Events.csv, Mission.csv, ScnConnections.csv@."; 
       
       (* Process the output dir path: clean up old files or create a new directory *)
       let output_dir_path = process_output_dir input_dir output_dir in
@@ -177,7 +177,7 @@ let execute input_dir output_dir =
       let mission_ch  = In_channel.read_lines (Hashtbl.find_exn input_file_table "Mission.csv") in
       let comp_dep_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "CompDep.csv") in
       let comp_saf_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "CompSaf.csv") in
-      let scn_arch_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "ScnArch.csv") in
+      let scn_arch_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "ScnConnections.csv") in
       let defense_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "Defenses.csv") in
       let defense2nist_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "Defenses2NIST.csv") in
       let attack_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "CAPEC.csv") in

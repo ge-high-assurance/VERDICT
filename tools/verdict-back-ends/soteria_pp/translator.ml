@@ -32,7 +32,7 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
 	# let compSafe = mainListtag (In_channel.read_lines "test/CompSaf.csv");;
 	# let attack = mainListtag (In_channel.read_lines "test/CAPEC.csv");;
 	# let events = mainListtag (In_channel.read_lines "test/Events.csv");;
-	# let arch = mainListtag (In_channel.read_lines "test/ScnArch.csv");;
+	# let arch = mainListtag (In_channel.read_lines "test/ScnConnections.csv");;
 	# let mission = mainListtag (In_channel.read_lines "test/Mission.csv");;
 	# let defense = mainListtag (In_channel.read_lines "test/Defenses.csv");;
 	#
