@@ -64,7 +64,7 @@ public class VerdictStemTest {
         testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
-        testFile = testGraphsDir.resolve("Run_sadl11.svg");
+        testFile = testGraphsDir.resolve("Run_sadl10.svg");
         Assertions.assertThat(testFile).exists();
     }
 }
