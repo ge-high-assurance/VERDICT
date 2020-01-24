@@ -75,10 +75,12 @@ public class VDM2CSV extends VdmTranslator {
 
         // Generate STEM input
         scnConnectionsTable.toCsvFile(new File(stemOutputPath, "ScnArch.csv"));
+        scnConnectionsTable.toCsvFile(new File(stemOutputPath, "ScnConnections.csv"));
         scnCompPropsTable.toCsvFile(new File(stemOutputPath, "ScnCompProps.csv"));
         scnConnectionPropsTable.toCsvFile(new File(stemOutputPath, "ScnConnectionProps.csv"));
 
         // Generate Soteria_pp input
+        scnConnectionsTable.toCsvFile(new File(stemOutputPath, "ScnConnections.csv"));
         scnConnectionsTable.toCsvFile(new File(soteriaOutputPath, "ScnArch.csv"));
         compDepTable.toCsvFile(new File(soteriaOutputPath, "CompDep.csv"));
         missionTable.toCsvFile(new File(soteriaOutputPath, "Mission.csv"));
