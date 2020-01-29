@@ -1,6 +1,6 @@
 
 BIN_NAME=aadl2iml
-BIN_PATH=bin/$(BIN_NAME)
+BIN_PATH=bin
 
 OCB_FLAGS   = -I src
 OCB = ocamlbuild $(OCB_FLAGS)
@@ -11,9 +11,9 @@ all: native
 
 clean:
 	$(OCB) -clean
-	@rm $(BIN_PATH)
+	@rm -rf $(BIN_PATH)
 
 native:
 	$(OCB) main.native
-	@mkdir -p bin
-	@cp -L main.native bin/aadl2iml
+	@mkdir -p $(BIN_PATH)
+	@cp -L main.native $(BIN_PATH)/$(BIN_NAME)
