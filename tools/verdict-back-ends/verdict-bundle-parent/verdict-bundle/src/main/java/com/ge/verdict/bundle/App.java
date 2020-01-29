@@ -313,7 +313,9 @@ public class App {
         String stemOutputDir = (new File(stemProjectDir, "Output")).getAbsolutePath();
         String stemGraphsDir = (new File(stemProjectDir, "Graphs")).getAbsolutePath();
         String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
-        String soteriaPpOutputDir = (new File(stemOutputDir, "Soteria_Output")).getAbsolutePath();
+        File soteriaOutputDir = new File(stemOutputDir, "Soteria_Output");
+        soteriaOutputDir.mkdirs();
+        String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
 
         checkFile(stemCsvDir, true, true, true, false, null);
         checkFile(stemOutputDir, true, true, true, false, null);
