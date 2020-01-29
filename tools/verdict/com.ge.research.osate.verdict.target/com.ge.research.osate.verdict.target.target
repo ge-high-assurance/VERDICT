@@ -3,6 +3,10 @@
 <target includeMode="feature" name="com.ge.research.osate.verdict.target" sequenceNumber="1">
     <locations>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
+            <unit id="com.rockwellcollins.atc.agree.feature.feature.group" version="0.0.0"/>
+            <repository location="https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.4.1"/>
+        </location>
+        <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
             <unit id="de.itemis.xtext.antlr.sdk.feature.group" version="0.0.0"/>
             <repository location="http://download.itemis.com/updates/releases/2.1.1"/>
         </location>
