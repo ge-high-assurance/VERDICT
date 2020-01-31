@@ -18,7 +18,7 @@
              enablesFor="1">
           <enabledWhen>
              <reference
-                   definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">>
+                   definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">
              </reference>
           </enabledWhen>
        </handler>              
@@ -28,17 +28,17 @@
 	         <enabledWhen>
 	            <reference
 	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
+	            </reference>	            
 	         </enabledWhen>               
-       </handler>
+       </handler>     
        <handler
              class="com.ge.research.osate.verdict.handlers.AlloyTranslator"
              commandId="com.ge.research.osate.verdict.commands.runAlloyTranslation">
 	         <enabledWhen>
 	            <reference
 	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
+	            </reference>	            
+	         </enabledWhen>              
        </handler>       
        <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"

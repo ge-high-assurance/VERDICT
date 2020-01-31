@@ -32,7 +32,9 @@ import com.ge.research.osate.verdict.dsl.verdict.ThreatNot;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatOr;
 import com.ge.research.osate.verdict.dsl.verdict.Var;
 
-public class ThreatModelAlloyTranslator {
+public class ThreatModelAlloyTranslator {	
+	public static Map<String, List<Func>> predicates = new HashMap<>();
+	
 	public static List<Func> translate(Collection<ThreatModel> threats) {
 		return threats.stream()
 				.map(ThreatModelAlloyTranslator::translateThreat)
@@ -40,16 +42,36 @@ public class ThreatModelAlloyTranslator {
 	}
 	
 	/**
-	 * Translate each threat
+	 * Translate each threat's entity part into a predicate
 	 * */
 	protected static Func translateThreat(ThreatModel threat) {
 		String id = threat.getId();		
 		Map<String, Pair<ExprHasName, Sig>> env = new HashMap<>();		
 		List<Decl> intro = translateIntro(threat.getIntro(), env);		
 		Expr expr = translateExpr(threat.getExpr(), env);
-		return new Func(Pos.UNKNOWN, id, intro, null, expr);
+		Func pred = new Func(Pos.UNKNOWN, id, intro, null, expr);
+		
+		addPred(threat.getIntro().getType(), pred);
+		return pred;
 	}
 	
+	/**
+	 * Store a applied comp name - predicate pair
+	 * */
+	protected static void addPred(String name, Func pred) {
+		if(predicates.containsKey(name)) {
+			predicates.get(name).add(pred);
+		} else {
+			List<Func> preds = new ArrayList<Func>();
+			
+			preds.add(pred);
+			predicates.put(name, preds);
+		}
+	}
+	
+	/**
+	 * Translate a threat expression
+	 * */
 	protected static Expr translateExpr(ThreatExpr expr, Map<String, Pair<ExprHasName, Sig>> env) {
 		if (expr instanceof Exists) {
 			return translateExists((Exists) expr, env);
@@ -75,9 +97,10 @@ public class ThreatModelAlloyTranslator {
 	 */
 	protected static List<Decl> translateIntro(Intro intro, Map<String, Pair<ExprHasName, Sig>> env) {
 		Sig typeSig;
+		String introType = intro.getType();
 		
-		if (SysArchAlloyModel.compNameToSigMap.containsKey(intro.getType())) {
-			typeSig = SysArchAlloyModel.compNameToSigMap.get(intro.getType());
+		if (SysArchAlloyModel.compNameToSigMap.containsKey(introType)) {
+			typeSig = SysArchAlloyModel.compNameToSigMap.get(introType);
 		} else {
 			throw new RuntimeException("Missing type: " + intro.getType());
 		}
@@ -87,6 +110,7 @@ public class ThreatModelAlloyTranslator {
 		introVars.add(ExprVar.make(Pos.UNKNOWN, intro.getId(), typeSig.type()));
 		
 		Decl introDecl = new Decl(Pos.UNKNOWN, Pos.UNKNOWN, Pos.UNKNOWN, introVars, typeSig);
+		
 		List<Decl> introParams = new ArrayList<>();
 		introParams.add(introDecl);
 		env.put(intro.getId(), new Pair<>(introDecl.get(), typeSig));
@@ -168,24 +192,27 @@ public class ThreatModelAlloyTranslator {
 		Expr expr =null;
 		Sig sig;
 		
-//		if (env.containsKey(var.getId())) {
-//			Pair<ExprHasName, Sig> pair = env.get(var.getId());
-//			expr = pair.a;
-//			sig = pair.b;
-//		} else if (AlloyModel.valueMap.containsKey(var.getId())) {
+		if (env.containsKey(var.getId())) {
+			Pair<ExprHasName, Sig> pair = env.get(var.getId());
+			expr = pair.a;
+			sig = pair.b;
+		} else {
+			throw new RuntimeException("Unbound variable or constant: " + var.getId());
+		}
+		
+//		else if (AlloyModel.valueMap.containsKey(var.getId())) {
 //			expr = AlloyModel.valueMap.get(var.getId());
 //			sig = null;
-//		} else {
-//			throw new RuntimeException("Unbound variable or constant: " + var.getId());
-//		}
+//		} 
 		
 		for (String id : var.getIds()) {
-//			Pair<Sig, String> lookup = new Pair<>(sig, id);
-//			if (AlloyModel.sigToFieldMap.containsKey(lookup)) {
-//				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, AlloyModel.sigToFieldMap.get(lookup));
-//			} else {
-//				throw new RuntimeException("Unbound field: " + id);
-//			}
+			Pair<Sig, String> lookup = new Pair<>(sig, id);
+			
+			if (SysArchAlloyModel.compSigFdNameToFdMap.containsKey(lookup)) {
+				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, SysArchAlloyModel.compSigFdNameToFdMap.get(lookup));
+			} else {
+				throw new RuntimeException("Unbound field: " + id);
+			}
 		}
 		
 		return expr;

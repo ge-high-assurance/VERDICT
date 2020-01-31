@@ -14,9 +14,10 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.eclipse.emf.ecore.editor,
  org.eclipse.ui.console,
  org.osate.aadl2,
+ org.osate.aadl2.instantiation,
  org.osate.xtext.aadl2.ui
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,
  com.ge.research.osate.verdict.handlers
 Bundle-ClassPath: .,
- /Users/a212461047/Downloads/org.alloytools.alloy.dist.jar
+ lib/org.alloytools.alloy.dist.jar

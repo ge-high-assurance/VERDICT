@@ -3,23 +3,55 @@ package com.ge.research.osate.verdict.alloy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.ModalPropertyValue;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NumericRange;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PropertyOwner;
+import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.TypedElement;
+import org.osate.aadl2.impl.AadlBooleanImpl;
+import org.osate.aadl2.impl.AadlIntegerImpl;
+import org.osate.aadl2.impl.AadlStringImpl;
+import org.osate.aadl2.impl.BooleanLiteralImpl;
+import org.osate.aadl2.impl.EnumerationLiteralImpl;
+import org.osate.aadl2.impl.EnumerationTypeImpl;
+import org.osate.aadl2.impl.IntegerLiteralImpl;
+import org.osate.aadl2.impl.MetaclassReferenceImpl;
+import org.osate.aadl2.impl.NamedValueImpl;
+import org.osate.aadl2.impl.PropertyAssociationImpl;
 import org.osate.aadl2.impl.PropertyImpl;
+import org.osate.aadl2.impl.PropertySetImpl;
+import org.osate.aadl2.impl.RealLiteralImpl;
+import org.osate.aadl2.impl.StringLiteralImpl;
+
+import com.ge.research.osate.verdict.handlers.AlloyTranslator;
+
 import edu.mit.csail.sdg.alloy4.Pair;
 import edu.mit.csail.sdg.alloy4.Pos;
 import edu.mit.csail.sdg.ast.Attr;
@@ -29,11 +61,23 @@ import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.Field;
 import edu.mit.csail.sdg.ast.Sig.PrimSig;
 
-public class AadlAlloyTranslator {
-
+public class AadlAlloyTranslator extends AlloyTranslator {
+	
+	static final String BOOL = "Bool";
+	static final String ENUM = "Enum";
+	static final String INT = "Int";
+	static final String SYSTEM = "system";
+	static final String PORT = "port";
+	static final String CONNECTION = "connection";
+	
+	static final Map<String, List<String>> aadlProps = new HashMap<>();
+	
+	/**
+	 * 
+	 * */
 	public static void translateFromAADLObjects(Collection<EObject> objects) {
 		List<PublicPackageSection> models = objects.stream()
-				.map(AadlAlloyTranslator::getModel)
+				.map(AadlAlloyTranslator::getPublicModel)
 				.flatMap(Util::streamOfOptional)
 				.collect(Collectors.toList());
 		
@@ -54,10 +98,25 @@ public class AadlAlloyTranslator {
 				}
 			}
 		}
+		// Translate properties
+		for(EObject obj : objects) {
+			if(obj instanceof PropertySetImpl) {
+				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
+					translateProperty(prop);
+					
+					// Store property to be used later					
+					for(PropertyOwner po : prop.getAppliesTos()) {
+						saveAProp(((MetaclassReferenceImpl)po).getMetaclass().getName().toLowerCase(), prop.getFullName());
+					}
+				}
+			} 			
+		}
 		
+		// Translate system type 
 		for (SystemType system : systems) {
 			translateSystem(system);
 		}
+		// Translate system implementation		
 		for (SystemImplementation systemImpl : systemImpls) {
 			translateSystemImpl(systemImpl);
 			translateSystemImplSubcomponents(systemImpl);
@@ -67,9 +126,61 @@ public class AadlAlloyTranslator {
 		// TODO state disjunction of all ports
 	}
 	
-	protected static Optional<PublicPackageSection> getModel(EObject obj) {
-		return Util.searchEObject(obj, PublicPackageSection.class);
-	}
+	/**
+	 * Translate a connection or system property
+	 * */
+	protected static void translateProperty(Property prop) {
+		PrimSig propSig = null;
+		String propName = prop.getName();
+		PropertyType propType = prop.getPropertyType();
+		
+		if (propType instanceof EnumerationTypeImpl) {
+			String propEnumTypeName = propName + "_" + ENUM;
+			propSig = new PrimSig(propEnumTypeName, Attr.ABSTRACT);
+			
+			// For each enumerate value, we create a sig
+			for(NamedElement ne : ((EnumerationTypeImpl)propType).getMembers()) {
+				String enumValue = ne.getName();
+				PrimSig enumValueSig = new PrimSig(enumValue, propSig, Attr.ONE);
+				// Save the pair of enum value and its corresponding sig 
+				SysArchAlloyModel.propEnumValToSigMap.put(enumValue, enumValueSig);
+			}
+			// Add an unknown sig for each prop for the case the property is unassigned
+			String unknownEnumValue = SysArchAlloyModel.UNKNOWN + propName; 
+			PrimSig unknownEnumValueSig = new PrimSig(unknownEnumValue, propSig, Attr.ONE);
+			
+			// Save the pair of prop enum type name and prop enum prop; and the pair of enum value and its corresponding sig
+			SysArchAlloyModel.propNameToSigMap.put(propName, propSig);
+			SysArchAlloyModel.propEnumValToSigMap.put(unknownEnumValue, unknownEnumValueSig);
+		} else if (propType instanceof AadlBooleanImpl) {
+			// Don't need to translate it as we have declared a built-in sig Bool
+		} else if (propType instanceof AadlIntegerImpl) {
+			NumericRange range = ((AadlIntegerImpl)propType).getRange();
+			if(range != null) {
+//				PropertyExpression lbExpr = range.getLowerBound();
+//				PropertyExpression ubExpr = range.getLowerBound();
+//				int lb = Integer.valueOf(lbExpr.toString());
+//				int ub = Integer.valueOf(ubExpr.toString());
+//				
+//				for(int i = lb; i <= ub; ++i) {
+//					
+//				}
+				// Let us assume that there are 0 - 9 DAL numbers
+				// The number sigs have been preloaded
+			} else {
+				throw new RuntimeException("The integer property is not a range!");
+			}
+			// 
+		} else if (propType instanceof AadlStringImpl) {
+			throw new RuntimeException("Unsupported type: String");
+		} else {
+			throw new RuntimeException("Unsupported type: " + propType);
+		}
+		
+		if (propSig != null) {
+			SysArchAlloyModel.propNameToSigMap.put(propName, propSig);
+		}
+	}	
 	
 	/**
 	 * 
@@ -79,7 +190,7 @@ public class AadlAlloyTranslator {
 		String sanitizedSysName = sanitizeName(system.getName());
 		Sig compTypeSig = new PrimSig(sanitizedSysName, SysArchAlloyModel.COMPTYPE, new Attr[] {});
 		
-		Expr allInportsUnionExpr = null, allOutportsUnionExpr = null;;
+		Expr allInportsUnionExpr = null, allOutportsUnionExpr = null;
 		
 		for (DataPort port : system.getOwnedDataPorts()) {			
 			Field field;
@@ -143,6 +254,8 @@ public class AadlAlloyTranslator {
 	 * */
 	protected static void translateSystemImplSubcomponents(SystemImplementation systemImpl) {
 		// An implementation name usually has two parts divided by "." 
+		// The first part is the type of the implementation
+		// The second part is "Impl"
 		String sanitizedSystemName = sanitizeName(systemImpl.getName().split("\\.")[0]);
 		String sanitizedSysImplName = sanitizeName(systemImpl.getName());
 		
@@ -172,30 +285,80 @@ public class AadlAlloyTranslator {
 			if (allSubcompsUnionExpr == null) {
 				allSubcompsUnionExpr = subcompSig;
 			} else {
-				allSubcompsUnionExpr = ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, allSubcompsUnionExpr, subcompSig);
+				allSubcompsUnionExpr = union(allSubcompsUnionExpr, subcompSig);						
 			}
 			
 			System.out.println("translating subcomponent: " + subcomp.getName());
 			
-
-			for (PropertyAssociation prop : subcomp.getOwnedPropertyAssociations()) {
-				System.out.println("propery name: " + prop.getProperty().getName());
-				for (ModalPropertyValue val : prop.getOwnedValues()) {
-					System.out.println("value name: " + val.getName());
-					System.out.println("value: " + val.getOwnedValue());
-				}
-			}
+			// Handle declared subcomponent properties
+			Set<String> declPropNames = new HashSet<>();			
+			handleUsedProperties(declPropNames, subcomp, null, subcompSig);
 			
+			// Handle non-declared properties
+			handleNonUsedProperties(aadlProps.get(SYSTEM), declPropNames, subcompSig);
+			
+			// Save subcomSig and increase system number
 			SysArchAlloyModel.compNameToSigMap.put(subcompName, subcompSig);
 			SysArchAlloyModel.system++;
 		}
 		
-		// The union of all subcomponent expression is equal to the system 
+		// The union of all "subcomponent" expressions is equal to the system 
 		// join with its "subcomponents" field 
 		if (allSubcompsUnionExpr != null) {
 			compImplSig.addFact(equal(join(compTypeSig, SysArchAlloyModel.COMPIMPLSUBCOMPS),
 					allSubcompsUnionExpr));
 		}		
+	}
+	
+	/**
+	 * Handle declared properties
+	 * */
+	static void handleUsedProperties(Set<String> declPropNames, Subcomponent subcomp, Connection conn, Sig relevantSig) {
+		List<PropertyAssociation> propAccs = subcomp == null ? conn.getOwnedPropertyAssociations() : subcomp.getOwnedPropertyAssociations();
+		
+		if(propAccs != null) {
+			for (PropertyAssociation prop : subcomp.getOwnedPropertyAssociations()) {
+				PropertyAssociationImpl propImpl = (PropertyAssociationImpl)prop; 
+				System.out.println("propery name: " + propImpl.getProperty().getName());
+				String propName = prop.getProperty().getFullName();
+				Sig propSig = SysArchAlloyModel.propNameToSigMap.get(propName);
+				
+				// Add to declared props set
+				declPropNames.add(propName);
+				
+				// We assume that each property only has only 1 value for now
+				if(prop.getOwnedValues().size() == 1) {
+					ModalPropertyValue val = prop.getOwnedValues().get(0);
+					Sig propValSig = getPropertyValueSig(val.getOwnedValue());
+					
+					if(propValSig != null) {
+						// sugcompSig.propSig = propValSig
+						relevantSig.addFact(equal(relevantSig.join(propSig), propValSig));
+					} else {
+						throw new RuntimeException("Unexpected: property value is null!");
+					}
+				} else {
+					throw new RuntimeException("Unexpected: property " + propName +" value has " + prop.getOwnedValues().size() + " values!");
+				}
+			}
+		}
+	}	
+	
+	/**
+	 * Deal with non-declared properties
+	 * For all non-declared system, connection, and port properties, we add the following facts:
+	 * relevantSig.propSig = unkownPropSig
+	 * */
+	static void handleNonUsedProperties(List<String> allDeclPropNames, Set<String> declPropNames, Sig relevantSig) {
+		if(allDeclPropNames != null) {
+			for(String prop : allDeclPropNames) {
+				if(!declPropNames.contains(prop)) {
+					String unknownPropName = SysArchAlloyModel.UNKNOWN + prop;
+					Sig unknownPropNameSig = SysArchAlloyModel.propNameToSigMap.get(unknownPropName);
+					SysArchAlloyModel.facts.add(equal(relevantSig.join(SysArchAlloyModel.propNameToSigMap.get(prop)), unknownPropNameSig));
+				}
+			}
+		}
 	}
 	
 	/**
@@ -254,6 +417,16 @@ public class AadlAlloyTranslator {
 			
 			SysArchAlloyModel.facts.add(equal(connSrcPortExpr, actualConnSrcPortExpr));
 			SysArchAlloyModel.facts.add(equal(connDestPortExpr, actualConnDestPortExpr));
+			
+			
+			// Handle declared CONNECTION properties
+			Set<String> declPropNames = new HashSet<>();			
+			handleUsedProperties(declPropNames, null, conn, connSig);			
+			// Handle non-declared properties
+			handleNonUsedProperties(aadlProps.get(CONNECTION), declPropNames, connSig);
+			
+			// save connection name and sig
+			SysArchAlloyModel.compNameToSigMap.put(connName, connSig);
 			SysArchAlloyModel.connection++;
 		}		
 	}
@@ -276,6 +449,81 @@ public class AadlAlloyTranslator {
 	
 	public static final Expr equal(Expr expr1, Expr expr2) {
 		return ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
+	}
+	
+	
+	protected static Optional<PublicPackageSection> getPublicModel(EObject obj) {
+		return Util.searchEObject(obj, PublicPackageSection.class);
+	}
+	
+	/**
+	 * Get the type name from a property type
+	 * */
+	static String getPropTypeName(PropertyType propType) {
+		String typeName = "";
+		
+		if(propType instanceof EnumerationTypeImpl) {
+			typeName = ENUM;
+		} else if(propType instanceof AadlBooleanImpl) {
+			typeName = BOOL;
+		} else if (propType instanceof AadlIntegerImpl) {
+			typeName = INT;
+		} else {
+			throw new RuntimeException("Unsupported type: " + propType.getFullName());
+		}
+		
+		return typeName;
 	}	
 	
+	/**
+	 * Get the sig for the input property value
+	 * */
+	public static Sig getPropertyValueSig(PropertyExpression exp)
+	{
+		if(exp == null) {
+			return null;
+		}
+		
+		String value = null;
+		
+		if (exp instanceof BooleanLiteralImpl) {
+			BooleanLiteralImpl bool = ((BooleanLiteralImpl) exp);
+			value = Boolean.toString(bool.getValue());
+		} else if (exp instanceof IntegerLiteralImpl) {
+			IntegerLiteralImpl inte = ((IntegerLiteralImpl) exp);
+			value = SysArchAlloyModel.DALNames[(int)inte.getValue()];
+		} else if (exp instanceof NamedValueImpl) {
+			NamedValueImpl namedValue =((NamedValueImpl) exp);
+			
+			if (namedValue.getNamedValue() instanceof EnumerationLiteralImpl)
+			{
+				EnumerationLiteralImpl enu = ((EnumerationLiteralImpl) namedValue.getNamedValue());
+				value = enu.getName();
+			} else {
+				throw new RuntimeException("Unsupported property value: " + exp);
+			} 
+		} else {
+			throw new RuntimeException("Unsupported property value: " + exp);
+		}
+		
+		return SysArchAlloyModel.propNameToSigMap.get(value);
+	}	
+	
+	
+	/**
+	 * Add a system, connection or port property 
+	 * */
+	static void saveAProp(String propCat, String propName) {
+		if(aadlProps.containsKey(propCat)) {
+			aadlProps.get(propCat).add(propName);
+		} else {			
+			if(propCat.equalsIgnoreCase(PORT) || propCat.equalsIgnoreCase(SYSTEM) || propCat.equalsIgnoreCase(CONNECTION)) {
+				List<String> props = new ArrayList<>();
+				props.add(propName);
+				aadlProps.put(propCat.toLowerCase(), props);	
+			} else {
+				throw new RuntimeException("New type of property: " + propCat);
+			}												
+		}
+	}
 }
