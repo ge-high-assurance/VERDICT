@@ -27,6 +27,15 @@
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
             <unit id="org.osate.plugins.feature.feature.group" version="0.0.0"/>
             <repository location="https://osate-build.sei.cmu.edu/download/osate/stable/2.6.1/updates"/>
+	        <unit id="org.osate.ba.feature.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.core.feature.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.core.feature.source.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.ge.feature.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.ge.feature.source.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.plugins.feature.source.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.utils.feature.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.xtext.aadl2.errormodel.feature.feature.group" version="0.0.0"/>
+	        <unit id="org.osate.xtext.aadl2.errormodel.feature.source.feature.group" version="0.0.0"/>
         </location>
     </locations>
 </target>
