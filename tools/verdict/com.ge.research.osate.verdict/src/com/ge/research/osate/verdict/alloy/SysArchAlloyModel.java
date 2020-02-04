@@ -138,7 +138,7 @@ public class SysArchAlloyModel {
         System.out.println("All facts: " + mkAnd(facts));
         
         Command cmd1 = new Command(false, 10, 10, 10, mkAnd(facts));
-        CompUtil.flushModelToFile(model, tmpAls);
+//        CompUtil.flushModelToFile(model, tmpAls);
         A4Solution sol1 = TranslateAlloyToKodkod.execute_command(NOP, sigs, cmd1, opt);
         System.out.println("[Solution1]:");
         System.out.println(sol1.toString());        
