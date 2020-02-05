@@ -28,92 +28,15 @@
 
 6. Unpack the release's "extern" folder to a location on your machine.
 
-## Setup Instructions on MacOS
+## Install the VERDICT plugin for OSATE
 
-1. Create a plist file anywhere on your Mac called
-   "com.ge.verdict.vars.plist" as follows:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>setenv.stem</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>/bin/launchctl</string>
-    <string>setenv</string>
-    <string>GraphVizPath</string>
-    <string>/path/to/the/dir/contains/dot</string>
-    <!-- "dot" is a graph visualization tool; this path might look like /usr/local/bin -->
-  </array>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>ServiceIPC</key>
-  <false/>
-</dict>
-</plist>
-```
-
-2.  Modify the path to GraphVizPath in the plist file to reflect your
-    system setup.
-
-3. Move the plist file to /Library/LaunchDaemons
-
-        mv /path/to/the/plist/file  /Library/LaunchDaemons/
-
-4. Load the environment variable in your terminal:
-
-        launchctl load -w /Library/LaunchDaemons/com.ge.verdict.vars.plist
-
-5. To test if you set the variable successfully, type the following
-   command on terminal and it should return the path you just set in
-   the plist file.
-
-        launchctl getenv GraphVizPath
-
-6. Install the VERDICT plugin for OSATE
-
-   * Open OSATE
-   * Go to "Help -> Install New Software -> Add... -> Archive..." and
+   1. Open OSATE; go to "Help -> Install New Software -> Add... -> Archive..." and
      find the "com.ge.research.osate.verdict.feature.zip" file in
      the "extern" folder
-   * Make sure uncheck the "Group items by category" to be able to see
-     the plugin
-   * Finish the installation
-   * Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict
+   2. Make sure uncheck the "Group items by category" to be able to see
+     the plugin. Finish the installation
+   3. Set VERDICT bundle path: Go to "OSATE -> Preferences -> Verdict
      -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" file in
      the "extern" folder
-   * In the same place, also set the STEM project, aadl2iml, Kind 2 and 
-     Soteria++ binary paths respectively, and then save and close the dialog
-
-## Setup Instructions on Ubuntu
-
-1. Open the environment variable setting script by typing the
-   following on a termial (you may need to type your password):
-
-        sudo -H gedit /etc/environment
-
-2. Append the following environment variable setting for GraphVizPath
-   to your environment variables file (change the path according to
-   the location of the GraphViz "dot" app on your platform):
-
-        GraphVizPath="/usr/bin"
-
-3. Save it, logout Ubuntu and login again.
-
-4. Install the VERDICT plugin for OSATE:
-
-   * Open OSATE
-   * Go to "Help -> Install New Software -> Add... -> Archive..." and
-     find the "com.ge.research.osate.verdict.feature.zip" file in the
-     "extern" folder
-   * Make sure uncheck the "Group items by category" to be able to see
-     the plugin
-   * Finish the installation
-   * Set VERDICT bundle path: Go to "Windows -> Preferences -> Verdict
-     -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" in the
-     "extern" folder
-   * In the same place, also set the STEM project, aadl2iml, Kind 2 and 
-     Soteria++ binary paths respectively, and then save and close the dialog
+   4. In the same place, also set the STEM project, aadl2iml, Kind 2 and 
+     Soteria++ and GraphViz paths respectively, and then save and close the dialog
