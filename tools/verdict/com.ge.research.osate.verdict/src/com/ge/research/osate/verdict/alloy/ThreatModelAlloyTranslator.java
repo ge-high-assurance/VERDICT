@@ -96,14 +96,14 @@ public class ThreatModelAlloyTranslator {
 	 * @return
 	 */
 	protected static List<Decl> translateIntro(Intro intro, Map<String, Pair<ExprHasName, Sig>> env) {
-		Sig typeSig;
+		Sig typeSig = null;
 		String introType = intro.getType();
 		
-		if (SysArchAlloyModel.compNameToSigMap.containsKey(introType)) {
-			typeSig = SysArchAlloyModel.compNameToSigMap.get(introType);
-		} else {
-			throw new RuntimeException("Missing type: " + intro.getType());
-		}
+//		if (SysArchAlloyModel.compNameToSigMap.containsKey(introType)) {
+//			typeSig = SysArchAlloyModel.compNameToSigMap.get(introType);
+//		} else {
+//			throw new RuntimeException("Missing type: " + intro.getType());
+//		}
 		
 		List<ExprVar> introVars = new ArrayList<>();
 		
@@ -208,11 +208,11 @@ public class ThreatModelAlloyTranslator {
 		for (String id : var.getIds()) {
 			Pair<Sig, String> lookup = new Pair<>(sig, id);
 			
-			if (SysArchAlloyModel.compSigFdNameToFdMap.containsKey(lookup)) {
-				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, SysArchAlloyModel.compSigFdNameToFdMap.get(lookup));
-			} else {
-				throw new RuntimeException("Unbound field: " + id);
-			}
+//			if (SysArchAlloyModel.compSigFdNameToFdMap.containsKey(lookup)) {
+//				expr = ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr, SysArchAlloyModel.compSigFdNameToFdMap.get(lookup));
+//			} else {
+//				throw new RuntimeException("Unbound field: " + id);
+//			}
 		}
 		
 		return expr;

@@ -85,44 +85,7 @@ import edu.mit.csail.sdg.ast.Func;
  * UTRC's translator, but it will require significant re-working.
  */
 
-public class AlloyTranslator extends AbstractHandler {
-	public static List<Property> aadlProps = new ArrayList<Property>();
-	
-	protected IStatus runJob(Element sel, URI uri, IProgressMonitor monitor) {
-	  try {
-	      if (sel instanceof ComponentImplementation) {
-	          final ComponentImplementation compImpl = (ComponentImplementation) sel;
-	          for(PropertyAssociation pa : compImpl.getAllPropertyAssociations()) {
-	        	  System.out.println("pa.getProperty() = " + pa.getProperty().getFullName());
-	          }
-	          SystemInstance sysInst = InstantiateModel.buildInstanceModelFile(compImpl);
-	          
-	          for(ConnectionInstance ci : sysInst.getConnectionInstances()) {
-	        	  System.out.println("ci.getFullName() = "+ci.getFullName());
-	        	  System.out.println("&&&& ci.getOwnedPropertyAssociations().size()" + ci.getOwnedPropertyAssociations().size());
-	        	  
-	        	  for(PropertyAssociation pa : ci.getOwnedPropertyAssociations()) {
-	        		  System.out.println("pa.getProperty().getFullName() = " + pa.getProperty().getFullName());
-	        		  System.out.println("pa.getProperty().getQualifiedName() = " + pa.getProperty().getQualifiedName());	        		  
-	        	  }
-	          }
-//	          for(Connection con : compImpl.getAllConnections()) {
-//	        	  for(PropertyAssociation pa : con.getOwnedPropertyAssociations()) {
-//	        		  System.out.println("pa.getProperty().getFullName() = " + pa.getProperty().getFullName());
-//	        		  System.out.println("pa.getProperty().getQualifiedName() = " + pa.getProperty().getQualifiedName());
-//	        	  }
-//	          }
-				System.out.println("****************************Translation Starts****************************");
-				
-	      } else {
-	    	  System.out.println("it is not a component implementation!");
-	      }
-	  } catch (Throwable t) {
-	      return Status.CANCEL_STATUS;
-	  }
-	  return Status.OK_STATUS;
-	}
-	
+public class AADL2AlloyHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (VerdictHandlersUtils.startRun()) {
@@ -165,10 +128,12 @@ public class AlloyTranslator extends AbstractHandler {
 					for (final Resource resource : resources) {
 						resource.getAllContents().forEachRemaining(objects::add);
 					}
-					AadlAlloyTranslator.translateFromAADLObjects(objects);
-					SysArchAlloyModel.execute();
-//					test(VerdictHandlersUtils.getCurrentSelection(event));
-//					runOnModelInst(event);
+					SysArchAlloyModel sysArchAlloyModel = new SysArchAlloyModel();
+					sysArchAlloyModel.loadBuiltinConstructs();
+					
+					AadlAlloyTranslator aadlAlloyTranslator = new AadlAlloyTranslator(sysArchAlloyModel);
+					aadlAlloyTranslator.translateFromAADLObjects(objects);
+					sysArchAlloyModel.execute();
 				}
 			};
 			mbasAnalysisThread.start();	

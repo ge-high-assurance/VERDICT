@@ -14,7 +14,7 @@ property set VERDICT_Properties is
 -- Component properties 
  manufacturer: enumeration (ThirdParty, InHouse) applies to (system);
  pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
- category: aadlstring applies to (system);
+-- category: aadlstring applies to (system);
  componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
  situated: enumeration (OnBoard, Remote) applies to (system);
  adversariallyTested: aadlboolean applies to (system);

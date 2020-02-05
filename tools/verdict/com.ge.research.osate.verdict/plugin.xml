@@ -32,7 +32,7 @@
 	         </enabledWhen>               
        </handler>     
        <handler
-             class="com.ge.research.osate.verdict.handlers.AlloyTranslator"
+             class="com.ge.research.osate.verdict.handlers.AADL2AlloyHandler"
              commandId="com.ge.research.osate.verdict.commands.runAlloyTranslation">
 	         <enabledWhen>
 	            <reference
