@@ -39,4 +39,4 @@
      -> Verdict Bundle" and find the "verdict-bundle-1.0.jar" file in
      the "extern" folder
    4. In the same place, also set the STEM project, aadl2iml, Kind 2 and 
-     Soteria++ and GraphViz paths respectively, and then save and close the dialog
+     Soteria++ and GraphViz paths for your OS respectively, and then save and close the dialog
