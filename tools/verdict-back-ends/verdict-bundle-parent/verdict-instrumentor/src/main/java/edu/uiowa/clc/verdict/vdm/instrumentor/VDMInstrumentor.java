@@ -35,8 +35,8 @@ import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.ConnectionEnd;
 import verdict.vdm.vdm_model.ConnectionType;
 import verdict.vdm.vdm_model.KindOfComponent;
+import verdict.vdm.vdm_model.ManufacturerType;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
 
@@ -886,7 +886,7 @@ public class VDMInstrumentor {
                     // visit(connection, instrumented_channel);
                     ConnectionType con_type = connection.getConnType();
                     if (con_type == ConnectionType.REMOTE
-                            && connection.isEncryptedTransmission() == data_encryption
+                            && connection.isDataEncrypted() == data_encryption
                             && connection.isAuthenticated() == authentication) {
 
                         // selected_channels.add(connection);
@@ -908,11 +908,7 @@ public class VDMInstrumentor {
         // Conditions
         KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
 
         BlockImpl blockImpl = null;
 
@@ -931,9 +927,8 @@ public class VDMInstrumentor {
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+
                     // Option 1) Specification
                     if (componentType != null) {
 
@@ -952,8 +947,7 @@ public class VDMInstrumentor {
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)
-                            //                            manufacturer == manufacturer_cond
+                            && manufacturer == manufacturer_cond
                             && !comp_cond_3) {
                         // Store component
                         // if (!vdm_components.contains(componentType)) {
@@ -976,10 +970,7 @@ public class VDMInstrumentor {
         // Conditions
         KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
 
         BlockImpl blockImpl = null;
 
@@ -998,9 +989,7 @@ public class VDMInstrumentor {
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     // Option 1) Specification
                     if (componentType != null) {
@@ -1014,7 +1003,7 @@ public class VDMInstrumentor {
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
+                            && manufacturer == manufacturer_cond) {
 
                         // Port
                         for (Port port : componentType.getPort()) {
@@ -1138,10 +1127,7 @@ public class VDMInstrumentor {
         KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
 
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
 
         BlockImpl blockImpl = null;
 
@@ -1157,16 +1143,13 @@ public class VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
+                    ManufacturerType manufacturer = componentInstance.getManufacturer();
 
                     componentType = getType(componentInstance);
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
-
+                            && manufacturer == manufacturer_cond) {
                         // Store component
                         vdm_components.add(componentType);
                         // instrument_component(componentType, blockImpl);
@@ -1627,8 +1610,7 @@ public class VDMInstrumentor {
         new_con.setName(connection.getName() + "_instrumented_channel");
         new_con.setConnType(connection.getConnType());
         new_con.setFlowType(connection.getFlowType());
-
-        new_con.setDataEncrypted(connection.isEncryptedTransmission());
+        new_con.setDataEncrypted(connection.isDataEncrypted());
         new_con.setAuthenticated(connection.isAuthenticated());
 
         new_con.setSource(con_end_inst);
