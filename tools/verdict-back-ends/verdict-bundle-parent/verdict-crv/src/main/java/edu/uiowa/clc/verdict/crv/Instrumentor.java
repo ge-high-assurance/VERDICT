@@ -19,8 +19,8 @@ import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.ConnectionEnd;
 import verdict.vdm.vdm_model.ConnectionType;
 import verdict.vdm.vdm_model.KindOfComponent;
-import verdict.vdm.vdm_model.ManufacturerType;
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
 
@@ -313,8 +313,17 @@ public class Instrumentor extends VDMInstrumentor {
                 for (Connection connection : blockImpl.getConnection()) {
                     // visit(connection, instrumented_channel);
                     ConnectionType con_type = connection.getConnType();
+
+                    System.out.println(
+                            "Connection Name: "
+                                    + connection.getName()
+                                    + " "
+                                    + connection.isEncryptedTransmission()
+                                    + " "
+                                    + connection.isDataEncrypted());
+
                     if (con_type == ConnectionType.REMOTE
-                            && connection.isDataEncrypted() == data_encryption
+                            && connection.isEncryptedTransmission() == data_encryption
                             && connection.isAuthenticated() == authentication) {
 
                         // selected_channels.add(connection);
@@ -388,7 +397,10 @@ public class Instrumentor extends VDMInstrumentor {
         // Conditions
         KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
 
         BlockImpl blockImpl = null;
 
@@ -407,8 +419,10 @@ public class Instrumentor extends VDMInstrumentor {
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+                    //                    ManufacturerType manufacturer =
+                    // componentInstance.getManufacturer();
 
+                    PedigreeType pedgree = componentInstance.getPedigree();
                     // Option 1) Specification
                     if (componentType != null) {
 
@@ -427,7 +441,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && manufacturer == manufacturer_cond
+                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)
                             && !comp_cond_3) {
                         // Store component
                         // if (!vdm_components.contains(componentType)) {
@@ -458,7 +472,10 @@ public class Instrumentor extends VDMInstrumentor {
         // Conditions
         KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
 
         BlockImpl blockImpl = null;
 
@@ -477,7 +494,10 @@ public class Instrumentor extends VDMInstrumentor {
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+                    //                    ManufacturerType manufacturer =
+                    // componentInstance.getManufacturer();
+
+                    PedigreeType pedgree = componentInstance.getPedigree();
 
                     // Option 1) Specification
                     if (componentType != null) {
@@ -491,7 +511,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && manufacturer == manufacturer_cond) {
+                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
 
                         // Port
                         for (Port port : componentType.getPort()) {
@@ -629,7 +649,10 @@ public class Instrumentor extends VDMInstrumentor {
         KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
         KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
 
-        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+
+        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
 
         BlockImpl blockImpl = null;
 
@@ -645,13 +668,16 @@ public class Instrumentor extends VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    ManufacturerType manufacturer = componentInstance.getManufacturer();
+                    //                    ManufacturerType manufacturer =
+                    // componentInstance.getManufacturer();
+
+                    PedigreeType pedgree = componentInstance.getPedigree();
 
                     componentType = getType(componentInstance);
 
                     if ((kind_of_component == component_kind_cond_1
                                     || kind_of_component == component_kind_cond_2)
-                            && manufacturer == manufacturer_cond) {
+                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
