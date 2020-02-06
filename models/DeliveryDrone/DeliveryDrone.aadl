@@ -675,11 +675,10 @@ public
 				-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::pedigree => COTS; 
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
 		
-				VERDICT_Properties::manufacturer => ThirdParty;
 			 	VERDICT_Properties::adversariallyTested => false;
 			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
 				
@@ -761,14 +760,12 @@ public
 			 	-- VERDICT Component Properties
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::pedigree => Sourced;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
 				VERDICT_Properties::controlReceivedFromUntrusted => true;
 				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				
-				VERDICT_Properties::manufacturer => ThirdParty;
-				--VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
 			
 				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
@@ -839,8 +836,8 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 			 	VERDICT_Properties::componentType => Hybrid;
 			 	
-			 	VERDICT_Properties::manufacturer => ThirdParty;
-			 	-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
+			 	VERDICT_Properties::pedigree => COTS;
+			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 			 	VERDICT_Properties::adversariallyTested => false;
 			};
 			
@@ -901,9 +898,9 @@ public
 			{VERDICT_Properties::flowType => Xdata;
 		     VERDICT_Properties::connectionType => Remote;
 			 VERDICT_Properties::authenticated => false;
-			 VERDICT_Properties::dataEncrypted => false;
+			 VERDICT_Properties::encryptedTransmission => false;
 			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
-			 --VERDICT_Properties::dataEncrypted => true; -- Fix for Network Injection
+			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
 			};
 			
 			c17: port radio.comm_out -> comm2
