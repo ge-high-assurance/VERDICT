@@ -1,16 +1,16 @@
 property set VERDICT_Properties is
+-- Port properties
+ probe: aadlboolean applies to (port);
 
 -- Connection properties, including defenses and DAL values
  flowType: enumeration (Xdata, Xcontrol, Xrequest) applies to (connection);
  connectionType: enumeration (Local, Remote) applies to (connection);
  authenticated: aadlboolean applies to (connection);
- dataEncrypted: aadlboolean applies to (connection);
  trustedConnection: aadlboolean applies to (connection);
  encryptedTransmission: aadlboolean applies to (connection);
  encryptedTransmissionDAL: aadlinteger 0 .. 9 applies to (connection);
 
 -- Component properties 
- manufacturer: enumeration (ThirdParty, InHouse) applies to (system);
  pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
  category: aadlstring applies to (system);
  componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
