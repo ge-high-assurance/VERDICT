@@ -500,7 +500,10 @@ public class App {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
 
-        debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
+        File file = new File(imlPath);
+        String parentPath = file.getAbsoluteFile().getParent();
+
+        debugOutVdm(parentPath, "VERDICT_output_debug_vdm.xml", vdmModel);
 
         logHeader("VDM Instrumentor");
 
