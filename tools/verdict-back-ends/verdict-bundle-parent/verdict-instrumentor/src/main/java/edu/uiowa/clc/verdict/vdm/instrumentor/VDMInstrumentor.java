@@ -33,10 +33,7 @@ import verdict.vdm.vdm_model.ComponentInstance;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.ConnectionEnd;
-import verdict.vdm.vdm_model.ConnectionType;
-import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
 
@@ -822,46 +819,47 @@ public class VDMInstrumentor {
     // c.Component-Group = 'GPS' v 'IMU' v 'LIDAR'
     public void locationSpoofing(HashSet<ComponentType> vdm_components) {
 
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
-                    // Option 1) Specification
-                    if (componentType != null) {
-
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
-
-                        componentType = subcomponentImpl.getType();
-                    }
-
-                    String component_group = componentInstance.getCategory();
-
-                    if (component_group == null) {
-                        component_group = "";
-                    }
-
-                    if (component_group.equals("GPS")
-                            || component_group.equals("DME_VOR")
-                            || component_group.equals("IRU")) {
-                        vdm_components.add(componentType);
-                    }
-                }
-            }
-        }
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    componentType = componentInstance.getSpecification();
+        //                    ComponentImpl subcomponentImpl =
+        // componentInstance.getImplementation();
+        //
+        //                    // Option 1) Specification
+        //                    if (componentType != null) {
+        //
+        //                    }
+        //                    // Option 2) Implementation
+        //                    else if (subcomponentImpl != null) {
+        //
+        //                        componentType = subcomponentImpl.getType();
+        //                    }
+        //
+        //                    String component_group = componentInstance.getCategory();
+        //
+        //                    if (component_group == null) {
+        //                        component_group = "";
+        //                    }
+        //
+        //                    if (component_group.equals("GPS")
+        //                            || component_group.equals("DME_VOR")
+        //                            || component_group.equals("IRU")) {
+        //                        vdm_components.add(componentType);
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // NI:
@@ -872,31 +870,31 @@ public class VDMInstrumentor {
 
         // ArrayList<Connection> selected_channels = new ArrayList<Connection>();
 
-        boolean data_encryption = false;
-        boolean authentication = false;
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-            blockImpl = componentImpl.getBlockImpl();
-            // BlockImpl
-            if (blockImpl != null) {
-
-                // Selection channels (Authentication = OFF & DataEncrypted = OFF)
-                for (Connection connection : blockImpl.getConnection()) {
-                    // visit(connection, instrumented_channel);
-                    ConnectionType con_type = connection.getConnType();
-                    if (con_type == ConnectionType.REMOTE
-                            && connection.isEncryptedTransmission() == data_encryption
-                            && connection.isAuthenticated() == authentication) {
-
-                        // selected_channels.add(connection);
-                        // LOGGER.info("(" + connection_index++ + ") " +
-                        // connection.getName());
-                        vdm_links.add(connection);
-                    }
-                }
-            }
-        }
+        //        boolean data_encryption = false;
+        //        boolean authentication = false;
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //            blockImpl = componentImpl.getBlockImpl();
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                // Selection channels (Authentication = OFF & DataEncrypted = OFF)
+        //                for (Connection connection : blockImpl.getConnection()) {
+        //                    // visit(connection, instrumented_channel);
+        //                    ConnectionType con_type = connection.getConnType();
+        //                    if (con_type == ConnectionType.REMOTE
+        //                            && connection.isEncryptedTransmission() == data_encryption
+        //                            && connection.isAuthenticated() == authentication) {
+        //
+        //                        // selected_channels.add(connection);
+        //                        // LOGGER.info("(" + connection_index++ + ") " +
+        //                        // connection.getName());
+        //                        vdm_links.add(connection);
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // LB:
@@ -905,64 +903,67 @@ public class VDMInstrumentor {
     // 'ThirdParty'
     public void logicBomb(HashSet<ComponentType> vdm_components) {
 
-        // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
-
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
-                    // Option 1) Specification
-                    if (componentType != null) {
-
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
-
-                        componentType = subcomponentImpl.getType();
-                    }
-
-                    boolean comp_cond_3 = false;
-
-                    if (componentInstance.isAdversariallyTested() != null) {
-                        comp_cond_3 = componentInstance.isAdversariallyTested();
-                    }
-
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)
-                            //                            manufacturer == manufacturer_cond
-                            && !comp_cond_3) {
-                        // Store component
-                        // if (!vdm_components.contains(componentType)) {
-                        vdm_components.add(componentType);
-                        // }
-                    }
-                }
-            }
-        }
+        //        // Conditions
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        //        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        //
+        //        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //
+        //        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        //        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        //
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    componentType = componentInstance.getSpecification();
+        //                    ComponentImpl subcomponentImpl =
+        // componentInstance.getImplementation();
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //                    //                    ManufacturerType manufacturer =
+        //                    // componentInstance.getManufacturer();
+        //                    PedigreeType pedgree = componentInstance.getPedigree();
+        //                    // Option 1) Specification
+        //                    if (componentType != null) {
+        //
+        //                    }
+        //                    // Option 2) Implementation
+        //                    else if (subcomponentImpl != null) {
+        //
+        //                        componentType = subcomponentImpl.getType();
+        //                    }
+        //
+        //                    boolean comp_cond_3 = false;
+        //
+        //                    if (componentInstance.isAdversariallyTested() != null) {
+        //                        comp_cond_3 = componentInstance.isAdversariallyTested();
+        //                    }
+        //
+        //                    if ((kind_of_component == component_kind_cond_1
+        //                                    || kind_of_component == component_kind_cond_2)
+        //                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)
+        //                            //                            manufacturer ==
+        // manufacturer_cond
+        //                            && !comp_cond_3) {
+        //                        // Store component
+        //                        // if (!vdm_components.contains(componentType)) {
+        //                        vdm_components.add(componentType);
+        //                        // }
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // SV:
@@ -973,83 +974,85 @@ public class VDMInstrumentor {
     // Remote
     public void softwareVirus(HashSet<ComponentType> vdm_components) {
 
-        // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
-
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
-
-                    // Option 1) Specification
-                    if (componentType != null) {
-
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
-
-                        componentType = subcomponentImpl.getType();
-                    }
-
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
-
-                        // Port
-                        for (Port port : componentType.getPort()) {
-                            // System.out.print("(" + port_index + ") ");
-
-                            PortMode mode = port.getMode();
-                            if (mode == PortMode.IN) {;
-                            }
-                            {
-                                for (Connection con : blockImpl.getConnection()) {
-
-                                    ConnectionType con_type = con.getConnType();
-
-                                    if (con_type == ConnectionType.REMOTE) {
-
-                                        ConnectionEnd src_con = con.getSource();
-                                        Port src_port = src_con.getComponentPort();
-
-                                        if (src_port == null) {
-                                            CompInstancePort compPort =
-                                                    src_con.getSubcomponentPort();
-                                            src_port = compPort.getPort();
-                                        }
-
-                                        if (port == src_port) {
-                                            vdm_components.add(componentType);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //        // Conditions
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        //        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        //        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //
+        //        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        //        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        //
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    componentType = componentInstance.getSpecification();
+        //                    ComponentImpl subcomponentImpl =
+        // componentInstance.getImplementation();
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //                    //                    ManufacturerType manufacturer =
+        //                    // componentInstance.getManufacturer();
+        //                    PedigreeType pedgree = componentInstance.getPedigree();
+        //
+        //                    // Option 1) Specification
+        //                    if (componentType != null) {
+        //
+        //                    }
+        //                    // Option 2) Implementation
+        //                    else if (subcomponentImpl != null) {
+        //
+        //                        componentType = subcomponentImpl.getType();
+        //                    }
+        //
+        //                    if ((kind_of_component == component_kind_cond_1
+        //                                    || kind_of_component == component_kind_cond_2)
+        //                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
+        //
+        //                        // Port
+        //                        for (Port port : componentType.getPort()) {
+        //                            // System.out.print("(" + port_index + ") ");
+        //
+        //                            PortMode mode = port.getMode();
+        //                            if (mode == PortMode.IN) {;
+        //                            }
+        //                            {
+        //                                for (Connection con : blockImpl.getConnection()) {
+        //
+        //                                    ConnectionType con_type = con.getConnType();
+        //
+        //                                    if (con_type == ConnectionType.REMOTE) {
+        //
+        //                                        ConnectionEnd src_con = con.getSource();
+        //                                        Port src_port = src_con.getComponentPort();
+        //
+        //                                        if (src_port == null) {
+        //                                            CompInstancePort compPort =
+        //                                                    src_con.getSubcomponentPort();
+        //                                            src_port = compPort.getPort();
+        //                                        }
+        //
+        //                                        if (port == src_port) {
+        //                                            vdm_components.add(componentType);
+        //                                        }
+        //                                    }
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // Remote Code Injection:
@@ -1060,74 +1063,76 @@ public class VDMInstrumentor {
     public void remoteCodeInjection(HashSet<ComponentType> vdm_components) {
 
         // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
-                    // Option 1) Specification
-                    if (componentType != null) {
-
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
-
-                        componentType = subcomponentImpl.getType();
-                    }
-
-                    if ((kind_of_component == component_kind_cond_1
-                            || kind_of_component == component_kind_cond_2)) {
-
-                        // Port
-                        for (Port port : componentType.getPort()) {
-                            // System.out.print("(" + port_index + ") ");
-
-                            PortMode mode = port.getMode();
-                            if (mode == PortMode.IN) {;
-                            }
-                            {
-                                for (Connection con : blockImpl.getConnection()) {
-
-                                    ConnectionType con_type = con.getConnType();
-
-                                    if (con_type == ConnectionType.REMOTE) {
-
-                                        ConnectionEnd src_con = con.getSource();
-                                        Port src_port = src_con.getComponentPort();
-
-                                        if (src_port == null) {
-                                            CompInstancePort compPort =
-                                                    src_con.getSubcomponentPort();
-                                            src_port = compPort.getPort();
-                                        }
-
-                                        if (port == src_port) {
-                                            vdm_components.add(componentType);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
+        //        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        //
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    componentType = componentInstance.getSpecification();
+        //                    ComponentImpl subcomponentImpl =
+        // componentInstance.getImplementation();
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //
+        //                    // Option 1) Specification
+        //                    if (componentType != null) {
+        //
+        //                    }
+        //                    // Option 2) Implementation
+        //                    else if (subcomponentImpl != null) {
+        //
+        //                        componentType = subcomponentImpl.getType();
+        //                    }
+        //
+        //                    if ((kind_of_component == component_kind_cond_1
+        //                            || kind_of_component == component_kind_cond_2)) {
+        //
+        //                        // Port
+        //                        for (Port port : componentType.getPort()) {
+        //                            // System.out.print("(" + port_index + ") ");
+        //
+        //                            PortMode mode = port.getMode();
+        //                            if (mode == PortMode.IN) {;
+        //                            }
+        //                            {
+        //                                for (Connection con : blockImpl.getConnection()) {
+        //
+        //                                    ConnectionType con_type = con.getConnType();
+        //
+        //                                    if (con_type == ConnectionType.REMOTE) {
+        //
+        //                                        ConnectionEnd src_con = con.getSource();
+        //                                        Port src_port = src_con.getComponentPort();
+        //
+        //                                        if (src_port == null) {
+        //                                            CompInstancePort compPort =
+        //                                                    src_con.getSubcomponentPort();
+        //                                            src_port = compPort.getPort();
+        //                                        }
+        //
+        //                                        if (port == src_port) {
+        //                                            vdm_components.add(componentType);
+        //                                        }
+        //                                    }
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // HT
@@ -1135,45 +1140,46 @@ public class VDMInstrumentor {
     // ComponentKind = Hardware v Hybrid and manufacturer = ThirdParty
     public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
 
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
-
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-                    PedigreeType pedgree = componentInstance.getPedigree();
-
-                    componentType = getType(componentInstance);
-
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
-
-                        // Store component
-                        vdm_components.add(componentType);
-                        // instrument_component(componentType, blockImpl);
-                    }
-                }
-            }
-        }
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
+        //        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        //
+        //        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
+        //
+        //        PedigreeType pedigree_cond1 = PedigreeType.COTS;
+        //        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        //
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //                    //                    ManufacturerType manufacturer =
+        //                    // componentInstance.getManufacturer();
+        //                    PedigreeType pedgree = componentInstance.getPedigree();
+        //
+        //                    componentType = getType(componentInstance);
+        //
+        //                    if ((kind_of_component == component_kind_cond_1
+        //                                    || kind_of_component == component_kind_cond_2)
+        //                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
+        //
+        //                        // Store component
+        //                        vdm_components.add(componentType);
+        //                        // instrument_component(componentType, blockImpl);
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // OT
@@ -1181,34 +1187,36 @@ public class VDMInstrumentor {
     // ComponentKind = Human and c.InsideTrustedBoundary = False
     public void outsiderThreat(HashSet<ComponentType> vdm_components) {
 
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
-        boolean boundary_cond = false;
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
-                    componentType = getType(componentInstance);
-
-                    if (kind_of_component == component_kind_cond_1
-                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
-                        // Store component
-                        vdm_components.add(componentType);
-                        // instrument_component(componentType, blockImpl);
-                    }
-                }
-            }
-        }
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
+        //        boolean boundary_cond = false;
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //
+        //                    componentType = getType(componentInstance);
+        //
+        //                    if (kind_of_component == component_kind_cond_1
+        //                            && componentInstance.isInsideTrustedBoundary() ==
+        // boundary_cond) {
+        //                        // Store component
+        //                        vdm_components.add(componentType);
+        //                        // instrument_component(componentType, blockImpl);
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     // IT
@@ -1216,34 +1224,36 @@ public class VDMInstrumentor {
     // ComponentKind = Human and c.InsideTrustedBoundary = True
     public void insiderThreat(HashSet<ComponentType> vdm_components) {
 
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
-        boolean boundary_cond = true;
-        BlockImpl blockImpl = null;
-
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-            blockImpl = componentImpl.getBlockImpl();
-
-            // BlockImpl
-            if (blockImpl != null) {
-
-                ComponentType componentType = componentImpl.getType();
-
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
-
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
-                    componentType = getType(componentInstance);
-
-                    if (kind_of_component == component_kind_cond_1
-                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
-                        // Store component
-                        vdm_components.add(componentType);
-                        // instrument_component(componentType, blockImpl);
-                    }
-                }
-            }
-        }
+        //        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
+        //        boolean boundary_cond = true;
+        //        BlockImpl blockImpl = null;
+        //
+        //        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+        //
+        //            blockImpl = componentImpl.getBlockImpl();
+        //
+        //            // BlockImpl
+        //            if (blockImpl != null) {
+        //
+        //                ComponentType componentType = componentImpl.getType();
+        //
+        //                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+        //
+        //                    KindOfComponent kind_of_component =
+        // componentInstance.getComponentKind();
+        //
+        //                    componentType = getType(componentInstance);
+        //
+        //                    if (kind_of_component == component_kind_cond_1
+        //                            && componentInstance.isInsideTrustedBoundary() ==
+        // boundary_cond) {
+        //                        // Store component
+        //                        vdm_components.add(componentType);
+        //                        // instrument_component(componentType, blockImpl);
+        //                    }
+        //                }
+        //            }
+        //        }
 
         // for (ComponentType component : selected_components) {
         // LOGGER.info("(" + component_index++ + ") " + component.getId());
@@ -1273,27 +1283,27 @@ public class VDMInstrumentor {
     public HashSet<Connection> instrument_component(ComponentType component, BlockImpl blockImpl) {
 
         HashSet<Connection> vdm_links = new HashSet<Connection>();
-
-        for (Port port : component.getPort()) {
-
-            PortMode mode = port.getMode();
-
-            if (mode == PortMode.OUT) {;
-            }
-            {
-                // Block Implementation Component Selection.
-                if (blockImpl != null) {
-                    for (Connection connection : blockImpl.getConnection()) {
-                        if (retrieve_links(component, connection, port)) {
-                            vdm_links.add(connection);
-                        }
-                    }
-                } else {
-                    // DataFlow Implementation Selection.
-                }
-            }
-        }
-
+        //
+        //            for (Port port : component.getPort()) {
+        //
+        //                PortMode mode = port.getMode();
+        //
+        //                if (mode == PortMode.OUT) {;
+        //                }
+        //                {
+        //                    // Block Implementation Component Selection.
+        //                    if (blockImpl != null) {
+        //                        for (Connection connection : blockImpl.getConnection()) {
+        //                            if (retrieve_links(component, connection, port)) {
+        //                                vdm_links.add(connection);
+        //                            }
+        //                        }
+        //                    } else {
+        //                        // DataFlow Implementation Selection.
+        //                    }
+        //                }
+        //            }
+        //
         return vdm_links;
     }
 
