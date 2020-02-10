@@ -82,6 +82,8 @@ public
 				else
 					enum(Data_Types::ATE7Type, Inadequate);
 
+			guarantee "ATE7_Def": ATE7 = (enum(Data_Types::ATE7Type, Adequate) -> pre (next_ATE7));
+
 --			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants::Integer_cia_I => ATE7 = Agree_Constants::ATE7Type_cia_I;
 --			guarantee "ATE7_Def:Formula":  battery_level = Agree_Constants::Integer_cia_A => ATE7 = Agree_Constants::ATE7Type_cia_A;
 
@@ -359,7 +361,6 @@ public
 			CyberRel "dir_Integrity" => dir:I;
 			CyberRel "dir_Availability" => dir:A;		
 		**};
-
 	end GPS;
 	
 	system IRU
@@ -647,7 +648,6 @@ public
 				else if (gps_dir = iru_dir) then gps_dir
 				else dme_vor_dir
 			);
-			
 --			guarantee "voted_pos_Def:Formula": gps_pos = Agree_Constants::Position_impl_cia_I or dme_vor_pos = Agree_Constants::Position_impl_cia_I 
 --			                              or iru_pos = Agree_Constants::Position_impl_cia_I  
 --           	                              => voted_pos =  Agree_Constants::Position_impl_cia_I;
@@ -726,7 +726,6 @@ public
 --      		
 --		    guarantee "1_2:Integrity:Major":
 --			    payloadCmdFC = Agree_Constants::Action_cia_I or currentPos = Agree_Constants::Position_impl_cia_I or currentDir = Agree_Constants::Direction_cia_I;				
-
 	    	assume "location_source_Pos_Simulated_Value":
 	    		location_source_pos = Agree_Nodes::LocationSource_Pos(cmd);
 	    		
@@ -810,7 +809,7 @@ public
 		subcomponents
 			actuators: system Actuators
 			{ 
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "Actuators";
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::situated => OnBoard;
@@ -819,7 +818,7 @@ public
 			};
 			battery_health_check: system BatteryHealthCheck
 			{
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::category => "BatteryHealthChecker";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -828,7 +827,7 @@ public
 			};
 			flight_controller: system FlightController
 			{
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => Sourced;
 				VERDICT_Properties::category => "FlightController";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -837,13 +836,13 @@ public
 			};
 			gps: system GPS
 			{ 
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::category => "GPS";
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::situated => OnBoard;
 				VERDICT_Properties::adversariallyTested => false;
 				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::broadcastFromOutsideTB => true;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
 				VERDICT_Properties::heterogeneity => true;
 				VERDICT_Properties::antiJamming => true;
 				VERDICT_Properties::heterogeneityDAL => 7;
@@ -851,12 +850,12 @@ public
 			};
 			dme_vor: system DME_VOR
 			{ 
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::category => "DME_VOR";
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::situated => OnBoard;
 				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::broadcastFromOutsideTB => true;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
 				VERDICT_Properties::heterogeneity => true;
 				VERDICT_Properties::antiJamming => true;
 				VERDICT_Properties::heterogeneityDAL => 7;
@@ -864,7 +863,7 @@ public
 			};
 			iru: system IRU
 			{
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::category => "IRU";
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::situated => OnBoard; 
@@ -874,7 +873,7 @@ public
 			};
 			triplex_voter: system TriplexVoter
 			{
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "TriplexVoter";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -882,7 +881,7 @@ public
 			};
 			mission_planner: system MissionPlanner
 			{ 
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "MissionPlanner";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -892,7 +891,7 @@ public
 			};
 			mixer: system Mixer
 			{
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "Mixer";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard; 
@@ -901,7 +900,7 @@ public
 			};
 			navigator: system Navigator
 			{
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => Sourced;
 				VERDICT_Properties::category => "Navigator";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -910,7 +909,7 @@ public
 			};
 			position_estimator: system PositionEstimator
 			{
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "PositionEstimator";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -919,25 +918,45 @@ public
 			};
 			RC_receiver: system RCReceiver
 			{
-			 	VERDICT_Properties::manufacturer => InHouse;
+			 	VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "RCReceiver";
 				VERDICT_Properties::componentType => Hardware;
 				VERDICT_Properties::situated => OnBoard;
 				VERDICT_Properties::adversariallyTested => false;
 				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::wifiFromOutsideTB => true;
-                                VERDICT_Properties::encryption => true;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				
+                -- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => true;
+				VERDICT_Properties::supplyChainSecurityDAL => 7;
+				VERDICT_Properties::physicalAccessControl => true;
+				VERDICT_Properties::physicalAccessControlDAL => 7;
+				VERDICT_Properties::systemAccessControl => true;
+				VERDICT_Properties::systemAccessControlDAL => 7;
+				VERDICT_Properties::secureBoot => true;
+				VERDICT_Properties::secureBootDAL => 7;
+				VERDICT_Properties::memoryProtection => true;
+				VERDICT_Properties::memoryProtectionDAL => 7;
+				VERDICT_Properties::staticCodeAnalysis => true;
+				VERDICT_Properties::staticCodeAnalysisDAL => 7;
+				VERDICT_Properties::resourceAvailability => true;
+				VERDICT_Properties::resourceAvailabilityDAL => 7;
 				VERDICT_Properties::antiJamming => true;
-				VERDICT_Properties::antiFlooding => true;
-				VERDICT_Properties::antiFuzzing => true;
-				VERDICT_Properties::encryptionDAL => 7;
 				VERDICT_Properties::antiJammingDAL => 7;
-				VERDICT_Properties::antiFloodingDAL => 7;
-				VERDICT_Properties::antiFuzzingDAL => 7;
+				VERDICT_Properties::dosProtection => true;
+				VERDICT_Properties::dosProtectionDAL => 7;
+				VERDICT_Properties::deviceAuthentication => true;
+				VERDICT_Properties::deviceAuthenticationDAL => 7;
+				VERDICT_Properties::inputValidation => true;
+				VERDICT_Properties::inputValidationDAL => 7;
+				VERDICT_Properties::sessionAuthenticity => true;
+				VERDICT_Properties::sessionAuthenticityDAL => 7;
+				VERDICT_Properties::strongCryptoAlgorithms => true;
+				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;
 			};
 			RC_receiver_health_check: system RCReceiverHealthCheck
 			{
-				VERDICT_Properties::manufacturer => ThirdParty;
+				VERDICT_Properties::pedigree => COTS;
 				VERDICT_Properties::category => "RCReceiverHealthChecker";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard; 
@@ -946,7 +965,7 @@ public
 			};
 			state_controller: system StateController
 			{
-				VERDICT_Properties::manufacturer => InHouse;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 				VERDICT_Properties::category => "StateController";
 				VERDICT_Properties::componentType => Software;
 				VERDICT_Properties::situated => OnBoard;
@@ -960,62 +979,62 @@ public
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
 				VERDICT_Properties::flowType => Xcontrol;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 			};
 			wireless2: port rcv_move -> RC_receiver.rcv_move
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true; 
 				VERDICT_Properties::flowType => Xcontrol;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 			};
 			wireless3: port rcv_uavMode -> RC_receiver.rcv_uavMode
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true; 
 				VERDICT_Properties::flowType => Xdata;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 			};
 			wireless4_A: port location_source_pos -> gps.location_source_pos
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			wireless5_A: port location_source_dir -> gps.location_source_dir
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			wireless4_B: port location_source_pos -> dme_vor.location_source_pos
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			wireless5_B: port location_source_dir -> dme_vor.location_source_dir
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			wireless4_C: port location_source_pos -> iru.location_source_pos
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			wireless5_C: port location_source_dir -> iru.location_source_dir
 			{
 				VERDICT_Properties::connectionType => Remote;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			
@@ -1023,154 +1042,154 @@ public
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet2: port triplex_voter.voted_dir -> position_estimator.voted_dir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet3: port position_estimator.currentPos -> navigator.currentPos
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet4A: port position_estimator.currentDir -> navigator.currentDir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet4B: port position_estimator.currentDir -> mixer.currentDir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet5: port navigator.dest_reached -> flight_controller.dest_reached
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;			 
+				VERDICT_Properties::encryptedTransmission => true;			 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet6: port navigator.move -> mixer.moveNav
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => false;
-				VERDICT_Properties::dataEncrypted => false; 
+				VERDICT_Properties::encryptedTransmission => false; 
 				VERDICT_Properties::flowType => Xdata;
 			}; 
 			ethernet7: port flight_controller.waypoint -> navigator.waypoint
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet8: port flight_controller.payloadCmd -> actuators.payloadCmdFC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet9: port mission_planner.tasks -> flight_controller.tasks
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet10: port RC_receiver.normal -> RC_receiver_health_check.normal
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet11: port RC_receiver_health_check.ATE6 -> state_controller.ATE6
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet12: port state_controller.mstate -> flight_controller.mstate
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet13: port actuators.payload_performed -> flight_controller.payload_performed
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;		 
+				VERDICT_Properties::encryptedTransmission => true;		 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet14: port actuators.battery_level -> battery_health_check.battery_level
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet15: port battery_health_check.ATE7 -> state_controller.ATE7
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet16: port mixer.cmd -> actuators.cmd
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet17: port RC_receiver.payloadCmd -> actuators.payloadCmdRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet18: port RC_receiver.move -> mixer.moveRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet19: port RC_receiver.uavMode -> state_controller.uavMode
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet20: port state_controller.mstate -> actuators.mstate
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			}; 
 			ethernet21: port state_controller.mstate -> mixer.mstate
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			
@@ -1178,91 +1197,91 @@ public
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet23: port position_estimator.currentPos -> currentPos
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet24: port flight_controller.payloadCmd -> payloadCmdFC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet25: port RC_receiver.payloadCmd -> payloadCmdRC
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xcontrol;
 			};
 			ethernet26: port state_controller.mstate -> mstate
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet27: port mission_planner.tasks -> tasks
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet28: port actuators.payload_performed -> payload_performed
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet29_A: port gps.pos -> triplex_voter.gps_pos
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet30_A: port gps.dir -> triplex_voter.gps_dir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet29_B: port dme_vor.pos -> triplex_voter.dme_vor_pos
 			{ 
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true;
+				VERDICT_Properties::encryptedTransmission => true;
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet30_B: port dme_vor.dir -> triplex_voter.dme_vor_dir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet29_C: port iru.pos -> triplex_voter.iru_pos
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			ethernet30_C: port iru.dir -> triplex_voter.iru_dir
 			{
 				VERDICT_Properties::connectionType => Local;
 				VERDICT_Properties::authenticated => true;
-				VERDICT_Properties::dataEncrypted => true; 
+				VERDICT_Properties::encryptedTransmission => true; 
 				VERDICT_Properties::flowType => Xdata;
 			};
 			
