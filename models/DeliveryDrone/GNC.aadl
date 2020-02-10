@@ -157,6 +157,7 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => Sourced;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				
 				-- VERDICT Cyber Defenses & DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
