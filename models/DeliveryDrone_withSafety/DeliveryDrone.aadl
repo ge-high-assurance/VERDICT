@@ -665,8 +665,8 @@ public
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{VERDICT_Properties::insideTrustedBoundary => true;
-			 VERDICT_Properties::manufacturer => ThirdParty;
-			 --VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb
+			 VERDICT_Properties::pedigree => COTS;
+			 --VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
 			 VERDICT_Properties::componentType => Software;
 			 VERDICT_Properties::adversariallyTested => false;
 			};
@@ -718,9 +718,9 @@ public
 			{VERDICT_Properties::flowType => Xdata;
 			 VERDICT_Properties::connectionType => Remote;
 			 VERDICT_Properties::authenticated => false;
-			 VERDICT_Properties::dataEncrypted => false;
+			 VERDICT_Properties::encryptedTransmission => false;
 			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
-			 --VERDICT_Properties::dataEncrypted => true; -- Fix for Network Injection
+			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
 			};
 			
 			c12: port posSens.gps_pos_out -> positionEstimator.gps_pos_in

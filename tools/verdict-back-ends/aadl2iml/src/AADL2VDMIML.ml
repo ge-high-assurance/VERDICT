@@ -553,12 +553,20 @@ let get_instance_index sys_impl iml_comp_types = function
   )
   | _ -> assert false
 
+let failwith_replace_property old_prop new_prop =
+  Format.printf "%% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% @.";
+  Format.printf "* VERDICT_Properties::%s is not supported anymore.@." old_prop; 
+  Format.printf "* Please use VERDICT_Properties::%s instead.@." new_prop;
+  Format.printf "%% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% @.";
+  exit 0
+
 let get_manufacturer_prop_value properties =
   let manufacturer_qpr = AD.mk_full_qpref app_property_set "manufacturer" in
   match AD.find_assoc manufacturer_qpr properties with
   | None -> None
   | Some {AD.value} -> (
-    match value with
+    failwith_replace_property "manufacturer" "pedigree"
+    (*match value with
     | AD.LiteralOrReference (None, (_, id)) -> (
       let v =
         match (String.lowercase_ascii id) with
@@ -568,7 +576,7 @@ let get_manufacturer_prop_value properties =
       in
       Some v
     )
-    | _ -> failwith "Unexpected Manufacturer value"
+    | _ -> failwith "Unexpected Manufacturer value"*)
   )
 
 let get_pedigree_prop_value properties =
@@ -946,7 +954,10 @@ let port_connection_to_iml_connection ct ct_idx sys_impl iml_comp_types subcomps
      get_bool_prop_value qpr properties);
    VI.data_encrypted = (
      let qpr = AD.mk_full_qpref app_property_set "dataEncrypted" in
-     get_bool_prop_value qpr properties);
+     match AD.find_assoc qpr properties with
+     | None -> None
+     | Some _ -> failwith_replace_property "dataEncrypted" "encryptedTransmission"
+   );
    VI.trustedConnection = (
      let qpr = AD.mk_full_qpref app_property_set "trustedConnection" in
      get_bool_prop_value qpr properties);
