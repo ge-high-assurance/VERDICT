@@ -19,13 +19,9 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Runs SADL on a Verdict STEM project. */
 public class VerdictStem {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerdictStem.class);
-
     /**
      * Runs SADL on a Verdict STEM project.
      *

@@ -11,22 +11,25 @@ import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
-import java.io.ByteArrayOutputStream;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleConfig;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -47,50 +50,79 @@ public class App {
         }
     }
 
-    private static List<String> crvThreats =
+    private static final List<String> crvThreats =
             Arrays.asList(new String[] {"LS", "NI", "LB", "IT", "OT", "RI", "SV", "HT"});
 
-    private static Options buildOptions() {
-        OptionBuilder.hasArgs(2);
-        // OptionBuilder.withArgName("AADL input directory");
-        // OptionBuilder.withArgName("aadl2iml binary");
-        OptionBuilder.withLongOpt("aadl");
-        Option aadl = OptionBuilder.create();
+    private static final List<String> soteria_pngs =
+            Arrays.asList(new String[] {"and_gray", "and", "not_gray", "not", "or_gray", "or"});
 
-        OptionBuilder.hasArgs(1);
-        OptionBuilder.withArgName("IML input file");
-        OptionBuilder.withLongOpt("iml");
-        Option iml = OptionBuilder.create();
+    public static void main(String[] args) throws IOException {
+        // Metrics.addRegistry(new GraphiteMeterRegistry(GraphiteConfig.DEFAULT, Clock.SYSTEM));
+        Metrics.addRegistry(new SimpleMeterRegistry(SimpleConfig.DEFAULT, Clock.SYSTEM));
+        Options options = buildOptions();
+
+        try {
+            CommandLineParser parser = new DefaultParser();
+            CommandLine opts = parser.parse(options, args);
+            handleOpts(opts);
+            printMetrics();
+        } catch (ParseException e) {
+            printHelp();
+
+            System.exit(1);
+        } catch (VerdictRunException e) {
+            logError(e.getMessage());
+            e.printStackTrace();
+
+            System.exit(2);
+        }
+    }
+
+    private static Options buildOptions() {
+        Option aadl =
+                Option.builder()
+                        .longOpt("aadl")
+                        .numberOfArgs(2)
+                        .argName("AADL input directory")
+                        .argName("aadl2iml binary")
+                        .build();
+
+        Option iml = Option.builder().longOpt("iml").hasArg().argName("IML input file").build();
 
         OptionGroup inputGroup = new OptionGroup();
         inputGroup.addOption(aadl);
         inputGroup.addOption(iml);
         inputGroup.setRequired(true);
 
-        OptionBuilder.hasArgs(2);
-        // OptionBuilder.withArgName("STEM project dir");
-        // OptionBuilder.withArgName("Soteria++ binary");
-        OptionBuilder.withDescription("Run MBAS");
-        OptionBuilder.withLongOpt("mbas");
-        Option mbas = OptionBuilder.create();
+        Option mbas =
+                Option.builder()
+                        .longOpt("mbas")
+                        .numberOfArgs(2)
+                        .argName("STEM project dir")
+                        .argName("Soteria++ binary")
+                        .desc("Run MBAS")
+                        .build();
 
-        OptionBuilder.hasArgs(2);
-        // OptionBuilder.withArgName("Kind2 output file (.xml or .json)");
-        // OptionBuilder.withArgName("kind2 binary");
-        OptionBuilder.withDescription("Run CRV");
-        OptionBuilder.withLongOpt("crv");
-        Option crv = OptionBuilder.create();
+        Option crv =
+                Option.builder()
+                        .longOpt("crv")
+                        .numberOfArgs(2)
+                        .argName("Kind2 output file (.xml or .json)")
+                        .argName("kind2 binary")
+                        .desc("Run CRV")
+                        .build();
 
         OptionGroup group = new OptionGroup();
         group.addOption(mbas);
         group.addOption(crv);
         group.setRequired(true);
 
-        OptionBuilder.hasArgs(1);
-        OptionBuilder.withArgName("Debug directory");
-        OptionBuilder.withDescription("Produce intermediary debug XML");
-        OptionBuilder.withLongOpt("debug");
-        Option debug = OptionBuilder.create('d');
+        Option debug =
+                Option.builder("d")
+                        .longOpt("debug")
+                        .hasArg()
+                        .argName("Produce intermediary debug XML")
+                        .build();
 
         Options options = new Options();
         options.addOptionGroup(inputGroup);
@@ -156,33 +188,10 @@ public class App {
         helpLine("-d, --debug <dir> .......... debug output directory");
     }
 
-    //    private static Binary AADL2IML = new Binary("aadl2iml");
-    //    private static Binary KIND2 = new Binary("kind2");
-    //    private static Binary SOTERIA_PP = new Binary("soteria_pp");
-
-    public static void main(String[] args) throws IOException {
-        Options options = buildOptions();
-
-        try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine opts = parser.parse(options, args);
-            handleOpts(opts);
-        } catch (ParseException e) {
-            printHelp();
-
-            System.exit(1);
-        } catch (VerdictRunException e) {
-            logError(e.getMessage());
-            e.printStackTrace();
-
-            System.exit(2);
-        }
-    }
-
     private static void handleOpts(CommandLine opts) throws VerdictRunException {
         String debugDir = opts.hasOption('d') ? opts.getOptionValue('d') : null;
 
-        String aadlPath, imlPath, aadl2imlBin;
+        String aadlPath, imlPath, aadl2imlBin, modelName;
 
         if (opts.hasOption("aadl")) {
             String[] aadlOpts = opts.getOptionValues("aadl");
@@ -191,20 +200,24 @@ public class App {
             imlPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.iml")
                             .getAbsolutePath();
+            modelName = new File(aadlPath).getName();
         } else if (opts.hasOption("iml")) {
             aadlPath = null;
             aadl2imlBin = null;
             imlPath = opts.getOptionValue("iml");
+            modelName = imlPath;
         } else {
             throw new VerdictRunException("Must specifiy either AADL or IML input");
         }
 
+        Timer.Sample sample = Timer.start(Metrics.globalRegistry);
         if (opts.hasOption("mbas")) {
             String[] mbasOpts = opts.getOptionValues("mbas");
             String stemProjectDir = mbasOpts[0];
             String soteriaPpBin = mbasOpts[1];
 
             runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+            sample.stop(Metrics.timer("timer.mbas", "model", modelName));
         } else if (opts.hasOption("crv")) {
             String instrPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml")
@@ -241,7 +254,19 @@ public class App {
                     outputBaPath,
                     debugDir,
                     kind2Bin);
+            sample.stop(Metrics.timer("timer.crv", "model", modelName));
         }
+    }
+
+    private static void printMetrics() {
+        Function<Timer, Integer> visitTimer =
+                timer -> {
+                    System.out.println(
+                            timer.getId() + ": " + timer.totalTime(TimeUnit.SECONDS) + " secs");
+                    return 0;
+                };
+        Metrics.globalRegistry.forEachMeter(
+                meter -> meter.match(null, null, visitTimer, null, null, null, null, null, null));
     }
 
     private static void log(String msg) {
@@ -265,31 +290,6 @@ public class App {
         logLine();
         System.out.println();
     }
-
-    /**
-     * Run an action while concealing System.err. Don't try this at home, kids.
-     *
-     * @param action
-     */
-    private static void hideErrorStream(Runnable action) throws VerdictRunException {
-        ByteArrayOutputStream store = new ByteArrayOutputStream();
-
-        PrintStream systemErr = System.err;
-        System.setErr(new PrintStream(store));
-
-        action.run();
-
-        // TODO: do this when the thing fails so that we still get the error output
-        System.err.println(new String(store.toByteArray()));
-
-        //        System.setErr(systemErr);
-    }
-
-    private static final List<String> soteria_pngs =
-            Arrays.asList(new String[] {"and_gray", "and", "not_gray", "not", "or_gray", "or"});
-
-    private static final List<String> stem_output_csv =
-            Arrays.asList(new String[] {"CAPEC", "Defenses"});
 
     /**
      * Run MBAS.
@@ -345,11 +345,15 @@ public class App {
             throw new VerdictRunException("Failed to copy Soteria++ pngs", e);
         }
 
+        String modelName = imlPath;
         if (aadlPath != null) {
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             checkFile(aadlPath, true, true, false, false, null);
             checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
             runAadl2iml(aadlPath, imlPath, aadl2imlBin);
+            modelName = new File(aadlPath).getName();
+            sample.stop(Metrics.timer("timer.mbas.aadl2iml", "model", modelName));
         } else {
             checkFile(imlPath, true, false, false, false, ".iml");
         }
@@ -362,7 +366,9 @@ public class App {
         Model vdmModel;
         try {
             // Translate the model from IML to VDM
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             vdmModel = ResourceTest.setup(imlPath);
+            sample.stop(Metrics.timer("timer.mbas.iml2vdm", "model", modelName));
         } catch (IOException e) {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
@@ -378,7 +384,11 @@ public class App {
 
         // Generate MBAS inputs
         VDM2CSV vdm2csv = new VDM2CSV();
-        vdm2csv.marshalToMbasInputs(vdmModel, imlPath, stemCsvDir, stemOutputDir);
+        Metrics.timer("timer.mbas.vdm2csv", "model", modelName)
+                .record(
+                        () ->
+                                vdm2csv.marshalToMbasInputs(
+                                        vdmModel, imlPath, stemCsvDir, stemOutputDir));
 
         logHeader("STEM");
 
@@ -393,8 +403,13 @@ public class App {
         log("STEM is running. Please be patient...");
 
         VerdictStem stemRunner = new VerdictStem();
-        stemRunner.runStem(
-                new File(stemProjectDir), new File(stemOutputDir), new File(stemGraphsDir));
+        Metrics.timer("timer.mbas.stem", "model", modelName)
+                .record(
+                        () ->
+                                stemRunner.runStem(
+                                        new File(stemProjectDir),
+                                        new File(stemOutputDir),
+                                        new File(stemGraphsDir)));
 
         //        if (!stem_output_csv.stream()
         //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
@@ -410,6 +425,7 @@ public class App {
         log("Soteria++ is running. Please be patient...");
 
         try {
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
                     soteriaPpBin,
                     soteriaPpOutputDir,
@@ -417,6 +433,7 @@ public class App {
                     "-o",
                     soteriaPpOutputDir,
                     stemOutputDir);
+            sample.stop(Metrics.timer("timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
         }
@@ -467,24 +484,25 @@ public class App {
         deleteFile(lustrePath);
         deleteFile(outputPath);
 
+        if (debugDir != null) {
+            logHeader("DEBUGGING XML OUTPUT");
+        }
+
+        String modelName = imlPath;
         if (aadlPath != null) {
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             checkFile(aadlPath, true, true, false, false, null);
             checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
+            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
+            modelName = new File(aadlPath).getName();
+            sample.stop(Metrics.timer("timer.crv.aadl2iml", "model", modelName));
         } else {
             checkFile(imlPath, true, false, false, false, ".iml");
         }
 
         if (outputBaPath != null) {
             deleteFile(outputBaPath);
-        }
-
-        if (debugDir != null) {
-            logHeader("DEBUGGING XML OUTPUT");
-        }
-
-        if (aadlPath != null) {
-            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
         }
 
         log("Loading IML into Verdict data model");
@@ -495,7 +513,9 @@ public class App {
         Model vdmModel;
         try {
             // Translate the model from IML to VDM
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             vdmModel = ResourceTest.setup(imlPath);
+            sample.stop(Metrics.timer("timer.crv.iml2vdm", "model", modelName));
         } catch (IOException e) {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
@@ -510,8 +530,10 @@ public class App {
             log("Instrumenting model");
 
             // Instrument loaded model
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
             instrumentor.instrument(vdmModel, threats, blameAssignment, componentLevel);
+            sample.stop(Metrics.timer("timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");
         }
@@ -532,8 +554,10 @@ public class App {
         log("Converting instrumented Verdict data model to Lustre");
 
         // Build Lustre model
+        Timer.Sample vdm2lusSample = Timer.start(Metrics.globalRegistry);
         VDM2Lustre vdm2lus = new VDM2Lustre(vdmModel);
         Model lustreModel = vdm2lus.translate();
+        vdm2lusSample.stop(Metrics.timer("timer.crv.vdm2lus", "model", modelName));
 
         debugOutVdm(debugDir, "VERDICT_output_debug_lus", lustreModel);
 
@@ -545,8 +569,10 @@ public class App {
 
             // Why do we do this to vdmModel and not lustreModel?
             // Good question. I don't know, but it works.
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             VerdictTestInstrumentor atgInstrumentor = new VerdictTestInstrumentor(vdmModel);
             atgInstrumentor.instrumentTests();
+            sample.stop(Metrics.timer("timer.crv.atgInstrumentor", "model", modelName));
 
             debugOutVdm(debugDir, "VERDICT_output_debug_lus_atg", lustreModel);
         }
@@ -556,8 +582,10 @@ public class App {
         log("Output Lustre file: " + lustrePath);
 
         // Output Lustre model
+        Timer.Sample verdictlustreSample = Timer.start(Metrics.globalRegistry);
         VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
         lustreOutputer.marshalToLustre(lustreModel, new File(lustrePath));
+        verdictlustreSample.stop(Metrics.timer("timer.crv.verdictlustre", "model", modelName));
 
         logHeader("Kind2");
 
@@ -572,6 +600,7 @@ public class App {
             }
         }
 
+        Timer.Sample kind2Sample = Timer.start(Metrics.globalRegistry);
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
@@ -612,6 +641,8 @@ public class App {
             }
         } catch (IOException e) {
             throw new VerdictRunException("Failed to execute kind2", e);
+        } finally {
+            kind2Sample.stop(Metrics.timer("timer.crv.kind2", "model", modelName));
         }
 
         if (blameAssignment && instrumentor != null) {
@@ -628,11 +659,13 @@ public class App {
             log("Blame assignment output: " + outputBaPath);
 
             try {
+                Timer.Sample sample = Timer.start(Metrics.globalRegistry);
                 BlameAssignment ba = new BlameAssignment();
                 ba =
                         ba.compute_blame_assignment(
                                 new File(outputPath), instrumentor.getAttackMap(), componentLevel);
                 XMLProcessor.dumpXML(ba, new File(outputBaPath));
+                sample.stop(Metrics.timer("timer.crv.blameassignment", "model", modelName));
             } catch (FileNotFoundException e) {
                 throw new VerdictRunException("Failed to perform blame assignment", e);
             }
