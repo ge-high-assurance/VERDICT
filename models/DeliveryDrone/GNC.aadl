@@ -118,10 +118,9 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with trustedConnection for c12 and c34 to false
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => COTS;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				
-				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
-				VERDICT_Properties::manufacturer => ThirdParty;	
+					
 				VERDICT_Properties::adversariallyTested => false;
 
                 -- VERDICT Cyber Defenses & DAL Mitigations
@@ -158,6 +157,7 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => Sourced;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				
 				-- VERDICT Cyber Defenses & DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => true;
