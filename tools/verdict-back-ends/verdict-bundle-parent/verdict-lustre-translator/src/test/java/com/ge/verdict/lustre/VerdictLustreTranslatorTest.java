@@ -21,7 +21,7 @@ public class VerdictLustreTranslatorTest {
         Assertions.assertThat(testFile).exists();
 
         File controlFile = new File("src/test/resources/vdm-model-output.lus");
-        Assertions.assertThat(testFile).hasSameContentAs(controlFile);
+        Assertions.assertThat(testFile).hasSameTextualContentAs(controlFile);
     }
 
     @Test
