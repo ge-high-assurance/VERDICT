@@ -618,11 +618,11 @@ public
 		    	};	
 	    	MissionReq {
 		    	id ="MReq01"
-		    	reqs = "CyberReq01","SafetyReq02", "SafetyReq01"
+		    	reqs = "CyberReq01","SafetyReq01"
 	    	};
 	    	MissionReq {
 		    	id ="MReq02"
-		    	reqs = "CyberReq02", "SafetyReq02", "SafetyReq01"
+		    	reqs = "CyberReq02", "SafetyReq02"
 	    	};	    	
 		**};
 	end DeliveryDroneSystem;
