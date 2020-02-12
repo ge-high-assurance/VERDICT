@@ -90,7 +90,7 @@ public class MBASResultSummary {
 
 				for (int k = 0; k < paths1.size(); k++) {
 					PathAttributes path = paths1.get(k);
-					Optional<PathAttributes> other = paths1.stream().filter(o -> path.compareCutset(o)).findFirst();
+					Optional<PathAttributes> other = paths2.stream().filter(o -> path.compareCutset(o)).findFirst();
 					if (other.isPresent()) {
 						path.setComponentImplDefense(other.get().getComponentDefenses());
 					} else {
