@@ -16,6 +16,7 @@ import edu.mit.csail.sdg.ast.Command;
 import edu.mit.csail.sdg.ast.Decl;
 import edu.mit.csail.sdg.ast.Expr;
 import edu.mit.csail.sdg.ast.ExprBinary;
+import edu.mit.csail.sdg.ast.Func;
 import edu.mit.csail.sdg.ast.Sig;
 import edu.mit.csail.sdg.ast.Sig.Field;
 import edu.mit.csail.sdg.ast.Sig.PrimSig;
@@ -27,7 +28,7 @@ import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
 import static edu.mit.csail.sdg.alloy4.A4Reporter.NOP;
 
 public class SysArchAlloyModel {
-	public int system = 0, connection = 0, port = 0;
+	public int systemNum = 0, connectionNum = 0, portNum = 0;
 	public String UNKNOWN = "unknown_";
 	public final List<Expr> allInstInports = new ArrayList<>();
 	public final List<Expr> allInstOutports = new ArrayList<>();
@@ -36,13 +37,11 @@ public class SysArchAlloyModel {
 	public final Map<String, Sig> compNameToSigMap = new LinkedHashMap<>();
 	public final Map<String, Sig> propNameToSigMap = new LinkedHashMap<>();
 	public final Map<Pair<Sig, String>, Field> compSigFdNameToFdMap = new LinkedHashMap<>();
+	public final Map<String, List<String>> allDeclProps = new HashMap<>();
+	public final List<Sig> subcompSigs = new ArrayList<>();
 	
-	/**
-	 * For printing
-	 * */
-	public final List<Sig> topLevelSigs = new ArrayList<>();
-	public final Map<Pair<String, Sig>, Sig> subsetSigAndParent = new LinkedHashMap<>();
-	public final Map<Pair<String, Sig>, Sig> subSigAndParent = new LinkedHashMap<>();
+	public Field testField = null;
+	public Sig testSig = null;
 	
 	/**
 	-- abstract sig AadlModel {}
@@ -107,26 +106,6 @@ public class SysArchAlloyModel {
 	public String[] DALNames = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
 	public final PrimSig UNKNOWNDALSIG = new PrimSig("unknown_DAL", DALSIG, Attr.ONE);
 	
-	public void addAlloyModelForPrinting() {
-		// For printing
-		// SYSTEM
-		topLevelSigs.add(SYSTEMSIG);				
-		// PORT
-		topLevelSigs.add(PORTSIG);		
-		subSigAndParent.put(new Pair<>("one", INPORTSIG), PORTSIG);
-		subSigAndParent.put(new Pair<>("one", OUTPORTSIG), PORTSIG);
-		// CONNECTION
-		topLevelSigs.add(CONNSIG);		
-		// BOOL
-		topLevelSigs.add(BOOLSIG);
-		subSigAndParent.put(new Pair<>("one", TRUESIG), BOOLSIG);
-		subSigAndParent.put(new Pair<>("one", FALSESIG), BOOLSIG);
-		subSigAndParent.put(new Pair<>("one", UNKNOWNBOOLSIG), BOOLSIG);
-		//DAL
-		topLevelSigs.add(DALSIG);
-		subSigAndParent.put(new Pair<>("one", UNKNOWNDALSIG), DALSIG);
-	}
-	
 	
 	/**
 	 * Load built-in Alloy constructs
@@ -137,35 +116,34 @@ public class SysArchAlloyModel {
 		compNameToSigMap.put("OutPort", OUTPORTSIG);
 		compNameToSigMap.put("system", SYSTEMSIG);
 		compNameToSigMap.put("connection", CONNSIG);
-//		compNameToSigMap.put("Component", COMP);
-//		compNameToSigMap.put("ComponentImpl", COMPIMPL);
 		
-//		propNameToSigMap.put("Bool", BOOL);
-//		propNameToSigMap.put("true", TRUE);
-//		propNameToSigMap.put("false", FALSE);
-//		propNameToSigMap.put("unknown_Bool", UNKNOWNBOOL);		
-//		propNameToSigMap.put("unknown_DAL", UNKNOWNDAL);
-//		propNameToSigMap.put("DAL", DAL);
+		propNameToSigMap.put("Bool", BOOLSIG);
+		propNameToSigMap.put("true", TRUESIG);
+		propNameToSigMap.put("false", FALSESIG);
+		propNameToSigMap.put("unknown_Bool", UNKNOWNBOOLSIG);		
+		propNameToSigMap.put("unknown_DAL", UNKNOWNDALSIG);
+		propNameToSigMap.put("DAL", DALSIG);
 		
-//		for(int i = 0; i < DALNames.length; ++i) {
-//			PrimSig dalSig = new PrimSig(DALNames[i], DAL, Attr.ONE);
-//			propNameToSigMap.put(DALNames[i], dalSig);
-//			
-//			// Add alloy model for printing
-////			subSigAndParent.put(new Pair<>("one", dalSig), DAL);
-//		}
-		// Add alloy model for printing
-//		addAlloyModelForPrinting();
+		for(int i = 0; i < DALNames.length; ++i) {
+			PrimSig dalSig = new PrimSig(DALNames[i], DALSIG, Attr.ONE);
+			propNameToSigMap.put(DALNames[i], dalSig);
+		}
 	}
 	
 	Expr mkFacts(List<Expr> facts, StringBuilder sb) {		
-		Expr expr = ExprBinary.Op.IN.make(Pos.UNKNOWN, Pos.UNKNOWN, SYSTEMSIG, Sig.UNIV);;
-		sb.append(expr.toString()).append("\n");
-		if(facts.size() > 0) {			
-			for(int i = 0; i < facts.size(); ++i) {
+		Expr expr = null;
+		
+		if(!facts.isEmpty()) {	
+			expr = facts.get(0);
+			sb.append(expr.toString()).append("\n");
+			for(int i = 1; i < facts.size(); ++i) {
 				expr = expr.and(facts.get(i));
 				sb.append(facts.get(i).toString()).append("\n");				
 			}
+		}
+		if(expr == null) {
+			expr = ExprBinary.Op.IN.make(Pos.UNKNOWN, Pos.UNKNOWN, Sig.NONE, Sig.UNIV);
+			sb.append(expr.toString()).append("\n");
 		}
 		return expr;
 	}
@@ -182,7 +160,9 @@ public class SysArchAlloyModel {
 				PrimSig primSig = (PrimSig)sig;
 				sb.append("sig ").append(primSig.label+" ");
 				if(primSig.parent != null) {
-					sb.append("extends ").append(primSig.parent.label);
+					if(!primSig.parent.label.equalsIgnoreCase("univ")) {
+						sb.append("extends ").append(primSig.parent.label);
+					}
 				}
 				sb.append("{").append("\n");
 				for(int i = 0; i < primSig.getFields().size(); ++i) {
@@ -224,28 +204,58 @@ public class SysArchAlloyModel {
 		StringBuilder sb = new StringBuilder("");
         // Chooses the Alloy4 options
         A4Options opt = new A4Options();
-        opt.solver = A4Options.SatSolver.SAT4J;
+        opt.solver = A4Options.SatSolver.MiniSatJNI;
+        opt.symmetry = 0;
         Set<Sig> filterSigSet = new LinkedHashSet<>();
+        
         filterSigSet.addAll(compNameToSigMap.values());
         filterSigSet.addAll(propNameToSigMap.values());
 
-        
         // Print sigs
         printSigs(filterSigSet, sb);
         Expr fact = mkFacts(facts, sb);
-//        mkFacts(facts, sb);
-//        Command cmd0 = new Command(false, 15, 3, 3, facts.get(0));
-        System.out.println("Total Ports: " + this.port);
-        Command cmd1 = new Command(false, 20, 4, 4, fact);
-        System.out.println("********************* Alloy Model ********************* ");
-        sb.append("\n").append(cmd1.toString()).append("\n");
-        System.out.println(sb.toString());
         
-        A4Solution sol1 = TranslateAlloyToKodkod.execute_command(NOP, filterSigSet, cmd1, opt);
-//        System.out.println("KodKod Input: ");
-//        System.out.println(sol1.debugExtractKInput());
+        Expr body = null;
+        
+        Func isSoftware = null;
+        
+//        if(testField != null) {
+//        	Decl sys = SYSTEMSIG.oneOf("s");
+//        	Sig positionEstimatorSig = null;
+//        	
+//        	for(Sig sig : subcompSigs) {
+//        		if(sig.label.equalsIgnoreCase("positionEstimator")) {
+//        			positionEstimatorSig = sig;
+//        			break;
+//        		}
+//        	}
+//        	body = sys.get().join(testField).equal(testSig);
+//        	isSoftware = new Func(null, "isSoftware", edu.mit.csail.sdg.alloy4.Util.asList(sys), null, body);
+//        	Expr expr = isSoftware.call(positionEstimatorSig);
+//        	sb.append(expr.toString());
+//        	fact = fact.and(expr);
+//        }
+        
+        // Prepare the command to execute the Alloy model 
+        Command cmd = new Command(false, 100, 4, 4, fact);
+        cmd = cmd.change(SYSTEMSIG, true, systemNum)
+        		.change(CONNSIG, true, connectionNum)
+                		.change(PORTSIG, true, portNum);
+        long startTime = System.currentTimeMillis();
+
+
+        System.out.println("********************* Alloy Model *********************");        
+        sb.append("\n").append(cmd.toString()).append("\n");
+        System.out.println(sb.toString());
+        System.out.println("*******************************************************");        
+        
+        A4Solution sol1 = TranslateAlloyToKodkod.execute_command(NOP, filterSigSet, cmd, opt);
         System.out.println("[Solution1]:");        
         System.out.println(sol1.toString());
+        
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Executing Alloy takes: " + (endTime - startTime)/1000 + " seconds");
 	}	
 	
 }
