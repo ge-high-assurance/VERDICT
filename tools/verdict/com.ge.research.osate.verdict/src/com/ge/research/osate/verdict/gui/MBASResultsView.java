@@ -228,6 +228,7 @@ public class MBASResultsView extends ViewPart {
 					table.getColumn(col).pack();
 				}
 				table.pack();
+				composite.pack();
 			}
 
 			if (safetyItems.size() > 0) {
