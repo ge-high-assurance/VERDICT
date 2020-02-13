@@ -58,6 +58,7 @@ import kodkod.ast.Relation;
 
 public class Aadl2KodkodTranslator {
 	final String ENUM = "Enum";
+	final String BOOL = "Bool";
 	final String SYSTEM = "system";
 	final String PORT = "port";
 	final String CONNECTION = "connection";
@@ -119,7 +120,7 @@ public class Aadl2KodkodTranslator {
 		}
 		
 		// Post-process additional facts
-		postProcessFacts();
+//		postProcessFacts();
 		
 		plain("Finished the Translation from AADL to Alloy");
 	}
@@ -128,14 +129,14 @@ public class Aadl2KodkodTranslator {
 	 * Process all remaining facts
 	 * 
 	 * */
-	void postProcessFacts() {
-		if(!aadlKodkodModel.allInstInports.isEmpty()) {
-			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstInports));
-		}
-		if(!aadlKodkodModel.allInstOutports.isEmpty()) {
-			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstOutports));
-		}		
-	}
+//	void postProcessFacts() {
+//		if(!aadlKodkodModel.allInstInports.isEmpty()) {
+//			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstInports));
+//		}
+//		if(!aadlKodkodModel.allInstOutports.isEmpty()) {
+//			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstOutports));
+//		}		
+//	}
 
 	/**
 	 * Translate a connection or system property
@@ -150,7 +151,7 @@ public class Aadl2KodkodTranslator {
 	 * }
 	 * */
 	protected void translateProperty(Property prop) {
-		Field propField = null;
+		Relation propBinaryRel = null;
 		Relation propTypeUnaryRel = null;
 		String propName = prop.getName();
 		PropertyType propType = prop.getPropertyType();
@@ -171,12 +172,12 @@ public class Aadl2KodkodTranslator {
 			}
 			// Add an unknown sig for each prop for the case the property is unassigned
 			propValueNames.add(aadlKodkodModel.UNKNOWN + propName);
-			aadlKodkodModel.mkSubUnaryRels(propTypeUnaryRel, true, true, propValueNames);
+			aadlKodkodModel.mkSubRelationships(propTypeUnaryRel, true, true, propValueNames);
 		} else if (propType instanceof AadlBooleanImpl) {
 			// Don't need to translate it as we have declared a built-in unary relation Bool
 			// But we need to save the unknown_propName and unknown_Bool for later use
-			String unknownPropName = aadlKodkodModel.UNKNOWN + propName;
-			aadlKodkodModel.nameToUnaryRelMap.put(unknownPropName, aadlKodkodModel.unknownBoolUnaryRel);			
+			String unknownPropValName = aadlKodkodModel.UNKNOWN + propName;
+			aadlKodkodModel.nameToUnaryRelMap.put(unknownPropValName, aadlKodkodModel.nameToUnaryRelMap.get(aadlKodkodModel.UNKNOWNBOOL));			
 			propTypeUnaryRel = aadlKodkodModel.boolUnaryRel;
 		} else if (propType instanceof AadlIntegerImpl) {
 			NumericRange range = ((AadlIntegerImpl)propType).getRange();
@@ -184,9 +185,9 @@ public class Aadl2KodkodTranslator {
 				// Let us assume that there are 0 - 9 DAL numbers
 				// The number sigs have been preloaded
 				// This property type is a DAL number
-				String unknownPropName = aadlKodkodModel.UNKNOWN + propName;
-				aadlKodkodModel.nameToUnaryRelMap.put(unknownPropName, aadlKodkodModel.UNKNOWNDALSIG);
-				propTypeUnaryRel = aadlKodkodModel.DALSIG;
+				String unknownPropValName = aadlKodkodModel.UNKNOWN + propName;
+				aadlKodkodModel.nameToUnaryRelMap.put(unknownPropValName, aadlKodkodModel.nameToUnaryRelMap.get(aadlKodkodModel.UNKNOWNDAL));
+				propTypeUnaryRel = aadlKodkodModel.dalUnaryRel;
 			} else {
 				throw new RuntimeException("The integer property is not a range!");
 			}
@@ -200,25 +201,17 @@ public class Aadl2KodkodTranslator {
 		// Get the "applies" of a property, and add the property 
 		// fields to the owners (system, connection, or port)
 		for(PropertyOwner po : prop.getAppliesTos()) {
-			Sig propOwnerSig = null;
 			String propOwner = ((MetaclassReferenceImpl)po).getMetaclass().getName();			
-			
 			if(propOwner.equalsIgnoreCase(CONNECTION)) {
-				propField = aadlKodkodModel.CONNSIG.addField(propName, propTypeUnaryRel.oneOf());
-				propOwnerSig = aadlKodkodModel.CONNSIG;
+				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.connectionUnaryRel, propTypeUnaryRel, true, propName);;
 			} else if(propOwner.equalsIgnoreCase(SYSTEM)) {
-				propField = aadlKodkodModel.SYSTEMSIG.addField(propName, propTypeUnaryRel.oneOf());
-				propOwnerSig = aadlKodkodModel.SYSTEMSIG;
-				if(propName.equalsIgnoreCase("componentType")) {
-					aadlKodkodModel.testField = propField;
-				}
+				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.systemUnaryRel, propTypeUnaryRel, true, propName);;
 			} else if(propOwner.equalsIgnoreCase(PORT)) {
-				propField = aadlKodkodModel.PORTSIG.addField(propName, propTypeUnaryRel.oneOf());
-				propOwnerSig = aadlKodkodModel.PORTSIG;
+				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.portUnaryRel, propTypeUnaryRel, true, propName);;
 			} else {
 				throw new RuntimeException("Unsupported property applies to + " + propOwner);
 			}
-			aadlKodkodModel.compSigFdNameToFdMap.put(new Pair<Sig, String>(propOwnerSig, propName), propField);
+			aadlKodkodModel.propNameToBinaryRelMap.put(propName, propBinaryRel);
 		}				
 	}	
 	
@@ -231,18 +224,19 @@ public class Aadl2KodkodTranslator {
 	 * */
 	protected void translateSystem(SystemType system) {
 		String sanitizedSysName = sanitizeName(system.getName());
-		PrimSig compTypeSig = new PrimSig(sanitizedSysName, aadlKodkodModel.SYSTEMSIG, Attr.ABSTRACT);
+//		PrimSig compTypeSig = new PrimSig(sanitizedSysName, aadlKodkodModel.SYSTEMSIG, Attr.ABSTRACT);
+		Relation compTypeRel = aadlKodkodModel.mkUnaryRel(sanitizedSysName);
 		
 		Expr allInportsUnionExpr = null, allOutportsUnionExpr = null;
 		
 		// Create a field for each data port
 		for (DataPort port : system.getOwnedDataPorts()) {			
-			Field field;
+			Relation portBinaryRel;
 			String sanitizedPortName = sanitizeName(port.getName());
 			
 			switch (port.getDirection()) {
 			case IN:
-				field = compTypeSig.addField(sanitizedPortName, aadlKodkodModel.INPORTSIG.oneOf());
+				portBinaryRel = aadlKodkodModel.mkBinaryRel(compTypeRel, aadlKodkodModel.inPortUnaryRel, true, sanitizedPortName);
 				if (allInportsUnionExpr == null) {
 					allInportsUnionExpr = field;
 				} else {
@@ -250,7 +244,7 @@ public class Aadl2KodkodTranslator {
 				}
 				break;
 			case OUT:
-				field = compTypeSig.addField(sanitizedPortName, aadlKodkodModel.OUTPORTSIG.oneOf());
+				portBinaryRel = aadlKodkodModel.mkBinaryRel(compTypeRel, aadlKodkodModel.outPortUnaryRel, true, sanitizedPortName);
 				if (allOutportsUnionExpr == null) {
 					allOutportsUnionExpr = field;
 				} else {

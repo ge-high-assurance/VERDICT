@@ -11,6 +11,10 @@ import kodkod.ast.Formula;
 import kodkod.ast.Relation;
 
 public class SysArchKodkodModel {
+	public final String UNKNOWN = "unknown_";
+	public final String UNKNOWNDAL = UNKNOWN+"DAL";
+	public final String UNKNOWNBOOL = UNKNOWN+"Bool";
+	
 	/**
 	 * 
 	 	abstract sig port {}
@@ -39,21 +43,21 @@ public class SysArchKodkodModel {
 	 * Unary Relations
 	 * */
 	public final Relation portUnaryRel, inPortUnaryRel, outPortUnaryRel, systemUnaryRel, connectionUnaryRel,
-						  boolUnaryRel, trueUnaryRel, falseUnaryRel, unknownBoolUnaryRel,
-						  DAL;
+						  boolUnaryRel, dalUnaryRel;
 
-	public String[] DALNames = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+	public String[] DALNames = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", UNKNOWN+"DAL"};
 	/**
 	 * Binary Relations
 	 * */	
 	public final Relation inPortsBinaryRel, outPortsBinaryRel, srcPortBinaryRel, destPortBinaryRel;
 	
-	public final String UNKNOWN = "unknown_";
+	
 	
 	public final List<Formula> facts = new ArrayList<Formula>();
 	
 	public final Map<String, Relation> nameToUnaryRelMap = new LinkedHashMap<>();
 	public final Map<String, Relation> nameToBinaryRelMap = new LinkedHashMap<>();
+	public final Map<String, Relation> propNameToBinaryRelMap = new LinkedHashMap<>();
 	public final Map<Relation, Integer> unaryRelToNumMap = new LinkedHashMap<>();
 	
 	public SysArchKodkodModel() {
@@ -64,12 +68,10 @@ public class SysArchKodkodModel {
 		connectionUnaryRel = mkUnaryRel("connection");
 		
 		boolUnaryRel = mkUnaryRel("Bool");
-		trueUnaryRel = mkUnaryRel("true");
-		falseUnaryRel = mkUnaryRel("false");
-		unknownBoolUnaryRel = mkUnaryRel("unknown_Bool");
+		mkSubRelationship(boolUnaryRel, true, true, "true", "false", UNKNOWN+"Bool");
 		
-		DAL = mkUnaryRel("DAL_Enum");
-		mkSubUnaryRels(DAL, true, true, DALNames);
+		dalUnaryRel = mkUnaryRel("DAL");
+		mkSubRelationship(dalUnaryRel, true, true, DALNames);
 		
 		inPortsBinaryRel = mkBinaryRel("inPorts");
 		outPortsBinaryRel = mkBinaryRel("outPorts");
@@ -91,11 +93,7 @@ public class SysArchKodkodModel {
     	final Formula f3 = srcPortBinaryRel.function(connectionUnaryRel, portUnaryRel);
     	final Formula f4 = destPortBinaryRel.function(systemUnaryRel, portUnaryRel);    	
     	
-    	final Formula f5 = boolUnaryRel.eq(trueUnaryRel.union(falseUnaryRel).union(unknownBoolUnaryRel));   	
-    	final Formula f6 = trueUnaryRel.intersection(falseUnaryRel).no().and(trueUnaryRel.intersection(unknownBoolUnaryRel).no());
-    	final Formula f7 = falseUnaryRel.intersection(unknownBoolUnaryRel).no();
-    	
-    	return f0.and(f1).and(f2).and(f3).and(f4).and(f5).and(f6).and(f7);
+    	return f0.and(f1).and(f2).and(f3).and(f4);
     }
     
     /**
@@ -218,10 +216,10 @@ public class SysArchKodkodModel {
 	 * 2. Make additional constraints for "extends" or "in" relationship, and isOne
 	 * 
 	 * */
-	void mkSubUnaryRels(Relation parentRel, boolean isExtends, boolean isOne, String ... extendsNames) {
-		mkSubUnaryRels(parentRel, isExtends, isOne, Arrays.asList(extendsNames));
+	void mkSubRelationship(Relation parentRel, boolean isExtends, boolean isOne, String ... extendsNames) {
+		mkSubRelationships(parentRel, isExtends, isOne, Arrays.asList(extendsNames));
 	}	
-	void mkSubUnaryRels(Relation parentRel, boolean isExtends, boolean isOne, List<String> extendsNames) {
+	void mkSubRelationships(Relation parentRel, boolean isExtends, boolean isOne, List<String> extendsNames) {
 		if(extendsNames != null && extendsNames.size() > 0) {
 			List<Relation> unaryRels = new ArrayList<Relation>();
 			
@@ -258,11 +256,49 @@ public class SysArchKodkodModel {
 		}
 	}    
 	
+	void mkSubRelationship(Relation parentRel, boolean isExtends, List<Relation> subRelations, boolean isOne) {
+		if(subRelations != null && subRelations.size() > 0 && parentRel != null) {
+			if(isOne) {
+				for(Relation rel : subRelations) {
+					mkOne(rel);
+				}
+			}
+			if(isExtends) {
+				// Create the union of all unary relations
+				Expression unionExpr = mkUnionRels(subRelations);					
+				// The union of all sub relations is equivalent to the parent relation
+				mkEq(unionExpr, parentRel);
+				
+				// Sub-signatures are mutually disjoint
+				if(subRelations.size() >= 2) {
+					mkMutualDisjointRels(subRelations);
+				}
+			} else {
+				// Each unaryRel is in parentRel
+				for(Relation unaryRel : subRelations) {
+					mkSubsetRels(unaryRel, parentRel);
+				}
+			}
+		} else {
+			throw new RuntimeException("Sub-relations or parent relation are not given!");
+		}
+	} 	
+	
 	
 	/**
 	 * Make a binary relation
 	 * */
-	void mkBinaryRel(Relation domain, Relation range, boolean isFunc, String binaryRelName) {
-		
+	Relation mkBinaryRel(Relation domain, Relation range, boolean isFunc, String binaryRelName) {
+		if(domain == null || range == null || binaryRelName == null){
+			throw new RuntimeException("Some inputs are not given: " + " domain: " + domain + " range: " +range + " binaryRelName: " + binaryRelName);
+		}
+		Relation binaryRel = Relation.binary(binaryRelName);
+		if(isFunc) {				
+			facts.add(binaryRel.function(domain, range));				
+		} else {
+			facts.add(binaryRel.in(domain.product(range)));
+		}
+		nameToBinaryRelMap.put(binaryRelName, binaryRel);	
+		return binaryRel;
 	}		
 }
