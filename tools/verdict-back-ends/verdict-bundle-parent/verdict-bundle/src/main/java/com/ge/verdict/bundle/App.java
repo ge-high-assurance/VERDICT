@@ -217,7 +217,7 @@ public class App {
             String soteriaPpBin = mbasOpts[1];
 
             runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
-            sample.stop(Metrics.timer("timer.mbas", "model", modelName));
+            sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
         } else if (opts.hasOption("crv")) {
             String instrPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml")
@@ -254,15 +254,22 @@ public class App {
                     outputBaPath,
                     debugDir,
                     kind2Bin);
-            sample.stop(Metrics.timer("timer.crv", "model", modelName));
+            sample.stop(Metrics.timer("Timer.crv", "model", modelName));
         }
     }
 
     private static void printMetrics() {
+        int i = 0;
+
         Function<Timer, Integer> visitTimer =
                 timer -> {
                     System.out.println(
-                            timer.getId() + ": " + timer.totalTime(TimeUnit.SECONDS) + " secs");
+                            timer.getId().getName()
+                                    + " for "
+                                    + timer.getId().getTag("model")
+                                    + ": "
+                                    + timer.totalTime(TimeUnit.SECONDS)
+                                    + " secs");
                     return 0;
                 };
         Metrics.globalRegistry.forEachMeter(
@@ -353,7 +360,7 @@ public class App {
             deleteFile(imlPath);
             runAadl2iml(aadlPath, imlPath, aadl2imlBin);
             modelName = new File(aadlPath).getName();
-            sample.stop(Metrics.timer("timer.mbas.aadl2iml", "model", modelName));
+            sample.stop(Metrics.timer("Timer.mbas.aadl2iml", "model", modelName));
         } else {
             checkFile(imlPath, true, false, false, false, ".iml");
         }
@@ -368,7 +375,7 @@ public class App {
             // Translate the model from IML to VDM
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             vdmModel = ResourceTest.setup(imlPath);
-            sample.stop(Metrics.timer("timer.mbas.iml2vdm", "model", modelName));
+            sample.stop(Metrics.timer("Timer.mbas.iml2vdm", "model", modelName));
         } catch (IOException e) {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
@@ -384,7 +391,7 @@ public class App {
 
         // Generate MBAS inputs
         VDM2CSV vdm2csv = new VDM2CSV();
-        Metrics.timer("timer.mbas.vdm2csv", "model", modelName)
+        Metrics.timer("Timer.mbas.vdm2csv", "model", modelName)
                 .record(
                         () ->
                                 vdm2csv.marshalToMbasInputs(
@@ -403,7 +410,7 @@ public class App {
         log("STEM is running. Please be patient...");
 
         VerdictStem stemRunner = new VerdictStem();
-        Metrics.timer("timer.mbas.stem", "model", modelName)
+        Metrics.timer("Timer.mbas.stem", "model", modelName)
                 .record(
                         () ->
                                 stemRunner.runStem(
@@ -433,7 +440,7 @@ public class App {
                     "-o",
                     soteriaPpOutputDir,
                     stemOutputDir);
-            sample.stop(Metrics.timer("timer.mbas.soteria_pp", "model", modelName));
+            sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
         }
@@ -496,7 +503,7 @@ public class App {
             deleteFile(imlPath);
             runAadl2iml(aadlPath, imlPath, aadl2imlBin);
             modelName = new File(aadlPath).getName();
-            sample.stop(Metrics.timer("timer.crv.aadl2iml", "model", modelName));
+            sample.stop(Metrics.timer("Timer.crv.aadl2iml", "model", modelName));
         } else {
             checkFile(imlPath, true, false, false, false, ".iml");
         }
@@ -515,7 +522,7 @@ public class App {
             // Translate the model from IML to VDM
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             vdmModel = ResourceTest.setup(imlPath);
-            sample.stop(Metrics.timer("timer.crv.iml2vdm", "model", modelName));
+            sample.stop(Metrics.timer("Timer.crv.iml2vdm", "model", modelName));
         } catch (IOException e) {
             throw new VerdictRunException("Failed to translate IML to VDM", e);
         }
@@ -533,7 +540,7 @@ public class App {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
             instrumentor.instrument(vdmModel, threats, blameAssignment, componentLevel);
-            sample.stop(Metrics.timer("timer.crv.instrumentor", "model", modelName));
+            sample.stop(Metrics.timer("Timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");
         }
@@ -557,7 +564,7 @@ public class App {
         Timer.Sample vdm2lusSample = Timer.start(Metrics.globalRegistry);
         VDM2Lustre vdm2lus = new VDM2Lustre(vdmModel);
         Model lustreModel = vdm2lus.translate();
-        vdm2lusSample.stop(Metrics.timer("timer.crv.vdm2lus", "model", modelName));
+        vdm2lusSample.stop(Metrics.timer("Timer.crv.vdm2lus", "model", modelName));
 
         debugOutVdm(debugDir, "VERDICT_output_debug_lus", lustreModel);
 
@@ -572,7 +579,7 @@ public class App {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             VerdictTestInstrumentor atgInstrumentor = new VerdictTestInstrumentor(vdmModel);
             atgInstrumentor.instrumentTests();
-            sample.stop(Metrics.timer("timer.crv.atgInstrumentor", "model", modelName));
+            sample.stop(Metrics.timer("Timer.crv.atgInstrumentor", "model", modelName));
 
             debugOutVdm(debugDir, "VERDICT_output_debug_lus_atg", lustreModel);
         }
@@ -585,7 +592,7 @@ public class App {
         Timer.Sample verdictlustreSample = Timer.start(Metrics.globalRegistry);
         VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
         lustreOutputer.marshalToLustre(lustreModel, new File(lustrePath));
-        verdictlustreSample.stop(Metrics.timer("timer.crv.verdictlustre", "model", modelName));
+        verdictlustreSample.stop(Metrics.timer("Timer.crv.verdictlustre", "model", modelName));
 
         logHeader("Kind2");
 
@@ -642,7 +649,7 @@ public class App {
         } catch (IOException e) {
             throw new VerdictRunException("Failed to execute kind2", e);
         } finally {
-            kind2Sample.stop(Metrics.timer("timer.crv.kind2", "model", modelName));
+            kind2Sample.stop(Metrics.timer("Timer.crv.kind2", "model", modelName));
         }
 
         if (blameAssignment && instrumentor != null) {
@@ -665,7 +672,7 @@ public class App {
                         ba.compute_blame_assignment(
                                 new File(outputPath), instrumentor.getAttackMap(), componentLevel);
                 XMLProcessor.dumpXML(ba, new File(outputBaPath));
-                sample.stop(Metrics.timer("timer.crv.blameassignment", "model", modelName));
+                sample.stop(Metrics.timer("Timer.crv.blameassignment", "model", modelName));
             } catch (FileNotFoundException e) {
                 throw new VerdictRunException("Failed to perform blame assignment", e);
             }
