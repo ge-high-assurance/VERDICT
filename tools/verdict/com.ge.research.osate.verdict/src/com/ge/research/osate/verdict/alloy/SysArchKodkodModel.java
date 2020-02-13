@@ -9,12 +9,13 @@ import java.util.Map;
 import kodkod.ast.Expression;
 import kodkod.ast.Formula;
 import kodkod.ast.Relation;
+import kodkod.util.collections.Pair;
 
 public class SysArchKodkodModel {
 	public final String UNKNOWN = "unknown_";
 	public final String UNKNOWNDAL = UNKNOWN+"DAL";
 	public final String UNKNOWNBOOL = UNKNOWN+"Bool";
-	
+	public int systemNum = 0, portNum = 0, connectionNum = 0;
 	/**
 	 * 
 	 	abstract sig port {}
@@ -49,16 +50,19 @@ public class SysArchKodkodModel {
 	/**
 	 * Binary Relations
 	 * */	
-	public final Relation inPortsBinaryRel, outPortsBinaryRel, srcPortBinaryRel, destPortBinaryRel;
+	public final Relation inPortsBinaryRel, outPortsBinaryRel, srcPortBinaryRel, destPortBinaryRel,
+						  connectionsBinaryRel, subcomponentsBinaryRel;
 	
 	
 	
 	public final List<Formula> facts = new ArrayList<Formula>();
 	
 	public final Map<String, Relation> nameToUnaryRelMap = new LinkedHashMap<>();
-	public final Map<String, Relation> nameToBinaryRelMap = new LinkedHashMap<>();
+	public final Map<Pair<Relation, String>, Relation> domainRelNameToRelMap = new LinkedHashMap<>();
 	public final Map<String, Relation> propNameToBinaryRelMap = new LinkedHashMap<>();
 	public final Map<Relation, Integer> unaryRelToNumMap = new LinkedHashMap<>();
+	public final List<Expression> allInstInports = new ArrayList<Expression>();
+	public final List<Expression> allInstOutports = new ArrayList<Expression>();
 	
 	public SysArchKodkodModel() {
 		portUnaryRel = mkUnaryRel("port");
@@ -73,29 +77,16 @@ public class SysArchKodkodModel {
 		dalUnaryRel = mkUnaryRel("DAL");
 		mkSubRelationship(dalUnaryRel, true, true, DALNames);
 		
-		inPortsBinaryRel = mkBinaryRel("inPorts");
-		outPortsBinaryRel = mkBinaryRel("outPorts");
-		srcPortBinaryRel = mkBinaryRel("srcPort");
-		destPortBinaryRel = mkBinaryRel("destPort");
-		
-		// Load decl facts
-		facts.add(decls());
+		mkSubRelationship(portUnaryRel, true, Arrays.asList(inPortUnaryRel, outPortUnaryRel), false);
+		inPortsBinaryRel = mkBinaryRel(systemUnaryRel, inPortUnaryRel, false, "inPorts");
+		outPortsBinaryRel = mkBinaryRel(systemUnaryRel, outPortUnaryRel, false, "outPorts");
+		srcPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, "srcPort");
+		destPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, "destPort");
+		connectionsBinaryRel = mkBinaryRel(systemUnaryRel, connectionUnaryRel, false, "connections");
+		subcomponentsBinaryRel = mkBinaryRel(systemUnaryRel, systemUnaryRel, false, "subcomponents");		
 	}
 	
-    public final Formula decls() {
-    	// inPort and outPort partition port
-    	final Formula f0 = portUnaryRel.eq(inPortUnaryRel.union(outPortUnaryRel)).and(inPortUnaryRel.intersection(outPortUnaryRel).no());
-    	// inPorts <= system x InPort
-    	// all x : system | one (x.inPorts)
-    	final Formula f1 = inPortsBinaryRel.function(systemUnaryRel, inPortUnaryRel);
-    	final Formula f2 = outPortsBinaryRel.function(systemUnaryRel, outPortUnaryRel);
-    	
-    	final Formula f3 = srcPortBinaryRel.function(connectionUnaryRel, portUnaryRel);
-    	final Formula f4 = destPortBinaryRel.function(systemUnaryRel, portUnaryRel);    	
-    	
-    	return f0.and(f1).and(f2).and(f3).and(f4);
-    }
-    
+
     /**
      * Make a unary relation
      * */
@@ -108,19 +99,31 @@ public class SysArchKodkodModel {
     		throw new RuntimeException("Relation name is null!");
     	}
     }
-    
     /**
-     * Make a binary relation
-     * */
-    public Relation mkBinaryRel(String name) {
+     * Make a unary relation with name such that it is in parentRel
+     * */    
+    public Relation mkUnaryRel(String name, Relation parentRel) {
     	if(name != null) {
-    		Relation rel = Relation.binary(name);
-    		nameToBinaryRelMap.put(name, rel);
+    		Relation rel = Relation.unary(name);
+    		nameToUnaryRelMap.put(name, rel);
     		return rel;
     	} else {
     		throw new RuntimeException("Relation name is null!");
     	}
     }    
+    
+    /**
+     * Make a binary relation
+     * */
+//    public Relation mkBinaryRel(String name) {
+//    	if(name != null) {
+//    		Relation rel = Relation.binary(name);
+//    		nameToBinaryRelMap.put(name, rel);
+//    		return rel;
+//    	} else {
+//    		throw new RuntimeException("Relation name is null!");
+//    	}
+//    }    
     
     /**
      * Make the union of expressions
@@ -298,7 +301,7 @@ public class SysArchKodkodModel {
 		} else {
 			facts.add(binaryRel.in(domain.product(range)));
 		}
-		nameToBinaryRelMap.put(binaryRelName, binaryRel);	
+		domainRelNameToRelMap.put(new Pair<>(domain, binaryRelName), binaryRel);	
 		return binaryRel;
 	}		
 }
