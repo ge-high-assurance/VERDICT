@@ -69,3 +69,5 @@ below shows how the back-end tools are invoked by the plug-in to
 perform architectural and behavioral analysis of AADL models.
 
 ![VERDICT Plugin Diagram](docs/images/VERDICT-Plugin-Diagram.png)
+
+Distribution Statement A: Approved for Public Release, Distribution Unlimited
