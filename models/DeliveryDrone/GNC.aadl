@@ -44,7 +44,7 @@ public
 			}
 			Event {
 				id = "ued_event"
-				probability = 1.0e-6
+				probability = 1.0e-8
 				comment = "undetected erroneous data of the GPS"
 				description = "UED"
 			}
@@ -80,7 +80,7 @@ public
 			}
 			Event {
 				id = "ued_event"
-				probability = 1.0e-6
+				probability = 1.0e-8
 				comment = "undetected erroneous data of the IMU"
 				description = "UED"
 			}
