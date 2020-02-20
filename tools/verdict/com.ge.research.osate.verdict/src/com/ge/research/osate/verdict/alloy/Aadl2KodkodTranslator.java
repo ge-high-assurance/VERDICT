@@ -1,7 +1,6 @@
 package com.ge.research.osate.verdict.alloy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,33 +40,17 @@ import org.osate.aadl2.impl.MetaclassReferenceImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 
-import edu.mit.csail.sdg.alloy4.Pair;
-import edu.mit.csail.sdg.alloy4.Pos;
-import edu.mit.csail.sdg.ast.Attr;
-import edu.mit.csail.sdg.ast.Decl;
-import edu.mit.csail.sdg.ast.Expr;
-import edu.mit.csail.sdg.ast.ExprBinary;
-import edu.mit.csail.sdg.ast.ExprList;
-import edu.mit.csail.sdg.ast.Sig;
-import edu.mit.csail.sdg.ast.Sig.Field;
-import edu.mit.csail.sdg.ast.Sig.PrimSig;
-import edu.mit.csail.sdg.ast.Sig.SubsetSig;
+import kodkod.util.collections.Pair;
 import kodkod.ast.Expression;
 import kodkod.ast.Formula;
 import kodkod.ast.Relation;
 import kodkod.ast.Variable;
 
 public class Aadl2KodkodTranslator {
-	final String ENUM = "Enum";
-	final String BOOL = "Bool";
-	final String SYSTEM = "system";
-	final String PORT = "port";
-	final String CONNECTION = "connection";
-	final String SUBCOMPONENTS = "subcomponents";
-	final String CONNECTIONS = "connections";
-	SysArchKodkodModel aadlKodkodModel;
-		
+	final SysArchKodkodModel aadlKodkodModel;
 	final Map<String, List<String>> allDeclProps = new HashMap<>();
+	final Map<Relation, Expression> sysImplTypeRelToSubcompsExpr = new HashMap<Relation, Expression>();
+	final Map<Relation, Expression> sysImplTypeRelToConnsExpr = new HashMap<Relation, Expression>();
 
 	public Aadl2KodkodTranslator(SysArchKodkodModel kodkodModel) {
 		aadlKodkodModel = kodkodModel;
@@ -108,13 +91,10 @@ public class Aadl2KodkodTranslator {
 		}
 		
 		// Translate system type
-		List<Relation> rels = new ArrayList<Relation>();
 		for (SystemType system : systems) {
 			printHeader("Translate a system type: " + system.getName());			
-			translateSystem(system, rels);			
+			translateSystem(system);			
 		}
-		// All component type relations partition the system relation
-		aadlKodkodModel.mkSubRelationship(aadlKodkodModel.systemUnaryRel, true, rels, false);
 		
 		// Translate system implementation, subcomponent, and connections		
 		for (SystemImplementation systemImpl : systemImpls) {
@@ -125,7 +105,7 @@ public class Aadl2KodkodTranslator {
 		}
 		
 		// Post-process additional facts
-//		postProcessFacts();
+		postProcessConstraints();
 		
 		plain("Finished the Translation from AADL to Alloy");
 	}
@@ -134,14 +114,80 @@ public class Aadl2KodkodTranslator {
 	 * Process all remaining facts
 	 * 
 	 * */
-//	void postProcessFacts() {
-//		if(!aadlKodkodModel.allInstInports.isEmpty()) {
-//			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstInports));
-//		}
-//		if(!aadlKodkodModel.allInstOutports.isEmpty()) {
-//			aadlKodkodModel.facts.add(disj(aadlKodkodModel.allInstOutports));
-//		}		
-//	}
+	void postProcessConstraints() {
+		if(!aadlKodkodModel.allInstInports.isEmpty()) {
+			aadlKodkodModel.mkMutualDisjoint(aadlKodkodModel.allInstInports);
+		}
+		if(!aadlKodkodModel.allInstOutports.isEmpty()) {
+			aadlKodkodModel.mkMutualDisjoint(aadlKodkodModel.allInstOutports);
+		}	
+		if(!aadlKodkodModel.compTypeRelToInstRelMap.isEmpty()) {
+			// All component type partitions "system"
+			aadlKodkodModel.mkSubRelationship(aadlKodkodModel.systemUnaryRel, true, new ArrayList<Relation>(aadlKodkodModel.compTypeRelToInstRelMap.keySet()), false);
+			
+			// All sub-types partition the component type
+			for(Map.Entry<Relation, Set<Relation>> entry : aadlKodkodModel.compTypeRelToInstRelMap.entrySet()) {
+				Relation parentRel = entry.getKey();
+				Set<Relation> subRels = entry.getValue();
+				
+				if(!hasImplRel(subRels) && !subRels.isEmpty()) {
+					// All subcomponent instances partition the parent component type relation
+					aadlKodkodModel.mkSubRelationship(parentRel, true, new ArrayList<Relation>(subRels), true);
+				} else {
+					//TODO: need to change here!
+//					aadlKodkodModel.mkSubRelationship(parentRel, true, new ArrayList<Relation>(subRels), true);					
+				}			
+			}
+		}
+		
+		Expression unionOfRels = Relation.NONE;
+		if(!sysImplTypeRelToSubcompsExpr.isEmpty()) {
+			// sys:entry.getKey() | sys.subcomponents = entry.value();
+			
+			for(Map.Entry<Relation, Expression> entry : sysImplTypeRelToSubcompsExpr.entrySet()) {
+				Relation implRel = entry.getKey();
+				Variable var = Variable.unary("x");					
+				aadlKodkodModel.facts.add(var.join(aadlKodkodModel.subcomponentsBinaryRel).eq(entry.getValue()).forAll(var.oneOf(implRel)));
+				unionOfRels = unionOfRels.union(implRel);
+			}
+		}
+		// sys:systems - unionOfRels | sys.subcomponents = NONE 
+		Variable sys1 = Variable.unary("s");
+		aadlKodkodModel.facts.add(sys1.join(aadlKodkodModel.subcomponentsBinaryRel).eq(Relation.NONE).forAll(sys1.oneOf(aadlKodkodModel.systemUnaryRel.difference(unionOfRels))));
+		
+		Expression unionOfRels2 = Relation.NONE;
+		if(!sysImplTypeRelToConnsExpr.isEmpty()) {
+			// sys: SystemImpl | sys.connections = entry.value();			
+			for(Map.Entry<Relation, Expression> entry : sysImplTypeRelToConnsExpr.entrySet()) {
+				Relation implRel = entry.getKey();
+				Variable var = Variable.unary("x");
+				aadlKodkodModel.facts.add(var.join(aadlKodkodModel.connectionsBinaryRel).eq(entry.getValue()).forAll(var.oneOf(implRel)));
+				unionOfRels2 = unionOfRels2.union(implRel);
+			}
+		}	
+		// sys:system - unionOfRels | sys.connections = NONE
+		Variable sys2 = Variable.unary("s");
+		aadlKodkodModel.facts.add(sys2.join(aadlKodkodModel.connectionsBinaryRel).eq(Relation.NONE).forAll(sys2.oneOf(aadlKodkodModel.systemUnaryRel.difference(unionOfRels2))));
+		
+		// Make all connections extends the connection relation
+		if(!aadlKodkodModel.allConnectionRels.isEmpty()) {
+			aadlKodkodModel.mkSubRelationship(aadlKodkodModel.connectionUnaryRel, true, new ArrayList<Relation>(aadlKodkodModel.allConnectionRels), true);
+		}
+		
+		// system.(in1 ... ink) allInports are distinct 
+	}
+	
+	boolean hasImplRel(Set<Relation> subRels) {
+		boolean hasImpl = false;
+		
+		for(Relation subRel : subRels) {
+			if(aadlKodkodModel.compImplRelToInstRelMap.containsKey(subRel)) {
+				hasImpl = true;
+				break;
+			}
+		}
+		return hasImpl;
+	}
 
 	/**
 	 * Translate a connection or system property
@@ -156,7 +202,6 @@ public class Aadl2KodkodTranslator {
 	 * }
 	 * */
 	protected void translateProperty(Property prop) {
-		Relation propBinaryRel = null;
 		Relation propTypeUnaryRel = null;
 		String propName = prop.getName();
 		PropertyType propType = prop.getPropertyType();
@@ -166,18 +211,20 @@ public class Aadl2KodkodTranslator {
 		// translate property definition in property set
 		if (propType instanceof EnumerationTypeImpl) {
 			// Append "_Enum" to a enumerate property name
-			String propEnumTypeName = propName + "_" + ENUM;
+			String propEnumTypeName = propName + aadlKodkodModel.ENUM;
 			propTypeUnaryRel = aadlKodkodModel.mkUnaryRel(propEnumTypeName);
-			List<String> propValueNames = new ArrayList<String>();
+			Set<Relation> propValueRels = new HashSet<Relation>();
 			
 			// For each enumerate value, we create a sig
 			for(NamedElement ne : ((EnumerationTypeImpl)propType).getMembers()) {
-				String enumValue = ne.getName();
-				propValueNames.add(enumValue);
+				propValueRels.add(aadlKodkodModel.mkUnaryRel(ne.getName()));
 			}
-			// Add an unknown sig for each prop for the case the property is unassigned
-			propValueNames.add(aadlKodkodModel.UNKNOWN + propName);
-			aadlKodkodModel.mkSubRelationships(propTypeUnaryRel, true, true, propValueNames);
+			// Add an unknown_propName relation for each prop for the case the property is unassigned
+			propValueRels.add(aadlKodkodModel.mkUnaryRel(aadlKodkodModel.UNKNOWN + propName));
+			aadlKodkodModel.mkSubRelationship(propTypeUnaryRel, true, propValueRels, true);
+			
+			// Save the property relation and its value relations
+			aadlKodkodModel.propTypeRelToValRelMap.put(propTypeUnaryRel, propValueRels);
 		} else if (propType instanceof AadlBooleanImpl) {
 			// Don't need to translate it as we have declared a built-in unary relation Bool
 			// But we need to save the unknown_propName and unknown_Bool for later use in 
@@ -207,13 +254,18 @@ public class Aadl2KodkodTranslator {
 		// Get the "applies" of a property, and add the property 
 		// fields to the owners (system, connection, or port)
 		for(PropertyOwner po : prop.getAppliesTos()) {
-			String propOwner = ((MetaclassReferenceImpl)po).getMetaclass().getName();			
-			if(propOwner.equalsIgnoreCase(CONNECTION)) {
-				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.connectionUnaryRel, propTypeUnaryRel, true, propName);;
-			} else if(propOwner.equalsIgnoreCase(SYSTEM)) {
-				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.systemUnaryRel, propTypeUnaryRel, true, propName);;
-			} else if(propOwner.equalsIgnoreCase(PORT)) {
-				propBinaryRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.portUnaryRel, propTypeUnaryRel, true, propName);;
+			String propOwner = ((MetaclassReferenceImpl)po).getMetaclass().getName();
+			Relation propRel = null;
+			
+			if(propOwner.equalsIgnoreCase(aadlKodkodModel.CONNECTION)) {
+				propRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.connectionUnaryRel, propTypeUnaryRel, true, propName);
+				aadlKodkodModel.binaryRelToDomainRangeRelMap.put(propRel, new Pair<>(aadlKodkodModel.connectionUnaryRel, propTypeUnaryRel));
+			} else if(propOwner.equalsIgnoreCase(aadlKodkodModel.SYSTEM)) {
+				propRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.systemUnaryRel, propTypeUnaryRel, true, propName);
+				aadlKodkodModel.binaryRelToDomainRangeRelMap.put(propRel, new Pair<>(aadlKodkodModel.systemUnaryRel, propTypeUnaryRel));
+			} else if(propOwner.equalsIgnoreCase(aadlKodkodModel.PORT)) {
+				propRel = aadlKodkodModel.mkBinaryRel(aadlKodkodModel.portUnaryRel, propTypeUnaryRel, true, propName);
+				aadlKodkodModel.binaryRelToDomainRangeRelMap.put(propRel, new Pair<>(aadlKodkodModel.portUnaryRel, propTypeUnaryRel));
 			} else {
 				throw new RuntimeException("Unsupported property applies to + " + propOwner);
 			}
@@ -227,12 +279,14 @@ public class Aadl2KodkodTranslator {
 	 * to "abstract sig comp in system", only subcomponents (instantiations) have 
 	 * elements of the component type sig
 	 * */
-	protected void translateSystem(SystemType system, List<Relation> compRels) {
+	protected void translateSystem(SystemType system) {
 		String sanitizedSysName = sanitizeName(system.getName());
 		Relation compTypeRel = aadlKodkodModel.mkUnaryRel(sanitizedSysName);
 		Expression allInportsUnionExpr = null, allOutportsUnionExpr = null;
-		
-		compRels.add(compTypeRel);
+
+		// Save the component type relation 
+		// This is necessary because some component types are not used in the model.
+		saveTypeRelAndInstRel(aadlKodkodModel.compTypeRelToInstRelMap, compTypeRel, null);
 		
 		// Create a binary relation for each data port
 		for (DataPort port : system.getOwnedDataPorts()) {			
@@ -245,16 +299,30 @@ public class Aadl2KodkodTranslator {
 				if (allInportsUnionExpr == null) {
 					allInportsUnionExpr = portBinaryRel;
 				} else {
-					allInportsUnionExpr = aadlKodkodModel.mkUnionExprs(allInportsUnionExpr, portBinaryRel);
+					allInportsUnionExpr = allInportsUnionExpr.union(portBinaryRel);
 				}
+				if(!aadlKodkodModel.allBinaryInportRels.contains(portBinaryRel)) {
+					aadlKodkodModel.allBinaryInportRels.add(portBinaryRel);
+				} else {
+					throw new RuntimeException("Mutltiple system " + sanitizedSysName + " has the same inport name: " + sanitizedPortName);
+				}
+				// Save port binary relation and its domain and range relation
+				aadlKodkodModel.binaryRelToDomainRangeRelMap.put(portBinaryRel, new Pair<>(compTypeRel, aadlKodkodModel.inPortUnaryRel));
 				break;
 			case OUT:
 				portBinaryRel = aadlKodkodModel.mkBinaryRel(compTypeRel, aadlKodkodModel.outPortUnaryRel, true, sanitizedPortName);
 				if (allOutportsUnionExpr == null) {
-					allOutportsUnionExpr = portBinaryRel;
 				} else {
-					allOutportsUnionExpr = aadlKodkodModel.mkUnionExprs(allOutportsUnionExpr, portBinaryRel);
+					allOutportsUnionExpr = allOutportsUnionExpr.union(portBinaryRel);
 				}
+				allOutportsUnionExpr = portBinaryRel;
+				if(!aadlKodkodModel.allBinaryOutportRels.contains(portBinaryRel)) {
+					aadlKodkodModel.allBinaryOutportRels.add(portBinaryRel);
+				} else {
+					throw new RuntimeException("Mutltiple system " + sanitizedSysName + " has the same outport name: " + sanitizedPortName);
+				}
+				// Save port binary relation and its domain and range relation
+				aadlKodkodModel.binaryRelToDomainRangeRelMap.put(portBinaryRel, new Pair<>(compTypeRel, aadlKodkodModel.outPortUnaryRel));
 				break;
 			case IN_OUT:
 			default:
@@ -262,18 +330,17 @@ public class Aadl2KodkodTranslator {
 			}
 			
 			// Handle used port properties
-			Set<String> usedPropNames = new HashSet<>();			
+//			Set<String> usedPropNames = new HashSet<>();			
 //			handleUsedProperties(usedPropNames, null, null, port, subcompSig);
 			
 			// Handle non-used port properties
 //			handleNonUsedProperties(allDeclProps.get(PORT), usedPropNames, subcompSig, aadlAlloyModel.PORTSIG);			
-
 		}
 		
 		// The union of all inports and outports should be equal to 
 		// the "system" field's inports and outports respectively 
-		// all x : compTypeRel | x.inPorts = allInportsUnionExpr
-		// all x : compTypeRel | x.outPorts = allOutportsUnionExpr		
+		// all x : compTypeRel | x.inPorts = x.allInportsUnionExpr
+		// all x : compTypeRel | x.outPorts = x.allOutportsUnionExpr		
 		if (allInportsUnionExpr != null) {
 	        Variable var = Variable.unary("x");
 	        Formula fact = var.join(aadlKodkodModel.inPortsBinaryRel).eq(var.join(allInportsUnionExpr)).forAll(var.oneOf(compTypeRel));			
@@ -281,19 +348,15 @@ public class Aadl2KodkodTranslator {
 		}
 		if (allOutportsUnionExpr != null) {
 	        Variable var = Variable.unary("x");
-	        Formula fact = var.join(aadlKodkodModel.inPortsBinaryRel).eq(var.join(allOutportsUnionExpr)).forAll(var.oneOf(compTypeRel));			
+	        Formula fact = var.join(aadlKodkodModel.outPortsBinaryRel).eq(var.join(allOutportsUnionExpr)).forAll(var.oneOf(compTypeRel));			
 			aadlKodkodModel.facts.add(fact);
 		}		
 	}
 	
 	/**
 	 * 
-	 * Translate system implementations
+	 * Translate s system implementation
 	 * For each system implementation SysImpl, we translate it into the following:
-	 * "one sig SysImpl extends SysImplTypeSig {
-	 * 		subcomponents : set system,
-	 * 		connections : set connection
-	 * }"
 	 * 
 	 * */
 	protected void translateSystemImpl(SystemImplementation systemImpl) {
@@ -303,33 +366,30 @@ public class Aadl2KodkodTranslator {
 		Relation systemImplTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizedSystemImplTypeName);
 		Relation systemImplRel = aadlKodkodModel.mkUnaryRel(sanitizedSystemImplName);
 		
-		aadlKodkodModel.mkSubRelationship(systemImplTypeRel, false, Arrays.asList(systemImplRel), true);
+		// Save the implementation type and implementation relations pair
+		// Consider the implementation as an instance of the implementation type
+		saveTypeRelAndInstRel(aadlKodkodModel.compTypeRelToInstRelMap, systemImplTypeRel, systemImplRel);
 		
 		// Obtain all the systemImpl join inports and outports expressions
-		for(Feature feature: systemImplType.getOwnedFeatures()) {				
+		for(Feature feature : systemImplType.getOwnedFeatures()) {				
 			if(feature instanceof DataPort) {
 				DataPort dp = (DataPort) feature;
 				String portName = sanitizeName(dp.getFullName());
-				Relation portBinaryRel = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<Sig, String>(systemImplTypeSig, portName));
+				Relation portBinaryRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<Relation, String>(systemImplTypeRel, portName));
 				
 				switch (dp.getDirection()) {
 				case IN:
-					aadlKodkodModel.allInstInports.add(join(systemImplSig, portField));
+					aadlKodkodModel.allInstInports.add(systemImplRel.join(portBinaryRel));
 					break;
 				case OUT:
-					aadlKodkodModel.allInstOutports.add(join(systemImplSig, portField));
+					aadlKodkodModel.allInstOutports.add(systemImplRel.join(portBinaryRel));
 					break;
 				case IN_OUT:
 				default:
 					throw new RuntimeException("In/out port not supported");
 				}
-				
-				// TODO: Need to handle the case where there are multiple instances of system implementation
-				aadlKodkodModel.portNum++;
 			}
 		}		
-		// Save the systemImpl sig
-		aadlKodkodModel.systemNum++;
 	}
 	
 	/**
@@ -340,10 +400,8 @@ public class Aadl2KodkodTranslator {
 	 * */
 	protected void translateSystemImplSubcomponents(SystemImplementation systemImpl) {
 		printHeader("Translate Subcomponents of " + systemImpl.getFullName());
-		Expr allSubcompsUnionExpr = null;
-		String sanitizedSysImplName = sanitizeName(systemImpl.getName());		
-		Sig systemImplSig = aadlKodkodModel.compNameToSigMap.get(sanitizedSysImplName);				
-		
+		Expression allSubcompsUnionExpr = null;
+						
 		// subcomponents field of a system impl = the sum of all subcomponents 
 		for (Subcomponent subcomp : systemImpl.getOwnedSubcomponents()) {
 			printHeader("Translating a subcomponent: " + subcomp.getFullName());
@@ -357,168 +415,159 @@ public class Aadl2KodkodTranslator {
 			String sanitizedSubcompCompTypeName = sanitizeName(subcompCompType.getName());
 			String sanitizedSubcompTypeName = sanitizeName(subcompType.getName());
 			
-			Sig subcompCompTypeSig = aadlKodkodModel.compNameToSigMap.get(sanitizedSubcompCompTypeName);
-			Sig subcompTypeSig = aadlKodkodModel.compNameToSigMap.get(sanitizedSubcompTypeName);
+			Relation subcompCompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizedSubcompCompTypeName);
+			Relation subcompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizedSubcompTypeName);
 			
 			// Make an instance (one sig subcomp in subcompTypeSig) for the subcomponent
 			String subcompName = sanitizeName(subcomp.getName());
-			// We expect all instances of an implementation to possess the same set of properties
-			// That is why we use the multiplicity keyword "ONE"
+			Relation subcompRel = aadlKodkodModel.mkUnaryRel(subcompName);
 			
-			SubsetSig subcompSig = new SubsetSig(subcompName, Arrays.asList((PrimSig)subcompTypeSig), Attr.ONE);
-			
-			// Make the union of all subcomponents sigs
-			if (allSubcompsUnionExpr == null) {
-				allSubcompsUnionExpr = subcompSig;
+			// Save the component type relation to instance relations pair
+			// if the subcomponent is an instance of a component type.
+			// Otherwise, save the implementation and the instance pair; 
+			// and also save the pair between the type and the implementation.
+			if(subcompTypeRel==subcompCompTypeRel) {
+				saveTypeRelAndInstRel(aadlKodkodModel.compTypeRelToInstRelMap, subcompCompTypeRel, subcompRel);
 			} else {
-				allSubcompsUnionExpr = union(allSubcompsUnionExpr, subcompSig);						
+				saveTypeRelAndInstRel(aadlKodkodModel.compTypeRelToInstRelMap, subcompCompTypeRel, subcompTypeRel);
+				saveTypeRelAndInstRel(aadlKodkodModel.compImplRelToInstRelMap, subcompTypeRel, subcompRel);
+			}
+			
+			// Make the union of all subcomponents relations
+			if (allSubcompsUnionExpr == null) {
+				allSubcompsUnionExpr = subcompRel;
+			} else {
+				allSubcompsUnionExpr = allSubcompsUnionExpr.union(subcompRel);						
 			}
 			
 			// Handle used subcomponent properties
 			Set<String> usedPropNames = new HashSet<>();			
-			handleUsedProperties(usedPropNames, subcomp, null, null, subcompSig);
+			handleUsedProperties(usedPropNames, subcomp, null, null, subcompRel);
 			
 			// Handle non-used properties
-			handleNonUsedProperties(allDeclProps.get(SYSTEM), usedPropNames, subcompSig, aadlKodkodModel.SYSTEMSIG);
+			handleNonUsedProperties(allDeclProps.get(aadlKodkodModel.SYSTEM), usedPropNames, subcompRel, aadlKodkodModel.systemUnaryRel);
 				
-			// Obtain all the subcomp sig joins its fields: inports and outports expressions
+			// Obtain all the subcomp rel joins its fields: inports and outports expressions
 			for(Feature feature: subcompCompType.getOwnedFeatures()) {				
 				if(feature instanceof DataPort) {
 					DataPort dp = (DataPort) feature;
 					String portName = sanitizeName(dp.getFullName());
-					Field portField = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<Sig, String>(subcompCompTypeSig, portName));
+					Relation portRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<Relation, String>(subcompCompTypeRel, portName));
 					
 					switch (dp.getDirection()) {
 					case IN:
-						aadlKodkodModel.allInstInports.add(join(subcompSig, portField));
+						aadlKodkodModel.allInstInports.add(subcompRel.join(portRel));
 						break;
 					case OUT:
-						aadlKodkodModel.allInstOutports.add(join(subcompSig, portField));
+						aadlKodkodModel.allInstOutports.add(subcompRel.join(portRel));
 						break;
 					case IN_OUT:
 					default:
 						throw new RuntimeException("In/out port not supported");
 					}
-					aadlKodkodModel.portNum++;
 				}
 			}
-			
-			// Save subcomSig and increase system number
-			aadlKodkodModel.subcompSigs.add(subcompSig);
-			aadlKodkodModel.compNameToSigMap.put(subcompName, subcompSig);
-			aadlKodkodModel.systemNum++;
 		}
 		
-		// The union of all "subcomponent" expressions is equal to the system impl sig
-		// join with its "subcomponents" field 
-		if (allSubcompsUnionExpr != null) {
-			for(Field field : systemImplSig.getFields()) {
-				if(field.label.equalsIgnoreCase(SUBCOMPONENTS)) {
-					aadlKodkodModel.facts.add(equal(join(systemImplSig, field),
-							allSubcompsUnionExpr));
-					break;
-				}
-			}
+		// Save: systemImplRel.subcomponents = allSubcompsUnionExpr
+		if (allSubcompsUnionExpr != null) {			
+			Relation systemImplRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizeName(systemImpl.getName()));
+			sysImplTypeRelToSubcompsExpr.put(systemImplRel, allSubcompsUnionExpr);
 		}		
 	}
 	
 	/**
 	 * 	Translate connections of a system implementation
  	 *  TODO: Need to make sure the connection name is unique
- 	 *  1. Make a sig for each connection
+ 	 *  1. Make a relation for each connection
  	 *  2. The union of all connections = system impl sig join with its "connections" field
 	 * */
 	protected void translateSystemImplConnections(SystemImplementation systemImpl) {
-		Expr allConnsUnionExpr = null;
-		String sysImplName = sanitizeName(systemImpl.getFullName());
-		Sig systemImplSig = aadlKodkodModel.compNameToSigMap.get(sysImplName);
+		Expression allConnsUnionExpr = null;
+		Relation systemImplRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizeName(systemImpl.getFullName()));
 		
 		for(Connection conn : systemImpl.getOwnedConnections()) {			
-			Sig srcSubcompSig = null;
-			Sig srcSubcompTypeSig = null;
-			Sig destSubcompSig = null;
-			Sig destSubcompTypeSig = null;
+			Relation srcSubcompRel = null;
+			Relation srcSubcompTypeRel = null;
+			Relation destSubcompRel = null;
+			Relation destSubcompTypeRel = null;			
+			String connName = sanitizeName(conn.getName());
+			Relation connRel = aadlKodkodModel.mkUnaryRel(connName);
 			
-			String connName = sanitizeName(conn.getFullName());
-			Sig connSig = new PrimSig(connName, aadlKodkodModel.CONNSIG, Attr.ONE);			
-			System.out.println("*** translate connection = " + connName);
-			
+			if(!aadlKodkodModel.allConnectionRels.contains(connRel)) {
+				aadlKodkodModel.allConnectionRels.add(connRel);
+			} else {
+				throw new RuntimeException("Multiple connections with the same name in the AADL model: " + connName);
+			}
+						
+			System.out.println("*** Translate a connection = " + connName);
+			// The ports in the connection
 			ConnectionEnd srcConnectionEnd = conn.getAllSource();
 			ConnectionEnd destConnectionEnd = conn.getAllDestination();
 			
 			// Obtain the src and dest subcomponent sig and their type sigs 
+			// If conn.getAllSource()/conn.getAllDestinationContext() is null, it means the connection
+			// conn.getAllSourceContext() is the subcomponent 
 			if(conn.getAllSourceContext()!= null) {
 				String srcConnectionSubcompName = sanitizeName(conn.getAllSourceContext().getFullName());
 				String srcSubcompTypeName = sanitizeName(srcConnectionEnd.getContainingClassifier().getFullName());
 				
-				srcSubcompSig = aadlKodkodModel.compNameToSigMap.get(srcConnectionSubcompName);
-				srcSubcompTypeSig = aadlKodkodModel.compNameToSigMap.get(srcSubcompTypeName);
+				srcSubcompRel = aadlKodkodModel.nameToUnaryRelMap.get(srcConnectionSubcompName);
+				srcSubcompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(srcSubcompTypeName);
 			} else {
-				srcSubcompTypeSig = aadlKodkodModel.compNameToSigMap.get(sanitizeName(srcConnectionEnd.getContainingClassifier().getFullName()));
+				srcSubcompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizeName(srcConnectionEnd.getContainingClassifier().getFullName()));
 			}
 			if(conn.getAllDestinationContext() != null) {
 				String destConnectionSubcompName = conn.getAllDestinationContext().getFullName();
 				String destSubcompTypeName = sanitizeName(destConnectionEnd.getContainingClassifier().getFullName());
 				
-				destSubcompSig = aadlKodkodModel.compNameToSigMap.get(destConnectionSubcompName);
-				destSubcompTypeSig = aadlKodkodModel.compNameToSigMap.get(destSubcompTypeName);
+				destSubcompRel = aadlKodkodModel.nameToUnaryRelMap.get(destConnectionSubcompName);
+				destSubcompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(destSubcompTypeName);
 			} else {
-				destSubcompTypeSig = aadlKodkodModel.compNameToSigMap.get(sanitizeName(destConnectionEnd.getContainingClassifier().getFullName()));;
+				destSubcompTypeRel = aadlKodkodModel.nameToUnaryRelMap.get(sanitizeName(destConnectionEnd.getContainingClassifier().getFullName()));;
 			}
 
 			
 			String srcPortName = sanitizeName(srcConnectionEnd.getFullName());			
 			String destPortName = sanitizeName(destConnectionEnd.getFullName());
-			Field srcPortField = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<>(srcSubcompTypeSig, srcPortName));
-			Field destPortField = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<>(destSubcompTypeSig, destPortName));
+			Relation srcPortRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(srcSubcompTypeRel, srcPortName));
+			Relation destPortRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(destSubcompTypeRel, destPortName));			
+			Expression connSrcPortExpr = connRel.join(aadlKodkodModel.srcPortBinaryRel);
+			Expression actualConnSrcPortExpr = (srcSubcompRel != null ? srcSubcompRel : systemImplRel).join(srcPortRel);			
+			Expression connDestPortExpr = connRel.join(aadlKodkodModel.destPortBinaryRel);
+			Expression actualConnDestPortExpr = (destSubcompRel != null ? destSubcompRel : systemImplRel).join(destPortRel);
 			
-			// Alloy Encoding:
+			// Kodkod Encoding:
 			// connectionSig.srcPort = subcomponentSig/systemImplSig.srcPort
-			Expr connSrcPortExpr = join(connSig, aadlKodkodModel.CONNSRCPORTSIG);
-			Expr actualConnSrcPortExpr = join(srcSubcompSig != null ? srcSubcompSig : systemImplSig, srcPortField);			
-		    // connectionSig.destPort = subcomponentSig/systemImplSig.destPort
-			Expr connDestPortExpr = join(connSig, aadlKodkodModel.CONNDESTPORTSIG);
-			Expr actualConnDestPortExpr = join(destSubcompSig != null ? destSubcompSig : systemImplSig, destPortField);
-			
-			aadlKodkodModel.facts.add(equal(connSrcPortExpr, actualConnSrcPortExpr));
-			aadlKodkodModel.facts.add(equal(connDestPortExpr, actualConnDestPortExpr));
-			
+		    // connectionSig.destPort = subcomponentSig/systemImplSig.destPort			
+			aadlKodkodModel.mkEq(connSrcPortExpr, actualConnSrcPortExpr);
+			aadlKodkodModel.mkEq(connDestPortExpr, actualConnDestPortExpr);
 			
 			// Handle declared CONNECTION properties
 			Set<String> declPropNames = new HashSet<>();			
-			handleUsedProperties(declPropNames, null, conn, null, connSig);			
+			handleUsedProperties(declPropNames, null, conn, null, connRel);			
 			// Handle non-declared properties
-			handleNonUsedProperties(allDeclProps.get(CONNECTION), declPropNames, connSig, aadlKodkodModel.CONNSIG);
+			handleNonUsedProperties(allDeclProps.get(aadlKodkodModel.CONNECTION), declPropNames, connRel, aadlKodkodModel.connectionUnaryRel);
 			
 			// Union of all connections of the system implementation 
 			if(allConnsUnionExpr == null) {
-				allConnsUnionExpr = connSig;
+				allConnsUnionExpr = connRel;
 			} else {
-				allConnsUnionExpr = union(allConnsUnionExpr, connSig);
+				allConnsUnionExpr = allConnsUnionExpr.union(connRel);
 			}
-			
-			// save connection name and sig
-			aadlKodkodModel.compNameToSigMap.put(connName, connSig);
-			aadlKodkodModel.connectionNum++;
 		}
 		
 		// The union of all "subcomponent" expressions is equal to the system impl sig
 		// join with its "subcomponents" field 
-		if (allConnsUnionExpr != null) {
-			for(Field field : systemImplSig.getFields()) {
-				if(field.label.equalsIgnoreCase(CONNECTIONS)) {
-					aadlKodkodModel.facts.add(equal(join(systemImplSig, field),
-							allConnsUnionExpr));
-					break;
-				}
-			}
-		}			
+		if (allConnsUnionExpr != null) {	
+			sysImplTypeRelToConnsExpr.put(systemImplRel, allConnsUnionExpr);
+		}				
 	}
 	
 	/**
 	 * Handle declared properties
 	 * */
-	 void handleUsedProperties(Set<String> declPropNames, Subcomponent subcomp, Connection conn, Port port, Sig relevantSig) {
+	 void handleUsedProperties(Set<String> declPropNames, Subcomponent subcomp, Connection conn, Port port, Relation relevantRel) {
 		List<PropertyAssociation> propAccs = null;
 		
 		if(subcomp != null) {
@@ -533,28 +582,28 @@ public class Aadl2KodkodTranslator {
 		if(propAccs != null && !propAccs.isEmpty()) {
 			for (PropertyAssociation prop : propAccs) { 								
 				String propName = prop.getProperty().getFullName();
-				Field propField = null;
+				Relation propRel = null;
 				printHeader("Translate a used property: " + propName);
 				
 				if(subcomp != null) {
-					propField = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<>(aadlKodkodModel.SYSTEMSIG, propName));
+					propRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(aadlKodkodModel.systemUnaryRel, propName));
 				} else if(conn != null) {
-					propField = aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<>(aadlKodkodModel.CONNSIG, propName));
-				} else {
-					
+					propRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(aadlKodkodModel.connectionUnaryRel, propName));
+				} else if(port != null){
+					propRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(aadlKodkodModel.portUnaryRel, propName));
 				}
 				
 				// Add to declared props set
 				declPropNames.add(propName);
 				
-				// We assume that each property only has only 1 value for now
+				// We assume that each property only has only 1 non-list value for now
 				if(prop.getOwnedValues().size() == 1) {
 					ModalPropertyValue val = prop.getOwnedValues().get(0);					
-					Sig propValSig = getPropertyValueSig(val.getOwnedValue());
+					Relation propValRel = getPropertyValueRel(val.getOwnedValue());
 					
-					if(propValSig != null) {
+					if(propValRel != null) {
 						// subcompSig.propSig = propValSig 
-						aadlKodkodModel.facts.add(equal(relevantSig.join(propField), propValSig));
+						aadlKodkodModel.mkEq(relevantRel.join(propRel), propValRel);
 					} else {
 						throw new RuntimeException("Unexpected: property value is null!");
 					}
@@ -570,54 +619,39 @@ public class Aadl2KodkodTranslator {
 	 * For all non-declared system, connection, and port properties, we add the following facts:
 	 * relevantSig.propSig = unkownPropSig
 	 * */
-	void handleNonUsedProperties(List<String> allDeclPropNames, Set<String> declPropNames, Sig relevantSig, Sig relevantArchSig) {
+	void handleNonUsedProperties(List<String> allDeclPropNames, Set<String> declPropNames, Relation relevantSig, Relation relevantArchSig) {
 		
 		if(allDeclPropNames != null) {
 			for(String propName : allDeclPropNames) {
 				if(!declPropNames.contains(propName)) {
 					printHeader("Translate a not used property: " + propName);
 					String unknownPropName = aadlKodkodModel.UNKNOWN + propName;
-					Sig unknownPropValueSig = aadlKodkodModel.propNameToSigMap.get(unknownPropName);
+					Relation unknownPropValueRel = aadlKodkodModel.nameToUnaryRelMap.get(unknownPropName);
 					
-					aadlKodkodModel.facts.add(equal(relevantSig.join(aadlKodkodModel.compSigFdNameToFdMap.get(new Pair<>(relevantArchSig, propName))), unknownPropValueSig));
+					aadlKodkodModel.mkEq(relevantSig.join(aadlKodkodModel.domainRelNameToRelMap.get(new Pair<>(relevantArchSig, propName))), unknownPropValueRel);
 				}
 			}
 		}
 	}	
 	
 	
-	protected static String sanitizeName(String name) {
-		return name != null ? name.replace(".", "_") : "";
-	}
-	
  	/**
 	 * Aux functions to create expressions
 	 * */
-	public final Expr join(Expr expr1, Expr expr2) {
-		return ExprBinary.Op.JOIN.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
+	
+	protected static String sanitizeName(String name) {
+		return name != null ? name.replace(".", "_") : "";
 	}
-	
-	public final Expr union(Expr expr1, Expr expr2) {
-		return ExprBinary.Op.PLUS.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
-	}
-	
-	public final Expr disj(List<Expr> exprs) {
-		return ExprList.makeDISJOINT(Pos.UNKNOWN, Pos.UNKNOWN, exprs);
-	}	
-	
-	public final Expr equal(Expr expr1, Expr expr2) {
-		return ExprBinary.Op.EQUALS.make(Pos.UNKNOWN, Pos.UNKNOWN, expr1, expr2);
-	}
-	
+
 	
 	protected Optional<PublicPackageSection> getPublicModel(EObject obj) {
 		return Util.searchEObject(obj, PublicPackageSection.class);
 	}
 	
 	/**
-	 * Get the sig for the input property value
+	 * Get the relation for the input property value
 	 * */
-	public Sig getPropertyValueSig(PropertyExpression exp)
+	public Relation getPropertyValueRel(PropertyExpression exp)
 	{
 		if(exp == null) {
 			warning("The input to getPropertyValueSig is null!");
@@ -630,8 +664,8 @@ public class Aadl2KodkodTranslator {
 			BooleanLiteralImpl bool = ((BooleanLiteralImpl) exp);
 			value = Boolean.toString(bool.getValue());
 		} else if (exp instanceof IntegerLiteralImpl) {
-			IntegerLiteralImpl inte = ((IntegerLiteralImpl) exp);
-			value = aadlKodkodModel.DALNames[(int)inte.getValue()];
+			IntegerLiteralImpl intVal = ((IntegerLiteralImpl) exp);
+			value = aadlKodkodModel.DALNames[(int)intVal.getValue()];
 		} else if (exp instanceof NamedValueImpl) {
 			NamedValueImpl namedValue =((NamedValueImpl) exp);
 			
@@ -645,8 +679,37 @@ public class Aadl2KodkodTranslator {
 		} else {
 			throw new RuntimeException("Unsupported property value: " + exp);
 		}
-		return aadlKodkodModel.propNameToSigMap.get(value);
+		return aadlKodkodModel.nameToUnaryRelMap.get(value);
 	}	
+	
+	/**
+	 * Increase relation's count by 1
+	 * */
+	void increaseRelCountByOne(Map<Relation, Integer> map, Relation rel) {
+		if(map.containsKey(rel)) {
+			int currCount = map.get(rel);
+			map.put(rel, currCount+1);
+		} else {
+			map.put(rel, 1);
+		}
+	}	
+	
+	void saveTypeRelAndInstRel(Map<Relation, Set<Relation>> map, Relation compTypeRel, Relation instRel) {
+		
+		if(map.containsKey(compTypeRel)) {
+			System.out.println("1 &*********** Adding type relation: " + compTypeRel + " system implementation relation: " + instRel);
+			Set<Relation> instRels = map.get(compTypeRel); 
+			instRels.add(instRel);
+			map.put(compTypeRel, instRels);
+		} else {
+			System.out.println("2 &*********** Adding type relation: " + compTypeRel + " system implementation relation: " + instRel);
+			Set<Relation> instRels = new HashSet<Relation>();
+			if(instRel != null) {
+				instRels.add(instRel);
+			}
+			map.put(compTypeRel, instRels);
+		}
+	}
 	
 	
 	/**
@@ -656,7 +719,9 @@ public class Aadl2KodkodTranslator {
 		if(allDeclProps.containsKey(propCat)) {
 			allDeclProps.get(propCat).add(propName);
 		} else {			
-			if(propCat.equalsIgnoreCase(PORT) || propCat.equalsIgnoreCase(SYSTEM) || propCat.equalsIgnoreCase(CONNECTION)) {
+			if(propCat.equalsIgnoreCase(aadlKodkodModel.PORT) || 
+					propCat.equalsIgnoreCase(aadlKodkodModel.SYSTEM) || 
+					propCat.equalsIgnoreCase(aadlKodkodModel.CONNECTION)) {
 				List<String> props = new ArrayList<>();
 				props.add(propName);
 				allDeclProps.put(propCat.toLowerCase(), props);	

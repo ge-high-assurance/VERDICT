@@ -67,10 +67,13 @@ import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 
+import com.ge.research.osate.verdict.alloy.Aadl2KodkodTranslator;
 import com.ge.research.osate.verdict.alloy.AadlAlloyTranslator;
 import com.ge.research.osate.verdict.alloy.AlloyPrettyPrinter;
 import com.ge.research.osate.verdict.alloy.SysArchAlloyModel;
+import com.ge.research.osate.verdict.alloy.SysArchKodkodModel;
 import com.ge.research.osate.verdict.alloy.ThreatLibrary;
+import com.ge.research.osate.verdict.alloy.ThreatModel2KodkodTranslator;
 import com.ge.research.osate.verdict.alloy.ThreatModelAlloyTranslator;
 import com.ge.research.osate.verdict.alloy.ThreatModelParser;
 import com.ge.research.osate.verdict.alloy.Util;
@@ -107,7 +110,6 @@ public class AADL2AlloyHandler extends AbstractHandler {
 			Thread mbasAnalysisThread = new Thread() {
 				@Override
 				public void run() {
-//					runFromFile("/Users/baoluomeng/Desktop/test/alloy/test1.als");
 					final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
 					final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);					
 					File dir = new File(VerdictHandlersUtils.getCurrentSelection(event).get(0));									
@@ -115,10 +117,13 @@ public class AADL2AlloyHandler extends AbstractHandler {
 					
 					// Get all AADL files contents in the project
 					List<EObject> objects = new ArrayList<>();
+					List<String> verdictPaths = new ArrayList<>();
 					
 					for (File file : dir.listFiles()) {
 						if (file.getAbsolutePath().endsWith(".aadl")) {
 							aadlFileNames.add(file.getAbsolutePath());
+						} else if (file.getAbsolutePath().endsWith(".verdict")) {
+							verdictPaths.add(file.getAbsolutePath());
 						}
 					}
 					
@@ -141,15 +146,7 @@ public class AADL2AlloyHandler extends AbstractHandler {
 						resource.getAllContents().forEachRemaining(objects::add);
 					}
 					
-					// Start the translation and invoke the solver
-					SysArchAlloyModel sysArchAlloyModel = new SysArchAlloyModel();
-					sysArchAlloyModel.loadBuiltinConstructs();
-					
-					AadlAlloyTranslator aadlAlloyTranslator = new AadlAlloyTranslator(sysArchAlloyModel);
-					aadlAlloyTranslator.translateFromAADLObjects(objects);
-//					AlloyPrettyPrinter.printToAlloy(sysArchAlloyModel);					
-					sysArchAlloyModel.execute();
-					
+					executeKodkod(objects, verdictPaths);
 				}
 			};
 			mbasAnalysisThread.start();	
@@ -157,6 +154,27 @@ public class AADL2AlloyHandler extends AbstractHandler {
 				
 		}
 		return null;		
+	}
+	
+	public void executeAlloy(List<EObject> objects) {
+		// Start the translation and invoke the solver
+		SysArchAlloyModel sysArchAlloyModel = new SysArchAlloyModel();
+		sysArchAlloyModel.loadBuiltinConstructs();
+		
+		AadlAlloyTranslator aadlAlloyTranslator = new AadlAlloyTranslator(sysArchAlloyModel);
+		aadlAlloyTranslator.translateFromAADLObjects(objects);
+//		AlloyPrettyPrinter.printToAlloy(sysArchAlloyModel);					
+		sysArchAlloyModel.execute();		
+	}
+	
+	public void executeKodkod(List<EObject> objects, List<String> verdictPaths) {
+		SysArchKodkodModel kodkodModel = new SysArchKodkodModel();
+		Aadl2KodkodTranslator aadl2Kodkod = new Aadl2KodkodTranslator(kodkodModel);		
+		aadl2Kodkod.translateFromAADLObjects(objects);
+		
+		ThreatModel2KodkodTranslator verdict2Kodkod = new ThreatModel2KodkodTranslator(kodkodModel);
+		verdict2Kodkod.translate(verdictPaths);
+		kodkodModel.execute(); 
 	}
 	
 	public void runFromFile(String filename) throws Err{
