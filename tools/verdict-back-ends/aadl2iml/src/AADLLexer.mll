@@ -46,6 +46,7 @@
     "aadlinteger",    P.AADLINTEGER ;
     "aadlreal",       P.AADLREAL ;
     "enumeration",    P.ENUMERATION ;
+    "extends",        P.EXTENDS ;
     "property",       P.PROPERTY ;
     "package",        P.PACKAGE ;
     "system",         P.SYSTEM ;
