@@ -82,6 +82,7 @@ rule token = parse
   | "else"           { P.ELSE }
   | "true"           { P.TRUE }
   | "false"          { P.FALSE }
+  | "prev"           { P.PREV }
 
   | "**}"            { P.ANNEX_BLOCK_END }
   | "<=>"            { P.EQUIV }

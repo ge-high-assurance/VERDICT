@@ -228,6 +228,8 @@ let merge_packages input =
         let e2 = flatten_agree_expr e2 in
         let e3 = flatten_agree_expr e3 in
         AG.Ite (pos, e1, e2, e3)
+      | AG.Prev (pos, e1, e2) ->
+        AG.Prev (pos, flatten_agree_expr e1, flatten_agree_expr e2)
       | AG.Proj (pos, e, pid) -> (
         match e with
         | AG.Ident name -> flatten_proj pos (name, pid)
