@@ -318,7 +318,8 @@ let agree_annex_to_contract_spec type_decls annex =
       | AG.EqStatement (_, v) ->
         (cds, v :: vds, ass, gts)
       | AG.AssignStatement _
-      | AG.NodeDefinition _ -> assert false
+      | AG.NodeDefinition _
+      | AG.AssertStatement _ -> assert false
     )
     ([], [], [], []) (List.rev annex)
   in
@@ -1058,14 +1059,14 @@ let agree_assign_statement_to_iml_equation { AG.var; AG.definition } =
   }
 
 let agree_annex_to_dataflow_impl type_decls annex =
-  let const_decls, var_decls, eqs =
-    List.fold_left (fun (cds, vds, eqs) -> function
+  let const_decls, var_decls, eqs, assertions =
+    List.fold_left (fun (cds, vds, eqs, ass) -> function
       | AG.ConstStatement (_, const_decl) ->
         let c = agree_const_decl_to_iml_const_decl type_decls const_decl in
-        (c::cds, vds, eqs)
+        (c::cds, vds, eqs, ass)
       | AG.AssignStatement (_, assign_st) ->
         let eq = agree_assign_statement_to_iml_equation assign_st in
-        (cds, vds, eq :: eqs)
+        (cds, vds, eq :: eqs, ass)
       | AG.EqStatement (_, {AG.vars; AG.definition}) ->
         let vds' =
           List.fold_left (fun acc (id,dtype) ->
@@ -1085,15 +1086,18 @@ let agree_annex_to_dataflow_impl type_decls annex =
            VI.rhs = agree_expr_to_iml_expr def;
           }
         in
-        (cds, List.rev_append vds' vds, eq :: eqs)
+        (cds, List.rev_append vds' vds, eq :: eqs, ass)
+      | AG.AssertStatement (_, { AG.expression }) ->
+        let e = agree_expr_to_iml_expr expression in
+        (cds, vds, eqs, e :: ass)
       | AG.NamedSpecStatement _
       | AG.NodeDefinition _ -> assert false
     )
-    ([], [], []) (List.rev annex)
+    ([], [], [], []) (List.rev annex)
   in
   {VI.constant_declarations = const_decls;
    VI.variable_declarations = var_decls;
-   VI.assertions = [];
+   assertions;
    VI.equations = eqs;
    VI.properties = [];
   }
@@ -1152,7 +1156,8 @@ let agree_annex_to_dataflow_model type_decls annex =
       | AG.NodeDefinition (_, n) -> (cds, n :: nds)
       | AG.NamedSpecStatement _
       | AG.EqStatement _
-      | AG.AssignStatement _ -> assert false
+      | AG.AssignStatement _
+      | AG.AssertStatement _ -> assert false
     )
     ([], []) (List.rev annex)
   in

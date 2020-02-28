@@ -90,12 +90,17 @@ type assign_statement = {
   definition: expr;
 }
 
+type assert_statement = {
+  expression: expr;
+}
+
 type spec_statement =
   | NamedSpecStatement of Position.t * named_spec_statement
   | ConstStatement of Position.t * const_statement
   | EqStatement of Position.t * eq_statement
   | AssignStatement of Position.t * assign_statement
   | NodeDefinition of Position.t * node_definition
+  | AssertStatement of Position.t * assert_statement
 
 type agree_annex = spec_statement list
 
