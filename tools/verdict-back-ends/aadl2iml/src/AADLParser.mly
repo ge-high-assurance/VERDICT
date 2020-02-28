@@ -55,7 +55,7 @@ let mk_package_section header_items body_items =
 %}
 
 %token AADLBOOLEAN AADLSTRING AADLINTEGER AADLREAL ENUMERATION
-%token PROPERTY SET IS APPLIES TO INHERIT
+%token PROPERTY SET IS APPLIES TO INHERIT EXTENDS
 %token PACKAGE SYSTEM IMPLEMENTATION FEATURES PROPERTIES
 %token SUBCOMPONENTS CONNECTIONS
 %token PUBLIC PRIVATE
@@ -493,15 +493,19 @@ package_properties:
   (* INCOMPLE *)
 
 data_type:
-  DATA pid = ident
+  DATA pid = ident; ext_qcr = option(type_extension);
   prop_assocs = component_properties
   (* INCOMPLETE *)
   END ID ";"
   {
     { A.name = pid;
+      A.type_extension = ext_qcr;
       A.properties = prop_assocs;
     }
   }
+
+type_extension:
+  EXTENDS qcr = qcref { qcr }
 
 component_properties:
   | { [] }

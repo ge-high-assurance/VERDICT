@@ -110,21 +110,33 @@ let get_data_type type_decls = function
   )
 
 let data_to_type_decls data_types data_impls =
-  let type_decls =
-    let add_type ({AD.name; AD.properties}: AD.data_type) =
+  let type_decls_with_extension_id =
+    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
       match AD.find_assoc data_repr_qpref properties with
-      | None -> {VI.name = C.get_id name; VI.definition = None}
+      | None -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
       | Some {AD.value} -> (
         match value with
         | AD.LiteralOrReference (None, (_, id)) when (equal_ids id "Enum") -> (
           let enumerators = get_enumerators properties in
           let enum_type = VI.EnumType enumerators in
-          {VI.name = C.get_id name; VI.definition = Some enum_type}
+          ({VI.name = C.get_id name; VI.definition = Some enum_type}, None)
         )
         | _ -> failwith ("Only Enum data definitions are supported by now")
       )
     in
     List.map add_type data_types
+  in
+  let type_decls = List.map fst type_decls_with_extension_id in
+  let type_decls =
+    let set_type_aliases ((type_decl, ext_id) : (VI.type_declaration * C.qcref option)) =
+      match ext_id with
+      | None -> type_decl
+      | Some qcr ->
+        { VI.name = type_decl.VI.name;
+          VI.definition = Some (get_data_type type_decls qcr)
+        }
+    in
+    List.map set_type_aliases type_decls_with_extension_id
   in
   let process_data_impl type_decls {AD.name; AD.subcomponents} =
     let type_name = C.get_id (fst name) in
