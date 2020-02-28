@@ -30,7 +30,7 @@ let add_range rg = function
 
 %}
 
-%token ASSUME GUARANTEE LEMMA ASSIGN
+%token ASSUME GUARANTEE LEMMA ASSIGN ASSERT
 %token NODE RETURNS LET TEL VAR
 %token CONST ENUM
 %token REAL BOOL INT
@@ -113,6 +113,10 @@ spec_statement:
   {
     A.NodeDefinition (mk_pos $startpos, nd)
   }
+  | ass = assert_statement
+  {
+    A.AssertStatement (mk_pos $startpos, ass)
+  }
   (* INCOMPLETE *)
 
 ident: id = ID { (mk_pos $startpos, id) }
@@ -174,6 +178,12 @@ named_spec_statement:
   | LEMMA id = option(ident) desc = STRING ":" e = expr_or_pattern_statement ";"
   {
     A.Lemma { A.id = id; A.desc = desc; A.spec = e }
+  }
+
+assert_statement:
+  ASSERT  e = expr_or_pattern_statement ";"
+  {
+    { A.expression = e }
   }
 
 expr_or_pattern_statement:

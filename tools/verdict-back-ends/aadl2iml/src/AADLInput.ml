@@ -300,6 +300,10 @@ let merge_packages input =
       }
     in
 
+    let flatten_assertion { AG.expression } =
+      { AG.expression = flatten_agree_expr expression }
+    in
+
     let flatten_spec_statement = function
       | AG.NamedSpecStatement (pos, n) ->
         AG.NamedSpecStatement (pos, flatten_named_spec_statement n)
@@ -311,6 +315,8 @@ let merge_packages input =
         AG.NodeDefinition (pos, flatten_node_def n)
       | AG.AssignStatement (pos, a) ->
         AG.AssignStatement (pos, flatten_assign_statement a)
+      | AG.AssertStatement (pos, a) ->
+        AG.AssertStatement (pos, flatten_assertion a)
     in
 
     let flatten_agree_annex agree_annex =

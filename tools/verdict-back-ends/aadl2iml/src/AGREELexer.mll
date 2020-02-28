@@ -54,6 +54,7 @@ let real_lit = digit+ ('_' digit+)* '.' digit+ ('_' digit+)* exponent?
 let id = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 
 rule token = parse
+  | "assert"         { P.ASSERT }
   | "assign"         { P.ASSIGN }
   | "assume"         { P.ASSUME }
   | "guarantee"      { P.GUARANTEE }
