@@ -218,6 +218,8 @@ let agree_unary_op_to_iml_unary_op = function
   | AG.Not -> VI.Not
   | AG.UMinus -> VI.UMinus
   | AG.Pre -> VI.Pre
+  | AG.FloorCast -> VI.ToInt
+  | AG.RealCast -> VI.ToReal
 
 let rec agree_expr_to_iml_expr = function
   | AG.BinaryOp (_, op, e1, e2) ->
