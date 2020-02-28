@@ -236,6 +236,10 @@ let rec agree_expr_to_iml_expr = function
     let e2 = agree_expr_to_iml_expr e2 in
     let e3 = agree_expr_to_iml_expr e3 in
     VI.Ite (e1, e2, e3)
+  | AG.Prev (_, e1, e2) ->
+    let delay = agree_expr_to_iml_expr e1 in
+    let init = agree_expr_to_iml_expr e2 in
+    VI.BinaryOp (VI.Arrow, init, VI.UnaryOp (VI.Pre, delay))
   | AG.Proj (_, e, field) ->
     VI.Proj (agree_expr_to_iml_expr e, C.get_id field)
   | AG.Ident pn -> VI.Ident (C.pname_to_string pn)

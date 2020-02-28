@@ -38,6 +38,7 @@ type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
   | UnaryOp of Position.t * unary_op * expr
   | Ite of Position.t * expr * expr * expr
+  | Prev of Position.t * expr * expr
   | Proj of Position.t * expr * pid
   | Ident of pname
   | EnumValue of Position.t * qcref * pid

@@ -38,6 +38,7 @@ type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
   | UnaryOp of Position.t * unary_op * expr
   | Ite of Position.t * expr * expr * expr
+  | Prev of Position.t * expr * expr
   | Proj of Position.t * expr * pid
   | Ident of pname
   | EnumValue of Position.t * qcref * pid
@@ -200,6 +201,9 @@ let rec pp_print_expr ppf = function
   | Ite (_, e1, e2, e3) ->
     Format.fprintf ppf "(if %a then %a else %a)"
       pp_print_expr e1 pp_print_expr e2 pp_print_expr e3
+  | Prev (_, e1, e2) ->
+    Format.fprintf ppf "(prev(%a, %a))"
+      pp_print_expr e1 pp_print_expr e2
   | Proj (_, e, pid) ->
     Format.fprintf ppf "%a.%a"
       pp_print_expr e pp_print_id pid
