@@ -63,6 +63,7 @@ rule token = parse
   | "returns"        { P.RETURNS }
   | "node"           { P.NODE }
   | "enum"           { P.ENUM }
+  | "floor"          { P.FLOOR }
   | "real"           { P.REAL }
   | "bool"           { P.BOOL }
   | "int"            { P.INT }

@@ -33,7 +33,7 @@ let add_range rg = function
 %token ASSUME GUARANTEE LEMMA ASSIGN ASSERT
 %token NODE RETURNS LET TEL VAR
 %token CONST ENUM
-%token REAL BOOL INT
+%token REAL BOOL INT FLOOR
 %token NOT AND OR EQ
 %token IF THEN ELSE PRE
 %token ANNEX_BLOCK_END "**}"
@@ -316,6 +316,10 @@ expr:
     { A.UnaryOp (mk_pos $startpos, A.UMinus, e) }
   | PRE "(" e = expr ")"
     { A.UnaryOp (mk_pos $startpos, A.Pre, e) }
+  | FLOOR "(" e = expr ")"
+    { A.UnaryOp (mk_pos $startpos, A.FloorCast, e) }
+  | REAL "(" e = expr ")"
+    { A.UnaryOp (mk_pos $startpos, A.RealCast, e) }
   | IF e1 = expr THEN e2 = expr ELSE e3 = expr
     { A.Ite (mk_pos $startpos, e1, e2, e3) }
   | e = expr "." pid = ident

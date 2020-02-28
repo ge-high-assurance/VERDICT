@@ -49,7 +49,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | ToInt | ToReal
 
 type expr =
   | BinaryOp of binary_op * expr * expr
@@ -564,6 +564,8 @@ let get_unary_op_kind_and_field = function
   | Not -> "Not", "not"
   | UMinus -> "Negative", "negative"
   | Pre -> "Pre", "pre"
+  | ToInt -> "ToInt", "to_int"
+  | ToReal -> "ToReal", "to_real"
 
 let rec pp_print_expr ind ppf expr =
   Format.fprintf ppf "e.kind = ExpressionKind.";

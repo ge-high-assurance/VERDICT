@@ -32,7 +32,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod | Exp
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | FloorCast | RealCast
 
 type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
@@ -190,6 +190,12 @@ let rec pp_print_expr ppf = function
       pp_print_expr e
   | UnaryOp (_, Pre, e) ->
     Format.fprintf ppf "(pre (%a))"
+      pp_print_expr e
+  | UnaryOp (_, FloorCast, e) ->
+    Format.fprintf ppf "(floor (%a))"
+      pp_print_expr e
+  | UnaryOp (_, RealCast, e) ->
+    Format.fprintf ppf "(real (%a))"
       pp_print_expr e
   | Ite (_, e1, e2, e3) ->
     Format.fprintf ppf "(if %a then %a else %a)"

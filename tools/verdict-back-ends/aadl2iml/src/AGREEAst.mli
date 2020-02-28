@@ -32,7 +32,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod | Exp
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | FloorCast | RealCast
 
 type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
