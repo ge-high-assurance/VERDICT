@@ -110,21 +110,33 @@ let get_data_type type_decls = function
   )
 
 let data_to_type_decls data_types data_impls =
-  let type_decls =
-    let add_type ({AD.name; AD.properties}: AD.data_type) =
+  let type_decls_with_extension_id =
+    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
       match AD.find_assoc data_repr_qpref properties with
-      | None -> {VI.name = C.get_id name; VI.definition = None}
+      | None -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
       | Some {AD.value} -> (
         match value with
         | AD.LiteralOrReference (None, (_, id)) when (equal_ids id "Enum") -> (
           let enumerators = get_enumerators properties in
           let enum_type = VI.EnumType enumerators in
-          {VI.name = C.get_id name; VI.definition = Some enum_type}
+          ({VI.name = C.get_id name; VI.definition = Some enum_type}, None)
         )
         | _ -> failwith ("Only Enum data definitions are supported by now")
       )
     in
     List.map add_type data_types
+  in
+  let type_decls = List.map fst type_decls_with_extension_id in
+  let type_decls =
+    let set_type_aliases ((type_decl, ext_id) : (VI.type_declaration * C.qcref option)) =
+      match ext_id with
+      | None -> type_decl
+      | Some qcr ->
+        { VI.name = type_decl.VI.name;
+          VI.definition = Some (get_data_type type_decls qcr)
+        }
+    in
+    List.map set_type_aliases type_decls_with_extension_id
   in
   let process_data_impl type_decls {AD.name; AD.subcomponents} =
     let type_name = C.get_id (fst name) in
@@ -206,6 +218,8 @@ let agree_unary_op_to_iml_unary_op = function
   | AG.Not -> VI.Not
   | AG.UMinus -> VI.UMinus
   | AG.Pre -> VI.Pre
+  | AG.FloorCast -> VI.ToInt
+  | AG.RealCast -> VI.ToReal
 
 let rec agree_expr_to_iml_expr = function
   | AG.BinaryOp (_, op, e1, e2) ->
@@ -222,6 +236,10 @@ let rec agree_expr_to_iml_expr = function
     let e2 = agree_expr_to_iml_expr e2 in
     let e3 = agree_expr_to_iml_expr e3 in
     VI.Ite (e1, e2, e3)
+  | AG.Prev (_, e1, e2) ->
+    let delay = agree_expr_to_iml_expr e1 in
+    let init = agree_expr_to_iml_expr e2 in
+    VI.BinaryOp (VI.Arrow, init, VI.UnaryOp (VI.Pre, delay))
   | AG.Proj (_, e, field) ->
     VI.Proj (agree_expr_to_iml_expr e, C.get_id field)
   | AG.Ident pn -> VI.Ident (C.pname_to_string pn)
@@ -306,7 +324,8 @@ let agree_annex_to_contract_spec type_decls annex =
       | AG.EqStatement (_, v) ->
         (cds, v :: vds, ass, gts)
       | AG.AssignStatement _
-      | AG.NodeDefinition _ -> assert false
+      | AG.NodeDefinition _
+      | AG.AssertStatement _ -> assert false
     )
     ([], [], [], []) (List.rev annex)
   in
@@ -1046,14 +1065,14 @@ let agree_assign_statement_to_iml_equation { AG.var; AG.definition } =
   }
 
 let agree_annex_to_dataflow_impl type_decls annex =
-  let const_decls, var_decls, eqs =
-    List.fold_left (fun (cds, vds, eqs) -> function
+  let const_decls, var_decls, eqs, assertions =
+    List.fold_left (fun (cds, vds, eqs, ass) -> function
       | AG.ConstStatement (_, const_decl) ->
         let c = agree_const_decl_to_iml_const_decl type_decls const_decl in
-        (c::cds, vds, eqs)
+        (c::cds, vds, eqs, ass)
       | AG.AssignStatement (_, assign_st) ->
         let eq = agree_assign_statement_to_iml_equation assign_st in
-        (cds, vds, eq :: eqs)
+        (cds, vds, eq :: eqs, ass)
       | AG.EqStatement (_, {AG.vars; AG.definition}) ->
         let vds' =
           List.fold_left (fun acc (id,dtype) ->
@@ -1073,15 +1092,18 @@ let agree_annex_to_dataflow_impl type_decls annex =
            VI.rhs = agree_expr_to_iml_expr def;
           }
         in
-        (cds, List.rev_append vds' vds, eq :: eqs)
+        (cds, List.rev_append vds' vds, eq :: eqs, ass)
+      | AG.AssertStatement (_, { AG.expression }) ->
+        let e = agree_expr_to_iml_expr expression in
+        (cds, vds, eqs, e :: ass)
       | AG.NamedSpecStatement _
       | AG.NodeDefinition _ -> assert false
     )
-    ([], [], []) (List.rev annex)
+    ([], [], [], []) (List.rev annex)
   in
   {VI.constant_declarations = const_decls;
    VI.variable_declarations = var_decls;
-   VI.assertions = [];
+   assertions;
    VI.equations = eqs;
    VI.properties = [];
   }
@@ -1140,7 +1162,8 @@ let agree_annex_to_dataflow_model type_decls annex =
       | AG.NodeDefinition (_, n) -> (cds, n :: nds)
       | AG.NamedSpecStatement _
       | AG.EqStatement _
-      | AG.AssignStatement _ -> assert false
+      | AG.AssignStatement _
+      | AG.AssertStatement _ -> assert false
     )
     ([], []) (List.rev annex)
   in

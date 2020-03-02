@@ -30,10 +30,10 @@ let add_range rg = function
 
 %}
 
-%token ASSUME GUARANTEE LEMMA ASSIGN
+%token ASSUME GUARANTEE LEMMA ASSIGN ASSERT
 %token NODE RETURNS LET TEL VAR
 %token CONST ENUM
-%token REAL BOOL INT
+%token REAL BOOL INT FLOOR
 %token NOT AND OR EQ
 %token IF THEN ELSE PRE
 %token ANNEX_BLOCK_END "**}"
@@ -63,6 +63,7 @@ let add_range rg = function
 %token PLUS "+"
 %token MINUS "-"
 %token POWER "^"
+%token PREV
 %token <string>ID
 %token <string>INTEGER_LIT
 %token <string>REAL_LIT
@@ -112,6 +113,10 @@ spec_statement:
   | nd = node_def
   {
     A.NodeDefinition (mk_pos $startpos, nd)
+  }
+  | ass = assert_statement
+  {
+    A.AssertStatement (mk_pos $startpos, ass)
   }
   (* INCOMPLETE *)
 
@@ -174,6 +179,12 @@ named_spec_statement:
   | LEMMA id = option(ident) desc = STRING ":" e = expr_or_pattern_statement ";"
   {
     A.Lemma { A.id = id; A.desc = desc; A.spec = e }
+  }
+
+assert_statement:
+  ASSERT  e = expr_or_pattern_statement ";"
+  {
+    { A.expression = e }
   }
 
 expr_or_pattern_statement:
@@ -306,6 +317,10 @@ expr:
     { A.UnaryOp (mk_pos $startpos, A.UMinus, e) }
   | PRE "(" e = expr ")"
     { A.UnaryOp (mk_pos $startpos, A.Pre, e) }
+  | FLOOR "(" e = expr ")"
+    { A.UnaryOp (mk_pos $startpos, A.FloorCast, e) }
+  | REAL "(" e = expr ")"
+    { A.UnaryOp (mk_pos $startpos, A.RealCast, e) }
   | IF e1 = expr THEN e2 = expr ELSE e3 = expr
     { A.Ite (mk_pos $startpos, e1, e2, e3) }
   | e = expr "." pid = ident
@@ -318,6 +333,8 @@ expr:
     { A.IntegerLit (mk_pos $startpos, l) }
   | n = expr "(" args = separated_list(",", expr) ")"
     { A.Call (mk_pos $startpos, n, args) }
+  | PREV "(" e1 = expr "," e2 = expr ")"
+    { A.Prev (mk_pos $startpos, e1, e2) }
   | r = expr "{" fs = separated_nonempty_list(";", record_field_def) "}"
     { A.RecordExpr (mk_pos $startpos, r, fs) }
   | l = REAL_LIT

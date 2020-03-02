@@ -32,12 +32,13 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod | Exp
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | FloorCast | RealCast
 
 type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
   | UnaryOp of Position.t * unary_op * expr
   | Ite of Position.t * expr * expr * expr
+  | Prev of Position.t * expr * expr
   | Proj of Position.t * expr * pid
   | Ident of pname
   | EnumValue of Position.t * qcref * pid
@@ -90,12 +91,17 @@ type assign_statement = {
   definition: expr;
 }
 
+type assert_statement = {
+  expression: expr;
+}
+
 type spec_statement =
   | NamedSpecStatement of Position.t * named_spec_statement
   | ConstStatement of Position.t * const_statement
   | EqStatement of Position.t * eq_statement
   | AssignStatement of Position.t * assign_statement
   | NodeDefinition of Position.t * node_definition
+  | AssertStatement of Position.t * assert_statement
 
 type agree_annex = spec_statement list
 
@@ -186,9 +192,18 @@ let rec pp_print_expr ppf = function
   | UnaryOp (_, Pre, e) ->
     Format.fprintf ppf "(pre (%a))"
       pp_print_expr e
+  | UnaryOp (_, FloorCast, e) ->
+    Format.fprintf ppf "(floor (%a))"
+      pp_print_expr e
+  | UnaryOp (_, RealCast, e) ->
+    Format.fprintf ppf "(real (%a))"
+      pp_print_expr e
   | Ite (_, e1, e2, e3) ->
     Format.fprintf ppf "(if %a then %a else %a)"
       pp_print_expr e1 pp_print_expr e2 pp_print_expr e3
+  | Prev (_, e1, e2) ->
+    Format.fprintf ppf "(prev(%a, %a))"
+      pp_print_expr e1 pp_print_expr e2
   | Proj (_, e, pid) ->
     Format.fprintf ppf "%a.%a"
       pp_print_expr e pp_print_id pid
@@ -280,6 +295,9 @@ let pp_print_spec_statement ind ppf = function
   )
   | NodeDefinition (_, node_def) -> (
     pp_print_node_def ind ppf node_def
+  )
+  | AssertStatement (_, {expression}) -> (
+    Format.fprintf ppf "assert %a;" pp_print_expr expression
   )
 
 let pp_print_agree_annex ind ppf annex =

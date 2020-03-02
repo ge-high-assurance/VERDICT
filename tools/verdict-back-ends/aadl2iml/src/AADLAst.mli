@@ -59,6 +59,7 @@ type system_type = {
 
 type data_type = {
   name: pid;
+  type_extension: qcref option;
   properties: property_association list;
 }
 

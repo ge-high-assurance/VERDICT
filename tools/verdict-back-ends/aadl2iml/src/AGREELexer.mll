@@ -54,6 +54,7 @@ let real_lit = digit+ ('_' digit+)* '.' digit+ ('_' digit+)* exponent?
 let id = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 
 rule token = parse
+  | "assert"         { P.ASSERT }
   | "assign"         { P.ASSIGN }
   | "assume"         { P.ASSUME }
   | "guarantee"      { P.GUARANTEE }
@@ -62,6 +63,7 @@ rule token = parse
   | "returns"        { P.RETURNS }
   | "node"           { P.NODE }
   | "enum"           { P.ENUM }
+  | "floor"          { P.FLOOR }
   | "real"           { P.REAL }
   | "bool"           { P.BOOL }
   | "int"            { P.INT }
@@ -80,6 +82,7 @@ rule token = parse
   | "else"           { P.ELSE }
   | "true"           { P.TRUE }
   | "false"          { P.FALSE }
+  | "prev"           { P.PREV }
 
   | "**}"            { P.ANNEX_BLOCK_END }
   | "<=>"            { P.EQUIV }

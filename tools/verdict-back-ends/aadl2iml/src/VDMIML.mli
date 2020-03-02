@@ -49,7 +49,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | ToInt | ToReal
 
 type expr =
   | BinaryOp of binary_op * expr * expr

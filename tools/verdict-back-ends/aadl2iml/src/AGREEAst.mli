@@ -32,12 +32,13 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod | Exp
 
-type unary_op = Not | UMinus | Pre
+type unary_op = Not | UMinus | Pre | FloorCast | RealCast
 
 type expr =
   | BinaryOp of Position.t * binary_op * expr * expr
   | UnaryOp of Position.t * unary_op * expr
   | Ite of Position.t * expr * expr * expr
+  | Prev of Position.t * expr * expr
   | Proj of Position.t * expr * pid
   | Ident of pname
   | EnumValue of Position.t * qcref * pid
@@ -90,12 +91,17 @@ type assign_statement = {
   definition: expr;
 }
 
+type assert_statement = {
+  expression: expr;
+}
+
 type spec_statement =
   | NamedSpecStatement of Position.t * named_spec_statement
   | ConstStatement of Position.t * const_statement
   | EqStatement of Position.t * eq_statement
   | AssignStatement of Position.t * assign_statement
   | NodeDefinition of Position.t * node_definition
+  | AssertStatement of Position.t * assert_statement
 
 type agree_annex = spec_statement list
 

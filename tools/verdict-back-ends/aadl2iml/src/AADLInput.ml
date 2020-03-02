@@ -228,6 +228,8 @@ let merge_packages input =
         let e2 = flatten_agree_expr e2 in
         let e3 = flatten_agree_expr e3 in
         AG.Ite (pos, e1, e2, e3)
+      | AG.Prev (pos, e1, e2) ->
+        AG.Prev (pos, flatten_agree_expr e1, flatten_agree_expr e2)
       | AG.Proj (pos, e, pid) -> (
         match e with
         | AG.Ident name -> flatten_proj pos (name, pid)
@@ -300,6 +302,10 @@ let merge_packages input =
       }
     in
 
+    let flatten_assertion { AG.expression } =
+      { AG.expression = flatten_agree_expr expression }
+    in
+
     let flatten_spec_statement = function
       | AG.NamedSpecStatement (pos, n) ->
         AG.NamedSpecStatement (pos, flatten_named_spec_statement n)
@@ -311,6 +317,8 @@ let merge_packages input =
         AG.NodeDefinition (pos, flatten_node_def n)
       | AG.AssignStatement (pos, a) ->
         AG.AssignStatement (pos, flatten_assign_statement a)
+      | AG.AssertStatement (pos, a) ->
+        AG.AssertStatement (pos, flatten_assertion a)
     in
 
     let flatten_agree_annex agree_annex =
