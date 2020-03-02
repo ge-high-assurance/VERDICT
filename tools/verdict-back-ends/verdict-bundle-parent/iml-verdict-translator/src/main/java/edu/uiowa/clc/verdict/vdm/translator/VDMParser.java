@@ -551,7 +551,18 @@ public class VDMParser extends Parser {
                 expression.setPre(pre_expr);
                 return expression;
             }
+            if (type == Type.TO_REAL) {
+                Expression real_expr = expression();
+                expression.setToReal(real_expr);
+                return expression;
+            }
+            if (type == Type.TO_INT) {
+                Expression int_expr = expression();
+                expression.setToInt(int_expr);
+                return expression;
+            }
 
+            
             if (token.type == Type.BINARY_OP) {
                 // OP
                 // EQ
