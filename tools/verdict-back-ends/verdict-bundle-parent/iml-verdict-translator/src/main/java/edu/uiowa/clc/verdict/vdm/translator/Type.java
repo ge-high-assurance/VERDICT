@@ -326,6 +326,9 @@ public enum Type {
     REAL_Lit("RealLiteral"),
     BOOL_Lit("BoolLiteral"),
 
+    TO_REAL("ToReal"),
+    TO_INT("ToInt"),
+    
     NOT("Not"),
     PRE("Pre"),
     EQ("Equal"),
