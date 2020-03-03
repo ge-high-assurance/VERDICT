@@ -16,60 +16,67 @@ import kodkod.engine.Solution;
 import kodkod.engine.Solver;
 import kodkod.engine.satlab.SATFactory;
 import kodkod.instance.Bounds;
+import kodkod.instance.Tuple;
 import kodkod.instance.TupleFactory;
 import kodkod.instance.TupleSet;
 import kodkod.instance.Universe;
 import kodkod.util.collections.Pair;
 
 public class SysArchKodkodModel {
-	final String ENUM = "_Enum";
-	final String UNKNOWN = "unknown_";
-	final String UNKNOWNDAL = UNKNOWN+"DAL";
-	final String UNKNOWNBOOL = UNKNOWN+"Bool";
-	
-	final String SYSTEM = "system";
+	final String DAL = "DAL";
+	final String INST = "_Inst_";
+	final String BOOL = "Bool";	
 	final String PORT = "port";
-	final String CONNECTION = "connection";
-	
 	final String TRUE = "true";
+	final String PORTS = "ports";
 	final String FALSE = "false";
+	final String SYSTEM = "system";
+	final String SRCPORT = "srcPort";
+	final String DESTPORT = "destPort";
+	
+	final String CONNECTION = "connection";
 	
 	final String CONNECTIONS = "connections";
 	final String SUBCOMPONENTS = "subcomponents";
 	
-	final Map<Relation, Pair<Relation, Relation>> binaryRelToDomainRangeRelMap = new HashMap<>();
+	final String ENUM = "_Enum";
+	final String UNKNOWN = "unknown_";
+	final String UNKNOWNDAL = UNKNOWN+DAL;
+	final String UNKNOWNBOOL = UNKNOWN+BOOL;	
+	boolean isDalDecled = false;
+	
+	/** ALL facts */
+	final List<Formula> facts = new ArrayList<Formula>();
+	/** ALL connection relations */
+	final Set<Relation> allConnectionRels = new HashSet<Relation>();
+	/** ALL inports and outports expression of instance relations */
+	final List<Expression> allInstInports = new ArrayList<Expression>();
+	final List<Expression> allInstOutports = new ArrayList<Expression>();
+	/** Mapping between name and unary relation */
+	final Map<String, Relation> nameToUnaryRelMap = new HashMap<>();
+	final Map<Relation, Relation> implInstRelToImplRelMap = new HashMap<>();
+	final Map<Relation, Set<Relation>> propTypeRelToValRelMap = new HashMap<>();
 	final Map<Relation, Set<Relation>> compTypeRelToInstRelMap = new HashMap<>();
 	final Map<Relation, Set<Relation>> compImplRelToInstRelMap = new HashMap<>();
-	final Map<Relation, Set<Relation>> propTypeRelToValRelMap = new HashMap<>();
-	final Set<Relation> allConnectionRels = new HashSet<Relation>();
-	final Set<Relation> allBinaryInportRels = new HashSet<Relation>();
-	final Set<Relation> allBinaryOutportRels = new HashSet<Relation>();
-	
-	final Map<Relation, Pair<String, Formula>> instRelToPredicateMap = new HashMap<>();
+	final Map<Pair<Relation, String>, Relation> domainRelNameToRelMap = new HashMap<>();
+	final Map<Relation, List<Pair<String, Formula>>> instRelToPredMap = new HashMap<>();	
+	final Map<Relation, Pair<Relation, Relation>> binaryRelToDomainRangeRelMap = new HashMap<>();
 	
 	/**
 	 * Unary Relations
 	 * */
 	public final Relation portUnaryRel, inPortUnaryRel, outPortUnaryRel, systemUnaryRel, connectionUnaryRel,
-						  boolUnaryRel, dalUnaryRel;
+						  boolUnaryRel;
+	
+	public Relation dalUnaryRel = null;
 
 	public String[] DALNames = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", UNKNOWNDAL};
 	
 	/**
 	 * Binary Relations
 	 * */	
-	public final Relation inPortsBinaryRel, outPortsBinaryRel, srcPortBinaryRel, destPortBinaryRel,
+	public final Relation inPortsBinaryRel, outPortsBinaryRel, portsBinaryRel, srcPortBinaryRel, destPortBinaryRel,
 						  connectionsBinaryRel, subcomponentsBinaryRel;
-	
-	
-	public final List<Formula> facts = new ArrayList<Formula>();
-	
-	public final Map<String, Relation> nameToUnaryRelMap = new LinkedHashMap<>();
-	public final Map<Pair<Relation, String>, Relation> domainRelNameToRelMap = new LinkedHashMap<>();
-	public final Map<String, Relation> propNameToBinaryRelMap = new LinkedHashMap<>();
-
-	public final List<Expression> allInstInports = new ArrayList<Expression>();
-	public final List<Expression> allInstOutports = new ArrayList<Expression>();
 	
 	public SysArchKodkodModel() {
 		portUnaryRel = mkUnaryRel(PORT);
@@ -77,7 +84,7 @@ public class SysArchKodkodModel {
 		outPortUnaryRel = mkUnaryRel("OutPort");
 		mkSubRelationship(portUnaryRel, true, Arrays.asList(inPortUnaryRel, outPortUnaryRel), false);
 		
-		boolUnaryRel = mkUnaryRel("Bool");
+		boolUnaryRel = mkUnaryRel(BOOL);
 		mkSubRelationship(boolUnaryRel, true, true, TRUE, FALSE, UNKNOWNBOOL);
 		Set<Relation> boolSubrels = new HashSet<Relation>();
 		boolSubrels.add(nameToUnaryRelMap.get(TRUE));
@@ -85,26 +92,31 @@ public class SysArchKodkodModel {
 		boolSubrels.add(nameToUnaryRelMap.get(UNKNOWNBOOL));
 		propTypeRelToValRelMap.put(boolUnaryRel, boolSubrels);
 		
-		dalUnaryRel = mkUnaryRel("DAL");
-		mkSubRelationship(dalUnaryRel, true, true, DALNames);
-		
-		Set<Relation> dalRels = new HashSet<Relation>();
-		for(String dalName : DALNames) {
-			dalRels.add(nameToUnaryRelMap.get(dalName));
-		}
-		propTypeRelToValRelMap.put(dalUnaryRel, dalRels);
+
 		
 		systemUnaryRel = mkUnaryRel(SYSTEM);
 		connectionUnaryRel = mkUnaryRel(CONNECTION);
 		
+		portsBinaryRel = mkBinaryRel(systemUnaryRel, portUnaryRel, false, PORTS);
 		inPortsBinaryRel = mkBinaryRel(systemUnaryRel, inPortUnaryRel, false, "inPorts");
 		outPortsBinaryRel = mkBinaryRel(systemUnaryRel, outPortUnaryRel, false, "outPorts");
-		
-		srcPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, "srcPort");
-		destPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, "destPort");
+		 
+		srcPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, SRCPORT);
+		destPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, DESTPORT);
 		
 		connectionsBinaryRel = mkBinaryRel(systemUnaryRel, connectionUnaryRel, false, CONNECTIONS);
 		subcomponentsBinaryRel = mkBinaryRel(systemUnaryRel, systemUnaryRel, false, SUBCOMPONENTS);
+	}
+	
+	public void declDalRels() {
+		Set<Relation> dalRels = new HashSet<Relation>();
+		dalUnaryRel = mkUnaryRel(DAL);
+		mkSubRelationship(dalUnaryRel, true, true, DALNames);
+		for(String dalName : DALNames) {
+			dalRels.add(nameToUnaryRelMap.get(dalName));
+		}
+		propTypeRelToValRelMap.put(dalUnaryRel, dalRels);		
+		isDalDecled = true;
 	}
 	
 	/**
@@ -151,13 +163,13 @@ public class SysArchKodkodModel {
 		List<String> inportTuples = new ArrayList<String>();
 		List<String> outportTuples = new ArrayList<String>();
 		
-		for(int i = 0; i < allBinaryInportRels.size(); ++i) {
+		for(int i = 0; i < allInstInports.size(); ++i) {
 			String inportTupName = "inport$" + i;
 			portTuples.add(inportTupName);
 			inportTuples.add(inportTupName);
 			atoms.add(inportTupName);
 		}
-		for(int i = 0; i < allBinaryOutportRels.size(); ++i) {
+		for(int i = 0; i < allInstOutports.size(); ++i) {
 			String inportTupName = "outport$" + i;
 			portTuples.add(inportTupName);
 			outportTuples.add(inportTupName);
@@ -174,26 +186,46 @@ public class SysArchKodkodModel {
 			List<String> allSysInstsTuples = new ArrayList<String>();
 			
 			for(int i = 0; i < sysInsts.size(); ++i) {
-				Relation sysInstRel = sysInsts.get(i);
-				String tupName = relInsts.getKey().name()+"$"+i;
+				Relation sysInstRel = sysInsts.get(i);				
 				List<String> sysInstTuples = new ArrayList<String>();
 				
-				atoms.add(tupName);
-				allSysInstsTuples.add(tupName);
-				systemTuples.add(tupName);
-				sysInstTuples.add(tupName);
-				relToBoundMap.put(sysInstRel, sysInstTuples);
+				// Handle system implementation and its instances
+				if(compImplRelToInstRelMap.containsKey(sysInstRel)
+						&& !compImplRelToInstRelMap.get(sysInstRel).isEmpty()) {
+					List<Relation> implInstsRels = new ArrayList<Relation>(compImplRelToInstRelMap.get(sysInstRel));
+					for(int j = 0; j < implInstsRels.size(); ++j) {
+						Relation implInstRel = implInstsRels.get(j);
+						String instTupName  = implInstRel.name() + "$" + j;
+						List<String> implInstRelTuples = new ArrayList<String>();
+						
+						atoms.add(instTupName);
+						allSysInstsTuples.add(instTupName);
+						systemTuples.add(instTupName);
+						sysInstTuples.add(instTupName);
+						implInstRelTuples.add(instTupName);
+						relToBoundMap.put(sysInstRel, sysInstTuples);						
+						relToBoundMap.put(implInstRel, implInstRelTuples);
+					}
+				} else {
+					String tupName = relInsts.getKey().name()+"$"+i;
+					
+					atoms.add(tupName);
+					allSysInstsTuples.add(tupName);
+					systemTuples.add(tupName);
+					sysInstTuples.add(tupName);
+					relToBoundMap.put(sysInstRel, sysInstTuples);
+				}
 			}
 			relToBoundMap.put(relInsts.getKey(), allSysInstsTuples);
 		}
 		relToBoundMap.put(systemUnaryRel, systemTuples);
 				
-		
-//		System.out.println(Relation.UNIV + " : " + atoms);
+		System.out.println("***************************** BOUNDS **************************");
+		System.out.println(Relation.UNIV + " : " + atoms);
 		
 		final Universe u = new Universe(atoms);
         final Bounds b = new Bounds(u);
-        final TupleFactory f = u.factory();
+        final TupleFactory factory = u.factory();
         Map<Relation, TupleSet> unaryRelToBoundMap = new HashMap<>();
         
         for(Map.Entry<Relation, List<String>> relToBound : relToBoundMap.entrySet()) {
@@ -201,18 +233,23 @@ public class SysArchKodkodModel {
         	List<String> tuples = relToBound.getValue();
         	
         	if(!tuples.isEmpty()) {
-        		final TupleSet exactBound = f.range(f.tuple(tuples.get(0)), f.tuple(tuples.get(tuples.size()-1)));
+        		Set<Tuple> tupleSet = new HashSet<>();
+        		for(String tup : tuples) {
+        			tupleSet.add(factory.tuple(tup));
+        		}
+        		final TupleSet exactBound = factory.setOf(tupleSet);
         		b.boundExactly(rel, exactBound);
         		unaryRelToBoundMap.put(rel, exactBound);
-//        		System.out.println(rel.name() + " : " + exactBound.toString());
+        		System.out.println(rel.name() + " : " + exactBound.toString());
         	} else {
-        		b.bound(rel, f.noneOf(1));
-        		unaryRelToBoundMap.put(rel, f.noneOf(1));
-//        		System.out.println(rel.name() + " : " + f.noneOf(1).toString());
+        		b.bound(rel, factory.noneOf(1));
+        		unaryRelToBoundMap.put(rel, factory.noneOf(1));
+        		System.out.println(rel.name() + " : " + factory.noneOf(1).toString());
         	}
         }
         
-        // Assign upper bounds for each binary relation   
+        // Assign upper bounds for each binary relation
+        b.bound(portsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(portUnaryRel)));
         b.bound(inPortsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(inPortUnaryRel)));
         b.bound(outPortsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(outPortUnaryRel)));
         b.bound(srcPortBinaryRel, unaryRelToBoundMap.get(connectionUnaryRel).product(unaryRelToBoundMap.get(portUnaryRel)));
@@ -228,8 +265,11 @@ public class SysArchKodkodModel {
         	if(!unaryRelToBoundMap.containsKey(domainRel) || !unaryRelToBoundMap.containsKey(rangeRel)) {
         		throw new RuntimeException("No bound found for domian or range relation: " + domainRel + ", " + rangeRel);
         	}
-        	b.bound(propRel, unaryRelToBoundMap.get(domainRel).product(unaryRelToBoundMap.get(rangeRel)));
+        	TupleSet relBd= unaryRelToBoundMap.get(domainRel).product(unaryRelToBoundMap.get(rangeRel));
+        	b.bound(propRel, relBd);
+        	System.out.println(propRel.name() + " : " + relBd);
         }
+        System.out.println("***************************** END BOUNDS **************************");
         return b;
 	}
 	
@@ -239,14 +279,6 @@ public class SysArchKodkodModel {
 			fact = fact.and(f);
 			System.out.println(f);
 		}
-//		Relation sysImplRel = nameToUnaryRelMap.get("comp1_inst");
-//		Relation compTypePropRel = domainRelNameToRelMap.get(new Pair<>(systemUnaryRel, "userAuthentication"));
-//		
-//		if(sysImplRel != null && compTypePropRel != null) {
-//			Formula f  = sysImplRel.join(compTypePropRel).eq(nameToUnaryRelMap.get("true"));
-//			System.out.println(f);
-//			fact = fact.and(f);
-//		}
 		return fact;
 	}
 	
@@ -254,21 +286,37 @@ public class SysArchKodkodModel {
 		final Solver solver = new Solver();
         solver.options().setSolver(SATFactory.MiniSat);
         Formula facts = mkFacts();
+        Bounds bounds = mkBounds();
         
-        for(Map.Entry<Relation, Pair<String, Formula>> instRelToPred : instRelToPredicateMap.entrySet()) {
-        	Relation instRel = instRelToPred.getKey();
-        	Pair<String, Formula> pred = instRelToPred.getValue();
-        	System.out.println("********************************************");
-            Solution sol = solver.solve(facts.and(pred.b), mkBounds());
-            
-            if(sol.sat()) {
-            	System.out.println("System Instance " + instRel.name() + " is subject to " + pred.a);
-            } else if(sol.unsat()){
-            	System.out.println("System Instance " + instRel.name() + " is NOT subject to " + pred.a);
-            } else {
-            	throw new RuntimeException("Unreachable!");
+        if(instRelToPredMap.isEmpty()) {
+        	System.out.println("*******************************************************");
+        	Solution sol = solver.solve(facts, mkBounds());
+        	System.out.println(sol);
+        	System.out.println("*******************************************************");
+        } else {
+        	System.out.println("*************************** RESULTS ***************************");
+            for(Map.Entry<Relation, List<Pair<String, Formula>>> instRelToPred : instRelToPredMap.entrySet()) {
+            	Relation instRel = instRelToPred.getKey();
+            	List<Pair<String, Formula>> preds = instRelToPred.getValue();
+            	
+            	for(Pair<String, Formula> pred : preds) {                	
+                    Solution sol = solver.solve(facts.and(pred.b), bounds);
+                    
+                    if(implInstRelToImplRelMap.containsKey(instRel)) {
+                    	instRel = implInstRelToImplRelMap.get(instRel);
+                    }
+                    
+                    if(sol.sat()) {
+                    	System.out.println("System " + instRel.name() + " is susceptible to " + pred.a);
+//                    	System.out.println(sol);
+                    } else if(sol.unsat()){
+                    	System.out.println("System " + instRel.name() + " is NOT susceptible to " + pred.a);
+                    } else {
+                    	throw new RuntimeException("Unreachable!");
+                    }
+            	}
             }
-            System.out.println("********************************************");
+            System.out.println("*************************** END RESULTS ***************************");
         }
 	}
 
@@ -304,6 +352,16 @@ public class SysArchKodkodModel {
     	}
     	return unionExpr;
     }
+    public Expression mkUnionRels(Set<Relation> rels) {
+    	if(rels == null || rels.isEmpty()) {
+    		throw new RuntimeException("The input to the function is NULL or empty!");
+    	}
+    	Expression unionExpr = Expression.NONE;
+    	for(Relation rel : rels) {
+    		unionExpr = unionExpr.union(rel);
+    	}
+    	return unionExpr;
+    }    
     public Expression mkUnionExprs(List<Expression> exprs) {
     	if(exprs != null && exprs.size() > 0) {
     		Expression unionExpr = exprs.get(0);
@@ -336,29 +394,44 @@ public class SysArchKodkodModel {
     	mkMutualDisjoint(Arrays.asList(exprs));
     }
     public void mkMutualDisjoint(List<Expression> exprs) {
-    	if(exprs != null && exprs.size() > 0) {
-    		if(exprs.size() > 1) {
-    			for(int i = 0;i < exprs.size()-1; ++i) {
-    				Expression fstExpr = exprs.get(i);    				
-    				for(int j = i+1; j < exprs.size(); ++j) {
-    					Expression sndExpr = exprs.get(j);
-    					Formula constraint = fstExpr.intersection(sndExpr).no();
-    					facts.add(constraint);
-    				}
-    			}
-    		} else {
-    		}
-    	} else {
+    	if(exprs == null) {
     		throw new RuntimeException("No valid input is given to function \"mkMutualDisjoint\": " + exprs);
-    	}    	
+    	} 
+		if(exprs.size() > 1) {
+			for(int i = 0;i < exprs.size()-1; ++i) {
+				Expression fstExpr = exprs.get(i);    				
+				for(int j = i+1; j < exprs.size(); ++j) {
+					Expression sndExpr = exprs.get(j);
+					Formula constraint = fstExpr.intersection(sndExpr).no();
+					facts.add(constraint);
+				}
+			}
+		} else {
+			// Nothing to make for this case
+		}    	
     } 
     
     public void mkMutualDisjointRels(List<Relation> rels) {
     	if(rels == null) {
     		throw new RuntimeException("The input to the function is NULL!");
     	}
-    	mkMutualDisjoint(new ArrayList<Expression>(rels));
-    }   
+		if(rels.size() > 1) {
+			for(int i = 0;i < rels.size()-1; ++i) {
+				Expression fstExpr = rels.get(i);    				
+				for(int j = i+1; j < rels.size(); ++j) {
+					Expression sndExpr = rels.get(j);
+					Formula constraint = fstExpr.intersection(sndExpr).no();
+					facts.add(constraint);
+				}
+			}
+		} else {
+			// Nothing to make for this case
+		}
+    } 
+    
+    public void mkMutualDisjointRels(Set<Relation> rels) {
+    	mkMutualDisjointRels(new ArrayList<Relation>(rels));
+    }     
     
     public void mkSubsetRels(Relation rel1, Relation rel2) {
     	if(rel1 == null || rel2 == null) {
@@ -428,6 +501,39 @@ public class SysArchKodkodModel {
 		}
 	}    
 	
+	void mkSubRelationship(Relation parentRel, boolean isExtends, Map<Relation, Boolean> relToIsOneMap) {
+		if(relToIsOneMap != null && !relToIsOneMap.isEmpty() && parentRel != null) {
+			for(Map.Entry<Relation, Boolean> relToIsOne : relToIsOneMap.entrySet()) {
+				if(relToIsOne.getValue()) {
+					mkOne(relToIsOne.getKey());
+				}
+			}
+			Set<Relation> subRels = relToIsOneMap.keySet();
+			
+			if(isExtends) {
+				// Create the union of all unary relations
+				Expression unionExpr = mkUnionRels(subRels);					
+				// The union of all sub relations is equivalent to the parent relation
+				mkEq(unionExpr, parentRel);
+				
+				// Sub-signatures are mutually disjoint
+				if(subRels.size() >= 2) {
+					mkMutualDisjointRels(subRels);
+				}
+			} else {
+				// Each unaryRel is in parentRel
+				for(Relation unaryRel : subRels) {
+					mkSubsetRels(unaryRel, parentRel);
+				}
+			}
+		} else {
+			throw new RuntimeException("Sub-relations or parent relation are not given!");
+		}
+	} 	
+	void mkSubRelationship(Relation parentRel, boolean isExtends, Set<Relation> subRelations, boolean isOne) {
+		mkSubRelationship(parentRel, isExtends, new ArrayList<Relation>(subRelations), isOne);
+	}
+	
 	void mkSubRelationship(Relation parentRel, boolean isExtends, List<Relation> subRelations, boolean isOne) {
 		if(subRelations != null && subRelations.size() > 0 && parentRel != null) {
 			if(isOne) {
@@ -454,10 +560,7 @@ public class SysArchKodkodModel {
 		} else {
 			throw new RuntimeException("Sub-relations or parent relation are not given!");
 		}
-	} 	
-	void mkSubRelationship(Relation parentRel, boolean isExtends, Set<Relation> subRelations, boolean isOne) {
-		mkSubRelationship(parentRel, isExtends, new ArrayList<Relation>(subRelations), isOne);
-	}
+	} 		
 	
 	/**
 	 * Make a binary relation

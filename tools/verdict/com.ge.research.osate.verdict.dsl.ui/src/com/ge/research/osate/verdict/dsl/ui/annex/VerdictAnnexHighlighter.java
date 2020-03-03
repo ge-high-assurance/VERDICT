@@ -112,6 +112,7 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 
 		stylesLibrary.put("kw_system", KEYWORD_ID);
 		stylesLibrary.put("kw_port", KEYWORD_ID);
+		stylesLibrary.put("kw_connection", KEYWORD_ID);
 		stylesLibrary.put("kw_connections", KEYWORD_ID);
 		stylesLibrary.put("kw_subcomponents", KEYWORD_ID);
 

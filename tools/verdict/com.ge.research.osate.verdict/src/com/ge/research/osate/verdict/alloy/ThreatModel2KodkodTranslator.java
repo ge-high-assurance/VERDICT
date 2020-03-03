@@ -1,5 +1,6 @@
 package com.ge.research.osate.verdict.alloy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,10 @@ public class ThreatModel2KodkodTranslator {
 		varNameToRelMap.put(kodkodModel.CONNECTIONS, kodkodModel.connectionsBinaryRel);
 		varNameToRelMap.put(kodkodModel.SUBCOMPONENTS, kodkodModel.subcomponentsBinaryRel);
 		varNameToRelMap.put(kodkodModel.PORT, kodkodModel.portUnaryRel);
+		varNameToRelMap.put(kodkodModel.SRCPORT, kodkodModel.srcPortBinaryRel);
+		varNameToRelMap.put(kodkodModel.DESTPORT, kodkodModel.destPortBinaryRel);
 		varNameToRelMap.put(kodkodModel.SYSTEM, kodkodModel.systemUnaryRel);
+		varNameToRelMap.put(kodkodModel.PORTS, kodkodModel.portsBinaryRel);
 		// Add all property names and its value names
 		for(Relation propRel : kodkodModel.binaryRelToDomainRangeRelMap.keySet()) {
 			varNameToRelMap.put(propRel.name(), propRel);
@@ -56,8 +60,7 @@ public class ThreatModel2KodkodTranslator {
 	 * */
 	public void translate(List<String> paths) {
 		List<VerdictThreatModels> threatModels = ThreatModelParser.parseModels(paths);
-		System.out.println("Threat Model: ");
-		System.out.println(threatModels);
+		
 		for(VerdictThreatModels model : threatModels) {
 			List<ThreatStatement> statements = model.getStatements();
 			for(ThreatStatement threatStatement : statements) {
@@ -79,14 +82,31 @@ public class ThreatModel2KodkodTranslator {
 			for(Set<Relation> instRels : kodkodModel.compTypeRelToInstRelMap.values()) {
 				for(Relation instRel : instRels) {
 					Map<String, Expression> context = new HashMap<>();
-					context.put(id, instRel);
-					kodkodModel.instRelToPredicateMap.put(instRel, new Pair<String, Formula>(threatStatement.getId(), translateThreatExpr(threatStatement.getExpr(), context)));
+					
+					if(kodkodModel.compImplRelToInstRelMap.containsKey(instRel)) {
+						for(Relation implInstRel : kodkodModel.compImplRelToInstRelMap.get(instRel)) {
+							context.put(id, implInstRel);
+							addPredicate(kodkodModel.instRelToPredMap, implInstRel, new Pair<String, Formula>(threatStatement.getId(), translateThreatExpr(threatStatement.getExpr(), context)));							
+						}
+					} else {						
+						context.put(id, instRel);
+						addPredicate(kodkodModel.instRelToPredMap, instRel, new Pair<String, Formula>(threatStatement.getId(), translateThreatExpr(threatStatement.getExpr(), context)));
+					}
 				}
 			}
-			System.out.println("Entities = " + threatStatement.getIntro() + " | " + threatStatement.getExpr());
 		} else {
 			throw new RuntimeException("Unsupported entity type: " + entityType);
 		}		
+	}
+	
+	public void addPredicate(Map<Relation, List<Pair<String, Formula>>> instRelToPredicateMap, Relation rel, Pair<String, Formula> predPair) {
+		if(instRelToPredicateMap.containsKey(rel)) {
+			instRelToPredicateMap.get(rel).add(predPair);
+		} else {
+			List<Pair<String, Formula>> preds = new ArrayList<Pair<String,Formula>>();
+			preds.add(predPair);
+			instRelToPredicateMap.put(rel, preds);
+		}
 	}
 	
 	public void translateThreatDefenses() {
