@@ -3,11 +3,13 @@ package com.ge.research.osate.verdict.gui;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -21,7 +23,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
 *
@@ -79,6 +80,10 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		shell.setActive();
 	}
 
+	private Image getIcon(String name) {
+		return ResourceLocator.imageDescriptorFromBundle("com.ge.research.osate.verdict", "icons/" + name).get().createImage();
+	}
+
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -95,8 +100,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
 		atgCheckBox.setText("Enable Test Case Generation (ATG)");
 		atgCheckBox.setFont(font);
-		atgCheckBox.setImage(AbstractUIPlugin
-				.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/atg.png").createImage());
+		atgCheckBox.setImage(getIcon("atg.png"));
 		atgCheckBox.setSelection(testCaseGeneration);
 
 		// The "Blame Assignment" section: component-level and link-level
@@ -110,8 +114,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Button baCheckBox = new Button(baGroup, SWT.CHECK);
 		baCheckBox.setText("Enable Blame Assignment");
 		baCheckBox.setFont(font);
-		baCheckBox.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/BA.ico")
-				.createImage());
+		baCheckBox.setImage(getIcon("BA.ico"));
 		baCheckBox.setSelection(blameAssignment);
 
 		Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
@@ -139,64 +142,56 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
 		Button ls = new Button(selectionButtonGroup, SWT.CHECK);
-		ls.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/LS.png")
-				.createImage());
+		ls.setImage(getIcon("LS.png"));
 		ls.setText("Location Spoofing");
 		if (selectedThreats.contains(LS)) {
 			ls.setSelection(true);
 		}
 
 		Button ni = new Button(selectionButtonGroup, SWT.CHECK);
-		ni.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/NI.png")
-				.createImage());
+		ni.setImage(getIcon("NI.png"));
 		ni.setText("Network Injection");
 		if (selectedThreats.contains(NI)) {
 			ni.setSelection(true);
 		}
 
 		Button lb = new Button(selectionButtonGroup, SWT.CHECK);
-		lb.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/LB.png")
-				.createImage());
+		lb.setImage(getIcon("LB.png"));
 		lb.setText("Logic Bomb");
 		if (selectedThreats.contains(LB)) {
 			lb.setSelection(true);
 		}
 
 		Button it = new Button(selectionButtonGroup, SWT.CHECK);
-		it.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/IT.png")
-				.createImage());
+		it.setImage(getIcon("IT.png"));
 		it.setText("Insider Threat");
 		if (selectedThreats.contains(IT)) {
 			it.setSelection(true);
 		}
 
 		Button ot = new Button(selectionButtonGroup, SWT.CHECK);
-		ot.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/OT.png")
-				.createImage());
+		ot.setImage(getIcon("OT.png"));
 		ot.setText("Outside User Threat");
 		if (selectedThreats.contains(OT)) {
 			ot.setSelection(true);
 		}
 
 		Button ri = new Button(selectionButtonGroup, SWT.CHECK);
-		ri.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/RI.png")
-				.createImage());
+		ri.setImage(getIcon("RI.png"));
 		ri.setText("Remote Code Injection");
 		if (selectedThreats.contains(RI)) {
 			ri.setSelection(true);
 		}
 
 		Button sv = new Button(selectionButtonGroup, SWT.CHECK);
-		sv.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/SV.png")
-				.createImage());
+		sv.setImage(getIcon("SV.png"));
 		sv.setText("Software Virus/Malware/Worm/Trojan");
 		if (selectedThreats.contains(SV)) {
 			sv.setSelection(true);
 		}
 
 		Button ht = new Button(selectionButtonGroup, SWT.CHECK);
-		ht.setImage(AbstractUIPlugin.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/HT.png")
-				.createImage());
+		ht.setImage(getIcon("HT.png"));
 		ht.setText("Hardware Trojans");
 		if (selectedThreats.contains(HT)) {
 			ht.setSelection(true);

@@ -562,7 +562,6 @@ public class VDMParser extends Parser {
                 return expression;
             }
 
-            
             if (token.type == Type.BINARY_OP) {
                 // OP
                 // EQ

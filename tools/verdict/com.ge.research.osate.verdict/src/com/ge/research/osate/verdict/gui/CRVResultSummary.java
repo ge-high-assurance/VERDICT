@@ -67,6 +67,7 @@ public class CRVResultSummary {
 	}
 
 	private static class InvalidAtgException extends Exception {
+		private static final long serialVersionUID = 1L;
 		public InvalidAtgException(String message) {
 			super(message);
 		}

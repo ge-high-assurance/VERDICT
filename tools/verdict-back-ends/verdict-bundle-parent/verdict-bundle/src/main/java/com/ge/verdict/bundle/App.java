@@ -259,8 +259,6 @@ public class App {
     }
 
     private static void printMetrics() {
-        int i = 0;
-
         Function<Timer, Integer> visitTimer =
                 timer -> {
                     System.out.println(

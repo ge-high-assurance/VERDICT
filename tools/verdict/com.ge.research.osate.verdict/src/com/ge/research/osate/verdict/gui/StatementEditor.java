@@ -740,11 +740,12 @@ public class StatementEditor extends ApplicationWindow {
 		});
 
 		editors[0].addListener(new ICellEditorListener() {
-			private int previousSelection = -1;
+//			private int previousSelection = -1;
 
 			@Override
 			public void applyEditorValue() {
-				breakout: if (editorContentCol0 != (String) editors[0].getValue()) {
+//				breakout:
+				if (editorContentCol0 != (String) editors[0].getValue()) {
 
 //					for (int i = 0; i < tableContent.size(); i++) {
 //						if (i != previousSelection && i != tv.getTable().getSelectionIndex()
@@ -774,10 +775,10 @@ public class StatementEditor extends ApplicationWindow {
 //						}
 //					}
 
-					String previousId = previousSelection != -1 && previousSelection < tableContent.size()
-							? tableContent.get(previousSelection).getFormulaID()
-							: null;
-					boolean unchanged = previousId != null && previousId.equals(editors[0].getValue());
+//					String previousId = previousSelection != -1 && previousSelection < tableContent.size()
+//							? tableContent.get(previousSelection).getFormulaID()
+//							: null;
+//					boolean unchanged = previousId != null && previousId.equals(editors[0].getValue());
 
 //					if (!unchanged && idSet.contains(editors[0].getValue())) {
 //						MessageDialog.openError(composite.getShell(), "VERDICT Wizard Error",
@@ -809,7 +810,7 @@ public class StatementEditor extends ApplicationWindow {
 					addDefinition.setEnabled(true);
 				}
 
-				previousSelection = tv.getTable().getSelectionIndex();
+//				previousSelection = tv.getTable().getSelectionIndex();
 			}
 
 			@Override

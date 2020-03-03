@@ -1,7 +1,6 @@
 package com.ge.research.osate.verdict.gui;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -31,21 +30,19 @@ public class NewIDProvider extends ApplicationWindow {
 	private List<MissionInfo> missions;
 	private List<WzrdTableRow> formulas;
 	private String purpose;
-	private Set<String> idSet;
 
 	// Jface variables
 	private Composite composite;
 	private Rectangle sourceRect;
 
 	public NewIDProvider(Shell shell, Rectangle sourceRect, List<MissionInfo> missions, List<WzrdTableRow> formulas,
-			String purpose, Set<String> idSet) {
+			String purpose) {
 		super(shell);
 		lastShell = shell;
 		this.sourceRect = sourceRect;
 		this.missions = missions;
 		this.purpose = purpose;
 		this.formulas = formulas;
-		this.idSet = idSet;
 		MissionEditor.addIsValid = false;
 	}
 

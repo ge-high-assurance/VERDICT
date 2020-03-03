@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -13,7 +14,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-//import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -27,7 +27,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
 *
@@ -55,8 +54,7 @@ public class CRVResultsView extends ViewPart {
 	}
 
 	private Image getIcon(String name) {
-		return AbstractUIPlugin
-				.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/" + name).createImage();
+		return ResourceLocator.imageDescriptorFromBundle("com.ge.research.osate.verdict", "icons/" + name).get().createImage();
 	}
 
 	@Override
@@ -145,8 +143,6 @@ public class CRVResultsView extends ViewPart {
 				if (answers.get(count).equals("falsifiable")) {
 					image = getIcon("false.png");
 				} else if (answers.get(count).equals("unknown")) {
-					image = AbstractUIPlugin
-							.imageDescriptorFromPlugin("com.ge.research.osate.verdict", "icons/fail.png").createImage();
 					image = getIcon("fail.png");
 				} else {
 					image = getIcon("valid.png");

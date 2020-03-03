@@ -117,7 +117,7 @@ public class MissionEditor extends ApplicationWindow {
 		add.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				(new NewIDProvider(composite.getShell(), sourceRect, missions, tableContents, "mission", idSet)).run();
+				(new NewIDProvider(composite.getShell(), sourceRect, missions, tableContents, "mission")).run();
 				if (addIsValid) {
 					MissionInfo newMission = new MissionInfo();
 					newMission.setMissionID(newMissionName);

@@ -3,7 +3,6 @@ package com.ge.research.osate.verdict.dsl.ui.contentassist;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.text.templates.TemplateVariable;

@@ -328,7 +328,7 @@ public enum Type {
 
     TO_REAL("ToReal"),
     TO_INT("ToInt"),
-    
+
     NOT("Not"),
     PRE("Pre"),
     EQ("Equal"),

@@ -6,11 +6,8 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -19,8 +16,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -84,16 +79,16 @@ public class CapecDefenseView extends ViewPart {
 			item.setText(itemSeq);
 			item.setData(tableContents.get(i));
 		}
-		
+
 		// Display a tooltip on hover
 		table.addListener(SWT.MouseHover, event -> {
 			TableItem item = table.getItem(new Point(event.x, event.y));
 			CapecDefenseRow data = (CapecDefenseRow) item.getData();
-			
+
 			// Note: getTextBounds should (I think?) give just the bounds
 			// of the text inside the cell, but it appears to be giving
 			// the bounds for the whole cell
-			
+
 			String text = "";
 			if (item.getTextBounds(2).contains(event.x, event.y)) {
 				// Attack type (CAPEC)
@@ -106,7 +101,7 @@ public class CapecDefenseView extends ViewPart {
 				showTooltip(text, table.toDisplay(event.x, event.y));
 			}
 		});
-		
+
 		// Get rid of the tooltip when mouse moves or window loses focus
 		Listener listener = event -> {
 			if (tooltipShell != null) {
@@ -125,10 +120,10 @@ public class CapecDefenseView extends ViewPart {
 		table.pack();
 		composite.pack();
 	}
-	
+
 	/**
 	 * Display a tooltip at the given position.
-	 * 
+	 *
 	 * @param text
 	 * @param pos
 	 */
