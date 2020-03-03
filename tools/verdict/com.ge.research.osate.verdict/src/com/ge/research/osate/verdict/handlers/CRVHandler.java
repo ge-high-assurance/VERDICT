@@ -1,7 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -23,7 +23,6 @@ import com.ge.research.osate.verdict.gui.CRVSettingsPanel;
 * Date: Jun 12, 2019
 *
 */
-
 public class CRVHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -42,6 +41,7 @@ public class CRVHandler extends AbstractHandler {
 				public void run() {
 					try {
 						String bundleJar = BundlePreferences.getBundleJar();
+						String dockerImage = BundlePreferences.getDockerImage();
 						if (bundleJar.length() == 0) {
 							System.out.println("Please set Verdict Bundle Jar path in Preferences");
 							return;
@@ -60,18 +60,20 @@ public class CRVHandler extends AbstractHandler {
 						VerdictHandlersUtils.printGreeting();
 
 						String outputPath = new File(System.getProperty("java.io.tmpdir"), "crv_output.xml")
-								.getAbsolutePath();
+								.getCanonicalPath();
 						String outputPathBa = new File(System.getProperty("java.io.tmpdir"), "crv_output_ba.xml")
-								.getAbsolutePath();
+								.getCanonicalPath();
 
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 
-						if (runBundle(bundleJar, selection.get(0), outputPath, aadl2imlBin, kind2Bin)) {
+						if (runBundle(bundleJar, dockerImage, selection.get(0), outputPath, aadl2imlBin, kind2Bin)) {
 							// Run this code on the UI thread
 							mainThreadDisplay.asyncExec(() -> {
 								new CRVReportGenerator(outputPath, outputPathBa, iWindow);
 							});
 						}
+					} catch (IOException e) {
+						VerdictLogger.severe(e.toString());
 					} finally {
 						VerdictHandlersUtils.finishRun();
 					}
@@ -82,38 +84,33 @@ public class CRVHandler extends AbstractHandler {
 		return null;
 	}
 
-	public static boolean runBundle(String bundleJar, String inputPath, String outputPath, String aadl2imlbin,
-			String kind2bin) {
-		List<String> args = new ArrayList<>();
+	public static boolean runBundle(String bundleJar, String dockerImage, String inputPath, String outputPath,
+			String aadl2imlbin, String kind2bin) throws IOException {
 
-		args.add(VerdictHandlersUtils.JAVA);
-		args.add(VerdictHandlersUtils.JAR);
-		args.add(bundleJar);
+		VerdictBundleCommand command = new VerdictBundleCommand();
+		command
+			.jarOrImage(bundleJar, dockerImage)
+			.arg("--aadl")
+			.argBind(inputPath, "/app/model")
+			.arg2(aadl2imlbin, "/app/aadl2iml")
+			.arg("--crv")
+			.argBind(outputPath, "/app/tmp/crv_output.xml")
+			.arg2(kind2bin, "/app/kind2");
 
-		args.add("--aadl");
-		args.add(inputPath);
-		args.add(aadl2imlbin);
-
-		args.add("--crv");
-		args.add(outputPath);
-		args.add(kind2bin);
-
-		args.addAll(CRVSettingsPanel.selectedThreats);
-
+		for (String threat : CRVSettingsPanel.selectedThreats) {
+			command.arg(threat);
+		}
 		if (CRVSettingsPanel.blameAssignment) {
-			args.add("-BA");
+			command.arg("-BA");
 		}
-
 		if (CRVSettingsPanel.testCaseGeneration) {
-			args.add("-ATG");
+			command.arg("-ATG");
 		}
-
 		if (CRVSettingsPanel.componentLevel) {
-			args.add("-C");
+			command.arg("-C");
 		}
 
-		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null, null);
-
+		int code = command.runJarOrImage();
 		return code == 0;
 	}
 }
