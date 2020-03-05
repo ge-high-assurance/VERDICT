@@ -1,5 +1,8 @@
 (* 
 
+Copyright © 2019 United States Government as represented by the Administrator of the 
+National Aeronautics and Space Administration.  All Rights Reserved.
+
 Author: Pete Manolios
 Date: 2017-12-15
 

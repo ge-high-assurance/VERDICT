@@ -1,4 +1,7 @@
 (* 
+
+Copyright © 2020 General Electric Company. All Rights Reserved.
+
 Authors: Heber Herencia-Zapana, Kit Siu
 Date: 25/03/2019
 
@@ -6,6 +9,7 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          9/27/2019, Heber Herencia-zapana, added functions to generate defense profiles
          11/05/2019, Kit Siu, added functions to fill in safety information
          11/15/2019, Kit Siu, added functions to deal with hierarchy
+
 *)
 
 (**

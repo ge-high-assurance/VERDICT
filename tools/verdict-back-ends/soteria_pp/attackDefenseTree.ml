@@ -1,5 +1,7 @@
 (* 
 
+Copyright © 2020 General Electric Company. All Rights Reserved.
+
 Author: Kit Siu
 Date: 2018-05-09
 

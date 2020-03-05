@@ -1,5 +1,8 @@
 (* 
 
+Copyright © 2019-2020 General Electric Company and United States Government as represented 
+by the Administrator of the National Aeronautics and Space Administration.  All Rights Reserved.
+
 Authors: Kit Siu, Hongwei Liao, Mike Noorman
 Date: 2017-12-15
 
