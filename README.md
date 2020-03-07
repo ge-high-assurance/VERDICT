@@ -71,3 +71,5 @@ perform architectural and behavioral analysis of AADL models.
 ![VERDICT Plugin Diagram](docs/images/VERDICT-Plugin-Diagram.png)
 
 Distribution Statement A: Approved for Public Release, Distribution Unlimited
+
+Copyright © 2020, General Electric Company, Board of Trustees of the University of Iowa
