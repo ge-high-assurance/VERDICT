@@ -13,6 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
+import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;
 
@@ -40,6 +41,8 @@ public class MBASHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
+//						runAadl2Csv(event);
+						
 						String bundleJar = BundlePreferences.getBundleJar();
 						if (bundleJar.length() == 0) {
 							System.out.println("Please set Verdict Bundle Jar path in Preferences");
@@ -132,6 +135,11 @@ public class MBASHandler extends AbstractHandler {
 			mbasAnalysisThread.start();
 		}
 		return null;
+	}
+	
+	public static void runAadl2Csv(ExecutionEvent event) {
+		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+		aadl2csv.execute(event);
 	}
 
 	public static boolean runBundle(String bundleJar, String inputPath, String aadl2imlBin, String stemProjectDir,

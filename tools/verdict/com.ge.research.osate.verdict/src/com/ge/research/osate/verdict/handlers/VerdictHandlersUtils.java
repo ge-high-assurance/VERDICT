@@ -411,7 +411,7 @@ public class VerdictHandlersUtils {
 	/** the current selection in the AADL model
 	 *  Return a list of paths to the selected objects
 	 */
-	static List<String> getCurrentSelection(ExecutionEvent event) {
+	public static List<String> getCurrentSelection(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		List<String> paths = new ArrayList<>();
 
