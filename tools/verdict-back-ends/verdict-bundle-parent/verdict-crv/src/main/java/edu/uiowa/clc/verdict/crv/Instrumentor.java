@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2019-2020, Board of Trustees of the University of Iowa.
    Copyright (c) 2019-2020, General Electric Company.
    All rights reserved.

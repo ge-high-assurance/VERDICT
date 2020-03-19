@@ -744,10 +744,10 @@ public class VDMParser extends Parser {
         consume(Type.EXPRESSION);
         consume(Type.REAL);
         //        System.out.println("REAL TOKEN:" + token.getFloatingValue());
-	//BigDecimal literal_value = BigDecimal.valueOf(token.getFloatingValue());
-	BigDecimal literal_value = new BigDecimal(String.format("%f", token.getFloatingValue()));
+        // BigDecimal literal_value = BigDecimal.valueOf(token.getFloatingValue());
+        BigDecimal literal_value = new BigDecimal(String.format("%f", token.getFloatingValue()));
 
-	consume(Type.Float);
+        consume(Type.Float);
 
         realExpr.setRealLiteral(literal_value);
 
