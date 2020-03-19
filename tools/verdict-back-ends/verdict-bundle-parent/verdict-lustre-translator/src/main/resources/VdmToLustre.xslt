@@ -274,7 +274,7 @@
 		<xsl:for-each select="vdm_lustre:realLiteral">
 			<span>
 				<xsl:variable name="altova:seqContentStrings_0">
-					<xsl:value-of select="format-number(number(string(.)), '#0.0#')"/>
+					<xsl:value-of select="format-number(number(string(.)), '#0.0###############')"/>
 				</xsl:variable>
 				<xsl:variable name="altova:sContent_0" select="string($altova:seqContentStrings_0)"/>
 				<xsl:value-of select="$altova:sContent_0"/>
