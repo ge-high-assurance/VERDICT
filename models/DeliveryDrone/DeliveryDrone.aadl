@@ -572,22 +572,22 @@ public
       		
       		eq release_cmd: bool = (probe_delivery_cmd = Agree_Constants::RELEASE_PACKAGE_CMD);
       		
-      		guarantee "P1: constellation for GPS is initialized properly": 
+      		guarantee "P1: Constellation for GPS is initialized properly":
       			isOn => (most_recent_constellation = probe_constellation);
       		
-      		guarantee "P2: launch location for IMU is initialized properly": 
+      		guarantee "P2: Launch location for IMU is initialized properly":
       			isOn => most_recent_launch_location = probe_launch_location;
       		
-      		guarantee "P3: delivery location for navigation is initialized properly": 
+      		guarantee "P3: Delivery location for navigation is initialized properly":
       			isOn => most_recent_delivery_location = probe_delivery_location;
 
-      		guarantee "P4: a command to release a valuable package is issued only if drone has received confirmation from base":
+      		guarantee "P4: A command to release a valuable package is issued only if drone has received confirmation from base":
     			release_cmd and valuable_package => target_confirmed;
 
   			guarantee "P5: The drone will always request a confirmation to base before starting delivery of a valuable package":
     			delivery_started and valuable_package => confirmation_requested;
 
-    		guarantee "P6: The drone is flying only if since last initialization, it has not got aborted": 
+    		guarantee "P6: The drone is flying only if since last initialization the mission was not aborted":
       			probe_fly_cmd => Agree_Nodes::Since(probe_init_mode, not (probe_abort_mode));
 		**};
 			
