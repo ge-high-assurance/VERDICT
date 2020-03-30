@@ -34,7 +34,7 @@ import com.ge.research.osate.verdict.gui.WzrdDashboard;;
 
 /**
 *
-* Author: Soumya Talukder
+* @author Paul Meng, Soumya Talukder
 * Date: Jun 25, 2019
 *
 */

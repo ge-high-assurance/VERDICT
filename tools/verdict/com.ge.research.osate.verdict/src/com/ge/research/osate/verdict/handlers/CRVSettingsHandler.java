@@ -8,7 +8,7 @@ import com.ge.research.osate.verdict.gui.CRVSettingsPanel;
 
 /**
 *
-* Author: Paul Meng
+* @author Paul Meng
 * Date: Jun 12, 2019
 *
 */

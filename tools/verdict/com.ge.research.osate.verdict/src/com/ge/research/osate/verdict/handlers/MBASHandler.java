@@ -19,7 +19,7 @@ import com.ge.research.osate.verdict.gui.MBASReportGenerator;
 
 /**
 *
-* Author: Paul Meng
+* @author Paul Meng
 * Date: Jun 12, 2019
 *
 */
@@ -41,16 +41,9 @@ public class MBASHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
-//						runAadl2Csv(event);
-						
 						String bundleJar = BundlePreferences.getBundleJar();
 						if (bundleJar.length() == 0) {
 							System.out.println("Please set Verdict Bundle Jar path in Preferences");
-							return;
-						}
-						String aadl2imlBin = BundlePreferences.getAadl2imlBin();
-						if (aadl2imlBin.length() == 0) {
-							System.out.println("Please set aadl2iml binary path in Preferences");
 							return;
 						}
 						String stemProjPath = BundlePreferences.getStemDir();
@@ -93,8 +86,13 @@ public class MBASHandler extends AbstractHandler {
 						} else {
 							graphsFolder.mkdir();
 						}
-
-						if (runBundle(bundleJar, selection.get(0), aadl2imlBin, stemProjPath, soteriaPpBin,
+						
+						File projectDir = new File(selection.get(0));
+						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+						
+						aadl2csv.execute(projectDir, CSVDataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+						
+						if (runBundle(bundleJar, projectDir.getName(), stemProjPath, soteriaPpBin,
 								graphVizPath)) {
 							// Soteria++ output directory
 							String soteriaOut = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
@@ -137,9 +135,9 @@ public class MBASHandler extends AbstractHandler {
 		return null;
 	}
 	
-	public static void runAadl2Csv(ExecutionEvent event) {
+	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
 		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-		aadl2csv.execute(event);
+		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
 	}
 
 	public static boolean runBundle(String bundleJar, String inputPath, String aadl2imlBin, String stemProjectDir,
@@ -164,6 +162,28 @@ public class MBASHandler extends AbstractHandler {
 
 		return code == 0;
 	}
+	
+	
+	public static boolean runBundle(String bundleJar, String projectName, String stemProjectDir, String soteriaPpBin, String graphVizPath) {
+		List<String> args = new ArrayList<>();
+
+		args.add(VerdictHandlersUtils.JAVA);
+		args.add(VerdictHandlersUtils.JAR);
+		args.add(bundleJar);
+
+		args.add("--csv");
+		args.add(projectName);
+
+		args.add("--mbas");
+		args.add(stemProjectDir);
+		args.add(soteriaPpBin);
+
+		String[] env = { "GraphVizPath=" + graphVizPath };
+
+		int code = VerdictHandlersUtils.run(args.toArray(new String[args.size()]), null, env);
+
+		return code == 0;
+	}	
 
 	/**
 	 * Delete all csv files in a folder

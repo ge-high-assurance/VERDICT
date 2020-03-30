@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 
 /**
 *
-* Author: Paul Meng
+* @author Paul Meng
 * Date: Jun 12, 2019
 *
 */

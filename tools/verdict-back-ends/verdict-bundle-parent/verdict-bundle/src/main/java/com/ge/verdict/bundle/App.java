@@ -88,10 +88,12 @@ public class App {
                         .build();
 
         Option iml = Option.builder().longOpt("iml").hasArg().argName("IML input file").build();
+        Option csv = Option.builder().longOpt("csv").hasArg().argName("CSV project name").build();
 
         OptionGroup inputGroup = new OptionGroup();
         inputGroup.addOption(aadl);
         inputGroup.addOption(iml);
+        inputGroup.addOption(csv);
         inputGroup.setRequired(true);
 
         Option mbas =
@@ -161,12 +163,14 @@ public class App {
         helpLine("Usage: %s (--aadl <args> | --iml <args>)", jarName);
         helpLine("       (--mbas <args> | --crv <args>) [-d, --debug <args>]");
         helpLine();
-        helpLine("Input: AADL or IML");
+        helpLine("Input: AADL or IML or CSV");
         helpLine("  --aadl <dir> <aadl2iml> .. AADL project input");
         helpLine("      <dir> ................ project directory");
         helpLine();
         helpLine("  --iml <file> ............. IML file input");
         helpLine("      <file> ............... file");
+        helpLine();
+        helpLine("  --csv <project name> ............. Use csv input");
         helpLine();
         helpLine("Toolchain: MBAS (Model Based Architecture & Synthesis)");
         helpLine("           or CRV (Cyber Resiliency Verifier)");
@@ -191,9 +195,12 @@ public class App {
     private static void handleOpts(CommandLine opts) throws VerdictRunException {
         String debugDir = opts.hasOption('d') ? opts.getOptionValue('d') : null;
 
-        String aadlPath, imlPath, aadl2imlBin, modelName;
+        String aadlPath = null, imlPath = null, aadl2imlBin = null, modelName = null;
+        String csvProjectName = null;
 
-        if (opts.hasOption("aadl")) {
+        if (opts.hasOption("csv")) {
+            csvProjectName = opts.getOptionValue("csv");
+        } else if (opts.hasOption("aadl")) {
             String[] aadlOpts = opts.getOptionValues("aadl");
             aadlPath = aadlOpts[0];
             aadl2imlBin = aadlOpts[1];
@@ -215,8 +222,11 @@ public class App {
             String[] mbasOpts = opts.getOptionValues("mbas");
             String stemProjectDir = mbasOpts[0];
             String soteriaPpBin = mbasOpts[1];
-
-            runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+            if (csvProjectName != null) {
+                runMbas(csvProjectName, stemProjectDir, debugDir, soteriaPpBin);
+            } else {
+                runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+            }
             sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
         } else if (opts.hasOption("crv")) {
             String instrPath =
@@ -294,6 +304,93 @@ public class App {
         System.out.println("      " + header);
         logLine();
         System.out.println();
+    }
+
+    /**
+     * Run MBAS with csv files input
+     *
+     * @param modelName
+     * @param stemDir output directory for STEM input files
+     * @param soteriaDir output directory for Soteria++ input files
+     * @throws VerdictRunException
+     */
+    public static void runMbas(
+            String modelName, String stemProjectDir, String debugDir, String soteriaPpBin)
+            throws VerdictRunException {
+
+        String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
+        String stemOutputDir = (new File(stemProjectDir, "Output")).getAbsolutePath();
+        String stemGraphsDir = (new File(stemProjectDir, "Graphs")).getAbsolutePath();
+        String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
+        File soteriaOutputDir = new File(stemOutputDir, "Soteria_Output");
+        soteriaOutputDir.mkdirs();
+        String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
+
+        checkFile(stemCsvDir, true, true, true, false, null);
+        checkFile(stemOutputDir, true, true, true, false, null);
+        checkFile(stemGraphsDir, true, true, true, false, null);
+        checkFile(stemSadlFile, true, false, false, false, null);
+        checkFile(soteriaPpOutputDir, true, true, true, false, null);
+        checkFile(soteriaPpBin, true, false, false, true, null);
+
+        deleteDirectoryContents(stemGraphsDir);
+        deleteDirectoryContents(soteriaPpOutputDir);
+
+        if (debugDir != null) {
+            logHeader("DEBUGGING XML OUTPUT");
+        }
+
+        try {
+            // Copy Soteria++ pngs
+            for (String soteria_png : soteria_pngs) {
+                Binary.copyResource(
+                        "soteria_pngs/" + soteria_png + ".png",
+                        new File(soteriaPpOutputDir, soteria_png + ".png"),
+                        false);
+            }
+        } catch (Binary.ExecutionException e) {
+            throw new VerdictRunException("Failed to copy Soteria++ pngs", e);
+        }
+
+        logHeader("STEM");
+
+        log("STEM project directory: " + stemProjectDir);
+        log("STEM output directory: " + stemOutputDir);
+        log("STEM graphs directory: " + stemGraphsDir);
+        log("STEM is running. Please be patient...");
+
+        VerdictStem stemRunner = new VerdictStem();
+        Metrics.timer("Timer.mbas.stem", "model", modelName)
+                .record(
+                        () ->
+                                stemRunner.runStem(
+                                        new File(stemProjectDir),
+                                        new File(stemOutputDir),
+                                        new File(stemGraphsDir)));
+
+        log("STEM finished!");
+
+        logHeader("Soteria++");
+
+        log("Soteria++ input directory: " + stemOutputDir);
+        log("Soteria++ output directory: " + soteriaPpOutputDir);
+        log("Soteria++ is running. Please be patient...");
+
+        try {
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+            Binary.invokeBin(
+                    soteriaPpBin,
+                    soteriaPpOutputDir,
+                    new PumpStreamHandler(),
+                    "-o",
+                    soteriaPpOutputDir,
+                    stemOutputDir);
+            sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
+        } catch (Binary.ExecutionException e) {
+            throw new VerdictRunException("Failed to execute soteria_pp", e);
+        }
+
+        logHeader("Finished");
     }
 
     /**

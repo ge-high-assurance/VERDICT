@@ -11,7 +11,11 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+*
+* @author Paul Meng
+*
+*/
 /** Construct tabular data and output to CSV. */
 public class Table {
     private static class Row {
@@ -232,6 +236,8 @@ public class Table {
     public void toCsvFile(File file) {
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
             toCsv(out);
+            out.close();
+            System.out.println("Write to csv file: " + file.getAbsolutePath());
         } catch (Exception e) {
             System.err.println("Failed to write file: " + file.getAbsolutePath());
             throw new RuntimeException(e);

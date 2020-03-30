@@ -31,7 +31,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
 *
-* Author: Paul Meng
+* @author Paul Meng
 * Date: Jun 12, 2019
 *
 */

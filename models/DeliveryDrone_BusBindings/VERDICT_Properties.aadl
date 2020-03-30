@@ -1,0 +1,87 @@
+property set VERDICT_Properties is
+-- Port properties
+ probe: aadlboolean applies to (port);
+
+-- Connection properties, including defenses and DAL values
+ flowType: enumeration (Xdata, Xcontrol, Xrequest) applies to (connection);
+ connectionType: enumeration (Local, Remote) applies to (connection);
+ authenticated: aadlboolean applies to (connection);
+ trustedConnection: aadlboolean applies to (connection);
+ encryptedTransmission: aadlinteger 0 .. 9 applies to (connection);
+
+-- Component properties 
+ pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
+ category: aadlstring applies to (system);
+ componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
+ situated: enumeration (OnBoard, Remote) applies to (system);
+ adversariallyTested: aadlboolean applies to (system);
+ hasSensitiveInfo: aadlboolean applies to (system);
+ insideTrustedBoundary: aadlboolean applies to (system);
+ canReceiveConfigUpdate: aadlboolean applies to (system);
+ canReceiveSWUpdate: aadlboolean applies to (system);
+ controlReceivedFromUntrusted: aadlboolean applies to (system);
+ controlSentToUntrusted: aadlboolean applies to (system);
+ dataReceivedFromUntrusted: aadlboolean applies to (system);
+ dataSentToUntrusted: aadlboolean applies to (system);
+
+ -- Cyber Attack Properties from TA1 
+ Configuration_Attack: aadlboolean applies to (system);
+ Physical_Theft_Attack: aadlboolean applies to (system);
+ Interception_Attack: aadlboolean applies to (system);
+ Hardware_Integrity_Attack: aadlboolean applies to (system);
+ Supply_Chain_Attack: aadlboolean applies to (system);
+ Brute_Force_Attack: aadlboolean applies to (system);
+ Fault_Injection_Attack: aadlboolean applies to (system);
+ Identity_Spoofing_Attack: aadlboolean applies to (system);
+ Excessive_Allocation_Attack: aadlboolean applies to (system);
+ Sniffing_Attack: aadlboolean applies to (system);
+ Buffer_Attack: aadlboolean applies to (system);
+ Flooding_Attack: aadlboolean applies to (system);
+
+ -- Cyber Defense Properties
+-- antiJamming: aadlboolean applies to (system); 
+-- auditMessageResponses: aadlboolean applies to (system);
+-- deviceAuthentication: aadlboolean applies to (system);
+-- dosProtection: aadlboolean applies to (system);
+-- encryptedStorage: aadlboolean applies to (system);
+-- heterogeneity: aadlboolean applies to (system);
+-- inputValidation: aadlboolean applies to (system);
+-- logging: aadlboolean applies to (system);
+-- memoryProtection: aadlboolean applies to (system);
+-- physicalAccessControl: aadlboolean applies to (system);
+-- removeIdentifyingInformation: aadlboolean applies to (system);
+-- resourceAvailability: aadlboolean applies to (system);
+-- resourceIsolation: aadlboolean applies to (system);
+-- secureBoot: aadlboolean applies to (system);
+-- sessionAuthenticity: aadlboolean applies to (system);
+-- staticCodeAnalysis: aadlboolean applies to (system);
+-- strongCryptoAlgorithms: aadlboolean applies to (system);
+-- supplyChainSecurity: aadlboolean applies to (system);
+-- systemAccessControl: aadlboolean applies to (system);
+-- tamperProtection: aadlboolean applies to (system);
+-- userAuthentication: aadlboolean applies to (system);
+
+ -- DAL for Cyber Defense Properties
+ antiJamming: aadlinteger 0 .. 9 applies to (system);
+ auditMessageResponses: aadlinteger 0 .. 9 applies to (system);
+ deviceAuthentication: aadlinteger 0 .. 9 applies to (system);
+ dosProtection: aadlinteger 0 .. 9 applies to (system);
+ encryptedStorage: aadlinteger 0 .. 9 applies to (system);
+ heterogeneity: aadlinteger 0 .. 9 applies to (system);
+ inputValidation: aadlinteger 0 .. 9 applies to (system);
+ logging: aadlinteger 0 .. 9 applies to (system);
+ memoryProtection: aadlinteger 0 .. 9 applies to (system);
+ physicalAccessControl: aadlinteger 0 .. 9 applies to (system);
+ removeIdentifyingInformation: aadlinteger 0 .. 9 applies to (system);
+ resourceAvailability: aadlinteger 0 .. 9 applies to (system);
+ resourceIsolation: aadlinteger 0 .. 9 applies to (system);
+ secureBoot: aadlinteger 0 .. 9 applies to (system);
+ sessionAuthenticity: aadlinteger 0 .. 9 applies to (system);
+ staticCodeAnalysis: aadlinteger 0 .. 9 applies to (system);
+ strongCryptoAlgorithms: aadlinteger 0 .. 9 applies to (system);
+ supplyChainSecurity: aadlinteger 0 .. 9 applies to (system);
+ systemAccessControl: aadlinteger 0 .. 9 applies to (system);
+ tamperProtection: aadlinteger 0 .. 9 applies to (system);
+ userAuthentication: aadlinteger 0 .. 9 applies to (system);
+ 
+end VERDICT_Properties;
