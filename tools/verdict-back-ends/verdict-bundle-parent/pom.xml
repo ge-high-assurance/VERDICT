@@ -217,9 +217,6 @@
                 </executions>
                 <configuration>
                     <java>
-                        <licenseHeader>
-                            <content>/* See LICENSE in project directory */</content>
-                        </licenseHeader>
                         <googleJavaFormat>
                             <version>1.7</version>
                             <style>AOSP</style>
