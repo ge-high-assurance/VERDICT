@@ -64,6 +64,13 @@ public class VerdictStemTest {
         testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
+        controlFile = controlOutputDir.resolve("ArchMitigation.csv");
+        testFile = testOutputDir.resolve("ArchMitigation.csv");
+        Assertions.assertThat(testFile).exists();
+        controlData = new String(Files.readAllBytes(controlFile));
+        testData = new String(Files.readAllBytes(testFile));
+        Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
+
         testFile = testGraphsDir.resolve("Run_sadl10.svg");
         Assertions.assertThat(testFile).exists();
     }

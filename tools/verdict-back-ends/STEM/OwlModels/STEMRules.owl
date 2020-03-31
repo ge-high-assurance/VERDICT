@@ -38,6 +38,7 @@
   <j.0:Rule rdf:ID="Transitive4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-151-3"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-507-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-151-10"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-28-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-2"/>
@@ -68,6 +69,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-594-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-184-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-439-1"/>
+  <j.0:Rule rdf:ID="InferDataSentToUntrusted"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-440-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-115-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-549-2"/>
@@ -155,6 +157,7 @@
   <j.0:Rule rdf:ID="TA1-Flooding_Attack"/>
   <j.0:Rule rdf:ID="InferInsideTrustedBoundary1"/>
   <j.0:Rule rdf:ID="TA1-Physical_Theft_Attack"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-607-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-21-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-390-1"/>
@@ -173,6 +176,7 @@
   <j.0:Rule rdf:ID="InferTrustedConnectionFalse3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-114-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-438-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-607-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-22-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-21-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-2"/>

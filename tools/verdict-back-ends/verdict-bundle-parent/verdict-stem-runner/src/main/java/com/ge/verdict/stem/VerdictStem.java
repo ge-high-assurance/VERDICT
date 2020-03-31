@@ -34,14 +34,17 @@ public class VerdictStem {
             final Path knowledgeBaseDir = projectDir.toPath();
             final Path csvDataDir = knowledgeBaseDir.resolve("CSVData");
             final boolean csvIncludesHeader = true;
+            final Path busCsv = csvDataDir.resolve("ScnBusBindings.csv");
             final Path compCsv = csvDataDir.resolve("ScnCompProps.csv");
             final Path connCsv = csvDataDir.resolve("ScnConnections.csv");
+            final Path archMitigationCsv = outputDir.toPath().resolve("ArchMitigation.csv");
             final Path capecCsv = outputDir.toPath().resolve("CAPEC.csv");
             final Path defensesCsv = outputDir.toPath().resolve("Defenses.csv");
             final Path defenses2NistCsv = outputDir.toPath().resolve("Defenses2NIST.csv");
             final String graphName = "Run_sadl10";
             final Path modelsDir = knowledgeBaseDir.resolve("OwlModels");
             final Path templatesDir = knowledgeBaseDir.resolve("Templates");
+            final Path busTemplate = templatesDir.resolve("ScnBusBindings.tmpl");
             final Path compTemplate = templatesDir.resolve("ScnCompProps.tmpl");
             final Path connTemplate = templatesDir.resolve("ScnConnections.tmpl");
 
@@ -57,6 +60,8 @@ public class VerdictStem {
                     compCsv.toUri().toString(), csvIncludesHeader, compTemplate.toUri().toString());
             srvr.loadCsvData(
                     connCsv.toUri().toString(), csvIncludesHeader, connTemplate.toUri().toString());
+            srvr.loadCsvData(
+                    busCsv.toUri().toString(), csvIncludesHeader, busTemplate.toUri().toString());
 
             // Create output and graph directories
             outputDir.mkdirs();
@@ -84,6 +89,15 @@ public class VerdictStem {
             if (rs != null) {
                 Files.write(
                         defensesCsv,
+                        rs.toString()
+                                .replaceAll(anyNamespace, "")
+                                .getBytes(StandardCharsets.UTF_8));
+            }
+
+            rs = srvr.query("http://sadl.org/STEM/Queries#ArchMitigation");
+            if (rs != null) {
+                Files.write(
+                        archMitigationCsv,
                         rs.toString()
                                 .replaceAll(anyNamespace, "")
                                 .getBytes(StandardCharsets.UTF_8));

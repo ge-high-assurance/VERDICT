@@ -14,8 +14,9 @@ import "http://sadl.org/STEM/BaseModel".
 //log "c:/tmp/scnconnections.log"
 
 validate <Scenario> not blank skip
+validate <Comp> not blank skip
+validate <Impl> not blank skip
 validate <ConnectionName> not blank skip
-//validate <ActualConnectionBinding> not blank skip
 validate <SrcComp> not blank skip
 validate <SrcImpl> not blank skip
 validate <SrcCompInstance> not blank skip
@@ -28,9 +29,7 @@ validate <DestCompInstance> not blank skip
 validate <DestCompCategory> not blank skip
 validate <DestPortName> not blank skip
 validate <DestPortType> not blank skip
-validate <Flow1> not blank skip
-validate <Flow2> not blank skip
-validate <Flow3> not blank skip
+validate <flowType> not blank skip
 validate <trustedConnection> not blank skip
 validate <encryptedTransmission> not blank skip
 
@@ -41,9 +40,8 @@ validate <encryptedTransmission> not blank skip
 // the above have error markings; but that is a XText issue; so ignore error markings
 
 transform <trustedConnection> to <trusted> replace "1" : true,"0" : false
-transform <encryptedTransmission> to <def1A[]> split "#"
-transform <def1A[1]> to <def1> replace "1" : true,"0" : false
 
+transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 
 <SrcComp> rdfs:subClassOf Subsystem
 <SrcCompInstance> rdf:type <SrcComp>
@@ -51,39 +49,34 @@ transform <def1A[1]> to <def1> replace "1" : true,"0" : false
 <DestComp> rdfs:subClassOf Subsystem
 <DestCompInstance> rdf:type <DestComp>
 <DestImpl> rdf:type <DestComp>
-//<ActualConnectionBinding> rdf:type Bus
 
 // Sometimes SrcCompInstance is empty but in that case SrcImpl is present.
 // So in rules, I then set srcCompInst to be TEMP2SrcImpl where TEMP2SrcImpl is SrcImpl after stripping off .Impl / .impl
 // Similarly for destCompInstance.
 
-// I also need to make connection name unique; doing that by concatenating row number of input csv file 
 // ignoring SrcPortType and DestPortType as these were for SOTERIA++
 // ignoring SrcCompCategory and DestCompCategory as they are currently only 'system', eventually we will have 'bus' etc
 // note that I do not have 'system' in my model
 
-<ConnectionName>row() rdf:type Connection
-<ConnectionName>row() connectionName <ConnectionName>
-<ConnectionName>row() srcCompType <SrcComp>
-<ConnectionName>row() srcCompImpl <SrcImpl> 
-<ConnectionName>row() connectionSource <SrcCompInstance>
-//<ConnectionName>row() binding <ActualConnectionBinding>
-<ConnectionName>row() outPort <SrcPortName>
-<ConnectionName>row() destCompType <DestComp>
-<ConnectionName>row() destCompImpl <DestImpl> 
-<ConnectionName>row() connectionDestination <DestCompInstance>
-<ConnectionName>row() inPort <DestPortName>
-<ConnectionName>row() connectionFlow <Flow1>
-<ConnectionName>row() connectionFlow <Flow2>
-<ConnectionName>row() connectionFlow <Flow3>
-<ConnectionName>row() trustedConnection <trusted>
-<ConnectionName>row() XencryptedTransmission <def1>
+<ConnectionName><Impl><Comp> rdf:type Connection
+<ConnectionName><Impl><Comp> connectionName <ConnectionName>
+<ConnectionName><Impl><Comp> srcCompType <SrcComp>
+<ConnectionName><Impl><Comp> srcCompImpl <SrcImpl> 
+<ConnectionName><Impl><Comp> connectionSource <SrcCompInstance>
+<ConnectionName><Impl><Comp> outPort <SrcPortName>
+<ConnectionName><Impl><Comp> destCompType <DestComp>
+<ConnectionName><Impl><Comp> destCompImpl <DestImpl> 
+<ConnectionName><Impl><Comp> connectionDestination <DestCompInstance>
+<ConnectionName><Impl><Comp> inPort <DestPortName>
+<ConnectionName><Impl><Comp> connectionFlow <flowType>
+<ConnectionName><Impl><Comp> trustedConnection <trusted>
+<ConnectionName><Impl><Comp> XencryptedTransmission <def1>
 
 <1> rdf:type ImplProperty
 <1> name "encryptedTransmission"
 <1> val <def1>
-<1> dal <def1A[2]>
-<ConnectionName>row() encryptedTransmission <1>
+<1> dal <encryptedTransmission>
+<ConnectionName><Impl><Comp> encryptedTransmission <1>
 
 
 

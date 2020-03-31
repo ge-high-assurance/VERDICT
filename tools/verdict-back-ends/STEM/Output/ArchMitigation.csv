@@ -1,0 +1,2 @@
+"ConnectionName","SrcCompInstance","DestCompInstance","Mitigation"
+"c1","positionEstimator","navigation","Bind to different bus"

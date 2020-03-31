@@ -1,66 +1,199 @@
 "CompType","CompInst","CAPEC","CAPECDescription","Confidentiality","Integrity","Availability","LikelihoodOfSuccess"
-"Actuation","actuation","CAPEC-125","Flooding",null,null,"Availability",1.0
+"Actuation","actuation","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"Actuation","actuation","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"Actuation","actuation","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"Actuation","actuation","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "Actuation","actuation","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "Actuation","actuation","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "Actuation","actuation","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "Actuation","actuation","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Actuation","actuation","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"Actuation","actuation","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"Camera","camera","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"Camera","camera","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"Camera","camera","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"Camera","camera","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "Camera","camera","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "Camera","camera","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "Camera","camera","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "Camera","camera","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Camera","camera","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"Camera","camera","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"Connector","connector","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"Connector","connector","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "Connector","connector","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "Connector","connector","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "Connector","connector","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
 "Connector","connector","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Connector","connector","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "DeliveryItemMechanism","deliveryItemMechanism","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "DeliveryItemMechanism","deliveryItemMechanism","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "DeliveryItemMechanism","deliveryItemMechanism","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "DeliveryItemMechanism","deliveryItemMechanism","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"DeliveryItemMechanism","deliveryItemMechanism","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-112","Brute Force",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-112","Brute Force","Confidentiality",null,null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-112","Brute Force",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-114","Authentication Abuse",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-114","Authentication Abuse",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-115","Authentication Bypass",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-115","Authentication Bypass",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-123","Buffer Manipulation",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-123","Buffer Manipulation",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-125","Flooding",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-130","Excessive Allocation",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-131","Resource Leak Exposure",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-137","Parameter Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-175","Code Inclusion",null,"Integrity",null,1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-21","Exploitation of Trusted Credentials",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-22","Exploiting Trust in Client",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-22","Exploiting Trust in Client",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-242","Code Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-242","Code Injection",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-248","Command Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-248","Command Injection",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-25","Forced Deadlock",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-26","Leveraging Race Conditions",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-28","Fuzzing",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-549","Local Execution of Code",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-549","Local Execution of Code",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-586","Object Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-586","Object Injection",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-594","Traffic Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-594","Traffic Injection",null,null,"Availability",1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-607","Obstruction",null,null,"Availability",1.0
 "DeliveryPlanner","deliveryPlanner","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"DeliveryPlanner","deliveryPlanner","CAPEC-74","Manipulating User State",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"FlightControl","fc","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"FlightControl","fc","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"FlightControl","fc","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "FlightControl","fc","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "FlightControl","fc","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "FlightControl","fc","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "FlightControl","fc","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"FlightControl","fc","CAPEC-549","Local Execution of Code",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-549","Local Execution of Code",null,null,"Availability",1.0
+"FlightControl","fc","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"FlightControl","fc","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"GPS","gps","CAPEC-112","Brute Force",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-112","Brute Force",null,null,"Availability",1.0
+"GPS","gps","CAPEC-114","Authentication Abuse",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-114","Authentication Abuse",null,null,"Availability",1.0
+"GPS","gps","CAPEC-115","Authentication Bypass",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-115","Authentication Bypass",null,null,"Availability",1.0
+"GPS","gps","CAPEC-123","Buffer Manipulation",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-123","Buffer Manipulation",null,null,"Availability",1.0
+"GPS","gps","CAPEC-125","Flooding",null,null,"Availability",1.0
+"GPS","gps","CAPEC-130","Excessive Allocation",null,null,"Availability",1.0
+"GPS","gps","CAPEC-131","Resource Leak Exposure",null,null,"Availability",1.0
+"GPS","gps","CAPEC-137","Parameter Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-175","Code Inclusion",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-21","Exploitation of Trusted Credentials",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-22","Exploiting Trust in Client",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-22","Exploiting Trust in Client",null,null,"Availability",1.0
+"GPS","gps","CAPEC-242","Code Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-242","Code Injection",null,null,"Availability",1.0
+"GPS","gps","CAPEC-248","Command Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-248","Command Injection",null,null,"Availability",1.0
+"GPS","gps","CAPEC-25","Forced Deadlock",null,null,"Availability",1.0
+"GPS","gps","CAPEC-26","Leveraging Race Conditions",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-28","Fuzzing",null,null,"Availability",1.0
+"GPS","gps","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"GPS","gps","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"GPS","gps","CAPEC-586","Object Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-586","Object Injection",null,null,"Availability",1.0
+"GPS","gps","CAPEC-594","Traffic Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-594","Traffic Injection",null,null,"Availability",1.0
+"GPS","gps","CAPEC-607","Obstruction",null,null,"Availability",1.0
+"GPS","gps","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"GPS","gps","CAPEC-74","Manipulating User State",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"IMU","imu","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"IMU","imu","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"IMU","imu","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-125","Flooding",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-130","Excessive Allocation",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-131","Resource Leak Exposure",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"Navigation","navigation","CAPEC-22","Exploiting Trust in Client",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-22","Exploiting Trust in Client",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-25","Forced Deadlock",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-26","Leveraging Race Conditions",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-28","Fuzzing",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"Navigation","navigation","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "Navigation","navigation","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "Navigation","navigation","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "Navigation","navigation","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "Navigation","navigation","CAPEC-507","Physical Theft",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-549","Local Execution of Code",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-549","Local Execution of Code",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-607","Obstruction",null,null,"Availability",1.0
+"Navigation","navigation","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"Navigation","navigation","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
+"Navigation","navigation","CAPEC-74","Manipulating User State",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-184","Software Integrity Attack",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-188","Reverse Engineering","Confidentiality",null,null,1.0
+"PositionEstimator","positionEstimator","CAPEC-390","Bypassing Physical Security",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-390","Bypassing Physical Security","Confidentiality",null,null,1.0
+"PositionEstimator","positionEstimator","CAPEC-390","Bypassing Physical Security",null,null,"Availability",1.0
+"PositionEstimator","positionEstimator","CAPEC-438","Modification During Manufacture",null,"Integrity",null,1.0
 "PositionEstimator","positionEstimator","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
 "PositionEstimator","positionEstimator","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
 "PositionEstimator","positionEstimator","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-507","Physical Theft","Confidentiality",null,null,1.0
 "PositionEstimator","positionEstimator","CAPEC-507","Physical Theft",null,null,"Availability",1.0
-"Radio","radio","CAPEC-123","Buffer Manipulation",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-123","Buffer Manipulation",null,null,"Availability",1.0
-"Radio","radio","CAPEC-125","Flooding",null,null,"Availability",1.0
-"Radio","radio","CAPEC-130","Excessive Allocation",null,null,"Availability",1.0
-"Radio","radio","CAPEC-131","Resource Leak Exposure",null,null,"Availability",1.0
-"Radio","radio","CAPEC-137","Parameter Injection",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-148","Content Spoofing",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-151","Identity Spoofing",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-175","Code Inclusion",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-22","Exploiting Trust in Client",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-22","Exploiting Trust in Client",null,null,"Availability",1.0
-"Radio","radio","CAPEC-242","Code Injection",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-242","Code Injection",null,null,"Availability",1.0
-"Radio","radio","CAPEC-248","Command Injection",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-248","Command Injection",null,null,"Availability",1.0
-"Radio","radio","CAPEC-25","Forced Deadlock",null,null,"Availability",1.0
-"Radio","radio","CAPEC-26","Leveraging Race Conditions",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-28","Fuzzing",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-28","Fuzzing",null,null,"Availability",1.0
-"Radio","radio","CAPEC-439","Manipulation During Distribution",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-440","Hardware Integrity Attack",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-507","Physical Theft",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-507","Physical Theft",null,null,"Availability",1.0
-"Radio","radio","CAPEC-586","Object Injection",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-586","Object Injection",null,null,"Availability",1.0
-"Radio","radio","CAPEC-594","Traffic Injection",null,"Integrity",null,1.0
-"Radio","radio","CAPEC-594","Traffic Injection",null,null,"Availability",1.0
-"Radio","radio","CAPEC-607","Obstruction",null,null,"Availability",1.0
-"Radio","radio","CAPEC-74","Manipulating User State",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-549","Local Execution of Code",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-549","Local Execution of Code",null,null,"Availability",1.0
+"PositionEstimator","positionEstimator","CAPEC-624","Fault Injection",null,"Integrity",null,1.0
+"PositionEstimator","positionEstimator","CAPEC-624","Fault Injection","Confidentiality",null,null,1.0
