@@ -224,10 +224,12 @@ public class App {
             String soteriaPpBin = mbasOpts[1];
             if (csvProjectName != null) {
                 runMbas(csvProjectName, stemProjectDir, debugDir, soteriaPpBin);
+                sample.stop(Metrics.timer("Timer.mbas", "model", csvProjectName));
             } else {
                 runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+                sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
             }
-            sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
+
         } else if (opts.hasOption("crv")) {
             String instrPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml")

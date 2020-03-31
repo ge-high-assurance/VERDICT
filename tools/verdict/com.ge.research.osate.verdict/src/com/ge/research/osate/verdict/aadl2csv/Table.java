@@ -237,7 +237,7 @@ public class Table {
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
             toCsv(out);
             out.close();
-            System.out.println("Write to csv file: " + file.getAbsolutePath());
+            System.out.println("Info: Write to csv file: " + file.getAbsolutePath());
         } catch (Exception e) {
             System.err.println("Failed to write file: " + file.getAbsolutePath());
             throw new RuntimeException(e);

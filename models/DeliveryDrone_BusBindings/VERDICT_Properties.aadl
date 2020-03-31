@@ -23,6 +23,9 @@ property set VERDICT_Properties is
  controlSentToUntrusted: aadlboolean applies to (system);
  dataReceivedFromUntrusted: aadlboolean applies to (system);
  dataSentToUntrusted: aadlboolean applies to (system);
+ failSafe:aadlinteger 0 .. 9 applies to (system);
+ remoteAttestation: aadlinteger 0 .. 9 applies to (system);
+ zeroize:  aadlinteger 0 .. 9 applies to (system);
 
  -- Cyber Attack Properties from TA1 
  Configuration_Attack: aadlboolean applies to (system);
