@@ -18,7 +18,7 @@
              enablesFor="1">
           <enabledWhen>
              <reference
-                   definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">>
+                   definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">
              </reference>
           </enabledWhen>
        </handler>              

@@ -1,7 +1,0 @@
-# Ignore everything in current directory except the four
-# files which we need to copy to the image:
-*
-!target/classes/nix/aadl2iml
-!target/classes/nix/kind2
-!target/classes/nix/soteria_pp
-!target/verdict-bundle-1.0-SNAPSHOT-capsule.jar

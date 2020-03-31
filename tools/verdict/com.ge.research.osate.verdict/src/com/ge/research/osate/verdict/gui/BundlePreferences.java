@@ -18,6 +18,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 public class BundlePreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	// preference keys
 	private static final String BUNDLE_JAR = "verdict_bundle_jar";
+	private static final String DOCKER_IMAGE = "verdict_bundle_image";
 	private static final String STEM_DIR = "STEM";
 	private static final String AADL2IML_BIN = "aadl2iml_bin";
 	private static final String KIND2_BIN = "kind2_bin";
@@ -39,6 +40,10 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 
 	public static String getBundleJar() {
 		return getVerdictPreferenceStore().getString(BUNDLE_JAR);
+	}
+
+	public static String getDockerImage() {
+		return getVerdictPreferenceStore().getString(DOCKER_IMAGE);
 	}
 
 	public static String getStemDir() {
@@ -107,6 +112,42 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		}
 	}
 
+	/**
+	 * Make it so that a string text field gets saved when modified.
+	 *
+	 * @param editor the text field
+	 * @param pref_key the preferences key for storing the path
+	 */
+	private void addSaveHandler(StringFieldEditor editor, String pref_key) {
+		// The preferences won't save any other way
+		// This is really ugly, and it makes it save even if the user doesn't press "Apply and Close"
+		// But at least it saves the preferences instead of not saving them at all
+
+		Text textField = null;
+
+		try {
+			Field field = StringFieldEditor.class.getDeclaredField("textField");
+			field.setAccessible(true);
+
+			textField = (Text) field.get(editor);
+		} catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
+			e.printStackTrace();
+		}
+
+		if (textField != null) {
+			textField.addModifyListener(event -> {
+				String path = editor.getStringValue();
+				ScopedPreferenceStore prefs = getVerdictPreferenceStore();
+				prefs.putValue(pref_key, path);
+				try {
+					prefs.save();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+	}
+
 	@Override
 	protected void createFieldEditors() {
 		FileFieldEditor bundleJar = new FileFieldEditor(BUNDLE_JAR, "Bundle JAR:", true,
@@ -116,6 +157,12 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		addField(bundleJar);
 		addSaveHandler(bundleJar, BUNDLE_JAR,
 				file -> file.exists() && file.isFile() && file.getAbsolutePath().endsWith(".jar"));
+
+		StringFieldEditor dockerImage = new StringFieldEditor(DOCKER_IMAGE, "Bundle docker IMAGE:",
+				30, 1, StringFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent());
+		dockerImage.setStringValue(getDockerImage());
+		addField(dockerImage);
+		addSaveHandler(dockerImage, DOCKER_IMAGE);
 
 		DirectoryFieldEditor stemDir = new DirectoryFieldEditor(STEM_DIR, "STEM Project Path:", getFieldEditorParent());
 		stemDir.setStringValue(getStemDir());
