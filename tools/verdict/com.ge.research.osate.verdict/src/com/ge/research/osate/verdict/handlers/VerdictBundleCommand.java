@@ -224,6 +224,8 @@ public class VerdictBundleCommand {
 
                         // Read and relay all output printed by verdict-bundle to our own stdout
                         String logs = container.logs().fetch();
+                        // Trim the control characters that the above line currently leaves in the string
+                        logs = trimControlCharacters(logs);
                         System.out.print(logs);
 
                         // Return verdict-bundle's exit code
@@ -245,6 +247,31 @@ public class VerdictBundleCommand {
         } catch (IOException | UnexpectedResponseException e) {
             VerdictLogger.severe("Unable to run command: " + e);
             return -1;
+        }
+    }
+
+    /**
+     * Checks whether the logs have control characters and if so,
+     * trims the first eight characters from each line in the logs and
+     * reassembles the lines.
+     *
+     * @return Logs without control characters beginning each line
+     */
+    private String trimControlCharacters(String logs) {
+        // Check if the logs start with a control character
+        if (!logs.isEmpty() && Character.isISOControl(logs.codePointAt(0))) {
+            // Split the logs at line separators since each line has control characters
+            String[] lines = logs.split("\\R");
+            // Discard the first eight characters from each line
+            for (int i = 0; i < lines.length; i++) {
+                if (lines[i].length() >= 8 && Character.isISOControl(lines[i].codePointAt(0))) {
+                    lines[i] = lines[i].substring(8);
+                }
+            }
+            // Reassemble the lines and return the trimmed logs
+            return String.join("\n", lines);
+        } else {
+            return logs;
         }
     }
 
