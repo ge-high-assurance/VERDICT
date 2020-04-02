@@ -156,15 +156,15 @@ convert the project to an Xtext project after you open an AADL file,
 answer yes to enable our OSATE plugin's UI.
 
 Our OSATE plugin's UI is invoked from the Verdict pulldown menu.
-First click on a project's name in the AADL Navigator name to make it
+First click on a project's name in the AADL Navigator pane to make it
 the currently selected project, then pull down the Verdict menu and
 run MBAA or CRV as appropriate.  Our plugin will use Docker Java API
 calls to pull down the gehighassurance/verdict image from Docker Hub
 (only if the image isn't already in your Docker's local cache), start
-a Docker container to run the desired command, and then display any
-output from the command.  If you don't enter anything for the image's
-name, the plugin will run the verdict-bundle jar and back-end programs
-directly on your system instead.
+a temporary Docker container to run the desired command, and then
+display any output from the command.  If you don't enter anything for
+the image's name, the plugin will run the verdict-bundle jar and
+back-end programs directly on your system instead.
 
 For further information about how to use our VERDICT tools, please
 read our VERDICT [User
