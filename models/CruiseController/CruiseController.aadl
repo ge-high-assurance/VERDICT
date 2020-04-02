@@ -174,9 +174,6 @@ public
 				not inc and not dec and not brake_cancel;
 			
 			-- Assumptions
-			assume "Speed is always positive": 
-					speed > 0.0;
-			
 			assume "Buttons are mutually exclusive": 
 					ToInt(on_off) + ToInt(resume_speed) + ToInt(set_speed) + 
 					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;	
