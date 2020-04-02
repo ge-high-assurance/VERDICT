@@ -820,7 +820,7 @@ public
 		connections
 			c1: port positionEstimator.est_pos -> navigation.est_pos
 			{VERDICT_Properties::flowType => Xcontrol;
-			 VERDICT_Properties::trustedConnection => true;	
+--			 VERDICT_Properties::trustedConnection => false;	
 			 VERDICT_Properties::encryptedTransmission => 6;
 			};
 			
