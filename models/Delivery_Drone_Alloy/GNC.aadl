@@ -1,0 +1,98 @@
+package GNC
+
+public
+	with Base_Types;
+    with Data_Types;
+    with VERDICT_Properties;
+
+	system GPS
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
+	end GPS;
+
+	system IMU
+		features
+			-- inputs
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			imu_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+	end IMU;
+		
+	system GNC
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			gps_health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
+			imu_pos: out data port Data_Types::Position.impl;
+			imu_health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			
+		
+	end GNC;
+	
+	system implementation GNC.Impl
+		subcomponents
+			gps: system GPS
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with trustedConnection for c12 and c34 to false
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				
+				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
+				VERDICT_Properties::pedigree => COTS;	
+				VERDICT_Properties::adversariallyTested => false;															
+			};
+			imu: system IMU
+			{ 
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => Sourced;
+				
+			};
+		connections
+			i1: port constellation -> gps.constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			i2: port satellite0_pos -> gps.satellite0_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i3: port satellite1_pos -> gps.satellite1_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i4: port launch_pos -> imu.launch_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i5: port gps.gps_pos -> gps_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i6: port gps.health_status -> gps_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			i7: port gps.probe_constellation -> probe_constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			i8: port imu.imu_pos -> imu_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			i9: port imu.health_status -> imu_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			i10: port imu.probe_launch_pos -> probe_launch_pos
+			{VERDICT_Properties::flowType => Xdata;};
+	end GNC.Impl;
+end GNC;

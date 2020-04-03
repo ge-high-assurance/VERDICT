@@ -1,0 +1,410 @@
+package DeliveryDrone
+
+public
+	with Base_Types;
+    with Data_Types;
+	with VERDICT_Properties;
+	with GNC;
+
+	system PositionEstimator 
+		features
+			-- inputs
+			gps_pos: in data port Data_Types::Position.impl;
+			imu_pos: in data port Data_Types::Position.impl;	
+			pos_act_in: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			est_pos: out data port Data_Types::Position.impl;
+	end PositionEstimator;
+
+	system Navigation
+		features
+			-- inputs
+			est_pos: in data port Data_Types::Position.impl; 
+			dest_pos: in data port Data_Types::Position.impl;
+			cmd: in data port Base_Types::Boolean;
+			flight_control_state: in data port Base_Types::Boolean;
+			
+			-- outputs
+			move: out data port Base_Types::Boolean;				
+			cur_pos: out data port Data_Types::Position.impl;
+			pos_act_out: out data port Data_Types::Position.impl;
+			probe_dest_pos: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+	end Navigation;
+	
+	system FlightControl
+		features
+			-- inputs
+			actuation_response: in data port Base_Types::Boolean;
+			move: in data port Base_Types::Boolean;
+			
+			-- outputs
+			motor_cmd: out data port Base_Types::Boolean;
+			fc_state: out data port Base_Types::Boolean;
+	end FlightControl;
+	
+	system Actuation
+		features
+			-- inputs
+			motor_cmd: in data port Base_Types::Boolean;
+			
+			-- outputs
+			response: out data port Base_Types::Boolean;
+	end Actuation;
+	
+	system DeliveryPlanner
+		features
+			-- inputs
+			bus_in: in data port Data_Types::InputBus.impl;
+			cur_pos: in data port Data_Types::Position.impl;
+			delivery_status: in data port Data_Types::DeliveryStatus;
+			radio_response: in data port Data_Types::RadioResponse.impl;
+			camera_result: in data port Base_Types::Integer;
+			gps_health_status: in data port Base_Types::Boolean; 
+			imu_health_status: in data port Base_Types::Boolean;
+			rdo_health_status: in data port Base_Types::Boolean;
+			cam_health_status: in data port Base_Types::Boolean;
+			package_is_secure: in data port Base_Types::Boolean; 
+			
+			-- outputs
+			radio_cmd: out data port Base_Types::Boolean;
+			delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
+			dest_location: out data port Data_Types::Position.impl;
+			bus_out: out data port Base_Types::Boolean;
+	        nav_cmd: out data port Base_Types::Boolean;					
+			camera: out data port Base_Types::Boolean;
+			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
+			{ VERDICT_Properties::probe => true; };
+			constellation: out data port Data_Types::Constellation; 
+			launch_pos: out data port Data_Types::Position.impl;
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; 
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; }; 
+			target_clear: out data port Base_Types::Boolean;
+			valid_marker: out data port Base_Types::Boolean;
+	end DeliveryPlanner;
+	
+	system Radio
+		features
+			-- inputs
+			comm_in: in data port Data_Types::RadioResponse.impl;
+			radio_in: in data port Base_Types::Boolean;
+			
+			-- outputs
+			comm_out: out data port Base_Types::Boolean;
+			radio_out: out data port Data_Types::RadioResponse.impl;
+			health_status: out data port Base_Types::Boolean;
+	end Radio;
+	
+	system DeliveryItemMechanism
+		features
+			-- inputs
+			delivery_cmd_in : in data port Data_Types::PackageDeliveryCommand;
+			
+			-- outputs
+			delivery_status_out: out data port Data_Types::DeliveryStatus;
+			package_is_secure: out data port Base_Types::Boolean;
+			
+		annex agree {**
+			eq release_cmd: bool = (delivery_cmd_in = Agree_Constants::RELEASE_PACKAGE_CMD);
+			eq abort_cmd: bool = (delivery_cmd_in = Agree_Constants::ABORT_DELIVERY_CMD);
+			eq no_op_cmd: bool = (delivery_cmd_in = Agree_Constants::NO_OPERATION_CMD);
+			
+			guarantee "Initially, delivery status is NOT_STARTED":
+				Agree_Nodes::InitiallyX(delivery_status_out = Agree_Constants::NOT_STARTED_STATUS);
+				
+			guarantee "if no op or abort command have received then delivery status gets re-started":
+				true -> (no_op_cmd or abort_cmd => (delivery_status_out = Agree_Constants::NOT_STARTED_STATUS));
+			
+			guarantee "If delivery command is issued, delivery status is different from NOT_STARTED": 
+				true -> (release_cmd => delivery_status_out <> Agree_Constants::NOT_STARTED_STATUS);
+		**};
+	end DeliveryItemMechanism;
+	
+	system Camera
+		features
+			camera_in: in data port Base_Types::Boolean;
+			camera_out: out data port Base_Types::Integer;
+			health_status: out data port Base_Types::Boolean;	
+	end Camera;
+			
+	system Connector
+		features
+			-- inputs
+				bus_in: in data port Data_Types::InputBus.impl;
+					
+			-- outputs
+				bus_out: out data port Data_Types::InputBus.impl;
+	end Connector;
+	
+	system DeliveryDroneSystem
+		features
+			satellite0_sig_pos: in data port Data_Types::Position.impl;
+			satellite1_sig_pos: in data port Data_Types::Position.impl;
+			bus1: in data port Data_Types::InputBus.impl;
+			comm1: in data port Data_Types::RadioResponse.impl;
+			
+			comm2: out data port Base_Types::Boolean;
+			bus2: out data port Base_Types::Boolean;			
+			
+			radio_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			radio_response: out data port Data_Types::RadioResponse.impl
+			{ VERDICT_Properties::probe => true; };
+			delivery_status: out data port Data_Types::DeliveryStatus
+			{ VERDICT_Properties::probe => true; };
+			
+			actuation_out: out data port Base_Types::Boolean;
+			probe_init_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_abort_mode: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
+			{ VERDICT_Properties::probe => true; };
+			probe_constellation: out data port Data_Types::Constellation
+			{ VERDICT_Properties::probe => true; };
+			probe_launch_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_delivery_location: out data port Data_Types::Position.impl
+			{ VERDICT_Properties::probe => true; };
+			probe_fly_cmd: out data port Base_Types::Boolean
+			{ VERDICT_Properties::probe => true; };
+	end DeliveryDroneSystem;
+	
+	system implementation DeliveryDroneSystem.Impl
+		subcomponents
+			gnc: system GNC::GNC.Impl;
+			
+			radio: system Radio
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				
+							
+			};
+			positionEstimator: system PositionEstimator
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => COTS; 
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+		
+			 	VERDICT_Properties::adversariallyTested => false;
+			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
+				
+			};
+			navigation: system Navigation
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+
+			};
+			fc: system FlightControl
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+			};
+			actuation: system Actuation
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+			};
+			deliveryPlanner: system DeliveryPlanner
+			{	
+			 	-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::pedigree => Sourced;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				VERDICT_Properties::hasSensitiveInfo => true;
+				VERDICT_Properties::canReceiveSWUpdate => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+			};
+			deliveryItemMechanism: system DeliveryItemMechanism
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+
+			};
+			camera: system Camera
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::hasSensitiveInfo => true;
+			};
+			
+			connector: system Connector
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+			 	VERDICT_Properties::componentType => Hybrid;
+			 	
+			 	VERDICT_Properties::pedigree => COTS;
+			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+			 	VERDICT_Properties::adversariallyTested => false;
+			};
+			
+		connections
+			c1: port positionEstimator.est_pos -> navigation.est_pos
+			{VERDICT_Properties::flowType => Xcontrol;
+			 VERDICT_Properties::trustedConnection => true;	
+			 VERDICT_Properties::encryptedTransmission => true;
+			 VERDICT_Properties::encryptedTransmissionDAL => 6;
+			};
+			
+			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
+			{
+			 VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c2: port navigation.move -> fc.move;
+
+			c3: port fc.fc_state -> navigation.flight_control_state;
+			
+			c4: port deliveryPlanner.dest_location -> navigation.dest_pos;
+			
+			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos;
+			
+			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status;
+			
+			c9: port camera.camera_out -> deliveryPlanner.camera_result;
+			
+			c10: port deliveryPlanner.radio_cmd -> radio.radio_in;
+			
+			c11: port radio.radio_out -> deliveryPlanner.radio_response;
+			
+			c12: port gnc.gps_pos -> positionEstimator.gps_pos
+			{
+				VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c14a: port bus1 -> connector.bus_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c14b: port connector.bus_out -> DeliveryPlanner.bus_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c15: port deliveryPlanner.bus_out -> bus2
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c16: port comm1 -> radio.comm_in
+			{VERDICT_Properties::flowType => Xdata;
+		     VERDICT_Properties::connectionType => Remote;
+			 VERDICT_Properties::authenticated => false;
+			 VERDICT_Properties::encryptedTransmission => false;
+			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
+			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
+			};
+			
+			c17: port radio.comm_out -> comm2
+			{VERDICT_Properties::flowType => Xdata;};
+
+			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c19: port fc.motor_cmd -> actuation.motor_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c20: port actuation.response -> fc.actuation_response
+			{VERDICT_Properties::flowType => Xdata;};	
+
+			c22: port satellite0_sig_pos -> gnc.satellite0_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c23: port satellite1_sig_pos -> gnc.satellite1_pos
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
+			{VERDICT_Properties::flowType => Xdata;};
+
+			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c27: port deliveryPlanner.camera -> camera.camera_in			
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c28: port deliveryPlanner.radio_cmd -> radio_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c29: port radio.radio_out -> radio_response
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
+			{VERDICT_Properties::flowType => Xdata;}; 							
+			
+			c32: port actuation.response -> actuation_out
+			{VERDICT_Properties::flowType => Xdata;};	
+			
+			c33: port deliveryPlanner.constellation -> gnc.constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
+			{
+			VERDICT_Properties::flowType => Xdata;
+			--VERDICT_Properties::trustedConnection => false;
+			};
+			
+			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c37: port camera.health_status -> deliveryPlanner.cam_health_status
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c38: port gnc.probe_constellation -> probe_constellation
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c40: port gnc.probe_launch_pos -> probe_launch_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c41: port navigation.probe_dest_pos -> probe_delivery_location
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c43: port deliveryPlanner.nav_cmd -> probe_fly_cmd
+			{VERDICT_Properties::flowType => Xdata;};
+			
+			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
+			{VERDICT_Properties::flowType => Xdata;};
+												
+	end DeliveryDroneSystem.impl;
+	
+end DeliveryDrone;
