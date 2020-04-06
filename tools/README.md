@@ -22,10 +22,11 @@ You will need an installed [OSATE](https://osate.org/about-osate.html)
 (Open Source AADL Tool Environment) in order to use our OSATE plugin.
 Right now due to the narrowness and specificity of OSATE API versions
 and our dependency on another OSATE plugin called AGREE, our plugin
-works only in OSATE 2.6.1.
+works in OSATE 2.6.1 and 2.7.0 but older versions may not work (we
+haven't tested them).
 
 1. Download the appropriate [OSATE
-   2.6.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.6.1-vfinal/products/)
+   2.7.0](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.0-vfinal/products/)
    product for your operating system.
 
 2. If necessary, refer to these [installation
@@ -38,7 +39,7 @@ works only in OSATE 2.6.1.
 
 `https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-0.8.0`
 
-5. Select the VERDICT option and then click Next.
+5. Select the VERDICT for OSATE item and then click Next.
 
 6. Accept the license agreement and click Finish.
 
