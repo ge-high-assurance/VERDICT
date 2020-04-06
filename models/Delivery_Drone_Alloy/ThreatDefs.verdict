@@ -1,24 +1,24 @@
 ThreatEffect {
-	id = "Location Spoofing"
+	id = "Identity Spoofing"
 	entities = {s : system | s.category = GPS 
 							 or s.category = IMU 
 							 or s.category = LIDAR}
 	reference = "CAPEC-148"
-	description = "An adversary modifies content to make it contain something other than 
-				   what the original content producer intended while keeping the apparent 
-                   source of the content unchanged. The term content spoofing is most often 
-                   used to describe modification of web pages hosted by a target to display 
-                   the adversary's content instead of the owner's content. However, any 
-                   content can be spoofed, including the content of email messages, file 
-                   transfers, or the content of other network communication protocols.  
-                   Content can be modified at the source (e.g. modifying the source file 
-      			   for a web page) or in transit (e.g. intercepting and modifying a message 
-				   between the sender and recipient). Usually, the adversary will attempt 
-				   to hide the fact that the content has been modified, but in some cases, 
-				   such as with web site defacement, this is not necessary. 
-				   Content Spoofing can lead to malware exposure, financial fraud 
-				   (if the content governs financial transactions), privacy violations, 
-				   and other unwanted outcomes."
+	description = "It refers to the action of assuming (i.e., taking on) the identity 
+				   of some other entity (human or non-human) and then using that identity 
+ 				   to accomplish a goal. An adversary may craft messages that appear 
+				   to come from a different principle or use stolen / spoofed authentication 
+				   credentials. Alternatively, an adversary may intercept a message from 
+				   a legitimate sender and attempt to make it look like the message comes 
+				   from them without changing its content. The latter form of this attack 
+				   can be used to hijack credentials from legitimate users. The attacks 
+				   need not be limited to transmitted messages - any resource that is 
+				   associated with an identity (for example, a file with a signature) can 
+				   be the target of an attack where the adversary attempts to change the 
+				   apparent identity. This attack differs from Content Spoofing attacks where 
+				   the adversary does not wish to change the apparent identity of the message 
+				   but instead wishes to change what the message says. In an Spoofing attack, 
+                   the adversary is attempting to change the identity of the content. (Identity Spoofing)"
 };
 
 ThreatEffect {
@@ -91,7 +91,7 @@ ThreatEffect {
 	description = "The target software does not validate user-controlled 
 				   input such that the execution of a process may be altered 
                    by sending code in through legitimate data channels, using 
-                   no other mechanism."
+                   no other mechanism. (Code Injection)"
 };
 
 ThreatEffect {
@@ -104,23 +104,28 @@ ThreatEffect {
 				   maintenance process and causes a change to be made to a 
 				   technology, product, component, or sub-component or a new 
 				   one installed during its deployed use at the victim location 
-				   for the purpose of carrying out an attack."
+				   for the purpose of carrying out an attack. (Modification 
+				   During Manufacture, Distribution, and Maintenance)"
 };
 
---ThreatEffect {
---	id = "Outsider Threat"
---	entities = {s : system | s.componentType = Human 
---							  and s.insideTrustedBoundary = false}
---	reference = "CAPEC-1"	
---	description = "This is a description"
---};
---
---ThreatEffect {
---	id = "Insider Threat"
---	entities = {s : system | s.componentType = Human 
---							  and s.insideTrustedBoundary = true}
---	reference = "CAPEC-1"	
---	description = "This is a description"
---};
+ThreatDefense {
+	id = "Heterogeneity"
+	threats = "Identity Spoofing"
+	reference = "SC-39"
+}
+
+ThreatDefense {
+	id = "Device Identification and Authentication"
+	threats = "Network Injection", "Software Virus", "Remote Code Injection"
+	reference = "IA-3"
+}
+
+ThreatDefense {
+	id = "Supply Chain Protection"
+	threats = "Hardware Trojan"
+	reference = "SA-12"
+}
+
+
 
 
