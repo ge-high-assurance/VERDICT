@@ -43,35 +43,29 @@
              locationURI="menu:org.eclipse.ui.main.menu">             
 		<menu id="VerdictMenu" label="Verdict" >
 		<menu id="MbasMenu" 
-			label="&amp;Model Based Architecture Synthesis (MBAS)" icon="icons/mbas.ico" >
+			label="&amp;Model Based Architecture Synthesis (MBAS)" >
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runMbas"
-	            disabledIcon="icons/noCrvMbas.gif"
-	            icon="icons/mbas.ico"
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
 	            style="push"
 	            tooltip="Run MBAA">
 	      </command>    
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
-                icon="icons/wzrd.ico"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
       	  </command>	      
 		</menu> 
-		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" icon="icons/crv.ico" >
+		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
           <command
                 commandId="com.ge.research.osate.verdict.commands.runCrv"
                 label="&amp;Run Cyber Resilience Verifier"
                 style="push"
-                tooltip="Run CRV"
-                icon="icons/kind.ico">               
+                tooltip="Run CRV">
           </command> 	
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.crvSettings"
-	            disabledIcon="icons/noCrvMbas.gif"
-	            icon="icons/lib.ico"
 	            label="&amp;CRV Settings"
 	            style="push"
 	            tooltip="Click to Change CRV Settings">	            
@@ -84,7 +78,6 @@
              locationURI="popup:org.eclipse.ui.popup.any?after=additions">             			  
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runWzrd"
-                icon="icons/wzrd.ico"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to launch wizard to edit cyber requirements/relations">                
