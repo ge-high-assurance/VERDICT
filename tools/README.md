@@ -35,15 +35,30 @@ haven't tested them).
 
 3. Launch OSATE and navigate to Help > Install New Software...
 
-4. Click Add... and in the Location: field, paste the following URL.
+4. Paste the following URL in the Work With: field and press the Enter key.
+
+`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.4.2`
+
+5. Select the AGREE (by Collins Aerospace) item and then click Next.
+
+6. Keep clicking Next through the rest of the wizard (you will have to
+   accept the license agreement and install unsigned plugins) until
+   you reach the end and click Finish.
+
+7. Restart OSATE when prompted and navigate to Help > Install New
+   Software... again.
+
+8. Paste the following URL in the Work With: field and press the Enter key.
 
 `https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-0.8.0`
 
-5. Select the VERDICT for OSATE item and then click Next.
+9. Select the VERDICT for OSATE item and then click Next.
 
-6. Accept the license agreement and click Finish.
+10. Keep clicking Next through the rest of the wizard (you will have
+    to accept the license agreement and install unsigned plugins)
+    until you reach the end and click Finish.
 
-7. Restart OSATE when prompted.
+11. Restart OSATE when prompted.
 
 ## Install Docker (to run our back-end programs)
 
