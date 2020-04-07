@@ -9,6 +9,7 @@
 
 module AD = AADLAst
 module AG = AGREEAst
+module C = CommonAstTypes
 
 type input = AADLAst.t list
 
@@ -54,8 +55,17 @@ let from_file filename =
 type sort_error =
   | CycleFound
 
-module UnitSet = Set.Make(String)
-module UnitMap = Map.Make(String)
+module UnitSet = Set.Make(struct
+  type t = C.pname
+  let compare = C.compare_pnames
+end
+)
+
+module UnitMap = Map.Make(struct
+  type t = C.pname
+  let compare = C.compare_pnames
+end
+)
 
 let sort_model_units input =
 
@@ -69,12 +79,11 @@ let sort_model_units input =
   *)
   let unit_map =
     let add_dependency dp map pn =
-      let pn_str = CommonAstTypes.pname_to_string pn in
       let update_value = function
         | None -> Some (false, [dp], None)
         | Some (is_perm, deps, u) -> Some (is_perm, dp :: deps, u)
       in
-      UnitMap.update pn_str update_value map
+      UnitMap.update pn update_value map
     in
     let add_unit_model um = function
       | None -> Some (false, [], Some um)
@@ -83,15 +92,14 @@ let sort_model_units input =
     in
     let f map = function
       | AD.AADLPackage (_, { AD.name }) as um -> (
-        let name_str = CommonAstTypes.pname_to_string name in
         let imported_units = AD.get_imported_units um in
-        List.fold_left (add_dependency name_str) map imported_units
-        |> UnitMap.update name_str (add_unit_model um)
+        List.fold_left (add_dependency name) map imported_units
+        |> UnitMap.update name (add_unit_model um)
       )
       | AD.PropertySet (_, { AD.name; AD.imported_units }) as um -> (
-        let _, id = name in
-        List.fold_left (add_dependency id) map imported_units
-        |> UnitMap.update id (add_unit_model um)
+        let pname = [name] in
+        List.fold_left (add_dependency pname) map imported_units
+        |> UnitMap.update pname (add_unit_model um)
       )
     in
     List.fold_left f UnitMap.empty input
@@ -158,15 +166,17 @@ let sort_model_units input =
   process_pending [] unit_map pending
 
 
-module PkgNameSet = Set.Make(String)
+module PkgNameSet = Set.Make(struct
+  type t = C.pname
+  let compare = C.compare_pnames
+end)
 
 let merge_packages input =
 
   let package_names =
     let get_name set = function
       | AD.AADLPackage (_, { AD.name } ) -> (
-        let pname = CommonAstTypes.pname_to_string name in
-        PkgNameSet.add pname set
+        PkgNameSet.add name set
       )
       | AD.PropertySet _ -> set
     in
@@ -181,8 +191,7 @@ let merge_packages input =
 
     let remove_mu imported_units =
       let add_iu acc iu =
-        let iu_str = CommonAstTypes.pname_to_string iu in
-        match PkgNameSet.find_opt iu_str package_names with
+        match PkgNameSet.find_opt iu package_names with
         | None -> iu :: acc
         | _ -> acc
       in
@@ -191,18 +200,16 @@ let merge_packages input =
 
     let flatten_pname pname =
       let rev_pname = List.rev pname in
-      let pkg_str =
+      let pkg =
         rev_pname |> List.tl |> List.rev
-        |> CommonAstTypes.pname_to_string
       in
-      match PkgNameSet.find_opt pkg_str package_names with
+      match PkgNameSet.find_opt pkg package_names with
       | None -> pname
       | Some _ -> [List.hd rev_pname]
     in
 
     let flatten_proj pos (pname, pid) =
-      let pkg_str = CommonAstTypes.pname_to_string pname in
-      match PkgNameSet.find_opt pkg_str package_names with
+      match PkgNameSet.find_opt pname package_names with
       | None -> AG.Proj (pos, AG.Ident (flatten_pname pname), pid)
       | Some _ -> AG.Ident [pid]
     in
@@ -407,7 +414,6 @@ let merge_packages input =
     | AD.AADLPackage (pos, pkg) -> (
       let imported_units =
         AD.get_imported_units um
-        |> List.map CommonAstTypes.pname_to_string
         |> PkgNameSet.of_list
       in
       let inter = PkgNameSet.inter package_names imported_units in

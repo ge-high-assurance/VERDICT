@@ -32,7 +32,9 @@ let pp_print_pname ppf pn =
 let pname_to_string pn = Format.asprintf "%a" pp_print_pname pn
 
 let compare_pnames pn1 pn2 =
-  String.compare (pname_to_string pn1) (pname_to_string pn2)
+  let n1 = String.lowercase_ascii (pname_to_string pn1) in
+  let n2 = String.lowercase_ascii (pname_to_string pn2) in
+  String.compare n1 n2
 
 let pp_print_qcref ppf = function
   | pname, None ->
