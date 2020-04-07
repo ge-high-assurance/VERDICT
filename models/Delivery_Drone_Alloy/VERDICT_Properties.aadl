@@ -3,88 +3,14 @@ property set VERDICT_Properties is
  probe: aadlboolean applies to (port);
 
 -- Connection properties, including defenses and DAL values
- flowType: enumeration (Xdata, Xcontrol, Xrequest) applies to (connection);
  connectionType: enumeration (Local, Remote) applies to (connection);
  authenticated: aadlboolean applies to (connection);
  dataEncrypted: aadlboolean applies to (connection);
- trustedConnection: aadlboolean applies to (connection);
- encryptedTransmission: aadlboolean applies to (connection);
- encryptedTransmissionDAL: aadlinteger 0 .. 9 applies to (connection);
 
 -- Component properties 
- manufacturer: enumeration (ThirdParty, InHouse) applies to (system);
  pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
  category: enumeration (IMU, GPS, LIDAR) applies to (system);
  componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
- situated: enumeration (OnBoard, Remote) applies to (system);
  adversariallyTested: aadlboolean applies to (system);
- hasSensitiveInfo: aadlboolean applies to (system);
- insideTrustedBoundary: aadlboolean applies to (system);
- canReceiveConfigUpdate: aadlboolean applies to (system);
- canReceiveSWUpdate: aadlboolean applies to (system);
- controlReceivedFromUntrusted: aadlboolean applies to (system);
- controlSentToUntrusted: aadlboolean applies to (system);
- dataReceivedFromUntrusted: aadlboolean applies to (system);
- dataSentToUntrusted: aadlboolean applies to (system);
-
- -- Cyber Attack Properties from TA1 
- Configuration_Attack: aadlboolean applies to (system);
- Physical_Theft_Attack: aadlboolean applies to (system);
- Interception_Attack: aadlboolean applies to (system);
- Hardware_Integrity_Attack: aadlboolean applies to (system);
- Supply_Chain_Attack: aadlboolean applies to (system);
- Brute_Force_Attack: aadlboolean applies to (system);
- Fault_Injection_Attack: aadlboolean applies to (system);
- Identity_Spoofing_Attack: aadlboolean applies to (system);
- Excessive_Allocation_Attack: aadlboolean applies to (system);
- Sniffing_Attack: aadlboolean applies to (system);
- Buffer_Attack: aadlboolean applies to (system);
- Flooding_Attack: aadlboolean applies to (system);
-
- -- Cyber Defense Properties
- antiJamming: aadlboolean applies to (system); 
- auditMessageResponses: aadlboolean applies to (system);
- deviceAuthentication: aadlboolean applies to (system);
- dosProtection: aadlboolean applies to (system);
- encryptedStorage: aadlboolean applies to (system);
- heterogeneity: aadlboolean applies to (system);
- inputValidation: aadlboolean applies to (system);
- logging: aadlboolean applies to (system);
- memoryProtection: aadlboolean applies to (system);
- physicalAccessControl: aadlboolean applies to (system);
- removeIdentifyingInformation: aadlboolean applies to (system);
- resourceAvailability: aadlboolean applies to (system);
- resourceIsolation: aadlboolean applies to (system);
- secureBoot: aadlboolean applies to (system);
- sessionAuthenticity: aadlboolean applies to (system);
- staticCodeAnalysis: aadlboolean applies to (system);
- strongCryptoAlgorithms: aadlboolean applies to (system);
- supplyChainSecurity: aadlboolean applies to (system);
- systemAccessControl: aadlboolean applies to (system);
- tamperProtection: aadlboolean applies to (system);
- userAuthentication: aadlboolean applies to (system);
-
- -- DAL for Cyber Defense Properties
- antiJammingDAL: aadlinteger 0 .. 9 applies to (system);
- auditMessageResponsesDAL: aadlinteger 0 .. 9 applies to (system);
- deviceAuthenticationDAL: aadlinteger 0 .. 9 applies to (system);
- dosProtectionDAL: aadlinteger 0 .. 9 applies to (system);
- encryptedStorageDAL: aadlinteger 0 .. 9 applies to (system);
- heterogeneityDAL: aadlinteger 0 .. 9 applies to (system);
- inputValidationDAL: aadlinteger 0 .. 9 applies to (system);
- loggingDAL: aadlinteger 0 .. 9 applies to (system);
- memoryProtectionDAL: aadlinteger 0 .. 9 applies to (system);
- physicalAccessControlDAL: aadlinteger 0 .. 9 applies to (system);
- removeIdentifyingInformationDAL: aadlinteger 0 .. 9 applies to (system);
- resourceAvailabilityDAL: aadlinteger 0 .. 9 applies to (system);
- resourceIsolationDAL: aadlinteger 0 .. 9 applies to (system);
- secureBootDAL: aadlinteger 0 .. 9 applies to (system);
- sessionAuthenticityDAL: aadlinteger 0 .. 9 applies to (system);
- staticCodeAnalysisDAL: aadlinteger 0 .. 9 applies to (system);
- strongCryptoAlgorithmsDAL: aadlinteger 0 .. 9 applies to (system);
- supplyChainSecurityDAL: aadlinteger 0 .. 9 applies to (system);
- systemAccessControlDAL: aadlinteger 0 .. 9 applies to (system);
- tamperProtectionDAL: aadlinteger 0 .. 9 applies to (system);
- userAuthenticationDAL: aadlinteger 0 .. 9 applies to (system);
  
 end VERDICT_Properties;
