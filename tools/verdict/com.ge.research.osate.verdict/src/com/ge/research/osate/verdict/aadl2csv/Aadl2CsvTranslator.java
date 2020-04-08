@@ -535,8 +535,16 @@ public class Aadl2CsvTranslator {
                     			table.addValue(convertAbbreviation(cyberReq.getCia().getLiteral())); // MissionImpactCIA
                     			table.addValue(""); // Effect
                     			table.addValue(cyberReq.getSeverity().getLiteral()); // Severity   
-                    			table.addValue(depCompPortName[0]);
-                    			table.addValue(depCompPortName[1]);
+                    			if(depCompPortName[0] != null) {
+                    				table.addValue(depCompPortName[0]);	
+                    			} else {
+                    				throw new RuntimeException("Expression in condition field of cyber requirement is unexpected!");
+                    			}
+                    			if(depCompPortName[1] != null) {
+                    				table.addValue(depCompPortName[1]);	
+                    			} else {
+                    				throw new RuntimeException("Expression in condition field of cyber requirement is unexpected!");                    				
+                    			}  
                     			table.addValue(allPortCIAs.get(i));
                     			table.addValue("Cyber");
                     			table.capRow();
@@ -547,7 +555,7 @@ public class Aadl2CsvTranslator {
                     		List<String> allPortIAs = new ArrayList<>();
                     		
                     		if(safetyReq.getCondition() == null) {
-                    			throw new RuntimeException("Unexpected: the condition is cyber req is null!");
+                    			throw new RuntimeException("Unexpected: the condition is safety req is null!");
                     		} 
                     		
                     		extractPortsAndEventsFromSafetyRel(safetyReq.getCondition().getValue(), allPortNames, allPortIAs);
@@ -562,9 +570,18 @@ public class Aadl2CsvTranslator {
                         		table.addValue(""); // Req
                     			table.addValue(""); // MissionImpactCIA
                     			table.addValue(""); // Effect
-                    			table.addValue(safetyReq.getSeverity().getTargetLikelihood().getLiteral()); // Severity
-                    			table.addValue(depCompPortName[0]);
-                    			table.addValue(depCompPortName[1]);
+                    			
+                    			table.addValue(safetyReq.getSeverity().getProp()); // Severity
+                    			if(depCompPortName[0] != null) {
+                    				table.addValue(depCompPortName[0]);	
+                    			} else {
+                    				throw new RuntimeException("Expression in condition field of safety requirement is unexpected!");
+                    			}
+                    			if(depCompPortName[1] != null) {
+                    				table.addValue(depCompPortName[1]);	
+                    			} else {
+                    				throw new RuntimeException("Expression in condition field of safety requirement is unexpected!");                    				
+                    			}                   			
                     			table.addValue(allPortIAs.get(i));
                     			table.addValue("Safety");   
                     			table.capRow();
@@ -590,17 +607,44 @@ public class Aadl2CsvTranslator {
     		if(sysImplToConns.containsKey(compTypeNameToImpl.get(compTypeName))) {
     			List<Connection> conns = sysImplToConns.get(compTypeNameToImpl.get(compTypeName));
     			
-    			for(Connection conn : conns) {
-    				if(conn.getAllDestinationContext() == null) {
-        				ConnectionEnd destConnectionEnd = conn.getAllDestination(); 
-        				String destPortName = destConnectionEnd.getName();
-        				
-        				if(destPortName.equals(portName)) {
-        					compAndPortNames[0] = conn.getAllSourceContext().getName();
-        					compAndPortNames[1] = conn.getAllSource().getName();
-        					break;
+    			if(portName.contains(";")) {
+    				String[] portNames = portName.split(";");
+    				StringBuilder sb1 = new StringBuilder();
+    				StringBuilder sb2 = new StringBuilder();
+    				
+    				for(int i = 0; i < portNames.length; ++i) {
+            			for(Connection conn : conns) {
+            				if(conn.getAllDestinationContext() == null) {
+                				ConnectionEnd destConnectionEnd = conn.getAllDestination(); 
+                				String destPortName = destConnectionEnd.getName();
+                				
+                				if(destPortName.equals(portNames[i])) {
+                					sb1.append(conn.getAllSourceContext().getName());
+                					sb2.append(conn.getAllSource().getName());
+                					if(i < portNames.length-1) {
+                						sb1.append(";");
+                						sb2.append(";");
+                					}
+                					break;
+                				}
+            				}
+            			}      					
+    				}   		
+					compAndPortNames[0] = sb1.toString();
+					compAndPortNames[1] = sb2.toString();
+    			} else {
+        			for(Connection conn : conns) {
+        				if(conn.getAllDestinationContext() == null) {
+            				ConnectionEnd destConnectionEnd = conn.getAllDestination(); 
+            				String destPortName = destConnectionEnd.getName();
+            				
+            				if(destPortName.equals(portName)) {
+            					compAndPortNames[0] = conn.getAllSourceContext().getName();
+            					compAndPortNames[1] = conn.getAllSource().getName();
+            					break;
+            				}
         				}
-    				}
+        			}    				
     			}
     		}
     	} else {
