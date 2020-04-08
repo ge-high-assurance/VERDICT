@@ -207,7 +207,7 @@ public
 		**};
 	end CruiseControllerSystem;
 	
-	system implementation CruiseControllerSystem.impl
+	system implementation CruiseControllerSystem.Impl
 		subcomponents
 			measureSpeed: system MeasureSpeed;
 			setSpeed: system SetSpeed;
