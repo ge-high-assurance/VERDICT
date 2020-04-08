@@ -1,8 +1,0 @@
-package iml.software ;
-import iml.lang.* ;
-
-
-trait Process ;
-trait Thread ;
-trait SubProgram;
-trait Data ;
