@@ -281,10 +281,8 @@ public class VerdictBundleCommand {
      * @return Exit code from verdict-bundle
      */
     private int runWithJava() {
-        if (OS.equals("osx")) {
-            env("PATH", MAC_PATH);
-        } else if (OS.equals("win") || OS.equals("unknown")) {
-            VerdictLogger.severe("We don't support OS " + OS + " yet!");
+        if (OS.equals("win") || OS.equals("unknown")) {
+            VerdictLogger.severe("We don't have binaries for OS " + OS + ", please run our Docker image instead");
             return 1;
         }
 
@@ -310,6 +308,4 @@ public class VerdictBundleCommand {
                     : (MACHINEOS.startsWith("win")
                             ? "win"
                             : ((MACHINEOS.startsWith("linux") ? "glnx" : "unknown")));
-    // Environment variables
-    static final String MAC_PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
 }
