@@ -616,7 +616,7 @@ public
 			SafetyReq {
 			id = "SafetyReq02"
 			description = "Delivery Item Mechanism is reliable, where an undetected erroneous command shall be less than 1e-7 pfh" 
-			condition = delivery_status:I 
+			condition = delivery_status:I and delivery_status:A
 			targetProbability = 1e-07 
 		    	};	
 	    	MissionReq {

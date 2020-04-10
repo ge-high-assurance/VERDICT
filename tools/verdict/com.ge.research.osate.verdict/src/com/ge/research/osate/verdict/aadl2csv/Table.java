@@ -211,7 +211,7 @@ public class Table {
                 if (replaceDots) {
                     writer.write(row.vals[i].replace(".", "_"));
                 } else {
-                    writer.write(row.vals[i]==null? "caught here":row.vals[i]);
+                    writer.write(row.vals[i]);
                 }
 
                 if (i < row.vals.length - 1) {

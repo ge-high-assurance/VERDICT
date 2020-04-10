@@ -571,7 +571,7 @@ public class Aadl2CsvTranslator {
                     			table.addValue(""); // MissionImpactCIA
                     			table.addValue(""); // Effect
                     			
-                    			table.addValue(safetyReq.getSeverity().getProp()); // Severity
+                    			table.addValue(safetyReq.getSeverity().getTargetLikelihood().toString()); // Severity
                     			if(depCompPortName[0] != null) {
                     				table.addValue(depCompPortName[0]);	
                     			} else {
