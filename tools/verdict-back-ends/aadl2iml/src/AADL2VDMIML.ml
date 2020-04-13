@@ -153,7 +153,9 @@ let data_to_type_decls data_types data_impls =
       )
       | t :: tl -> update_type (t::l) tl
     in
-    update_type [] type_decls
+    match record_fields with
+    | [] -> type_decls
+    | _  -> update_type [] type_decls
   in
   List.fold_left process_data_impl type_decls data_impls
 
