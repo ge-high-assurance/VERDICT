@@ -358,9 +358,10 @@ let merge_packages input =
       | AD.DataType _ as dt -> dt
     in
 
-    let flatten_subcomponent {AD.name; AD.type_ref; AD.properties } =
+    let flatten_subcomponent {AD.name; AD.type_ref; AD.category; AD.properties } =
       {name;
        AD.type_ref = flatten_qcref_opt type_ref;
+       category;
        properties;
       }
     in

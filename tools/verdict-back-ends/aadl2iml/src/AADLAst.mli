@@ -58,9 +58,14 @@ type component_type =
   | SystemType of Position.t * system_type
   | DataType of Position.t * data_type
 
+type component_category =
+  | System
+  | Data
+
 type subcomponent = {
   name: pid;
   type_ref: qcref option;
+  category: component_category;
   properties: property_association list;
 }
 
@@ -136,6 +141,10 @@ val is_aadl_package: model_unit -> bool
 val is_agree_annex: aadl_annex -> bool
 
 val is_verdict_annex: aadl_annex -> bool
+
+val is_system: component_category -> bool
+
+val is_data: component_category -> bool
 
 val get_imported_units: model_unit -> pname list
 

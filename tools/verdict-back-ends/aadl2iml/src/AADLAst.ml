@@ -58,9 +58,14 @@ type component_type =
   | SystemType of Position.t * system_type
   | DataType of Position.t * data_type
 
+type component_category =
+  | System
+  | Data
+
 type subcomponent = {
   name: pid;
   type_ref: qcref option;
+  category: component_category;
   properties: property_association list;
 }
 
@@ -158,6 +163,14 @@ let is_agree_annex = function
 
 let is_verdict_annex = function
   | VerdictAnnex _ -> true
+  | _ -> false
+
+let is_system = function
+  | System -> true
+  | _ -> false
+
+let is_data = function
+  | Data -> true
   | _ -> false
 
 let get_imported_units = function

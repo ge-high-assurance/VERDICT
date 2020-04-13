@@ -237,10 +237,11 @@ system_subcomponents_section:
   | { [] }
   | SUBCOMPONENTS NONE ";" { [] }
   | SUBCOMPONENTS subcomps = nonempty_list(system_subcomponents_section_item)
-    { subcomps }
+    { List.filter (fun { A.category } -> A.is_system category) subcomps }
 
 system_subcomponents_section_item:
   | ss = system_subcomponent { ss }
+  | ds = data_subcomponent { ds }
   (* INCOMPLETE *)
 
 data_subcomponents_section:
@@ -262,6 +263,7 @@ data_subcomponent:
   {
     { A.name = pid;
       A.type_ref = type_ref;
+      A.category = A.Data;
       A.properties = prop_assocs;
     }
   }
@@ -275,6 +277,7 @@ system_subcomponent:
   {
     { A.name = pid;
       A.type_ref = type_ref;
+      A.category = A.System;
       A.properties = prop_assocs;
     }
   }
