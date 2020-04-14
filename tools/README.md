@@ -50,7 +50,7 @@ haven't tested them).
 
 8. Paste the following URL in the Work With: field and press the Enter key.
 
-`https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-0.8.0`
+`https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest`
 
 9. Select the VERDICT for OSATE item and then click Next.
 
