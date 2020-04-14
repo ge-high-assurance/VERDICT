@@ -40,24 +40,24 @@ public class MBASHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
-						String bundleJar = BundlePreferences.getBundleJar();
-						String dockerImage = BundlePreferences.getDockerImage();
-						if (bundleJar.length() == 0) {
-							System.out.println("Please set Verdict Bundle Jar path in Preferences");
-							return;
-						}
 						String stemProjPath = BundlePreferences.getStemDir();
-						if (stemProjPath.length() == 0) {
+						if (stemProjPath.isEmpty()) {
 							System.out.println("Please set STEM directory path in Preferences");
 							return;
 						}
+						String dockerImage = BundlePreferences.getDockerImage();
+						String bundleJar = BundlePreferences.getBundleJar();
+						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
+							System.out.println("Please set Verdict Bundle Jar path in Preferences");
+							return;
+						}
 						String soteriaPpBin = BundlePreferences.getSoteriaPpBin();
-						if (soteriaPpBin.length() == 0) {
+						if (dockerImage.isEmpty() && soteriaPpBin.isEmpty()) {
 							System.out.println("Please set soteria++ binary path in Preferences");
 							return;
 						}
 						String graphVizPath = BundlePreferences.getGraphVizPath();
-						if (graphVizPath.length() == 0) {
+						if (dockerImage.isEmpty() && graphVizPath.isEmpty()) {
 							System.out.println("Please set GraphViz path in Preferences");
 							return;
 						}
