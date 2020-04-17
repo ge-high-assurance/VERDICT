@@ -209,27 +209,107 @@ public
 	
 	system implementation CruiseControllerSystem.Impl
 		subcomponents
-			measureSpeed: system MeasureSpeed;
-			setSpeed: system SetSpeed;
-			controlSpeed: system ControlSpeed;
+			measureSpeed: system MeasureSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => true;
+			};
+			setSpeed: system SetSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => false;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => false;
+			};
+			controlSpeed: system ControlSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => true;
+			};
 		
 		connections
-			c01: port on_off -> setSpeed.on_off;
-			c02: port resume_speed -> setSpeed.resume_speed;
-			c03: port set_speed -> setSpeed.set_speed;
-			c04: port inc -> setSpeed.inc;
-			c05: port dec -> setSpeed.dec;
-			c06: port brake_cancel -> setSpeed.brake_cancel;
-			c07: port measureSpeed.speed -> setSpeed.speed;
-			c08: port measureSpeed.speed -> controlSpeed.speed;
-			c09: port setSpeed.enabled -> enabled;
-			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed;
-			c11: port controlSpeed.force -> force;
-			c12: port rotate -> measureSpeed.rotate;
-			c13: port second -> measureSpeed.second;
+			c01: port on_off -> setSpeed.on_off
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c02: port resume_speed -> setSpeed.resume_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c03: port set_speed -> setSpeed.set_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c04: port inc -> setSpeed.inc
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c05: port dec -> setSpeed.dec
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c06: port brake_cancel -> setSpeed.brake_cancel
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c07: port measureSpeed.speed -> setSpeed.speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c08: port measureSpeed.speed -> controlSpeed.speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c09: port setSpeed.enabled -> enabled
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+		     	VERDICT_Properties::connectionType => Remote;
+			 	VERDICT_Properties::authenticated => false;
+			 	VERDICT_Properties::encryptedTransmission => false;
+			 	VERDICT_Properties::trustedConnection => false;
+			};
+			c11: port controlSpeed.force -> force
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c12: port rotate -> measureSpeed.rotate
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c13: port second -> measureSpeed.second
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
 			-- Virtual connection for the sake of analysis
-			v01: port setSpeed.desired_speed -> desired_speed;
-			v02: port measureSpeed.speed -> speed;
-	end CruiseControllerSystem.impl;
+			v01: port setSpeed.desired_speed -> desired_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+		     	VERDICT_Properties::connectionType => Remote;
+			 	VERDICT_Properties::authenticated => false;
+			 	VERDICT_Properties::encryptedTransmission => false;
+			 	VERDICT_Properties::trustedConnection => false;
+			};
+			v02: port measureSpeed.speed -> speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+	end CruiseControllerSystem.Impl;
 	
 end CruiseController;
