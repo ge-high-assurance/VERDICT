@@ -1,141 +1,145 @@
-# VERDICT: Building the OSATE VERDICT plugin
+# VERDICT: Building the OSATE plugin
 
-## About OSATE
+## About VERDICT
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tool consists of an OSATE plugin and a set of VERDICT back-end tools
-invoked by the plugin.  The OSATE plugin sources are in this directory
-and the back-end tool sources are in the
-[../verdict-back-ends](../verdict-back-ends) directory.
+tools consist of an OSATE plugin and a set of VERDICT back-end
+programs invoked by the plugin.  The OSATE plugin sources are in this
+directory and the back-end program sources are in another directory
+[(../verdict-back-ends)](../verdict-back-ends).
+
+## Update our target definition file (if needed)
+
+Our OSATE plugin's target definition file tells Maven and Eclipse
+Tycho where to find the OSATE and other Eclipse APIs that our OSATE
+plugin sources should be compiled against.  Generally speaking, you do
+not need to change the OSATE update site in our target definition file
+every time a stable OSATE release comes out.  The OSATE and other
+Eclipse APIs used by our plugin tend to remain compatible across
+several stable OSATE releases.  We use "0.0.0" as API version numbers
+in our target definition file because we want our plugin to work in
+other OSATE releases besides the OSATE update site that happens to be
+in our file.
+
+If you still want to change our target
+[definition](com.ge.research.osate.verdict.target/com.ge.research.osate.verdict.target.target)
+file to use another stable OSATE release's update site, please go
+ahead and edit the file.  Our file also has some other Eclipse update
+sites that you may want to change in lockstep with the OSATE update
+site.  You can use the latest version of the OSATE source repository's
+own target
+[definition](https://github.com/osate/osate2/blob/2.6.1/core/org.osate.build.target/osate2-platform.target)
+file as a reference; simply copy the same update site urls OSATE
+itself uses for similar Eclipse features to our own target definition
+file.  However, note that our GenerateVerdict.mwe2 workflow file is
+not compatible with newer Eclipse releases than 2019-09 because it
+uses deprecated org.eclipse.emf.mwe2.launcher.feature.group APIs.  We
+use that workflow file only to generate some plugin source files and
+use "0.0.0" for API version numbers, so you still can install our
+OSATE plugin in newer OSATE & Eclipse releases.
 
 ## Build our OSATE plugin sources
 
-This directory and its subdirectories have a set of pom.xml files
-which will allow you to build our OSATE plugin sources with Maven
-using Eclipse Tycho.  Unless you want to import and edit the OSATE
-plugin sources in your Eclipse IDE, we recommend that you build our
-OSATE plugin sources from the command line in this directory as shown
-below:
+This directory and its subdirectories have pom.xml files which will
+allow you to build our OSATE plugin sources with Maven and Eclipse
+Tycho.  Unless you want to import and develop the OSATE plugin sources
+in your Eclipse IDE, we recommend that you build our OSATE plugin
+sources only with Maven from the command line in this directory:
 
+`$ mvn clean install -Dtycho.localArtifacts=ignore`
 
-```shell
-$ mvn clean install -Dtycho.localArtifacts=ignore
-```
+Including the `-Dtycho.localArtifacts=ignore` argument may prevent
+some build problems from happening.  You may not always need the
+`-Dtycho.localArtifacts=ignore` argument, but please change the
+argument or leave it out only if you are familiar with Tycho builds
+and want Tycho to use local artifacts that you have already built,
+such as if you are running Maven in a subdirectory.
 
-You may not always need the `-Dtycho.localArtifacts=ignore` argument
-but it is much safer to include it every time you build the OSATE
-plugin sources since it may prevent some build problems from
-happening.  You should change the argument or leave it out only if you
-are very familiar with Tycho builds and really want Tycho to use a
-local artifact that you have already built.
-
-If the Maven build encounters a problem and you need to see more
-information to diagnose what caused the problem, rerun the command
-line with an additional `-X` argument at the end to make Maven print
-very detailed debugging output.
+If Maven encounters a problem and you need to see more information to
+diagnose what caused the problem, rerun the command line with an
+additional `-X` argument at the end to make Maven print very detailed
+debugging output.
 
 If the Maven build completes successfully, you will be able to install
 our OSATE plugin in an OSATE release as shown in the next section.  A
 successful build ends with the following output:
 
 ```text
-[INFO] --- tycho-p2-repository-plugin:1.5.1:archive-repository (default-archive-repository) @ com.ge.research.osate.verdict.updatesite ---
-[INFO] Building zip: /home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT.zip
-[INFO]
-[INFO] --- maven-install-plugin:3.0.0-M1:install (default-install) @ com.ge.research.osate.verdict.updatesite ---
-[INFO] Installing /home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT.zip to /home/interran/.m2/repository/com/ge/research/osate/verdict/com.ge.research.osate.verdict.updatesite/1.0.0-SNAPSHOT/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT.zip
-[INFO] Installing /home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/pom.xml to /home/interran/.m2/repository/com/ge/research/osate/verdict/com.ge.research.osate.verdict.updatesite/1.0.0-SNAPSHOT/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT.pom
-[INFO] Installing /home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/p2content.xml to /home/interran/.m2/repository/com/ge/research/osate/verdict/com.ge.research.osate.verdict.updatesite/1.0.0-SNAPSHOT/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT-p2metadata.xml
-[INFO] Installing /home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/p2artifacts.xml to /home/interran/.m2/repository/com/ge/research/osate/verdict/com.ge.research.osate.verdict.updatesite/1.0.0-SNAPSHOT/com.ge.research.osate.verdict.updatesite-1.0.0-SNAPSHOT-p2artifacts.xml
-[INFO]
-[INFO] --- tycho-p2-plugin:1.5.1:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
+[INFO] --- tycho-p2-plugin:1.6.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for verdict 1.0.0-SNAPSHOT:
 [INFO]
-[INFO] verdict ............................................ SUCCESS [  0.694 s]
-[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [01:57 min]
-[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.516 s]
-[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  4.216 s]
-[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  5.133 s]
-[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.381 s]
-[INFO] com.ge.research.osate.verdict.target ............... SUCCESS [  0.089 s]
-[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  3.868 s]
+[INFO] verdict ............................................ SUCCESS [  2.392 s]
+[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [02:13 min]
+[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  1.101 s]
+[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  3.292 s]
+[INFO] com.ge.research.osate.verdict ...................... SUCCESS [ 10.332 s]
+[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.807 s]
+[INFO] com.ge.research.osate.verdict.target ............... SUCCESS [  0.047 s]
+[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  7.839 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  02:27 min
-[INFO] Finished at: 2020-01-02T16:29:21-05:00
+[INFO] Total time:  03:33 min
+[INFO] Finished at: 2020-04-17T17:44:25-04:00
 [INFO] ------------------------------------------------------------------------
 ```
 
-Maven will build an update site repository for the OSATE plugin and
-then archive the repository into a zip file which you can install into
-an OSATE release.  Look for the "Building zip:" line in the build
-output above to find the location of that zip file in your filesystem.
+Maven will build an update site for the OSATE plugin which you can
+install into an OSATE release.  Look for the location of that update
+site in your build output; it will look something like
+`/home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/repository`.
 
-## Install our OSATE plugin zip file
+## Install our OSATE plugin
 
-After you build a zip file (which Eclipse calls a deployable archive),
-you can install our OSATE plugin into an OSATE release.  If you have
-not already done it, please follow these
+After you build our plugin sources, you can install our plugin into a
+stable OSATE release.  If you don't have a stable OSATE release
+installed, you can follow these
 [instructions](https://osate.org/download-and-install.html) to
-download and install the latest stable OSATE release.  Generally
-speaking, our OSATE plugin's target definition file usually specifies
-the latest stable OSATE release as the target platform that the OSATE
-plugin should be compiled against.  Click on this
-[target](com.ge.research.osate.verdict.target/com.ge.research.osate.verdict.target.target)
-definition file if you need to find out or change that OSATE release's
-version.  Please keep in mind that you also may need to change the
-versions of some dependent features in this file in lockstep when you
-change the OSATE version.  The OSATE source repository also has its
-own OSATE
-[target](https://github.com/osate/osate2/blob/2.6.1/core/org.osate.build.target/osate2-platform.target)
-definition file which you can use as a reference; simply copy the same
-versions it uses for these other features in the OSATE release you
-want to compile against.
+download and install the latest stable OSATE release.  Once you have
+installed a stable OSATE release, you can follow these steps to deploy
+our OSATE plugin into it:
 
-Once you have installed and started your OSATE release, follow these
-steps to deploy our OSATE plugin into it:
-
-1. Open OSATE's Install New Software wizard using the pulldown menu
-   (Help > Install New Software...).
+1. Start OSATE and open its Install New Software wizard using the
+   pulldown menu (Help > Install New Software...).
 
 2. Click the Add... button in the Install dialog.
 
-3. Click the Archive... button in the Add Repository dialog.
+3. Click the Local... button in the Add Repository dialog.
 
-4. Select the newly built zip file using the file chooser dialog
+4. Select the newly built
+   `com.ge.research.osate.verdict.updatesite/target/repository` folder
+   using the file chooser dialog.
 
 5. Click the Add button in the Add Repository dialog.
 
 6. Click the Finish button in the Install dialog and restart OSATE
    when prompted to do so.
 
-7. Finally, click on these
-   [steps](com.ge.research.osate.verdict/README.md) for some more
-   instructions you will have to follow to make the OSATE plugin ready
-   for use.  Briefly speaking, you will have to download all the
-   necessary VERDICT back-end binaries from our
+7. Finally, set up our OSATE plugin to run either our Docker image or
+   our back-end programs as specified in these [steps](../README.md).
+   Briefly speaking, you will have to download an "extern.zip" file
+   from our
    [Releases](https://github.com/ge-high-assurance/VERDICT/releases)
-   page, unpack the release archive to get these binaries on your
-   filesystem, set an environment variable, and then set some Eclipse
-   preferences to tell the OSATE plugin where to find these
-   executables on your filesystem.
+   page, unpack it, and then set some Eclipse preferences to tell the
+   OSATE plugin how to find the STEM folder and either the Docker
+   image or the back-end programs.
 
-## Import and edit our OSATE plugin sources
+## Import and develop our OSATE plugin sources
 
-Follow these instructions if you want to import and edit the OSATE
+Follow these instructions if you want to import and develop the OSATE
 plugin sources in your Eclipse IDE.  You will need to use an Eclipse
 IDE that has at least the Plugin Development Environment (PDE) feature
 installed.  Most Eclipse IDEs (Java, Modeling, etc.) already have this
 PDE feature installed unless you are using a very specialized Eclipse
-IDE in which case you will have to install a standard Eclipse IDE for
-Java developers.
+IDE in which case you will have to install a standard Eclipse for Java
+developers IDE.
 
 We still recommend that you build our OSATE plugin sources from the
 command line first as we showed earlier.  This will reduce the number
-of steps you need to perform in your Eclipse IDE to the following:
+of steps you need to perform in your Eclipse IDE to just the
+following:
 
 1. Launch your Eclipse IDE and select File -> Import... from the
    pulldown menu.
@@ -144,46 +148,46 @@ of steps you need to perform in your Eclipse IDE to the following:
    Existing Maven Projects wizard.  Press the Next button.
 
 3. Enter this directory's path as the Root Directory or click the
-   Browse... button to use a file chooser dialog to get this
-   directory's path.  If done correctly, you should see this
-   directory's set of pom.xml files listed under Projects.  Press the
-   Finish button.
+   Browse... button and navigate to this directory using a file
+   chooser dialog.  If done correctly, you should see this directory's
+   set of pom.xml files listed under Projects.  Press the Finish
+   button.
 
 4. Once your Eclipse IDE finishes importing the OSATE plugin sources,
    these projects will have thousands of build errors in your
-   workspace.  This is normal since your current target platform will
-   be missing some necessary APIs and your Eclipse doesn't know where
-   to find these APIs yet.
+   workspace.  This is normal since your Eclipse IDE will be missing
+   some necessary OSATE and other Eclipse APIs so your Eclipse IDE
+   doesn't know where to find these APIs yet.
 
 5. To make these build errors go away, you need to open our target
-   definition file in Eclipse and set the current target platform to
-   what it specifies.  In the Package Explorer pane, expand the
-   verdict working set, expand the
-   com.ge.research.osate.verdict.target project, and double click the
+   definition file in Eclipse and set it as your Eclipse IDE's current
+   target platform.  In the Package Explorer pane, expand the verdict
+   working set, expand the com.ge.research.osate.verdict.target
+   project, and double click the
    com.ge.research.osate.verdict.target.target file to open it in the
    Eclipse editor window.
 
 6. Eclipse will need to spend some time resolving the target
-   definition file and downloading the features from update sites.
-   Wait until it is finished before you click on "Set as Target
-   Platform" in the upper right corner.  Now the build errors should
-   go away after Eclipse finishes building the projects again.  Please
-   note that if you have other projects in your workspace besides our
-   OSATE plugin sources, you may have to close these projects first in
-   case they get some build errors after you change the target
-   platform they were compiled against before.
+   definition file and downloading the OSATE and other Eclipse APIs
+   from update sites.  Wait for it to finish, then click on "Set as
+   Target Platform" in the upper right corner.  Eclipse will rebuild
+   the VERDICT projects again and the build errors should go away.
+   Please note that if you have other projects in your workspace
+   besides our OSATE plugin sources, you may have to close these
+   projects first in case they get some build errors because you will
+   be changing the target platform they were built against before.
 
-Now you can start editing our OSATE plugin sources if you want to make
-some changes to them.  You can run Maven from Eclipse or the command
-line whenever you want to assemble a new deployable archive, or you
-can launch a runtime Eclipse instance directly from your development
-Eclipse instance.  To do so, right click on the
-com.ge.research.osate.verdict project and select Run As... -> Eclipse
-Application.  Unless you have set up and are running an OSATE
-development IDE, however, your runtime Eclipse instance will not be a
-complete OSATE product.  It will have a Verdict pulldown menu but the
-OSATE, Analyses, and AGREE pulldown menus will be missing.  You still
-may be able to open an AADL project and do some debugging, though.
+Now you can start developing our OSATE plugin sources and making
+changes to them.  You can launch a runtime Eclipse instance directly
+from your Eclipse IDE whenever you want to run or debug our plugin.
+To do so, right click on the com.ge.research.osate.verdict project and
+select Run As... -> Eclipse Application or Debug As... -> Eclipse
+Application.  Unless you have imported and built all the OSATE source
+projects in your Eclipse IDE, however, your runtime Eclipse instance
+will not be a complete OSATE product.  It will have a Verdict pulldown
+menu but the OSATE and Analyses pulldown menus will be missing.  You
+still will be able to open an AADL model project and run some Verdict
+commands such as CRV and MBAS on the model, though.
 
 If you decide that you do want to set up a full-blown OSATE
 development instance capable of launching and debugging a complete
@@ -194,7 +198,10 @@ launched your OSATE development IDE and waited for it to import the
 OSATE sources, you can import our OSATE plugin sources into it as
 well.  You will not need to change your OSATE development IDE's target
 platform to make some build errors go away; OSATE's target platform
-will be a superset of our OSATE plugin's target platform.
+will be a superset of our OSATE plugin's target platform except for
+one feature (de.itemis.xtext.antlr.sdk.feature.group) which you may
+have to install into your IDE from its own
+[update](http://download.itemis.com/updates/releases/2.1.1) site.
 
 # Additional notes
 

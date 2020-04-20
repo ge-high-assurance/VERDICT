@@ -18,7 +18,7 @@
              enablesFor="1">
           <enabledWhen>
              <reference
-                   definitionId="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">
+                   definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">
              </reference>
           </enabledWhen>
        </handler>              
@@ -145,7 +145,7 @@
   <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
-            id="com.rockwellcollins.atc.agree.analysis.expressions.eCompSelected">
+            id="com.ge.research.osate.verdict.expressions.eCompSelected">
          <or>
 	         <with
 	               variable="selection">
