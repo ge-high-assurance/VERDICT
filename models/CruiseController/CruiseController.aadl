@@ -11,12 +11,18 @@ public
 	end EventType;
 
 	annex agree {**
-			
-		const MIN_SPEED: real = 25.0;
-		const MAX_SPEED: real = 130.0;
+
+		const PI: real = 3.1416;
+		const ONE_MILE: real = 1609.34; -- meters
+
+		const WHEEL_DIAMETER: real = 0.52; -- meters
+		const K: real = (3600.0/ONE_MILE)*(PI*WHEEL_DIAMETER);
+
+		const MIN_SPEED: real = 25.0; -- mph
+		const MAX_SPEED: real = 130.0; -- mph
 		const SPEED_CHANGE_STEP: real = 1.0;
 		const FORCE_COEFFICIENT: real = 0.1;
-		const K: real = 0.001;
+
 		node ToInt(b: bool) returns (i: int);
 		let
 			i = if b then 1 else 0;
