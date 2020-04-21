@@ -9,7 +9,7 @@ property set VERDICT_Properties is
 
 -- Component properties 
  pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
- category: enumeration (IMU, GPS, LIDAR) applies to (system);
+ category: enumeration (IMUCat, GPSCat, LIDARCat) applies to (system);
  componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
  adversariallyTested: aadlboolean applies to (system);
  

@@ -240,11 +240,11 @@ public class SysArchKodkodModel {
         		final TupleSet exactBound = factory.setOf(tupleSet);
         		b.boundExactly(rel, exactBound);
         		unaryRelToBoundMap.put(rel, exactBound);
-        		System.out.println(rel.name() + " : " + exactBound.toString());
+//        		System.out.println(rel.name() + " : " + exactBound.toString());
         	} else {
         		b.bound(rel, factory.noneOf(1));
         		unaryRelToBoundMap.put(rel, factory.noneOf(1));
-        		System.out.println(rel.name() + " : " + factory.noneOf(1).toString());
+//        		System.out.println(rel.name() + " : " + factory.noneOf(1).toString());
         	}
         }
         
@@ -267,7 +267,7 @@ public class SysArchKodkodModel {
         	}
         	TupleSet relBd= unaryRelToBoundMap.get(domainRel).product(unaryRelToBoundMap.get(rangeRel));
         	b.bound(propRel, relBd);
-        	System.out.println(propRel.name() + " : " + relBd);
+//        	System.out.println(propRel.name() + " : " + relBd);
         }
         System.out.println("***************************** END BOUNDS **************************");
         return b;
@@ -299,7 +299,8 @@ public class SysArchKodkodModel {
             	Relation instRel = instRelToPred.getKey();
             	List<Pair<String, Formula>> preds = instRelToPred.getValue();
             	
-            	for(Pair<String, Formula> pred : preds) {                	
+            	for(Pair<String, Formula> pred : preds) {     
+//            		System.out.println("Check Pred: " + pred.b);
                     Solution sol = solver.solve(facts.and(pred.b), bounds);
                     
                     if(implInstRelToImplRelMap.containsKey(instRel)) {

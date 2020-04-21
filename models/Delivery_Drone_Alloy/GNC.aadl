@@ -56,12 +56,14 @@ public
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hybrid;
 				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
-				VERDICT_Properties::pedigree => COTS;	
+				VERDICT_Properties::pedigree => COTS;
+				VERDICT_Properties::category => GPSCat;	
 				VERDICT_Properties::adversariallyTested => false;															
 			};
 			imu: system IMU
 			{ 
 				-- VERDICT Component Properties
+				VERDICT_Properties::category => IMUCat;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => Sourced;
 				

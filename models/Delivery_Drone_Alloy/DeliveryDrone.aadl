@@ -160,7 +160,7 @@ public
 	
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
-			gnc: system GNC::GNC.Impl;
+--			gnc: system GNC::GNC.Impl;
 			
 			radio: system Radio
 			{
@@ -230,7 +230,7 @@ public
 		connections
 			c1: port positionEstimator.pos_est_est_pos -> navigation.nav_est_pos;
 			
-			c1b: port deliveryPlanner.launch_pos -> gnc.gnc_launch_pos;
+--			c1b: port deliveryPlanner.launch_pos -> gnc.gnc_launch_pos;
 			
 			c2: port navigation.nav_move -> fc.fc_move;
 
@@ -248,7 +248,7 @@ public
 			
 			c11: port radio.rd_radio_out -> deliveryPlanner.dp_radio_response;
 			
-			c12: port gnc.gnc_gps_pos -> positionEstimator.pos_est_gps_pos;
+--			c12: port gnc.gnc_gps_pos -> positionEstimator.pos_est_gps_pos;
 			
 			c14a: port dds_bus1 -> connector.conn_bus_in;
 			
@@ -259,21 +259,20 @@ public
 			c16: port dds_comm1 -> radio.rd_comm_in
 			{VERDICT_Properties::connectionType => Remote;
 			 VERDICT_Properties::authenticated => false;
-			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
-			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
+			 VERDICT_Properties::dataEncrypted => false;
 			};
 			
 			c17: port radio.rd_comm_out -> dds_comm2;
 
-			c18a: port gnc.gnc_imu_pos -> positionEstimator.pos_est_imu_pos;
+--			c18a: port gnc.gnc_imu_pos -> positionEstimator.pos_est_imu_pos;
 			
 			c19: port fc.fc_motor_cmd -> actuation.motor_cmd;
 			
 			c20: port actuation.response -> fc.fc_actuation_response;	
 
-			c22: port dds_satellite0_sig_pos -> gnc.gnc_satellite0_pos;
+--			c22: port dds_satellite0_sig_pos -> gnc.gnc_satellite0_pos;
 			
-			c23: port dds_satellite1_sig_pos -> gnc.gnc_satellite1_pos;
+--			c23: port dds_satellite1_sig_pos -> gnc.gnc_satellite1_pos;
 			
 			c24: port navigation.nav_pos_act_out -> positionEstimator.pos_est_pos_act_in;
 			
@@ -293,21 +292,21 @@ public
 			
 			c32: port actuation.response -> dds_actuation_out;	
 			
-			c33: port deliveryPlanner.dp_constellation -> gnc.gnc_constellation;
+--			c33: port deliveryPlanner.dp_constellation -> gnc.gnc_constellation;
 			
-			c34: port gnc.gnc_gps_health_status -> deliveryPlanner.dp_gps_health_status;
+--			c34: port gnc.gnc_gps_health_status -> deliveryPlanner.dp_gps_health_status;
 			
-			c35: port gnc.gnc_imu_health_status -> deliveryPlanner.dp_imu_health_status;
+--			c35: port gnc.gnc_imu_health_status -> deliveryPlanner.dp_imu_health_status;
 			
 			c36: port radio.rd_health_status -> deliveryPlanner.dp_rdo_health_status;
 			
 			c37: port camera.cm_health_status -> deliveryPlanner.dp_cam_health_status;
 			
-			c38: port gnc.gnc_probe_constellation -> dds_probe_constellation;
+--			c38: port gnc.gnc_probe_constellation -> dds_probe_constellation;
 			
 			c39: port deliveryPlanner.dp_probe_init_mode -> dds_probe_init_mode;
 			
-			c40: port gnc.gnc_probe_launch_pos -> dds_probe_launch_location;
+--			c40: port gnc.gnc_probe_launch_pos -> dds_probe_launch_location;
 			
 			c41: port navigation.nav_probe_dest_pos -> dds_probe_delivery_location;
 			
@@ -316,6 +315,10 @@ public
 			c43: port deliveryPlanner.dp_nav_cmd -> dds_probe_fly_cmd;
 			
 			c44: port deliveryPlanner.dp_probe_abort_mode -> dds_probe_abort_mode;
+		properties 
+			VERDICT_Properties::componentType => Hybrid;
+			VERDICT_Properties::pedigree => COTS;
+			VERDICT_Properties::adversariallyTested => false;			
 												
 	end DeliveryDroneSystem.impl;
 	

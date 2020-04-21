@@ -1,24 +1,22 @@
 ThreatEffect {
-	id = "Identity Spoofing"
-	entities = {s : system | s.category = GPS 
-							 or s.category = IMU 
-							 or s.category = LIDAR}
+	id = "Content Spoofing"
+	entities = {s : system | s.category = GPSCat 
+							 or s.category = IMUCat 
+							 or s.category = LIDARCat}
 	reference = "CAPEC-148"
-	description = "It refers to the action of assuming (i.e., taking on) the identity 
-				   of some other entity (human or non-human) and then using that identity 
- 				   to accomplish a goal. An adversary may craft messages that appear 
-				   to come from a different principle or use stolen / spoofed authentication 
-				   credentials. Alternatively, an adversary may intercept a message from 
-				   a legitimate sender and attempt to make it look like the message comes 
-				   from them without changing its content. The latter form of this attack 
-				   can be used to hijack credentials from legitimate users. The attacks 
-				   need not be limited to transmitted messages - any resource that is 
-				   associated with an identity (for example, a file with a signature) can 
-				   be the target of an attack where the adversary attempts to change the 
-				   apparent identity. This attack differs from Content Spoofing attacks where 
-				   the adversary does not wish to change the apparent identity of the message 
-				   but instead wishes to change what the message says. In an Spoofing attack, 
-                   the adversary is attempting to change the identity of the content. (Identity Spoofing)"
+	
+	description = "An adversary modifies content to make it contain something other than what the original 
+					content producer intended while keeping the apparent source of the content unchanged. 
+					The term content spoofing is most often used to describe modification of web pages hosted 
+					by a target to display the adversary's content instead of the owner's content. However, 
+					any content can be spoofed, including the content of email messages, file transfers, or 
+					the content of other network communication protocols. Content can be modified at the source 
+					(e.g. modifying the source file for a web page) or in transit (e.g. intercepting and 
+					modifying a message between the sender and recipient). Usually, the adversary will 
+					attempt to hide the fact that the content has been modified, but in some cases, 
+					such as with web site defacement, this is not necessary. Content Spoofing can lead to 
+					malware exposure, financial fraud (if the content governs financial transactions), 
+					privacy violations, and other unwanted outcomes."
 };
 
 ThreatEffect {
@@ -44,7 +42,7 @@ ThreatEffect {
 	entities = {s : system | (s.componentType = Software 
 							     or s.componentType = Hybrid) 
 							  and (s.pedigree = Sourced or s.pedigree = COTS)
-							  and s.adversariallyTested = true}
+							  and s.adversariallyTested = false}
 	reference = "CAPEC-441"	
 	description = "An adversary installs or adds malicious logic (also known as malware) 
 				   into a seemingly benign component of a fielded system. This logic is 
@@ -116,7 +114,7 @@ ThreatDefense {
 
 ThreatDefense {
 	id = "Device Identification and Authentication"
-	threats = "Network Injection", "Software Virus", "Remote Code Injection"
+	threats = "Network Injection", "Software Virus", "Remote Code Injection", "Logic Bomb"
 	reference = "IA-3"
 }
 
