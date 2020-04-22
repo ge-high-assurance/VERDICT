@@ -63,13 +63,15 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?
  . OPTIONAL{{select distinct ?src (group_concat(distinct ?c6;separator='; &amp;#10;') as ?plist) where
     { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
          ?src ?prop ?z3 		
-       . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?r2 . ?z3 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?prop_val 
+       . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?r2 . ?z3 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?prop_val
+       . LET(?c3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) 
       }
     UNION
     { # this get properties, not implementation properties
       OPTIONAL{?src ?prop ?prop_val . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
+      . LET(?c3 := concat(str(?prop_val),str(?prop)))
     }
-   . LET(?c3 := concat(str(?prop_val),str(?prop)))
+   
    . LET(?c4 := replace(str(?c3),'http.*#',''))
    . LET(?c5 := replace(str(?c4),'^true',''))
    . LET(?c6 := replace(str(?c5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble gettting that working
@@ -103,6 +105,7 @@ where {?CompInst &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?x
 . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
 . ?x &lt;http://sadl.org/STEM/BaseModel#likelihoodOfSuccess&gt; ?LikelihoodOfSuccess
 . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
+. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
 . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
 . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
 . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
@@ -120,6 +123,7 @@ select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) 
       . ?x &lt;http://sadl.org/STEM/BaseModel#id&gt; ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
       . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}

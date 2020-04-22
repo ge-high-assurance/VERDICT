@@ -33,6 +33,7 @@ where {?CompInst <applicableCM> ?x
 . ?x <capecDesc> ?CAPECDescription
 . ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess
 . ?CompInst <type> ?CompType
+. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
 . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
 . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
 . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
@@ -48,6 +49,7 @@ select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) 
       . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
       . ?CompInst <type> ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
       . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
@@ -217,13 +219,15 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?
  . OPTIONAL{{select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where
     { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
          ?src ?prop ?z3 		
-       . ?prop <tooltipProp> ?r2 . ?z3 <dal> ?prop_val 
+       . ?prop <tooltipProp> ?r2 . ?z3 <dal> ?prop_val
+       . LET(?c3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) 
       }
     UNION
     { # this get properties, not implementation properties
       OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
+      . LET(?c3 := concat(str(?prop_val),str(?prop)))
     }
-   . LET(?c3 := concat(str(?prop_val),str(?prop)))
+   
    . LET(?c4 := replace(str(?c3),'http.*#',''))
    . LET(?c5 := replace(str(?c4),'^true',''))
    . LET(?c6 := replace(str(?c5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble gettting that working

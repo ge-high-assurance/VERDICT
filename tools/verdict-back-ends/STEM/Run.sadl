@@ -25,7 +25,10 @@ import "http://sadl.org/STEM/Queries".
 // Oracle VM has SADL version dated 20190311.
 // OVA on my laptop is dated 20190311.
 
-
+// 4/6/2020:
+//			* temporarily expecting encryptedTransmissionDAl and not encryptedTransmission in ScnConnections.csv
+//			* Altered 2 queries to address when SrcComp is same as SrcCompInstanc
+//			* Instead of outputting something like 7antiJamming we now output antiJamming DAL 7
 // 3/30/2020: Generation.xlsx has been updated, including 3 new properties: failSafe, remoteAttestation, zeroize
 //				Now there are 3 csv files read in and 2 new columns added in ScnConnections.csv.
 //				The query related to writing out Defenses.csv had to be redone 
