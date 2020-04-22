@@ -9,12 +9,7 @@
 
 uri "http://sadl.org/STEM/BaseModel" alias base.
 
-// Has 2 Cyber Attack Properties from TA1 for which we hand generated declarations and rules.
-// In the data, gps has a new attack and radio has an attack similar to our CAPEC 25
-// gps shows CAPEC 1000 (what we called the new attack) and radio has CAPEC 25 even when we comment 
-// out our CAPEC 25 rules.
-
-DAL (note "Design Assurance Level") is a type of int [0,9]. // 0 for DAL in case the implementation property is not present
+DAL (note "Design Assurance Level") is a type of int [0,9]. // 0 for DAL in case the implementation property is not present or false
 ComponentType is a class, must be one of {Software, Hardware, Hybrid, Human}.
 Pedigree is a class, must be one of {InternallyDeveloped, COTS, Sourced}.
 
@@ -29,6 +24,14 @@ ImplProperty is a class
 	described by name with a single value of type string
 	described by val with a single value of type boolean
 	described by dal with a single value of type DAL. 
+
+// In some cases, when a mitigation (an Implementation Property) is set then additional
+// new CAPECS may be present. These need to be handled differently as the implementation property 
+// (with DAL value) needs to be also viewed like an "implicit property". There are 3 such mitigations:
+// deviceAuthentication, physicalAccessControl (applicable to component)
+// and encryptedTransmission (applicable to connection).
+// The corresponding properties (boolean value) are called XdeviceAuthentication, XphysicalAccessControl
+// and XencryptedTransmission.
 
 //DataType is a class, must be one of {Control, yData}.	
 System is a type of Thing
@@ -83,12 +86,9 @@ System is a type of Thing
 	described by strongCryptoAlgorithms with a single value of type ImplProperty
 	described by supplyChainSecurity with a single value of type ImplProperty
 	described by systemAccessControl with a single value of type ImplProperty	
-	described by tamperProtection with a single value of type ImplProperty  //AM 7/24 made it and next one boolean for the moment
+	described by tamperProtection with a single value of type ImplProperty  
     described by userAuthentication with a single value of type ImplProperty
     described by zeroize with a single value of type ImplProperty
-
-//	described by ta1_Deadlock with a single value of type boolean
-	described by ta1_NewProp with a single value of type boolean
 	
 	// TA1 properties, all of them end with "_Attack"; each one maps to one or more CAPECS
 	described by Brute_Force_Attack with a single value of type boolean  // CAPEC-112
@@ -105,12 +105,9 @@ System is a type of Thing
 	described by Supply_Chain_Attack with a single value of type boolean // CAPEC-438, CAPEC-439
 . 
 
-// the following would also work so that we can filter on the properties we want to show as tooltip, but is not as clean as using annotations
-//tooltipProp is a property with values of type data.
-//{heterogeneity, insideTrustedBoundary, unencWifiFromOutsideTB, hasSensitiveInfo, broadcastFromOutsideTB} are types of tooltipProp.
-
+// all the component properties we want to display will have tooltipProp annotation set to true
 // note that we display boolean properties and not the enumerated ones
-tooltipProp is a type of annotation.	// all the component properties we want to display will have tooltipProp annotation set to true
+tooltipProp is a type of annotation.	
 heterogeneity has tooltipProp true.
 insideTrustedBoundary has tooltipProp true.	
 hasSensitiveInfo has tooltipProp true.	
@@ -123,8 +120,6 @@ canReceiveSWUpdate has tooltipProp true.
 canReceiveConfigUpdate has tooltipProp true.
 pedigree has tooltipProp true.
 antiJamming has tooltipProp true.	
-//antiFlooding has tooltipProp true.
-//antiFuzzing has tooltipProp true.
 staticCodeAnalysis has tooltipProp true.  
 removeIdentifyingInformation has tooltipProp true.	
 inputValidation has tooltipProp true.
@@ -148,7 +143,6 @@ tamperProtection has tooltipProp true.
 userAuthentication has tooltipProp true.
 zeroize has tooltipProp true.
 
-//ta1_NewProp has tooltipProp true.
 Configuration_Attack has tooltipProp true.
 Physical_Theft_Attack has tooltipProp true.
 Interception_Attack has tooltipProp true.
@@ -165,22 +159,23 @@ Flooding_Attack has tooltipProp true.
 Subsystem is a type of System.
   
 PortType is a class, must be one of {inport, outport}.
-Bus is a type of System. //AM: added 12/11
+Bus is a type of System. 
 
-Connection is a type of Subsystem // just for reading in the tabular data; some properties will be from the 3rd csv file
+// For reading in the tabular data; some properties will be from the 3rd csv file
+Connection is a type of Subsystem 
 	described by connectionName with a single value of type string
-	described by binding with a single value of type Bus //AM: added 12/11
-	described by connectionType with values of type ConnectionType //AM: added 1/14
-	described by bindingVulnerability with a single value of type boolean //AM: added 1/14 
+	described by binding with a single value of type Bus 
+	described by connectionType with values of type ConnectionType 
+	described by bindingVulnerability with a single value of type boolean  
 	described by connectionFlow with values of type ContentType
-	described by encryptedTransmission with a single value of type ImplProperty // this line gives NullPointerException
+	described by encryptedTransmission with a single value of type ImplProperty 
 	described by XencryptedTransmission with a single value of type boolean
 	described by trustedConnection with a single value of type boolean
     described by srcCompType with a single value of type Thing // SrcCompType
     described by srcCompImpl with a single value of type System // SrcCompImpl
     described by srcCompCategory with a single value of type System // SrcCompCategory
-	described by connectionSource with a single value of type Thing //SrcCompInstance
-	described by outPort with a single value of type string //outPort is on the "source"
+	described by connectionSource with a single value of type Thing // SrcCompInstance
+	described by outPort with a single value of type string // outPort is on the "source"
 	described by srcPortType with a single value of type PortType // SrcPortType
 	described by destCompType with a single value of type Thing // DestCompType
     described by destCompImpl with a single value of type System // DestCompImpl
@@ -204,28 +199,9 @@ NISTControl is a class
 	described by nistId with a single value of type string
 	described by nistDesc with a single value of type string.
 	
-Mitigation is a class // could we relate it to ImplProperty
+Mitigation is a class 
 	described by implProperty with a single value of type string 
 	described by nistControl with values of type NISTControl. 
- 
-/////////////////////////// manually generated for unmapped Cyber Attack Property ta1_NewProp
-// using dummy CAPECs numbered from 1000 for CAP that do not match to any CAPEC
-// and the also generating new Mitigation and NISTCoontrol structures to be edited as needed
-
-//CAPEC-1000-ta1NewProp is a CAPEC
-//   with id 1000
-//   with capecDesc "TA1 NewProp"
-//   with ciaIssue Availability
-//   with likelihoodOfSuccess 1
-//   with mitigation NewDefenseForta1NewProp.
-//   
-//NewDefenseForta1NewProp is a Mitigation 
-//   with implProperty "newDefenseForta1NewProp"
-//   with nistControl Nist-x1.   
-//   
-//Nist-x1 is a NISTControl
-//   with nistId "Nist-x1"
-//   with nistDesc "Description of Nist-x1". 
 
 ////////////////////// following generated from Excel: CAPEC, NIST, mitigation declarations /////////////////
 
@@ -790,6 +766,7 @@ CAPEC-624C-PhysicalAccessControl is a CAPEC
    with mitigation PhysicalAccessControl.
 
    
+// Generated NIST Control Declarations
 AU-12 is a NISTControl
    with nistId "AU-12"
    with nistDesc "Audit Generation".
@@ -877,6 +854,9 @@ SC-29 is a NISTControl
 SC-4 is a NISTControl
    with nistId "SC-4"
    with nistDesc "Information in Shared Resources".
+SC-4-2 is a NISTControl
+   with nistId "SC-4-2"
+   with nistDesc "Periods Processing".
 SC-40 is a NISTControl
    with nistId "SC-40"
    with nistDesc "Wireless Link Protection".
@@ -907,9 +887,15 @@ SI-10-5 is a NISTControl
 SI-11 is a NISTControl
    with nistId "SI-11"
    with nistDesc "Error Handling".
+SI-15 is a NISTControl
+   with nistId "SI-15"
+   with nistDesc "Information Output Handling".
 SI-16 is a NISTControl
    with nistId "SI-16"
    with nistDesc "Memory Protection".
+SI-7-1 is a NISTControl
+   with nistId "SI-7-1"
+   with nistDesc "Integrity Checks".
 SI-7-15 is a NISTControl
    with nistId "SI-7-15"
    with nistDesc "Code Authentication".
@@ -926,7 +912,7 @@ SI-17 is a NISTControl
    with nistId "SI-17"
    with nistDesc "Fail-Safe Procedures".
 
-
+// Generated Mitigation Declarations
 AntiJamming is a Mitigation
    with implProperty "antiJamming"
    with nistControl SC-40
@@ -976,20 +962,21 @@ RemoteAttestation is a Mitigation
    with nistControl IA-3-4.
 RemoveIdentifyingInformation is a Mitigation
    with implProperty "removeIdentifyingInformation"
-   with nistControl SC-7-16.
+   with nistControl SI-15.
 ResourceAvailability is a Mitigation
    with implProperty "resourceAvailability"
    with nistControl SC-6.
 ResourceIsolation is a Mitigation
    with implProperty "resourceIsolation"
-   with nistControl SC-4.
+   with nistControl SC-4
+   with nistControl SC-4-2.
 SecureBoot is a Mitigation
    with implProperty "secureBoot"
+   with nistControl SI-7-1
    with nistControl SI-7-5
    with nistControl SI-7-6
    with nistControl SI-7-9
-   with nistControl SI-7-15
-   with nistControl IA-3-4.
+   with nistControl SI-7-15.
 SessionAuthenticity is a Mitigation
    with implProperty "sessionAuthenticity"
    with nistControl SC-23.
@@ -1022,4 +1009,3 @@ UserAuthentication is a Mitigation
 Zeroize is a Mitigation
    with implProperty "zeroize"
    with nistControl MP-6-8.
-
