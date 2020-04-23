@@ -1,6 +1,6 @@
 # VERDICT: Building the OSATE plugin
 
-## About VERDICT
+## About the OSATE plugin
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
@@ -8,6 +8,37 @@ tools consist of an OSATE plugin and a set of VERDICT back-end
 programs invoked by the plugin.  The OSATE plugin sources are in this
 directory and the back-end program sources are in another directory
 [(../verdict-back-ends)](../verdict-back-ends).
+
+Running Maven in this directory builds an update site (a directory,
+not a website) containing our OSATE plugin.  You can install the
+directory
+`com.ge.research.osate.verdict.updatesite/target/repository/` directly
+into an OSATE release or copy that directory to a new directory in our
+[VERDICT-update-sites](https://github.com/ge-high-assurance/VERDICT-update-sites)
+repository, from where you can install our plugin via an update site
+URL.
+
+## Set up your build environment
+
+You will need a [Java Development Kit](https://adoptopenjdk.net/)
+(version 8) to compile all of our Java program sources.  Since OSATE
+is officially supported on Java 8 LTS only, we have not compiled our
+plugin sources with later versions than Java 8 LTS either.
+
+You also will need [Apache Maven](https://maven.apache.org) to build
+all of our Java program sources.  Your operating system may have a
+prebuilt Maven package available, but many developers would prefer to
+download the latest Maven release from Apache's website, unpack the
+Maven release someplace, and
+[add](https://maven.apache.org/install.html) the unpacked directory's
+bin directory to their PATH.
+
+Some developers also will need to tell Maven to [use a
+proxy](https://maven.apache.org/guides/mini/guide-proxies.html) in
+their settings.xml file (usually ${user.home}/.m2/settings.xml).
+Maven is unaffected by proxy environment variables, so you still need
+to create your own settings.xml file if Maven needs to use a proxy at
+your site.
 
 ## Update our target definition file (if needed)
 
@@ -86,10 +117,11 @@ successful build ends with the following output:
 [INFO] ------------------------------------------------------------------------
 ```
 
-Maven will build an update site for the OSATE plugin which you can
-install into an OSATE release.  Look for the location of that update
-site in your build output; it will look something like
-`/home/interran/git/VERDICT/tools/verdict/com.ge.research.osate.verdict.updatesite/target/repository`.
+The last directory built by Maven is an update site for the OSATE
+plugin which you can install into an OSATE release.  That update site
+is actually located inside the directory
+`com.ge.research.osate.verdict.updatesite/target/repository` and that
+directory can be installed directly into OSATE.
 
 ## Install our OSATE plugin
 
@@ -98,8 +130,8 @@ stable OSATE release.  If you don't have a stable OSATE release
 installed, you can follow these
 [instructions](https://osate.org/download-and-install.html) to
 download and install the latest stable OSATE release.  Once you have
-installed a stable OSATE release, you can follow these steps to deploy
-our OSATE plugin into it:
+installed a stable OSATE release, you can follow these steps to
+install our OSATE plugin into it:
 
 1. Start OSATE and open its Install New Software wizard using the
    pulldown menu (Help > Install New Software...).

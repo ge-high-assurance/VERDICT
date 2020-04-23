@@ -1,6 +1,6 @@
 # VERDICT: Running STEM queries on CSV data
 
-## About this VERDICT tool
+## About verdict-stem-runner
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
@@ -9,10 +9,11 @@ programs invoked by the plugin.
 
 This directory builds a program called verdict-stem-runner which runs
 STEM queries on CSV data.  This program is usually called from another
-program called verdict-bundle, but you can run this program using the
-executable capsule jar built by the pom if you want to test it by
-itself.  The only argument the capsule jar needs is the path to the
-[STEM](../../STEM) project on disk.  The program will load semantic
+program called verdict-bundle, but you can run this program by itself
+using an executable capsule jar
+(target/verdict-stem-runner-1.0-SNAPSHOT-capsule.jar) if you want.
+The only argument the capsule jar needs is the path to the
+[STEM](../../STEM) project on disk.  This program will load semantic
 modeling and reasoning rules from the STEM/OwlModels directory, read
 data from input CSV files in the STEM/CSVData directory, run STEM
 queries on the CSV data, and write the queries' output to CSV files in
@@ -59,11 +60,10 @@ The [STEM](../../STEM) project stores the STEM queries in the
 STEM/Queries.sadl file and the SADL commands that run these queries in
 the STEM/Run.sadl file.  The queries in the STEM/Queries.sadl file are
 copied to a translated OWL file which our verdict-stem-runner program
-loads from the STEM/OwlModels directory.  However, the commands in the
-STEM/Run.sadl are not copied to a translated OWL file because they
-have no representation in OWL and exist only as SADL commands.
-Therefore, we have to write hardcoded SADL API calls in our Java
-source file
+loads from the STEM/OwlModels directory.  However, the SADL commands
+in the STEM/Run.sadl are not copied to a translated OWL file because
+they have no representation in OWL.  Therefore, we have to write
+hardcoded SADL API calls in our Java source file
 [VerdictStem.java](src/main/java/com/ge/verdict/stem/VerdictStem.java)
 which do the same thing as the SADL commands in the
 [STEM/Run.sadl](../../STEM/Run.sadl) file.  You can change almost any
@@ -71,7 +71,7 @@ of the SADL files in the STEM project (even STEM/Queries.sadl) and
 simply rebuild the STEM project in the SADL IDE (which updates the
 translated OWL files in the OwlModels directory) without needing to
 make any changes to VerdictStem.java.  However, if you make a
-significant change to STEM/Run.sadl, be warned you will have to update
+significant change to STEM/Run.sadl, you will have to update
 VerdictStem.java likewise so that the verdict-stem-runner program will
 continue to do the same things the SADL IDE does when it executes the
 commands in the STEM/Run.sadl file.
@@ -81,17 +81,17 @@ commands in the STEM/Run.sadl file.
 The unit test copies our verdict-back-ends' STEM directory to its own
 target/test-classes/STEM directory before running the STEM queries so
 that it can compare its own "test" output files to the "control"
-output files in the verdict-back-ends' STEM directory for any
-differences.  The unit test fails if there are any differences.  If
-you run the SADL IDE on the verdict-back-ends' STEM project to change
-the SADL files and generate new OWL and output files, you need to be
-careful not to break the unit test since the SADL IDE generates very
-slighly different CSV output files such as quotes around numbers like
-"1.0" and an empty line at the end of the CSV output files.  The
-easiest way to remove these differences is to run the
-verdict-stem-runner capsule jar on the verdict-back-ends' STEM
-directory to replace the output files; then the unit test will find no
-differences and pass again.
+output files in the verdict-back-ends' STEM directory.  The unit test
+fails if there are any differences between the test and control output
+files.  If you change the SADL files and run the SADL IDE on the
+verdict-back-ends' STEM project to generate new OWL and output files,
+the unit test will fail because the SADL IDE generates very slighly
+different CSV output files such as quotes around numbers like "1.0"
+and an empty line at the end of the CSV output files.  The easiest way
+to remove these differences is to run the unit test, let it fail, and
+copy the new CSV output files from target/test-classes/STEM/Output to
+verdict-back-ends/STEM/Output; then the unit test will find no
+differences when you run it again.
 
 ## How to make changes to columns in input CSV files
 

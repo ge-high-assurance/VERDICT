@@ -1,6 +1,6 @@
 # VERDICT: Running the VERDICT tools
 
-## About VERDICT
+## About the VERDICT tools
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT

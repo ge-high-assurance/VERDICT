@@ -1,6 +1,6 @@
 # VERDICT: Building the VERDICT back-end programs
 
-## About VERDICT
+## About the VERDICT back-end programs
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
@@ -37,18 +37,46 @@ back-end programs not written in Java in subprocesses.
 
 ## Set up your build environment
 
-If you have not done it yet, you will need to install the Java
-Development Kit (version 8), Apache Maven (latest version), and Docker
-(latest version).  You can use our Dockerfile to build all of the
-back-end programs not written in Java so you can avoid needing to
-install C/C++ and OCaml compilers on your system.  If you really want
-to build these programs directly on your system with your system's
-native compilers, we will describe briefly how to set up these native
-compilers on your system although you may find more instructions in
-some other directories' README.md files so please look at all of the
-other README.md files too.  Our [Dockerfile](Dockerfile) also shows
-how to install or set up these native compilers within a Debian
-10-based OCaml builder image.
+You will need a [Java Development Kit](https://adoptopenjdk.net/)
+(version 8) to compile all of our Java program sources.  We are
+skipping Java 11 LTS and staying with Java 8 LTS until Java 17 LTS
+comes out.  OSATE itself is officially supported only on Java 8 LTS
+anyway.  Later versions than Java 8 LTS may work, but we have not
+tested them.  To use a later LTS version of Java, replace the
+maven.compiler.source and maven.compiler.target properties in our
+tools' parent [pom.xml](../../pom.xml) with maven.compiler.release and
+set the release number to 11 or 17, e.g.,
+
+```
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
+    </properties>
+```
+
+You also will need [Apache Maven](https://maven.apache.org) to build
+all of our Java program sources.  Your operating system may have a
+prebuilt Maven package available, but many developers would prefer to
+download the latest Maven release from Apache's website, unpack the
+Maven release someplace, and
+[add](https://maven.apache.org/install.html) the unpacked directory's
+bin directory to their PATH.
+
+Some developers also will need to tell Maven to [use a
+proxy](https://maven.apache.org/guides/mini/guide-proxies.html) in
+their settings.xml file (usually ${user.home}/.m2/settings.xml).
+Maven is unaffected by proxy environment variables, so you still need
+to create your own settings.xml file if Maven needs to use a proxy at
+your site.
+
+You can use our Dockerfile to build all of the back-end programs not
+written in Java so you can avoid needing to install C/C++ and OCaml
+compilers on your system.  If you really want to build these programs
+directly on your system with your system's native compilers, we will
+describe briefly how to set up these native compilers on your system.
+Our [Dockerfile](Dockerfile) also shows how to install or set up these
+native compilers within a Debian 10-based OCaml builder image.
 
 The aadl2iml and soteria_pp sources are written in
 [OCaml](https://ocaml.org/learn/description.html).  If you want to
@@ -103,9 +131,13 @@ reads translated OWL files from a STEM project and runs STEM's rules
 on semantic model data loaded from CSV data files created by some of
 our other back-end programs.
 
-The verdict-bundle sources are written in Java.  If you need them, you
-will find more detailed instructions for installing Java and Maven in
-verdict-bundle's [README.md](verdict-bundle-parent/README.md).
+The verdict-bundle sources are written in Java.  You will find some
+important notes about building these sources in verdict-bundle's
+[README.md](verdict-bundle-parent/README.md).  In short, you will need
+to set an environment variable `GraphVizPath` to the directory where
+Graphviz's `dot` executable can be found (usually `/usr/bin` on Linux)
+to make a unit test pass.  You also must allow Maven to download jars
+from our sadl-snapshot-repository.
 
 The z3 sources are written in C++ and live in a separate git
 repository.  Unfortunately, kind2 will not work with the latest
