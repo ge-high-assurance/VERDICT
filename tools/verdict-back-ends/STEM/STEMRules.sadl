@@ -92,9 +92,9 @@ if trustedConnection of a Connection is false
    and binding of a second Connection is b1
    and noValue(the second Connection, trustedConnection)
 then trustedConnection of the second Connection is false
-     and bindingVulnerability of the second Connection is true.  // output to new file    
+     and bindingVulnerability of the second Connection is true.  // output to ArchMitigation.csv    
 
-//Infer 3 Prop1 properties
+// Infer 3 properties
 // we do not infer controlSentToUntrusted 
 Rule InferControlReceivedFromUntrusted
 if trustedConnection of a Connection is false
@@ -124,14 +124,6 @@ then dataSentToUntrusted of the first Subsystem is true
      and bindingVulnerability of the second Connection is true.  // output to new file. 
 
 //////////////////// Manually created rules to address Cyber Attack Properties (CAP) from TA1 ////////////
-
-// if TA1 add a property that does not map to an existing CAPEC then 
-//		introduce for example CAPEC-1000-ta1NewProp, NewDefenseForta1NewProp, Nist-x1 in BaseModel.sadl
-//		set its tooltipProp to be true
-//		and have rule as follows
-//Rule TA1-2
-//	if ta1_NewProp of a Subsystem is true
-//	then applicableCM of the Subsystem is CAPEC-1000-ta1NewProp.
 
 Rule TA1-Brute_Force_Attack 
 	if Brute_Force_Attack of a Subsystem is true
@@ -169,7 +161,11 @@ Rule TA1-Hardware_Integrity_Attack
 Rule TA1-Identity_Spoofing_Attack 
 	if Identity_Spoofing_Attack of a Subsystem is true
 	then     applicableCM of the Subsystem is CAPEC-151C-DeviceAuthentication
-		 and applicableCM of the Subsystem is CAPEC-151I-DeviceAuthentication.	
+		 and applicableCM of the Subsystem is CAPEC-151C-Heterogeneity
+		 and applicableCM of the Subsystem is CAPEC-151C-PhysicalAccessControl	
+		 and applicableCM of the Subsystem is CAPEC-151I-DeviceAuthentication
+		 and applicableCM of the Subsystem is CAPEC-151I-Heterogeneity
+		 and applicableCM of the Subsystem is CAPEC-151I-PhysicalAccessControl.	
 
 Rule TA1-Interception_Attack 
 	if Interception_Attack of a Subsystem is true
@@ -178,8 +174,9 @@ Rule TA1-Interception_Attack
 Rule TA1-Physical_Theft_Attack 
 	if Physical_Theft_Attack of a Subsystem is true
 	then     applicableCM of the Subsystem is CAPEC-507C-PhysicalAccessControl
+		 and applicableCM of the Subsystem is CAPEC-507C-Zeroize
 		 and applicableCM of the Subsystem is CAPEC-507I-PhysicalAccessControl
-		 and applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.
+		 and applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.	 
 
 Rule TA1-Sniffing_Attack 
 	if Sniffing_Attack of a Subsystem is true
