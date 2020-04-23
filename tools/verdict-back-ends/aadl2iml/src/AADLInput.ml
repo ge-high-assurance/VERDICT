@@ -198,6 +198,19 @@ let merge_packages input =
       List.fold_left add_iu [] imported_units
     in
 
+    let remove_renamed_packages renamed_packages =
+      let add_rp acc ({ AD.name; AD.renamed_package; AD.rename_all } as rp) =
+        match name with
+        | None -> (
+          match PkgNameSet.find_opt renamed_package package_names with
+          | None -> rp :: acc
+          | _ -> acc
+        )
+        | _ -> failwith "Package renames are not supported yet"
+      in
+      List.fold_left add_rp [] renamed_packages
+    in
+
     let flatten_pname pname =
       let rev_pname = List.rev pname in
       let pkg =
@@ -396,11 +409,14 @@ let merge_packages input =
 
     let flatten_pkg_sec = function
       | None -> None
-      | Some {AD.imported_units; AD.classifiers; AD.annex_libs } -> (
-        Some {AD.imported_units = remove_mu imported_units;
-              AD.classifiers = List.map flatten_classifier classifiers;
-              AD.annex_libs = List.map flatten_annex annex_libs
-             }
+      | Some {AD.imported_units; AD.renamed_packages;
+              AD.classifiers; AD.annex_libs } ->
+      (
+          Some {AD.imported_units = remove_mu imported_units;
+                AD.renamed_packages = remove_renamed_packages renamed_packages;
+                AD.classifiers = List.map flatten_classifier classifiers;
+                AD.annex_libs = List.map flatten_annex annex_libs
+               }
       )
     in
 
@@ -478,6 +494,9 @@ let merge_packages input =
         {AD.imported_units =
            List.sort_uniq CommonAstTypes.compare_pnames
              (List.rev_append sec1.AD.imported_units sec2.AD.imported_units);
+         AD.renamed_packages =
+           (* TODO: Remove duplicates *)
+           List.append sec2.AD.renamed_packages sec1.AD.renamed_packages;
          AD.classifiers =
            List.append sec2.AD.classifiers sec1.AD.classifiers;
          AD.annex_libs =

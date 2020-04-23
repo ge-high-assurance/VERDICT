@@ -101,8 +101,15 @@ type classifier =
   | ComponentType of component_type
   | ComponentImpl of component_impl
 
+type package_rename = {
+  name: pid option;
+  renamed_package: pname;
+  rename_all: bool;
+}
+
 type package_section = {
   imported_units: pname list;
+  renamed_packages: package_rename list;
   classifiers: classifier list;
   annex_libs: aadl_annex list;
 }
@@ -194,6 +201,25 @@ let rec pp_print_imported_unit_list ppf = function
   | iu :: ius -> (
       Format.fprintf ppf "with %a;@," pp_print_pname iu;
       pp_print_imported_unit_list ppf ius
+  )
+
+let pp_print_renamed_package ppf { name; renamed_package; rename_all } =
+  match name with
+  | None ->
+    Format.fprintf ppf "renames %a::all;" pp_print_pname renamed_package
+  | Some id ->
+    Format.fprintf ppf "%a renames package %a%t;"
+      pp_print_id id
+      pp_print_pname renamed_package
+      (fun ppf -> if rename_all then Format.fprintf ppf "::all" else ())
+
+let rec pp_print_renamed_packages_list ppf = function
+  | [] ->
+      ()
+  | [rp] -> Format.fprintf ppf "%a@,@," pp_print_renamed_package rp
+  | rp :: rps -> (
+      Format.fprintf ppf "%a@," pp_print_renamed_package rp;
+      pp_print_renamed_packages_list ppf rps
   )
 
 let pp_print_port_dir ppf = function
@@ -381,10 +407,11 @@ let pp_print_classifier ind ppf = function
   | ComponentType ct -> pp_print_component_type ind ppf ct
   | ComponentImpl ci -> pp_print_component_impl ind ppf ci
 
-let pp_print_pkg_sec ind ppf { imported_units; classifiers; annex_libs } =
+let pp_print_pkg_sec ind ppf { imported_units; renamed_packages; classifiers; annex_libs } =
   let pp_sep ppf () = Format.fprintf ppf "@,@," in
-  Format.fprintf ppf "%a%a%a%a"
+  Format.fprintf ppf "%a%a%a%a%a"
     pp_print_imported_unit_list imported_units
+    pp_print_renamed_packages_list renamed_packages
     (Format.pp_print_list ~pp_sep (pp_print_annex ind))
     annex_libs
     (fun ppf (l1, l2) ->

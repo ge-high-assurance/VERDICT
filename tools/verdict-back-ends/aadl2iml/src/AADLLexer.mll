@@ -41,6 +41,7 @@
     "property",       P.PROPERTY ;
     "package",        P.PACKAGE ;
     "system",         P.SYSTEM ;
+    "abstract",       P.ABSTRACT ;
     "implementation", P.IMPLEMENTATION ;
     "features",       P.FEATURES ;
     "properties",     P.PROPERTIES ;
@@ -48,6 +49,7 @@
     "connections",    P.CONNECTIONS ;
     "public",         P.PUBLIC ;
     "private",        P.PRIVATE ;
+    "renames",        P.RENAMES ;
     "constant",       P.CONSTANT ;
     "type",           P.TYPE ;
     "none",           P.NONE ;
