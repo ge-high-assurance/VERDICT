@@ -24,3 +24,5 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: mvn -B package --file tools/pom.xml
+      env:
+        GraphVizPath: /usr/bin
