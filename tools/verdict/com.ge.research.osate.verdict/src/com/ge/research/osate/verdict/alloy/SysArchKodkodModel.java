@@ -54,13 +54,15 @@ public class SysArchKodkodModel {
 	final List<Expression> allInstOutports = new ArrayList<Expression>();
 	/** Mapping between name and unary relation */
 	final Map<String, Relation> nameToUnaryRelMap = new HashMap<>();
-	final Map<Relation, Relation> implInstRelToImplRelMap = new HashMap<>();
+	final Map<Relation, Relation> implExtraInstRelToImplRelMap = new HashMap<>();
 	final Map<Relation, Set<Relation>> propTypeRelToValRelMap = new HashMap<>();
 	final Map<Relation, Set<Relation>> compTypeRelToInstRelMap = new HashMap<>();
 	final Map<Relation, Set<Relation>> compImplRelToInstRelMap = new HashMap<>();
 	final Map<Pair<Relation, String>, Relation> domainRelNameToRelMap = new HashMap<>();
 	final Map<Relation, List<Pair<String, Formula>>> instRelToPredMap = new HashMap<>();	
 	final Map<Relation, Pair<Relation, Relation>> binaryRelToDomainRangeRelMap = new HashMap<>();
+	
+	final Map<String, String> threatToDefense = new HashMap<>();
 	
 	/**
 	 * Unary Relations
@@ -194,6 +196,8 @@ public class SysArchKodkodModel {
 						&& !compImplRelToInstRelMap.get(sysInstRel).isEmpty()) {
 					List<Relation> implInstsRels = new ArrayList<Relation>(compImplRelToInstRelMap.get(sysInstRel));
 					for(int j = 0; j < implInstsRels.size(); ++j) {
+						System.out.println("Implementation: " + sysInstRel);
+						System.out.println("Implementation subrelations: " + implInstsRels);
 						Relation implInstRel = implInstsRels.get(j);
 						String instTupName  = implInstRel.name() + "$" + j;
 						List<String> implInstRelTuples = new ArrayList<String>();
@@ -303,12 +307,17 @@ public class SysArchKodkodModel {
 //            		System.out.println("Check Pred: " + pred.b);
                     Solution sol = solver.solve(facts.and(pred.b), bounds);
                     
-                    if(implInstRelToImplRelMap.containsKey(instRel)) {
-                    	instRel = implInstRelToImplRelMap.get(instRel);
+                    if(implExtraInstRelToImplRelMap.containsKey(instRel)) {
+                    	instRel = implExtraInstRelToImplRelMap.get(instRel);
                     }
                     
                     if(sol.sat()) {
-                    	System.out.println("System " + instRel.name() + " is susceptible to " + pred.a);
+                    	if(threatToDefense.containsKey(pred.a)) {
+                        	System.out.println("System " + instRel.name() + " is susceptible to " + pred.a + " but "
+                        			+ "can be mitigated by " + threatToDefense.get(pred.a));                    		
+                    	} else {
+                    		System.out.println("System " + instRel.name() + " is susceptible to " + pred.a);
+                    	}
 //                    	System.out.println(sol);
                     } else if(sol.unsat()){
                     	System.out.println("System " + instRel.name() + " is NOT susceptible to " + pred.a);

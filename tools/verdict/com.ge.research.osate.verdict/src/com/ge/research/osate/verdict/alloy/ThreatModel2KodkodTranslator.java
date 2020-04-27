@@ -12,6 +12,7 @@ import com.ge.research.osate.verdict.dsl.verdict.Forall;
 import com.ge.research.osate.verdict.dsl.verdict.Implies;
 import com.ge.research.osate.verdict.dsl.verdict.Intro;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatAnd;
+import com.ge.research.osate.verdict.dsl.verdict.ThreatDefense;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatEqualContains;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatExpr;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatModel;
@@ -66,6 +67,8 @@ public class ThreatModel2KodkodTranslator {
 			for(ThreatStatement threatStatement : statements) {
 				if(threatStatement instanceof ThreatModel) {
 					translateThreatEffects((ThreatModel) threatStatement);
+				} else if(threatStatement instanceof ThreatDefense) {
+					translateThreatDefense((ThreatDefense) threatStatement);
 				}
 			}
 		}
@@ -97,6 +100,19 @@ public class ThreatModel2KodkodTranslator {
 		} else {
 			throw new RuntimeException("Unsupported entity type: " + entityType);
 		}		
+	}
+	
+	/**
+	 * Translate the threat defense statement for each instance
+	 * */
+	public void translateThreatDefense(ThreatDefense threatStatement) {
+		String defenseId = threatStatement.getName();
+		List<String> threats = threatStatement.getThreats();
+		if(defenseId != null && threats != null && !threats.isEmpty()) {
+			for(String threat : threats) {
+				kodkodModel.threatToDefense.put(threat, defenseId);
+			}
+		}
 	}
 	
 	public void addPredicate(Map<Relation, List<Pair<String, Formula>>> instRelToPredicateMap, Relation rel, Pair<String, Formula> predPair) {

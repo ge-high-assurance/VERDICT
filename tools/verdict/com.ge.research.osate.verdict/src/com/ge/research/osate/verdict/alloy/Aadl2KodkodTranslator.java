@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
@@ -153,29 +154,32 @@ public class Aadl2KodkodTranslator {
 				Set<Relation> subRels = entry.getValue();
 
 				// There could be cases where parent relation does not have any sub-relations  
-				if(subRels.isEmpty()) continue;
+				if(subRels == null || subRels.isEmpty()) continue;
 				
 				Relation parentTypeRel = entry.getKey();
 				Map<Relation, Boolean> relToIsOneMap = new HashMap<Relation, Boolean>();
-				Map<Relation, Set<Relation>> implRelToSubRels = hasSubImplRel(subRels, relToIsOneMap);
+				Map<Relation, Set<Relation>> implRelToSubRels = getImplRelToSubRels(subRels, relToIsOneMap);
 				
-				if(!implRelToSubRels.isEmpty()) {
-					if(subRels != null && !subRels.isEmpty()) {
-						// All subcomponent instances partition their parent component type relation
-						aadlKodkodModel.mkSubRelationship(parentTypeRel, true, new ArrayList<Relation>(subRels), true);
-					}
-				} else {
-					// all instances of system impl relations partition their parent impl relation
-					for(Map.Entry<Relation, Set<Relation>> imlRelToSubRelsEentry : implRelToSubRels.entrySet()) {
-						Relation implRel = imlRelToSubRelsEentry.getKey();
-						Set<Relation> subImplRels = imlRelToSubRelsEentry.getValue();
-						
-						relToIsOneMap.put(implRel, false);
-						aadlKodkodModel.mkSubRelationship(implRel, true, new ArrayList<Relation>(subImplRels), true);
-					}
-					// all system impl relations + (one) component type instance relations =  parentTypeRel
-					aadlKodkodModel.mkSubRelationship(parentTypeRel, true, relToIsOneMap);
-				}			
+				// all instances of system impl relations partition their parent impl relation
+				for(Map.Entry<Relation, Set<Relation>> imlRelToSubRelsEntry : implRelToSubRels.entrySet()) {
+					Relation implRel = imlRelToSubRelsEntry.getKey();
+					Set<Relation> subImplRels = imlRelToSubRelsEntry.getValue();
+					
+					relToIsOneMap.put(implRel, false);
+					aadlKodkodModel.mkSubRelationship(implRel, true, new ArrayList<Relation>(subImplRels), true);
+				}
+				// all system impl relations + (one) component type instance relations =  parentTypeRel
+				aadlKodkodModel.mkSubRelationship(parentTypeRel, true, relToIsOneMap);					
+//				if(!implRelToSubRels.isEmpty()) {
+//					if(subRels != null && !subRels.isEmpty()) {
+//					
+//						// All subcomponent instances partition their parent component type relation
+//						aadlKodkodModel.mkSubRelationship(parentTypeRel, true, new ArrayList<Relation>(subRels), true);
+//					}
+//				} else {
+//					// all system impl relations + (one) component type instance relations =  parentTypeRel
+//					aadlKodkodModel.mkSubRelationship(parentTypeRel, true, relToIsOneMap);
+//				}			
 			}
 		}
 		
@@ -214,7 +218,7 @@ public class Aadl2KodkodTranslator {
 		}
 	}
 	
-	Map<Relation, Set<Relation>> hasSubImplRel(Set<Relation> subRels, Map<Relation, Boolean> relToIsOneMap) {
+	Map<Relation, Set<Relation>> getImplRelToSubRels(Set<Relation> subRels, Map<Relation, Boolean> relToIsOneMap) {
 		Map<Relation, Set<Relation>> implRelToSubRels = new HashMap<>();
 		
 		if(subRels != null) {
@@ -222,6 +226,7 @@ public class Aadl2KodkodTranslator {
 				if(aadlKodkodModel.compImplRelToInstRelMap.containsKey(subRel) 
 						&& !aadlKodkodModel.compImplRelToInstRelMap.get(subRel).isEmpty()) {
 					implRelToSubRels.put(subRel, aadlKodkodModel.compImplRelToInstRelMap.get(subRel));
+					relToIsOneMap.put(subRel, false);
 				} else {
 					relToIsOneMap.put(subRel, true);
 				}
@@ -405,34 +410,35 @@ public class Aadl2KodkodTranslator {
 
 		// Make an extra instance for each implementation
 		Relation extraSystemImplInstRel = aadlKodkodModel.mkUnaryRel(sanitizedSystemImplName + aadlKodkodModel.INST);
-		aadlKodkodModel.implInstRelToImplRelMap.put(extraSystemImplInstRel, systemImplRel);
+		aadlKodkodModel.implExtraInstRelToImplRelMap.put(extraSystemImplInstRel, systemImplRel);
 		
 		// Save the implementation type and implementation relations pair
 		// Consider the implementation as an instance of the implementation type
 		saveParentTypeRelAndInstRel(aadlKodkodModel.compTypeRelToInstRelMap, systemImplTypeRel, systemImplRel);
 		saveParentTypeRelAndInstRel(aadlKodkodModel.compImplRelToInstRelMap, systemImplRel, extraSystemImplInstRel);
 		
-		// Obtain all the systemImpl join inports and outports expressions
-		for(Feature feature : systemImplType.getOwnedFeatures()) {				
-			if(feature instanceof DataPort) {
-				DataPort dp = (DataPort) feature;
-				String portName = sanitizeName(dp.getFullName());
-				Relation portBinaryRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<Relation, String>(systemImplTypeRel, portName));
-				
-				switch (dp.getDirection()) {
-				case IN:
-					aadlKodkodModel.allInstInports.add(extraSystemImplInstRel.join(portBinaryRel));
-					break;
-				case OUT:
-					aadlKodkodModel.allInstOutports.add(extraSystemImplInstRel.join(portBinaryRel));
-					break;
-				case IN_OUT:
-				default:
-					throw new RuntimeException("In/out port not supported");
+		if(systemImpl.getName().equals("DeliveryDroneSystem.Impl")) {
+			// Obtain all the systemImpl join inports and outports expressions
+			for(Feature feature : systemImplType.getOwnedFeatures()) {				
+				if(feature instanceof DataPort) {
+					DataPort dp = (DataPort) feature;
+					String portName = sanitizeName(dp.getFullName());
+					Relation portBinaryRel = aadlKodkodModel.domainRelNameToRelMap.get(new Pair<Relation, String>(systemImplTypeRel, portName));
+					
+					switch (dp.getDirection()) {
+					case IN:
+						aadlKodkodModel.allInstInports.add(extraSystemImplInstRel.join(portBinaryRel));
+						break;
+					case OUT:
+						aadlKodkodModel.allInstOutports.add(extraSystemImplInstRel.join(portBinaryRel));
+						break;
+					case IN_OUT:
+					default:
+						throw new RuntimeException("In/out port not supported");
+					}
 				}
-			}
-		}	
-		
+			}	
+		}
 		// Handle used system implementation properties
 		Set<String> usedPropNames = new HashSet<>();			
 		handleUsedProperties(usedPropNames, null, null, null, systemImpl, extraSystemImplInstRel);
@@ -460,6 +466,8 @@ public class Aadl2KodkodTranslator {
 			// "subcompType" will be the same as "subcompCompType",
 			ComponentType subcompCompType = subcomp.getComponentType();			
 			SubcomponentType subcompType = subcomp.getSubcomponentType();
+			ComponentType ct = subcomp.getComponentType();
+			ComponentImplementation ci = subcomp.getComponentImplementation();
 			
 			String sanitizedSubcompCompTypeName = sanitizeName(subcompCompType.getName());
 			String sanitizedSubcompTypeName = sanitizeName(subcompType.getName());
@@ -471,7 +479,7 @@ public class Aadl2KodkodTranslator {
 			String subcompName = sanitizeName(subcomp.getName());
 			Relation subcompRel = aadlKodkodModel.mkUnaryRel(subcompName);
 			
-			// Save the component type relation to instance relations pair
+			// Save the component type relation AND instance relation pair
 			// if the subcomponent is an instance of a component type.
 			// Otherwise, save the implementation and the instance pair; 
 			if(subcompTypeRel==subcompCompTypeRel) {

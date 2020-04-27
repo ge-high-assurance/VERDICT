@@ -108,7 +108,7 @@ ThreatEffect {
 
 ThreatDefense {
 	id = "Heterogeneity"
-	threats = "Identity Spoofing"
+	threats = "Content Spoofing"
 	reference = "SC-39"
 }
 
