@@ -32,6 +32,7 @@ import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
+import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.EventDataPort;
@@ -443,6 +444,8 @@ public class Aadl2CsvTranslator {
     					} else {
     						srcPortTypeName = "requires data access";
     					}
+    				} else if(srcConnectionEnd instanceof DataSubcomponent){
+    					srcPortTypeName = "data";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd);
     				}
@@ -458,6 +461,8 @@ public class Aadl2CsvTranslator {
     					} else {
     						destPortTypeName = "requires data access";
     					}
+    				}  else if(destConnectionEnd instanceof DataSubcomponent){
+    					destPortTypeName = "data";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd);
     				}    				

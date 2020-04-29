@@ -20,6 +20,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SubcomponentType;
@@ -339,7 +340,7 @@ public class VerdictJavaValidator extends PropertiesJavaValidator {
 	@Check(CheckType.FAST)
 	public void checkFExpr(FExpr fExpr) {
 		String eventName = fExpr.getEventName();
-		SystemType hostingSysType = VerdictUtil.getHostingSystemType(fExpr);
+		ComponentType hostingSysType = VerdictUtil.getHostingSystemType(fExpr);
 
 		if (eventName == null) {
 			error("Event must have a name");
