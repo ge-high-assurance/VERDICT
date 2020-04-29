@@ -81,7 +81,24 @@ let get_data_type type_decls = function
         type_decls
     in
     match ep with
-    | None -> assert false
+    | None -> (
+      match String.lowercase_ascii id with
+      | "boolean" -> VI.PlainType VI.Bool
+      | "integer" -> VI.PlainType VI.Int
+      | "integer_8" -> VI.PlainType VI.Int
+      | "integer_16" -> VI.PlainType VI.Int
+      | "integer_32" -> VI.PlainType VI.Int
+      | "integer_64" -> VI.PlainType VI.Int
+      | "unsigned_8" -> VI.PlainType VI.Int
+      | "unsigned_16" -> VI.PlainType VI.Int
+      | "unsigned_32" -> VI.PlainType VI.Int
+      | "unsigned_64" -> VI.PlainType VI.Int
+      | "natural" -> VI.PlainType VI.Int
+      | "float" -> VI.PlainType VI.Real
+      | "float_32" -> VI.PlainType VI.Real
+      | "float_64" -> VI.PlainType VI.Real
+      | _ -> failwith "Unsupported data type found"
+    )
     | Some (_, pos) -> VI.UserDefinedType pos
   )
   | (pname, _) -> (
@@ -153,7 +170,9 @@ let data_to_type_decls data_types data_impls =
       )
       | t :: tl -> update_type (t::l) tl
     in
-    update_type [] type_decls
+    match record_fields with
+    | [] -> type_decls
+    | _  -> update_type [] type_decls
   in
   List.fold_left process_data_impl type_decls data_impls
 

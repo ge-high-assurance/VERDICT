@@ -21,7 +21,6 @@ import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 public class Binary {
     /** Thrown upon errors during unpacking/invocation of a binary. */
     public static class ExecutionException extends Exception {
-        /** */
         private static final long serialVersionUID = 1L;
 
         private Optional<Integer> code;
@@ -173,19 +172,19 @@ public class Binary {
         argsList.add(binPath);
         argsList.addAll(Arrays.asList(args));
 
-        String[] env;
-
-        switch (getOsExtension()) {
+        String[] env = null;
+        String os = getOsExtension();
+        switch (os) {
             case "nix":
-                env = new String[] {};
                 break;
             case "mac":
                 env = new String[] {"PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"};
                 break;
-            case "win":
-                throw new RuntimeException("Windows not yet supported");
             default:
-                throw new RuntimeException("Invalid OS: " + getOsExtension());
+                throw new ExecutionException(
+                        "We don't have binaries for OS "
+                                + os
+                                + ", please run our Docker image instead");
         }
 
         Execute executor = new Execute(streamHandler);
@@ -193,7 +192,9 @@ public class Binary {
             executor.setWorkingDirectory(new File(wd));
         }
         executor.setCommandline(argsList.toArray(new String[argsList.size()]));
-        executor.setEnvironment(env);
+        if (env != null) {
+            executor.setEnvironment(env);
+        }
 
         try {
             int resultCode = executor.execute();

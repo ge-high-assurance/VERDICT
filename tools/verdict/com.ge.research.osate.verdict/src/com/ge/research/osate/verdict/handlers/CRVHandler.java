@@ -40,19 +40,19 @@ public class CRVHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
-						String bundleJar = BundlePreferences.getBundleJar();
 						String dockerImage = BundlePreferences.getDockerImage();
-						if (bundleJar.length() == 0) {
+						String bundleJar = BundlePreferences.getBundleJar();
+						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
 							System.out.println("Please set Verdict Bundle Jar path in Preferences");
 							return;
 						}
 						String aadl2imlBin = BundlePreferences.getAadl2imlBin();
-						if (aadl2imlBin.length() == 0) {
+						if (dockerImage.isEmpty() && aadl2imlBin.isEmpty()) {
 							System.out.println("Please set aadl2iml binary path in Preferences");
 							return;
 						}
 						String kind2Bin = BundlePreferences.getKind2Bin();
-						if (kind2Bin.length() == 0) {
+						if (dockerImage.isEmpty() && kind2Bin.isEmpty()) {
 							System.out.println("Please set kind2 binary path in Preferences");
 							return;
 						}

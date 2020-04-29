@@ -12,6 +12,7 @@ import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.SystemType;
 
@@ -230,13 +231,20 @@ public class VerdictUtil {
 			}
 
 			if (container instanceof SystemType) {
-				// Find all data ports
+				// Find all data(event data) ports
 				for (DataPort dataPort : ((SystemType) container).getOwnedDataPorts()) {
 					if ((dir != null && dataPort.getDirection().equals(dir))
 							|| (dir == null && (dataPort.getDirection().equals(DirectionType.IN)
 									|| dataPort.getDirection().equals(DirectionType.OUT)))) {
 						ports.add(dataPort.getName());
 					}
+				}
+				for(EventDataPort eventDataPort : ((SystemType) container).getOwnedEventDataPorts()) {
+					if ((dir != null && eventDataPort.getDirection().equals(dir))
+							|| (dir == null && (eventDataPort.getDirection().equals(DirectionType.IN)
+									|| eventDataPort.getDirection().equals(DirectionType.OUT)))) {
+						ports.add(eventDataPort.getName());
+					}					
 				}
 			}
 		}

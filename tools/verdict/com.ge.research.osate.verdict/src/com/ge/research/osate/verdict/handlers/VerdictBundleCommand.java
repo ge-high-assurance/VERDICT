@@ -1,12 +1,5 @@
 package com.ge.research.osate.verdict.handlers;
 
-import com.amihaiemil.docker.Container;
-import com.amihaiemil.docker.Docker;
-import com.amihaiemil.docker.Image;
-import com.amihaiemil.docker.Images;
-import com.amihaiemil.docker.LocalDocker;
-import com.amihaiemil.docker.RemoteDocker;
-import com.amihaiemil.docker.UnexpectedResponseException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -15,13 +8,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.json.Json;
 import javax.json.JsonObject;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
+
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+
+import com.amihaiemil.docker.Container;
+import com.amihaiemil.docker.Docker;
+import com.amihaiemil.docker.Image;
+import com.amihaiemil.docker.Images;
+import com.amihaiemil.docker.TcpDocker;
+import com.amihaiemil.docker.UnexpectedResponseException;
+import com.amihaiemil.docker.UnixDocker;
 
 /** Collects all arguments and then runs verdict-bundle via java or docker. */
 public class VerdictBundleCommand {
@@ -157,12 +157,8 @@ public class VerdictBundleCommand {
             tcpSocket = (tcpSocket != null) ? tcpSocket.replace("tcp:", "http:") : null;
             Docker docker =
                     (tcpSocket != null)
-                            ? new RemoteDocker(URI.create(tcpSocket))
-                            : new LocalDocker(new File(unixSocket));
-            URI baseUri =
-                    (tcpSocket != null)
-                            ? URI.create(URI.create(tcpSocket) + "/v1.35")
-                            : URI.create("unix://localhost:80/v1.35");
+                            ? new TcpDocker(URI.create(tcpSocket))
+                            : new UnixDocker(new File(unixSocket));
 
             // Make sure we can connect to the docker server
             if (!docker.ping()) {
@@ -204,42 +200,15 @@ public class VerdictBundleCommand {
             VerdictLogger.info("Running image: " + dockerImage + " " + String.join(" ", args));
             try {
                 container.start();
-                // Container doesn't have wait() method yet, so we will have to make the http call
-                // ourselves
-                HttpPost httpPost =
-                        new HttpPost(
-                                URI.create(
-                                        baseUri.toString()
-                                                + "/containers/"
-                                                + containerId
-                                                + "/wait"));
-                try {
-                    VerdictLogger.info("Started, now waiting for container to finish: " + containerId);
-                    HttpResponse httpResponse = docker.httpClient().execute(httpPost);
-                    JsonObject waitResult =
-                            Json.createReader(httpResponse.getEntity().getContent()).readObject();
-                    int httpStatus = httpResponse.getStatusLine().getStatusCode();
-                    if (HttpStatus.SC_OK == httpStatus) {
-                        int statusCode = waitResult.getInt("StatusCode");
+                VerdictLogger.info("Started, now waiting for container to finish: " + containerId);
+                int statusCode = container.waitOn(null);
 
-                        // Read and relay all output printed by verdict-bundle to our own stdout
-                        String logs = container.logs().fetch();
-                        // Trim the control characters that the above line currently leaves in the string
-                        logs = trimControlCharacters(logs);
-                        System.out.print(logs);
+                // Read and relay all output printed by verdict-bundle to our own stdout
+                String logs = container.logs().fetch();
+                System.out.print(logs);
 
-                        // Return verdict-bundle's exit code
-                        return statusCode;
-                    } else {
-                        throw new UnexpectedResponseException(
-                                httpPost.getURI().toString(),
-                                httpStatus,
-                                HttpStatus.SC_OK,
-                                waitResult);
-                    }
-                } finally {
-                    httpPost.releaseConnection();
-                }
+                // Return verdict-bundle's exit code
+                return statusCode;
             } finally {
                 // Always remove the container before we return
                 container.remove();
@@ -251,40 +220,13 @@ public class VerdictBundleCommand {
     }
 
     /**
-     * Checks whether the logs have control characters and if so,
-     * trims the first eight characters from each line in the logs and
-     * reassembles the lines.
-     *
-     * @return Logs without control characters beginning each line
-     */
-    private String trimControlCharacters(String logs) {
-        // Check if the logs start with a control character
-        if (!logs.isEmpty() && Character.isISOControl(logs.codePointAt(0))) {
-            // Split the logs at line separators since each line has control characters
-            String[] lines = logs.split("\\R");
-            // Discard the first eight characters from each line
-            for (int i = 0; i < lines.length; i++) {
-                if (lines[i].length() >= 8 && Character.isISOControl(lines[i].codePointAt(0))) {
-                    lines[i] = lines[i].substring(8);
-                }
-            }
-            // Reassemble the lines and return the trimmed logs
-            return String.join("\n", lines);
-        } else {
-            return logs;
-        }
-    }
-
-    /**
      * Runs verdict-bundle jar with java using the Ant Execute task API.
      *
      * @return Exit code from verdict-bundle
      */
     private int runWithJava() {
-        if (OS.equals("osx")) {
-            env("PATH", MAC_PATH);
-        } else if (OS.equals("win") || OS.equals("unknown")) {
-            VerdictLogger.severe("We don't support OS " + OS + " yet!");
+        if (OS.equals("win") || OS.equals("unknown")) {
+            VerdictLogger.severe("We don't have binaries for OS " + OS + ", please run our Docker image instead");
             return 1;
         }
 
@@ -310,6 +252,4 @@ public class VerdictBundleCommand {
                     : (MACHINEOS.startsWith("win")
                             ? "win"
                             : ((MACHINEOS.startsWith("linux") ? "glnx" : "unknown")));
-    // Environment variables
-    static final String MAC_PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
 }

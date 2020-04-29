@@ -16,18 +16,27 @@ let mk_pos = Position.mk_position
 
 type pkg_sec_header_item =
   | ImportedUnits of C.pname list
+  | PackageRename of (C.pid * C.pname * bool)
+  | RenameAll of C.pname
 
 type pkg_sec_body_item =
   | Classifier of A.classifier
   | AnnexLibrary of A.aadl_annex
 
 let mk_package_section header_items body_items =
-  (* No partition of header_items is necessary for now *)
-  let imported_units =
-    header_items |> List.map (fun hi ->
+  let imported_units, renamed_packages =
+    List.fold_left (fun (ius, rps) hi ->
       match hi with
-      | ImportedUnits i_units -> i_units
+      | ImportedUnits i_units -> (i_units :: ius, rps)
+      | RenameAll renamed_package ->
+        let pkg_rename =
+          { A.name = None; A.renamed_package; A.rename_all = true }
+        in
+        (ius, pkg_rename :: rps)
+      | PackageRename (name, renamed_package, rename_all) ->
+        (ius, { A.name = Some name; renamed_package; rename_all } :: rps)
     )
+    ([], []) header_items
   in
   let classifiers, annex_libs =
     List.fold_left (fun (cls, als) bi ->
@@ -39,6 +48,7 @@ let mk_package_section header_items body_items =
   in
   {
     A.imported_units = List.flatten imported_units;
+    A.renamed_packages = List.rev renamed_packages;
     A.classifiers = List.rev classifiers;
     A.annex_libs = List.rev annex_libs;
   }
@@ -47,9 +57,9 @@ let mk_package_section header_items body_items =
 
 %token AADLBOOLEAN AADLSTRING AADLINTEGER AADLREAL ENUMERATION
 %token PROPERTY SET IS APPLIES TO INHERIT EXTENDS
-%token PACKAGE SYSTEM IMPLEMENTATION FEATURES PROPERTIES
+%token PACKAGE SYSTEM ABSTRACT IMPLEMENTATION FEATURES PROPERTIES
 %token SUBCOMPONENTS CONNECTIONS
-%token PUBLIC PRIVATE
+%token PUBLIC PRIVATE RENAMES
 %token TYPE NONE UNITS WITH OUT IN CONSTANT
 %token LIST OF
 %token DATA PORT
@@ -128,11 +138,34 @@ package_section:
   }
 
 package_section_header_item:
-  WITH i_units = separated_nonempty_list(",", imported_unit) ";"
+  | WITH i_units = separated_nonempty_list(",", imported_unit) ";"
   { ImportedUnits i_units }
-  (* INCOMPLETE *)
+  | RENAMES rp = renamed_package ";"
+  { RenameAll rp }
+  | pid = ident RENAMES PACKAGE rpa = renamed_package_opt_all ";"
+  { PackageRename (pid, fst rpa, snd rpa) }
 
 imported_unit: pn = pname { pn } (* aadl2::ModelUnit *)
+
+renamed_package:
+  pid = ident "::" rps = renamed_package_suffix
+  { pid :: rps }
+
+renamed_package_suffix:
+  | (* Empty *) { [] }
+  | ALL { [] }
+  | pid = ident "::" rps = renamed_package_suffix { pid :: rps }
+
+renamed_package_opt_all:
+  pid = ident "::" rpas = renamed_package_opt_all_suffix
+  { (pid :: (fst rpas), snd rpas) }
+
+renamed_package_opt_all_suffix:
+  | (* Empty *) { ([], true) }
+  | ALL { ([], true) }
+  | pid = ident { ([pid], false) }
+  | pid = ident "::" rpas = renamed_package_opt_all_suffix
+    { (pid :: (fst rpas), snd rpas) }
 
 package_section_body_item:
   | c = classifier { Classifier c }
@@ -149,7 +182,7 @@ component_type:
   (* INCOMPLETE *)
 
 system_type:
-  SYSTEM pid = ident
+  system_or_abstract pid = ident
   fs = features_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
@@ -200,7 +233,7 @@ component_implementation:
   (* INCOMPLETE *)
 
 system_implementation:
-  SYSTEM IMPLEMENTATION
+  system_or_abstract IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = system_subcomponents_section
   connections = connections_section
@@ -237,10 +270,11 @@ system_subcomponents_section:
   | { [] }
   | SUBCOMPONENTS NONE ";" { [] }
   | SUBCOMPONENTS subcomps = nonempty_list(system_subcomponents_section_item)
-    { subcomps }
+    { List.filter (fun { A.category } -> A.is_system category) subcomps }
 
 system_subcomponents_section_item:
   | ss = system_subcomponent { ss }
+  | ds = data_subcomponent { ds }
   (* INCOMPLETE *)
 
 data_subcomponents_section:
@@ -262,12 +296,13 @@ data_subcomponent:
   {
     { A.name = pid;
       A.type_ref = type_ref;
+      A.category = A.Data;
       A.properties = prop_assocs;
     }
   }
 
 system_subcomponent:
-  pid = subcomponent_id SYSTEM
+  pid = subcomponent_id system_or_abstract
   type_ref = option(subcomponent_type_ref)
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
@@ -275,6 +310,7 @@ system_subcomponent:
   {
     { A.name = pid;
       A.type_ref = type_ref;
+      A.category = A.System;
       A.properties = prop_assocs;
     }
   }
@@ -578,10 +614,14 @@ metaclass_name:
   | ID {}
 
 core_keyword:
-  | SYSTEM {}
+  | system_or_abstract {}
   | CONNECTIONS {}
   | PORT {}
   (* INCOMPLETE *)
+
+system_or_abstract:
+  | SYSTEM {}
+  | ABSTRACT {}
 
 (*
 qm_reference:
