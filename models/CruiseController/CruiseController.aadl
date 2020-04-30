@@ -11,12 +11,23 @@ public
 	end EventType;
 
 	annex agree {**
-			
-		const MIN_SPEED: real = 25.0;
-		const MAX_SPEED: real = 130.0;
+
+		const PI: real = 3.1416;
+		const ONE_MILE: real = 1609.34; -- meters
+
+		const WHEEL_DIAMETER: real = 0.52; -- meters
+		const K: real = (3600.0/ONE_MILE)*(PI*WHEEL_DIAMETER);
+
+		const MIN_SPEED: real = 25.0; -- mph
+		const MAX_SPEED: real = 130.0; -- mph
+		
+		const MIN_FILTERED_SPEED: real = 20.0; -- mph
+		const MAX_FILTERED_SPEED: real = 140.0; -- mph
+		const FILTER_EXPECTED_DIFFERENCE: real = 10.0; -- mph
+	
 		const SPEED_CHANGE_STEP: real = 1.0;
 		const FORCE_COEFFICIENT: real = 0.1;
-		const K: real = 0.001;
+
 		node ToInt(b: bool) returns (i: int);
 		let
 			i = if b then 1 else 0;
@@ -36,9 +47,20 @@ public
 		let
 		  Y = X -> true;
 		tel;
+		
 		node IsPresent(E:EventType) returns (is_present:bool);
 		let
 			is_present = (E = enum(EventType, PRESENT));
+		tel;
+		
+		node Abs(x:real) returns(y: real);
+		let
+   			y = if (x >= 0.0) then x else -x;
+		tel;
+		
+		node Since(X: bool, Y: bool) returns (Z: bool);
+		let
+			Z = X or (Y and (false -> pre(Z)));
 		tel;
 	**};
 
@@ -149,6 +171,49 @@ public
 		**};
 	end MeasureSpeed;
 
+	system Filter
+		features
+			is_enabled: in data port Base_Types::Boolean;
+			desired_speed: in data port Base_Types::Float;
+			filtered_desired_speed: out data port Base_Types::Float;
+			
+		annex agree {**
+			
+			eq desired_speed_is_valid: bool = desired_speed >= MIN_FILTERED_SPEED and desired_speed <= MAX_FILTERED_SPEED;
+
+			-- Guarantees			
+			guarantee "If filter is not enabled, just relay the desired speed":
+				not is_enabled => filtered_desired_speed = desired_speed;
+			
+			guarantee "If filter is enabled and incomming desired speed is within the expected range, then just relay it to outgoing filtered desired speed":
+				is_enabled => (desired_speed_is_valid => filtered_desired_speed = desired_speed);
+				
+			guarantee "If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range":
+				is_enabled => (desired_speed < MIN_FILTERED_SPEED => filtered_desired_speed = MIN_FILTERED_SPEED);
+			
+			guarantee "If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range":
+				is_enabled => (desired_speed > MAX_FILTERED_SPEED => filtered_desired_speed = MAX_FILTERED_SPEED);
+			
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) <= MAX_FILTERED_SPEED
+					          => filtered_desired_speed = (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE)
+				);
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) > MAX_FILTERED_SPEED
+					          => filtered_desired_speed = MAX_FILTERED_SPEED
+				);	
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) >= MIN_FILTERED_SPEED
+					          => filtered_desired_speed = (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE)
+				);
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) < MIN_FILTERED_SPEED
+					          => filtered_desired_speed = MIN_FILTERED_SPEED
+				);
+		**};
+			
+	end Filter;
+	
 	system CruiseControllerSystem
 		features
 			on_off: in data port Base_Types::Boolean;
@@ -159,6 +224,7 @@ public
 			brake_cancel: in data port Base_Types::Boolean;
 			rotate: in data port EventType;
 			second: in data port EventType;
+			filter_is_enabled: in data port Base_Types::Boolean;
 			force: out data port Base_Types::Float;
 			enabled: out data port Base_Types::Boolean;
 
@@ -176,60 +242,163 @@ public
 			-- Assumptions
 			assume "Buttons are mutually exclusive": 
 					ToInt(on_off) + ToInt(resume_speed) + ToInt(set_speed) + 
-					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;	
+					ToInt(inc) + ToInt(dec) + ToInt(brake_cancel) <= 1;
+					
+			assume "Filter status":
+				    not filter_is_enabled;	 -- enable or disable the filter here
 				
 			-- Properties
 			guarantee "1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed":
 					   enabled => desired_speed >= MIN_SPEED and desired_speed <= MAX_SPEED;
 			
-			guarantee "2. Cruise Controller System is disabled initially":
+			guarantee "2. Cruise Controller System with its filter is enabled only if desired speed is within Cruise Controller filtered minimum and maximun speed":
+					   enabled => desired_speed >= MIN_FILTERED_SPEED and desired_speed <= MAX_FILTERED_SPEED;
+			
+			guarantee "3. Cruise Controller System with its filter is enabled only if difference between two consecutive desired speeds are not greater than the filter expected difference":
+					   disabled or Since(enabled, Abs(desired_speed - pre(desired_speed)) <= FILTER_EXPECTED_DIFFERENCE);
+			
+			guarantee "4. Cruise Controller System is disabled initially":
 					   InitiallyHolds(disabled);
 			
-			guarantee "3. When Cruise Controller System is disabled, the desired speed does not get changed":
+			guarantee "5. When Cruise Controller System is disabled, the desired speed does not get changed":
 					   disabled => UnchangedReal(desired_speed);
 			
-			guarantee "4. When Cruise Controller System is enabled and speed increase request does not exceed the maximum cruise controller speed, the desired speed is then increased accordingly":
+			guarantee "6. When Cruise Controller System is enabled and speed increase request does not exceed the maximum cruise controller speed, the desired speed is then increased accordingly":
 					   true -> enabled and inc and pre(desired_speed) <= (MAX_SPEED - SPEED_CHANGE_STEP) =>
 					   desired_speed = (pre(desired_speed) + SPEED_CHANGE_STEP);	
 			
-			guarantee "5. When Cruise Controller System is enabled and speed decrease request does not make desired speed become less than the minimum cruise controller speed, the desired speed is then decreased accordingly":
+			guarantee "7. When Cruise Controller System is enabled and speed decrease request does not make desired speed become less than the minimum cruise controller speed, the desired speed is then decreased accordingly":
 					   true -> enabled and dec and pre(desired_speed) > (MIN_SPEED + SPEED_CHANGE_STEP) =>
 					   desired_speed = (pre(desired_speed) - SPEED_CHANGE_STEP);	
 			
-			guarantee "6. When Cruise Controller System is enabled and no button is pressed, the desired speed does not get changed":
+			guarantee "8. When Cruise Controller System is enabled and no button is pressed, the desired speed does not get changed":
 					   enabled and no_button_pressed => UnchangedReal(desired_speed);		  
 		
-			guarantee "7. Force is zero if Cruise Controller System is enabled and the desired speed is not greater than the current speed":
+			guarantee "9. Force is zero if Cruise Controller System is enabled and the desired speed is not greater than the current speed":
 						enabled and desired_speed <= speed => force = 0.0;
 			
-			guarantee "8. Force is positive if Cruise Controller System is enabled and the desired speed is greater than the current speed":
+			guarantee "10. Force is positive if Cruise Controller System is enabled and the desired speed is greater than the current speed":
 						enabled and desired_speed > speed => force > 0.0;
 		**};
 	end CruiseControllerSystem;
 	
 	system implementation CruiseControllerSystem.Impl
 		subcomponents
-			measureSpeed: system MeasureSpeed;
-			setSpeed: system SetSpeed;
-			controlSpeed: system ControlSpeed;
+			measureSpeed: system MeasureSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => true;
+			};
+			setSpeed: system SetSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => false;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => false;
+			};
+			controlSpeed: system ControlSpeed
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => true;
+			};
+			filter: system Filter
+			{
+				-- VERDICT Component Properties
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				VERDICT_Properties::adversariallyTested => true;
+			};
 		
 		connections
-			c01: port on_off -> setSpeed.on_off;
-			c02: port resume_speed -> setSpeed.resume_speed;
-			c03: port set_speed -> setSpeed.set_speed;
-			c04: port inc -> setSpeed.inc;
-			c05: port dec -> setSpeed.dec;
-			c06: port brake_cancel -> setSpeed.brake_cancel;
-			c07: port measureSpeed.speed -> setSpeed.speed;
-			c08: port measureSpeed.speed -> controlSpeed.speed;
-			c09: port setSpeed.enabled -> enabled;
-			c10: port setSpeed.desired_speed -> controlSpeed.desired_speed;
-			c11: port controlSpeed.force -> force;
-			c12: port rotate -> measureSpeed.rotate;
-			c13: port second -> measureSpeed.second;
+			c01: port on_off -> setSpeed.on_off
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c02: port resume_speed -> setSpeed.resume_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c03: port set_speed -> setSpeed.set_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c04: port inc -> setSpeed.inc
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c05: port dec -> setSpeed.dec
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c06: port brake_cancel -> setSpeed.brake_cancel
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c07: port measureSpeed.speed -> setSpeed.speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c08: port measureSpeed.speed -> controlSpeed.speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c09: port setSpeed.enabled -> enabled
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c10: port setSpeed.desired_speed -> filter.desired_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+		     	VERDICT_Properties::connectionType => Remote;
+			 	VERDICT_Properties::authenticated => false;
+			 	VERDICT_Properties::encryptedTransmission => false;
+			 	VERDICT_Properties::trustedConnection => false;
+			};
+			c11: port controlSpeed.force -> force
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c12: port rotate -> measureSpeed.rotate
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c13: port second -> measureSpeed.second
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c14: port filter.filtered_desired_speed -> controlSpeed.desired_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			c15: port filter_is_enabled -> filter.is_enabled
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
 			-- Virtual connection for the sake of analysis
-			v01: port setSpeed.desired_speed -> desired_speed;
-			v02: port measureSpeed.speed -> speed;
-	end CruiseControllerSystem.impl;
+			v01: port filter.filtered_desired_speed -> desired_speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+			v02: port measureSpeed.speed -> speed
+			{
+				VERDICT_Properties::flowType => Xdata;
+			};
+	end CruiseControllerSystem.Impl;
 	
 end CruiseController;

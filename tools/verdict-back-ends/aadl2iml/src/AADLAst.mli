@@ -101,8 +101,15 @@ type classifier =
   | ComponentType of component_type
   | ComponentImpl of component_impl
 
+type package_rename = {
+  name: pid option;
+  renamed_package: pname;
+  rename_all: bool;
+}
+
 type package_section = {
   imported_units: pname list;
+  renamed_packages: package_rename list;
   classifiers: classifier list;
   annex_libs: aadl_annex list;
 }
