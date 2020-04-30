@@ -878,35 +878,36 @@ public class VDM2Lustre {
 
         DataType data_type = typeDeclaration.getDefinition();
 
-        RecordType record_type = data_type.getRecordType();
+        if (data_type != null) {
+            RecordType record_type = data_type.getRecordType();
 
-        if (record_type != null) {
-            identifier = identifier + "_Impl";
+            if (record_type != null) {
+                identifier = identifier + "_Impl";
 
-            List<RecordField> record_fields = record_type.getRecordField();
+                List<RecordField> record_fields = record_type.getRecordField();
 
-            for (RecordField record_field : record_fields) {
-                //            String identifier = record_field.getName();
+                for (RecordField record_field : record_fields) {
+                    //            String identifier = record_field.getName();
 
-                data_type = record_field.getType();
-                String user_defined_type = data_type.getUserDefinedType();
+                    data_type = record_field.getType();
+                    String user_defined_type = data_type.getUserDefinedType();
 
-                if (user_defined_type != null) {
-                    user_defined_type = user_defined_type + "_Impl";
-                    for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
-                        if (user_defined_type.equals(type_declaration.getName())) {
-                            data_type.setUserDefinedType(user_defined_type);
+                    if (user_defined_type != null) {
+                        user_defined_type = user_defined_type + "_Impl";
+                        for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
+                            if (user_defined_type.equals(type_declaration.getName())) {
+                                data_type.setUserDefinedType(user_defined_type);
+                            }
                         }
                     }
                 }
+
+                // Updating TypeName_Impl
+                typeDeclaration.setName(identifier);
             }
-
-            // Updating TypeName_Impl
-            typeDeclaration.setName(identifier);
-
-            typeDeclarations.put(identifier, typeDeclaration);
         }
 
+        typeDeclarations.put(identifier, typeDeclaration);
         program.getTypeDeclaration().add(typeDeclaration);
     }
 }
