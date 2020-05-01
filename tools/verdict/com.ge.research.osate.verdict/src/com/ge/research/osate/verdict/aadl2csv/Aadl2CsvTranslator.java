@@ -3,6 +3,7 @@ package com.ge.research.osate.verdict.aadl2csv;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.impl.AbstractSubcomponentImpl;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.DeviceSubcomponentImpl;
@@ -396,6 +397,16 @@ public class Aadl2CsvTranslator {
 							srcCompName = ((AbstractSubcomponent)srcConnContext).getComponentType().getName();
 							srcCompImplName = ((AbstractSubcomponent)srcConnContext).getComponentImplementation() == null? 
 													"":((AbstractSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
+	    				}  else if(srcConnContext instanceof DataSubcomponent) {
+							srcCompCatName = ((DataSubcomponent)srcConnContext).getCategory().getName();						
+							srcCompName = ((DataSubcomponent)srcConnContext).getComponentType().getName();
+							srcCompImplName = ((DataSubcomponent)srcConnContext).getComponentImplementation() == null? 
+													"":((DataSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
+	    				} else if(srcConnContext instanceof ThreadSubcomponent) {
+							srcCompCatName = ((ThreadSubcomponent)srcConnContext).getCategory().getName();						
+							srcCompName = ((ThreadSubcomponent)srcConnContext).getComponentType().getName();
+							srcCompImplName = ((ThreadSubcomponent)srcConnContext).getComponentImplementation() == null? 
+													"":((ThreadSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
 	    				} else {
 	    					throw new RuntimeException("Unsupported AADL component element type: " + srcConnContext);
 	    				}
@@ -423,6 +434,16 @@ public class Aadl2CsvTranslator {
 							destCompName = ((AbstractSubcomponent)destConnContext).getComponentType().getName();
 							destCompImplName = ((AbstractSubcomponent)destConnContext).getComponentImplementation() == null? 
 													"":((AbstractSubcomponent)destConnContext).getComponentImplementation().getName();
+	    				}  else if(destConnContext instanceof DataSubcomponent) {
+							destCompCatName = ((DataSubcomponent)destConnContext).getCategory().getName();
+							destCompName = ((DataSubcomponent)destConnContext).getComponentType().getName();
+							destCompImplName = ((DataSubcomponent)destConnContext).getComponentImplementation() == null? 
+													"":((DataSubcomponent)destConnContext).getComponentImplementation().getName();
+	    				}  else if(destConnContext instanceof ThreadSubcomponent) {
+							destCompCatName = ((ThreadSubcomponent)destConnContext).getCategory().getName();
+							destCompName = ((ThreadSubcomponent)destConnContext).getComponentType().getName();
+							destCompImplName = ((ThreadSubcomponent)destConnContext).getComponentImplementation() == null? 
+													"":((ThreadSubcomponent)destConnContext).getComponentImplementation().getName();
 	    				} else {
 	    					throw new RuntimeException("Unsupported AADL component element type: " + destConnContext);
 	    				}						
