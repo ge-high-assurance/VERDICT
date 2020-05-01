@@ -97,6 +97,8 @@ let get_data_type type_decls = function
       | "float" -> VI.PlainType VI.Real
       | "float_32" -> VI.PlainType VI.Real
       | "float_64" -> VI.PlainType VI.Real
+      | "character" -> VI.PlainType VI.Int
+      | "string" -> VI.PlainType VI.Int
       | _ -> failwith "Unsupported data type found"
     )
     | Some (_, pos) -> VI.UserDefinedType pos
@@ -117,22 +119,40 @@ let get_data_type type_decls = function
     | "base_types::float" -> VI.PlainType VI.Real
     | "base_types::float_32" -> VI.PlainType VI.Real
     | "base_types::float_64" -> VI.PlainType VI.Real
+    | "base_types::character" -> VI.PlainType VI.Int
+    | "base_types::string" -> VI.PlainType VI.Int
     | _ -> failwith "Unsupported data type found" 
   )
 
 let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
     let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
-      match AD.find_assoc data_repr_qpref properties with
-      | None -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
-      | Some {AD.value} -> (
-        match value with
-        | AD.LiteralOrReference (None, (_, id)) when (equal_ids id "Enum") -> (
-          let enumerators = get_enumerators properties in
-          let enum_type = VI.EnumType enumerators in
-          ({VI.name = C.get_id name; VI.definition = Some enum_type}, None)
-        )
-        | _ -> failwith ("Only Enum data definitions are supported by now")
+      match type_extension with
+      | Some _ -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
+      | None -> (
+        let def =
+          match AD.find_assoc data_repr_qpref properties with
+          | None -> None
+          | Some {AD.value} -> (
+            match value with
+            | AD.LiteralOrReference (None, (_, id)) -> (
+              match String.lowercase_ascii id with
+              | "enum" -> (
+                let enumerators = get_enumerators properties in
+                Some (VI.EnumType enumerators)
+              )
+              | "boolean" -> Some (VI.PlainType VI.Bool)
+              | "integer" -> Some (VI.PlainType VI.Int)
+              | "float" -> Some (VI.PlainType VI.Real)
+              | "character" -> Some (VI.PlainType VI.Int)
+              | "string" -> Some (VI.PlainType VI.Int)
+              | "fixed" -> Some (VI.PlainType VI.Real)
+              | _ -> None
+            )
+            | _ -> failwith ("Found unexpected data representation value")
+          )
+        in
+        ({VI.name = C.get_id name; VI.definition = def}, None)
       )
     in
     List.map add_type data_types
