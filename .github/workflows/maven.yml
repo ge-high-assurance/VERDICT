@@ -22,11 +22,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Set up Docker
-      uses: docker/build-push-action@v1
-      with:
-        push: false
     - name: Build with Maven
       run: mvn -B package --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
+    - name: Build Docker container
+      uses: docker/build-push-action@v1
+      with:
+        dockerfile: tools/verdict-back-ends/Dockerfile
+        push: false
