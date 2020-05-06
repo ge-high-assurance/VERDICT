@@ -1,7 +1,6 @@
-# This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# This workflow will build a Verdict project artifacts and Docker containers
 
-name: Java CI with Maven
+name: Verdict project build and test
 
 on:
   push:
@@ -22,12 +21,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Maven
+    - name: Executing Maven build
       run: mvn -B package --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
-    - name: Build Docker container
+    - name: Executing Docker build
       uses: docker/build-push-action@v1
       with:
+        path: tools/verdict-back-ends
         dockerfile: tools/verdict-back-ends/Dockerfile
         push: false
