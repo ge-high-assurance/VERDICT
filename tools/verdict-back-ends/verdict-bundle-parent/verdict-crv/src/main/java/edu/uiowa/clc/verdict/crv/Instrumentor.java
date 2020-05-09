@@ -422,12 +422,9 @@ public class Instrumentor extends VDMInstrumentor {
 
         HashSet<String> components = new HashSet<String>();
 
-        EnumSet<KindOfComponent> lbComponentTypeSet;
-        lbComponentTypeSet = EnumSet.of(KindOfComponent.SOFTWARE, 
-        							    KindOfComponent.SW_HW_HYBRID,
-        							    KindOfComponent.SW_HUMAN_HYBRID,
-        							    KindOfComponent.HYBRID);
-
+        HashSet<String> lbComponentTypeSet = 
+        		new HashSet<String>(Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
+        
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -453,14 +450,72 @@ public class Instrumentor extends VDMInstrumentor {
 
                         componentType = subcomponentImpl.getType();
                     }
+                    
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                    
+                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute = getAttributeByName(attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
+                    GenericAttribute pedigreeAttribute = getAttributeByName(attributeList, "Pedigree");
+                    GenericAttribute supplyChainSecurityAttribute = getAttributeByName(attributeList, "SupplyChainSecurity");
+                    GenericAttribute tamperProtectionAttribute = getAttributeByName(attributeList, "TamperProtection");
+                    GenericAttribute staticCodeAnalysisAttribute = getAttributeByName(attributeList, "StaticCodeAnalysis");
+                    
+                    
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	componentKind = "hybrid";
+                    }
+                    
+                    int adversariallyTestedForTrojanOrLogicBomb;
+                    if (adversariallyTestedForTrojanOrLogicBombAttribute != null) {
+                    	adversariallyTestedForTrojanOrLogicBomb = (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                    }
+                    else {
+                    	adversariallyTestedForTrojanOrLogicBomb = 0;
+                    }
+                    
+                    String pedigree;
+                    if (pedigreeAttribute != null) {
+                    	pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	pedigree = "cots";
+                    }
+                    
+                    int supplyChainSecurity;
+                    if (supplyChainSecurityAttribute != null) {
+                    	supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                    }
+                    else {
+                    	supplyChainSecurity = 0;
+                    }
+                    
+                    int tamperProtection;
+                    if (tamperProtectionAttribute != null) {
+                    	tamperProtection = (int) tamperProtectionAttribute.getValue();
+                    }
+                    else {
+                    	tamperProtection = 0;
+                    }
+                    
+                    int staticCodeAnalysis;
+                    if (staticCodeAnalysisAttribute != null) {
+                    	staticCodeAnalysis = (int) staticCodeAnalysisAttribute.getValue();
+                    }
+                    else {
+                    	staticCodeAnalysis = 0;
+                    }
 
-                    if (lbComponentTypeSet.contains(componentInstance.getComponentKind())
-                    	&& (componentInstance.getPedigree() == PedigreeType.COTS
-                    		|| (componentInstance.getPedigree() == PedigreeType.SOURCED
-                    		    && componentInstance.getSupplyChainSecurityDAL() == 0
-                    		    && componentInstance.getTamperProtectionDAL() == 0))
-                    	    && (componentInstance.getAdversariallyTestedForTrojanOrLogicBombDAL() == 0
-                    	        || componentInstance.getStaticCodeAnalysisDAL() == 0)
+                    if (lbComponentTypeSet.contains(componentKind)
+                    	&& (pedigree.equalsIgnoreCase("cots")
+                    		|| (pedigree.equalsIgnoreCase("sourced")
+                    		    && supplyChainSecurity == 0
+                    		    && tamperProtection == 0))
+                    	    && (adversariallyTestedForTrojanOrLogicBomb == 0
+                    	        || staticCodeAnalysis == 0)
                            ) {
                         // Store component
                         // if (!vdm_components.contains(componentType)) {
@@ -666,12 +721,10 @@ public class Instrumentor extends VDMInstrumentor {
     public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
-
-        EnumSet<KindOfComponent> htComponentTypeSet;
-        htComponentTypeSet = EnumSet.of(KindOfComponent.HARDWARE, 
-        							    KindOfComponent.SW_HW_HYBRID,
-        							    KindOfComponent.HW_HUMAN_HYBRID,
-        							    KindOfComponent.HYBRID);
+        
+        HashSet<String> htComponentTypeSet = 
+        		new HashSet<String>(Arrays.asList("hardware", "swhwhybrid", "hwhumanhybrid", "hybrid"));
+        
 
         BlockImpl blockImpl = null;
 
@@ -687,13 +740,61 @@ public class Instrumentor extends VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     componentType = getType(componentInstance);
+                    
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                    
+                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute = getAttributeByName(attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
+                    GenericAttribute pedigreeAttribute = getAttributeByName(attributeList, "Pedigree");
+                    GenericAttribute supplyChainSecurityAttribute = getAttributeByName(attributeList, "SupplyChainSecurity");
+                    GenericAttribute tamperProtectionAttribute = getAttributeByName(attributeList, "TamperProtection");
+                    
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	componentKind = "hybrid";
+                    }
+                    
+                    int adversariallyTestedForTrojanOrLogicBomb;
+                    if (adversariallyTestedForTrojanOrLogicBombAttribute != null) {
+                    	adversariallyTestedForTrojanOrLogicBomb = (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                    }
+                    else {
+                    	adversariallyTestedForTrojanOrLogicBomb = 0;
+                    }
+                    
+                    String pedigree;
+                    if (pedigreeAttribute != null) {
+                    	pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	pedigree = "cots";
+                    }
+                    
+                    int supplyChainSecurity;
+                    if (supplyChainSecurityAttribute != null) {
+                    	supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                    }
+                    else {
+                    	supplyChainSecurity = 0;
+                    }
+                    
+                    int tamperProtection;
+                    if (tamperProtectionAttribute != null) {
+                    	tamperProtection = (int) tamperProtectionAttribute.getValue();
+                    }
+                    else {
+                    	tamperProtection = 0;
+                    }
 
-                    if (htComponentTypeSet.contains(componentInstance.getComponentKind())
-                    	&& componentInstance.getAdversariallyTestedForTrojanOrLogicBombDAL() == 0
-                    	&& (componentInstance.getPedigree() == PedigreeType.COTS
-                    	    || (componentInstance.getPedigree() == PedigreeType.SOURCED
-                    	        && componentInstance.getSupplyChainSecurityDAL() == 0
-                    	        && componentInstance.getTamperProtectionDAL() == 0))) {
+                    if (htComponentTypeSet.contains(componentKind)
+                    	&& adversariallyTestedForTrojanOrLogicBomb == 0
+                    	&& (pedigree.equalsIgnoreCase("cots")
+                    	    || (pedigree.equalsIgnoreCase("sourced")
+                    	        && supplyChainSecurity == 0
+                    	        && tamperProtection == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
