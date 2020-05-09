@@ -7,12 +7,14 @@
 
     @author: William D. Smith
     @author: M. Fareed Arif
+    @author: Daniel Yahyazadeh
 */
 
 package edu.uiowa.clc.verdict.crv;
 
 import edu.uiowa.clc.verdict.vdm.instrumentor.VDMInstrumentor;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+
+import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.BlockImpl;
 import verdict.vdm.vdm_model.CompInstancePort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -245,13 +249,30 @@ public class Instrumentor extends VDMInstrumentor {
 
         return attack_type;
     }
+    
+    protected GenericAttribute getAttributeByName(List<GenericAttribute> genericAttributes, String attributeName) {
+        GenericAttribute genericAttribute = null;
+
+        for (GenericAttribute attribute : genericAttributes) {
+            if (attributeName.equalsIgnoreCase(attribute.getName())) {
+            	genericAttribute = attribute;
+                break;
+            }
+        }
+
+        return genericAttribute;
+    }
+    
     // LS:
-    // - Select all components in the model M such that:
-    // c.Component-Group = 'GPS' v 'IMU' v 'LIDAR'
+    // - Select all components c in C such that:
+    // c.category = GPS or c.category = IMU or c.category = LIDAR or c.category = LOCATION_DEVICE
     @Override
     public void locationSpoofing(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
+        
+        HashSet<String> locIdentificationDeviceSet = 
+        		new HashSet<String>(Arrays.asList("gps", "dme_vor", "iru", "lidar", "imu"));
 
         BlockImpl blockImpl = null;
 
@@ -278,18 +299,18 @@ public class Instrumentor extends VDMInstrumentor {
 
                         componentType = subcomponentImpl.getType();
                     }
+                    
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                    
+                    GenericAttribute componentCategoryAttribute = getAttributeByName(attributeList, "Category");
 
-                    String component_group = componentInstance.getCategory();
-                    if (component_group == null) {
-                        component_group = "";
-                    }
-
-                    if (component_group.equals("GPS")
-                            || component_group.equals("DME_VOR")
-                            || component_group.equals("IRU")) {
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
-                    }
+                    if (componentCategoryAttribute != null) {
+                    	String componentCategory = (String) componentCategoryAttribute.getValue();
+                    	if (locIdentificationDeviceSet.contains(componentCategory.toLowerCase())) {
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
+                        }
+					}
                 }
             }
         }
@@ -303,6 +324,10 @@ public class Instrumentor extends VDMInstrumentor {
     // - Select all channels ch in the model M such that:
     // ch.ConnectionType = Remote & ch.Connection-Encrypted = False &
     // ch.Connection-Authentication = False
+    //
+    // - Select all channels ch in CH such that:
+    // (ch.start.insideTrustedBoundary = false and ch.connectionType = Remote)
+    // and ((ch.deviceAuthentication = 0 and ch.sessionAuthenticity = 0) or ch.start.strongCryptoAlgorithms = 0)
     @Override
     public void networkInjection(HashSet<Connection> vdm_links) {
 
@@ -388,21 +413,20 @@ public class Instrumentor extends VDMInstrumentor {
     }
 
     // LB:
-    // - Select components c in the model M such that:
-    // c.ComponentType = 'Software' v c.ComponentType = 'Hybrid' & c.Manufacturer =
-    // 'ThirdParty'
+    // - Select components c in C such that:
+    // c.ComponentType is in {Software, SwHwHybrid, SwHumanHybrid, Hybrid}
+    // and (c.pedigree = COTS and (c.pedigree = Sourced and c.supplyChainSecurity = 0 and c.tamperProtection = 0))
+    // and (c.adversariallyTestedForTrojanOrLogicBomb = 0 or C.staticCodeAnalysis = 0)
     @Override
     public void logicBomb(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
 
-        // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        EnumSet<KindOfComponent> lbComponentTypeSet;
+        lbComponentTypeSet = EnumSet.of(KindOfComponent.SOFTWARE, 
+        							    KindOfComponent.SW_HW_HYBRID,
+        							    KindOfComponent.SW_HUMAN_HYBRID,
+        							    KindOfComponent.HYBRID);
 
         BlockImpl blockImpl = null;
 
@@ -420,11 +444,6 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-
-                    PedigreeType pedgree = componentInstance.getPedigree();
                     // Option 1) Specification
                     if (componentType != null) {
 
@@ -435,16 +454,14 @@ public class Instrumentor extends VDMInstrumentor {
                         componentType = subcomponentImpl.getType();
                     }
 
-                    boolean comp_cond_3 = false;
-
-                    if (componentInstance.isAdversariallyTested() != null) {
-                        comp_cond_3 = componentInstance.isAdversariallyTested();
-                    }
-
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)
-                            && !comp_cond_3) {
+                    if (lbComponentTypeSet.contains(componentInstance.getComponentKind())
+                    	&& (componentInstance.getPedigree() == PedigreeType.COTS
+                    		|| (componentInstance.getPedigree() == PedigreeType.SOURCED
+                    		    && componentInstance.getSupplyChainSecurityDAL() == 0
+                    		    && componentInstance.getTamperProtectionDAL() == 0))
+                    	    && (componentInstance.getAdversariallyTestedForTrojanOrLogicBombDAL() == 0
+                    	        || componentInstance.getStaticCodeAnalysisDAL() == 0)
+                           ) {
                         // Store component
                         // if (!vdm_components.contains(componentType)) {
                         vdm_components.add(componentType);
@@ -641,20 +658,20 @@ public class Instrumentor extends VDMInstrumentor {
     }
 
     // HT
-    // - Select all components c in the model M that meet condition:
-    // ComponentKind = Hardware v Hybrid and manufacturer = ThirdParty
+    // - Select all components c in C such that:
+    // c.ComponentKind is in {Hardware, SwHwHybrid, HwHumanHybrid, Hybrid} 
+    // and c.adversariallyTestedForTrojanOrLogicBomb = 0 
+    // and (c.pedigree = COTS or (c.pedigree = Sourced and c.supplyChainSecurity = 0 and c.tamperProtection = 0))
     @Override
     public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
 
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HARDWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        EnumSet<KindOfComponent> htComponentTypeSet;
+        htComponentTypeSet = EnumSet.of(KindOfComponent.HARDWARE, 
+        							    KindOfComponent.SW_HW_HYBRID,
+        							    KindOfComponent.HW_HUMAN_HYBRID,
+        							    KindOfComponent.HYBRID);
 
         BlockImpl blockImpl = null;
 
@@ -669,17 +686,14 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-
-                    PedigreeType pedgree = componentInstance.getPedigree();
-
                     componentType = getType(componentInstance);
 
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
+                    if (htComponentTypeSet.contains(componentInstance.getComponentKind())
+                    	&& componentInstance.getAdversariallyTestedForTrojanOrLogicBombDAL() == 0
+                    	&& (componentInstance.getPedigree() == PedigreeType.COTS
+                    	    || (componentInstance.getPedigree() == PedigreeType.SOURCED
+                    	        && componentInstance.getSupplyChainSecurityDAL() == 0
+                    	        && componentInstance.getTamperProtectionDAL() == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
@@ -695,15 +709,19 @@ public class Instrumentor extends VDMInstrumentor {
     }
 
     // OT
-    // - Select all components c in the model M that meet condition:
-    // ComponentKind = Human and c.InsideTrustedBoundary = False
+    // - Select all components c in C such that:
+    // c.componentType is in {Human, SwHumanHybrid, Hybrid, HwHumanHybrid}
+    // and c.insideTrustBoundary = false and c.physicalAccessControl = 0
+    // and (c.logging = 0 and (c.systemAccessControl = 0 and c.userAuthentication = 0))
     @Override
     public void outsiderThreat(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
 
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
-        boolean boundary_cond = false;
+        HashSet<String> otComponentTypeSet = 
+        		new HashSet<String>(Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+        
+        
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -717,12 +735,71 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
                     componentType = getType(componentInstance);
+                    
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                    
+                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute insideTrustedBoundaryAttribute = getAttributeByName(attributeList, "InsideTrustedBoundary");
+                    GenericAttribute physicalAccessControlAttribute = getAttributeByName(attributeList, "PhysicalAccessControl");
+                    GenericAttribute loggingAttribute = getAttributeByName(attributeList, "Logging");
+                    GenericAttribute systemAccessControlAttribute = getAttributeByName(attributeList, "SystemAccessControl");
+                    GenericAttribute userAuthenticationAttribute = getAttributeByName(attributeList, "UserAuthentication");
+                    
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	componentKind = "hybrid";
+                    }
+                    
+                    Boolean insideTrustedBoundary;
+                    if (insideTrustedBoundaryAttribute != null) {
+                    	insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                    }
+                    else {
+                    	insideTrustedBoundary = false;
+                    }
+                    
+                    int physicalAccessControl;
+                    if (physicalAccessControlAttribute != null) {
+                    	physicalAccessControl = (int) physicalAccessControlAttribute.getValue();
+                    }
+                    else {
+                    	physicalAccessControl = 0;
+                    }
+                    
+                    int logging;
+                    if (loggingAttribute != null) {
+                    	logging = (int) loggingAttribute.getValue();
+                    }
+                    else {
+                    	logging = 0;
+                    }
+                    
+                    int systemAccessControl;
+                    if (systemAccessControlAttribute != null) {
+                    	systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                    }
+                    else {
+                    	systemAccessControl = 0;
+                    }
+                    
+                    int userAuthentication;
+                    if (userAuthenticationAttribute != null) {
+                    	userAuthentication = (int) userAuthenticationAttribute.getValue();
+                    }
+                    else {
+                    	userAuthentication = 0;
+                    }
 
-                    if (kind_of_component == component_kind_cond_1
-                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
+                    if (otComponentTypeSet.contains(componentKind)
+                            && !insideTrustedBoundary
+                            && physicalAccessControl == 0
+                            && (logging == 0
+                                && (systemAccessControl == 0
+                                    || userAuthentication == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
@@ -737,15 +814,18 @@ public class Instrumentor extends VDMInstrumentor {
     }
 
     // IT
-    // - Select all components c in the model M that meet condition:
-    // ComponentKind = Human and c.InsideTrustedBoundary = True
+    // - Select all components c in C such that:
+    // c.componentType in {Human, SwHumanHybrid, HwHumanHybrid, Hybrid}
+    // and c.insideTrustBoundary = true 
+    // and (c.logging = 0 and (c.systemAccessControl = 0 or c.userAuthentication = 0))
     @Override
     public void insiderThreat(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
-
-        KindOfComponent component_kind_cond_1 = KindOfComponent.HUMAN;
-        boolean boundary_cond = true;
+        
+        HashSet<String> itComponentTypeSet = 
+        		new HashSet<String>(Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+        
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -759,12 +839,62 @@ public class Instrumentor extends VDMInstrumentor {
 
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
                     componentType = getType(componentInstance);
-
-                    if (kind_of_component == component_kind_cond_1
-                            && componentInstance.isInsideTrustedBoundary() == boundary_cond) {
+                    
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                    
+                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute insideTrustedBoundaryAttribute = getAttributeByName(attributeList, "InsideTrustedBoundary");
+                    GenericAttribute loggingAttribute = getAttributeByName(attributeList, "Logging");
+                    GenericAttribute systemAccessControlAttribute = getAttributeByName(attributeList, "SystemAccessControl");
+                    GenericAttribute userAuthenticationAttribute = getAttributeByName(attributeList, "UserAuthentication");
+                    
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    }
+                    else {
+                    	componentKind = "hybrid";
+                    }
+                    
+                    Boolean insideTrustedBoundary;
+                    if (insideTrustedBoundaryAttribute != null) {
+                    	insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                    }
+                    else {
+                    	insideTrustedBoundary = false;
+                    }
+                    
+                    int logging;
+                    if (loggingAttribute != null) {
+                    	logging = (int) loggingAttribute.getValue();
+                    }
+                    else {
+                    	logging = 0;
+                    }
+                    
+                    int systemAccessControl;
+                    if (systemAccessControlAttribute != null) {
+                    	systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                    }
+                    else {
+                    	systemAccessControl = 0;
+                    }
+                    
+                    int userAuthentication;
+                    if (userAuthenticationAttribute != null) {
+                    	userAuthentication = (int) userAuthenticationAttribute.getValue();
+                    }
+                    else {
+                    	userAuthentication = 0;
+                    }
+                    
+                    
+                    if (itComponentTypeSet.contains(componentKind)
+                            && insideTrustedBoundary
+                            && (logging == 0
+                                && (systemAccessControl == 0
+                                    || userAuthentication == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
