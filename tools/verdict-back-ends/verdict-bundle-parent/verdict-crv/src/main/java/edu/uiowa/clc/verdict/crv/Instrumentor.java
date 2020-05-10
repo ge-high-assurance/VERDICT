@@ -14,7 +14,6 @@ package edu.uiowa.clc.verdict.crv;
 
 import edu.uiowa.clc.verdict.vdm.instrumentor.VDMInstrumentor;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.BlockImpl;
 import verdict.vdm.vdm_model.CompInstancePort;
@@ -31,10 +29,7 @@ import verdict.vdm.vdm_model.ComponentInstance;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Connection;
 import verdict.vdm.vdm_model.ConnectionEnd;
-import verdict.vdm.vdm_model.ConnectionType;
-import verdict.vdm.vdm_model.KindOfComponent;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.PedigreeType;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
 
@@ -249,20 +244,21 @@ public class Instrumentor extends VDMInstrumentor {
 
         return attack_type;
     }
-    
-    protected GenericAttribute getAttributeByName(List<GenericAttribute> genericAttributes, String attributeName) {
+
+    protected GenericAttribute getAttributeByName(
+            List<GenericAttribute> genericAttributes, String attributeName) {
         GenericAttribute genericAttribute = null;
 
         for (GenericAttribute attribute : genericAttributes) {
             if (attributeName.equalsIgnoreCase(attribute.getName())) {
-            	genericAttribute = attribute;
+                genericAttribute = attribute;
                 break;
             }
         }
 
         return genericAttribute;
     }
-    
+
     // LS:
     // - Select all components c in C such that:
     // c.category = GPS or c.category = IMU or c.category = LIDAR or c.category = LOCATION_DEVICE
@@ -270,9 +266,9 @@ public class Instrumentor extends VDMInstrumentor {
     public void locationSpoofing(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
-        
-        HashSet<String> locIdentificationDeviceSet = 
-        		new HashSet<String>(Arrays.asList("gps", "dme_vor", "iru", "lidar", "imu"));
+
+        HashSet<String> locIdentificationDeviceSet =
+                new HashSet<String>(Arrays.asList("gps", "dme_vor", "iru", "lidar", "imu"));
 
         BlockImpl blockImpl = null;
 
@@ -299,18 +295,19 @@ public class Instrumentor extends VDMInstrumentor {
 
                         componentType = subcomponentImpl.getType();
                     }
-                    
+
                     List<GenericAttribute> attributeList = componentInstance.getAttribute();
-                    
-                    GenericAttribute componentCategoryAttribute = getAttributeByName(attributeList, "Category");
+
+                    GenericAttribute componentCategoryAttribute =
+                            getAttributeByName(attributeList, "Category");
 
                     if (componentCategoryAttribute != null) {
-                    	String componentCategory = (String) componentCategoryAttribute.getValue();
-                    	if (locIdentificationDeviceSet.contains(componentCategory.toLowerCase())) {
+                        String componentCategory = (String) componentCategoryAttribute.getValue();
+                        if (locIdentificationDeviceSet.contains(componentCategory.toLowerCase())) {
                             vdm_components.add(componentType);
                             components.add(componentType.getId());
                         }
-					}
+                    }
                 }
             }
         }
@@ -327,7 +324,8 @@ public class Instrumentor extends VDMInstrumentor {
     //
     // - Select all channels ch in CH such that:
     // (ch.start.insideTrustedBoundary = false and ch.connectionType = Remote)
-    // and ((ch.deviceAuthentication = 0 and ch.sessionAuthenticity = 0) or ch.start.strongCryptoAlgorithms = 0)
+    // and ((ch.deviceAuthentication = 0 and ch.sessionAuthenticity = 0) or
+    // ch.start.strongCryptoAlgorithms = 0)
     @Override
     public void networkInjection(HashSet<Connection> vdm_links) {
 
@@ -341,21 +339,75 @@ public class Instrumentor extends VDMInstrumentor {
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
             blockImpl = componentImpl.getBlockImpl();
+
             // BlockImpl
             if (blockImpl != null) {
 
                 // Selection channels (Authentication = OFF & DataEncrypted = OFF)
                 for (Connection connection : blockImpl.getConnection()) {
-                    // visit(connection, instrumented_channel);
-                    ConnectionType con_type = connection.getConnType();
 
-                    if (con_type == ConnectionType.REMOTE
-                            && connection.isEncryptedTransmission() == data_encryption
-                            && connection.isAuthenticated() == authentication) {
+                    ComponentInstance sourceComponent =
+                            connection.getSource().getSubcomponentPort().getSubcomponent();
 
-                        // selected_channels.add(connection);
-                        // LOGGER.info("(" + connection_index++ + ") " +
-                        // connection.getName());
+                    List<GenericAttribute> sourceComponentAttributeList =
+                            sourceComponent.getAttribute();
+
+                    GenericAttribute insideTrustedBoundaryAttribute =
+                            getAttributeByName(
+                                    sourceComponentAttributeList, "InsideTrustedBoundary");
+                    GenericAttribute strongCryptoAlgorithmsAttribute =
+                            getAttributeByName(
+                                    sourceComponentAttributeList, "StrongCryptoAlgorithms");
+
+                    Boolean insideTrustedBoundary;
+                    if (insideTrustedBoundaryAttribute != null) {
+                        insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                    } else {
+                        insideTrustedBoundary = false;
+                    }
+
+                    int strongCryptoAlgorithms;
+                    if (strongCryptoAlgorithmsAttribute != null) {
+                        strongCryptoAlgorithms = (int) strongCryptoAlgorithmsAttribute.getValue();
+                    } else {
+                        strongCryptoAlgorithms = 0;
+                    }
+
+                    List<GenericAttribute> connectionAttributeList = connection.getAttribute();
+
+                    GenericAttribute connectionTypeAttribute =
+                            getAttributeByName(connectionAttributeList, "ConnectionType");
+                    GenericAttribute deviceAuthenticationAttribute =
+                            getAttributeByName(connectionAttributeList, "DeviceAuthentication");
+                    GenericAttribute sessionAuthenticityAttribute =
+                            getAttributeByName(connectionAttributeList, "SessionAuthenticity");
+
+                    String connectionType;
+                    if (connectionTypeAttribute != null) {
+                        connectionType =
+                                ((String) connectionTypeAttribute.getValue()).toLowerCase();
+                    } else {
+                        connectionType = "remote";
+                    }
+
+                    int deviceAuthentication;
+                    if (deviceAuthenticationAttribute != null) {
+                        deviceAuthentication = (int) deviceAuthenticationAttribute.getValue();
+                    } else {
+                        deviceAuthentication = 0;
+                    }
+
+                    int sessionAuthenticity;
+                    if (sessionAuthenticityAttribute != null) {
+                        sessionAuthenticity = (int) sessionAuthenticityAttribute.getValue();
+                    } else {
+                        sessionAuthenticity = 0;
+                    }
+
+                    if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("remote"))
+                            && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
+                                    || strongCryptoAlgorithms == 0)) {
+
                         vdm_links.add(connection);
                         links.add(connection.getName());
                     }
@@ -415,16 +467,18 @@ public class Instrumentor extends VDMInstrumentor {
     // LB:
     // - Select components c in C such that:
     // c.ComponentType is in {Software, SwHwHybrid, SwHumanHybrid, Hybrid}
-    // and (c.pedigree = COTS and (c.pedigree = Sourced and c.supplyChainSecurity = 0 and c.tamperProtection = 0))
+    // and (c.pedigree = COTS and (c.pedigree = Sourced and c.supplyChainSecurity = 0 and
+    // c.tamperProtection = 0))
     // and (c.adversariallyTestedForTrojanOrLogicBomb = 0 or C.staticCodeAnalysis = 0)
     @Override
     public void logicBomb(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> lbComponentTypeSet = 
-        		new HashSet<String>(Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
-        
+        HashSet<String> lbComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
+
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -450,73 +504,73 @@ public class Instrumentor extends VDMInstrumentor {
 
                         componentType = subcomponentImpl.getType();
                     }
-                    
+
                     List<GenericAttribute> attributeList = componentInstance.getAttribute();
-                    
-                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
-                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute = getAttributeByName(attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
-                    GenericAttribute pedigreeAttribute = getAttributeByName(attributeList, "Pedigree");
-                    GenericAttribute supplyChainSecurityAttribute = getAttributeByName(attributeList, "SupplyChainSecurity");
-                    GenericAttribute tamperProtectionAttribute = getAttributeByName(attributeList, "TamperProtection");
-                    GenericAttribute staticCodeAnalysisAttribute = getAttributeByName(attributeList, "StaticCodeAnalysis");
-                    
-                    
+
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
+                            getAttributeByName(
+                                    attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
+                    GenericAttribute pedigreeAttribute =
+                            getAttributeByName(attributeList, "Pedigree");
+                    GenericAttribute supplyChainSecurityAttribute =
+                            getAttributeByName(attributeList, "SupplyChainSecurity");
+                    GenericAttribute tamperProtectionAttribute =
+                            getAttributeByName(attributeList, "TamperProtection");
+                    GenericAttribute staticCodeAnalysisAttribute =
+                            getAttributeByName(attributeList, "StaticCodeAnalysis");
+
                     String componentKind;
                     if (componentKindAttribute != null) {
-                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
                     }
-                    else {
-                    	componentKind = "hybrid";
-                    }
-                    
+
                     int adversariallyTestedForTrojanOrLogicBomb;
                     if (adversariallyTestedForTrojanOrLogicBombAttribute != null) {
-                    	adversariallyTestedForTrojanOrLogicBomb = (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                        adversariallyTestedForTrojanOrLogicBomb =
+                                (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                    } else {
+                        adversariallyTestedForTrojanOrLogicBomb = 0;
                     }
-                    else {
-                    	adversariallyTestedForTrojanOrLogicBomb = 0;
-                    }
-                    
+
                     String pedigree;
                     if (pedigreeAttribute != null) {
-                    	pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                        pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                    } else {
+                        pedigree = "cots";
                     }
-                    else {
-                    	pedigree = "cots";
-                    }
-                    
+
                     int supplyChainSecurity;
                     if (supplyChainSecurityAttribute != null) {
-                    	supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                        supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                    } else {
+                        supplyChainSecurity = 0;
                     }
-                    else {
-                    	supplyChainSecurity = 0;
-                    }
-                    
+
                     int tamperProtection;
                     if (tamperProtectionAttribute != null) {
-                    	tamperProtection = (int) tamperProtectionAttribute.getValue();
+                        tamperProtection = (int) tamperProtectionAttribute.getValue();
+                    } else {
+                        tamperProtection = 0;
                     }
-                    else {
-                    	tamperProtection = 0;
-                    }
-                    
+
                     int staticCodeAnalysis;
                     if (staticCodeAnalysisAttribute != null) {
-                    	staticCodeAnalysis = (int) staticCodeAnalysisAttribute.getValue();
-                    }
-                    else {
-                    	staticCodeAnalysis = 0;
+                        staticCodeAnalysis = (int) staticCodeAnalysisAttribute.getValue();
+                    } else {
+                        staticCodeAnalysis = 0;
                     }
 
                     if (lbComponentTypeSet.contains(componentKind)
-                    	&& (pedigree.equalsIgnoreCase("cots")
-                    		|| (pedigree.equalsIgnoreCase("sourced")
-                    		    && supplyChainSecurity == 0
-                    		    && tamperProtection == 0))
-                    	    && (adversariallyTestedForTrojanOrLogicBomb == 0
-                    	        || staticCodeAnalysis == 0)
-                           ) {
+                            && (pedigree.equalsIgnoreCase("cots")
+                                    || (pedigree.equalsIgnoreCase("sourced")
+                                            && supplyChainSecurity == 0
+                                            && tamperProtection == 0))
+                            && (adversariallyTestedForTrojanOrLogicBomb == 0
+                                    || staticCodeAnalysis == 0)) {
                         // Store component
                         // if (!vdm_components.contains(componentType)) {
                         vdm_components.add(componentType);
@@ -543,13 +597,9 @@ public class Instrumentor extends VDMInstrumentor {
 
         HashSet<String> components = new HashSet<String>();
 
-        // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
-        //        ManufacturerType manufacturer_cond = ManufacturerType.THIRD_PARTY;
-
-        PedigreeType pedigree_cond1 = PedigreeType.COTS;
-        PedigreeType pedigree_cond2 = PedigreeType.SOURCED;
+        HashSet<String> svComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
 
         BlockImpl blockImpl = null;
 
@@ -567,12 +617,6 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-                    //                    ManufacturerType manufacturer =
-                    // componentInstance.getManufacturer();
-
-                    PedigreeType pedgree = componentInstance.getPedigree();
-
                     // Option 1) Specification
                     if (componentType != null) {
 
@@ -583,39 +627,191 @@ public class Instrumentor extends VDMInstrumentor {
                         componentType = subcomponentImpl.getType();
                     }
 
-                    if ((kind_of_component == component_kind_cond_1
-                                    || kind_of_component == component_kind_cond_2)
-                            && (pedgree == pedigree_cond1 || pedgree == pedigree_cond2)) {
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                        // Port
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute staticCodeAnalysisAttribute =
+                            getAttributeByName(attributeList, "StaticCodeAnalysis");
+                    GenericAttribute inputValidationAttribute =
+                            getAttributeByName(attributeList, "InputValidation");
+                    GenericAttribute memoryProtectionAttribute =
+                            getAttributeByName(attributeList, "MemoryProtection");
+                    GenericAttribute secureBootAttribute =
+                            getAttributeByName(attributeList, "SecureBoot");
+
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
+                    }
+
+                    int staticCodeAnalysis;
+                    if (staticCodeAnalysisAttribute != null) {
+                        staticCodeAnalysis = (int) staticCodeAnalysisAttribute.getValue();
+                    } else {
+                        staticCodeAnalysis = 0;
+                    }
+
+                    int inputValidation;
+                    if (inputValidationAttribute != null) {
+                        inputValidation = (int) inputValidationAttribute.getValue();
+                    } else {
+                        inputValidation = 0;
+                    }
+
+                    int memoryProtection;
+                    if (memoryProtectionAttribute != null) {
+                        memoryProtection = (int) memoryProtectionAttribute.getValue();
+                    } else {
+                        memoryProtection = 0;
+                    }
+
+                    int secureBoot;
+                    if (secureBootAttribute != null) {
+                        secureBoot = (int) secureBootAttribute.getValue();
+                    } else {
+                        secureBoot = 0;
+                    }
+
+                    if (svComponentTypeSet.contains(componentKind.toLowerCase())
+                            && (staticCodeAnalysis == 0
+                                    || inputValidation == 0
+                                    || memoryProtection == 0
+                                    || secureBoot == 0)) {
+
+                        Boolean hasEligibleIncomingChannels = false;
+
                         for (Port port : componentType.getPort()) {
-                            // System.out.print("(" + port_index + ") ");
 
                             PortMode mode = port.getMode();
                             if (mode == PortMode.IN) {
-                                // Google code style intent add error here.
-                                for (Connection con : blockImpl.getConnection()) {
 
-                                    ConnectionType con_type = con.getConnType();
+                                for (Connection connection : blockImpl.getConnection()) {
 
-                                    if (con_type == ConnectionType.REMOTE) {
+                                    ComponentInstance sourceComponent =
+                                            connection
+                                                    .getSource()
+                                                    .getSubcomponentPort()
+                                                    .getSubcomponent();
 
-                                        ConnectionEnd src_con = con.getSource();
-                                        Port src_port = src_con.getComponentPort();
+                                    List<GenericAttribute> sourceComponentAttributeList =
+                                            sourceComponent.getAttribute();
 
-                                        if (src_port == null) {
-                                            CompInstancePort compPort =
-                                                    src_con.getSubcomponentPort();
-                                            src_port = compPort.getPort();
-                                        }
+                                    GenericAttribute sourceComponentInsideTrustedBoundaryAttribute =
+                                            getAttributeByName(
+                                                    sourceComponentAttributeList,
+                                                    "InsideTrustedBoundary");
+                                    GenericAttribute sourceComponentComponentKindAttribute =
+                                            getAttributeByName(attributeList, "ComponentType");
+                                    GenericAttribute sourceComponentPedigreeAttribute =
+                                            getAttributeByName(attributeList, "Pedigree");
+                                    GenericAttribute
+                                            sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                    getAttributeByName(
+                                                            sourceComponentAttributeList,
+                                                            "StrongCryptoAlgorithms");
 
-                                        if (port == src_port) {
-                                            vdm_components.add(componentType);
-                                            components.add(componentType.getId());
-                                        }
+                                    Boolean scInsideTrustedBoundary;
+                                    if (sourceComponentInsideTrustedBoundaryAttribute != null) {
+                                        scInsideTrustedBoundary =
+                                                (Boolean)
+                                                        sourceComponentInsideTrustedBoundaryAttribute
+                                                                .getValue();
+                                    } else {
+                                        scInsideTrustedBoundary = false;
+                                    }
+
+                                    String scComponentKind;
+                                    if (sourceComponentComponentKindAttribute != null) {
+                                        scComponentKind =
+                                                ((String)
+                                                                sourceComponentComponentKindAttribute
+                                                                        .getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        scComponentKind = "hybrid";
+                                    }
+
+                                    String scPedigree;
+                                    if (sourceComponentPedigreeAttribute != null) {
+                                        scPedigree =
+                                                ((String)
+                                                                sourceComponentPedigreeAttribute
+                                                                        .getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        scPedigree = "cots";
+                                    }
+
+                                    int scStrongCryptoAlgorithms;
+                                    if (sourceComponentStrongCryptoAlgorithmsAttribute != null) {
+                                        scStrongCryptoAlgorithms =
+                                                (int)
+                                                        sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                .getValue();
+                                    } else {
+                                        scStrongCryptoAlgorithms = 0;
+                                    }
+
+                                    List<GenericAttribute> connectionAttributeList =
+                                            connection.getAttribute();
+
+                                    GenericAttribute connectionTypeAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList, "ConnectionType");
+                                    GenericAttribute deviceAuthenticationAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList,
+                                                    "DeviceAuthentication");
+                                    GenericAttribute sessionAuthenticityAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList, "SessionAuthenticity");
+
+                                    String connectionType;
+                                    if (connectionTypeAttribute != null) {
+                                        connectionType =
+                                                ((String) connectionTypeAttribute.getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        connectionType = "remote";
+                                    }
+
+                                    int deviceAuthentication;
+                                    if (deviceAuthenticationAttribute != null) {
+                                        deviceAuthentication =
+                                                (int) deviceAuthenticationAttribute.getValue();
+                                    } else {
+                                        deviceAuthentication = 0;
+                                    }
+
+                                    int sessionAuthenticity;
+                                    if (sessionAuthenticityAttribute != null) {
+                                        sessionAuthenticity =
+                                                (int) sessionAuthenticityAttribute.getValue();
+                                    } else {
+                                        sessionAuthenticity = 0;
+                                    }
+
+                                    if ((!scInsideTrustedBoundary
+                                                    || connectionType.equalsIgnoreCase("local"))
+                                            && !scComponentKind.equalsIgnoreCase("hardware")
+                                            && (scPedigree.equalsIgnoreCase("cots")
+                                                    || ((deviceAuthentication == 0
+                                                                    && sessionAuthenticity == 0)
+                                                            || scStrongCryptoAlgorithms == 0))) {
+
+                                        hasEligibleIncomingChannels = true;
+                                        break;
                                     }
                                 }
                             }
+                        }
+
+                        if (hasEligibleIncomingChannels) {
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
                         }
                     }
                 }
@@ -637,9 +833,9 @@ public class Instrumentor extends VDMInstrumentor {
 
         HashSet<String> components = new HashSet<String>();
 
-        // Conditions
-        KindOfComponent component_kind_cond_1 = KindOfComponent.SOFTWARE;
-        KindOfComponent component_kind_cond_2 = KindOfComponent.HYBRID;
+        HashSet<String> rciComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
 
         BlockImpl blockImpl = null;
 
@@ -657,8 +853,6 @@ public class Instrumentor extends VDMInstrumentor {
                     componentType = componentInstance.getSpecification();
                     ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    KindOfComponent kind_of_component = componentInstance.getComponentKind();
-
                     // Option 1) Specification
                     if (componentType != null) {
 
@@ -669,38 +863,181 @@ public class Instrumentor extends VDMInstrumentor {
                         componentType = subcomponentImpl.getType();
                     }
 
-                    if ((kind_of_component == component_kind_cond_1
-                            || kind_of_component == component_kind_cond_2)) {
+                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                        // Port
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute staticCodeAnalysisAttribute =
+                            getAttributeByName(attributeList, "StaticCodeAnalysis");
+                    GenericAttribute inputValidationAttribute =
+                            getAttributeByName(attributeList, "InputValidation");
+                    GenericAttribute memoryProtectionAttribute =
+                            getAttributeByName(attributeList, "MemoryProtection");
+
+                    String componentKind;
+                    if (componentKindAttribute != null) {
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
+                    }
+
+                    int staticCodeAnalysis;
+                    if (staticCodeAnalysisAttribute != null) {
+                        staticCodeAnalysis = (int) staticCodeAnalysisAttribute.getValue();
+                    } else {
+                        staticCodeAnalysis = 0;
+                    }
+
+                    int inputValidation;
+                    if (inputValidationAttribute != null) {
+                        inputValidation = (int) inputValidationAttribute.getValue();
+                    } else {
+                        inputValidation = 0;
+                    }
+
+                    int memoryProtection;
+                    if (memoryProtectionAttribute != null) {
+                        memoryProtection = (int) memoryProtectionAttribute.getValue();
+                    } else {
+                        memoryProtection = 0;
+                    }
+
+                    if (rciComponentTypeSet.contains(componentKind.toLowerCase())
+                            && (staticCodeAnalysis == 0
+                                    || inputValidation == 0
+                                    || memoryProtection == 0)) {
+
+                        Boolean hasEligibleIncomingChannels = false;
+
                         for (Port port : componentType.getPort()) {
-                            // System.out.print("(" + port_index + ") ");
 
                             PortMode mode = port.getMode();
                             if (mode == PortMode.IN) {
-                                // Google code style add errror in here
-                                for (Connection con : blockImpl.getConnection()) {
 
-                                    ConnectionType con_type = con.getConnType();
+                                for (Connection connection : blockImpl.getConnection()) {
 
-                                    if (con_type == ConnectionType.REMOTE) {
+                                    ComponentInstance sourceComponent =
+                                            connection
+                                                    .getSource()
+                                                    .getSubcomponentPort()
+                                                    .getSubcomponent();
 
-                                        ConnectionEnd src_con = con.getSource();
-                                        Port src_port = src_con.getComponentPort();
+                                    List<GenericAttribute> sourceComponentAttributeList =
+                                            sourceComponent.getAttribute();
 
-                                        if (src_port == null) {
-                                            CompInstancePort compPort =
-                                                    src_con.getSubcomponentPort();
-                                            src_port = compPort.getPort();
-                                        }
+                                    GenericAttribute sourceComponentInsideTrustedBoundaryAttribute =
+                                            getAttributeByName(
+                                                    sourceComponentAttributeList,
+                                                    "InsideTrustedBoundary");
+                                    GenericAttribute sourceComponentComponentKindAttribute =
+                                            getAttributeByName(attributeList, "ComponentType");
+                                    GenericAttribute sourceComponentPedigreeAttribute =
+                                            getAttributeByName(attributeList, "Pedigree");
+                                    GenericAttribute
+                                            sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                    getAttributeByName(
+                                                            sourceComponentAttributeList,
+                                                            "StrongCryptoAlgorithms");
 
-                                        if (port == src_port) {
-                                            vdm_components.add(componentType);
-                                            components.add(componentType.getId());
-                                        }
+                                    Boolean scInsideTrustedBoundary;
+                                    if (sourceComponentInsideTrustedBoundaryAttribute != null) {
+                                        scInsideTrustedBoundary =
+                                                (Boolean)
+                                                        sourceComponentInsideTrustedBoundaryAttribute
+                                                                .getValue();
+                                    } else {
+                                        scInsideTrustedBoundary = false;
+                                    }
+
+                                    String scComponentKind;
+                                    if (sourceComponentComponentKindAttribute != null) {
+                                        scComponentKind =
+                                                ((String)
+                                                                sourceComponentComponentKindAttribute
+                                                                        .getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        scComponentKind = "hybrid";
+                                    }
+
+                                    String scPedigree;
+                                    if (sourceComponentPedigreeAttribute != null) {
+                                        scPedigree =
+                                                ((String)
+                                                                sourceComponentPedigreeAttribute
+                                                                        .getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        scPedigree = "cots";
+                                    }
+
+                                    int scStrongCryptoAlgorithms;
+                                    if (sourceComponentStrongCryptoAlgorithmsAttribute != null) {
+                                        scStrongCryptoAlgorithms =
+                                                (int)
+                                                        sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                .getValue();
+                                    } else {
+                                        scStrongCryptoAlgorithms = 0;
+                                    }
+
+                                    List<GenericAttribute> connectionAttributeList =
+                                            connection.getAttribute();
+
+                                    GenericAttribute connectionTypeAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList, "ConnectionType");
+                                    GenericAttribute deviceAuthenticationAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList,
+                                                    "DeviceAuthentication");
+                                    GenericAttribute sessionAuthenticityAttribute =
+                                            getAttributeByName(
+                                                    connectionAttributeList, "SessionAuthenticity");
+
+                                    String connectionType;
+                                    if (connectionTypeAttribute != null) {
+                                        connectionType =
+                                                ((String) connectionTypeAttribute.getValue())
+                                                        .toLowerCase();
+                                    } else {
+                                        connectionType = "remote";
+                                    }
+
+                                    int deviceAuthentication;
+                                    if (deviceAuthenticationAttribute != null) {
+                                        deviceAuthentication =
+                                                (int) deviceAuthenticationAttribute.getValue();
+                                    } else {
+                                        deviceAuthentication = 0;
+                                    }
+
+                                    int sessionAuthenticity;
+                                    if (sessionAuthenticityAttribute != null) {
+                                        sessionAuthenticity =
+                                                (int) sessionAuthenticityAttribute.getValue();
+                                    } else {
+                                        sessionAuthenticity = 0;
+                                    }
+
+                                    if ((!scInsideTrustedBoundary
+                                                    || connectionType.equalsIgnoreCase("remote"))
+                                            && !scComponentKind.equalsIgnoreCase("hardware")
+                                            && (scPedigree.equalsIgnoreCase("cots")
+                                                    || ((deviceAuthentication == 0
+                                                                    && sessionAuthenticity == 0)
+                                                            || scStrongCryptoAlgorithms == 0))) {
+
+                                        hasEligibleIncomingChannels = true;
+                                        break;
                                     }
                                 }
                             }
+                        }
+
+                        if (hasEligibleIncomingChannels) {
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
                         }
                     }
                 }
@@ -714,17 +1051,18 @@ public class Instrumentor extends VDMInstrumentor {
 
     // HT
     // - Select all components c in C such that:
-    // c.ComponentKind is in {Hardware, SwHwHybrid, HwHumanHybrid, Hybrid} 
-    // and c.adversariallyTestedForTrojanOrLogicBomb = 0 
-    // and (c.pedigree = COTS or (c.pedigree = Sourced and c.supplyChainSecurity = 0 and c.tamperProtection = 0))
+    // c.ComponentKind is in {Hardware, SwHwHybrid, HwHumanHybrid, Hybrid}
+    // and c.adversariallyTestedForTrojanOrLogicBomb = 0
+    // and (c.pedigree = COTS or (c.pedigree = Sourced and c.supplyChainSecurity = 0 and
+    // c.tamperProtection = 0))
     @Override
     public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
-        
-        HashSet<String> htComponentTypeSet = 
-        		new HashSet<String>(Arrays.asList("hardware", "swhwhybrid", "hwhumanhybrid", "hybrid"));
-        
+
+        HashSet<String> htComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("hardware", "swhwhybrid", "hwhumanhybrid", "hybrid"));
 
         BlockImpl blockImpl = null;
 
@@ -740,61 +1078,63 @@ public class Instrumentor extends VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     componentType = getType(componentInstance);
-                    
+
                     List<GenericAttribute> attributeList = componentInstance.getAttribute();
-                    
-                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
-                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute = getAttributeByName(attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
-                    GenericAttribute pedigreeAttribute = getAttributeByName(attributeList, "Pedigree");
-                    GenericAttribute supplyChainSecurityAttribute = getAttributeByName(attributeList, "SupplyChainSecurity");
-                    GenericAttribute tamperProtectionAttribute = getAttributeByName(attributeList, "TamperProtection");
-                    
+
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
+                            getAttributeByName(
+                                    attributeList, "AdversariallyTestedForTrojanOrLogicBomb");
+                    GenericAttribute pedigreeAttribute =
+                            getAttributeByName(attributeList, "Pedigree");
+                    GenericAttribute supplyChainSecurityAttribute =
+                            getAttributeByName(attributeList, "SupplyChainSecurity");
+                    GenericAttribute tamperProtectionAttribute =
+                            getAttributeByName(attributeList, "TamperProtection");
+
                     String componentKind;
                     if (componentKindAttribute != null) {
-                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
                     }
-                    else {
-                    	componentKind = "hybrid";
-                    }
-                    
+
                     int adversariallyTestedForTrojanOrLogicBomb;
                     if (adversariallyTestedForTrojanOrLogicBombAttribute != null) {
-                    	adversariallyTestedForTrojanOrLogicBomb = (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                        adversariallyTestedForTrojanOrLogicBomb =
+                                (int) adversariallyTestedForTrojanOrLogicBombAttribute.getValue();
+                    } else {
+                        adversariallyTestedForTrojanOrLogicBomb = 0;
                     }
-                    else {
-                    	adversariallyTestedForTrojanOrLogicBomb = 0;
-                    }
-                    
+
                     String pedigree;
                     if (pedigreeAttribute != null) {
-                    	pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                        pedigree = ((String) pedigreeAttribute.getValue()).toLowerCase();
+                    } else {
+                        pedigree = "cots";
                     }
-                    else {
-                    	pedigree = "cots";
-                    }
-                    
+
                     int supplyChainSecurity;
                     if (supplyChainSecurityAttribute != null) {
-                    	supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                        supplyChainSecurity = (int) supplyChainSecurityAttribute.getValue();
+                    } else {
+                        supplyChainSecurity = 0;
                     }
-                    else {
-                    	supplyChainSecurity = 0;
-                    }
-                    
+
                     int tamperProtection;
                     if (tamperProtectionAttribute != null) {
-                    	tamperProtection = (int) tamperProtectionAttribute.getValue();
-                    }
-                    else {
-                    	tamperProtection = 0;
+                        tamperProtection = (int) tamperProtectionAttribute.getValue();
+                    } else {
+                        tamperProtection = 0;
                     }
 
                     if (htComponentTypeSet.contains(componentKind)
-                    	&& adversariallyTestedForTrojanOrLogicBomb == 0
-                    	&& (pedigree.equalsIgnoreCase("cots")
-                    	    || (pedigree.equalsIgnoreCase("sourced")
-                    	        && supplyChainSecurity == 0
-                    	        && tamperProtection == 0))) {
+                            && adversariallyTestedForTrojanOrLogicBomb == 0
+                            && (pedigree.equalsIgnoreCase("cots")
+                                    || (pedigree.equalsIgnoreCase("sourced")
+                                            && supplyChainSecurity == 0
+                                            && tamperProtection == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
@@ -819,10 +1159,10 @@ public class Instrumentor extends VDMInstrumentor {
 
         HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> otComponentTypeSet = 
-        		new HashSet<String>(Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
-        
-        
+        HashSet<String> otComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -837,70 +1177,69 @@ public class Instrumentor extends VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     componentType = getType(componentInstance);
-                    
+
                     List<GenericAttribute> attributeList = componentInstance.getAttribute();
-                    
-                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
-                    GenericAttribute insideTrustedBoundaryAttribute = getAttributeByName(attributeList, "InsideTrustedBoundary");
-                    GenericAttribute physicalAccessControlAttribute = getAttributeByName(attributeList, "PhysicalAccessControl");
-                    GenericAttribute loggingAttribute = getAttributeByName(attributeList, "Logging");
-                    GenericAttribute systemAccessControlAttribute = getAttributeByName(attributeList, "SystemAccessControl");
-                    GenericAttribute userAuthenticationAttribute = getAttributeByName(attributeList, "UserAuthentication");
-                    
+
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute insideTrustedBoundaryAttribute =
+                            getAttributeByName(attributeList, "InsideTrustedBoundary");
+                    GenericAttribute physicalAccessControlAttribute =
+                            getAttributeByName(attributeList, "PhysicalAccessControl");
+                    GenericAttribute loggingAttribute =
+                            getAttributeByName(attributeList, "Logging");
+                    GenericAttribute systemAccessControlAttribute =
+                            getAttributeByName(attributeList, "SystemAccessControl");
+                    GenericAttribute userAuthenticationAttribute =
+                            getAttributeByName(attributeList, "UserAuthentication");
+
                     String componentKind;
                     if (componentKindAttribute != null) {
-                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
                     }
-                    else {
-                    	componentKind = "hybrid";
-                    }
-                    
+
                     Boolean insideTrustedBoundary;
                     if (insideTrustedBoundaryAttribute != null) {
-                    	insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                        insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                    } else {
+                        insideTrustedBoundary = false;
                     }
-                    else {
-                    	insideTrustedBoundary = false;
-                    }
-                    
+
                     int physicalAccessControl;
                     if (physicalAccessControlAttribute != null) {
-                    	physicalAccessControl = (int) physicalAccessControlAttribute.getValue();
+                        physicalAccessControl = (int) physicalAccessControlAttribute.getValue();
+                    } else {
+                        physicalAccessControl = 0;
                     }
-                    else {
-                    	physicalAccessControl = 0;
-                    }
-                    
+
                     int logging;
                     if (loggingAttribute != null) {
-                    	logging = (int) loggingAttribute.getValue();
+                        logging = (int) loggingAttribute.getValue();
+                    } else {
+                        logging = 0;
                     }
-                    else {
-                    	logging = 0;
-                    }
-                    
+
                     int systemAccessControl;
                     if (systemAccessControlAttribute != null) {
-                    	systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                        systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                    } else {
+                        systemAccessControl = 0;
                     }
-                    else {
-                    	systemAccessControl = 0;
-                    }
-                    
+
                     int userAuthentication;
                     if (userAuthenticationAttribute != null) {
-                    	userAuthentication = (int) userAuthenticationAttribute.getValue();
-                    }
-                    else {
-                    	userAuthentication = 0;
+                        userAuthentication = (int) userAuthenticationAttribute.getValue();
+                    } else {
+                        userAuthentication = 0;
                     }
 
                     if (otComponentTypeSet.contains(componentKind)
                             && !insideTrustedBoundary
                             && physicalAccessControl == 0
                             && (logging == 0
-                                && (systemAccessControl == 0
-                                    || userAuthentication == 0))) {
+                                    && (systemAccessControl == 0 || userAuthentication == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
@@ -917,16 +1256,17 @@ public class Instrumentor extends VDMInstrumentor {
     // IT
     // - Select all components c in C such that:
     // c.componentType in {Human, SwHumanHybrid, HwHumanHybrid, Hybrid}
-    // and c.insideTrustBoundary = true 
+    // and c.insideTrustBoundary = true
     // and (c.logging = 0 and (c.systemAccessControl = 0 or c.userAuthentication = 0))
     @Override
     public void insiderThreat(HashSet<ComponentType> vdm_components) {
 
         HashSet<String> components = new HashSet<String>();
-        
-        HashSet<String> itComponentTypeSet = 
-        		new HashSet<String>(Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
-        
+
+        HashSet<String> itComponentTypeSet =
+                new HashSet<String>(
+                        Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+
         BlockImpl blockImpl = null;
 
         for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
@@ -941,61 +1281,59 @@ public class Instrumentor extends VDMInstrumentor {
                 for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                     componentType = getType(componentInstance);
-                    
+
                     List<GenericAttribute> attributeList = componentInstance.getAttribute();
-                    
-                    GenericAttribute componentKindAttribute = getAttributeByName(attributeList, "ComponentType");
-                    GenericAttribute insideTrustedBoundaryAttribute = getAttributeByName(attributeList, "InsideTrustedBoundary");
-                    GenericAttribute loggingAttribute = getAttributeByName(attributeList, "Logging");
-                    GenericAttribute systemAccessControlAttribute = getAttributeByName(attributeList, "SystemAccessControl");
-                    GenericAttribute userAuthenticationAttribute = getAttributeByName(attributeList, "UserAuthentication");
-                    
+
+                    GenericAttribute componentKindAttribute =
+                            getAttributeByName(attributeList, "ComponentType");
+                    GenericAttribute insideTrustedBoundaryAttribute =
+                            getAttributeByName(attributeList, "InsideTrustedBoundary");
+                    GenericAttribute loggingAttribute =
+                            getAttributeByName(attributeList, "Logging");
+                    GenericAttribute systemAccessControlAttribute =
+                            getAttributeByName(attributeList, "SystemAccessControl");
+                    GenericAttribute userAuthenticationAttribute =
+                            getAttributeByName(attributeList, "UserAuthentication");
+
                     String componentKind;
                     if (componentKindAttribute != null) {
-                    	componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                        componentKind = ((String) componentKindAttribute.getValue()).toLowerCase();
+                    } else {
+                        componentKind = "hybrid";
                     }
-                    else {
-                    	componentKind = "hybrid";
-                    }
-                    
+
                     Boolean insideTrustedBoundary;
                     if (insideTrustedBoundaryAttribute != null) {
-                    	insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                        insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
+                    } else {
+                        insideTrustedBoundary = false;
                     }
-                    else {
-                    	insideTrustedBoundary = false;
-                    }
-                    
+
                     int logging;
                     if (loggingAttribute != null) {
-                    	logging = (int) loggingAttribute.getValue();
+                        logging = (int) loggingAttribute.getValue();
+                    } else {
+                        logging = 0;
                     }
-                    else {
-                    	logging = 0;
-                    }
-                    
+
                     int systemAccessControl;
                     if (systemAccessControlAttribute != null) {
-                    	systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                        systemAccessControl = (int) systemAccessControlAttribute.getValue();
+                    } else {
+                        systemAccessControl = 0;
                     }
-                    else {
-                    	systemAccessControl = 0;
-                    }
-                    
+
                     int userAuthentication;
                     if (userAuthenticationAttribute != null) {
-                    	userAuthentication = (int) userAuthenticationAttribute.getValue();
+                        userAuthentication = (int) userAuthenticationAttribute.getValue();
+                    } else {
+                        userAuthentication = 0;
                     }
-                    else {
-                    	userAuthentication = 0;
-                    }
-                    
-                    
+
                     if (itComponentTypeSet.contains(componentKind)
                             && insideTrustedBoundary
                             && (logging == 0
-                                && (systemAccessControl == 0
-                                    || userAuthentication == 0))) {
+                                    && (systemAccessControl == 0 || userAuthentication == 0))) {
                         // Store component
                         vdm_components.add(componentType);
                         components.add(componentType.getId());
