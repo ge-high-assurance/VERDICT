@@ -1252,7 +1252,7 @@ let pp_print_str ppf s =
 
 let pp_print_option f t ppf = function
   | Some a -> Format.fprintf ppf "mk_some<%s>(%a)" t f a
-  | None -> Format.fprintf ppf "mk_none<%s>()" t
+  | None -> Format.fprintf ppf "mk_none<%s>" t
 
 let pp_print_list (f : Format.formatter -> 'a -> unit)
       parent name ind ppf (lst : 'a list) =
