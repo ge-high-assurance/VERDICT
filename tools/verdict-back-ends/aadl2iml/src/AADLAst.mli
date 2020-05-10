@@ -137,6 +137,8 @@ val equal_qprefs: qpref -> qpref -> bool
 
 val mk_full_qpref: string -> string -> qpref
 
+val qpref_to_string : qpref -> string
+
 val find_assoc: qpref -> property_association list -> property_association option
 
 val is_component_type: classifier -> bool

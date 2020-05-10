@@ -248,103 +248,19 @@ type instance_type =
   | Specification of comp_type_ref
   | Implementation of comp_impl_ref
 
-type manufacturer_type = ThirdParty | InHouse
+type attribute_type = Integer | Real | Bool | String
 
-type kind_of_component = Software | Hardware | Human | Hybrid
-
-type situated_type = OnBoard | Remote
-
-type pedigree_type = InternallyDeveloped | COTS | Sourced 
+type generic_attribute = {
+  name: string;
+  atype: attribute_type;
+  value: string;
+}
 
 type component_instance = {
   name: identifier;
   itype: instance_type;
-
-  manufacturer: manufacturer_type option;
-  pedigree: pedigree_type option;
-  category: string option;
-  component_type: kind_of_component option;
-  situated: situated_type option;
-  adversarially_tested: bool option;
-  has_sensitive_info: bool option;
-  inside_trusted_boundary: bool option;
-  canReceiveConfigUpdate: bool option;
-  canReceiveSWUpdate: bool option;
-  controlReceivedFromUntrusted: bool option;
-  controlSentToUntrusted: bool option;
-  dataReceivedFromUntrusted: bool option;
-  dataSentToUntrusted: bool option;
-
-  configuration_Attack: bool option;
-  physical_Theft_Attack: bool option;
-  interception_Attack: bool option;
-  hardware_Integrity_Attack: bool option;
-  supply_Chain_Attack: bool option;
-  brute_Force_Attack: bool option;
-  fault_Injection_Attack: bool option;
-  identity_Spoofing_Attack: bool option;
-  excessive_Allocation_Attack: bool option;
-  sniffing_Attack: bool option;
-  buffer_Attack: bool option;
-  flooding_Attack: bool option;
-
-  anti_jamming: bool option;
-  auditMessageResponses: bool option;
-  deviceAuthentication: bool option;
-  dosProtection: bool option;
-  encryptedStorage: bool option;
-  heterogeneity: bool option;
-  inputValidation: bool option;
-  logging: bool option;
-  memoryProtection: bool option;
-  physicalAccessControl: bool option;
-  removeIdentifyingInformation: bool option;
-  resourceAvailability: bool option;
-  resourceIsolation: bool option;
-  secureBoot: bool option;
-  sessionAuthenticity: bool option;
-  staticCodeAnalysis: bool option;
-  strongCryptoAlgorithms: bool option;
-  supplyChainSecurity: bool option;
-  systemAccessControl: bool option;
-  tamperProtection: bool option;
-  userAuthentication: bool option;
-
-  anti_jamming_dal: integer option;
-  auditMessageResponsesDAL: integer option;
-  deviceAuthenticationDAL: integer option;
-  dosProtectionDAL: integer option;
-  encryptedStorageDAL: integer option;
-  heterogeneity_dal: integer option;
-  inputValidationDAL: integer option;
-  loggingDAL: integer option;
-  memoryProtectionDAL: integer option;
-  physicalAccessControlDAL: integer option;
-  removeIdentifyingInformationDAL: integer option;
-  resourceAvailabilityDAL: integer option;
-  resourceIsolationDAL: integer option;
-  secureBootDAL: integer option;
-  sessionAuthenticityDAL: integer option;
-  staticCodeAnalysisDAL: integer option;
-  strongCryptoAlgorithmsDAL: integer option;
-  supplyChainSecurityDAL: integer option;
-  systemAccessControlDAL: integer option;
-  tamperProtectionDAL: integer option;
-  userAuthenticationDAL: integer option;
-
-(*
-  broadcast_from_outside_tb: bool option;
-  wifi_from_outside_tb: bool option;
-  encryption: bool option;
-  anti_flooding: bool option;
-  anti_fuzzing: bool option;
-  encryption_dal: integer option;
-  anti_flooding_dal: integer option;
-  anti_fuzzing_dal: integer option;
-*)
+  attributes: generic_attribute list;
 }
-
-type flow_type = Xdata | Xcontrol | Xrequest
 
 type port_ref = int
 
@@ -354,18 +270,9 @@ type connection_end =
   | ComponentCE of (comp_type_ref * port_ref)
   | SubcomponentCE of (comp_inst_ref * comp_type_ref * port_ref)
 
-type connection_type = Local | Remote
-
 type connection = {
   name: identifier;
-  ftype: flow_type option;
-  conn_type: connection_type option;
-  authenticated: bool option;
-  data_encrypted: bool option;
-  trustedConnection: bool option;
-  encryptedTransmission: bool option;
-  encryptedTransmissionDAL: integer option;
-  replayProtection: bool option;
+  attributes: generic_attribute list;
   source: connection_end;
   destination: connection_end;
 }
@@ -1027,303 +934,30 @@ let pp_print_comp_types_list ind ppf comp_types =
       (pp_print_component_type ind) ct
   )
 
-let pp_print_manufacturer_type ppf = function
-  | ThirdParty -> Format.fprintf ppf "ManufacturerType.ThirdParty"
-  | InHouse -> Format.fprintf ppf "ManufacturerType.InHouse"
 
-let pp_print_manufacturer_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<ManufacturerType>"
-  | Some m -> (
-    Format.fprintf ppf "mk_some<ManufacturerType>(%a)"
-      pp_print_manufacturer_type m;
+let pp_print_generic_attribute ind ppf { name; atype; value } =
+  Format.fprintf ppf "ga.name = \"%s\" &&@," name;
+  Format.fprintf ppf "ga.atype = %s &&@,"
+    (match atype with
+     | Integer -> "Int"
+     | Real -> "Real"
+     | Bool -> "Bool"
+     | String -> "String"
+    );
+  Format.fprintf ppf "ga.value = \"%s\"@," value
+
+let pp_print_attributes ind ppf obj attributes =
+  Format.fprintf ppf "%s.attributes.length = %d"
+    obj (List.length attributes);
+  attributes |> List.iteri (fun i ga ->
+    Format.fprintf ppf " &&@, @[<v %d>%s.attributes.element[%d] = " ind obj i;
+    Format.fprintf ppf "some (ga: GenericAttribute) {@,";
+    Format.fprintf ppf "%a@]@,}"
+      (pp_print_generic_attribute ind) ga
   )
 
-let pp_print_pedigree_type ppf = function
-  | InternallyDeveloped -> Format.fprintf ppf "PedigreeType.InternallyDeveloped"
-  | COTS -> Format.fprintf ppf "PedigreeType.COTS"
-  | Sourced -> Format.fprintf ppf "PedigreeType.Sourced"
 
-let pp_print_pedigree_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<PedigreeType>"
-  | Some m -> (
-    Format.fprintf ppf "mk_some<PedigreeType>(%a)"
-      pp_print_pedigree_type m;
-  )
-
-let pp_print_kind_of_component ppf = function
-  | Software -> Format.fprintf ppf "KindOfComponent.Software"
-  | Hardware -> Format.fprintf ppf "KindOfComponent.Hardware"
-  | Human -> Format.fprintf ppf "KindOfComponent.Human"
-  | Hybrid -> Format.fprintf ppf "KindOfComponent.Hybrid"
-
-let pp_print_component_type_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<KindOfComponent>"
-  | Some m -> (
-    Format.fprintf ppf "mk_some<KindOfComponent>(%a)"
-      pp_print_kind_of_component m;
-  )
-
-let pp_print_situated_type ppf = function
-  | OnBoard -> Format.fprintf ppf "SituatedType.OnBoard"
-  | Remote -> Format.fprintf ppf "SituatedType.Remote"
-
-let pp_print_situated_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<SituatedType>"
-  | Some m -> (
-    Format.fprintf ppf "mk_some<SituatedType>(%a)"
-      pp_print_situated_type m;
-  )
-
-let pp_print_comp_instance_properties ppf
-  {manufacturer;
-   pedigree;
-   category;
-   component_type;
-   situated;
-   adversarially_tested;
-   has_sensitive_info;
-   inside_trusted_boundary;
-   canReceiveConfigUpdate;
-   canReceiveSWUpdate;
-   controlReceivedFromUntrusted;
-   controlSentToUntrusted;
-   dataReceivedFromUntrusted;
-   dataSentToUntrusted;
-
-   configuration_Attack;
-   physical_Theft_Attack;
-   interception_Attack;
-   hardware_Integrity_Attack;
-   supply_Chain_Attack;
-   brute_Force_Attack;
-   fault_Injection_Attack;
-   identity_Spoofing_Attack;
-   excessive_Allocation_Attack;
-   sniffing_Attack;
-   buffer_Attack;
-   flooding_Attack;
-
-   anti_jamming;
-   auditMessageResponses;
-   deviceAuthentication;
-   dosProtection;
-   encryptedStorage;
-   heterogeneity;
-   inputValidation;
-   logging;
-   memoryProtection;
-   physicalAccessControl;
-   removeIdentifyingInformation;
-   resourceAvailability;
-   resourceIsolation;
-   secureBoot;
-   sessionAuthenticity;
-   staticCodeAnalysis;
-   strongCryptoAlgorithms;
-   supplyChainSecurity;
-   systemAccessControl;
-   tamperProtection;
-   userAuthentication;
-
-   anti_jamming_dal;
-   auditMessageResponsesDAL;
-   deviceAuthenticationDAL;
-   dosProtectionDAL;
-   encryptedStorageDAL;
-   heterogeneity_dal;
-   inputValidationDAL;
-   loggingDAL;
-   memoryProtectionDAL;
-   physicalAccessControlDAL;
-   removeIdentifyingInformationDAL;
-   resourceAvailabilityDAL;
-   resourceIsolationDAL;
-   secureBootDAL;
-   sessionAuthenticityDAL;
-   staticCodeAnalysisDAL;
-   strongCryptoAlgorithmsDAL;
-   supplyChainSecurityDAL;
-   systemAccessControlDAL;
-   tamperProtectionDAL;
-   userAuthenticationDAL
-
-(*
-   broadcast_from_outside_tb;
-   wifi_from_outside_tb;
-   encryption;
-   anti_flooding;
-   anti_fuzzing;
-   encryption_dal;
-   anti_flooding_dal;
-   anti_fuzzing_dal;
-*)
-  }
-=
-  Format.fprintf ppf "ci.manufacturer = %a &&@,"
-    pp_print_manufacturer_prop_value manufacturer;
-  Format.fprintf ppf "ci.pedigree = %a &&@,"
-    pp_print_pedigree_prop_value pedigree;
-  Format.fprintf ppf "ci.category = %a &&@,"
-    pp_print_string_prop_value category;
-  Format.fprintf ppf "ci.component_type = %a &&@,"
-    pp_print_component_type_prop_value component_type;
-  Format.fprintf ppf "ci.situated = %a &&@,"
-    pp_print_situated_prop_value situated;
-  Format.fprintf ppf "ci.adversarially_tested = %a &&@,"
-    pp_print_bool_prop_value adversarially_tested;
-  Format.fprintf ppf "ci.has_sensitive_info = %a &&@,"
-    pp_print_bool_prop_value has_sensitive_info;
-  Format.fprintf ppf "ci.inside_trusted_boundary = %a &&@,"
-    pp_print_bool_prop_value inside_trusted_boundary;
-
-  Format.fprintf ppf "ci.canReceiveConfigUpdate = %a &&@,"
-    pp_print_bool_prop_value canReceiveConfigUpdate;
-  Format.fprintf ppf "ci.canReceiveSWUpdate = %a &&@,"
-    pp_print_bool_prop_value canReceiveSWUpdate;
-  Format.fprintf ppf "ci.controlReceivedFromUntrusted = %a &&@,"
-    pp_print_bool_prop_value controlReceivedFromUntrusted;
-  Format.fprintf ppf "ci.controlSentToUntrusted = %a &&@,"
-    pp_print_bool_prop_value controlSentToUntrusted;
-  Format.fprintf ppf "ci.dataReceivedFromUntrusted = %a &&@,"
-    pp_print_bool_prop_value dataReceivedFromUntrusted;
-  Format.fprintf ppf "ci.dataSentToUntrusted = %a &&@,"
-    pp_print_bool_prop_value dataSentToUntrusted;
-
-  Format.fprintf ppf "ci.Configuration_Attack = %a &&@,"
-    pp_print_bool_prop_value configuration_Attack;
-  Format.fprintf ppf "ci.Physical_Theft_Attack = %a &&@,"
-    pp_print_bool_prop_value physical_Theft_Attack;
-  Format.fprintf ppf "ci.Interception_Attack = %a &&@,"
-    pp_print_bool_prop_value interception_Attack;
-  Format.fprintf ppf "ci.Hardware_Integrity_Attack = %a &&@,"
-    pp_print_bool_prop_value hardware_Integrity_Attack;
-  Format.fprintf ppf "ci.Supply_Chain_Attack = %a &&@,"
-    pp_print_bool_prop_value supply_Chain_Attack;
-  Format.fprintf ppf "ci.Brute_Force_Attack = %a &&@,"
-    pp_print_bool_prop_value brute_Force_Attack;
-  Format.fprintf ppf "ci.Fault_Injection_Attack = %a &&@,"
-    pp_print_bool_prop_value fault_Injection_Attack;
-  Format.fprintf ppf "ci.Identity_Spoofing_Attack = %a &&@,"
-    pp_print_bool_prop_value identity_Spoofing_Attack;
-  Format.fprintf ppf "ci.Excessive_Allocation_Attack = %a &&@,"
-    pp_print_bool_prop_value excessive_Allocation_Attack;
-  Format.fprintf ppf "ci.Sniffing_Attack = %a &&@,"
-    pp_print_bool_prop_value sniffing_Attack;
-  Format.fprintf ppf "ci.Buffer_Attack = %a &&@,"
-    pp_print_bool_prop_value buffer_Attack;
-  Format.fprintf ppf "ci.Flooding_Attack = %a &&@,"
-    pp_print_bool_prop_value flooding_Attack;
-
-  Format.fprintf ppf "ci.anti_jamming = %a &&@,"
-    pp_print_bool_prop_value anti_jamming;
-  Format.fprintf ppf "ci.auditMessageResponses = %a &&@,"
-    pp_print_bool_prop_value auditMessageResponses;
-  Format.fprintf ppf "ci.deviceAuthentication = %a &&@,"
-    pp_print_bool_prop_value deviceAuthentication;
-  Format.fprintf ppf "ci.dosProtection = %a &&@,"
-    pp_print_bool_prop_value dosProtection;
-  Format.fprintf ppf "ci.encryptedStorage = %a &&@,"
-    pp_print_bool_prop_value encryptedStorage;
-  Format.fprintf ppf "ci.heterogeneity = %a &&@,"
-    pp_print_bool_prop_value heterogeneity;
-
-  Format.fprintf ppf "ci.inputValidation = %a &&@,"
-    pp_print_bool_prop_value inputValidation;
-  Format.fprintf ppf "ci.logging = %a &&@,"
-    pp_print_bool_prop_value logging;
-  Format.fprintf ppf "ci.memoryProtection = %a &&@,"
-    pp_print_bool_prop_value memoryProtection;
-  Format.fprintf ppf "ci.physicalAccessControl = %a &&@,"
-    pp_print_bool_prop_value physicalAccessControl;
-  Format.fprintf ppf "ci.removeIdentifyingInformation = %a &&@,"
-    pp_print_bool_prop_value removeIdentifyingInformation;
-  Format.fprintf ppf "ci.resourceAvailability = %a &&@,"
-    pp_print_bool_prop_value resourceAvailability;
-  Format.fprintf ppf "ci.resourceIsolation = %a &&@,"
-    pp_print_bool_prop_value resourceIsolation;
-  Format.fprintf ppf "ci.secureBoot = %a &&@,"
-    pp_print_bool_prop_value secureBoot;
-  Format.fprintf ppf "ci.sessionAuthenticity = %a &&@,"
-    pp_print_bool_prop_value sessionAuthenticity;
-  Format.fprintf ppf "ci.staticCodeAnalysis = %a &&@,"
-    pp_print_bool_prop_value staticCodeAnalysis;
-  Format.fprintf ppf "ci.strongCryptoAlgorithms = %a &&@,"
-    pp_print_bool_prop_value strongCryptoAlgorithms;
-  Format.fprintf ppf "ci.supplyChainSecurity = %a &&@,"
-    pp_print_bool_prop_value supplyChainSecurity;
-  Format.fprintf ppf "ci.systemAccessControl = %a &&@,"
-    pp_print_bool_prop_value systemAccessControl;
-  Format.fprintf ppf "ci.tamperProtection = %a &&@,"
-    pp_print_bool_prop_value tamperProtection;
-  Format.fprintf ppf "ci.userAuthentication = %a &&@,"
-    pp_print_bool_prop_value userAuthentication;
-
-  Format.fprintf ppf "ci.anti_jamming_dal = %a &&@,"
-    pp_print_int_prop_value anti_jamming_dal;
-
-  Format.fprintf ppf "ci.auditMessageResponsesDAL = %a &&@,"
-    pp_print_int_prop_value auditMessageResponsesDAL;
-  Format.fprintf ppf "ci.deviceAuthenticationDAL = %a &&@,"
-    pp_print_int_prop_value deviceAuthenticationDAL;
-  Format.fprintf ppf "ci.dosProtectionDAL = %a &&@,"
-    pp_print_int_prop_value dosProtectionDAL;
-  Format.fprintf ppf "ci.encryptedStorageDAL = %a &&@,"
-    pp_print_int_prop_value encryptedStorageDAL;
-  Format.fprintf ppf "ci.heterogeneity_dal = %a &&@,"
-    pp_print_int_prop_value heterogeneity_dal;
-
-  Format.fprintf ppf "ci.inputValidationDAL = %a &&@,"
-    pp_print_int_prop_value inputValidationDAL;
-  Format.fprintf ppf "ci.loggingDAL = %a &&@,"
-    pp_print_int_prop_value loggingDAL;
-  Format.fprintf ppf "ci.memoryProtectionDAL = %a &&@,"
-    pp_print_int_prop_value memoryProtectionDAL;
-  Format.fprintf ppf "ci.physicalAccessControlDAL = %a &&@,"
-    pp_print_int_prop_value physicalAccessControlDAL;
-  Format.fprintf ppf "ci.removeIdentifyingInformationDAL = %a &&@,"
-    pp_print_int_prop_value removeIdentifyingInformationDAL;
-  Format.fprintf ppf "ci.resourceAvailabilityDAL = %a &&@,"
-    pp_print_int_prop_value resourceAvailabilityDAL;
-  Format.fprintf ppf "ci.resourceIsolationDAL = %a &&@,"
-    pp_print_int_prop_value resourceIsolationDAL;
-  Format.fprintf ppf "ci.secureBootDAL = %a &&@,"
-    pp_print_int_prop_value secureBootDAL;
-  Format.fprintf ppf "ci.sessionAuthenticityDAL = %a &&@,"
-    pp_print_int_prop_value sessionAuthenticityDAL;
-  Format.fprintf ppf "ci.staticCodeAnalysisDAL = %a &&@,"
-    pp_print_int_prop_value staticCodeAnalysisDAL;
-  Format.fprintf ppf "ci.strongCryptoAlgorithmsDAL = %a &&@,"
-    pp_print_int_prop_value strongCryptoAlgorithmsDAL;
-  Format.fprintf ppf "ci.supplyChainSecurityDAL = %a &&@,"
-    pp_print_int_prop_value supplyChainSecurityDAL;
-  Format.fprintf ppf "ci.systemAccessControlDAL = %a &&@,"
-    pp_print_int_prop_value systemAccessControlDAL;
-  Format.fprintf ppf "ci.tamperProtectionDAL = %a &&@,"
-    pp_print_int_prop_value tamperProtectionDAL;
-  Format.fprintf ppf "ci.userAuthenticationDAL = %a"
-    pp_print_int_prop_value userAuthenticationDAL
-
-
-(*
-  Format.fprintf ppf "ci.broadcast_from_outside_tb = %a &&@,"
-    pp_print_bool_prop_value broadcast_from_outside_tb;
-  Format.fprintf ppf "ci.wifi_from_outside_tb = %a &&@,"
-    pp_print_bool_prop_value wifi_from_outside_tb;
-  Format.fprintf ppf "ci.encryption = %a &&@,"
-    pp_print_bool_prop_value encryption;
-  Format.fprintf ppf "ci.anti_flooding = %a &&@,"
-    pp_print_bool_prop_value anti_flooding;
-  Format.fprintf ppf "ci.anti_fuzzing = %a &&@,"
-    pp_print_bool_prop_value anti_fuzzing;
-  Format.fprintf ppf "ci.encryption_dal = %a &&@,"
-    pp_print_int_prop_value encryption_dal;
-  Format.fprintf ppf "ci.anti_fuzzing_dal = %a"
-    pp_print_int_prop_value anti_fuzzing_dal;
-  Format.fprintf ppf "ci.anti_flooding_dal = %a &&@,"
-    pp_print_int_prop_value anti_flooding_dal;
-*)
-
-let pp_print_comp_instance ind ppf ({name; itype} as ci) =
+let pp_print_comp_instance ind ppf ({name; itype; attributes}) =
   Format.fprintf ppf "ci.name = \"%s\" &&@," name;
   (match itype with
   | Specification idx -> (
@@ -1334,7 +968,7 @@ let pp_print_comp_instance ind ppf ({name; itype} as ci) =
     Format.fprintf ppf "ci.kind = ComponentInstanceKind.Implementation &&@,";
     Format.fprintf ppf "ci.implementation = m.component_impl.element[%d] &&@," idx
   ));
-  pp_print_comp_instance_properties ppf ci
+  pp_print_attributes ind ppf "ci" attributes
 
 let pp_print_subcomponent_list ind ppf subcomponents =
   subcomponents |> List.iteri (fun i sub ->
@@ -1342,18 +976,6 @@ let pp_print_subcomponent_list ind ppf subcomponents =
     Format.fprintf ppf "some (ci: ComponentInstance) {@,";
     Format.fprintf ppf "%a@]@,} &&@,"
       (pp_print_comp_instance ind) sub
-  )
-
-let pp_print_flow_type ppf = function
-  | Xdata -> Format.fprintf ppf "FlowType.Xdata"
-  | Xcontrol -> Format.fprintf ppf "FlowType.Xcontrol"
-  | Xrequest -> Format.fprintf ppf "FlowType.Xrequest"
-
-let pp_print_flow_type_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<FlowType>"
-  | Some m -> (
-    Format.fprintf ppf "mk_some<FlowType>(%a)"
-      pp_print_flow_type m;
   )
 
 let pp_print_comp_inst_port ppf ref =
@@ -1378,48 +1000,12 @@ let pp_print_connection_end ind inst ppf = function
     pp_print_comp_inst_port ref
   )
 
-let pp_print_connection_type ppf = function
-  | Local -> Format.fprintf ppf "ConnectionType.Local"
-  | Remote -> Format.fprintf ppf "ConnectionType.Remote"
-
-let pp_print_conn_type_prop_value ppf = function
-  | None -> Format.fprintf ppf "mk_none<ConnectionType>"
-  | Some t -> (
-    Format.fprintf ppf "mk_some<ConnectionType>(%a)"
-      pp_print_connection_type t;
-  )
-
 let pp_print_connection ind ppf
-  {name;
-   ftype;
-   conn_type;
-   authenticated;
-   data_encrypted;
-   trustedConnection;
-   encryptedTransmission;
-   encryptedTransmissionDAL;
-   replayProtection;
-   source;
-   destination
- }
+  {name; attributes; source; destination }
 =
   Format.fprintf ppf "c.name = \"%s\" &&@," name;
-  Format.fprintf ppf "c.conn_type = %a &&@,"
-    pp_print_conn_type_prop_value conn_type; 
-  Format.fprintf ppf "c.flow_type = %a &&@,"
-    pp_print_flow_type_prop_value ftype;
-  Format.fprintf ppf "c.data_encrypted = %a &&@,"
-    pp_print_bool_prop_value data_encrypted;
-  Format.fprintf ppf "c.authenticated = %a &&@,"
-    pp_print_bool_prop_value authenticated;
-  Format.fprintf ppf "c.trustedConnection = %a &&@,"
-    pp_print_bool_prop_value trustedConnection;
-  Format.fprintf ppf "c.encryptedTransmission = %a &&@,"
-    pp_print_bool_prop_value encryptedTransmission;
-  Format.fprintf ppf "c.encryptedTransmissionDAL = %a &&@,"
-    pp_print_int_prop_value encryptedTransmissionDAL;
-  Format.fprintf ppf "c.replayProtection = %a &&@,"
-    pp_print_bool_prop_value replayProtection;
+  pp_print_attributes ind ppf "c" attributes;
+  Format.fprintf ppf " &&@,";
   Format.fprintf ppf "@[<v %d>c.source = some (src: ConnectionEnd) {@," ind;
   Format.fprintf ppf "%a@]@,} &&@,"
     (pp_print_connection_end ind "src") source;

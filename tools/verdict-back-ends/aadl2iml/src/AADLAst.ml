@@ -243,6 +243,9 @@ let pp_print_qpref ppf = function
     Format.fprintf ppf "%a::%a" pp_print_id ctx pp_print_id pid
   )
 
+let qpref_to_string qpref =
+  Format.asprintf "%a" pp_print_qpref qpref
+
 let pp_print_const_modifier ppf const =
   if const then Format.fprintf ppf "constant " else ()
 
