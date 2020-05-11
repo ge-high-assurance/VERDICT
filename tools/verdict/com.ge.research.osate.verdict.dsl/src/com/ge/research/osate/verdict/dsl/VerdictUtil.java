@@ -9,6 +9,7 @@ import java.util.Set;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DirectionType;
@@ -66,7 +67,7 @@ public class VerdictUtil {
 	 * @param port the AST object from which to search up the tree
 	 * @return the ports info (see AvailablePortsInfo)
 	 */
-	public static Set<String> getAvailableEventIds(SystemType systemType) {
+	public static Set<String> getAvailableEventIds(ComponentType systemType) {
 		Set<String> eventIds = new HashSet<String>();
 		if (systemType != null) {
 			for (AnnexSubclause annex : systemType.getOwnedAnnexSubclauses()) {
@@ -85,18 +86,18 @@ public class VerdictUtil {
 		return eventIds;
 	}
 
-	public static SystemType getHostingSystemType(EObject element) {
-		SystemType hostingSysType = null;
+	public static ComponentType getHostingSystemType(EObject element) {
+		ComponentType hostingSysType = null;
 		EObject container = element;
 
-		while (!(container instanceof SystemType)) {
+		while (!(container instanceof ComponentType)) {
 			if (container == null) {
 				break;
 			}
 			container = container.eContainer();
 		}
-		if (container instanceof SystemType) {
-			hostingSysType = (SystemType) container;
+		if (container instanceof ComponentType) {
+			hostingSysType = (ComponentType) container;
 		}
 		return hostingSysType;
 	}
