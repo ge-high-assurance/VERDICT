@@ -1,4 +1,7 @@
 (* 
+
+Copyright @ 2020 General Electric Company. All Rights Reserved.
+
 Authors: Heber Herencia-Zapana, Kit Siu
 Date: 25/03/2019
 
