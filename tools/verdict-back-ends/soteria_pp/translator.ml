@@ -9,6 +9,7 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          9/27/2019, Heber Herencia-zapana, added functions to generate defense profiles
          11/05/2019, Kit Siu, added functions to fill in safety information
          11/15/2019, Kit Siu, added functions to deal with hierarchy
+         5/12/2020, Kit Siu, using xml library
 *)
 
 (**
@@ -825,58 +826,52 @@ let propCut2nistCut cOpe defense2nist =
          in List.map dNISTlist ~f:(fun x -> ANot( AVar (c, x) ))       
       | _ -> [] ;;
 
-let rec defenseToView cOpe defense2nist = 
+let rec defenseToView cOpe = 
       match cOpe with 
-      | APro (h::tl) -> List.append (defenseToView h defense2nist) (defenseToView (APro tl) defense2nist)
+      | APro (h::tl) -> List.append (defenseToView h) (defenseToView (APro tl))
       | ANot( AVar (c,d) ) -> 
             [[("comp",c);
-              ("suggested",d)]]
+              ("suggested",d);]]
       | DSum l -> 
             [[("comp",(defenseCompToView (DSum l))); 
               ("suggested",takeDefense2 (DSum l)); ]]
       | DPro l -> 
             [[("comp",(defenseCompToView (DPro l))); 
               ("suggested",takeDefense2 (DPro l)); ]]
-      | _ -> [] ;;
+      | _ -> [] ;;   
 
+let rec defenseProfileTranslator cOpe l_defense2nist =
+      match cOpe with
+      | ANot( AVar (c,d) ) -> DSum (propCut2nistCut (ANot( AVar (c,d) )) l_defense2nist ) (* <-- same as DSum because it's the DeMorgan of the a product of NISTs *)
+      | DSum l -> DSum (List.map l ~f:(fun x -> defenseProfileTranslator x l_defense2nist) ) 
+      | DPro l -> DPro (List.map l ~f:(fun x -> defenseProfileTranslator x l_defense2nist) ) 
+      | _ -> AFALSE ;;
 
-let rec defenseToView2 cOpe defense2nist = 
+let rec defenseToView2 cOpe l_defense2nist = 
       match cOpe with 
-      | APro (h::tl) -> List.append (defenseToView2 h defense2nist) (defenseToView2 (APro tl) defense2nist)
+      | APro (h::tl) -> List.append (defenseToView2 h l_defense2nist) (defenseToView2 (APro tl) l_defense2nist)
       | ANot( AVar (c,d) ) -> 
-         let profile = ssfc_ad ( DSum (propCut2nistCut (ANot( AVar (c,d) )) defense2nist ) ) in (* <-- same as DSum because it's just a product of NISTs *)
             [[("comp",c);
               ("suggested",d);
-              ("profile", takeDefense2 profile) ]]  
+              ("profile", takeDefense2 (ssfc_ad (defenseProfileTranslator (ANot(AVar(c,d))) l_defense2nist))) ]]
       | DSum l -> 
-         let profile = ssfc_ad ( DSum ( List.concat (List.map l ~f:(fun x -> propCut2nistCut x defense2nist) ) ) ) in
             [[("comp",(defenseCompToView (DSum l))); 
               ("suggested", takeDefense2 (DSum l));
-              ("profile", takeDefense2 profile) ]]
+              ("profile", takeDefense2 (ssfc_ad (defenseProfileTranslator (DSum l) l_defense2nist))) ]]
       | DPro l -> 
-         let profile = ssfc_ad ( DPro ( List.concat (List.map l ~f:(fun x -> propCut2nistCut x defense2nist) ) ) ) in
             [[("comp",(defenseCompToView (DPro l))); 
               ("suggested", takeDefense2 (DPro l));
-              ("profile", takeDefense2 profile) ]]
+              ("profile", takeDefense2 (ssfc_ad (defenseProfileTranslator (DPro l) l_defense2nist))) ]] 
       | _ -> [] ;;
       
-(* function below not used *)
-let rec pc2nc cut defense2nist =
-   match cut with
-     | ASum l -> ASum ( List.map l ~f:(fun x -> pc2nc x defense2nist) )
-     | APro l -> APro ( List.map l ~f:(fun x -> pc2nc x defense2nist) )
-     | DSum l -> ssfc_ad ( DSum ( List.concat (List.map l ~f:(fun x -> propCut2nistCut x defense2nist) ) ) )
-     | DPro l -> ssfc_ad ( DPro ( List.concat (List.map l ~f:(fun x -> propCut2nistCut x defense2nist) ) ) )
-     | AVar x -> AVar x ;;
-      
-let make_cutSetTuples cs defense2nist =     
+let make_cutSetTuples cs l_defense2nist =     
    let (cut,pro1,_) = cs in
    ( ("prob",(string_of_float pro1) ), 
       ("attacks", attacksToView cut),
-      ("defense", defenseToView2 cut defense2nist)
+      ("defense", defenseToView2 cut l_defense2nist )
    );;
 
-let cutSetsList csList defense2nist = List.map csList ~f:(fun x-> make_cutSetTuples x defense2nist);;
+let cutSetsList csList l_defense2nist = List.map csList ~f:(fun x-> make_cutSetTuples x l_defense2nist);;
 
 let rec cutSetsSafetyToView cOpe = 
       match cOpe with 
