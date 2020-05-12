@@ -12,7 +12,7 @@
 <text text-anchor="middle" x="56.5" y="-652.8" font-family="Times New Roman,serif" font-size="14.00">Cmd 14 &#160;(Graph)</text>
 <!-- n1 -->
 <g id="node1" class="node"><title>n1</title>
-<g id="a_node1"><a xlink:title="CAPEC&#45;125:Flooding; &#10; CAPEC&#45;26:Leveraging Race Conditions; &#10; CAPEC&#45;248:Command Injection; &#10; CAPEC&#45;123:Buffer Manipulation; &#10; CAPEC&#45;21:Exploitation of Trusted Credentials; &#10; CAPEC&#45;242:Code Injection; &#10; CAPEC&#45;22:Exploiting Trust in Client; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;175:Code Inclusion; &#10; CAPEC&#45;131:Resource Leak Exposure; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;137:Parameter Injection; &#10; CAPEC&#45;25:Forced Deadlock; &#10; CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;594:Traffic Injection; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;28:Fuzzing; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;115:Authentication Bypass; &#10; CAPEC&#45;114:Authentication Abuse; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;112:Brute Force; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;607:Obstruction; &#10; CAPEC&#45;586:Object Injection; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;130:Excessive Allocation; &#10; CAPEC&#45;74:Manipulating User State; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; deviceAuthentication DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate; &#10; insideTrustedBoundary; &#10; controlReceivedFromUntrusted; &#10; dataReceivedFromUntrusted">
+<g id="a_node1"><a xlink:title="CAPEC&#45;125:Flooding; &#10; CAPEC&#45;26:Leveraging Race Conditions; &#10; CAPEC&#45;248:Command Injection; &#10; CAPEC&#45;123:Buffer Manipulation; &#10; CAPEC&#45;242:Code Injection; &#10; CAPEC&#45;22:Exploiting Trust in Client; &#10; CAPEC&#45;175:Code Inclusion; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;131:Resource Leak Exposure; &#10; CAPEC&#45;137:Parameter Injection; &#10; CAPEC&#45;25:Forced Deadlock; &#10; CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;594:Traffic Injection; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;28:Fuzzing; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;607:Obstruction; &#10; CAPEC&#45;586:Object Injection; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;130:Excessive Allocation; &#10; CAPEC&#45;74:Manipulating User State; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; dataReceivedIsUntrusted; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="601.178,-645 500.178,-645 500.178,-609 601.178,-609 601.178,-645"/>
 <text text-anchor="middle" x="550.678" y="-623.3" font-family="Times New Roman,serif" font-size="14.00">deliveryPlanner</text>
 </a>
@@ -20,7 +20,7 @@
 </g>
 <!-- n2 -->
 <g id="node2" class="node"><title>n2</title>
-<g id="a_node2"><a xlink:title="CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; insideTrustedBoundary; &#10; hasSensitiveInfo">
+<g id="a_node2"><a xlink:title="CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; insideTrustedBoundary; &#10; hasSensitiveInfo">
 <polygon fill="red" stroke="black" points="578.678,-558 522.678,-558 522.678,-522 578.678,-522 578.678,-558"/>
 <text text-anchor="middle" x="550.678" y="-536.3" font-family="Times New Roman,serif" font-size="14.00">camera</text>
 </a>
@@ -34,7 +34,7 @@
 </g>
 <!-- n3 -->
 <g id="node3" class="node"><title>n3</title>
-<g id="a_node3"><a xlink:title="&#10; dataReceivedFromUntrusted">
+<g id="a_node3"><a xlink:title="&#10; dataReceivedIsUntrusted">
 <polygon fill="lightgrey" stroke="black" points="537.178,-471 370.178,-471 370.178,-435 537.178,-435 537.178,-471"/>
 <text text-anchor="middle" x="453.678" y="-449.3" font-family="Times New Roman,serif" font-size="14.00">DeliveryDroneSystem.Impl</text>
 </a>
@@ -78,7 +78,7 @@
 </g>
 <!-- n4 -->
 <g id="node4" class="node"><title>n4</title>
-<g id="a_node4"><a xlink:title="&#10; ">
+<g id="a_node4"><a xlink:title="&#10; dataReceivedIsUntrusted">
 <polygon fill="lightgrey" stroke="black" points="782.678,-384 728.678,-384 728.678,-348 782.678,-348 782.678,-384"/>
 <text text-anchor="middle" x="755.678" y="-362.3" font-family="Times New Roman,serif" font-size="14.00">gnc</text>
 </a>
@@ -98,7 +98,7 @@
 </g>
 <!-- n5 -->
 <g id="node5" class="node"><title>n5</title>
-<g id="a_node5"><a xlink:title="CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;624:Fault Injection; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary">
+<g id="a_node5"><a xlink:title="CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;624:Fault Injection; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="276.178,-558 127.178,-558 127.178,-522 276.178,-522 276.178,-558"/>
 <text text-anchor="middle" x="201.678" y="-536.3" font-family="Times New Roman,serif" font-size="14.00">deliveryItemMechanism</text>
 </a>
@@ -112,7 +112,7 @@
 </g>
 <!-- n6 -->
 <g id="node6" class="node"><title>n6</title>
-<g id="a_node6"><a xlink:title="&#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; deviceAuthentication DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; controlReceivedFromUntrusted; &#10; NOT_insideTrustedBoundary; &#10; dataReceivedFromUntrusted">
+<g id="a_node6"><a xlink:title="&#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; NOT_insideTrustedBoundary">
 <polygon fill="lightgrey" stroke="black" points="158.678,-384 104.678,-384 104.678,-348 158.678,-348 158.678,-384"/>
 <text text-anchor="middle" x="131.678" y="-362.3" font-family="Times New Roman,serif" font-size="14.00">radio</text>
 </a>
@@ -126,7 +126,7 @@
 </g>
 <!-- n7 -->
 <g id="node7" class="node"><title>n7</title>
-<g id="a_node7"><a xlink:title="CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;125:Flooding; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;25:Forced Deadlock; &#10; CAPEC&#45;26:Leveraging Race Conditions; &#10; CAPEC&#45;22:Exploiting Trust in Client; &#10; CAPEC&#45;28:Fuzzing; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;130:Excessive Allocation; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;74:Manipulating User State; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;607:Obstruction; &#10; CAPEC&#45;131:Resource Leak Exposure; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; controlReceivedFromUntrusted; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate; &#10; insideTrustedBoundary">
+<g id="a_node7"><a xlink:title="CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="879.178,-210 806.178,-210 806.178,-174 879.178,-174 879.178,-210"/>
 <text text-anchor="middle" x="842.678" y="-188.3" font-family="Times New Roman,serif" font-size="14.00">navigation</text>
 </a>
@@ -214,7 +214,7 @@
 </g>
 <!-- n12 -->
 <g id="node12" class="node"><title>n12</title>
-<g id="a_node12"><a xlink:title="CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary; &#10; canReceiveSWUpdate">
+<g id="a_node12"><a xlink:title="CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;117:Interception; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;607:Obstruction; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;192:Protocol Analysis; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; dataSentIsUntrusted; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary; &#10; canReceiveSWUpdate">
 <polygon fill="red" stroke="black" points="863.178,-297 748.178,-297 748.178,-261 863.178,-261 863.178,-297"/>
 <text text-anchor="middle" x="805.678" y="-275.3" font-family="Times New Roman,serif" font-size="14.00">positionEstimator</text>
 </a>
@@ -288,7 +288,7 @@
 </g>
 <!-- n9 -->
 <g id="node9" class="node"><title>n9</title>
-<g id="a_node9"><a xlink:title="CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; insideTrustedBoundary; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate">
+<g id="a_node9"><a xlink:title="CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;549:Local Execution of Code; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; insideTrustedBoundary; &#10; hasSensitiveInfo; &#10; canReceiveSWUpdate">
 <polygon fill="red" stroke="black" points="832.678,-123 778.678,-123 778.678,-87 832.678,-87 832.678,-123"/>
 <text text-anchor="middle" x="805.678" y="-101.3" font-family="Times New Roman,serif" font-size="14.00">fc</text>
 </a>
@@ -308,7 +308,7 @@
 </g>
 <!-- n8 -->
 <g id="node8" class="node"><title>n8</title>
-<g id="a_node8"><a xlink:title="CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary">
+<g id="a_node8"><a xlink:title="CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;188:Reverse Engineering; &#10; CAPEC&#45;507:Physical Theft; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; hasSensitiveInfo; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="795.178,-36 728.178,-36 728.178,-0 795.178,-0 795.178,-36"/>
 <text text-anchor="middle" x="761.678" y="-14.3" font-family="Times New Roman,serif" font-size="14.00">actuation</text>
 </a>
@@ -340,7 +340,7 @@
 </g>
 <!-- n10 -->
 <g id="node10" class="node"><title>n10</title>
-<g id="a_node10"><a xlink:title="CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; insideTrustedBoundary">
+<g id="a_node10"><a xlink:title="CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; physicalAccessControl DAL 7; &#10; systemAccessControl DAL 7; &#10; memoryProtection DAL 7; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="1143.68,-645 1089.68,-645 1089.68,-609 1143.68,-609 1143.68,-645"/>
 <text text-anchor="middle" x="1116.68" y="-623.3" font-family="Times New Roman,serif" font-size="14.00">imu</text>
 </a>
@@ -380,7 +380,7 @@
 </g>
 <!-- n13 -->
 <g id="node13" class="node"><title>n13</title>
-<g id="a_node13"><a xlink:title="CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;130:Excessive Allocation; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;112:Brute Force; &#10; CAPEC&#45;594:Traffic Injection; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;28:Fuzzing; &#10; CAPEC&#45;175:Code Inclusion; &#10; CAPEC&#45;114:Authentication Abuse; &#10; CAPEC&#45;22:Exploiting Trust in Client; &#10; CAPEC&#45;586:Object Injection; &#10; CAPEC&#45;26:Leveraging Race Conditions; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;242:Code Injection; &#10; CAPEC&#45;21:Exploitation of Trusted Credentials; &#10; CAPEC&#45;248:Command Injection; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;123:Buffer Manipulation; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;74:Manipulating User State; &#10; CAPEC&#45;25:Forced Deadlock; &#10; CAPEC&#45;137:Parameter Injection; &#10; CAPEC&#45;115:Authentication Bypass; &#10; CAPEC&#45;125:Flooding; &#10; CAPEC&#45;131:Resource Leak Exposure; &#10; CAPEC&#45;607:Obstruction; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; deviceAuthentication DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; dataReceivedFromUntrusted; &#10; insideTrustedBoundary">
+<g id="a_node13"><a xlink:title="CAPEC&#45;130:Excessive Allocation; &#10; CAPEC&#45;151:Identity Spoofing; &#10; CAPEC&#45;184:Software Integrity Attack; &#10; CAPEC&#45;594:Traffic Injection; &#10; CAPEC&#45;507:Physical Theft; &#10; CAPEC&#45;148:Content Spoofing; &#10; CAPEC&#45;28:Fuzzing; &#10; CAPEC&#45;175:Code Inclusion; &#10; CAPEC&#45;22:Exploiting Trust in Client; &#10; CAPEC&#45;586:Object Injection; &#10; CAPEC&#45;26:Leveraging Race Conditions; &#10; CAPEC&#45;390:Bypassing Physical Security; &#10; CAPEC&#45;624:Fault Injection; &#10; CAPEC&#45;438:Modification During Manufacture; &#10; CAPEC&#45;242:Code Injection; &#10; CAPEC&#45;248:Command Injection; &#10; CAPEC&#45;440:Hardware Integrity Attack; &#10; CAPEC&#45;123:Buffer Manipulation; &#10; CAPEC&#45;74:Manipulating User State; &#10; CAPEC&#45;25:Forced Deadlock; &#10; CAPEC&#45;439:Manipulation During Distribution; &#10; CAPEC&#45;137:Parameter Injection; &#10; CAPEC&#45;125:Flooding; &#10; CAPEC&#45;131:Resource Leak Exposure; &#10; CAPEC&#45;607:Obstruction; &#10; secureBoot DAL 7; &#10; supplyChainSecurity DAL 7; &#10; inputValidation DAL 7; &#10; physicalAccessControl DAL 7; &#10; staticCodeAnalysis DAL 7; &#10; antiJamming DAL 7; &#10; systemAccessControl DAL 7; &#10; dosProtection DAL 7; &#10; sessionAuthenticity DAL 7; &#10; memoryProtection DAL 7; &#10; resourceAvailability DAL 7; &#10; strongCryptoAlgorithms DAL 7; &#10; dataReceivedIsUntrusted; &#10; insideTrustedBoundary">
 <polygon fill="red" stroke="black" points="1143.68,-471 1089.68,-471 1089.68,-435 1143.68,-435 1143.68,-471"/>
 <text text-anchor="middle" x="1116.68" y="-449.3" font-family="Times New Roman,serif" font-size="14.00">gps</text>
 </a>

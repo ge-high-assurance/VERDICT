@@ -78,6 +78,7 @@ UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
       . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
       . ?CompInst <type> ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
       . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
@@ -127,6 +128,7 @@ UNION # now where there are 3 mitigations for a capec
       . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
       . ?CompInst <type> ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
       . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
