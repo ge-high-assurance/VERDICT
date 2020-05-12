@@ -1,14 +1,3 @@
-(* 
-
-Copyright © 2020 General Electric Company. All Rights Reserved.
-
-Author: Paul Meng, Kit Siu
-Date: 2019-11-04
-
-Updates: 
-
-*)
-
 (**
    Description: This tool provides a compositional, model-based framework
    for modeling, visualizing and analyzing the safety and security of system
@@ -38,6 +27,7 @@ Updates:
 
 open Core
 open PrintBox
+open Xml
 open FaultTree 
 open AttackDefenseTree
 open Qualitative
