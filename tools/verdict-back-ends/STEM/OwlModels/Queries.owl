@@ -152,6 +152,7 @@ UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
       . ?x &lt;http://sadl.org/STEM/BaseModel#id&gt; ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
       . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
@@ -201,6 +202,7 @@ UNION # now where there are 3 mitigations for a capec
       . ?x &lt;http://sadl.org/STEM/BaseModel#id&gt; ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
       . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
       . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
