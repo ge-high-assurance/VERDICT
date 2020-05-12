@@ -507,7 +507,15 @@ public class Aadl2CsvTranslator {
     				scnConnTable.addValue(destPortTypeName);  
     				
     				for(Property prop : connPropertyToName.keySet()) {
-    					String value = getStrRepofPropVal(conn.getPropertyValue(prop));
+    					String value = "";
+						PropertyAcc propAcc = conn.getPropertyValue(prop);
+						PropertyExpression defPropExpr = prop.getDefaultValue();
+						
+						if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+							value = getStrRepofPropVal(propAcc);	
+						} else if(defPropExpr != null) {
+							value = getStrRepofExpr(defPropExpr)[0];
+						}    					
     					scnConnTable.addValue(value);
     				}
     				scnConnTable.capRow();
@@ -533,7 +541,15 @@ public class Aadl2CsvTranslator {
         				scnConnTable.addValue(srcPortName);
         				scnConnTable.addValue(srcPortTypeName);
         				for(Property prop : connPropertyToName.keySet()) {
-        					String value = getStrRepofPropVal(conn.getPropertyValue(prop));
+        					String value = "";
+    						PropertyAcc propAcc = conn.getPropertyValue(prop);
+    						PropertyExpression defPropExpr = prop.getDefaultValue();
+    						
+    						if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+    							value = getStrRepofPropVal(propAcc);	
+    						} else if(defPropExpr != null) {
+    							value = getStrRepofExpr(defPropExpr)[0];
+    						}    					
         					scnConnTable.addValue(value);
         				}
         				scnConnTable.capRow();        				
@@ -569,7 +585,15 @@ public class Aadl2CsvTranslator {
 					
 					if(subcomp.getCategory().getName().equals("system")) {
 						for(Property prop : systemPropertyToName.keySet()) {
-							String value = getStrRepofPropVal(subcomp.getPropertyValue(prop));
+							String value = "";
+							PropertyAcc propAcc = subcomp.getPropertyValue(prop);
+							PropertyExpression defPropExpr = prop.getDefaultValue();
+							
+							if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+								value = getStrRepofPropVal(subcomp.getPropertyValue(prop));	
+							} else if(defPropExpr != null) {
+								value = getStrRepofExpr(defPropExpr)[0];
+							}
 							scnCompPropsTable.addValue(value);
 						}
 					} else {
