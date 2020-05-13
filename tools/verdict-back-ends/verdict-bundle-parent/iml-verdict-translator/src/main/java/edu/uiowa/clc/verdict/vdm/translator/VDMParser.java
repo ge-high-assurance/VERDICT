@@ -1040,6 +1040,8 @@ public class VDMParser extends Parser {
                         DataType dataType = dataType();
                         typeDeclaration.setDefinition(dataType);
                     }
+                } else {
+                    System.out.println("Found Data Type with No Definition!!!!!!!!!!!");
                 }
             }
         }

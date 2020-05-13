@@ -3,8 +3,9 @@
 Copyright © 2020 General Electric Company. All Rights Reserved.
 
 Author: Paul Meng, Kit Siu
+  
 Date: 2019-11-04
-
+  
 Updates: 
 
 *)
@@ -38,6 +39,7 @@ Updates:
 
 open Core
 open PrintBox
+open Xml
 open FaultTree 
 open AttackDefenseTree
 open Qualitative
