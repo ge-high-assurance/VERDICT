@@ -30,12 +30,11 @@ validate <DestCompCategory> not blank skip
 validate <DestPortName> not blank skip
 validate <DestPortType> not blank skip
 validate <connectionType> not blank skip
-validate <deviceAuthentication> not blank skip
 validate <encryptedTransmission> not blank skip
-
+validate <deviceAuthentication> not blank skip
+validate <sessionAuthenticity> not blank skip
 
 transform <deviceAuthentication> to <def0> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
-
 transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 
 <SrcComp> rdfs:subClassOf Subsystem
@@ -60,6 +59,7 @@ transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,
 <ConnectionName><Impl><Comp> connectionDestination <DestCompInstance>
 <ConnectionName><Impl><Comp> inPort <DestPortName>
 <ConnectionName><Impl><Comp> connectionType <connectionType>
+<ConnectionName><Impl><Comp> sessionAuthenticity <sessionAuthenticity>
 <ConnectionName><Impl><Comp> XdeviceAuthentication <def0>
 <ConnectionName><Impl><Comp> XencryptedTransmission <def1>
 
