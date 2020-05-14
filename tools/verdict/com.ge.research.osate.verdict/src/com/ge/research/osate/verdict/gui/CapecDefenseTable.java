@@ -37,13 +37,14 @@ public class CapecDefenseTable {
 			newRow.addToRow("Path # " + (i + 1));
 			newRow.addToRow(path.getLikelihood());
 			newRow.addToRow(path.attacks());
-			newRow.addToRow(path.applicableDefenses());
+			newRow.addToRow(path.suggestedDefenses());
+			newRow.addToRow(path.suggestedDefensesProfile());
 			newRow.addToRow(path.implDefenses());
 			
 			// Find descriptions for all CAPECs and NISTS
 			// We don't have the unformatted attacks/defenses, so we need to do a regex split
 			// We ignore "(", ")", and whitespace, plus the words "and" and "or"
-			for (ComponentData data : path.getComponentCapecs()) {
+			for (ComponentData data : path.getComponentAttacks()) {
 				String[] keys = data.getData().split("[\\s()]");
 				for (String key : keys) {
 					if (key.length() == 0 || "and".equals(key) || "or".equals(key)) {
@@ -55,7 +56,7 @@ public class CapecDefenseTable {
 					}
 				}
 			}
-			for (ComponentData data : path.getComponentDefenses()) {
+			for (ComponentData data : path.getComponentSuggestedDefensesProfile()) {
 				String[] keys = data.getData().split("[\\s()]");
 				for (String key : keys) {
 					if (key.length() == 0 || "and".equals(key) || "or".equals(key)) {
