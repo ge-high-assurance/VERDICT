@@ -343,73 +343,75 @@ public class Instrumentor extends VDMInstrumentor {
                 for (Connection connection : blockImpl.getConnection()) {
 
                     if (connection.getSource().getSubcomponentPort() != null) {
-                	
-	                	ComponentInstance sourceComponent =
-	                            connection.getSource().getSubcomponentPort().getSubcomponent();
-	
-	                    List<GenericAttribute> sourceComponentAttributeList =
-	                            sourceComponent.getAttribute();
-	
-	                    GenericAttribute insideTrustedBoundaryAttribute =
-	                            getAttributeByName(
-	                                    sourceComponentAttributeList, "InsideTrustedBoundary");
-	                    GenericAttribute strongCryptoAlgorithmsAttribute =
-	                            getAttributeByName(
-	                                    sourceComponentAttributeList, "StrongCryptoAlgorithms");
-	
-	                    Boolean insideTrustedBoundary;
-	                    if (insideTrustedBoundaryAttribute != null) {
-	                        insideTrustedBoundary = (Boolean) insideTrustedBoundaryAttribute.getValue();
-	                    } else {
-	                        insideTrustedBoundary = false;
-	                    }
-	
-	                    int strongCryptoAlgorithms;
-	                    if (strongCryptoAlgorithmsAttribute != null) {
-	                        strongCryptoAlgorithms = (int) strongCryptoAlgorithmsAttribute.getValue();
-	                    } else {
-	                        strongCryptoAlgorithms = 0;
-	                    }
-	
-	                    List<GenericAttribute> connectionAttributeList = connection.getAttribute();
-	
-	                    GenericAttribute connectionTypeAttribute =
-	                            getAttributeByName(connectionAttributeList, "ConnectionType");
-	                    GenericAttribute deviceAuthenticationAttribute =
-	                            getAttributeByName(connectionAttributeList, "DeviceAuthentication");
-	                    GenericAttribute sessionAuthenticityAttribute =
-	                            getAttributeByName(connectionAttributeList, "SessionAuthenticity");
-	
-	                    String connectionType;
-	                    if (connectionTypeAttribute != null) {
-	                        connectionType =
-	                                ((String) connectionTypeAttribute.getValue()).toLowerCase();
-	                    } else {
-	                        connectionType = "remote";
-	                    }
-	
-	                    int deviceAuthentication;
-	                    if (deviceAuthenticationAttribute != null) {
-	                        deviceAuthentication = (int) deviceAuthenticationAttribute.getValue();
-	                    } else {
-	                        deviceAuthentication = 0;
-	                    }
-	
-	                    int sessionAuthenticity;
-	                    if (sessionAuthenticityAttribute != null) {
-	                        sessionAuthenticity = (int) sessionAuthenticityAttribute.getValue();
-	                    } else {
-	                        sessionAuthenticity = 0;
-	                    }
-	
-	                    if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("remote"))
-	                            && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
-	                                    || strongCryptoAlgorithms == 0)) {
-	
-	                        vdm_links.add(connection);
-	                        links.add(connection.getName());
-	                    }
-	                }
+
+                        ComponentInstance sourceComponent =
+                                connection.getSource().getSubcomponentPort().getSubcomponent();
+
+                        List<GenericAttribute> sourceComponentAttributeList =
+                                sourceComponent.getAttribute();
+
+                        GenericAttribute insideTrustedBoundaryAttribute =
+                                getAttributeByName(
+                                        sourceComponentAttributeList, "InsideTrustedBoundary");
+                        GenericAttribute strongCryptoAlgorithmsAttribute =
+                                getAttributeByName(
+                                        sourceComponentAttributeList, "StrongCryptoAlgorithms");
+
+                        Boolean insideTrustedBoundary;
+                        if (insideTrustedBoundaryAttribute != null) {
+                            insideTrustedBoundary =
+                                    (Boolean) insideTrustedBoundaryAttribute.getValue();
+                        } else {
+                            insideTrustedBoundary = false;
+                        }
+
+                        int strongCryptoAlgorithms;
+                        if (strongCryptoAlgorithmsAttribute != null) {
+                            strongCryptoAlgorithms =
+                                    (int) strongCryptoAlgorithmsAttribute.getValue();
+                        } else {
+                            strongCryptoAlgorithms = 0;
+                        }
+
+                        List<GenericAttribute> connectionAttributeList = connection.getAttribute();
+
+                        GenericAttribute connectionTypeAttribute =
+                                getAttributeByName(connectionAttributeList, "ConnectionType");
+                        GenericAttribute deviceAuthenticationAttribute =
+                                getAttributeByName(connectionAttributeList, "DeviceAuthentication");
+                        GenericAttribute sessionAuthenticityAttribute =
+                                getAttributeByName(connectionAttributeList, "SessionAuthenticity");
+
+                        String connectionType;
+                        if (connectionTypeAttribute != null) {
+                            connectionType =
+                                    ((String) connectionTypeAttribute.getValue()).toLowerCase();
+                        } else {
+                            connectionType = "remote";
+                        }
+
+                        int deviceAuthentication;
+                        if (deviceAuthenticationAttribute != null) {
+                            deviceAuthentication = (int) deviceAuthenticationAttribute.getValue();
+                        } else {
+                            deviceAuthentication = 0;
+                        }
+
+                        int sessionAuthenticity;
+                        if (sessionAuthenticityAttribute != null) {
+                            sessionAuthenticity = (int) sessionAuthenticityAttribute.getValue();
+                        } else {
+                            sessionAuthenticity = 0;
+                        }
+
+                        if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("remote"))
+                                && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
+                                        || strongCryptoAlgorithms == 0)) {
+
+                            vdm_links.add(connection);
+                            links.add(connection.getName());
+                        }
+                    }
                 }
             }
         }
@@ -688,126 +690,130 @@ public class Instrumentor extends VDMInstrumentor {
                             if (mode == PortMode.IN) {
 
                                 for (Connection connection : blockImpl.getConnection()) {
-                                	
-                                	if (connection.getSource().getSubcomponentPort() != null) {
-                                		
-	                                    ComponentInstance sourceComponent =
-	                                            connection
-	                                                    .getSource()
-	                                                    .getSubcomponentPort()
-	                                                    .getSubcomponent();
-	
-	                                    List<GenericAttribute> sourceComponentAttributeList =
-	                                            sourceComponent.getAttribute();
-	
-	                                    GenericAttribute sourceComponentInsideTrustedBoundaryAttribute =
-	                                            getAttributeByName(
-	                                                    sourceComponentAttributeList,
-	                                                    "InsideTrustedBoundary");
-	                                    GenericAttribute sourceComponentComponentKindAttribute =
-	                                            getAttributeByName(attributeList, "ComponentType");
-	                                    GenericAttribute sourceComponentPedigreeAttribute =
-	                                            getAttributeByName(attributeList, "Pedigree");
-	                                    GenericAttribute
-	                                            sourceComponentStrongCryptoAlgorithmsAttribute =
-	                                                    getAttributeByName(
-	                                                            sourceComponentAttributeList,
-	                                                            "StrongCryptoAlgorithms");
-	
-	                                    Boolean scInsideTrustedBoundary;
-	                                    if (sourceComponentInsideTrustedBoundaryAttribute != null) {
-	                                        scInsideTrustedBoundary =
-	                                                (Boolean)
-	                                                        sourceComponentInsideTrustedBoundaryAttribute
-	                                                                .getValue();
-	                                    } else {
-	                                        scInsideTrustedBoundary = false;
-	                                    }
-	
-	                                    String scComponentKind;
-	                                    if (sourceComponentComponentKindAttribute != null) {
-	                                        scComponentKind =
-	                                                ((String)
-	                                                                sourceComponentComponentKindAttribute
-	                                                                        .getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        scComponentKind = "hybrid";
-	                                    }
-	
-	                                    String scPedigree;
-	                                    if (sourceComponentPedigreeAttribute != null) {
-	                                        scPedigree =
-	                                                ((String)
-	                                                                sourceComponentPedigreeAttribute
-	                                                                        .getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        scPedigree = "cots";
-	                                    }
-	
-	                                    int scStrongCryptoAlgorithms;
-	                                    if (sourceComponentStrongCryptoAlgorithmsAttribute != null) {
-	                                        scStrongCryptoAlgorithms =
-	                                                (int)
-	                                                        sourceComponentStrongCryptoAlgorithmsAttribute
-	                                                                .getValue();
-	                                    } else {
-	                                        scStrongCryptoAlgorithms = 0;
-	                                    }
-	
-	                                    List<GenericAttribute> connectionAttributeList =
-	                                            connection.getAttribute();
-	
-	                                    GenericAttribute connectionTypeAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList, "ConnectionType");
-	                                    GenericAttribute deviceAuthenticationAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList,
-	                                                    "DeviceAuthentication");
-	                                    GenericAttribute sessionAuthenticityAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList, "SessionAuthenticity");
-	
-	                                    String connectionType;
-	                                    if (connectionTypeAttribute != null) {
-	                                        connectionType =
-	                                                ((String) connectionTypeAttribute.getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        connectionType = "remote";
-	                                    }
-	
-	                                    int deviceAuthentication;
-	                                    if (deviceAuthenticationAttribute != null) {
-	                                        deviceAuthentication =
-	                                                (int) deviceAuthenticationAttribute.getValue();
-	                                    } else {
-	                                        deviceAuthentication = 0;
-	                                    }
-	
-	                                    int sessionAuthenticity;
-	                                    if (sessionAuthenticityAttribute != null) {
-	                                        sessionAuthenticity =
-	                                                (int) sessionAuthenticityAttribute.getValue();
-	                                    } else {
-	                                        sessionAuthenticity = 0;
-	                                    }
-	
-	                                    if ((!scInsideTrustedBoundary
-	                                                    || connectionType.equalsIgnoreCase("local"))
-	                                            && !scComponentKind.equalsIgnoreCase("hardware")
-	                                            && (scPedigree.equalsIgnoreCase("cots")
-	                                                    || ((deviceAuthentication == 0
-	                                                                    && sessionAuthenticity == 0)
-	                                                            || scStrongCryptoAlgorithms == 0))) {
-	
-	                                        hasEligibleIncomingChannels = true;
-	                                        break;
-	                                    }
-	                                }
-	                            }
+
+                                    if (connection.getSource().getSubcomponentPort() != null) {
+
+                                        ComponentInstance sourceComponent =
+                                                connection
+                                                        .getSource()
+                                                        .getSubcomponentPort()
+                                                        .getSubcomponent();
+
+                                        List<GenericAttribute> sourceComponentAttributeList =
+                                                sourceComponent.getAttribute();
+
+                                        GenericAttribute
+                                                sourceComponentInsideTrustedBoundaryAttribute =
+                                                        getAttributeByName(
+                                                                sourceComponentAttributeList,
+                                                                "InsideTrustedBoundary");
+                                        GenericAttribute sourceComponentComponentKindAttribute =
+                                                getAttributeByName(attributeList, "ComponentType");
+                                        GenericAttribute sourceComponentPedigreeAttribute =
+                                                getAttributeByName(attributeList, "Pedigree");
+                                        GenericAttribute
+                                                sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                        getAttributeByName(
+                                                                sourceComponentAttributeList,
+                                                                "StrongCryptoAlgorithms");
+
+                                        Boolean scInsideTrustedBoundary;
+                                        if (sourceComponentInsideTrustedBoundaryAttribute != null) {
+                                            scInsideTrustedBoundary =
+                                                    (Boolean)
+                                                            sourceComponentInsideTrustedBoundaryAttribute
+                                                                    .getValue();
+                                        } else {
+                                            scInsideTrustedBoundary = false;
+                                        }
+
+                                        String scComponentKind;
+                                        if (sourceComponentComponentKindAttribute != null) {
+                                            scComponentKind =
+                                                    ((String)
+                                                                    sourceComponentComponentKindAttribute
+                                                                            .getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            scComponentKind = "hybrid";
+                                        }
+
+                                        String scPedigree;
+                                        if (sourceComponentPedigreeAttribute != null) {
+                                            scPedigree =
+                                                    ((String)
+                                                                    sourceComponentPedigreeAttribute
+                                                                            .getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            scPedigree = "cots";
+                                        }
+
+                                        int scStrongCryptoAlgorithms;
+                                        if (sourceComponentStrongCryptoAlgorithmsAttribute
+                                                != null) {
+                                            scStrongCryptoAlgorithms =
+                                                    (int)
+                                                            sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                    .getValue();
+                                        } else {
+                                            scStrongCryptoAlgorithms = 0;
+                                        }
+
+                                        List<GenericAttribute> connectionAttributeList =
+                                                connection.getAttribute();
+
+                                        GenericAttribute connectionTypeAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList, "ConnectionType");
+                                        GenericAttribute deviceAuthenticationAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList,
+                                                        "DeviceAuthentication");
+                                        GenericAttribute sessionAuthenticityAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList,
+                                                        "SessionAuthenticity");
+
+                                        String connectionType;
+                                        if (connectionTypeAttribute != null) {
+                                            connectionType =
+                                                    ((String) connectionTypeAttribute.getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            connectionType = "remote";
+                                        }
+
+                                        int deviceAuthentication;
+                                        if (deviceAuthenticationAttribute != null) {
+                                            deviceAuthentication =
+                                                    (int) deviceAuthenticationAttribute.getValue();
+                                        } else {
+                                            deviceAuthentication = 0;
+                                        }
+
+                                        int sessionAuthenticity;
+                                        if (sessionAuthenticityAttribute != null) {
+                                            sessionAuthenticity =
+                                                    (int) sessionAuthenticityAttribute.getValue();
+                                        } else {
+                                            sessionAuthenticity = 0;
+                                        }
+
+                                        if ((!scInsideTrustedBoundary
+                                                        || connectionType.equalsIgnoreCase("local"))
+                                                && !scComponentKind.equalsIgnoreCase("hardware")
+                                                && (scPedigree.equalsIgnoreCase("cots")
+                                                        || ((deviceAuthentication == 0
+                                                                        && sessionAuthenticity == 0)
+                                                                || scStrongCryptoAlgorithms
+                                                                        == 0))) {
+
+                                            hasEligibleIncomingChannels = true;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -918,125 +924,130 @@ public class Instrumentor extends VDMInstrumentor {
 
                                 for (Connection connection : blockImpl.getConnection()) {
 
-                                	if (connection.getSource().getSubcomponentPort() != null) {
-                                		
-	                                	ComponentInstance sourceComponent =
-	                                            connection
-	                                                    .getSource()
-	                                                    .getSubcomponentPort()
-	                                                    .getSubcomponent();
-	
-	                                    List<GenericAttribute> sourceComponentAttributeList =
-	                                            sourceComponent.getAttribute();
-	
-	                                    GenericAttribute sourceComponentInsideTrustedBoundaryAttribute =
-	                                            getAttributeByName(
-	                                                    sourceComponentAttributeList,
-	                                                    "InsideTrustedBoundary");
-	                                    GenericAttribute sourceComponentComponentKindAttribute =
-	                                            getAttributeByName(attributeList, "ComponentType");
-	                                    GenericAttribute sourceComponentPedigreeAttribute =
-	                                            getAttributeByName(attributeList, "Pedigree");
-	                                    GenericAttribute
-	                                            sourceComponentStrongCryptoAlgorithmsAttribute =
-	                                                    getAttributeByName(
-	                                                            sourceComponentAttributeList,
-	                                                            "StrongCryptoAlgorithms");
-	
-	                                    Boolean scInsideTrustedBoundary;
-	                                    if (sourceComponentInsideTrustedBoundaryAttribute != null) {
-	                                        scInsideTrustedBoundary =
-	                                                (Boolean)
-	                                                        sourceComponentInsideTrustedBoundaryAttribute
-	                                                                .getValue();
-	                                    } else {
-	                                        scInsideTrustedBoundary = false;
-	                                    }
-	
-	                                    String scComponentKind;
-	                                    if (sourceComponentComponentKindAttribute != null) {
-	                                        scComponentKind =
-	                                                ((String)
-	                                                                sourceComponentComponentKindAttribute
-	                                                                        .getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        scComponentKind = "hybrid";
-	                                    }
-	
-	                                    String scPedigree;
-	                                    if (sourceComponentPedigreeAttribute != null) {
-	                                        scPedigree =
-	                                                ((String)
-	                                                                sourceComponentPedigreeAttribute
-	                                                                        .getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        scPedigree = "cots";
-	                                    }
-	
-	                                    int scStrongCryptoAlgorithms;
-	                                    if (sourceComponentStrongCryptoAlgorithmsAttribute != null) {
-	                                        scStrongCryptoAlgorithms =
-	                                                (int)
-	                                                        sourceComponentStrongCryptoAlgorithmsAttribute
-	                                                                .getValue();
-	                                    } else {
-	                                        scStrongCryptoAlgorithms = 0;
-	                                    }
-	
-	                                    List<GenericAttribute> connectionAttributeList =
-	                                            connection.getAttribute();
-	
-	                                    GenericAttribute connectionTypeAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList, "ConnectionType");
-	                                    GenericAttribute deviceAuthenticationAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList,
-	                                                    "DeviceAuthentication");
-	                                    GenericAttribute sessionAuthenticityAttribute =
-	                                            getAttributeByName(
-	                                                    connectionAttributeList, "SessionAuthenticity");
-	
-	                                    String connectionType;
-	                                    if (connectionTypeAttribute != null) {
-	                                        connectionType =
-	                                                ((String) connectionTypeAttribute.getValue())
-	                                                        .toLowerCase();
-	                                    } else {
-	                                        connectionType = "remote";
-	                                    }
-	
-	                                    int deviceAuthentication;
-	                                    if (deviceAuthenticationAttribute != null) {
-	                                        deviceAuthentication =
-	                                                (int) deviceAuthenticationAttribute.getValue();
-	                                    } else {
-	                                        deviceAuthentication = 0;
-	                                    }
-	
-	                                    int sessionAuthenticity;
-	                                    if (sessionAuthenticityAttribute != null) {
-	                                        sessionAuthenticity =
-	                                                (int) sessionAuthenticityAttribute.getValue();
-	                                    } else {
-	                                        sessionAuthenticity = 0;
-	                                    }
-	
-	                                    if ((!scInsideTrustedBoundary
-	                                                    || connectionType.equalsIgnoreCase("remote"))
-	                                            && !scComponentKind.equalsIgnoreCase("hardware")
-	                                            && (scPedigree.equalsIgnoreCase("cots")
-	                                                    || ((deviceAuthentication == 0
-	                                                                    && sessionAuthenticity == 0)
-	                                                            || scStrongCryptoAlgorithms == 0))) {
-	
-	                                        hasEligibleIncomingChannels = true;
-	                                        break;
-	                                    }
-	                                }
-	                            }
+                                    if (connection.getSource().getSubcomponentPort() != null) {
+
+                                        ComponentInstance sourceComponent =
+                                                connection
+                                                        .getSource()
+                                                        .getSubcomponentPort()
+                                                        .getSubcomponent();
+
+                                        List<GenericAttribute> sourceComponentAttributeList =
+                                                sourceComponent.getAttribute();
+
+                                        GenericAttribute
+                                                sourceComponentInsideTrustedBoundaryAttribute =
+                                                        getAttributeByName(
+                                                                sourceComponentAttributeList,
+                                                                "InsideTrustedBoundary");
+                                        GenericAttribute sourceComponentComponentKindAttribute =
+                                                getAttributeByName(attributeList, "ComponentType");
+                                        GenericAttribute sourceComponentPedigreeAttribute =
+                                                getAttributeByName(attributeList, "Pedigree");
+                                        GenericAttribute
+                                                sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                        getAttributeByName(
+                                                                sourceComponentAttributeList,
+                                                                "StrongCryptoAlgorithms");
+
+                                        Boolean scInsideTrustedBoundary;
+                                        if (sourceComponentInsideTrustedBoundaryAttribute != null) {
+                                            scInsideTrustedBoundary =
+                                                    (Boolean)
+                                                            sourceComponentInsideTrustedBoundaryAttribute
+                                                                    .getValue();
+                                        } else {
+                                            scInsideTrustedBoundary = false;
+                                        }
+
+                                        String scComponentKind;
+                                        if (sourceComponentComponentKindAttribute != null) {
+                                            scComponentKind =
+                                                    ((String)
+                                                                    sourceComponentComponentKindAttribute
+                                                                            .getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            scComponentKind = "hybrid";
+                                        }
+
+                                        String scPedigree;
+                                        if (sourceComponentPedigreeAttribute != null) {
+                                            scPedigree =
+                                                    ((String)
+                                                                    sourceComponentPedigreeAttribute
+                                                                            .getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            scPedigree = "cots";
+                                        }
+
+                                        int scStrongCryptoAlgorithms;
+                                        if (sourceComponentStrongCryptoAlgorithmsAttribute
+                                                != null) {
+                                            scStrongCryptoAlgorithms =
+                                                    (int)
+                                                            sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                    .getValue();
+                                        } else {
+                                            scStrongCryptoAlgorithms = 0;
+                                        }
+
+                                        List<GenericAttribute> connectionAttributeList =
+                                                connection.getAttribute();
+
+                                        GenericAttribute connectionTypeAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList, "ConnectionType");
+                                        GenericAttribute deviceAuthenticationAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList,
+                                                        "DeviceAuthentication");
+                                        GenericAttribute sessionAuthenticityAttribute =
+                                                getAttributeByName(
+                                                        connectionAttributeList,
+                                                        "SessionAuthenticity");
+
+                                        String connectionType;
+                                        if (connectionTypeAttribute != null) {
+                                            connectionType =
+                                                    ((String) connectionTypeAttribute.getValue())
+                                                            .toLowerCase();
+                                        } else {
+                                            connectionType = "remote";
+                                        }
+
+                                        int deviceAuthentication;
+                                        if (deviceAuthenticationAttribute != null) {
+                                            deviceAuthentication =
+                                                    (int) deviceAuthenticationAttribute.getValue();
+                                        } else {
+                                            deviceAuthentication = 0;
+                                        }
+
+                                        int sessionAuthenticity;
+                                        if (sessionAuthenticityAttribute != null) {
+                                            sessionAuthenticity =
+                                                    (int) sessionAuthenticityAttribute.getValue();
+                                        } else {
+                                            sessionAuthenticity = 0;
+                                        }
+
+                                        if ((!scInsideTrustedBoundary
+                                                        || connectionType.equalsIgnoreCase(
+                                                                "remote"))
+                                                && !scComponentKind.equalsIgnoreCase("hardware")
+                                                && (scPedigree.equalsIgnoreCase("cots")
+                                                        || ((deviceAuthentication == 0
+                                                                        && sessionAuthenticity == 0)
+                                                                || scStrongCryptoAlgorithms
+                                                                        == 0))) {
+
+                                            hasEligibleIncomingChannels = true;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
 

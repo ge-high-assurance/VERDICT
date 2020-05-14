@@ -105,7 +105,9 @@ public class Token {
         this.sd = sd;
     }
 
-    public Token(SymbolReferenceTerm v) {}
+    public Token(NamedType v) {
+        this.type = Type.get(v.getName());
+    }
 
     public String toString() {
 

@@ -1643,11 +1643,11 @@ public class VDMInstrumentor {
         Connection new_con = new Connection();
         // Copying connection related artifacts
         new_con.setName(connection.getName() + "_instrumented_channel");
-        new_con.setConnType(connection.getConnType());
-        new_con.setFlowType(connection.getFlowType());
-
-        new_con.setDataEncrypted(connection.isEncryptedTransmission());
-        new_con.setAuthenticated(connection.isAuthenticated());
+        //        new_con.setConnType(connection.getConnType());
+        //        new_con.setFlowType(connection.getFlowType());
+        //
+        //        new_con.setDataEncrypted(connection.isEncryptedTransmission());
+        //        new_con.setAuthenticated(connection.isAuthenticated());
 
         new_con.setSource(con_end_inst);
 
