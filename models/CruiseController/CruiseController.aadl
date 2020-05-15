@@ -290,9 +290,7 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::adversariallyTested => true;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
 			};
 			setSpeed: system SetSpeed
 			{
@@ -300,9 +298,7 @@ public
 				VERDICT_Properties::insideTrustedBoundary => false;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::adversariallyTested => false;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 			};
 			controlSpeed: system ControlSpeed
 			{
@@ -310,9 +306,7 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::adversariallyTested => true;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
 			};
 			filter: system Filter
 			{
@@ -320,84 +314,80 @@ public
 				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::adversariallyTested => true;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
 			};
 		
 		connections
 			c01: port on_off -> setSpeed.on_off
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c02: port resume_speed -> setSpeed.resume_speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c03: port set_speed -> setSpeed.set_speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c04: port inc -> setSpeed.inc
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c05: port dec -> setSpeed.dec
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c06: port brake_cancel -> setSpeed.brake_cancel
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c07: port measureSpeed.speed -> setSpeed.speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c08: port measureSpeed.speed -> controlSpeed.speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c09: port setSpeed.enabled -> enabled
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c10: port setSpeed.desired_speed -> filter.desired_speed
 			{
-				VERDICT_Properties::flowType => Xdata;
-		     	VERDICT_Properties::connectionType => Remote;
-			 	VERDICT_Properties::authenticated => false;
-			 	VERDICT_Properties::encryptedTransmission => false;
-			 	VERDICT_Properties::trustedConnection => false;
+				VERDICT_Properties::connectionType => Untrusted;
+				VERDICT_Properties::deviceAuthentication => 0;
+				VERDICT_Properties::encryptedTransmission => 0;
 			};
 			c11: port controlSpeed.force -> force
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c12: port rotate -> measureSpeed.rotate
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c13: port second -> measureSpeed.second
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c14: port filter.filtered_desired_speed -> controlSpeed.desired_speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			c15: port filter_is_enabled -> filter.is_enabled
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			-- Virtual connection for the sake of analysis
 			v01: port filter.filtered_desired_speed -> desired_speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 			v02: port measureSpeed.speed -> speed
 			{
-				VERDICT_Properties::flowType => Xdata;
+				VERDICT_Properties::connectionType => Trusted;
 			};
 	end CruiseControllerSystem.Impl;
 	

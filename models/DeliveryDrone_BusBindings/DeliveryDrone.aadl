@@ -2,10 +2,10 @@ package DeliveryDrone
 
 public
 	with Base_Types;
-    with Data_Types;
-    with Agree_Constants;
-    with Agree_Nodes;
-    with Agree_Constants;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with Agree_Constants;
 	with VERDICT_Properties;
 	with GNC;
 
@@ -572,22 +572,22 @@ public
       		
       		eq release_cmd: bool = (probe_delivery_cmd = Agree_Constants::RELEASE_PACKAGE_CMD);
       		
-      		guarantee "P1: constellation for GPS is initialized properly": 
+      		guarantee "P1: Constellation for GPS is initialized properly":
       			isOn => (most_recent_constellation = probe_constellation);
       		
-      		guarantee "P2: launch location for IMU is initialized properly": 
+      		guarantee "P2: Launch location for IMU is initialized properly":
       			isOn => most_recent_launch_location = probe_launch_location;
       		
-      		guarantee "P3: delivery location for navigation is initialized properly": 
+      		guarantee "P3: Delivery location for navigation is initialized properly":
       			isOn => most_recent_delivery_location = probe_delivery_location;
 
-      		guarantee "P4: a command to release a valuable package is issued only if drone has received confirmation from base":
+      		guarantee "P4: A command to release a valuable package is issued only if drone has received confirmation from base":
     			release_cmd and valuable_package => target_confirmed;
 
   			guarantee "P5: The drone will always request a confirmation to base before starting delivery of a valuable package":
     			delivery_started and valuable_package => confirmation_requested;
 
-    		guarantee "P6: The drone is flying only if since last initialization, it has not got aborted": 
+    		guarantee "P6: The drone is flying only if since last initialization the mission was not aborted":
       			probe_fly_cmd => Agree_Nodes::Since(probe_init_mode, not (probe_abort_mode));
 		**};
 			
@@ -648,8 +648,6 @@ public
 				VERDICT_Properties::insideTrustedBoundary => false;
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => 7;
@@ -661,9 +659,7 @@ public
 				VERDICT_Properties::resourceAvailability => 7;
 				VERDICT_Properties::antiJamming => 7;
 				VERDICT_Properties::dosProtection => 7;
-				VERDICT_Properties::deviceAuthentication => 7;
 				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
 				VERDICT_Properties::strongCryptoAlgorithms => 7;
 				
 							
@@ -677,16 +673,14 @@ public
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
 		
-			 	VERDICT_Properties::adversariallyTested => false;
-			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				--VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => 7;
 				VERDICT_Properties::physicalAccessControl => 7;
 				VERDICT_Properties::systemAccessControl => 7;
-				
 				VERDICT_Properties::secureBoot => 7;
-
 				VERDICT_Properties::memoryProtection => 7;
 			};
 			navigation: system Navigation
@@ -702,9 +696,8 @@ public
 				VERDICT_Properties::supplyChainSecurity => 7;
 				VERDICT_Properties::physicalAccessControl => 7;
 				VERDICT_Properties::systemAccessControl => 7;
-				
 				VERDICT_Properties::secureBoot => 7;
-				VERDICT_Properties::memoryProtection => 7;	
+				VERDICT_Properties::memoryProtection => 7;
 			};
 			fc: system FlightControl
 			{
@@ -719,7 +712,6 @@ public
 				VERDICT_Properties::supplyChainSecurity => 7;
 				VERDICT_Properties::physicalAccessControl => 7;
 				VERDICT_Properties::systemAccessControl => 7;
-				
 				VERDICT_Properties::secureBoot => 7;
 				VERDICT_Properties::memoryProtection => 7;
 			};
@@ -745,31 +737,18 @@ public
 				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
 				VERDICT_Properties::hasSensitiveInfo => true;
 				VERDICT_Properties::canReceiveSWUpdate => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
 			
 				-- VERDICT Cyber Defense and DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => 7;
 				VERDICT_Properties::physicalAccessControl => 7;
 				VERDICT_Properties::systemAccessControl => 7;
-				
 				VERDICT_Properties::secureBoot => 7;
-				VERDICT_Properties::memoryProtection => 7;	
-				
+				VERDICT_Properties::memoryProtection => 7;
 				VERDICT_Properties::staticCodeAnalysis => 7;
-				
 				VERDICT_Properties::resourceAvailability => 7;
-				
 				VERDICT_Properties::antiJamming => 7;
-				
 				VERDICT_Properties::dosProtection => 7;
-				
-				VERDICT_Properties::deviceAuthentication => 7;
-				
 				VERDICT_Properties::inputValidation => 7;
-				
-				VERDICT_Properties::sessionAuthenticity => 7;
-				
 				VERDICT_Properties::strongCryptoAlgorithms => 7;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
@@ -781,11 +760,8 @@ public
 				VERDICT_Properties::hasSensitiveInfo => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				
 				VERDICT_Properties::supplyChainSecurity => 7;
-				
 				VERDICT_Properties::physicalAccessControl => 7;
-				
 				VERDICT_Properties::systemAccessControl => 7;
 				
 			};
@@ -798,11 +774,8 @@ public
 				VERDICT_Properties::hasSensitiveInfo => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				
 				VERDICT_Properties::supplyChainSecurity => 7;
-				
 				VERDICT_Properties::physicalAccessControl => 7;
-				
 				VERDICT_Properties::systemAccessControl => 7;
 			};
 			
@@ -814,153 +787,149 @@ public
 			 	
 			 	VERDICT_Properties::pedigree => COTS;
 			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-			 	VERDICT_Properties::adversariallyTested => false;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 			};
 
 		connections
 			c1: port positionEstimator.est_pos -> navigation.est_pos
-			{VERDICT_Properties::flowType => Xcontrol;
---			 VERDICT_Properties::trustedConnection => false;	
+			{VERDICT_Properties::connectionType => Untrusted;
 			 VERDICT_Properties::encryptedTransmission => 6;
 			};
 			
 			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
-			{VERDICT_Properties::flowType => Xrequest;
-			 VERDICT_Properties::trustedConnection => false;
-			};
+			{VERDICT_Properties::connectionType => Untrusted;};
 			
 			c2: port navigation.move -> fc.move
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 
 			c3: port fc.fc_state -> navigation.flight_control_state
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c4: port deliveryPlanner.dest_location -> navigation.dest_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			
 			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status			
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c9: port camera.camera_out -> deliveryPlanner.camera_result			
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c10: port deliveryPlanner.radio_cmd -> radio.radio_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c11: port radio.radio_out -> deliveryPlanner.radio_response
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c12: port gnc.gps_pos -> positionEstimator.gps_pos
 			{
-			VERDICT_Properties::flowType => Xdata;
-			-- VERDICT_Properties::trustedConnection => false;
+			VERDICT_Properties::connectionType => Trusted;
+			-- VERDICT_Properties::connectionType => Untrusted;
 			};
 			
 			c14a: port bus1 -> connector.bus_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c14b: port connector.bus_out -> DeliveryPlanner.bus_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c15: port deliveryPlanner.bus_out -> bus2
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c16: port comm1 -> radio.comm_in
-			{VERDICT_Properties::flowType => Xdata;
-		     VERDICT_Properties::connectionType => Remote;
-			 VERDICT_Properties::authenticated => false;
+			{VERDICT_Properties::connectionType => Untrusted;
+			 VERDICT_Properties::deviceAuthentication => 0;
 			 VERDICT_Properties::encryptedTransmission => 0;
-			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
-			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
+			 --VERDICT_Properties::deviceAuthentication => 7; -- Fix for Network Injection
+			 --VERDICT_Properties::encryptedTransmission => 5; -- Fix for Network Injection
 			};
 			
 			c17: port radio.comm_out -> comm2
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 
 			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c19: port fc.motor_cmd -> actuation.motor_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c20: port actuation.response -> fc.actuation_response
-			{VERDICT_Properties::flowType => Xdata;};	
+			{VERDICT_Properties::connectionType => Trusted;};
 
 			c22: port satellite0_sig_pos -> gnc.satellite0_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c23: port satellite1_sig_pos -> gnc.satellite1_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 
 			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c27: port deliveryPlanner.camera -> camera.camera_in			
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c28: port deliveryPlanner.radio_cmd -> radio_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c29: port radio.radio_out -> radio_response
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
-			{VERDICT_Properties::flowType => Xdata;}; 							
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c32: port actuation.response -> actuation_out
-			{VERDICT_Properties::flowType => Xdata;};	
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c33: port deliveryPlanner.constellation -> gnc.constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
 			{
-			VERDICT_Properties::flowType => Xdata;
-			--VERDICT_Properties::trustedConnection => false;
+			VERDICT_Properties::connectionType => Trusted;
+			--VERDICT_Properties::connectionType => Untrusted;
 			};
 			
 			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c37: port camera.health_status -> deliveryPlanner.cam_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c38: port gnc.probe_constellation -> probe_constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c40: port gnc.probe_launch_pos -> probe_launch_location
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c41: port navigation.probe_dest_pos -> probe_delivery_location
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c43: port deliveryPlanner.nav_cmd -> probe_fly_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 		properties
 			Actual_Connection_Binding => (reference (ethernet)) applies to c1, c16;			
 															

@@ -213,16 +213,11 @@ public
 				VERDICT_Properties::pedigree => COTS;
 				
 				-- VRERDICT Cyber Defense Properties and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 3;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 3;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 3;
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 3;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 3;
+				VERDICT_Properties::supplyChainSecurity => 3;
+				VERDICT_Properties::physicalAccessControl => 3;
+				VERDICT_Properties::systemAccessControl => 3;
+				VERDICT_Properties::secureBoot => 3;
+				VERDICT_Properties::memoryProtection => 3;
 				
 			};
 			
