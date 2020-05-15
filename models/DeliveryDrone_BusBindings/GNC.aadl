@@ -2,9 +2,9 @@ package GNC
 
 public
 	with Base_Types;
-    with Data_Types;
-    with Agree_Nodes;
-    with VERDICT_Properties;
+	with Data_Types;
+	with Agree_Nodes;
+	with VERDICT_Properties;
 
 	system GPS
 		features
@@ -110,39 +110,29 @@ public
 		
 	end GNC;
 		
-	
 	system implementation GNC.Impl
 		subcomponents
 			gps: system GPS
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with trustedConnection for c12 and c34 to false
+				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with connectionType for c12 and c34 to Untrusted
 				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => COTS;
 				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-					
-				VERDICT_Properties::adversariallyTested => false;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 
-                -- VERDICT Cyber Defenses & DAL Mitigations
---				VERDICT_Properties::supplyChainSecurity => true;
+				-- VERDICT Cyber Defenses & DAL Mitigations
 				VERDICT_Properties::supplyChainSecurity => 7;
---				VERDICT_Properties::physicalAccessControl => true;
 				VERDICT_Properties::physicalAccessControl => 7;
---				VERDICT_Properties::systemAccessControl => true;
 				VERDICT_Properties::systemAccessControl => 7;
---				VERDICT_Properties::secureBoot => true;
 				VERDICT_Properties::secureBoot => 7;
---				VERDICT_Properties::memoryProtection => true;
 				VERDICT_Properties::memoryProtection => 7;
 				VERDICT_Properties::staticCodeAnalysis => 7;
 				VERDICT_Properties::resourceAvailability => 7;
 				VERDICT_Properties::antiJamming => 7;
 				VERDICT_Properties::dosProtection => 7;
-				VERDICT_Properties::deviceAuthentication => 7;
 				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
-				VERDICT_Properties::strongCryptoAlgorithms => 7;																
+				VERDICT_Properties::strongCryptoAlgorithms => 7;
 			};
 			imu: system IMU
 			{ 
@@ -161,24 +151,24 @@ public
 			};
 		connections
 			i1: port constellation -> gps.constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i2: port satellite0_pos -> gps.satellite0_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i3: port satellite1_pos -> gps.satellite1_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i4: port launch_pos -> imu.launch_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i5: port gps.gps_pos -> gps_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i6: port gps.health_status -> gps_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i7: port gps.probe_constellation -> probe_constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i8: port imu.imu_pos -> imu_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i9: port imu.health_status -> imu_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{VERDICT_Properties::connectionType => Trusted;};
 			i10: port imu.probe_launch_pos -> probe_launch_pos
-			{VERDICT_Properties::flowType => Xdata;};			
+			{VERDICT_Properties::connectionType => Trusted;};
 	end GNC.Impl;
 end GNC;
