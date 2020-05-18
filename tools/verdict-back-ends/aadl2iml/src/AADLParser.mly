@@ -544,12 +544,13 @@ component_properties:
 property_set:
   PROPERTY SET pid = ident IS
   i_units = list(property_set_imported_units)
-  list(property_set_body_item)
+  decls = list(property_set_body_item)
   list(annex_subclause)
   END ID ";"
   {
     {A.name = pid;
      A.imported_units = List.flatten i_units;
+     A.declarations = decls;
     }
   }
 
@@ -557,9 +558,9 @@ property_set_imported_units:
   WITH i_units = separated_nonempty_list(",", imported_unit) ";" { i_units }
 
 property_set_body_item:
-  | property_type ";" {}
-  | property_definition ";" {}
-  | property_constant ";" {}
+  | property_type ";" { A.UnsupportedDecl }
+  | def = property_definition ";" { A.PropertyDef def }
+  | property_constant ";" { A.UnsupportedDecl }
 
 property_type:
   | boolean_type {}
@@ -573,34 +574,57 @@ property_type:
   | reference_type {}
   | record_type {}*)
 
-boolean_type: ID ":" TYPE unnamed_boolean_type {}
+boolean_type: ident ":" TYPE unnamed_boolean_type {}
 
-string_type: ID ":" TYPE unnamed_string_type {}
+string_type: ident ":" TYPE unnamed_string_type {}
 
-enumeration_type: ID ":" TYPE unnamed_enumeration_type {}
+enumeration_type: ident ":" TYPE unnamed_enumeration_type {}
 
-units_type: ID ":" TYPE unnamed_units_type {}
+units_type: ident ":" TYPE unnamed_units_type {}
 
-real_type: ID ":" TYPE unnamed_real_type {}
+real_type: ident ":" TYPE unnamed_real_type {}
 
-integer_type: ID ":" TYPE unnamed_integer_type {}
+integer_type: ident ":" TYPE unnamed_integer_type {}
 
 property_definition:
-  ID ":" option(INHERIT)
+  pid = ident ":" inh = boption(INHERIT)
   referenced_property_type_or_unnamed_property_type
-  option(pair("=>", property_expression))
-  APPLIES TO "(" applies_to_element ")"
-  {}
+  odv = opt_default_value
+  APPLIES TO "(" ate = applies_to_element ")"
+  {
+    { A.name = pid;
+      A.is_inheritable = inh;
+      A.default_value = odv;
+      A.applies_to = ate;
+    }
+  }
+
+opt_default_value:
+  | { None }
+  | "=>" v = property_expression { Some v }
 
 applies_to_element:
-  | separated_nonempty_list(",", property_owner) {}
-  | all_reference {}
+  | l = separated_nonempty_list(",", property_owner)
+  {
+    l |> List.fold_left (fun acc e ->
+      match acc, e with
+      | A.All, _ -> A.All
+      | A.System, A.Connection -> A.All
+      | A.System, _ -> A.System
+      | A.Connection, A.System -> A.All
+      | A.Connection, _ -> A.Connection
+      | A.Other, _ -> e
+    )
+    A.Other
+  }
+  | all_reference
+  { A.All }
 
 property_owner:
   (* qm_reference rule has been expanded here to avoid shift/reduce conflicts *)
-  | qm_annex_ref nonempty_list(metaclass_name) {} (* qm_reference *)
-  | nonempty_list(metaclass_name) {} (* qm_reference *)
-  | qc_reference {}
+  | qm_annex_ref metaclass_name { A.Other } (* qm_reference *)
+  | mn = metaclass_name { mn } (* qm_reference *)
+  | qc_reference { A.Other }
 
 qm_annex_ref:
   "{" ID "}" "*" "*" {}
@@ -610,13 +634,13 @@ qc_reference: fqcref {} (* aadl2::ComponentClassifier *)
 fqcref: ID "::" separated_nonempty_list("::", ID) option(pair(".", ID)) {}
 
 metaclass_name:
-  | core_keyword {}
-  | ID {}
+  | ck = core_keyword { ck }
+  | ID { A.Other }
 
 core_keyword:
-  | system_or_abstract {}
-  | CONNECTIONS {}
-  | PORT {}
+  | system_or_abstract { A.System }
+  | CONNECTIONS { A.Connection }
+  | PORT { A.Other }
   (* INCOMPLETE *)
 
 system_or_abstract:
@@ -632,7 +656,7 @@ qm_reference:
 all_reference: ALL {}
 
 property_constant:
-  ID ":" CONSTANT
+  ident ":" CONSTANT
   referenced_property_type_or_unnamed_property_type
   "=>" constant_property_expression
   {}
