@@ -10,6 +10,7 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          11/05/2019, Kit Siu, added functions to fill in safety information
          11/15/2019, Kit Siu, added functions to deal with hierarchy
          5/12/2020, Kit Siu, using xml library
+         5/18/202, Heber Herencia-Zapana, added inferring  cyber relations.
 *)
 
 (**
@@ -596,13 +597,54 @@ let formula name coutputs cinputs l_comp_dep l_attack ciaList =
     let formulaOut name out = List.map ciaList ~f:(fun x-> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
-let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList = 
+(*cyber relation inferring*)
+let elemExtract l ltag = 
+     let extracTags l ltag = List.map ltag (fun x->(x,List.Assoc.find_exn l x ~equal:(=)))  in 
+     List.dedup_and_sort ~compare:compare (List.map l (fun x-> extracTags x ltag));; 
+let elemExtractVal l ltag = 
+     let extracTags l ltag = List.map ltag (fun x->List.Assoc.find_exn l x ~equal:(=))  in
+     List.dedup_and_sort ~compare:compare (List.map l (fun x-> extracTags x ltag));; 
+     
+let filterTags l tag = 
+ let value a = List.Assoc.find_exn a tag ~equal:(=) in
+ let clean l = List.filter l (fun x->x<>[]) in 
+ clean (List.map l (fun a-> if (value a = "") then a else [] ));;
+let ele_l_nol1 l l1 =
+  let clean l = List.concat l in  
+  clean(List.map l (fun x->if (List.mem l1 x ~equal:(=) = true) then [] else [x]));; 
+
+(*components without cyber relations, components with implementation are not considered*)
+let compCyberInfe larch  filter1 lcompDepen  =
+ let compArchSelected larch filter1= elemExtractVal (filterTags (elemExtract larch [srcType_Arc;filter1]) filter1) [srcType_Arc] in
+ let compWithCyberRel lcompDepen  = elemExtractVal lcompDepen  [compType_C] in
+ List.concat (ele_l_nol1 (compArchSelected larch filter1) (compWithCyberRel lcompDepen));;
+
+let formulaInfe_aux name cia out linputs l_attack= 
+    let l = List.concat (noEmptyList (attack_cia name cia l_attack)) in
+    let lattack = List.map l (fun x->A[x]) in
+    let confidInteg = List.map linputs (fun x->A[x;cia]) in
+    let availability = List.concat (List.map linputs (fun x->[A[x;cia];A[x;"Integrity"]])) in (*No hard coded*) 
+    ([out; cia], Or (List.concat [lattack; if (cia = "Availability") then availability else confidInteg]));;
+    
+let formulaInfe name coutputs cinputs l_attack ciaList = 
+    let formulaOut name out = List.map ciaList ~f:(fun x-> formulaInfe_aux name x out cinputs l_attack) in
+    (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
+(* Heber 
+let formulaInfeCyber name coutputs cinputs l_comp_dep l_attack ciaList l_arch comNoCyberRe=
+ if List.mem comNoCyberRe name ~equal:(=)
+ then formulaInfe name coutputs cinputs l_attack ciaList
+ else formula name coutputs cinputs l_comp_dep l_attack ciaList;;
+*)
+(**)
+
+let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
 	and cinputs = (compInputArch name l_arch)
 	and cevents = (compEvents name l_events)
 	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
 	(*and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) *)
+	and comNoCyberRe = compCyberInfe l_arch srcImpl_Arc l_comp_dep
 	in 
 	genComp (*name*)            name 
 			(*input_flows*)     cinputs 
@@ -610,11 +652,15 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defe
 			(*faults*)          iaList (* (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
 			(*basic_events*)    cevents 
 			(*event_info*)      (compEventsInfo name l_events cevents) 
-			(*fault_formulas*)  (formulaSafe name coutputs cinputs cevents l_comp_saf iaList)
+			(*fault_formulas*)  (if infeSafe 
+			                      then (formulaSafe name coutputs cinputs cevents l_comp_saf iaList)
+			                      else (formulaSafe name coutputs cinputs cevents l_comp_saf iaList))
 			(*attacks*)         ciaList (*  (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
 			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
 			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
-			(*attack_formula*)  (formula name coutputs cinputs l_comp_dep l_attack ciaList) 
+			(*attack_formula*)  (if (infeCyber && List.mem comNoCyberRe name ~equal:(=))
+			                        then (formulaInfe name coutputs cinputs l_attack ciaList)
+			                        else (formula name coutputs cinputs l_comp_dep l_attack ciaList)) 
 			(*defense_events*)  (defenseEvents name defType l_defense)   (* eventsList *)
 			(*defense_rigors*)  (defenseRigors name defType l_defense)   (* rigorsList *)  
 			(*defense_profiles*)(defenseProfile name defType l_defense l_defense2nist);;
@@ -692,8 +738,8 @@ let gen_model reqId l_arch l_mission =
 	genModel (instances reqId l_arch) (connections reqId l_arch l_mission) fault attack;;
  
 (**)
-let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission ciaList iaList = 
-    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList) in
+let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission ciaList iaList infeCyber infeSafe= 
+    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe) in
     let rType = compReqType reqId l_mission in
     match rType with
     | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
@@ -703,7 +749,7 @@ let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_d
 
 (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
 
-let libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist =
+let libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist infeCyber infeSafe =
    let ciaList = ["Confidentiality";"Integrity";"Availability"] (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; *)
    and iaList = ["Integrity";"Availability"]  (* <-- these can be hardcoded because these are the only options allowed in the VERDICT annex; *)
    and arch_prime = massageArch arch 
@@ -715,7 +761,7 @@ let libraries_threatConditions deftype compDepen compSafe attack events arch mis
        (* find what reqIDs are under this missionReqID and iterate through those *)
        let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) reqId_M)) in
 	   (y, List.map reqL ~f:(fun x->
-	      (x,deftype),((gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission ciaList iaList), 
+	      (x,deftype),((gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission ciaList iaList infeCyber infeSafe), 
                         gen_model x arch_prime mission)
           )
        )
@@ -1043,7 +1089,7 @@ let rec removeMissionsWithNoReq l_librariesThreats =
 
        
 (* Analyze function - Calls model_to_adtree and model_to_ftree. Generates the artifacts *)
-let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath =
+let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
    let compDepen =  mainListtag comp_dep_ch  
    and compSafe = mainListtag comp_saf_ch
    and attack    = mainListtag attack_ch
@@ -1056,15 +1102,15 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
    (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
    List.iter [applProps_D; implProps_D] ~f:(fun deftype ->
    
-     let xml_oc = Out_channel.create (fpath^deftype^".xml")  
+     (*let xml_oc = Out_channel.create (fpath^deftype^".xml")  
      and xml_safety_oc = Out_channel.create (fpath^deftype^"-safety.xml")  
-     in
+     in*)
   
      (* check if there's anything to analyze *)
      if List.is_empty mission 
      then Format.printf 
           "Info: mission.csv is empty. No requirements to analyze@." ;   
-     let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist
+     let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist infeCyber infeSafe
   
      in
      
