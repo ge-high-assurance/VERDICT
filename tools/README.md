@@ -181,3 +181,7 @@ in additional subprocesses directly on your system as well.
 For further information about how to analyze a model's system
 architecture using our VERDICT tools, please read our VERDICT [User
 Manual](https://github.com/ge-high-assurance/VERDICT/wiki/VERDICT-Modeling-Style-Guide-&-User-Manual:-V1-to-support-VERDICT-VM-19.1-Tool-Assessment-%233).
+
+## Setting up CI/CD environment in GitHub Actions
+
+This is a placeholder. Testing build again.
