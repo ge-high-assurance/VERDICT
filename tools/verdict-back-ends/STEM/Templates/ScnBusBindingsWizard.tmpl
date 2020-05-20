@@ -1,0 +1,32 @@
+//
+//
+// Copyright © 2020 General Electric Company
+//
+// Author: Abha Moitra
+// Date: 2020-03-24
+//
+//
+
+uri "http://sadl.org/STEM/Scenario3" alias scn3
+
+import "http://sadl.org/STEM/BaseModel".
+import "http://sadl.org/STEM/Scenario".
+import "http://sadl.org/STEM/Scenario2".
+
+//log "c:/tmp/scnconnections.log"
+
+validate <Scenario> not blank skip
+validate <Comp> not blank skip
+validate <Impl> not blank skip
+validate <ActualConnectionBindingSrcComp> not blank skip
+validate <ActualConnectionBindingSrcImpl> not blank skip
+validate <ActualConnectionBindingSrcCompInst> not blank skip
+validate <ActualConnectionBindingSrcBusInst> not blank skip
+validate <ActualConnectionBindingDestConnComp> not blank skip
+validate <ActualConnectionBindingDestConnImpl> not blank skip
+validate <ActualConnectionBindingDestConnCompInst> not blank skip
+validate <ActualConnectionBindingDestConn> not blank skip
+
+<ActualConnectionBindingSrcBusInst> rdf:type Bus
+<ActualConnectionBindingDestConn><Impl><Comp> binding <ActualConnectionBindingSrcBusInst>
+

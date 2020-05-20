@@ -26,7 +26,8 @@ import "http://sadl.org/STEM/Queries".
 // Oracle VM has SADL version dated 20190311.
 // OVA on my laptop is dated 20190311.
 
-//5/8/2020: Reconciled properties, cleaned out, updated / cleared out default rules.
+// 5/19/2020: updated rules to handle connection properties, added tooltips for connections in graph; outputting ConnDefenses.csv
+// 5/8/2020: Reconciled properties, cleaned out, updated / cleared out default rules.
 // 4/6/2020:
 //			* Altered 2 queries to address when SrcComp is same as SrcCompInstanc
 //			* Instead of outputting something like 7antiJamming we now output antiJamming DAL 7
@@ -40,7 +41,7 @@ Read: data from "ScnConnections.csv" using "ScnConnections.tmpl".  //connections
 Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
 Read: data from "ScnBusBindings.csv" using "ScnBusBindings.tmpl".
 
-//Explain: Rule InferConnectionDestination.
+//Explain: Rule InferDataReceivedIsUntrusted1.
 // note this count may be larger than the number of entries in CAPEC.csv as there may be 
 // multiple mitigations for a capec (e.g. capec-148 etc.)
 Print: "Just get the counts of all CIA Issues".
@@ -51,6 +52,8 @@ Write: data {Ask: queries:Defenses2NIST.} to "/Output/Defenses2NIST.csv".
 Write: data {Ask: queries:CAPEC.} to "/Output/CAPEC.csv". 
 
 Write: data {Ask: queries:Defenses.} to "/Output/Defenses.csv".
+
+Write: data {Ask: queries:ConnDefenses.} to "/Output/ConnDefenses.csv".
 
 Write: data {Ask: queries:ArchMitigation.} to "/Output/ArchMitigation.csv".
 
@@ -173,10 +176,25 @@ Graph: queries:STEMgraph.
 //} group by ?cid ?desc2
 //order by ?cid".
 
+// get all the capecs for components
+//Ask: "select distinct ?CompInst ?Capec ?Desc where 
+//{?CompInst <applicableCM> ?x
+//  . ?x <id> ?Capec . ?x <capecDesc> ?Desc
+//} order by ?CompInst ?Capec".
+
 // get all dataSent and dataReceived is untrusted
 //Ask: "select * where
 //{?x <dataSentIsUntrusted> ?y}".
 //
 //Ask: "select * where
 //{?x <dataReceivedIsUntrusted> ?y}".
+
+//Ask: "select * where
+//{?conn <rdf:type> <Connection> . ?conn <connectionName> ?connname
+//. LET(?strippedcname := replace(str(?connname),'^.*#',''))
+//. ?conn <connectionType> ?t . FILTER(regex(str(?t),'Untrusted'))
+//}".
+
+
+
             
