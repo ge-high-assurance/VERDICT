@@ -535,3 +535,15 @@ let merge_packages input =
     main_pkg :: property_sets
   )
 
+
+let get_verdict_properties input =
+  let ast =
+    input |> List.find_opt (function
+      | AD.PropertySet (_, { AD.name }) -> (snd name) = "VERDICT_Properties"
+      | _ -> false
+    )
+  in
+  match ast with
+  | Some (AD.PropertySet (_, ps)) -> Some ps
+  | _ -> None
+

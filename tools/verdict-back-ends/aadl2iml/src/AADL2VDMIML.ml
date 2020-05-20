@@ -585,38 +585,89 @@ let get_instance_index sys_impl iml_comp_types = function
   )
   | _ -> assert false
 
-let get_attributes properties =
-  let properties = (* Filter lists *)
-    properties |> List.filter (fun { AD.value } ->
-      match value with AD.ListTerm _ -> false | _ -> true
-    )
-  in
-  properties |> List.map (fun { AD.name; AD.value } ->
+
+module AttrMap = Map.Make(struct
+  type t = string
+  let compare = (fun s1 s2 ->
+    String.compare
+      (String.lowercase_ascii s1)
+      (String.lowercase_ascii s2)
+  )
+end
+)
+
+let get_iml_prop_value = function
+  | AD.BooleanLit b ->
+    (VI.Bool, if b then "true" else "false")
+  | AD.IntegerTerm nl ->
+    (VI.Integer, C.numeric_literal_to_string nl)
+  | AD.RealTerm nl ->
+    (VI.Integer, C.numeric_literal_to_string nl)
+  | AD.StringLit str ->
+    (VI.String, str)
+  | AD.LiteralOrReference qpr ->
+    (VI.String, AD.qpref_to_string qpr)
+  | AD.ListTerm _ -> failwith "List-value properties are not supported yet"
+
+
+let get_attributes e_name default_props properties =
+  properties |> List.fold_left (fun acc { AD.name; AD.value } ->
     let name =
       match name with
       | Some (_,"VERDICT_Properties"), (_, id) -> id
       | _ -> AD.qpref_to_string name
     in
-    match value with
-    | AD.BooleanLit b ->
-      { name; VI.atype = Bool; VI.value = if b then "true" else "false" }
-    | AD.IntegerTerm nl ->
-      { name; VI.atype = Integer; VI.value = C.numeric_literal_to_string nl }
-    | AD.RealTerm nl ->
-      { name; VI.atype = Integer; VI.value = C.numeric_literal_to_string nl }
-    | AD.StringLit str ->
-      { name; VI.atype = String; VI.value = str }
-    | AD.LiteralOrReference qpr ->
-      { name; VI.atype = String; VI.value = AD.qpref_to_string qpr }
-    | AD.ListTerm _ -> failwith "Properties with list values are not supported yet"
+    acc |> AttrMap.update name (fun e ->
+      match e with
+      | None -> None (* Not a VERDICT Property, ignore it *)
+      | Some _ -> Some (Some (get_iml_prop_value value))
+    )
+  )
+  default_props
+  |> AttrMap.bindings
+  |> List.map (fun (name, v) ->
+     match v with
+     | None -> (
+       let msg =
+         Format.asprintf
+           "Mandatory VERDICT Property '%s' not set in '%s'"
+             name e_name
+       in
+       failwith msg
+     )
+     | Some (atype, value) -> { VI.name = name; atype; value }
   )
 
-let subcomponent_to_comp_inst sys_impl iml_comp_types
+let split_property_set_and_get_map { AD.declarations } =
+  declarations |> List.map (function
+    | AD.UnsupportedDecl ->
+      failwith ("Unsupported declaration in VERDICT Properties file!")
+    | AD.PropertyDef def -> def
+  )
+  |> List.fold_left
+    (fun (comp, conn) { AD.name; AD.default_value; AD.applies_to } ->
+      let name = C.get_id name in
+      let value =
+        match default_value with
+        | None -> None
+        | Some expr -> Some (get_iml_prop_value expr)
+      in
+      match applies_to with
+      | All -> (AttrMap.add name value comp, AttrMap.add name value conn)
+      | System -> (AttrMap.add name value comp, conn)
+      | Connection -> (comp, AttrMap.add name value conn)
+      | Other -> (comp, conn)
+    )
+    (AttrMap.empty, AttrMap.empty)
+
+
+let subcomponent_to_comp_inst comp_props sys_impl iml_comp_types
   {AD.name; AD.type_ref; AD.properties }
 =
- {VI.name = C.get_id name;
+ let name = C.get_id name in
+ {VI.name = name;
   VI.itype = get_instance_index sys_impl iml_comp_types type_ref;
-  VI.attributes = get_attributes properties
+  VI.attributes = get_attributes name comp_props properties
  }
 
 let get_port_index {VI.ports} port =
@@ -655,12 +706,13 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
     VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct port)
   )
 
-let port_connection_to_iml_connection ct ct_idx sys_impl iml_comp_types subcomps
+let port_connection_to_iml_connection conn_props ct ct_idx sys_impl iml_comp_types subcomps
   { AD.name; AD.dir; AD.src; AD.dst; AD.properties }
 =
   assert (dir = AD.Unidirectional);
-  {VI.name = C.get_id name;
-   VI.attributes = get_attributes properties;
+  let name = C.get_id name in
+  {VI.name = name;
+   VI.attributes = get_attributes name conn_props properties;
    VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
    VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
   }
@@ -788,7 +840,10 @@ let empty_dataflow_impl =
    VI.properties = [];
   }
 
-let system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impl =
+let system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impl =
+  let comp_props, conn_props =
+    split_property_set_and_get_map v_props
+  in
   sys_impl |> List.map
   (fun {AD.name; AD.subcomponents; AD.connections; AD.annexes} ->
     let iml_name =
@@ -809,11 +864,11 @@ let system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impl =
         let b_impl =
           let subcomponents =
             subcomponents |>
-            List.map (subcomponent_to_comp_inst sys_impl iml_comp_types)
+            List.map (subcomponent_to_comp_inst comp_props sys_impl iml_comp_types)
           in
           let connections =
             connections |> List.map
-              (port_connection_to_iml_connection
+              (port_connection_to_iml_connection conn_props
                 ct ct_idx sys_impl iml_comp_types subcomponents)
           in
           ({ subcomponents; connections } : VI.block_impl)
@@ -959,7 +1014,7 @@ let missions_of_system_types sys_types =
            -> Some (iml_of_mission id reqs description comment)
          | _ -> None) |> filter_opt
 
-let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
+let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs } =
   let comp_types, comp_impls =
     List.fold_left (fun (cts, cis) -> function
       | AD.ComponentType ct -> (ct :: cts, cis)
@@ -988,7 +1043,7 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
     system_types_to_iml_comp_types type_decls sys_types
   in
   let iml_comp_impl =
-    system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impls
+    system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impls
   in
   let dataflow_code =
     match List.find_opt AD.is_agree_annex annex_libs with
@@ -1015,7 +1070,7 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
    VI.missions = missions
   }
 
-let aadl_ast_to_vdm_iml = function
+let aadl_ast_to_vdm_iml v_props = function
   | AD.AADLPackage (_, { AD.name ; AD.public_sec }) -> (
     match public_sec with
     | None -> None
@@ -1023,7 +1078,7 @@ let aadl_ast_to_vdm_iml = function
       let pkg =
         let pkg_name = aadl_pname_to_iml_pname name in
         { VI.name = pkg_name;
-          VI.model = pkg_sec_to_model pkg_name sec;
+          VI.model = pkg_sec_to_model v_props pkg_name sec;
         }
       in
       Some pkg

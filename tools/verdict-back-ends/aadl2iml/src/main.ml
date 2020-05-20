@@ -68,19 +68,22 @@ let process_input_files input_files output_file =
       match AADLInput.sort_model_units input with
       | Ok input -> (
         (*List.iter process_ast (AADLInput.merge_packages (List.rev input));*)
-        let input = AADLInput.merge_packages (List.rev input) in
-        match List.find_opt AADLAst.is_aadl_package input with
-        | None -> ()
-        | Some ast -> (
-          match AADL2VDMIML.aadl_ast_to_vdm_iml ast with
+        match AADLInput.get_verdict_properties input with
+        | None -> Format.eprintf "VERDICT Properties file not found!"
+        | Some verdict_props ->
+          let input = AADLInput.merge_packages (List.rev input) in
+          match List.find_opt AADLAst.is_aadl_package input with
           | None -> ()
-          | Some vdm_iml -> (
-            if output_file = "" then
-              Format.printf "%a@." VDMIML.pp_print_vdm_iml vdm_iml
-            else
-              write_vdm_iml_model_to_file vdm_iml output_file
+          | Some ast -> (
+            match AADL2VDMIML.aadl_ast_to_vdm_iml verdict_props ast with
+            | None -> ()
+            | Some vdm_iml -> (
+              if output_file = "" then
+                Format.printf "%a@." VDMIML.pp_print_vdm_iml vdm_iml
+              else
+                write_vdm_iml_model_to_file vdm_iml output_file
+            )
           )
-        )
       )
       | Error _ ->
         Format.eprintf "Cycle found!@."
