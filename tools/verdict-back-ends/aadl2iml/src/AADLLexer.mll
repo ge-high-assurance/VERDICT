@@ -47,6 +47,7 @@
     "properties",     P.PROPERTIES ;
     "subcomponents",  P.SUBCOMPONENTS ;
     "connections",    P.CONNECTIONS ;
+    "connection",     P.CONNECTION ;
     "public",         P.PUBLIC ;
     "private",        P.PRIVATE ;
     "renames",        P.RENAMES ;
