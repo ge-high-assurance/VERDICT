@@ -193,8 +193,27 @@ UNION # now where there are 3 mitigations for a capec
 } order by ?CompInst ?CAPEC ?ic ?ii ?ia ?ADP
 ".
 
-Graph STEMgraph: "
-select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?finallist as ?N1_tooltip) where
+Ask ConnDefenses: " # for connections, each capec has only a single mitigation
+select ('Connection' as ?CompType) ?CompInst ?Src ?Dest ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
+       (?m1 as ?ApplicableDefenseProperties) (?y2 as ?ImplProperties) ?DAL where
+{  ?conn <connectionName> ?CompInst . ?conn <applicableCM> ?x
+ . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
+ . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
+ . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
+ . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
+ . ?x <mitigation> ?m1
+ . LET(?temp1 := lcase(str(?m1)))
+ . OPTIONAL{?conn ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
+            . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?DAL 
+           }
+ . ?conn <connectionSource> ?Src . ?conn <connectionDestination> ?Dest
+}order by ?CompInst ?CAPEC 
+".
+
+Graph STEMgraph: " # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl
+# but link_style worked
+select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color 
+(?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where
 {  ?conn <rdf:type> <Connection>
  . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest
  . ?conn <outPort> ?oport . ?conn <inPort> ?iport
@@ -208,7 +227,10 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?
 # . LET(?link := concat(concat(str(?oport),':'),str(?iport)))  # if we want to show port names at both ends
 # . LET(?link := ' ') 										   # if we want to show nothing
  . LET(?link := ?strippedcname) 								# if we want to show connection name
-# now get list of CAPECs
+ . OPTIONAL{?conn <connectionType> ?t . FILTER(regex(str(?t),'Untrusted')) . 
+             LET(?link_style := 'dashed') # . LET(?link_color := 'red')
+           }
+# now get list of component CAPECs
  .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where # use &#10; for newline in tooltip
       {?src <applicableCM> ?longcapec
        . ?longcapec <id> ?id . ?longcapec <capecDesc> ?desc
@@ -218,30 +240,71 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor (?
 
 # now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
 # using OPTIONAL as the 'generated' object does not have capecs or properties on it
- . OPTIONAL{{select distinct ?src (group_concat(distinct ?c6;separator='; &#10;') as ?plist) where
+ . OPTIONAL{{select distinct ?src (group_concat(distinct ?f6;separator='; &#10;') as ?plist) where
     { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
-         ?src ?prop ?z3 		
-       . ?prop <tooltipProp> ?r2 . ?z3 <dal> ?prop_val
-       . LET(?c3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) 
+         ?src ?prop ?f1 		
+       . ?prop <tooltipProp> ?f2 . ?f1 <dal> ?prop_val
+       . LET(?f3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) 
       }
     UNION
     { # this get properties, not implementation properties
-      OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?r2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
-      . LET(?c3 := concat(str(?prop_val),str(?prop)))
+      OPTIONAL{?src ?prop ?prop_val . ?prop <tooltipProp> ?f2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
+      . LET(?f3 := concat(str(?prop_val),str(?prop)))
     }
    
-   . LET(?c4 := replace(str(?c3),'http.*#',''))
-   . LET(?c5 := replace(str(?c4),'^true',''))
-   . LET(?c6 := replace(str(?c5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble gettting that working
+   . LET(?f4 := replace(str(?f3),'http.*#',''))
+   . LET(?f5 := replace(str(?f4),'^true',''))
+   . LET(?f6 := replace(str(?f5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working
    } group by ?src}}
 # now concat capec list and property list
- . LET(?clist     := COALESCE(?capeclist,''))
- . LET(?tempplist := COALESCE(?plist,''))
- . LET(?templist  := concat(concat(?clist,'; &#10;'),?tempplist))
- . LET(?templist2 := replace(?templist,'^; ',''))  # get rid of initial ';'
- . LET(?templist3 := replace(?templist2,';','; ')) # having a space ensures that we get quotes around in .dot file
- . LET(?cplist    := replace(?templist3,'  ',' ')) # do not need 2 spaces
- . LET(?finallist     := COALESCE(?cplist,''))
+ . LET(?f7  := COALESCE(?capeclist,''))
+ . LET(?f8  := COALESCE(?plist,''))
+ . LET(?f9  := concat(concat(?f7,'; &#10;'),?f8))
+ . LET(?f10 := replace(?f9,'^; ',''))  # get rid of initial ';'
+ . LET(?f11 := replace(?f10,';','; ')) # having a space ensures that we get quotes around in .dot file
+ . LET(?f12 := replace(?f11,'  ',' ')) # do not need 2 spaces
+ . LET(?finallist := COALESCE(?f12,''))
+
+# set tooltip props for connection properties (just like what was done for components)
+# variables are like those used in processing components but have a 'c' prefix
+# now get list of CAPECs
+ .  OPTIONAL {{select distinct ?conn (group_concat(distinct ?ccapec;separator='; &#10;') as ?ccapeclist) where # use &#10; for newline in tooltip
+      {?conn <applicableCM> ?clongcapec
+       . ?clongcapec <id> ?cid . ?clongcapec <capecDesc> ?cdesc
+       . LET(?ccapec := concat(concat(concat('CAPEC-',str(?cid)),':'),?cdesc))
+      } group by ?conn}
+   }
+
+# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
+# using OPTIONAL as the 'generated' object does not have capecs or properties on it
+ . OPTIONAL{{select distinct ?conn (group_concat(distinct ?cf6;separator='; &#10;') as ?cplist) where
+    { {  #target: ?conn is component instance, ?cprop is property, ?cprop_val is whether the property is true or false
+         ?conn ?cprop ?cf1 		
+       . ?cprop <tooltipProp> ?cf2 . ?cf1 <dal> ?cprop_val
+       . LET(?cf3 := concat(str(?cprop),concat(' DAL ',str(?cprop_val)))) 
+      }
+    UNION
+    { # this get properties, not implementation properties
+      OPTIONAL{?conn ?cprop ?cprop_val . ?cprop <tooltipProp> ?cf2 . FILTER(regex(str(?cprop_val),'true') || regex(str(?cprop_val),'false'))}
+      . LET(?cf3 := concat(str(?cprop_val),str(?cprop)))
+    }
+   
+   . LET(?cf4 := replace(str(?cf3),'http.*#',''))
+   . LET(?cf5 := replace(str(?cf4),'^true',''))
+   . LET(?cf6 := replace(str(?cf5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working
+   } group by ?conn}}
+# now concat conncapec list (ccapeclist) and conn property list (cplist)
+ . LET(?cf7  := COALESCE(?ccapeclist,''))
+ . LET(?cf8  := COALESCE(?cplist,''))
+ . ?conn <connectionType> ?xxx1 # add in connectionType value
+ . LET(?xxx2 := replace(str(?xxx1),'^.*#',''))
+ . LET(?xxx3 := concat(concat(?cf8, '; &#10;'),?xxx2))
+ . LET(?cf9  := concat(concat(?cf7,'; &#10;'),?xxx3)) 
+ . LET(?cf10 := replace(?cf9,'^; ',''))  # get rid of initial ';'
+ . LET(?cf11 := replace(?cf10,';','; ')) # having a space ensures that we get quotes around in .dot file
+ . LET(?cf12 := replace(?cf11,'  ',' ')) # do not need 2 spaces
+ . LET(?cf13 := COALESCE(?cf12,''))
+ . LET(?cfinallist := concat('Connection: ',concat(?strippedcname,concat('&#10;',?cf13)))) # add connection name at top
 }
 ".
 

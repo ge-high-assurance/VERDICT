@@ -38,14 +38,13 @@ back-end programs not written in Java in subprocesses.
 ## Set up your build environment
 
 You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 8) to compile all of our Java program sources.  We are
-skipping Java 11 LTS and staying with Java 8 LTS until Java 17 LTS
-comes out.  OSATE itself is officially supported only on Java 8 LTS
-anyway.  Later versions than Java 8 LTS may work, but we have not
-tested them.  To use a later LTS version of Java, replace the
+(version 8 or 11) to build all of our Java program sources.  We have
+tried Java 11 LTS successfully, but OSATE itself is officially
+supported only on Java 8 LTS so we recommend using Java 8 LTS anyway.
+If you want to switch to a later LTS version of Java, replace the
 maven.compiler.source and maven.compiler.target properties in our
 tools' parent [pom.xml](../../pom.xml) with maven.compiler.release and
-set the release number to 11 or 17, e.g.,
+set the release number to 11, e.g.,
 
 ```
     <properties>

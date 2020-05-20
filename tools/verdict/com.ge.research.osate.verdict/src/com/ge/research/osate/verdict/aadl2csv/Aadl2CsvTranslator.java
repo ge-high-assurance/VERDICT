@@ -4,18 +4,14 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
 import org.osate.aadl2.SystemType;
 import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.impl.AbstractSubcomponentImpl;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
-import org.osate.aadl2.impl.DeviceSubcomponentImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
 import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.MetaclassReferenceImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
-import org.osate.aadl2.impl.ProcessSubcomponentImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.ReferenceValueImpl;
-import org.osate.aadl2.impl.SystemSubcomponentImpl;
 import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 import org.osate.aadl2.AbstractImplementation;
@@ -31,7 +27,6 @@ import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
-import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceImplementation;
@@ -949,7 +944,7 @@ public class Aadl2CsvTranslator {
 				EnumerationLiteralImpl enu = ((EnumerationLiteralImpl) namedValue.getNamedValue());
 				values[0] = enu.getName();
 			} else {
-				throw new RuntimeException("Unsupported property value: " + expr);
+				throw new RuntimeException("Unsupported property value: " + namedValue.getNamedValue());
 			}
 		} else if (expr instanceof ListValueImpl) {
 			ListValueImpl listValue = (ListValueImpl)expr;

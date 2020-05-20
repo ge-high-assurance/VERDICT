@@ -57,6 +57,13 @@ public class VerdictStemTest {
         testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
+        controlFile = controlOutputDir.resolve("ConnDefenses.csv");
+        testFile = testOutputDir.resolve("ConnDefenses.csv");
+        Assertions.assertThat(testFile).exists();
+        controlData = new String(Files.readAllBytes(controlFile));
+        testData = new String(Files.readAllBytes(testFile));
+        Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
+
         controlFile = controlOutputDir.resolve("Defenses2NIST.csv");
         testFile = testOutputDir.resolve("Defenses2NIST.csv");
         Assertions.assertThat(testFile).exists();
@@ -71,7 +78,7 @@ public class VerdictStemTest {
         testData = new String(Files.readAllBytes(testFile));
         Assertions.assertThat(testData).isEqualToNormalizingNewlines(controlData);
 
-        testFile = testGraphsDir.resolve("Run_sadl10.svg");
+        testFile = testGraphsDir.resolve("Run_sadl_graph.svg");
         Assertions.assertThat(testFile).exists();
     }
 }
