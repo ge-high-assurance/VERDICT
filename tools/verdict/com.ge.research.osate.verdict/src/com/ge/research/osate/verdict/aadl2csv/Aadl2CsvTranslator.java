@@ -12,6 +12,7 @@ import org.osate.aadl2.impl.MetaclassReferenceImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.ReferenceValueImpl;
+import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 import org.osate.aadl2.AbstractImplementation;
@@ -991,6 +992,9 @@ public class Aadl2CsvTranslator {
 			} else {
 				throw new RuntimeException("Unexpected number of property values: " + refValue.getContainmentPathElements().size());
 			}
+		} else if(expr instanceof StringLiteralImpl) {
+			StringLiteralImpl strVal = ((StringLiteralImpl) expr);
+			values[0] = strVal.getValue();
 		} else {
 			throw new RuntimeException("Unsupported property value: " + expr);
 		}
