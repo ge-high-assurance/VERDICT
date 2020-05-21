@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -131,6 +132,9 @@ public class App {
         options.addOptionGroup(group);
         options.addOption(debug);
 
+        options.addOption("c", false, "Cyber Relations Inference");
+        options.addOption("s", false, "Safety Relations Inference");
+
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
         }
@@ -173,15 +177,16 @@ public class App {
         helpLine("  --csv <project name> ............. Use csv input");
         helpLine();
         helpLine("Toolchain: MBAS (Model Based Architecture & Synthesis)");
-        helpLine("           or CRV (Cyber Resiliency Verifier)");
-        helpLine("  --mbas <stem_dir> <soteria++ bin>");
+        helpLine("  --mbas <stem_dir> <soteria++ bin> [-c] [-s]");
         helpLine("      <stem_dir> ........... STEM project directory");
         helpLine("      <soteria++ bin> ...... Soteria++ binary");
+        helpLine("      -c ................... cyber relations inference");
+        helpLine("      -s ................... safety relations inference");
         helpLine();
+        helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
-
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
         helpLine("      -BA .................. blame assignment");
         helpLine(
@@ -222,11 +227,29 @@ public class App {
             String[] mbasOpts = opts.getOptionValues("mbas");
             String stemProjectDir = mbasOpts[0];
             String soteriaPpBin = mbasOpts[1];
+
+            boolean cyberInference = opts.hasOption("c");
+            boolean safetyInference = opts.hasOption("s");
+
             if (csvProjectName != null) {
-                runMbas(csvProjectName, stemProjectDir, debugDir, soteriaPpBin);
+                runMbas(
+                        csvProjectName,
+                        stemProjectDir,
+                        debugDir,
+                        soteriaPpBin,
+                        cyberInference,
+                        safetyInference);
                 sample.stop(Metrics.timer("Timer.mbas", "model", csvProjectName));
             } else {
-                runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+                runMbas(
+                        aadlPath,
+                        aadl2imlBin,
+                        imlPath,
+                        stemProjectDir,
+                        debugDir,
+                        soteriaPpBin,
+                        cyberInference,
+                        safetyInference);
                 sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
             }
 
@@ -317,7 +340,12 @@ public class App {
      * @throws VerdictRunException
      */
     public static void runMbas(
-            String modelName, String stemProjectDir, String debugDir, String soteriaPpBin)
+            String modelName,
+            String stemProjectDir,
+            String debugDir,
+            String soteriaPpBin,
+            boolean cyberInference,
+            boolean safetyInference)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -378,15 +406,25 @@ public class App {
         log("Soteria++ output directory: " + soteriaPpOutputDir);
         log("Soteria++ is running. Please be patient...");
 
+        // Soteria has optional arguments, so need to add all args to this list
+        List<String> args = new ArrayList<>();
+        args.add("-o");
+        args.add(soteriaPpOutputDir);
+        args.add(stemOutputDir);
+        if (cyberInference) {
+            args.add("-c");
+        }
+        if (safetyInference) {
+            args.add("-s");
+        }
+
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
                     soteriaPpBin,
                     soteriaPpOutputDir,
                     new PumpStreamHandler(),
-                    "-o",
-                    soteriaPpOutputDir,
-                    stemOutputDir);
+                    args.toArray(new String[args.size()]));
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
@@ -410,7 +448,9 @@ public class App {
             String imlPath,
             String stemProjectDir,
             String debugDir,
-            String soteriaPpBin)
+            String soteriaPpBin,
+            boolean cyberInference,
+            boolean safetyInference)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -499,11 +539,6 @@ public class App {
         log("STEM project directory: " + stemProjectDir);
         log("STEM output directory: " + stemOutputDir);
         log("STEM graphs directory: " + stemGraphsDir);
-
-        //        hideErrorStream(
-        //                () -> {
-        //
-        //                });
         log("STEM is running. Please be patient...");
 
         VerdictStem stemRunner = new VerdictStem();
@@ -515,11 +550,6 @@ public class App {
                                         new File(stemOutputDir),
                                         new File(stemGraphsDir)));
 
-        //        if (!stem_output_csv.stream()
-        //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
-        //            throw new VerdictRunException("STEM failed to generate all required files");
-        //        }
-
         log("STEM finished!");
 
         logHeader("Soteria++");
@@ -528,15 +558,25 @@ public class App {
         log("Soteria++ output directory: " + soteriaPpOutputDir);
         log("Soteria++ is running. Please be patient...");
 
+        // Soteria has optional arguments, so need to add all args to this list
+        List<String> args = new ArrayList<>();
+        args.add("-o");
+        args.add(soteriaPpOutputDir);
+        args.add(stemOutputDir);
+        if (cyberInference) {
+            args.add("-c");
+        }
+        if (safetyInference) {
+            args.add("-s");
+        }
+
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
                     soteriaPpBin,
                     soteriaPpOutputDir,
                     new PumpStreamHandler(),
-                    "-o",
-                    soteriaPpOutputDir,
-                    stemOutputDir);
+                    args.toArray(new String[args.size()]));
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
