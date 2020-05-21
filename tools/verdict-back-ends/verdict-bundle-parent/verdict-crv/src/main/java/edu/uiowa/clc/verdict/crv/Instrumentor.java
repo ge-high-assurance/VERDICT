@@ -346,12 +346,12 @@ public class Instrumentor extends VDMInstrumentor {
 
                 // Selection channels (Authentication = OFF & DataEncrypted = OFF)
                 for (Connection connection : blockImpl.getConnection()) {
-                	
-                	boolean insideTrustedBoundary;
-                	int strongCryptoAlgorithms;
-                	
+
+                    boolean insideTrustedBoundary;
+                    int strongCryptoAlgorithms;
+
                     if (connection.getSource().getSubcomponentPort() != null) {
-                    	ComponentInstance sourceComponent =
+                        ComponentInstance sourceComponent =
                                 connection.getSource().getSubcomponentPort().getSubcomponent();
 
                         List<GenericAttribute> sourceComponentAttributeList =
@@ -374,10 +374,9 @@ public class Instrumentor extends VDMInstrumentor {
                         strongCryptoAlgorithms =
                                 Integer.parseInt(
                                         strongCryptoAlgorithmsAttribute.getValue().toString());
-                    }
-                    else {
-                    	insideTrustedBoundary = true;
-                    	strongCryptoAlgorithms = 1;
+                    } else {
+                        insideTrustedBoundary = true;
+                        strongCryptoAlgorithms = 1;
                     }
 
                     List<GenericAttribute> connectionAttributeList = connection.getAttribute();
@@ -402,12 +401,10 @@ public class Instrumentor extends VDMInstrumentor {
                             connectionTypeAttribute.getValue().toString().toLowerCase();
 
                     int deviceAuthentication =
-                            Integer.parseInt(
-                                    deviceAuthenticationAttribute.getValue().toString());
+                            Integer.parseInt(deviceAuthenticationAttribute.getValue().toString());
 
                     int sessionAuthenticity =
-                            Integer.parseInt(
-                                    sessionAuthenticityAttribute.getValue().toString());
+                            Integer.parseInt(sessionAuthenticityAttribute.getValue().toString());
 
                     if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("untrusted"))
                             && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
@@ -651,8 +648,9 @@ public class Instrumentor extends VDMInstrumentor {
 
                     int memoryProtection =
                             Integer.parseInt(memoryProtectionAttribute.getValue().toString());
-
-                    int secureBoot = Integer.parseInt(secureBootAttribute.getValue().toString());
+                            
+                    int secureBoot = 
+                    		Integer.parseInt(secureBootAttribute.getValue().toString());
 
                     if (svComponentTypeSet.contains(componentKind.toLowerCase())
                             && (staticCodeAnalysis == 0
@@ -668,116 +666,136 @@ public class Instrumentor extends VDMInstrumentor {
                             if (mode == PortMode.IN) {
 
                                 for (Connection connection : blockImpl.getConnection()) {
-
-                                    if (connection.getSource().getSubcomponentPort() != null) {
-
-                                        ComponentInstance sourceComponent =
-                                                connection
-                                                        .getSource()
-                                                        .getSubcomponentPort()
-                                                        .getSubcomponent();
-
-                                        List<GenericAttribute> sourceComponentAttributeList =
-                                                sourceComponent.getAttribute();
-
-                                        GenericAttribute
-                                                sourceComponentInsideTrustedBoundaryAttribute =
-                                                        getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "InsideTrustedBoundary",
-                                                                sourceComponent.getName());
-                                        GenericAttribute sourceComponentComponentKindAttribute =
-                                                getAttributeByName(
-                                                        attributeList,
-                                                        "ComponentType",
-                                                        sourceComponent.getName());
-                                        GenericAttribute sourceComponentPedigreeAttribute =
-                                                getAttributeByName(
-                                                        attributeList,
-                                                        "Pedigree",
-                                                        sourceComponent.getName());
-                                        GenericAttribute
-                                                sourceComponentStrongCryptoAlgorithmsAttribute =
-                                                        getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "StrongCryptoAlgorithms",
-                                                                sourceComponent.getName());
-
-                                        Boolean scInsideTrustedBoundary =
-                                                Boolean.parseBoolean(
-                                                        sourceComponentInsideTrustedBoundaryAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        String scComponentKind =
-                                                sourceComponentComponentKindAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        String scPedigree =
-                                                sourceComponentPedigreeAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        int scStrongCryptoAlgorithms =
-                                                Integer.parseInt(
-                                                        sourceComponentStrongCryptoAlgorithmsAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        List<GenericAttribute> connectionAttributeList =
-                                                connection.getAttribute();
-
-                                        GenericAttribute connectionTypeAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "ConnectionType",
-                                                        connection.getName());
-                                        GenericAttribute deviceAuthenticationAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "DeviceAuthentication",
-                                                        connection.getName());
-                                        GenericAttribute sessionAuthenticityAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "SessionAuthenticity",
-                                                        connection.getName());
-
-                                        String connectionType =
-                                                connectionTypeAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        int deviceAuthentication =
-                                                Integer.parseInt(
-                                                        deviceAuthenticationAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        int sessionAuthenticity =
-                                                Integer.parseInt(
-                                                        sessionAuthenticityAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        if ((!scInsideTrustedBoundary
-                                                        || connectionType.equalsIgnoreCase("trusted"))
-                                                && !scComponentKind.equalsIgnoreCase("hardware")
-                                                && (scPedigree.equalsIgnoreCase("cots")
-                                                        || ((deviceAuthentication == 0
-                                                                        && sessionAuthenticity == 0)
-                                                                || scStrongCryptoAlgorithms
-                                                                        == 0))) {
-
-                                            hasEligibleIncomingChannels = true;
-                                            break;
-                                        }
+                                	
+                                	if (connection.getDestination().getSubcomponentPort() != null) {
+                                		if (connection.getDestination().getSubcomponentPort().getPort() == port) {                                		
+                                			
+                                			Boolean scInsideTrustedBoundary;
+                                			String scComponentKind;
+                                			String scPedigree;
+                                			int scStrongCryptoAlgorithms;
+                                			
+                                			if (connection.getSource().getSubcomponentPort() != null) {
+		                                        ComponentInstance sourceComponent =
+		                                                connection
+		                                                        .getSource()
+		                                                        .getSubcomponentPort()
+		                                                        .getSubcomponent();
+		
+		                                        List<GenericAttribute> sourceComponentAttributeList =
+		                                                sourceComponent.getAttribute();
+		
+		                                        GenericAttribute
+		                                                sourceComponentInsideTrustedBoundaryAttribute =
+		                                                        getAttributeByName(
+		                                                                sourceComponentAttributeList,
+		                                                                "InsideTrustedBoundary",
+		                                                                sourceComponent.getName());
+		                                        GenericAttribute sourceComponentComponentKindAttribute =
+		                                                getAttributeByName(
+		                                                        attributeList,
+		                                                        "ComponentType",
+		                                                        sourceComponent.getName());
+		                                        GenericAttribute sourceComponentPedigreeAttribute =
+		                                                getAttributeByName(
+		                                                        attributeList,
+		                                                        "Pedigree",
+		                                                        sourceComponent.getName());
+		                                        GenericAttribute
+		                                                sourceComponentStrongCryptoAlgorithmsAttribute =
+		                                                        getAttributeByName(
+		                                                                sourceComponentAttributeList,
+		                                                                "StrongCryptoAlgorithms",
+		                                                                sourceComponent.getName());
+		
+		                                        scInsideTrustedBoundary =
+		                                                Boolean.parseBoolean(
+		                                                        sourceComponentInsideTrustedBoundaryAttribute
+		                                                                .getValue()
+		                                                                .toString());
+		
+		                                        scComponentKind =
+		                                                sourceComponentComponentKindAttribute
+		                                                        .getValue()
+		                                                        .toString()
+		                                                        .toLowerCase();
+		
+		                                        scPedigree =
+		                                                sourceComponentPedigreeAttribute
+		                                                        .getValue()
+		                                                        .toString()
+		                                                        .toLowerCase();
+		
+		                                        scStrongCryptoAlgorithms =
+		                                                Integer.parseInt(
+		                                                        sourceComponentStrongCryptoAlgorithmsAttribute
+		                                                                .getValue()
+		                                                                .toString());
+                                			}
+                                			else {
+                                				scInsideTrustedBoundary = true;
+                                    			scComponentKind = "";
+                                    			scPedigree = "";
+                                    			scStrongCryptoAlgorithms = -1;
+                                			}
+	
+	                                        List<GenericAttribute> connectionAttributeList =
+	                                                connection.getAttribute();
+	
+	                                        GenericAttribute connectionTypeAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "ConnectionType",
+	                                                        connection.getName());
+	                                        GenericAttribute deviceAuthenticationAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "DeviceAuthentication",
+	                                                        connection.getName());
+	                                        GenericAttribute sessionAuthenticityAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "SessionAuthenticity",
+	                                                        connection.getName());
+	
+	                                        String connectionType =
+	                                                connectionTypeAttribute
+	                                                        .getValue()
+	                                                        .toString()
+	                                                        .toLowerCase();
+	
+	                                        int deviceAuthentication =
+	                                                Integer.parseInt(
+	                                                        deviceAuthenticationAttribute
+	                                                                .getValue()
+	                                                                .toString());
+	
+	                                        int sessionAuthenticity =
+	                                                Integer.parseInt(
+	                                                        sessionAuthenticityAttribute
+	                                                                .getValue()
+	                                                                .toString());
+	
+	                                        if ((!scInsideTrustedBoundary
+	                                                        || connectionType.equalsIgnoreCase(
+	                                                                "trusted"))
+	                                                && !scComponentKind.equalsIgnoreCase("hardware")
+	                                                && (scPedigree.equalsIgnoreCase("cots")
+	                                                        || ((deviceAuthentication == 0
+	                                                                        && sessionAuthenticity == 0)
+	                                                                || scStrongCryptoAlgorithms
+	                                                                        == 0))) {
+	
+	                                            hasEligibleIncomingChannels = true;
+	                                        }
+	                                        break;
+	                                    }
                                     }
                                 }
+                            }
+                            
+                            if (hasEligibleIncomingChannels) {
+                            	break;
                             }
                         }
 
@@ -877,117 +895,136 @@ public class Instrumentor extends VDMInstrumentor {
                             if (mode == PortMode.IN) {
 
                                 for (Connection connection : blockImpl.getConnection()) {
-
-                                    if (connection.getSource().getSubcomponentPort() != null) {
-
-                                        ComponentInstance sourceComponent =
-                                                connection
-                                                        .getSource()
-                                                        .getSubcomponentPort()
-                                                        .getSubcomponent();
-
-                                        List<GenericAttribute> sourceComponentAttributeList =
-                                                sourceComponent.getAttribute();
-
-                                        GenericAttribute
-                                                sourceComponentInsideTrustedBoundaryAttribute =
-                                                        getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "InsideTrustedBoundary",
-                                                                sourceComponent.getName());
-                                        GenericAttribute sourceComponentComponentKindAttribute =
-                                                getAttributeByName(
-                                                        attributeList,
-                                                        "ComponentType",
-                                                        sourceComponent.getName());
-                                        GenericAttribute sourceComponentPedigreeAttribute =
-                                                getAttributeByName(
-                                                        attributeList,
-                                                        "Pedigree",
-                                                        sourceComponent.getName());
-                                        GenericAttribute
-                                                sourceComponentStrongCryptoAlgorithmsAttribute =
-                                                        getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "StrongCryptoAlgorithms",
-                                                                sourceComponent.getName());
-
-                                        Boolean scInsideTrustedBoundary =
-                                                Boolean.parseBoolean(
-                                                        sourceComponentInsideTrustedBoundaryAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        String scComponentKind =
-                                                sourceComponentComponentKindAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        String scPedigree =
-                                                sourceComponentPedigreeAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        int scStrongCryptoAlgorithms =
-                                                Integer.parseInt(
-                                                        sourceComponentStrongCryptoAlgorithmsAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        List<GenericAttribute> connectionAttributeList =
-                                                connection.getAttribute();
-
-                                        GenericAttribute connectionTypeAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "ConnectionType",
-                                                        connection.getName());
-                                        GenericAttribute deviceAuthenticationAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "DeviceAuthentication",
-                                                        connection.getName());
-                                        GenericAttribute sessionAuthenticityAttribute =
-                                                getAttributeByName(
-                                                        connectionAttributeList,
-                                                        "SessionAuthenticity",
-                                                        connection.getName());
-
-                                        String connectionType =
-                                                connectionTypeAttribute
-                                                        .getValue()
-                                                        .toString()
-                                                        .toLowerCase();
-
-                                        int deviceAuthentication =
-                                                Integer.parseInt(
-                                                        deviceAuthenticationAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        int sessionAuthenticity =
-                                                Integer.parseInt(
-                                                        sessionAuthenticityAttribute
-                                                                .getValue()
-                                                                .toString());
-
-                                        if ((!scInsideTrustedBoundary
-                                                        || connectionType.equalsIgnoreCase(
-                                                                "untrusted"))
-                                                && !scComponentKind.equalsIgnoreCase("hardware")
-                                                && (scPedigree.equalsIgnoreCase("cots")
-                                                        || ((deviceAuthentication == 0
-                                                                        && sessionAuthenticity == 0)
-                                                                || scStrongCryptoAlgorithms
-                                                                        == 0))) {
-
-                                            hasEligibleIncomingChannels = true;
-                                            break;
-                                        }
+                                	
+                                	if (connection.getDestination().getSubcomponentPort() != null) {
+                                		if (connection.getDestination().getSubcomponentPort().getPort() == port) {                                		
+                                			
+                                			Boolean scInsideTrustedBoundary;
+                                			String scComponentKind;
+                                			String scPedigree;
+                                			int scStrongCryptoAlgorithms;
+                                			
+                                			if (connection.getSource().getSubcomponentPort() != null) {
+		                                        ComponentInstance sourceComponent =
+		                                                connection
+		                                                        .getSource()
+		                                                        .getSubcomponentPort()
+		                                                        .getSubcomponent();
+		
+		                                        List<GenericAttribute> sourceComponentAttributeList =
+		                                                sourceComponent.getAttribute();
+		
+		                                        GenericAttribute
+		                                                sourceComponentInsideTrustedBoundaryAttribute =
+		                                                        getAttributeByName(
+		                                                                sourceComponentAttributeList,
+		                                                                "InsideTrustedBoundary",
+		                                                                sourceComponent.getName());
+		                                        GenericAttribute sourceComponentComponentKindAttribute =
+		                                                getAttributeByName(
+		                                                        attributeList,
+		                                                        "ComponentType",
+		                                                        sourceComponent.getName());
+		                                        GenericAttribute sourceComponentPedigreeAttribute =
+		                                                getAttributeByName(
+		                                                        attributeList,
+		                                                        "Pedigree",
+		                                                        sourceComponent.getName());
+		                                        GenericAttribute
+		                                                sourceComponentStrongCryptoAlgorithmsAttribute =
+		                                                        getAttributeByName(
+		                                                                sourceComponentAttributeList,
+		                                                                "StrongCryptoAlgorithms",
+		                                                                sourceComponent.getName());
+		
+		                                        scInsideTrustedBoundary =
+		                                                Boolean.parseBoolean(
+		                                                        sourceComponentInsideTrustedBoundaryAttribute
+		                                                                .getValue()
+		                                                                .toString());
+		
+		                                        scComponentKind =
+		                                                sourceComponentComponentKindAttribute
+		                                                        .getValue()
+		                                                        .toString()
+		                                                        .toLowerCase();
+		
+		                                        scPedigree =
+		                                                sourceComponentPedigreeAttribute
+		                                                        .getValue()
+		                                                        .toString()
+		                                                        .toLowerCase();
+		
+		                                        scStrongCryptoAlgorithms =
+		                                                Integer.parseInt(
+		                                                        sourceComponentStrongCryptoAlgorithmsAttribute
+		                                                                .getValue()
+		                                                                .toString());
+                                			}
+                                			else {
+                                				scInsideTrustedBoundary = true;
+                                    			scComponentKind = "";
+                                    			scPedigree = "";
+                                    			scStrongCryptoAlgorithms = -1;
+                                			}
+	
+	                                        List<GenericAttribute> connectionAttributeList =
+	                                                connection.getAttribute();
+	
+	                                        GenericAttribute connectionTypeAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "ConnectionType",
+	                                                        connection.getName());
+	                                        GenericAttribute deviceAuthenticationAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "DeviceAuthentication",
+	                                                        connection.getName());
+	                                        GenericAttribute sessionAuthenticityAttribute =
+	                                                getAttributeByName(
+	                                                        connectionAttributeList,
+	                                                        "SessionAuthenticity",
+	                                                        connection.getName());
+	
+	                                        String connectionType =
+	                                                connectionTypeAttribute
+	                                                        .getValue()
+	                                                        .toString()
+	                                                        .toLowerCase();
+	
+	                                        int deviceAuthentication =
+	                                                Integer.parseInt(
+	                                                        deviceAuthenticationAttribute
+	                                                                .getValue()
+	                                                                .toString());
+	
+	                                        int sessionAuthenticity =
+	                                                Integer.parseInt(
+	                                                        sessionAuthenticityAttribute
+	                                                                .getValue()
+	                                                                .toString());
+	
+	                                        if ((!scInsideTrustedBoundary
+	                                                        || connectionType.equalsIgnoreCase(
+	                                                                "untrusted"))
+	                                                && !scComponentKind.equalsIgnoreCase("hardware")
+	                                                && (scPedigree.equalsIgnoreCase("cots")
+	                                                        || ((deviceAuthentication == 0
+	                                                                        && sessionAuthenticity == 0)
+	                                                                || scStrongCryptoAlgorithms
+	                                                                        == 0))) {
+	
+	                                            hasEligibleIncomingChannels = true;
+	                                        }
+	                                        break;
+	                                    }
                                     }
                                 }
+                            }
+                            
+                            if (hasEligibleIncomingChannels) {
+                            	break;
                             }
                         }
 
