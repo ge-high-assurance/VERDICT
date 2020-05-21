@@ -34,5 +34,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: gehighassurance/verdict
         tags: latest
-        push: false
-        
+        push: true
