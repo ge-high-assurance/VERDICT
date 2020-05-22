@@ -97,6 +97,8 @@ let get_data_type type_decls = function
       | "float" -> VI.PlainType VI.Real
       | "float_32" -> VI.PlainType VI.Real
       | "float_64" -> VI.PlainType VI.Real
+      | "character" -> VI.PlainType VI.Int
+      | "string" -> VI.PlainType VI.Int
       | _ -> failwith "Unsupported data type found"
     )
     | Some (_, pos) -> VI.UserDefinedType pos
@@ -117,31 +119,67 @@ let get_data_type type_decls = function
     | "base_types::float" -> VI.PlainType VI.Real
     | "base_types::float_32" -> VI.PlainType VI.Real
     | "base_types::float_64" -> VI.PlainType VI.Real
+    | "base_types::character" -> VI.PlainType VI.Int
+    | "base_types::string" -> VI.PlainType VI.Int
     | _ -> failwith "Unsupported data type found" 
   )
 
 let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
-    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
-      match AD.find_assoc data_repr_qpref properties with
-      | None -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
-      | Some {AD.value} -> (
-        match value with
-        | AD.LiteralOrReference (None, (_, id)) when (equal_ids id "Enum") -> (
-          let enumerators = get_enumerators properties in
-          let enum_type = VI.EnumType enumerators in
-          ({VI.name = C.get_id name; VI.definition = Some enum_type}, None)
-        )
-        | _ -> failwith ("Only Enum data definitions are supported by now")
+    let add_type ({AD.name; AD.type_extension; AD.features; AD.properties}: AD.data_type) =
+      match type_extension with
+      | Some _ ->
+        ({VI.name = C.get_id name; VI.definition = None}, (type_extension, features))
+      | None -> (
+        let def =
+          match AD.find_assoc data_repr_qpref properties with
+          | None -> None
+          | Some {AD.value} -> (
+            match value with
+            | AD.LiteralOrReference (None, (_, id)) -> (
+              match String.lowercase_ascii id with
+              | "enum" -> (
+                let enumerators = get_enumerators properties in
+                Some (VI.EnumType enumerators)
+              )
+              | "boolean" -> Some (VI.PlainType VI.Bool)
+              | "integer" -> Some (VI.PlainType VI.Int)
+              | "float" -> Some (VI.PlainType VI.Real)
+              | "character" -> Some (VI.PlainType VI.Int)
+              | "string" -> Some (VI.PlainType VI.Int)
+              | "fixed" -> Some (VI.PlainType VI.Real)
+              | _ -> None
+            )
+            | _ -> failwith ("Found unexpected data representation value")
+          )
+        in
+        ({VI.name = C.get_id name; VI.definition = def}, (None, features))
       )
     in
     List.map add_type data_types
   in
   let type_decls = List.map fst type_decls_with_extension_id in
   let type_decls =
-    let set_type_aliases ((type_decl, ext_id) : (VI.type_declaration * C.qcref option)) =
+    let set_type_aliases ((type_decl, (ext_id, features))
+      : (VI.type_declaration * (C.qcref option * AD.data_feature list))) =
       match ext_id with
-      | None -> type_decl
+      | None -> (
+        match features with
+        | [] -> type_decl
+        | _ -> (
+          let process_feature {AD.name; AD.dtype} =
+            match dtype with
+            | None -> failwith ("Record field definition without a type is not supported")
+            | Some qcr -> (C.get_id name, get_data_type type_decls qcr)
+          in
+          let record_fields =
+            List.map process_feature features
+          in
+          { VI.name = type_decl.VI.name;
+            VI.definition = Some (VI.RecordType record_fields)
+          }
+        )
+      )
       | Some qcr ->
         { VI.name = type_decl.VI.name;
           VI.definition = Some (get_data_type type_decls qcr)
@@ -164,7 +202,12 @@ let data_to_type_decls data_types data_impls =
       | [] -> failwith ("Data implementation found without data type declaration")
       | { VI.name; VI.definition } :: tl when (equal_ids name type_name) -> (
         let td: VI.type_declaration =
-          { name; VI.definition = Some (VI.RecordType record_fields) }
+          let def =
+            match definition with
+            | None -> Some (VI.RecordType record_fields)
+            | _ -> definition
+          in
+          { name; VI.definition = def }
         in
         List.rev_append (td :: l) tl
       )
