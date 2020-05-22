@@ -58,7 +58,8 @@ let mk_package_section header_items body_items =
 %token AADLBOOLEAN AADLSTRING AADLINTEGER AADLREAL ENUMERATION
 %token PROPERTY SET IS APPLIES TO INHERIT EXTENDS
 %token PACKAGE SYSTEM ABSTRACT IMPLEMENTATION FEATURES PROPERTIES
-%token SUBCOMPONENTS CONNECTIONS SUBPROGRAM
+%token SUBCOMPONENTS CONNECTIONS
+%token PROCESS THREAD SUBPROGRAM PROCESSOR MEMORY DEVICE
 %token PROVIDES REQUIRES ACCESS PUBLIC PRIVATE RENAMES
 %token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP
 %token LIST OF
@@ -182,7 +183,7 @@ component_type:
   (* INCOMPLETE *)
 
 system_type:
-  system_or_abstract pid = ident
+  system_or_like pid = ident
   fs = sys_features_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
@@ -233,7 +234,7 @@ component_implementation:
   (* INCOMPLETE *)
 
 system_implementation:
-  system_or_abstract IMPLEMENTATION
+  system_or_like IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = system_subcomponents_section
   connections = sys_connections_section
@@ -336,7 +337,7 @@ data_subcomponent:
   }
 
 system_subcomponent:
-  pid = subcomponent_id system_or_abstract
+  pid = subcomponent_id system_or_like
   type_ref = option(subcomponent_type_ref)
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
@@ -675,14 +676,21 @@ metaclass_name:
   | ID {}
 
 core_keyword:
-  | system_or_abstract {}
+  | system_or_like {}
   | CONNECTIONS {}
   | PORT {}
   (* INCOMPLETE *)
 
-system_or_abstract:
+system_or_like:
   | SYSTEM {}
   | ABSTRACT {}
+  | PROCESS {}
+  | THREAD GROUP? {}
+  | SUBPROGRAM GROUP? {}
+  | DEVICE {}
+  | VIRTUAL? BUS {}
+  | VIRTUAL? PROCESSOR {}
+  | MEMORY {}
 
 (*
 qm_reference:
