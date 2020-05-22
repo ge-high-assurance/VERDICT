@@ -1523,7 +1523,7 @@ public class VDMInstrumentor {
         String global_constant_Id = src_componentInstance.getName();
 
         if (instrumented_port_src.getMode() == instrumented_port_dest.getMode()) {
-            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+            instrumented_port_src.setName(src_port.getName());
 
             if (instrumented_port_src.getMode() == PortMode.IN) {
                 instrumented_port_src.setMode(PortMode.OUT);
@@ -1531,7 +1531,7 @@ public class VDMInstrumentor {
                 instrumented_port_dest.setMode(PortMode.IN);
             }
         } else {
-            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+            instrumented_port_src.setName(src_port.getName());
         }
 
         if (dest_port.getMode() == PortMode.OUT) {
