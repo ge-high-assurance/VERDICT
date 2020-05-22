@@ -36,6 +36,11 @@
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

@@ -22,10 +22,10 @@ public class MBASResultSummary {
 
 	private List<MissionAttributes> missions;
 
-	public MBASResultSummary(String fileName1, String fileName2) {
-		MBASReadXMLFile xmlReader1 = new MBASReadXMLFile(fileName1);
-		MBASReadXMLFile xmlReader2 = new MBASReadXMLFile(fileName2);
-		missions = loadTableContents(xmlReader1.getContent(), xmlReader2.getContent());
+	public MBASResultSummary(String applicableDefense, String implProperty) {
+		MBASReadXMLFile applicableDefenseReader = new MBASReadXMLFile(applicableDefense);
+		MBASReadXMLFile implPropertyReader = new MBASReadXMLFile(implProperty);
+		missions = loadTableContents(applicableDefenseReader.getContent(), implPropertyReader.getContent());
 	}
 
 	public List<MissionAttributes> loadTableContents(List<MissionAttributes> missions1,
@@ -92,7 +92,7 @@ public class MBASResultSummary {
 					PathAttributes path = paths1.get(k);
 					Optional<PathAttributes> other = paths2.stream().filter(o -> path.compareCutset(o)).findFirst();
 					if (other.isPresent()) {
-						path.setComponentImplDefense(other.get().getComponentDefenses());
+						path.setComponentImplDefense(other.get().getComponentSuggestedDefenses());
 					} else {
 						System.err.println("Missing impl defenses");
 						path.setComponentImplDefense(Collections.emptyList());

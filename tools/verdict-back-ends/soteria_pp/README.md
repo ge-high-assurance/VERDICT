@@ -40,13 +40,13 @@ The tool is built using the following command:
 
 
 ```
-$ corebuild -pkg printbox soteria_pp.byte 
+$ corebuild -pkg printbox -pkg xml-light soteria_pp.byte 
 ```
 
 or
 
 ```
-$ corebuild -pkg printbox soteria_pp.native 
+$ corebuild -pkg printbox -pkg xml-light soteria_pp.native 
 ```
 
 Note that you can clean a build with the following command. (If you do, you have

@@ -26,14 +26,9 @@ validate <hasSensitiveInfo> not blank skip
 validate <insideTrustedBoundary> not blank skip
 validate <componentType> not blank skip
 validate <pedigree> not blank skip
-validate <controlReceivedFromUntrusted> not blank skip
-validate <dataReceivedFromUntrusted> not blank skip
-validate <controlSentToUntrusted> not blank skip
-validate <dataSentToUntrusted> not blank skip
 
 validate <antiJamming> not blank skip
 validate <auditMessageResponses> not blank skip
-validate <deviceAuthentication> not blank skip
 validate <dosProtection> not blank skip
 validate <encryptedStorage> not blank skip
 validate <heterogeneity> not blank skip
@@ -45,7 +40,6 @@ validate <removeIdentifyingInformation> not blank skip
 validate <resourceAvailability> not blank skip
 validate <resourceIsolation> not blank skip
 validate <secureBoot> not blank skip
-validate <sessionAuthenticity> not blank skip
 validate <staticCodeAnalysis> not blank skip
 validate <strongCryptoAlgorithms> not blank skip
 validate <supplyChainSecurity> not blank skip
@@ -71,16 +65,11 @@ validate <zeroize> not blank skip
 
 transform <hasSensitiveInfo> to <val1> replace "1" : true,"0" : false
 transform <insideTrustedBoundary> to <val2> replace "1" : true,"0" : false
-transform <controlReceivedFromUntrusted> to <val7> replace "1" : true,"0" : false
-transform <dataReceivedFromUntrusted> to <val8> replace "1" : true,"0" : false
-transform <controlSentToUntrusted> to <val9> replace "1" : true,"0" : false
-transform <dataSentToUntrusted> to <val10> replace "1" : true,"0" : false
 transform <canReceiveSWUpdate> to <val11> replace "1" : true,"0" : false
 transform <canReceiveConfigUpdate> to <val12> replace "1" : true,"0" : false
 
 transform <antiJamming> to <def1> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <auditMessageResponses> to <def2> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
-transform <deviceAuthentication> to <def3> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <dosProtection> to <def4> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <encryptedStorage> to <def5> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 
@@ -93,7 +82,6 @@ transform <removeIdentifyingInformation> to <def12> replace 1:true,2:true,3:true
 transform <resourceAvailability> to <def13> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <resourceIsolation> to <def14> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <secureBoot> to <def15> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
-transform <sessionAuthenticity> to <def16> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <staticCodeAnalysis> to <def17> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <strongCryptoAlgorithms> to <def18> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <supplyChainSecurity> to <def19> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
@@ -120,11 +108,7 @@ transform <Flooding_Attack> to <val24> replace "1" : true,"0" : false
 
 <CompInstance> hasSensitiveInfo <val1> 
 <CompInstance> insideTrustedBoundary <val2> 
-<CompInstance> componentType <componentType>
-<CompInstance> controlReceivedFromUntrusted <val7> 
-<CompInstance> dataReceivedFromUntrusted <val8> 
-<CompInstance> controlSentToUntrusted <val9> 
-<CompInstance> dataSentToUntrusted <val10> 
+<CompInstance> componentType <componentType> 
 <CompInstance> canReceiveSWUpdate <val11> 
 <CompInstance> canReceiveConfigUpdate <val12> 
 <CompInstance> pedigree <pedigree> 
@@ -153,13 +137,6 @@ transform <Flooding_Attack> to <val24> replace "1" : true,"0" : false
 <2> val <def2>
 <2> dal <auditMessageResponses>
 <CompInstance> auditMessageResponses <2>
-
-<3> rdf:type ImplProperty
-<3> name "deviceAuthentication"
-<3> val <def3>
-<3> dal <deviceAuthentication>
-<CompInstance> deviceAuthentication <3>
-<CompInstance> XdeviceAuthentication <def3>
 
 <4> rdf:type ImplProperty
 <4> name "dosProtection"
@@ -227,12 +204,6 @@ transform <Flooding_Attack> to <val24> replace "1" : true,"0" : false
 <15> val <def15>
 <15> dal <secureBoot>
 <CompInstance> secureBoot <15>
-
-<16> rdf:type ImplProperty
-<16> name "sessionAuthenticity"
-<16> val <def16>
-<16> dal <sessionAuthenticity>
-<CompInstance> sessionAuthenticity <16>
 
 <17> rdf:type ImplProperty
 <17> name "staticCodeAnalysis"

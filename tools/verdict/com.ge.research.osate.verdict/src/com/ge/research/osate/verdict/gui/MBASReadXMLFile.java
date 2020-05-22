@@ -89,11 +89,12 @@ public class MBASReadXMLFile {
 				newPath.setLikelihood(eElement.getAttribute("likelihood"));
 				NodeList attacks = eElement.getElementsByTagName("Attack");
 				if (attacks.getLength() > 0) {
-					newPath.setComponentCapecs(extractComponents(attacks.item(0), "capec"));
+					newPath.setComponentAttacks(extractComponents(attacks.item(0), "attack"));
 				}
 				NodeList defenses = eElement.getElementsByTagName("Defense");
 				if (defenses.getLength() > 0) {
-					newPath.setComponentDefenses(extractComponents(defenses.item(0), "profile"));
+					newPath.setComponentSuggestedDefenses(extractComponents(defenses.item(0), "suggested"));
+					newPath.setComponentSuggestedDefensesProfile(extractComponents(defenses.item(0), "profile"));
 				}
 				list.add(newPath);
 			}
@@ -112,7 +113,7 @@ public class MBASReadXMLFile {
 			Node nNode = nList.item(temp);
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element elem = (Element) nNode;
-				data.add(new PathAttributes.ComponentData(elem.getAttribute("name"),
+				data.add(new PathAttributes.ComponentData(elem.getAttribute("comp"),
 						elem.getAttribute(dataLabel)));
 			}
 		}
