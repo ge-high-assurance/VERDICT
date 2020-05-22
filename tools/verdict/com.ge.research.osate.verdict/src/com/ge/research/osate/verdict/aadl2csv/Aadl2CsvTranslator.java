@@ -17,11 +17,14 @@ import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 import org.osate.aadl2.AbstractImplementation;
 import org.osate.aadl2.AbstractSubcomponent;
+import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
+import org.osate.aadl2.BusType;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.ContainedNamedElement;
@@ -32,12 +35,14 @@ import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
+import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
@@ -69,9 +74,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -87,7 +94,10 @@ public class Aadl2CsvTranslator {
 	String scenario = "";
 	List<ComponentImplementation> allImpls = new ArrayList<>();
 	Map<Property, String> connPropertyToName = new LinkedHashMap<>();
-	Map<Property, String> systemPropertyToName = new LinkedHashMap<>();
+	Map<Property, String> componentPropertyToName = new LinkedHashMap<>();
+	Map<Property, String> abstractPropertyToName = new LinkedHashMap<>();
+	Map<Property, String> processPropertyToName = new LinkedHashMap<>();
+	Map<Property, String> devicePropertyToName = new LinkedHashMap<>();
 	Map<String, List<Event>> compTypeNameToEvents = new LinkedHashMap<>();
 	Map<String, List<CyberReq>> compTypeNameToCyberReqs = new LinkedHashMap<>();
 	Map<String, List<CyberRel>> compTypeNameToCyberRels = new LinkedHashMap<>();
@@ -155,12 +165,19 @@ public class Aadl2CsvTranslator {
 	 * Populate mission req, cyber and safety reqs and rels from AADL objects
 	 * */
 	public void populateDataFromAadlObjects(List<EObject> objects) { 		
-		List<SystemType> systemTypes = new ArrayList<>();
+		List<ComponentType> componentTypes = new ArrayList<>();
 
-		
 		for(EObject obj : objects) {
 			if (obj instanceof SystemType) {
-				systemTypes.add((SystemType) obj);
+				componentTypes.add((SystemType) obj);
+			} else if (obj instanceof BusType) {
+				componentTypes.add((BusType)obj);
+			} else if (obj instanceof DeviceType) {
+				componentTypes.add((DeviceType)obj);
+			} else if (obj instanceof AbstractType) {
+				componentTypes.add((AbstractType)obj);
+			} else if (obj instanceof ProcessType) {
+				componentTypes.add((ProcessType)obj);
 			} else if (obj instanceof SystemImplementation) {
 				allImpls.add((SystemImplementation) obj);
 			} else if (obj instanceof BusImplementation) {
@@ -180,11 +197,26 @@ public class Aadl2CsvTranslator {
 						
 						switch(propCat) {
 							case "system": {
-								systemPropertyToName.put(prop, propName);
+								componentPropertyToName.put(prop, propName);
 								break;
 							}
 							case "connection": {
 								connPropertyToName.put(prop, propName);
+								break;
+							}
+							case "process": {
+								componentPropertyToName.put(prop, propName);
+//								processPropertyToName.put(prop, propName);
+								break;
+							}
+							case "abstract": {
+								componentPropertyToName.put(prop, propName);
+//								abstractPropertyToName.put(prop, propName);
+								break;
+							}
+							case "device": {
+								componentPropertyToName.put(prop, propName);
+//								devicePropertyToName.put(prop, propName);
 								break;
 							}
 							default: {
@@ -196,8 +228,8 @@ public class Aadl2CsvTranslator {
 			}
 		}
 		
-		for(SystemType sysType : systemTypes) {
-			String compTypeName = sysType.getName();
+		for(ComponentType compType : componentTypes) {
+			String compTypeName = compType.getName();
 			List<Event> events = new ArrayList<>();
 			List<CyberMission> missionReqs = new ArrayList<>();
 			List<CyberRel> cyberRels = new ArrayList<>();
@@ -205,7 +237,7 @@ public class Aadl2CsvTranslator {
 			List<CyberReq> cyberReqs = new ArrayList<>();
 			List<SafetyReq> safetyReqs = new ArrayList<>();			
 			
-			for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {
+			for(AnnexSubclause annex : compType.getOwnedAnnexSubclauses()) {
 				if(annex.getName().equalsIgnoreCase("verdict")) {
 					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
 
@@ -246,11 +278,11 @@ public class Aadl2CsvTranslator {
 			}			
 		}
 		
-		for(ComponentImplementation sysImpl : allImpls) {
-			compTypeNameToImpl.put(sysImpl.getType().getName(), sysImpl);
+		for(ComponentImplementation impl : allImpls) {
+			compTypeNameToImpl.put(impl.getType().getName(), impl);
 			
-			if(!sysImpl.getAllConnections().isEmpty()) {
-				sysImplToConns.put(sysImpl, sysImpl.getAllConnections());
+			if(!impl.getAllConnections().isEmpty()) {
+				sysImplToConns.put(impl, impl.getAllConnections());
 			}		
 		}		
 	}
@@ -564,7 +596,7 @@ public class Aadl2CsvTranslator {
 	public Table buildScnCompPropsTable() {
 		// "Scenario", "Comp", "Impl", "CompInstance"
 		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "Comp", "Impl", "CompInstance"));
-		headers.addAll(systemPropertyToName.values());
+		headers.addAll(componentPropertyToName.values());
 		
 		Table scnCompPropsTable = new Table(headers);	
 		
@@ -573,14 +605,15 @@ public class Aadl2CsvTranslator {
 				for (Subcomponent subcomp : sysImpl.getOwnedSubcomponents()) {
 					String subcompCompTypeName = subcomp.getComponentType().getName();
 					String subcompTypeName = subcomp.getSubcomponentType().getName();
+					String compCatName = subcomp.getCategory().getName().toLowerCase();
 					
 					scnCompPropsTable.addValue(scenario);
 					scnCompPropsTable.addValue(subcomp.getComponentType().getName());
 					scnCompPropsTable.addValue(subcompCompTypeName.equalsIgnoreCase(subcompTypeName)?"":subcompTypeName);
-					scnCompPropsTable.addValue(subcomp.getName());
+					scnCompPropsTable.addValue(subcomp.getName());					
 					
-					if(subcomp.getCategory().getName().equals("system")) {
-						for(Property prop : systemPropertyToName.keySet()) {
+					for(Property prop : componentPropertyToName.keySet()) {
+						if(isApplicableToCat(prop, compCatName)) {
 							String value = "";
 							PropertyAcc propAcc = subcomp.getPropertyValue(prop);
 							PropertyExpression defPropExpr = prop.getDefaultValue();
@@ -591,19 +624,30 @@ public class Aadl2CsvTranslator {
 								value = getStrRepofExpr(defPropExpr)[0];
 							}
 							scnCompPropsTable.addValue(value);
+						} else {
+							scnCompPropsTable.addValue("");	
 						}
-					} else {
-						for(int i = 0; i < systemPropertyToName.keySet().size(); ++i) {
-							scnCompPropsTable.addValue("");
-						}
-					}
-
+					}					
 					scnCompPropsTable.capRow();
 				}
 			}
 		}
 		
 		return scnCompPropsTable;
+	}
+	
+	private boolean isApplicableToCat(Property prop, String cat) {
+		for(PropertyOwner po : prop.getAppliesTos()) {
+			String propCat = ((MetaclassReferenceImpl)po).getMetaclass().getName().toLowerCase();
+			
+			if(cat.equals("abstract") && propCat.equals("system")) {
+				return true;
+			}
+			if(propCat.equalsIgnoreCase(cat)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
     /**
@@ -999,10 +1043,6 @@ public class Aadl2CsvTranslator {
 			throw new RuntimeException("Unsupported property value: " + expr);
 		}
 		return values;
-	}
-	
-	public void translateSystemType(SystemType sysType) {
-		
 	}
 	
 	/**
