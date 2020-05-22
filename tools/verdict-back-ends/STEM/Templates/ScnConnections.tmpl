@@ -36,6 +36,7 @@ validate <sessionAuthenticity> not blank skip
 
 transform <deviceAuthentication> to <def0> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
+transform <sessionAuthenticity> to <def2> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 
 <SrcComp> rdfs:subClassOf Subsystem
 <SrcCompInstance> rdf:type <SrcComp>
@@ -48,6 +49,8 @@ transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,
 // ignoring SrcCompCategory and DestCompCategory as they are currently only 'system', eventually we will have 'bus' etc
 // note that I do not have 'system' in my model
 
+// do I need to introduce XsessionAuthenticity in BaseModel and set it here?
+
 <ConnectionName><Impl><Comp> rdf:type Connection
 <ConnectionName><Impl><Comp> connectionName <ConnectionName>
 <ConnectionName><Impl><Comp> srcCompType <SrcComp>
@@ -59,7 +62,6 @@ transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,
 <ConnectionName><Impl><Comp> connectionDestination <DestCompInstance>
 <ConnectionName><Impl><Comp> inPort <DestPortName>
 <ConnectionName><Impl><Comp> connectionType <connectionType>
-<ConnectionName><Impl><Comp> sessionAuthenticity <sessionAuthenticity>
 <ConnectionName><Impl><Comp> XdeviceAuthentication <def0>
 <ConnectionName><Impl><Comp> XencryptedTransmission <def1>
 
@@ -69,8 +71,14 @@ transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,
 <1> dal <deviceAuthentication>
 <ConnectionName><Impl><Comp> deviceAuthentication <1>
 
-<1> rdf:type ImplProperty
-<1> name "encryptedTransmission"
-<1> val <def1>
-<1> dal <encryptedTransmission>
-<ConnectionName><Impl><Comp> encryptedTransmission <1>
+<2> rdf:type ImplProperty
+<2> name "encryptedTransmission"
+<2> val <def1>
+<2> dal <encryptedTransmission>
+<ConnectionName><Impl><Comp> encryptedTransmission <2>
+
+<3> rdf:type ImplProperty
+<3> name "sessionAuthenticity"
+<3> val <def2>
+<3> dal <sessionAuthenticity>
+<ConnectionName><Impl><Comp> sessionAuthenticity <3>

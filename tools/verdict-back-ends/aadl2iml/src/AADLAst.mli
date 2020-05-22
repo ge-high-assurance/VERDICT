@@ -33,6 +33,8 @@ type aadl_annex =
   | VerdictAnnex of Position.t * VerdictAst.t
   | UnsupportedAnnex of Position.t * string
 
+type access_dir = Requires | Provides
+
 type port_dir = In | Out | InOut
 
 type data_port = {
@@ -48,9 +50,16 @@ type system_type = {
   annexes: aadl_annex list;
 }
 
+type data_feature = {
+  name: pid;
+  adir: access_dir;
+  dtype: qcref option;
+}
+
 type data_type = {
   name: pid;
   type_extension: qcref option;
+  features: data_feature list;
   properties: property_association list;
 }
 

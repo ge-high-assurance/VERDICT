@@ -27,6 +27,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-112-5"/>
   <j.0:Rule rdf:ID="TA1-Identity_Spoofing_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-192-1"/>
+  <j.0:Rule rdf:ID="InferDataReceivedIsUntrusted2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-586-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-22-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-439-3"/>
@@ -48,6 +49,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-28-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-507-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-586-1"/>
+  <j.0:Rule rdf:ID="InferDataSentIsUntrusted2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-117-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-242-1"/>
@@ -58,7 +60,6 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-439-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-440-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-549-2"/>
-  <j.0:Rule rdf:ID="InferDataReceivedIsUntrusted"/>
   <j.0:Rule rdf:ID="Transitive2"/>
   <j.0:Rule rdf:ID="TA1-Supply_Chain_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-123-1"/>
@@ -67,12 +68,12 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-151-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-507-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-176-1"/>
+  <j.0:Rule rdf:ID="InferDataSentIsUntrusted1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-5"/>
   <j.0:Rule rdf:ID="TA1-Hardware_Integrity_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-114-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-594-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-439-2"/>
-  <j.0:Rule rdf:ID="InferDataSentIsUntrusted"/>
   <j.0:Rule rdf:ID="TA1-Buffer_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-184-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-549-3"/>
@@ -80,6 +81,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-586-2"/>
   <j.0:Rule rdf:ID="Transitive3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-25-1"/>
+  <j.0:Rule rdf:ID="InferDataReceivedIsUntrusted1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-507-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-28-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-123-3"/>
@@ -92,6 +94,7 @@
   <j.0:Rule rdf:ID="TA1-Fault_Injection_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-114-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-438-2"/>
+  <j.0:Rule rdf:ID="InferBindingVulAndDataSentIsUntrusted2"/>
   <j.0:Rule rdf:ID="TA1-Sniffing_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-607-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-1"/>
@@ -132,6 +135,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-112-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-188-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-115-3"/>
+  <j.0:Rule rdf:ID="InferBindingVulAndDataSentIsUntrusted1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-438-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-21-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-2"/>

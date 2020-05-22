@@ -32,7 +32,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>1.27.0</version>
+                    <version>1.31.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.chrisdchristo</groupId>
@@ -62,7 +62,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -100,7 +100,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.8.2</version>
+                    <version>3.9.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -133,37 +133,37 @@
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>target-platform-configuration</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-compiler-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-p2-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-p2-publisher-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-p2-repository-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
                     <artifactId>tycho-packaging-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.xtend</groupId>

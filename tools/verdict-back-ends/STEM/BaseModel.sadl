@@ -68,7 +68,7 @@ System is a type of Thing
 	described by resourceAvailability with a single value of type ImplProperty
 	described by resourceIsolation with a single value of type ImplProperty 
 	described by secureBoot with a single value of type ImplProperty 	
-	described by sessionAuthenticity with a single value of type ImplProperty
+//	described by sessionAuthenticity with a single value of type ImplProperty
 	described by staticCodeAnalysis with a single value of type ImplProperty  
 	described by strongCryptoAlgorithms with a single value of type ImplProperty
 	described by supplyChainSecurity with a single value of type ImplProperty
@@ -106,6 +106,7 @@ Connection is a type of Subsystem
 	described by XdeviceAuthentication with a single value of type boolean
 	described by encryptedTransmission with a single value of type ImplProperty 
 	described by XencryptedTransmission with a single value of type boolean
+	described by sessionAuthenticity with a single value of type ImplProperty
     described by srcCompType with a single value of type Thing // SrcCompType
     described by srcCompImpl with a single value of type System // SrcCompImpl
     described by srcCompCategory with a single value of type System // SrcCompCategory
@@ -118,7 +119,7 @@ Connection is a type of Subsystem
 	described by connectionDestination with a single value of type Thing
 	described by inPort with a single value of type string // inPort is on the "destination"
 	described by destPortType with a single value of type PortType // DestPortType
-    described by infoFlowSeverity with a single value of type int.
+    described by infoFlowSeverity with a single value of type int. 
 
 ConnectionType is a class, must be one of {Trusted, Untrusted}.	
 
@@ -140,7 +141,8 @@ antiJamming has tooltipProp true.
 auditMessageResponses has tooltipProp true.
 deviceAuthentication has tooltipProp true.
 dosProtection has tooltipProp true.  
-encryptedStorage has tooltipProp true.	
+encryptedStorage has tooltipProp true.
+encryptedTransmission has tooltipProp true.	
 failSafe has tooltipProp true.
 heterogeneity has tooltipProp true.
 inputValidation has tooltipProp true.
