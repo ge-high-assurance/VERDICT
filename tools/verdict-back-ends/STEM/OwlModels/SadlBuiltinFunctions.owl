@@ -764,6 +764,35 @@
         >-- sqrt(): uri("com.ge.research.sadl.jena.reasoner.builtin#sqrt")</j.1:script>
       </j.1:Script>
     </j.1:expression>
+    <j.1:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.hp.hpl.jena.reasoner.rulesys.builtins#sqrt</j.1:externalURI>
+    <j.1:returnTypes rdf:parseType="Resource">
+      <j.0:first>
+        <j.1:DataDescriptor>
+          <j.1:dataType>http://www.w3.org/2001/XMLSchema#decimal</j.1:dataType>
+        </j.1:DataDescriptor>
+      </j.0:first>
+      <rdf:type rdf:nodeID="A0"/>
+    </j.1:returnTypes>
+    <j.1:arguments rdf:parseType="Resource">
+      <j.0:first>
+        <j.1:DataDescriptor>
+          <j.1:dataType>http://www.w3.org/2001/XMLSchema#decimal</j.1:dataType>
+          <j.1:descriptorVariable>
+            <j.1:GPVariable rdf:ID="sqrt_X"/>
+          </j.1:descriptorVariable>
+          <j.1:localDescriptorName>X</j.1:localDescriptorName>
+        </j.1:DataDescriptor>
+      </j.0:first>
+      <rdf:type rdf:nodeID="A0"/>
+    </j.1:arguments>
+    <j.1:expression>
+      <j.1:Script>
+        <j.1:language rdf:resource="sadlimplicitmodel#Text"/>
+        <j.1:script rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >decimal sqrt(decimal X): uri("com.hp.hpl.jena.reasoner.rulesys.builtins#sqrt")</j.1:script>
+      </j.1:Script>
+    </j.1:expression>
   </j.1:ExternalEquation>
   <j.1:ExternalEquation rdf:ID="product">
     <j.1:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
@@ -856,6 +885,45 @@
         <j.1:language rdf:resource="sadlimplicitmodel#Text"/>
         <j.1:script rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
         >-- pow(): uri("com.ge.research.sadl.jena.reasoner.builtin#pow")</j.1:script>
+      </j.1:Script>
+    </j.1:expression>
+    <j.1:externalURI rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.hp.hpl.jena.reasoner.rulesys.builtins#pow</j.1:externalURI>
+    <j.1:returnTypes rdf:parseType="Resource">
+      <j.0:first>
+        <j.1:DataDescriptor>
+          <j.1:dataType>http://www.w3.org/2001/XMLSchema#decimal</j.1:dataType>
+        </j.1:DataDescriptor>
+      </j.0:first>
+      <rdf:type rdf:nodeID="A0"/>
+    </j.1:returnTypes>
+    <j.1:arguments rdf:parseType="Resource">
+      <j.0:rest rdf:parseType="Resource">
+        <j.0:first>
+          <j.1:DataDescriptor>
+            <j.1:dataType>http://www.w3.org/2001/XMLSchema#decimal</j.1:dataType>
+            <j.1:descriptorVariable>
+              <j.1:GPVariable rdf:ID="pow_X"/>
+            </j.1:descriptorVariable>
+            <j.1:localDescriptorName>X</j.1:localDescriptorName>
+          </j.1:DataDescriptor>
+        </j.0:first>
+        <rdf:type rdf:nodeID="A0"/>
+      </j.0:rest>
+      <j.0:first>
+        <j.1:DataDescriptor>
+          <j.1:dataType>http://www.w3.org/2001/XMLSchema#decimal</j.1:dataType>
+          <j.1:descriptorVariable rdf:resource="#pow_X"/>
+          <j.1:localDescriptorName>X</j.1:localDescriptorName>
+        </j.1:DataDescriptor>
+      </j.0:first>
+      <rdf:type rdf:nodeID="A0"/>
+    </j.1:arguments>
+    <j.1:expression>
+      <j.1:Script>
+        <j.1:language rdf:resource="sadlimplicitmodel#Text"/>
+        <j.1:script rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+        >decimal pow(decimal X,decimal X): uri("com.hp.hpl.jena.reasoner.rulesys.builtins#pow")</j.1:script>
       </j.1:Script>
     </j.1:expression>
   </j.1:ExternalEquation>
