@@ -1574,8 +1574,6 @@ public class VDMInstrumentor {
         ContractSpec contractSpec = new ContractSpec();
         contractSpec.getGuarantee().add(true_guarantee_item);
 
-        // instrumented_cmp.setContract(contractSpec);
-
         // ---------------------------------------------
 
         ComponentImpl instrument_compImpl = new ComponentImpl();

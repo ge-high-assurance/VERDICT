@@ -148,7 +148,7 @@ public class VDM2Lustre {
         } else {
             // Imported Node
             node.setIsImported(true);
-            //System.out.println("Imported Nodes:" +identifier );
+            // System.out.println("Imported Nodes:" +identifier );
 
         }
 
@@ -318,21 +318,22 @@ public class VDM2Lustre {
         // Node OutputParameter
         else if (port_mode == PortMode.OUT) {
             node.getOutputParameter().add(node_parameter);
-            
-//            if(node.isIsImported() != null) {
-                String inst_cmp = "(.+)_Inst_.*";
-                Pattern inst_pattern = Pattern.compile(inst_cmp);
-                Matcher m = inst_pattern.matcher(node.getName());
 
-                if (m.matches()) {
-                    // Instrumented component Instance ID
-//                	System.out.println("Imported Node: " + node.getName());
-//                	String return_type = node_parameter.getName();
-//                	System.out.println("Return Parameter: " + node_parameter.getName()+"_instrumented");
-                	node_parameter.setName(node_parameter.getName()+"_instrumented");
-                }
+            //            if(node.isIsImported() != null) {
+            String inst_cmp = "(.+)_Inst_.*";
+            Pattern inst_pattern = Pattern.compile(inst_cmp);
+            Matcher m = inst_pattern.matcher(node.getName());
 
-//            }
+            if (m.matches()) {
+                // Instrumented component Instance ID
+                //                	System.out.println("Imported Node: " + node.getName());
+                //                	String return_type = node_parameter.getName();
+                //                	System.out.println("Return Parameter: " +
+                // node_parameter.getName()+"_instrumented");
+                node_parameter.setName(node_parameter.getName() + "_instrumented");
+            }
+
+            //            }
         }
     }
 
@@ -703,7 +704,8 @@ public class VDM2Lustre {
                         if (node_called != null) {
                             if (node_called.getNodeId().equals(called_node_ID)) {
                                 for (Expression arg_expr : node_called.getArgument()) {
-                                    if (arg_expr.getIdentifier() == dest_component_port.getName()) {
+                                    if (arg_expr.getIdentifier()
+                                            .equals(dest_component_port.getName())) {
                                         arg_expr.setIdentifier(arg_value);
                                     } else if (node_called.getArgument().size() == 1) {
                                         arg_expr.setIdentifier(arg_value);
