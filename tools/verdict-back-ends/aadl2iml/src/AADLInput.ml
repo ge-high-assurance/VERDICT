@@ -536,10 +536,12 @@ let merge_packages input =
   )
 
 
-let get_verdict_properties input =
+let get_verdict_properties prop_set_name input =
+  let lc_prop_set_name = String.lowercase_ascii prop_set_name in
   let ast =
     input |> List.find_opt (function
-      | AD.PropertySet (_, { AD.name }) -> (snd name) = "VERDICT_Properties"
+      | AD.PropertySet (_, { AD.name }) -> 
+        String.lowercase_ascii (snd name) = lc_prop_set_name
       | _ -> false
     )
   in

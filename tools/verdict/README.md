@@ -21,9 +21,9 @@ URL.
 ## Set up your build environment
 
 You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 8) to compile all of our Java program sources.  Since OSATE
-is officially supported on Java 8 LTS only, we have not compiled our
-plugin sources with later versions than Java 8 LTS either.
+(version 8 or 11) to build all of our Java program sources.  We have
+tried Java 11 LTS successfully, but OSATE itself is officially
+supported only on Java 8 LTS so we recommend using Java 8 LTS anyway.
 
 You also will need [Apache Maven](https://maven.apache.org) to build
 all of our Java program sources.  Your operating system may have a

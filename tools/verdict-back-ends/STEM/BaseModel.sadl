@@ -9,8 +9,8 @@
 
 uri "http://sadl.org/STEM/BaseModel" alias base.
 
-DAL (note "Design Assurance Level") is a type of int [0,9]. // 0 for DAL in case the implementation property is not present or false
-ComponentType is a class, must be one of {Software, Hardware, Hybrid, Human}.
+DAL (note "Design Assurance Level") is a type of int [0,9]. // default value is 0 indicating that the implementation property is false
+ComponentType is a class, must be one of {Software, Hardware, Hybrid, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid}.
 Pedigree is a class, must be one of {InternallyDeveloped, COTS, Sourced}.
 
 Thing (alias "super class of everything") is a class
@@ -28,61 +28,48 @@ ImplProperty is a class
 // In some cases, when a mitigation (an Implementation Property) is set then additional
 // new CAPECS may be present. These need to be handled differently as the implementation property 
 // (with DAL value) needs to be also viewed like an "implicit property". There are 3 such mitigations:
-// deviceAuthentication, physicalAccessControl (applicable to component)
-// and encryptedTransmission (applicable to connection).
+// physicalAccessControl (applicable to component)
+// and deviceAuthentication, encryptedTransmission (applicable to connection).
 // The corresponding properties (boolean value) are called XdeviceAuthentication, XphysicalAccessControl
 // and XencryptedTransmission.
-
-//DataType is a class, must be one of {Control, yData}.	
+	
 System is a type of Thing
 	described by component with values of type Subsystem
 	described by inputPort with values of type string 
 	described by outputPort with values of type string 
 	described by applicableCM with values of type CAPEC //has capec and mitigation
-//	described by dependency with values of type Dependency
 //	described by secLevel with a single value of type SL //int range 1-5 
 	// properties
-	described by insideTrustedBoundary with a single value of type boolean
-	described by broadcast with a single value of type boolean
-	described by broadcastFromOutsideTB with a single value of type boolean
-	described by wifiFromOutsideTB with a single value of type boolean
-	described by hasSensitiveInfo with a single value of type boolean
-	described by controlReceivedFromUntrusted with a single value of type boolean
-	described by dataReceivedFromUntrusted with a single value of type boolean
-	described by controlSentToUntrusted with a single value of type boolean
-	described by dataSentToUntrusted with a single value of type boolean
 	described by canReceiveSWUpdate with a single value of type boolean
 	described by canReceiveConfigUpdate with a single value of type boolean
+	described by dataReceivedIsUntrusted with a single value of type boolean
+	described by dataSentIsUntrusted with a single value of type boolean
+	described by hasSensitiveInfo with a single value of type boolean	
+	described by insideTrustedBoundary with a single value of type boolean
 	described by pedigree with a single value of type Pedigree		
 			
-	// implementation properties related to mitigations 	
-	described by heterogeneity with a single value of type ImplProperty 
-	described by antiJamming with a single value of type ImplProperty 	
+	// implementation properties related to mitigations 		
 	described by antiFlooding with a single value of type ImplProperty
 	described by antiFuzzing with a single value of type ImplProperty
-	described by physicalAccessControl with a single value of type ImplProperty  
-	described by deviceAuthentication with a single value of type ImplProperty
-	described by XdeviceAuthentication with a single value of type boolean  
-	described by XphysicalAccessControl with a single value of type boolean
-
-	described by staticCodeAnalysis with a single value of type ImplProperty  
-	described by removeIdentifyingInformation with a single value of type ImplProperty	
-	described by inputValidation with a single value of type ImplProperty  
-	described by dosProtection with a single value of type ImplProperty
-	described by physicalAccessControl with a single value of type ImplProperty	 	
-	described by deviceAuthentication with a single value of type ImplProperty
+	described by antiJamming with a single value of type ImplProperty 
 	described by auditMessageResponses with a single value of type ImplProperty  
+	described by physicalAccessControl with a single value of type ImplProperty   
+	described by dosProtection with a single value of type ImplProperty
 	described by encryptedStorage with a single value of type ImplProperty
 	described by failSafe with a single value of type ImplProperty	
-	described by logging with a single value of type ImplProperty  
-	described by secureBoot with a single value of type ImplProperty
+	described by heterogeneity with a single value of type ImplProperty
+	described by inputValidation with a single value of type ImplProperty 	
+	described by logging with a single value of type ImplProperty	 
 	described by memoryProtection with a single value of type ImplProperty
-	described by remoteAttestation with a single value of type ImplProperty	 	
+	described by physicalAccessControl with a single value of type ImplProperty	 	
+	described by XphysicalAccessControl with a single value of type boolean
+	described by remoteAttestation with a single value of type ImplProperty	
+	described by removeIdentifyingInformation with a single value of type ImplProperty	
 	described by resourceAvailability with a single value of type ImplProperty
-	described by resourceIsolation with a single value of type ImplProperty
-	described by secureBoot with a single value of type ImplProperty  
-	described by sessionAuthenticity with a single value of type ImplProperty
-	described by saticCodeAnalysis with a single value of type ImplProperty
+	described by resourceIsolation with a single value of type ImplProperty 
+	described by secureBoot with a single value of type ImplProperty 	
+//	described by sessionAuthenticity with a single value of type ImplProperty
+	described by staticCodeAnalysis with a single value of type ImplProperty  
 	described by strongCryptoAlgorithms with a single value of type ImplProperty
 	described by supplyChainSecurity with a single value of type ImplProperty
 	described by systemAccessControl with a single value of type ImplProperty	
@@ -102,40 +89,73 @@ System is a type of Thing
 	described by Interception_Attack with a single value of type boolean // CAPEC-117
 	described by Physical_Theft_Attack with a single value of type boolean // CAPEC-507
 	described by Sniffing_Attack with a single value of type boolean // CAPEC-169
-	described by Supply_Chain_Attack with a single value of type boolean // CAPEC-438, CAPEC-439
-. 
+	described by Supply_Chain_Attack with a single value of type boolean. // CAPEC-438, CAPEC-439
 
-// all the component properties we want to display will have tooltipProp annotation set to true
-// note that we display boolean properties and not the enumerated ones
+Subsystem is a type of System.
+  
+PortType is a class, must be one of {inport, outport}.
+Bus is a type of System. 
+
+// For reading in the tabular data; some properties related to bus binding will be from the 3rd csv file
+Connection is a type of Subsystem 
+	described by connectionName with a single value of type string
+	described by binding with a single value of type Bus 
+	described by connectionType with values of type ConnectionType 
+	described by bindingVulnerability with a single value of type boolean  
+	described by deviceAuthentication with a single value of type ImplProperty
+	described by XdeviceAuthentication with a single value of type boolean
+	described by encryptedTransmission with a single value of type ImplProperty 
+	described by XencryptedTransmission with a single value of type boolean
+	described by sessionAuthenticity with a single value of type ImplProperty
+    described by srcCompType with a single value of type Thing // SrcCompType
+    described by srcCompImpl with a single value of type System // SrcCompImpl
+    described by srcCompCategory with a single value of type System // SrcCompCategory
+	described by connectionSource with a single value of type Thing // SrcCompInstance
+	described by outPort with a single value of type string // outPort is on the "source"
+	described by srcPortType with a single value of type PortType // SrcPortType
+	described by destCompType with a single value of type Thing // DestCompType
+    described by destCompImpl with a single value of type System // DestCompImpl
+    described by destCompCategory with a single value of type System // DestCompCategory
+	described by connectionDestination with a single value of type Thing
+	described by inPort with a single value of type string // inPort is on the "destination"
+	described by destPortType with a single value of type PortType // DestPortType
+    described by infoFlowSeverity with a single value of type int. 
+
+ConnectionType is a class, must be one of {Trusted, Untrusted}.	
+
+// All the component properties we want to display will have tooltipProp annotation set to true.
+// Note that we display boolean properties and not the enumerated ones
+// We may decide not to show dataReceivedIsUntrusted and dataSentIsUntrusted 
+// as these are not properties that the user will set in the new update.
 tooltipProp is a type of annotation.	
-heterogeneity has tooltipProp true.
-insideTrustedBoundary has tooltipProp true.	
-hasSensitiveInfo has tooltipProp true.	
-controlReceivedFromUntrusted has tooltipProp true.
-dataReceivedFromUntrusted has tooltipProp true.
-controlSentToUntrusted has tooltipProp true.
-dataSentToUntrusted has tooltipProp true.
-componentType has tooltipProp true.  // But we do not display it in graph as we look for value to be true or false
 canReceiveSWUpdate has tooltipProp true.
 canReceiveConfigUpdate has tooltipProp true.
+componentType has tooltipProp true.  // But we do not display it in graph as we look for value to be true or false	
+dataReceivedIsUntrusted has tooltipProp true.
+dataSentIsUntrusted has tooltipProp true.
+hasSensitiveInfo has tooltipProp true.
+insideTrustedBoundary has tooltipProp true.	
 pedigree has tooltipProp true.
+
 antiJamming has tooltipProp true.	
-staticCodeAnalysis has tooltipProp true.  
-removeIdentifyingInformation has tooltipProp true.	
-inputValidation has tooltipProp true.
-dosProtection has tooltipProp true.
-physicalAccessControl has tooltipProp true.	 	
+auditMessageResponses has tooltipProp true.
 deviceAuthentication has tooltipProp true.
-auditMessageResponses has tooltipProp true.  
-encryptedStorage has tooltipProp true.	
+dosProtection has tooltipProp true.  
+encryptedStorage has tooltipProp true.
+encryptedTransmission has tooltipProp true.	
 failSafe has tooltipProp true.
+heterogeneity has tooltipProp true.
+inputValidation has tooltipProp true.
 logging has tooltipProp true.  
-secureBoot has tooltipProp true.
 memoryProtection has tooltipProp true.
-remoteAttestation has tooltipProp true. 	
+physicalAccessControl has tooltipProp true.	
+remoteAttestation has tooltipProp true.
+removeIdentifyingInformation has tooltipProp true. 	
 resourceAvailability has tooltipProp true.
-resourceIsolation has tooltipProp true. 
+resourceIsolation has tooltipProp true.
+secureBoot has tooltipProp true. 
 sessionAuthenticity has tooltipProp true.
+staticCodeAnalysis has tooltipProp true. 
 strongCryptoAlgorithms has tooltipProp true. 
 supplyChainSecurity has tooltipProp true.
 systemAccessControl has tooltipProp true.	
@@ -156,37 +176,6 @@ Sniffing_Attack has tooltipProp true.
 Buffer_Attack has tooltipProp true.
 Flooding_Attack has tooltipProp true.
 
-Subsystem is a type of System.
-  
-PortType is a class, must be one of {inport, outport}.
-Bus is a type of System. 
-
-// For reading in the tabular data; some properties will be from the 3rd csv file
-Connection is a type of Subsystem 
-	described by connectionName with a single value of type string
-	described by binding with a single value of type Bus 
-	described by connectionType with values of type ConnectionType 
-	described by bindingVulnerability with a single value of type boolean  
-	described by connectionFlow with values of type ContentType
-	described by encryptedTransmission with a single value of type ImplProperty 
-	described by XencryptedTransmission with a single value of type boolean
-	described by trustedConnection with a single value of type boolean
-    described by srcCompType with a single value of type Thing // SrcCompType
-    described by srcCompImpl with a single value of type System // SrcCompImpl
-    described by srcCompCategory with a single value of type System // SrcCompCategory
-	described by connectionSource with a single value of type Thing // SrcCompInstance
-	described by outPort with a single value of type string // outPort is on the "source"
-	described by srcPortType with a single value of type PortType // SrcPortType
-	described by destCompType with a single value of type Thing // DestCompType
-    described by destCompImpl with a single value of type System // DestCompImpl
-    described by destCompCategory with a single value of type System // DestCompCategory
-	described by connectionDestination with a single value of type Thing
-	described by inPort with a single value of type string // inPort is on the "destination"
-	described by destPortType with a single value of type PortType // DestPortType
-    described by infoFlowSeverity with a single value of type int.
-
-ConnectionType is a class, must be one of {Local, Remote}.	
-ContentType is a class, must be one of {Xdata, Xcontrol, Xrequest}.
 SecurityIssueLabel is a class, must be one of {Confidentiality, Integrity, Availability}.
 CAPEC is a class  
 	described by id with a single value of type integer
@@ -621,13 +610,13 @@ CAPEC-390A-SystemAccessControl is a CAPEC
    with ciaIssue Availability
    with likelihoodOfSuccess 1
    with mitigation SystemAccessControl.
-CAPEC-438I-SupplyChainSecurity is a CAPEC
+CAPEC-438I-SupplyChainSecurity-TamperProtection is a CAPEC
    with id 438
    with capecDesc "Modification During Manufacture"
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
    with mitigation SupplyChainSecurity.
-CAPEC-439I-SupplyChainSecurity is a CAPEC
+CAPEC-439I-SupplyChainSecurity-TamperProtection is a CAPEC
    with id 439
    with capecDesc "Manipulation During Distribution"
    with ciaIssue Integrity
@@ -838,7 +827,7 @@ SA-12 is a NISTControl
    with nistDesc "Supply Chain Protection".
 SA-18-1 is a NISTControl
    with nistId "SA-18-1"
-   with nistDesc "Tamper Resistence and Detection".
+   with nistDesc "Tamper Resistance and Detection".
 SC-13 is a NISTControl
    with nistId "SC-13"
    with nistDesc "Cryptographic Protection".

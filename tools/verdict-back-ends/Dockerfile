@@ -43,6 +43,7 @@ RUN opam switch 4.07 \
     ocamlbuild \
     ocamlfind \
     printbox \
+    xml-light \
     yojson \
  && echo '#use "topfind" ;;' >> /home/opam/.ocamlinit \
  && echo '#thread ;;' >> /home/opam/.ocamlinit \

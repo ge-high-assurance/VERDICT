@@ -59,10 +59,11 @@ let mk_package_section header_items body_items =
 %token PROPERTY SET IS APPLIES TO INHERIT EXTENDS
 %token PACKAGE SYSTEM ABSTRACT IMPLEMENTATION FEATURES PROPERTIES
 %token SUBCOMPONENTS CONNECTIONS CONNECTION
-%token PUBLIC PRIVATE RENAMES
-%token TYPE NONE UNITS WITH OUT IN CONSTANT
+%token PROCESS THREAD SUBPROGRAM PROCESSOR MEMORY DEVICE
+%token PROVIDES REQUIRES ACCESS PUBLIC PRIVATE RENAMES
+%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP
 %token LIST OF
-%token DATA PORT
+%token DATA PORT BUS
 %token <Lexing.lexbuf>ANNEX
 %token ANNEX_BLOCK_START "{**"
 %token ALL END
@@ -182,8 +183,8 @@ component_type:
   (* INCOMPLETE *)
 
 system_type:
-  system_or_abstract pid = ident
-  fs = features_section
+  system_or_like pid = ident
+  fs = sys_features_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
   END ID ";"
@@ -194,12 +195,12 @@ system_type:
     }
   }
 
-features_section:
+sys_features_section:
   | { [] }
   | FEATURES NONE ";" { [] }
-  | FEATURES fs = nonempty_list(feature) { fs }
+  | FEATURES fs = nonempty_list(sys_feature) { fs }
 
-feature:
+sys_feature:
   | dp = data_port { dp }
   (* INCOMPLETE *)
 
@@ -233,10 +234,10 @@ component_implementation:
   (* INCOMPLETE *)
 
 system_implementation:
-  system_or_abstract IMPLEMENTATION
+  system_or_like IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = system_subcomponents_section
-  connections = connections_section
+  connections = sys_connections_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
   END full_iname ";"
@@ -252,6 +253,7 @@ data_implementation:
   DATA IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = data_subcomponents_section
+  connections = data_connections_section
   (* INCOMPLETE *)
   END full_iname ";"
   {
@@ -259,6 +261,39 @@ data_implementation:
       A.subcomponents = subcomps;
     }
   }
+
+data_connections_section:
+  | { [] }
+  | CONNECTIONS NONE ";" { [] }
+  | CONNECTIONS cs = nonempty_list(data_connection) { cs }
+
+data_connection:
+  | ac = access_connection { ac }
+  (* INCOMPLETE *)
+
+access_connection:
+  pid = ident ":"
+  access_category
+  ACCESS
+  src = access_connection_end
+  cdir = connection_direction
+  dst = access_connection_end
+  (* INCOMPLETE *)
+  ";"
+  {
+    ()
+  }
+
+access_connection_end:
+  ce = connected_element { ce }
+  (* INCOMPLETE *)
+
+access_category:
+  | DATA {}
+  | BUS {}
+  | SUBPROGRAM {}
+  | SUBPROGRAM GROUP {}
+  | VIRTUAL BUS {}
 
 realization: pid = ident { pid } (* aadl2::ComponentType *)
 
@@ -302,7 +337,7 @@ data_subcomponent:
   }
 
 system_subcomponent:
-  pid = subcomponent_id system_or_abstract
+  pid = subcomponent_id system_or_like
   type_ref = option(subcomponent_type_ref)
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
@@ -333,12 +368,12 @@ qcref:
     (pn, Some pid)
   }
 
-connections_section:
+sys_connections_section:
   | { [] }
   | CONNECTIONS NONE ";" { [] }
-  | CONNECTIONS cs = nonempty_list(connection) { cs }
+  | CONNECTIONS cs = nonempty_list(sys_connection) { cs }
 
-connection:
+sys_connection:
   | pc = port_connection { pc }
   (* INCOMPLETE *)
 
@@ -521,15 +556,42 @@ package_properties:
 
 data_type:
   DATA pid = ident; ext_qcr = option(type_extension);
+  fs = data_features_section
   prop_assocs = component_properties
   (* INCOMPLETE *)
   END ID ";"
   {
     { A.name = pid;
       A.type_extension = ext_qcr;
+      A.features = fs;
       A.properties = prop_assocs;
     }
   }
+
+data_features_section:
+  | { [] }
+  | FEATURES NONE ";" { [] }
+  | FEATURES fs = nonempty_list(data_feature) { fs }
+
+data_feature:
+  | da = data_access { da }
+  (* INCOMPLETE *)
+
+data_access:
+  pid = ident ":" ad = access_direction;
+  DATA ACCESS qcr = option(qcref) (* aadl2::DataSubcomponentType *)
+  (* INCOMPLETE *)
+  ";"
+  {
+    { A.name = pid;
+      A.adir = ad;
+      A.dtype = qcr;
+    }
+  }
+
+access_direction:
+  | REQUIRES { A.Requires }
+  | PROVIDES { A.Provides }
 
 type_extension:
   EXTENDS qcr = qcref { qcr }
@@ -638,14 +700,21 @@ metaclass_name:
   | ID { A.Other }
 
 core_keyword:
-  | system_or_abstract { A.System }
+  | system_or_like { A.System }
   | CONNECTION { A.Connection }
   | PORT { A.Other }
   (* INCOMPLETE *)
 
-system_or_abstract:
+system_or_like:
   | SYSTEM {}
   | ABSTRACT {}
+  | PROCESS {}
+  | THREAD GROUP? {}
+  | SUBPROGRAM GROUP? {}
+  | DEVICE {}
+  | VIRTUAL? BUS {}
+  | VIRTUAL? PROCESSOR {}
+  | MEMORY {}
 
 (*
 qm_reference:

@@ -23,12 +23,13 @@ subdirectories with a single command here if you want to:
 
 You will need an installed [OSATE](https://osate.org/about-osate.html)
 (Open Source AADL Tool Environment) in order to use our OSATE plugin.
-We have tested and verified our plugin works in OSATE 2.6.1 and 2.7.0;
-later versions may work as well and earlier versions may or may not
-work since we haven't tested the current plugin version in them.
+We have tested and verified our plugin works in OSATE 2.6.1, 2.7.0,
+and 2.7.1; later versions may work as well and earlier versions may or
+may not work since we haven't tested the current plugin version in
+them.
 
-1. Download the appropriate [OSATE
-   2.7.0](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.0-vfinal/products/)
+1. Download the latest
+   [OSATE](https://osate-build.sei.cmu.edu/download/osate/stable/latest/products/)
    product for your operating system.
 
 2. If necessary, refer to these [installation
@@ -180,3 +181,7 @@ in additional subprocesses directly on your system as well.
 For further information about how to analyze a model's system
 architecture using our VERDICT tools, please read our VERDICT [User
 Manual](https://github.com/ge-high-assurance/VERDICT/wiki/VERDICT-Modeling-Style-Guide-&-User-Manual:-V1-to-support-VERDICT-VM-19.1-Tool-Assessment-%233).
+
+## Setting up CI/CD environment in GitHub Actions
+
+This is a placeholder. Testing build again.

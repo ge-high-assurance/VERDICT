@@ -40,8 +40,9 @@ public class VerdictStem {
             final Path archMitigationCsv = outputDir.toPath().resolve("ArchMitigation.csv");
             final Path capecCsv = outputDir.toPath().resolve("CAPEC.csv");
             final Path defensesCsv = outputDir.toPath().resolve("Defenses.csv");
+            final Path connDefensesCsv = outputDir.toPath().resolve("ConnDefenses.csv");
             final Path defenses2NistCsv = outputDir.toPath().resolve("Defenses2NIST.csv");
-            final String graphName = "Run_sadl10";
+            final String graphName = "Run_sadl_graph";
             final Path modelsDir = knowledgeBaseDir.resolve("OwlModels");
             final Path templatesDir = knowledgeBaseDir.resolve("Templates");
             final Path busTemplate = templatesDir.resolve("ScnBusBindings.tmpl");
@@ -94,6 +95,15 @@ public class VerdictStem {
                                 .getBytes(StandardCharsets.UTF_8));
             }
 
+            rs = srvr.query("http://sadl.org/STEM/Queries#ConnDefenses");
+            if (rs != null) {
+                Files.write(
+                        connDefensesCsv,
+                        rs.toString()
+                                .replaceAll(anyNamespace, "")
+                                .getBytes(StandardCharsets.UTF_8));
+            }
+
             rs = srvr.query("http://sadl.org/STEM/Queries#ArchMitigation");
             if (rs != null) {
                 Files.write(
@@ -112,7 +122,7 @@ public class VerdictStem {
                         graphName,
                         null,
                         Orientation.TD,
-                        "Cmd 11  (Graph)");
+                        "STEM (Graph)");
                 visualizer.graphResultSetData(rs);
             }
         } catch (IOException

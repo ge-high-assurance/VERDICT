@@ -27,8 +27,6 @@ let data_repr_qpref = AD.mk_full_qpref "Data_Model" "Data_Representation"
 
 let enumerators_qpref = AD.mk_full_qpref "Data_Model" "Enumerators"
 
-let app_property_set = "VERDICT_Properties"
-
 let get_bool_prop_value qpr properties =
   match AD.find_assoc qpr properties with
   | None -> None
@@ -97,6 +95,8 @@ let get_data_type type_decls = function
       | "float" -> VI.PlainType VI.Real
       | "float_32" -> VI.PlainType VI.Real
       | "float_64" -> VI.PlainType VI.Real
+      | "character" -> VI.PlainType VI.Int
+      | "string" -> VI.PlainType VI.Int
       | _ -> failwith "Unsupported data type found"
     )
     | Some (_, pos) -> VI.UserDefinedType pos
@@ -117,31 +117,67 @@ let get_data_type type_decls = function
     | "base_types::float" -> VI.PlainType VI.Real
     | "base_types::float_32" -> VI.PlainType VI.Real
     | "base_types::float_64" -> VI.PlainType VI.Real
+    | "base_types::character" -> VI.PlainType VI.Int
+    | "base_types::string" -> VI.PlainType VI.Int
     | _ -> failwith "Unsupported data type found" 
   )
 
 let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
-    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
-      match AD.find_assoc data_repr_qpref properties with
-      | None -> ({VI.name = C.get_id name; VI.definition = None}, type_extension)
-      | Some {AD.value} -> (
-        match value with
-        | AD.LiteralOrReference (None, (_, id)) when (equal_ids id "Enum") -> (
-          let enumerators = get_enumerators properties in
-          let enum_type = VI.EnumType enumerators in
-          ({VI.name = C.get_id name; VI.definition = Some enum_type}, None)
-        )
-        | _ -> failwith ("Only Enum data definitions are supported by now")
+    let add_type ({AD.name; AD.type_extension; AD.features; AD.properties}: AD.data_type) =
+      match type_extension with
+      | Some _ ->
+        ({VI.name = C.get_id name; VI.definition = None}, (type_extension, features))
+      | None -> (
+        let def =
+          match AD.find_assoc data_repr_qpref properties with
+          | None -> None
+          | Some {AD.value} -> (
+            match value with
+            | AD.LiteralOrReference (None, (_, id)) -> (
+              match String.lowercase_ascii id with
+              | "enum" -> (
+                let enumerators = get_enumerators properties in
+                Some (VI.EnumType enumerators)
+              )
+              | "boolean" -> Some (VI.PlainType VI.Bool)
+              | "integer" -> Some (VI.PlainType VI.Int)
+              | "float" -> Some (VI.PlainType VI.Real)
+              | "character" -> Some (VI.PlainType VI.Int)
+              | "string" -> Some (VI.PlainType VI.Int)
+              | "fixed" -> Some (VI.PlainType VI.Real)
+              | _ -> None
+            )
+            | _ -> failwith ("Found unexpected data representation value")
+          )
+        in
+        ({VI.name = C.get_id name; VI.definition = def}, (None, features))
       )
     in
     List.map add_type data_types
   in
   let type_decls = List.map fst type_decls_with_extension_id in
   let type_decls =
-    let set_type_aliases ((type_decl, ext_id) : (VI.type_declaration * C.qcref option)) =
+    let set_type_aliases ((type_decl, (ext_id, features))
+      : (VI.type_declaration * (C.qcref option * AD.data_feature list))) =
       match ext_id with
-      | None -> type_decl
+      | None -> (
+        match features with
+        | [] -> type_decl
+        | _ -> (
+          let process_feature {AD.name; AD.dtype} =
+            match dtype with
+            | None -> failwith ("Record field definition without a type is not supported")
+            | Some qcr -> (C.get_id name, get_data_type type_decls qcr)
+          in
+          let record_fields =
+            List.map process_feature features
+          in
+          { VI.name = type_decl.VI.name;
+            VI.definition = Some (VI.RecordType record_fields)
+          }
+        )
+      )
       | Some qcr ->
         { VI.name = type_decl.VI.name;
           VI.definition = Some (get_data_type type_decls qcr)
@@ -164,7 +200,12 @@ let data_to_type_decls data_types data_impls =
       | [] -> failwith ("Data implementation found without data type declaration")
       | { VI.name; VI.definition } :: tl when (equal_ids name type_name) -> (
         let td: VI.type_declaration =
-          { name; VI.definition = Some (VI.RecordType record_fields) }
+          let def =
+            match definition with
+            | None -> Some (VI.RecordType record_fields)
+            | _ -> definition
+          in
+          { name; VI.definition = def }
         in
         List.rev_append (td :: l) tl
       )
@@ -181,7 +222,9 @@ let aadl_dir_to_iml_mode = function
   | AD.Out -> VI.Out
   | AD.InOut -> failwith "Input-Output ports are not supported"
 
-let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype; AD.properties } =
+let aadl_port_to_iml_port prop_set_name type_decls
+  {AD.name; AD.dir; AD.dtype; AD.properties }
+=
   {VI.name = C.get_id name;
    VI.mode = aadl_dir_to_iml_mode dir;
    VI.ptype = (
@@ -190,7 +233,7 @@ let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype; AD.properties }
      | Some qcr -> Some (get_data_type type_decls qcr)
    );
    VI.probe = (
-     let qpr = AD.mk_full_qpref app_property_set "probe" in
+     let qpr = AD.mk_full_qpref prop_set_name "probe" in
      match get_bool_prop_value qpr properties with
      | None -> false
      | Some v -> v
@@ -511,7 +554,7 @@ let verdict_annex_to_safety_reqs annex =
       | _ -> acc
     end [] annex
 
-let system_types_to_iml_comp_types type_decls sys_types =
+let system_types_to_iml_comp_types prop_set_name type_decls sys_types =
   sys_types |> List.map
   (fun {AD.name; AD.ports; AD.annexes} ->
     let contract =
@@ -547,7 +590,7 @@ let system_types_to_iml_comp_types type_decls sys_types =
         | _ -> assert false
       end in
     {VI.name = C.get_id name;
-     VI.ports = List.map (aadl_port_to_iml_port type_decls) ports;
+     VI.ports = List.map (aadl_port_to_iml_port prop_set_name type_decls) ports;
      contract;
      cyber_rels;
      safety_rels;
@@ -610,11 +653,11 @@ let get_iml_prop_value = function
   | AD.ListTerm _ -> failwith "List-value properties are not supported yet"
 
 
-let get_attributes e_name default_props properties =
+let get_attributes prop_set_name e_name default_props properties =
   properties |> List.fold_left (fun acc { AD.name; AD.value } ->
     let name =
       match name with
-      | Some (_,"VERDICT_Properties"), (_, id) -> id
+      | Some (_, ps_name), (_, id) when equal_ids ps_name prop_set_name -> id
       | _ -> AD.qpref_to_string name
     in
     acc |> AttrMap.update name (fun e ->
@@ -638,10 +681,11 @@ let get_attributes e_name default_props properties =
      | Some (atype, value) -> { VI.name = name; atype; value }
   )
 
-let split_property_set_and_get_map { AD.declarations } =
+let split_property_set_and_get_map { AD.name; AD.declarations } =
+  let name = C.get_id name in
   declarations |> List.map (function
     | AD.UnsupportedDecl ->
-      failwith ("Unsupported declaration in VERDICT Properties file!")
+      failwith ("Unsupported declaration in property set '" ^ name ^ "'!")
     | AD.PropertyDef def -> def
   )
   |> List.fold_left
@@ -661,13 +705,13 @@ let split_property_set_and_get_map { AD.declarations } =
     (AttrMap.empty, AttrMap.empty)
 
 
-let subcomponent_to_comp_inst comp_props sys_impl iml_comp_types
+let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
   {AD.name; AD.type_ref; AD.properties }
 =
  let name = C.get_id name in
  {VI.name = name;
   VI.itype = get_instance_index sys_impl iml_comp_types type_ref;
-  VI.attributes = get_attributes name comp_props properties
+  VI.attributes = get_attributes prop_set_name name comp_props properties
  }
 
 let get_port_index {VI.ports} port =
@@ -706,13 +750,14 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
     VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct port)
   )
 
-let port_connection_to_iml_connection conn_props ct ct_idx sys_impl iml_comp_types subcomps
+let port_connection_to_iml_connection
+  prop_set_name conn_props ct ct_idx sys_impl iml_comp_types subcomps
   { AD.name; AD.dir; AD.src; AD.dst; AD.properties }
 =
   assert (dir = AD.Unidirectional);
   let name = C.get_id name in
   {VI.name = name;
-   VI.attributes = get_attributes name conn_props properties;
+   VI.attributes = get_attributes prop_set_name name conn_props properties;
    VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
    VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
   }
@@ -861,14 +906,15 @@ let system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impl =
           VI.DataflowImpl (empty_dataflow_impl)
       )
       else (
+        let prop_set_name = C.get_id v_props.AD.name in
         let b_impl =
           let subcomponents =
-            subcomponents |>
-            List.map (subcomponent_to_comp_inst comp_props sys_impl iml_comp_types)
+            subcomponents |> List.map 
+              (subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types)
           in
           let connections =
             connections |> List.map
-              (port_connection_to_iml_connection conn_props
+              (port_connection_to_iml_connection prop_set_name conn_props
                 ct ct_idx sys_impl iml_comp_types subcomponents)
           in
           ({ subcomponents; connections } : VI.block_impl)
@@ -1039,8 +1085,9 @@ let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs } =
   let type_decls =
     data_to_type_decls data_types data_impls
   in
+  let prop_set_name = C.get_id v_props.AD.name in
   let iml_comp_types =
-    system_types_to_iml_comp_types type_decls sys_types
+    system_types_to_iml_comp_types prop_set_name type_decls sys_types
   in
   let iml_comp_impl =
     system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impls

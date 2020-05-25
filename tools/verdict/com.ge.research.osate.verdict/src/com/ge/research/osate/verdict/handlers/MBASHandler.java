@@ -16,6 +16,7 @@ import org.eclipse.ui.intro.IIntroPart;
 import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;
+import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 
 /**
 *
@@ -67,22 +68,22 @@ public class MBASHandler extends AbstractHandler {
 
 						// Create CSVData, Output, Graphs folders if they don't exist
 						// If they exist, delete all the csv and svg files
-						File CSVDataFolder = new File(stemProjPath, "CSVData");
+						File dataFolder = new File(stemProjPath, "CSVData");
 						File outputFolder = new File(stemProjPath, "Output");
 						File graphsFolder = new File(stemProjPath, "Graphs");
 
-						if (CSVDataFolder.exists() && CSVDataFolder.isDirectory()) {
-							deleteCsvFilesInDir(CSVDataFolder);
+						if (dataFolder.exists() && dataFolder.isDirectory()) {
+							deleteFilesInDir("cvs", dataFolder);
 						} else {
-							CSVDataFolder.mkdir();
+							dataFolder.mkdir();
 						}
 						if (outputFolder.exists() && outputFolder.isDirectory()) {
-							deleteCsvFilesInDir(outputFolder);
+							deleteFilesInDir("cvs", outputFolder);
 						} else {
 							outputFolder.mkdir();
 						}
 						if (graphsFolder.exists() && graphsFolder.isDirectory()) {
-							deleteSvgFilesInDir(graphsFolder);
+							deleteFilesInDir("svg", graphsFolder);
 						} else {
 							graphsFolder.mkdir();
 						}
@@ -90,7 +91,7 @@ public class MBASHandler extends AbstractHandler {
 						File projectDir = new File(selection.get(0));
 						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
 						
-						aadl2csv.execute(projectDir, CSVDataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 						
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
 								graphVizPath)) {
@@ -147,48 +148,34 @@ public class MBASHandler extends AbstractHandler {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		command
+			.env("GraphVizPath", graphVizPath)
 			.jarOrImage(bundleJar, dockerImage)
 			.arg("--csv")
 			.arg(projectName)
 			.arg("--mbas")
 			.argBind(stemProjectDir, "/app/STEM")
-			.arg2(soteriaPpBin, "/app/soteria_pp")
-			.env("GraphVizPath", graphVizPath);
+			.arg2(soteriaPpBin, "/app/soteria_pp");
+
+		if (MBASSettingsPanel.cyberInference) {
+			command.arg("-c");
+		}
+		if (MBASSettingsPanel.safetyInference) {
+			command.arg("-s");
+		}
 
 		int code = command.runJarOrImage();
 		return code == 0;
 	}
 	
 	/**
-	 * Delete all csv files in a folder
+	 * Delete all files with given extension in given folder
 	 */
-	static void deleteCsvFilesInDir(File dir) {
+	private static void deleteFilesInDir(String extension, File dir) {
 		if (dir.exists()) {
 			if (dir.isDirectory()) {
 				for (File file : dir.listFiles()) {
 					if (file.isFile()) {
-						if (getFileExtension(file).equals("csv")) {
-							file.delete();
-						}
-					}
-				}
-			} else {
-				dir.mkdirs();
-			}
-		} else {
-			dir.mkdirs();
-		}
-	}
-
-	/**
-	 * Delete all svg files in a folder
-	 */
-	static void deleteSvgFilesInDir(File dir) {
-		if (dir.exists()) {
-			if (dir.isDirectory()) {
-				for (File file : dir.listFiles()) {
-					if (file.isFile()) {
-						if (getFileExtension(file).equals("svg")) {
+						if (getFileExtension(file).equals(extension)) {
 							file.delete();
 						}
 					}
@@ -206,18 +193,11 @@ public class MBASHandler extends AbstractHandler {
 	 */
 	private static String getFileExtension(File file) {
 		String extension = "";
-
-		try {
-			if (file != null && file.exists()) {
-				String name = file.getName();
-				extension = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
-			}
-		} catch (Exception e) {
-			extension = "";
+		if (file != null && file.exists()) {
+			String name = file.getName();
+			extension = name.substring(name.lastIndexOf(".") + 1).toLowerCase();
 		}
-
 		return extension;
 
 	}
-
 }

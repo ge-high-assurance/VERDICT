@@ -1418,8 +1418,9 @@ let pp_print_model_body ind ppf
     (List.length component_types);
   pp_print_comp_types_list ind ppf component_types;
   pp_print_dataflow_code_opt ind ppf dataflow_code;
-  Format.fprintf ppf "m.component_impl.length = %d &&@,"
-    (List.length comp_impl);
+  Format.fprintf ppf "m.component_impl.length = %d %s@,"
+    (List.length comp_impl)
+    (match comp_impl with [] -> "" | _ -> "&&");
   pp_print_comp_impl_list ind ppf comp_impl;
   Format.fprintf ppf " && @,m.cyber_requirements.length = %d %s@,"
     (List.length cyber_reqs)

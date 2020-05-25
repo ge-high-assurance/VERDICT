@@ -59,7 +59,7 @@ let expand_dirs input_files =
   in
   loop [] input_files
 
-let process_input_files input_files output_file =
+let process_input_files input_files output_file prop_set_name =
 
   try (
     let input_files = expand_dirs input_files in
@@ -68,8 +68,8 @@ let process_input_files input_files output_file =
       match AADLInput.sort_model_units input with
       | Ok input -> (
         (*List.iter process_ast (AADLInput.merge_packages (List.rev input));*)
-        match AADLInput.get_verdict_properties input with
-        | None -> Format.eprintf "VERDICT Properties file not found!"
+        match AADLInput.get_verdict_properties prop_set_name input with
+        | None -> Format.eprintf "Property set '%s' not found!@." prop_set_name
         | Some verdict_props ->
           let input = AADLInput.merge_packages (List.rev input) in
           match List.find_opt AADLAst.is_aadl_package input with
@@ -104,27 +104,30 @@ let process_input_files input_files output_file =
 
 let parse_command_line_args () =
   let num_args = (Array.length Sys.argv) - 1 in
-  if num_args = 0 then
+  if num_args < 3 then
     None
-  else if Sys.argv.(1) = "-o" then
-    if num_args < 3 then
+  else if Sys.argv.(3) = "-o" then
+    if num_args < 5 then
       None
     else (
       let input_files =
-        Array.to_list (Array.sub Sys.argv 3 (num_args - 2))
+        Array.to_list (Array.sub Sys.argv 5 (num_args - 4))
       in
-      Some (input_files, Sys.argv.(2))
+      Some (input_files, Sys.argv.(4), Sys.argv.(2))
     )
   else
-    Some (List.tl (Array.to_list Sys.argv), "")
+    let input_files =
+      Array.to_list (Array.sub Sys.argv 3 (num_args - 2))
+    in
+    Some (input_files, "", Sys.argv.(2))
 
 let main () =
   match parse_command_line_args () with
-  | Some (input_files, output_file) ->
-    process_input_files input_files output_file
+  | Some (input_files, output_file, prop_set_name) ->
+    process_input_files input_files output_file prop_set_name
   | None ->
     Format.printf
-      "Usage: %s [-o <output.iml>] <file_1.aadl|dir1> ... <file_N.aadl|dir_N>@."
+      "Usage: %s -ps <prop_set_name> [-o <output.iml>] <file_1.aadl|dir1> ... <file_N.aadl|dir_N>@."
       Sys.argv.(0)
 
 let () = main ()

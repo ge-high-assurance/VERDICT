@@ -64,9 +64,11 @@ public class CapecDefenseView extends ViewPart {
 		TableColumn col3 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 		col3.setText("Attack Type");
 		TableColumn col4 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col4.setText("Suggested Defense");
+		col4.setText("Suggested Defenses");
 		TableColumn col5 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-		col5.setText("Implemented Defenses");
+		col5.setText("Suggested Defenses Profile");
+		TableColumn col6 = new TableColumn(table, SWT.CENTER | SWT.WRAP);
+		col6.setText("Implemented Defenses");
 
 		int itemCount = tableContents.size();
 		for (int i = 0; i < itemCount; i++) {
@@ -93,8 +95,8 @@ public class CapecDefenseView extends ViewPart {
 			if (item.getTextBounds(2).contains(event.x, event.y)) {
 				// Attack type (CAPEC)
 				text = String.join("\n", data.getAttackHoverText());
-			} else if (item.getTextBounds(3).contains(event.x, event.y)) {
-				// Suggested defense (NIST)
+			} else if (item.getTextBounds(4).contains(event.x, event.y)) {
+				// Suggested defenses profile (NIST)
 				text = String.join("\n", data.getDefenseHoverText());
 			}
 			if (text.length() > 0) {

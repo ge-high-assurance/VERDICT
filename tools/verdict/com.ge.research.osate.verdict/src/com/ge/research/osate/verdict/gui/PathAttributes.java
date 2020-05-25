@@ -39,8 +39,9 @@ public class PathAttributes implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	private String likelihood;
-	private List<ComponentData> componentCapecs = new ArrayList<>();
-	private List<ComponentData> componentApplicableDefenses = new ArrayList<>();
+	private List<ComponentData> componentAttacks = new ArrayList<>();
+	private List<ComponentData> componentSuggestedDefenses = new ArrayList<>();
+	private List<ComponentData> componentSuggestedDefensesProfile = new ArrayList<>();
 	private List<ComponentData> componentImplDefenses = new ArrayList<>();
 
 	public void setLikelihood(String str) {
@@ -51,20 +52,28 @@ public class PathAttributes implements Serializable, Cloneable {
 		return likelihood;
 	}
 	
-	public void setComponentCapecs(List<ComponentData> componentCapecs) {
-		this.componentCapecs = componentCapecs;
+	public void setComponentAttacks(List<ComponentData> componentAttacks) {
+		this.componentAttacks = componentAttacks;
 	}
 	
-	public List<ComponentData> getComponentCapecs() {
-		return componentCapecs;
+	public List<ComponentData> getComponentAttacks() {
+		return componentAttacks;
 	}
 	
-	public void setComponentDefenses(List<ComponentData> componentDefenses) {
-		this.componentApplicableDefenses = componentDefenses;
+	public void setComponentSuggestedDefenses(List<ComponentData> componentDefenses) {
+		this.componentSuggestedDefenses = componentDefenses;
 	}
 	
-	public List<ComponentData> getComponentDefenses() {
-		return componentApplicableDefenses;
+	public List<ComponentData> getComponentSuggestedDefenses() {
+		return componentSuggestedDefenses;
+	}
+	
+	public void setComponentSuggestedDefensesProfile(List<ComponentData> componentDefensesProfile) {
+		this.componentSuggestedDefensesProfile = componentDefensesProfile;
+	}
+	
+	public List<ComponentData> getComponentSuggestedDefensesProfile() {
+		return componentSuggestedDefensesProfile;
 	}
 	
 	public void setComponentImplDefense(List<ComponentData> componentImplDefenses) {
@@ -83,11 +92,15 @@ public class PathAttributes implements Serializable, Cloneable {
 	}
 	
 	public String attacks() {
-		return joinComponentDataList(componentCapecs);
+		return joinComponentDataList(componentAttacks);
 	}
 	
-	public String applicableDefenses() {
-		return joinComponentDataList(componentApplicableDefenses);
+	public String suggestedDefenses() {
+		return joinComponentDataList(componentSuggestedDefenses);
+	}
+	
+	public String suggestedDefensesProfile() {
+		return joinComponentDataList(componentSuggestedDefensesProfile);
 	}
 	
 	public String implDefenses() {
@@ -98,12 +111,12 @@ public class PathAttributes implements Serializable, Cloneable {
 		// We use this so that we can search for matching cutsets
 		// between ApplicableDefenseProperties and ImplProperties.
 		
-		if (other.componentCapecs.size() != componentCapecs.size()) {
+		if (other.componentAttacks.size() != componentAttacks.size()) {
 			return false;
 		}
-		for (int i = 0; i < componentCapecs.size(); i++) {
-			if (!other.componentCapecs.get(i).getComponent().equals(componentCapecs.get(i).getComponent())
-					|| !other.componentCapecs.get(i).getData().equals(componentCapecs.get(i).getData())) {
+		for (int i = 0; i < componentAttacks.size(); i++) {
+			if (!other.componentAttacks.get(i).getComponent().equals(componentAttacks.get(i).getComponent())
+					|| !other.componentAttacks.get(i).getData().equals(componentAttacks.get(i).getData())) {
 				return false;
 			}
 		}

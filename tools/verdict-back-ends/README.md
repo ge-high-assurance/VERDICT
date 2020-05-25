@@ -38,14 +38,13 @@ back-end programs not written in Java in subprocesses.
 ## Set up your build environment
 
 You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 8) to compile all of our Java program sources.  We are
-skipping Java 11 LTS and staying with Java 8 LTS until Java 17 LTS
-comes out.  OSATE itself is officially supported only on Java 8 LTS
-anyway.  Later versions than Java 8 LTS may work, but we have not
-tested them.  To use a later LTS version of Java, replace the
+(version 8 or 11) to build all of our Java program sources.  We have
+tried Java 11 LTS successfully, but OSATE itself is officially
+supported only on Java 8 LTS so we recommend using Java 8 LTS anyway.
+If you want to switch to a later LTS version of Java, replace the
 maven.compiler.source and maven.compiler.target properties in our
 tools' parent [pom.xml](../../pom.xml) with maven.compiler.release and
-set the release number to 11 or 17, e.g.,
+set the release number to 11, e.g.,
 
 ```
     <properties>
@@ -98,7 +97,7 @@ $ eval $(opam env)
 $ opam switch create ocaml 4.07.1
 $ eval $(opam env)
 $ opam install async camlp4 core core_extended menhir
-$ opam install num ocamlbuild ocamlfind printbox yojson
+$ opam install num ocamlbuild ocamlfind printbox xml-light yojson
 $ echo '#use "topfind" ;;' >> $HOME/.ocamlinit
 $ echo '#thread ;;' >> $HOME/.ocamlinit
 $ echo '#load "stdlib.cma" ;;' >> $HOME/.ocamlinit
@@ -152,34 +151,52 @@ operating system already has a z3-4.7.1 package.
 
 As we have said before, you normally will build only the Java program
 sources on your system and use Docker to build the rest of the program
-sources not written in Java.  To do so, simply run Maven in either
-this directory or the verdict-bundle-parent directory:
+sources not written in Java.  If Docker is not installed on your
+operating system, please see our parent [README.md](../README.md) for
+instructions how to install Docker.  You also will need to download
+two Docker images before you can build our own Docker image:
+
+```shell
+$ docker pull ocaml/opam2:latest
+$ docker pull openjdk:8-jre-slim-buster
+```
+
+You need to run the above commands only when you haven't downloaded a
+Docker image yet or you want to download a later version which you
+know is available now.  You also need a fresh build of the Java
+program sources on your system as well.  To get the fresh build, run
+Maven in either this directory or the verdict-bundle-parent directory:
 
 `mvn clean install`
 
-Now cd back into this directory and run the following command to build
-a Docker image containing all of the back-end programs (change or
-remove the --build-arg http_proxy= arguments if you have a different
-HTTP proxy or don't need a HTTP proxy):
+Now cd back into this directory and run either of the following
+commands to build a Docker image containing all of the back-end
+programs:
 
 ```shell
+: If you don't need a HTTP proxy
+$ docker build -t gehighassurance/verdict .
+: If you need a HTTP proxy
 $ docker build --build-arg http_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ --build-arg https_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ -t gehighassurance/verdict .
 ```
 
-If the above command runs successfully, you will have a
-gehighassurance/verdict image that will be able to run all of the
-VERDICT back-end programs in a container:
+Omit or change the build arguments if you don't need a HTTP proxy or
+you use a different HTTP proxy.  If the docker build command finishes
+successfully, you will have a gehighassurance/verdict image that will
+be able to run all of the VERDICT back-end programs in a container:
 
 ```shell
 $ docker image ls
-REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
-gehighassurance/verdict      latest              c95f08a73c67        2 minutes ago       357MB
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+gehighassurance/verdict   latest              8bac939d1ece        25 minutes ago      336MB
+ocaml/opam2               latest              f58ef9d0ce70        2 weeks ago         3.56GB
+openjdk                   8-jre-slim-buster   bf20b099be53        2 weeks ago         184MB
 ```
 
 Once you have done sufficient testing to make sure that the latest
 version of the Docker image works with the latest version of our OSATE
-plugin, then you would push the image to DockerHub to publish the
-image and make its newest version available for everyone to use:
+plugin, then push the image to DockerHub to publish the image and make
+its latest version available for everyone else to use:
 
 ```shell
 $ docker push gehighassurance/verdict
