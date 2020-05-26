@@ -4,7 +4,7 @@ public
 	with Base_Types;
 	with Data_Types;
 	with Agree_Nodes;
-	with VERDICT_Properties;
+	with CASE_Consolidated_Properties;
 
 	system GPS
 		features
@@ -17,7 +17,7 @@ public
 			gps_pos: out data port Data_Types::Position.impl;
 			health_status: out data port Base_Types::Boolean;
 			probe_constellation: out data port Data_Types::Constellation
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			
 		annex agree {**
 			 -- variables
@@ -62,7 +62,7 @@ public
 			imu_pos: out data port Data_Types::Position.impl;
 			health_status: out data port Base_Types::Boolean;
 			probe_launch_pos: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 		
 		annex agree {**
 			-- probe
@@ -101,11 +101,11 @@ public
 			gps_pos: out data port Data_Types::Position.impl;
 			gps_health_status: out data port Base_Types::Boolean;
 			probe_constellation: out data port Data_Types::Constellation
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			imu_pos: out data port Data_Types::Position.impl;
 			imu_health_status: out data port Base_Types::Boolean;
 			probe_launch_pos: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			
 		
 	end GNC;
@@ -115,60 +115,60 @@ public
 			gps: system GPS
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with connectionType for c12 and c34 to Untrusted
-				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::pedigree => COTS;
-				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with connectionType for c12 and c34 to Untrusted
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::pedigree => COTS;
+				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 
 				-- VERDICT Cyber Defenses & DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => 7;
-				VERDICT_Properties::physicalAccessControl => 7;
-				VERDICT_Properties::systemAccessControl => 7;
-				VERDICT_Properties::secureBoot => 7;
-				VERDICT_Properties::memoryProtection => 7;
-				VERDICT_Properties::staticCodeAnalysis => 7;
-				VERDICT_Properties::resourceAvailability => 7;
-				VERDICT_Properties::antiJamming => 7;
-				VERDICT_Properties::dosProtection => 7;
-				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::strongCryptoAlgorithms => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
 			};
 			imu: system IMU
 			{ 
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::pedigree => Sourced;
-				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				
 				-- VERDICT Cyber Defenses & DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => 7;
-				VERDICT_Properties::physicalAccessControl => 7;
-				VERDICT_Properties::systemAccessControl => 7;
-				VERDICT_Properties::secureBoot => 7;
-				VERDICT_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
 			};
 		connections
 			i1: port constellation -> gps.constellation
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i2: port satellite0_pos -> gps.satellite0_pos
-			{VERDICT_Properties::connectionType => Untrusted;};
+			{CASE_Consolidated_Properties::connectionType => Untrusted;};
 			i3: port satellite1_pos -> gps.satellite1_pos
-			{VERDICT_Properties::connectionType => Untrusted;};
+			{CASE_Consolidated_Properties::connectionType => Untrusted;};
 			i4: port launch_pos -> imu.launch_pos
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i5: port gps.gps_pos -> gps_pos
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i6: port gps.health_status -> gps_health_status
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i7: port gps.probe_constellation -> probe_constellation
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i8: port imu.imu_pos -> imu_pos
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i9: port imu.health_status -> imu_health_status
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			i10: port imu.probe_launch_pos -> probe_launch_pos
-			{VERDICT_Properties::connectionType => Trusted;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 	end GNC.Impl;
 end GNC;

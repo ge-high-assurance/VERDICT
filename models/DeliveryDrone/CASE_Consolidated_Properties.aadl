@@ -1,4 +1,4 @@
-property set VERDICT_Properties is
+property set CASE_Consolidated_Properties is
 
 -------------------------------------------------------------------------
 --- The following VERDICT_Properties enable the use of the VERDICT tool suite for both the high-level Model-Based
@@ -419,4 +419,4 @@ Control_Level: aadlinteger 0 .. 100 applies to (feature, connection, classifier,
 -- FOUO: For Official Use Only
 Data_Classification : enumeration (TOP_SECRET, SECRET, CONFIDENTIAL, FOUO, TIME_SENSITIVE) applies to (feature, connection, subcomponent, classifier);
 
-end VERDICT_Properties;
+end CASE_Consolidated_Properties;

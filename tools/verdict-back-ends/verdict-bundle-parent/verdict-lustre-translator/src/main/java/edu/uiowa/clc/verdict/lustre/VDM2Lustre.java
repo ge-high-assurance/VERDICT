@@ -200,7 +200,7 @@ public class VDM2Lustre {
         NodeBody nodeBody = new NodeBody();
 
         // Option 1) Block Implementation
-//        retrieve_block(componentImpl);
+        //        retrieve_block(componentImpl);
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         // BlockImpl
@@ -933,7 +933,7 @@ public class VDM2Lustre {
         typeDeclarations.put(identifier, typeDeclaration);
         program.getTypeDeclaration().add(typeDeclaration);
     }
-   
+
     protected BlockImpl retrieve_block(ComponentImpl compImpl) {
 
         BlockImpl blockImpl = null;
@@ -962,5 +962,4 @@ public class VDM2Lustre {
 
         return blockImpl;
     }
-
 }
