@@ -443,11 +443,11 @@ Rule Vul-CAPEC-151-1
       and insideTrustedBoundary of the Subsystem is true 
       and dataReceivedIsUntrusted of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-151I-Heterogeneity.
-Rule Vul-CAPEC-151-2
-   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
-      and insideTrustedBoundary of the Subsystem is true 
-      and dataReceivedIsUntrusted of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-151I-PhysicalAccessControl.
+//Rule Vul-CAPEC-151-2
+//   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
+//      and insideTrustedBoundary of the Subsystem is true 
+//      and dataReceivedIsUntrusted of the Subsystem is true 
+//   then applicableCM of the Subsystem is CAPEC-151I-PhysicalAccessControl.
 Rule Vul-CAPEC-151-3
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -462,13 +462,13 @@ Rule Vul-CAPEC-151-4
       and dataReceivedIsUntrusted of the Subsystem is true 
       and dataSentIsUntrusted of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-151C-Heterogeneity.
-Rule Vul-CAPEC-151-5
-   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
-      and insideTrustedBoundary of the Subsystem is true 
-      and hasSensitiveInfo of the Subsystem is true 
-      and dataReceivedIsUntrusted of the Subsystem is true 
-      and dataSentIsUntrusted of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-151C-PhysicalAccessControl.
+//Rule Vul-CAPEC-151-5
+//   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
+//      and insideTrustedBoundary of the Subsystem is true 
+//      and hasSensitiveInfo of the Subsystem is true 
+//      and dataReceivedIsUntrusted of the Subsystem is true 
+//      and dataSentIsUntrusted of the Subsystem is true 
+//   then applicableCM of the Subsystem is CAPEC-151C-PhysicalAccessControl.
 Rule Vul-CAPEC-151-6
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 

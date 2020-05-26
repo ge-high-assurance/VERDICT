@@ -75,6 +75,12 @@ External strConcat(string X, string X) returns string:
 External uriConcat(string X, string X) returns string:
 "com.hp.hpl.jena.reasoner.rulesys.builtins#uriConcat".
 
+External pow(decimal X, decimal X) returns decimal:
+"com.hp.hpl.jena.reasoner.rulesys.builtins#pow".
+
+External sqrt(decimal X) returns decimal:
+"com.hp.hpl.jena.reasoner.rulesys.builtins#sqrt".
+
 External unbound(string X) returns string:
 "com.hp.hpl.jena.reasoner.rulesys.builtins#unbound".
 
@@ -150,9 +156,6 @@ External mod(--) returns --:
 External noSubjectsOtherThan(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noSubjectsOtherThan".
 
-External notOnlyValue(--) returns --:
-"com.ge.research.sadl.jena.reasoner.builtin#notOnlyValue".
-
 External noUnknownValues(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noUnknownValues".
 
@@ -161,6 +164,9 @@ External noValue(--) returns --:
 
 External noValuesOtherThan(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noValuesOtherThan".
+
+External notOnlyValue(--) returns --:
+"com.ge.research.sadl.jena.reasoner.builtin#notOnlyValue".
 
 External oneOf(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#oneOf".

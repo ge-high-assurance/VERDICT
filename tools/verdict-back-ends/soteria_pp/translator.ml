@@ -10,8 +10,9 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          11/05/2019, Kit Siu, added functions to fill in safety information
          11/15/2019, Kit Siu, added functions to deal with hierarchy
          5/12/2020, Kit Siu, using xml library
-         5/18/202, Heber Herencia-Zapana, added  cyber relations inferring
+         5/18/2020, Heber Herencia-Zapana, added  cyber relations inferring
          5/22/2020, Heber Herencia-Zapana, added safety relations inferring
+         
 *)
 
 (**
@@ -599,27 +600,37 @@ let formula name coutputs cinputs l_comp_dep l_attack ciaList =
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
 (*Inferring cyber relation *)
-let elemExtract l ltag = 
-     let extracTags l ltag = List.map ltag (fun x->(x,List.Assoc.find_exn l x ~equal:(=)))  in 
-     List.dedup_and_sort ~compare:compare (List.map l (fun x-> extracTags x ltag));; 
+
 let elemExtractVal l ltag = 
      let extracTags l ltag = List.map ltag (fun x->List.Assoc.find_exn l x ~equal:(=))  in
      List.dedup_and_sort ~compare:compare (List.map l (fun x-> extracTags x ltag));; 
      
-let filterTags l tag = 
-    let value a = List.Assoc.find_exn a tag ~equal:(=) in
-    let clean l = List.filter l (fun x->x<>[]) in 
-    clean (List.map l (fun a-> if (value a = "") then a else [] ));;
-
 let ele_l_nol1 l l1 =
     let clean l = List.concat l in  
     clean(List.map l (fun x->if (List.mem l1 x ~equal:(=) = true) then [] else [x]));; 
 
 (*components without cyber relations, components with implementation are not considered*)
-let compCyberInfe larch  filter1 lcompDepen  =
-    let compArchSelected larch filter1= elemExtractVal (filterTags (elemExtract larch [srcType_Arc;filter1]) filter1) [srcType_Arc] in
-    let compWithCyberRel lcompDepen  = elemExtractVal lcompDepen  [compType_C] in
-    List.concat (ele_l_nol1 (compArchSelected larch filter1) (compWithCyberRel lcompDepen));;
+let compArchImpleAux l =
+   let srcPortType = List.Assoc.find_exn l ~equal:(=) srcPortType_Arc
+        and desPortType = List.Assoc.find_exn l ~equal:(=) desPortType_Arc
+        and srcPortName = List.Assoc.find_exn l ~equal:(=) srcType_Arc
+        and srcImpl     = List.Assoc.find_exn l ~equal:(=) srcImpl_Arc
+        and desImpl     = List.Assoc.find_exn l ~equal:(=) desImpl_Arc
+        and desType     = List.Assoc.find_exn l ~equal:(=) desType_Arc
+   in 
+     match (srcImpl <> "",srcPortType,desPortType,desImpl <>"") with
+       (true,"in","in",_)   -> srcPortName
+       | (_,"out","out",true) -> desType
+       | _             -> ""  ;;
+   
+let compArchImple l = 
+    let clean l = List.dedup_and_sort ~compare:compare (List.filter l (fun x->x<>"")) in 
+    clean (List.map l (fun x->compArchImpleAux x));;
+
+let compCyberInfe l_arch l_compDepen =
+    let noInferredComp = List.append (compArchImple l_arch) (List.concat (elemExtractVal l_compDepen  [compType_C])) in
+    ele_l_nol1 (List.concat(elemExtractVal (l_arch)  [srcType_Arc])) noInferredComp;;
+
 
 let formulaInfer_aux name cia out linputs l_attack= 
     let l = List.concat (noEmptyList (attack_cia name cia l_attack)) in
@@ -666,15 +677,14 @@ let formulaInferSafe1 name coutputs cinputs cevents l_comp_saf iaList =
 
 (**)
 
-let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe = 
+let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist 
+             l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
 	and cinputs = (compInputArch name l_arch)
 	and cevents = (compEvents name l_events)
 	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
 	(*and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) *)
-	and comNoCyberRe = compCyberInfe l_arch srcImpl_Arc l_comp_dep
-	and comNoSafeRe  = compCyberInfe l_arch srcImpl_Arc l_comp_saf 
 	in 
 	genComp (*name*)            name 
 			(*input_flows*)     cinputs 
@@ -771,7 +781,10 @@ let gen_model reqId l_arch l_mission =
  
 (**)
 let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission ciaList iaList infeCyber infeSafe= 
-    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe) in
+    let comNoCyberRe = compCyberInfe l_arch l_comp_dep in
+	let comNoSafeRe  = compCyberInfe l_arch l_comp_saf in
+    let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack 
+                                   l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe) in
     let rType = compReqType reqId l_mission in
     match rType with
     | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
@@ -1169,7 +1182,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*) 
+               (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ; *)
               (* -- cutset metric file, in printbox format -- *)    
               saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
               (* -- save .svg tree visualizations -- *)    
@@ -1197,7 +1210,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, safetyReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
+             (*saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
               (* -- cutset metric file, in printbox format -- *)    
               saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
               (* -- save .svg tree visualizations -- *)    
