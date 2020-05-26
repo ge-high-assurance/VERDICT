@@ -12,6 +12,8 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          5/12/2020, Kit Siu, using xml library
          5/18/2020, Heber Herencia-Zapana, added  cyber relations inferring
          5/22/2020, Heber Herencia-Zapana, added safety relations inferring
+         5/26/2020, Heber Herencia-Zapana,  safety/cyber Availability dependes on availability only
+         
          
 *)
 
@@ -635,9 +637,10 @@ let compCyberInfe l_arch l_compDepen =
 let formulaInfer_aux name cia out linputs l_attack= 
     let l = List.concat (noEmptyList (attack_cia name cia l_attack)) in
     let lattack = List.map l (fun x->A[x]) in
-    let confidInteg = List.map linputs (fun x->A[x;cia]) in
-    let availability = List.concat (List.map linputs (fun x->[A[x;cia];A[x;"Integrity"]])) in  
-    ([out; cia], Or (List.concat [lattack; if (cia = "Availability") then availability else confidInteg]));;
+    let confidIntegAvail = List.map linputs (fun x->A[x;cia]) in
+    (*Heber let availability = List.concat (List.map linputs (fun x->[A[x;cia];A[x;"Integrity"]])) in  
+    ([out; cia], Or (List.concat [lattack; if (cia = "Availability") then availability else confidInteg])) *)
+    ([out; cia], Or (List.concat [lattack; confidIntegAvail]));;
     
 let formulaInfer name coutputs cinputs l_attack ciaList = 
     let formulaOut name out = List.map ciaList ~f:(fun x-> formulaInfer_aux name x out cinputs l_attack) in
@@ -646,7 +649,8 @@ let formulaInfer name coutputs cinputs l_attack ciaList =
 (*inferring safety relations*) 
    
 let formulaInferSafe  coutputs cinputs =
-    let availa= List.concat (List.map cinputs (fun x-> [F[x;"Availability"];F[x;"Integrity"]])) in
+    (*Heber let availa= List.concat (List.map cinputs (fun x-> [F[x;"Availability"];F[x;"Integrity"]])) in *)
+    let availa= List.map cinputs (fun x-> F[x;"Availability"]) in
     let integ = List.map cinputs (fun x-> F[x;"Integrity"]) in 
     List.concat(List.map coutputs (fun x-> [([x;"Availability"] , Or availa );([x;"Integrity"], Or integ)]));;
 
@@ -1182,7 +1186,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-               (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ; *)
+              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
               (* -- cutset metric file, in printbox format -- *)    
               saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
               (* -- save .svg tree visualizations -- *)    
@@ -1210,7 +1214,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, safetyReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-             (*saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
+              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
               (* -- cutset metric file, in printbox format -- *)    
               saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
               (* -- save .svg tree visualizations -- *)    
