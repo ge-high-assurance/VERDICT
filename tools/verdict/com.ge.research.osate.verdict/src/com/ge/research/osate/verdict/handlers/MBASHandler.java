@@ -49,7 +49,7 @@ public class MBASHandler extends AbstractHandler {
 						String dockerImage = BundlePreferences.getDockerImage();
 						String bundleJar = BundlePreferences.getBundleJar();
 						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
-							System.out.println("Please set Verdict Bundle Jar path in Preferences");
+							System.out.println("Please set VERDICT Bundle Jar path in Preferences");
 							return;
 						}
 						String soteriaPpBin = BundlePreferences.getSoteriaPpBin();

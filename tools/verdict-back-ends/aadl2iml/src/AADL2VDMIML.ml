@@ -27,8 +27,6 @@ let data_repr_qpref = AD.mk_full_qpref "Data_Model" "Data_Representation"
 
 let enumerators_qpref = AD.mk_full_qpref "Data_Model" "Enumerators"
 
-let app_property_set = "VERDICT_Properties"
-
 let get_bool_prop_value qpr properties =
   match AD.find_assoc qpr properties with
   | None -> None
@@ -224,7 +222,9 @@ let aadl_dir_to_iml_mode = function
   | AD.Out -> VI.Out
   | AD.InOut -> failwith "Input-Output ports are not supported"
 
-let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype; AD.properties } =
+let aadl_port_to_iml_port prop_set_name type_decls
+  {AD.name; AD.dir; AD.dtype; AD.properties }
+=
   {VI.name = C.get_id name;
    VI.mode = aadl_dir_to_iml_mode dir;
    VI.ptype = (
@@ -233,7 +233,7 @@ let aadl_port_to_iml_port type_decls {AD.name; AD.dir; AD.dtype; AD.properties }
      | Some qcr -> Some (get_data_type type_decls qcr)
    );
    VI.probe = (
-     let qpr = AD.mk_full_qpref app_property_set "probe" in
+     let qpr = AD.mk_full_qpref prop_set_name "probe" in
      match get_bool_prop_value qpr properties with
      | None -> false
      | Some v -> v
@@ -554,7 +554,7 @@ let verdict_annex_to_safety_reqs annex =
       | _ -> acc
     end [] annex
 
-let system_types_to_iml_comp_types type_decls sys_types =
+let system_types_to_iml_comp_types prop_set_name type_decls sys_types =
   sys_types |> List.map
   (fun {AD.name; AD.ports; AD.annexes} ->
     let contract =
@@ -590,7 +590,7 @@ let system_types_to_iml_comp_types type_decls sys_types =
         | _ -> assert false
       end in
     {VI.name = C.get_id name;
-     VI.ports = List.map (aadl_port_to_iml_port type_decls) ports;
+     VI.ports = List.map (aadl_port_to_iml_port prop_set_name type_decls) ports;
      contract;
      cyber_rels;
      safety_rels;
@@ -628,323 +628,98 @@ let get_instance_index sys_impl iml_comp_types = function
   )
   | _ -> assert false
 
-let failwith_replace_property old_prop new_prop =
-  Format.printf "%% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% @.";
-  Format.printf "* VERDICT_Properties::%s is not supported anymore.@." old_prop; 
-  Format.printf "* Please use VERDICT_Properties::%s instead.@." new_prop;
-  Format.printf "%% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% @.";
-  exit 0
 
-let get_manufacturer_prop_value properties =
-  let manufacturer_qpr = AD.mk_full_qpref app_property_set "manufacturer" in
-  match AD.find_assoc manufacturer_qpr properties with
-  | None -> None
-  | Some {AD.value} -> (
-    failwith_replace_property "manufacturer" "pedigree"
-    (*match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      let v =
-        match (String.lowercase_ascii id) with
-        | "thirdparty" -> VI.ThirdParty
-        | "inhouse" -> VI.InHouse
-        | _ -> failwith "Unexpected Manufacturer value"
-      in
-      Some v
-    )
-    | _ -> failwith "Unexpected Manufacturer value"*)
+module AttrMap = Map.Make(struct
+  type t = string
+  let compare = (fun s1 s2 ->
+    String.compare
+      (String.lowercase_ascii s1)
+      (String.lowercase_ascii s2)
   )
+end
+)
 
-let get_pedigree_prop_value properties =
-  let pedigree_qpr = AD.mk_full_qpref app_property_set "pedigree" in
-  match AD.find_assoc pedigree_qpr properties with
-  | None -> None
-  | Some {AD.value} -> (
-    match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      let v =
-        match (String.lowercase_ascii id) with
-        | "internallydeveloped" -> VI.InternallyDeveloped
-        | "cots" -> VI.COTS
-        | "sourced" -> VI.Sourced
-        | _ -> failwith "Unexpected Pedigree value"
-      in
-      Some v
+let get_iml_prop_value = function
+  | AD.BooleanLit b ->
+    (VI.Bool, if b then "true" else "false")
+  | AD.IntegerTerm nl ->
+    (VI.Integer, C.numeric_literal_to_string nl)
+  | AD.RealTerm nl ->
+    (VI.Integer, C.numeric_literal_to_string nl)
+  | AD.StringLit str ->
+    (VI.String, str)
+  | AD.LiteralOrReference qpr ->
+    (VI.String, AD.qpref_to_string qpr)
+  | AD.ListTerm _ -> failwith "List-value properties are not supported yet"
+
+
+let get_attributes prop_set_name e_name default_props properties =
+  properties |> List.fold_left (fun acc { AD.name; AD.value } ->
+    let name =
+      match name with
+      | Some (_, ps_name), (_, id) when equal_ids ps_name prop_set_name -> id
+      | _ -> AD.qpref_to_string name
+    in
+    acc |> AttrMap.update name (fun e ->
+      match e with
+      | None -> None (* Not a VERDICT Property, ignore it *)
+      | Some _ -> Some (Some (get_iml_prop_value value))
     )
-    | _ -> failwith "Unexpected Pedigree value"
   )
+  default_props
+  |> AttrMap.bindings
+  |> List.fold_left (fun acc (name, v) ->
+       match v with
+       | None -> acc
+       | Some (atype, value) -> { VI.name = name; atype; value } :: acc
+     )
+     []
+(*
+  |> List.map (fun (name, v) ->
+     match v with
+     | None -> (
+       let msg =
+         Format.asprintf
+           "Mandatory VERDICT Property '%s' not set in '%s'"
+             name e_name
+       in
+       failwith msg
+     )
+     | Some (atype, value) -> { VI.name = name; atype; value }
+  )
+*)
 
-let get_component_type_prop_value properties =
-  let component_type_qpr = AD.mk_full_qpref app_property_set "componentType" in
-  match AD.find_assoc component_type_qpr properties with
-  | None -> None
-  | Some {AD.value} -> (
-    match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      let v =
-        match (String.lowercase_ascii id) with
-        | "software" -> VI.Software
-        | "hardware" -> VI.Hardware
-        | "human" -> VI.Human
-        | "hybrid" -> VI.Hybrid
-        | _ -> failwith "Unexpected componentType value"
+let split_property_set_and_get_map { AD.name; AD.declarations } =
+  let name = C.get_id name in
+  declarations |> List.map (function
+    | AD.UnsupportedDecl ->
+      failwith ("Unsupported declaration in property set '" ^ name ^ "'!")
+    | AD.PropertyDef def -> def
+  )
+  |> List.fold_left
+    (fun (comp, conn) { AD.name; AD.default_value; AD.applies_to } ->
+      let name = C.get_id name in
+      let value =
+        match default_value with
+        | None -> None
+        | Some expr -> Some (get_iml_prop_value expr)
       in
-      Some v
+      match applies_to with
+      | All -> (AttrMap.add name value comp, AttrMap.add name value conn)
+      | System -> (AttrMap.add name value comp, conn)
+      | Connection -> (comp, AttrMap.add name value conn)
+      | Other -> (comp, conn)
     )
-    | _ -> failwith "Unexpected componentType value"
-  )
+    (AttrMap.empty, AttrMap.empty)
 
-let get_situated_prop_value properties =
-  let situated_qpr = AD.mk_full_qpref app_property_set "situated" in
-  match AD.find_assoc situated_qpr properties with
-  | None -> None
-  | Some {AD.value} -> (
-    match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      let v =
-        match (String.lowercase_ascii id) with
-        | "onboard" -> VI.OnBoard
-        | "remote" -> VI.Remote
-        | _ -> failwith "Unexpected Situated value"
-      in
-      Some v
-    )
-    | _ -> failwith "Unexpected Situated value"
-  )
 
-let subcomponent_to_comp_inst sys_impl iml_comp_types
+let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
   {AD.name; AD.type_ref; AD.properties }
 =
- {VI.name = C.get_id name;
+ let name = C.get_id name in
+ {VI.name = name;
   VI.itype = get_instance_index sys_impl iml_comp_types type_ref;
-  VI.manufacturer = get_manufacturer_prop_value properties;
-  VI.category = (
-    let qpr = AD.mk_full_qpref app_property_set "category" in
-    get_string_prop_value qpr properties);
-  VI.pedigree = get_pedigree_prop_value properties;
-  VI.component_type = get_component_type_prop_value properties;
-  VI.situated = get_situated_prop_value properties;
-  VI.adversarially_tested = (
-    let qpr = AD.mk_full_qpref app_property_set "adversariallyTested" in
-    get_bool_prop_value qpr properties);
-  VI.has_sensitive_info = (
-    let qpr = AD.mk_full_qpref app_property_set "hasSensitiveInfo" in
-    get_bool_prop_value qpr properties);
-  VI.inside_trusted_boundary = (
-    let qpr = AD.mk_full_qpref app_property_set "insideTrustedBoundary" in
-    get_bool_prop_value qpr properties);
-  VI.canReceiveConfigUpdate = (
-    let qpr = AD.mk_full_qpref app_property_set "canReceiveConfigUpdate" in
-    get_bool_prop_value qpr properties);
-  VI.canReceiveSWUpdate = (
-    let qpr = AD.mk_full_qpref app_property_set "canReceiveSWUpdate" in
-    get_bool_prop_value qpr properties);
-  VI.controlReceivedFromUntrusted = (
-    let qpr = AD.mk_full_qpref app_property_set "controlReceivedFromUntrusted" in
-    get_bool_prop_value qpr properties);
-  VI.controlSentToUntrusted = (
-    let qpr = AD.mk_full_qpref app_property_set "controlSentToUntrusted" in
-    get_bool_prop_value qpr properties);
-  VI.dataReceivedFromUntrusted = (
-    let qpr = AD.mk_full_qpref app_property_set "dataReceivedFromUntrusted" in
-    get_bool_prop_value qpr properties);
-  VI.dataSentToUntrusted = (
-    let qpr = AD.mk_full_qpref app_property_set "dataSentToUntrusted" in
-    get_bool_prop_value qpr properties);
-
-  VI.configuration_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Configuration_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.physical_Theft_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Physical_Theft_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.interception_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Interception_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.hardware_Integrity_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Hardware_Integrity_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.supply_Chain_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Supply_Chain_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.brute_Force_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Brute_Force_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.fault_Injection_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Fault_Injection_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.identity_Spoofing_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Identity_Spoofing_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.excessive_Allocation_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Excessive_Allocation_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.sniffing_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Sniffing_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.buffer_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Buffer_Attack" in
-    get_bool_prop_value qpr properties);
-  VI.flooding_Attack = (
-    let qpr = AD.mk_full_qpref app_property_set "Flooding_Attack" in
-    get_bool_prop_value qpr properties);
-
-  VI.anti_jamming = (
-    let qpr = AD.mk_full_qpref app_property_set "antiJamming" in
-    get_bool_prop_value qpr properties);
-
-  VI.auditMessageResponses = (
-    let qpr = AD.mk_full_qpref app_property_set "auditMessageResponses" in
-    get_bool_prop_value qpr properties);
-  VI.deviceAuthentication = (
-    let qpr = AD.mk_full_qpref app_property_set "deviceAuthentication" in
-    get_bool_prop_value qpr properties);
-  VI.dosProtection = (
-    let qpr = AD.mk_full_qpref app_property_set "dosProtection" in
-    get_bool_prop_value qpr properties);
-  VI.encryptedStorage = (
-    let qpr = AD.mk_full_qpref app_property_set "encryptedStorage" in
-    get_bool_prop_value qpr properties);
-
-  VI.heterogeneity = (
-    let qpr = AD.mk_full_qpref app_property_set "heterogeneity" in
-    get_bool_prop_value qpr properties);
-  VI.inputValidation = (
-    let qpr = AD.mk_full_qpref app_property_set "inputValidation" in
-    get_bool_prop_value qpr properties);
-  VI.logging = (
-    let qpr = AD.mk_full_qpref app_property_set "logging" in
-    get_bool_prop_value qpr properties);
-  VI.memoryProtection = (
-    let qpr = AD.mk_full_qpref app_property_set "memoryProtection" in
-    get_bool_prop_value qpr properties);
-  VI.physicalAccessControl = (
-    let qpr = AD.mk_full_qpref app_property_set "physicalAccessControl" in
-    get_bool_prop_value qpr properties);
-  VI.removeIdentifyingInformation = (
-    let qpr = AD.mk_full_qpref app_property_set "removeIdentifyingInformation" in
-    get_bool_prop_value qpr properties);
-  VI.resourceAvailability = (
-    let qpr = AD.mk_full_qpref app_property_set "resourceAvailability" in
-    get_bool_prop_value qpr properties);
-  VI.resourceIsolation = (
-    let qpr = AD.mk_full_qpref app_property_set "resourceIsolation" in
-    get_bool_prop_value qpr properties);
-  VI.secureBoot = (
-    let qpr = AD.mk_full_qpref app_property_set "secureBoot" in
-    get_bool_prop_value qpr properties);
-  VI.sessionAuthenticity = (
-    let qpr = AD.mk_full_qpref app_property_set "sessionAuthenticity" in
-    get_bool_prop_value qpr properties);
-  VI.staticCodeAnalysis = (
-    let qpr = AD.mk_full_qpref app_property_set "staticCodeAnalysis" in
-    get_bool_prop_value qpr properties);
-  VI.strongCryptoAlgorithms = (
-    let qpr = AD.mk_full_qpref app_property_set "strongCryptoAlgorithms" in
-    get_bool_prop_value qpr properties);
-  VI.supplyChainSecurity = (
-    let qpr = AD.mk_full_qpref app_property_set "supplyChainSecurity" in
-    get_bool_prop_value qpr properties);
-  VI.systemAccessControl = (
-    let qpr = AD.mk_full_qpref app_property_set "systemAccessControl" in
-    get_bool_prop_value qpr properties);
-  VI.tamperProtection = (
-    let qpr = AD.mk_full_qpref app_property_set "tamperProtection" in
-    get_bool_prop_value qpr properties);
-  VI.userAuthentication = (
-    let qpr = AD.mk_full_qpref app_property_set "userAuthentication" in
-    get_bool_prop_value qpr properties);
-
-  VI.anti_jamming_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "antiJammingDAL" in
-    get_int_prop_value qpr properties);
-  VI.auditMessageResponsesDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "auditMessageResponsesDAL" in
-    get_int_prop_value qpr properties);
-  VI.deviceAuthenticationDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "deviceAuthenticationDAL" in
-    get_int_prop_value qpr properties);
-  VI.dosProtectionDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "dosProtectionDAL" in
-    get_int_prop_value qpr properties);
-  VI.encryptedStorageDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "encryptedStorageDAL" in
-    get_int_prop_value qpr properties);
-  VI.heterogeneity_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "heterogeneityDAL" in
-    get_int_prop_value qpr properties);
-  VI.inputValidationDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "inputValidationDAL" in
-    get_int_prop_value qpr properties);
-  VI.loggingDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "loggingDAL" in
-    get_int_prop_value qpr properties);
-  VI.memoryProtectionDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "memoryProtectionDAL" in
-    get_int_prop_value qpr properties);
-  VI.physicalAccessControlDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "physicalAccessControlDAL" in
-    get_int_prop_value qpr properties);
-  VI.removeIdentifyingInformationDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "removeIdentifyingInformationDAL" in
-    get_int_prop_value qpr properties);
-  VI.resourceAvailabilityDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "resourceAvailabilityDAL" in
-    get_int_prop_value qpr properties);
-  VI.resourceIsolationDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "resourceIsolationDAL" in
-    get_int_prop_value qpr properties);
-  VI.secureBootDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "secureBootDAL" in
-    get_int_prop_value qpr properties);
-  VI.sessionAuthenticityDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "sessionAuthenticityDAL" in
-    get_int_prop_value qpr properties);
-  VI.staticCodeAnalysisDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "staticCodeAnalysisDAL" in
-    get_int_prop_value qpr properties);
-  VI.strongCryptoAlgorithmsDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "strongCryptoAlgorithmsDAL" in
-    get_int_prop_value qpr properties);
-  VI.supplyChainSecurityDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "supplyChainSecurityDAL" in
-    get_int_prop_value qpr properties);
-  VI.systemAccessControlDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "systemAccessControlDAL" in
-    get_int_prop_value qpr properties);
-  VI.tamperProtectionDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "tamperProtectionDAL" in
-    get_int_prop_value qpr properties);
-  VI.userAuthenticationDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "userAuthenticationDAL" in
-    get_int_prop_value qpr properties)
-
-  (*
-  VI.broadcast_from_outside_tb = (
-    let qpr = AD.mk_full_qpref app_property_set "broadcastFromOutsideTB" in
-    get_bool_prop_value qpr properties);
-  VI.wifi_from_outside_tb = (
-    let qpr = AD.mk_full_qpref app_property_set "wifiFromOutsideTB" in
-    get_bool_prop_value qpr properties);
-  VI.encryption = (
-    let qpr = AD.mk_full_qpref app_property_set "encryption" in
-    get_bool_prop_value qpr properties);
-  VI.anti_flooding = (
-    let qpr = AD.mk_full_qpref app_property_set "antiFlooding" in
-    get_bool_prop_value qpr properties);
-  VI.anti_fuzzing = (
-    let qpr = AD.mk_full_qpref app_property_set "antiFuzzing" in
-    get_bool_prop_value qpr properties);
-  VI.anti_flooding_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "antiFloodingDAL" in
-    get_int_prop_value qpr properties);
-  VI.anti_fuzzing_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "antiFuzzingDAL" in
-    get_int_prop_value qpr properties);
-  VI.encryption_dal = (
-    let qpr = AD.mk_full_qpref app_property_set "encryptionDAL" in
-    get_int_prop_value qpr properties);
-
-  *)
+  VI.attributes = get_attributes prop_set_name name comp_props properties
  }
 
 let get_port_index {VI.ports} port =
@@ -983,68 +758,14 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
     VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct port)
   )
 
-let get_flow_type_prop_value properties =
-  let flow_type_qpr = AD.mk_full_qpref app_property_set "flowType" in
-  match AD.find_assoc flow_type_qpr properties with
-  | None -> None 
-  | Some {AD.value} -> (
-    match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      match (String.lowercase_ascii id) with
-      | "xdata" -> Some VI.Xdata
-      | "xcontrol" -> Some VI.Xcontrol
-      | "xrequest" -> Some VI.Xrequest
-      | _ -> failwith "Unexpected FlowType value"
-    )
-    | _ -> failwith "Unexpected FlowType value"
-  )
-
-let get_conn_type_prop_value properties =
-  let conn_type_qpr = AD.mk_full_qpref app_property_set "connectionType" in
-  match AD.find_assoc conn_type_qpr properties with
-  | None -> None
-  | Some {AD.value} -> (
-    match value with
-    | AD.LiteralOrReference (None, (_, id)) -> (
-      let v =
-        match (String.lowercase_ascii id) with
-        | "local" -> VI.Local
-        | "remote" -> VI.Remote
-        | _ -> failwith "Unexpected Connection Type value"
-      in
-      Some v
-    )
-    | _ -> failwith "Unexpected Connection Type value"
-  )
-
-let port_connection_to_iml_connection ct ct_idx sys_impl iml_comp_types subcomps
+let port_connection_to_iml_connection
+  prop_set_name conn_props ct ct_idx sys_impl iml_comp_types subcomps
   { AD.name; AD.dir; AD.src; AD.dst; AD.properties }
 =
   assert (dir = AD.Unidirectional);
-  {VI.name = C.get_id name;
-   VI.ftype = get_flow_type_prop_value properties;
-   VI.conn_type = get_conn_type_prop_value properties;
-   VI.authenticated = (
-     let qpr = AD.mk_full_qpref app_property_set "authenticated" in
-     get_bool_prop_value qpr properties);
-   VI.data_encrypted = (
-     let qpr = AD.mk_full_qpref app_property_set "dataEncrypted" in
-     match AD.find_assoc qpr properties with
-     | None -> None
-     | Some _ -> failwith_replace_property "dataEncrypted" "encryptedTransmission"
-   );
-   VI.trustedConnection = (
-     let qpr = AD.mk_full_qpref app_property_set "trustedConnection" in
-     get_bool_prop_value qpr properties);
-   VI.encryptedTransmission = (
-     let qpr = AD.mk_full_qpref app_property_set "encryptedTransmission" in
-     get_bool_prop_value qpr properties);
-   VI.encryptedTransmissionDAL = (
-    let qpr = AD.mk_full_qpref app_property_set "encryptedTransmissionDAL" in
-    get_int_prop_value qpr properties);
-   VI.replayProtection = (
-     let qpr = AD.mk_full_qpref app_property_set "replayProtection" in
-     get_bool_prop_value qpr properties);
+  let name = C.get_id name in
+  {VI.name = name;
+   VI.attributes = get_attributes prop_set_name name conn_props properties;
    VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
    VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
   }
@@ -1172,7 +893,10 @@ let empty_dataflow_impl =
    VI.properties = [];
   }
 
-let system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impl =
+let system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impl =
+  let comp_props, conn_props =
+    split_property_set_and_get_map v_props
+  in
   sys_impl |> List.map
   (fun {AD.name; AD.subcomponents; AD.connections; AD.annexes} ->
     let iml_name =
@@ -1190,14 +914,15 @@ let system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impl =
           VI.DataflowImpl (empty_dataflow_impl)
       )
       else (
+        let prop_set_name = C.get_id v_props.AD.name in
         let b_impl =
           let subcomponents =
-            subcomponents |>
-            List.map (subcomponent_to_comp_inst sys_impl iml_comp_types)
+            subcomponents |> List.map 
+              (subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types)
           in
           let connections =
             connections |> List.map
-              (port_connection_to_iml_connection
+              (port_connection_to_iml_connection prop_set_name conn_props
                 ct ct_idx sys_impl iml_comp_types subcomponents)
           in
           ({ subcomponents; connections } : VI.block_impl)
@@ -1343,7 +1068,7 @@ let missions_of_system_types sys_types =
            -> Some (iml_of_mission id reqs description comment)
          | _ -> None) |> filter_opt
 
-let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
+let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs } =
   let comp_types, comp_impls =
     List.fold_left (fun (cts, cis) -> function
       | AD.ComponentType ct -> (ct :: cts, cis)
@@ -1368,11 +1093,12 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
   let type_decls =
     data_to_type_decls data_types data_impls
   in
+  let prop_set_name = C.get_id v_props.AD.name in
   let iml_comp_types =
-    system_types_to_iml_comp_types type_decls sys_types
+    system_types_to_iml_comp_types prop_set_name type_decls sys_types
   in
   let iml_comp_impl =
-    system_impl_to_iml_comp_impl type_decls iml_comp_types sys_impls
+    system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impls
   in
   let dataflow_code =
     match List.find_opt AD.is_agree_annex annex_libs with
@@ -1399,7 +1125,7 @@ let pkg_sec_to_model name { AD.classifiers; AD.annex_libs } =
    VI.missions = missions
   }
 
-let aadl_ast_to_vdm_iml = function
+let aadl_ast_to_vdm_iml v_props = function
   | AD.AADLPackage (_, { AD.name ; AD.public_sec }) -> (
     match public_sec with
     | None -> None
@@ -1407,7 +1133,7 @@ let aadl_ast_to_vdm_iml = function
       let pkg =
         let pkg_name = aadl_pname_to_iml_pname name in
         { VI.name = pkg_name;
-          VI.model = pkg_sec_to_model pkg_name sec;
+          VI.model = pkg_sec_to_model v_props pkg_name sec;
         }
       in
       Some pkg

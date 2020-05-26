@@ -129,9 +129,27 @@ type aadl_package = {
   private_sec: package_section option;
 }
 
+type property_owner =
+  | All
+  | System
+  | Connection
+  | Other
+
+type property_definition = {
+  name: pid;
+  is_inheritable: bool;
+  default_value: property_expr option;
+  applies_to: property_owner;
+}
+
+type property_decl =
+  | UnsupportedDecl
+  | PropertyDef of property_definition
+
 type property_set = {
   name: pid;
   imported_units: pname list;
+  declarations: property_decl list;
 }
 
 type model_unit =
@@ -145,6 +163,8 @@ val equal_ids: pid -> pid -> bool
 val equal_qprefs: qpref -> qpref -> bool
 
 val mk_full_qpref: string -> string -> qpref
+
+val qpref_to_string : qpref -> string
 
 val find_assoc: qpref -> property_association list -> property_association option
 

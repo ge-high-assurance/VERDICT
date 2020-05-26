@@ -53,6 +53,7 @@
     "properties",     P.PROPERTIES ;
     "subcomponents",  P.SUBCOMPONENTS ;
     "connections",    P.CONNECTIONS ;
+    "connection",     P.CONNECTION ;
     "requires",       P.REQUIRES ;
     "provides",       P.PROVIDES ;
     "access",         P.ACCESS ;

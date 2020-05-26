@@ -7,5 +7,5 @@
 
 (** @author Daniel Larraz *)
 
-val aadl_ast_to_vdm_iml: AADLAst.t -> VDMIML.t option
+val aadl_ast_to_vdm_iml: AADLAst.property_set -> AADLAst.t -> VDMIML.t option
  

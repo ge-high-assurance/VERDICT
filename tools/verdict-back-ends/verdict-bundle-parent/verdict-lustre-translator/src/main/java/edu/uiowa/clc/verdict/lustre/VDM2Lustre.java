@@ -148,6 +148,8 @@ public class VDM2Lustre {
         } else {
             // Imported Node
             node.setIsImported(true);
+            // System.out.println("Imported Nodes:" +identifier );
+
         }
 
         node.setName(identifier);
@@ -198,6 +200,7 @@ public class VDM2Lustre {
         NodeBody nodeBody = new NodeBody();
 
         // Option 1) Block Implementation
+        //        retrieve_block(componentImpl);
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         // BlockImpl
@@ -316,6 +319,22 @@ public class VDM2Lustre {
         // Node OutputParameter
         else if (port_mode == PortMode.OUT) {
             node.getOutputParameter().add(node_parameter);
+
+            //            if(node.isIsImported() != null) {
+            String inst_cmp = "(.+)_Inst_.*";
+            Pattern inst_pattern = Pattern.compile(inst_cmp);
+            Matcher m = inst_pattern.matcher(node.getName());
+
+            if (m.matches()) {
+                // Instrumented component Instance ID
+                //                	System.out.println("Imported Node: " + node.getName());
+                //                	String return_type = node_parameter.getName();
+                //                	System.out.println("Return Parameter: " +
+                // node_parameter.getName()+"_instrumented");
+                node_parameter.setName(node_parameter.getName() + "_instrumented");
+            }
+
+            //            }
         }
     }
 
@@ -641,53 +660,57 @@ public class VDM2Lustre {
                     //                    System.out.print(">>>" + expr_id);
                     NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
 
-                    Expression eq_rhs = n_eq.getRhs();
+                    if (n_eq != null) {
+                        Expression eq_rhs = n_eq.getRhs();
 
-                    NodeCall node_called = eq_rhs.getCall();
+                        NodeCall node_called = eq_rhs.getCall();
 
-                    String inst_cmp = "(.+)_Inst_.*";
-                    Pattern inst_pattern = Pattern.compile(inst_cmp);
+                        String inst_cmp = "(.+)_Inst_.*";
+                        Pattern inst_pattern = Pattern.compile(inst_cmp);
 
-                    String node_id = "";
-                    if (node_called != null) {
-                        node_id = node_called.getNodeId();
-                    }
+                        String node_id = "";
+                        if (node_called != null) {
+                            node_id = node_called.getNodeId();
+                        }
 
-                    //                    System.out.println(" = " + node_id + " (" + arg_value +
-                    // ")");
-                    Matcher m = inst_pattern.matcher(node_called.getNodeId());
+                        //                    System.out.println(" = " + node_id + " (" + arg_value
+                        // +
+                        // ")");
+                        Matcher m = inst_pattern.matcher(node_called.getNodeId());
 
-                    IfThenElse ifelse = new IfThenElse();
-                    Expression called_expr = new Expression();
-                    // Condition
-                    Expression gps_expr = new Expression();
+                        IfThenElse ifelse = new IfThenElse();
+                        Expression called_expr = new Expression();
+                        // Condition
+                        Expression gps_expr = new Expression();
 
-                    if (m.matches()) {
-                        // Instrumented component Instance ID
-                        String component_id = m.group(1);
-                        gps_expr.setIdentifier(component_id);
-                    }
-                    ifelse.setCondition(gps_expr);
-                    // Then
-                    ifelse.setThenBranch(called_expr);
-                    // Else
-                    Expression arg = new Expression();
-                    arg.setIdentifier(src_component_port.getName());
-                    ifelse.setElseBranch(arg);
+                        if (m.matches()) {
+                            // Instrumented component Instance ID
+                            String component_id = m.group(1);
+                            gps_expr.setIdentifier(component_id);
+                        }
+                        ifelse.setCondition(gps_expr);
+                        // Then
+                        ifelse.setThenBranch(called_expr);
+                        // Else
+                        Expression arg = new Expression();
+                        arg.setIdentifier(src_component_port.getName());
+                        ifelse.setElseBranch(arg);
 
-                    // NodeCalled Expr
-                    called_expr.setCall(node_called);
+                        // NodeCalled Expr
+                        called_expr.setCall(node_called);
 
-                    Expression instrumented_expr = new Expression();
-                    instrumented_expr.setConditionalExpression(ifelse);
+                        Expression instrumented_expr = new Expression();
+                        instrumented_expr.setConditionalExpression(ifelse);
 
-                    if (node_called != null) {
-                        if (node_called.getNodeId().equals(called_node_ID)) {
-                            for (Expression arg_expr : node_called.getArgument()) {
-                                if (arg_expr.getIdentifier() == dest_component_port.getName()) {
-                                    arg_expr.setIdentifier(arg_value);
-                                } else if (node_called.getArgument().size() == 1) {
-                                    arg_expr.setIdentifier(arg_value);
+                        if (node_called != null) {
+                            if (node_called.getNodeId().equals(called_node_ID)) {
+                                for (Expression arg_expr : node_called.getArgument()) {
+                                    if (arg_expr.getIdentifier()
+                                            .equals(dest_component_port.getName())) {
+                                        arg_expr.setIdentifier(arg_value);
+                                    } else if (node_called.getArgument().size() == 1) {
+                                        arg_expr.setIdentifier(arg_value);
+                                    }
                                 }
                             }
                         }
@@ -909,5 +932,34 @@ public class VDM2Lustre {
 
         typeDeclarations.put(identifier, typeDeclaration);
         program.getTypeDeclaration().add(typeDeclaration);
+    }
+
+    protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+
+        BlockImpl blockImpl = null;
+
+        String cmpID = compImpl.getType().getId();
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (cmpID.equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
     }
 }
