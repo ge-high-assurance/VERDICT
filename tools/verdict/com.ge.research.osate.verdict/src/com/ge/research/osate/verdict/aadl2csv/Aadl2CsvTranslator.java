@@ -3,9 +3,15 @@ package com.ge.research.osate.verdict.aadl2csv;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.ThreadGroupImplementation;
+import org.osate.aadl2.ThreadGroupSubcomponent;
+import org.osate.aadl2.ThreadGroupType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.VirtualProcessorImplementation;
+import org.osate.aadl2.VirtualProcessorSubcomponent;
+import org.osate.aadl2.VirtualProcessorType;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
@@ -192,6 +198,10 @@ public class Aadl2CsvTranslator {
 				componentTypes.add((AbstractType)obj);
 			} else if (obj instanceof ProcessType) {
 				componentTypes.add((ProcessType)obj);
+			} else if (obj instanceof ThreadGroupType) {
+				componentTypes.add((ThreadGroupType)obj);
+			} else if (obj instanceof VirtualProcessorType) {
+				componentTypes.add((VirtualProcessorType)obj);
 			} else if (obj instanceof SystemImplementation) {
 				compImpls.add((SystemImplementation) obj);
 			} else if (obj instanceof SubprogramImplementation) {
@@ -208,6 +218,10 @@ public class Aadl2CsvTranslator {
 				compImpls.add((DeviceImplementation) obj);
 			} else if (obj instanceof ProcessImplementation) {
 				compImpls.add((ProcessImplementation) obj);
+			} else if (obj instanceof ThreadGroupImplementation) {
+				compImpls.add((ThreadGroupImplementation) obj);
+			} else if (obj instanceof VirtualProcessorImplementation) {
+				compImpls.add((VirtualProcessorImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {					
 					// Save property owner to be used later					
@@ -248,6 +262,14 @@ public class Aadl2CsvTranslator {
 								componentPropertyToName.put(prop, propName);
 								break;
 							}
+							case "thread group": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}
+							case "virtual processor": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}							
 							default: {
 								break;
 							}
@@ -432,98 +454,18 @@ public class Aadl2CsvTranslator {
     				ConnectionEnd destConnectionEnd = conn.getAllDestination();
 					
 					if(srcConnContext != null) {
+						String info[] = obtainConnCompInfo(srcConnContext);
 						srcCompInstName = srcConnContext.getName();
-						
-	    				if(srcConnContext instanceof ProcessSubcomponent) {
-							srcCompCatName = ((ProcessSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((ProcessSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((ProcessSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((ProcessSubcomponent)srcConnContext).getComponentImplementation().getName();	    					
-	    				} else if(srcConnContext instanceof SystemSubcomponent) {
-							srcCompCatName = ((SystemSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((SystemSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((SystemSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((SystemSubcomponent)srcConnContext).getComponentImplementation().getName();
-	    				} else if(srcConnContext instanceof DeviceSubcomponent) {
-							srcCompCatName = ((DeviceSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((DeviceSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((DeviceSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((DeviceSubcomponent)srcConnContext).getComponentImplementation().getName();	    					
-	    				} else if(srcConnContext instanceof AbstractSubcomponent) {
-							srcCompCatName = ((AbstractSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((AbstractSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((AbstractSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((AbstractSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
-	    				}  else if(srcConnContext instanceof DataSubcomponent) {
-							srcCompCatName = ((DataSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((DataSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((DataSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((DataSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
-	    				} else if(srcConnContext instanceof ThreadSubcomponent) {
-							srcCompCatName = ((ThreadSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((ThreadSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((ThreadSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((ThreadSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
-	    				} else if(srcConnContext instanceof MemorySubcomponent) {
-							srcCompCatName = ((MemorySubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((MemorySubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((MemorySubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((MemorySubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
-	    				} else if(srcConnContext instanceof SubprogramSubcomponent) {
-							srcCompCatName = ((SubprogramSubcomponent)srcConnContext).getCategory().getName();						
-							srcCompName = ((SubprogramSubcomponent)srcConnContext).getComponentType().getName();
-							srcCompImplName = ((SubprogramSubcomponent)srcConnContext).getComponentImplementation() == null? 
-													"":((SubprogramSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
-	    				} else {
-	    					throw new RuntimeException("Unsupported AADL component element type: " + srcConnContext);
-	    				}
+						srcCompCatName = info[0];
+						srcCompName = info[1];
+						srcCompImplName = info[2];
 					} 
 					if(destConnContext != null) {
-						destCompInstName = destConnContext.getName();
-						
-	    				if(destConnContext instanceof ProcessSubcomponent) {
-							destCompCatName = ((ProcessSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((ProcessSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((ProcessSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((ProcessSubcomponent)destConnContext).getComponentImplementation().getName();								    					
-	    				} else if(destConnContext instanceof SystemSubcomponent) {
-							destCompCatName = ((SystemSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((SystemSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((SystemSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((SystemSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else if(destConnContext instanceof DeviceSubcomponent) {
-							destCompCatName = ((DeviceSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((DeviceSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((DeviceSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((DeviceSubcomponent)destConnContext).getComponentImplementation().getName();	    					
-	    				} else if(destConnContext instanceof AbstractSubcomponent) {
-							destCompCatName = ((AbstractSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((AbstractSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((AbstractSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((AbstractSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else if(destConnContext instanceof DataSubcomponent) {
-							destCompCatName = ((DataSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((DataSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((DataSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((DataSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else if(destConnContext instanceof ThreadSubcomponent) {
-							destCompCatName = ((ThreadSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((ThreadSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((ThreadSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((ThreadSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else if(destConnContext instanceof MemorySubcomponent) {
-							destCompCatName = ((MemorySubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((MemorySubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((MemorySubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((MemorySubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else if(destConnContext instanceof SubprogramSubcomponent) {
-							destCompCatName = ((SubprogramSubcomponent)destConnContext).getCategory().getName();
-							destCompName = ((SubprogramSubcomponent)destConnContext).getComponentType().getName();
-							destCompImplName = ((SubprogramSubcomponent)destConnContext).getComponentImplementation() == null? 
-													"":((SubprogramSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				} else {
-	    					throw new RuntimeException("Unsupported AADL component element type: " + destConnContext);
-	    				}						
+						String info[] = obtainConnCompInfo(destConnContext);
+						destCompInstName = destConnContext.getName();						
+						destCompCatName = info[0];
+						destCompName = info[1];
+						destCompImplName = info[2];					
 					} 
 					
     				String srcPortTypeName = null;
@@ -539,8 +481,10 @@ public class Aadl2CsvTranslator {
     					AccessType type = ((DataAccess) srcConnectionEnd).getKind();
     					if(type == AccessType.PROVIDES) {
     						srcPortTypeName = "provides data access";	
-    					} else {
+    					} else if(type == AccessType.REQUIRES) {
     						srcPortTypeName = "requires data access";
+    					} else {
+    						throw new RuntimeException("Unexpected access type: " + type);
     					}
     				} else if(srcConnectionEnd instanceof DataSubcomponent){
     					srcPortTypeName = "data";
@@ -636,6 +580,75 @@ public class Aadl2CsvTranslator {
 		}
         
         return scnConnTable;        
+    }
+    
+    /**
+     * 
+     * Obtain the connection component information from the input context
+     * 
+     * */
+    public String[] obtainConnCompInfo(Context connContext) {
+    	String[] info = new String[3];
+    	String compCat = "";
+    	String compName = "";
+    	String compImplName = "";
+		if(connContext instanceof ProcessSubcomponent) {
+			compCat = ((ProcessSubcomponent)connContext).getCategory().getName();						
+			compName = ((ProcessSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((ProcessSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((ProcessSubcomponent)connContext).getComponentImplementation().getName();	    					
+		} else if(connContext instanceof SystemSubcomponent) {
+			compCat = ((SystemSubcomponent)connContext).getCategory().getName();						
+			compName = ((SystemSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((SystemSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((SystemSubcomponent)connContext).getComponentImplementation().getName();
+		} else if(connContext instanceof DeviceSubcomponent) {
+			compCat = ((DeviceSubcomponent)connContext).getCategory().getName();						
+			compName = ((DeviceSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((DeviceSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((DeviceSubcomponent)connContext).getComponentImplementation().getName();	    					
+		} else if(connContext instanceof AbstractSubcomponent) {
+			compCat = ((AbstractSubcomponent)connContext).getCategory().getName();						
+			compName = ((AbstractSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((AbstractSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((AbstractSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		}  else if(connContext instanceof DataSubcomponent) {
+			compCat = ((DataSubcomponent)connContext).getCategory().getName();						
+			compName = ((DataSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((DataSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((DataSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else if(connContext instanceof ThreadSubcomponent) {
+			compCat = ((ThreadSubcomponent)connContext).getCategory().getName();						
+			compName = ((ThreadSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((ThreadSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((ThreadSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else if(connContext instanceof MemorySubcomponent) {
+			compCat = ((MemorySubcomponent)connContext).getCategory().getName();						
+			compName = ((MemorySubcomponent)connContext).getComponentType().getName();
+			compImplName = ((MemorySubcomponent)connContext).getComponentImplementation() == null? 
+									"":((MemorySubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else if(connContext instanceof SubprogramSubcomponent) {
+			compCat = ((SubprogramSubcomponent)connContext).getCategory().getName();						
+			compName = ((SubprogramSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((SubprogramSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((SubprogramSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else if(connContext instanceof ThreadGroupSubcomponent) {
+			compCat = ((ThreadGroupSubcomponent)connContext).getCategory().getName();						
+			compName = ((ThreadGroupSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((ThreadGroupSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((ThreadGroupSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else if(connContext instanceof VirtualProcessorSubcomponent) {
+			compCat = ((VirtualProcessorSubcomponent)connContext).getCategory().getName();						
+			compName = ((VirtualProcessorSubcomponent)connContext).getComponentType().getName();
+			compImplName = ((VirtualProcessorSubcomponent)connContext).getComponentImplementation() == null? 
+									"":((VirtualProcessorSubcomponent)connContext).getComponentImplementation().getName();	   	    					
+		} else {
+			throw new RuntimeException("Unsupported AADL component element type: " + connContext);
+		}    
+		info[0] = compCat;
+		info[1] = compName;
+		info[2] = compImplName;
+    	return info;
     }
 	
 	/**
