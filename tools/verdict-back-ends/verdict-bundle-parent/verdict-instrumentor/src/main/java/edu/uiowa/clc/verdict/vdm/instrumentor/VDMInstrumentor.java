@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -221,13 +222,23 @@ public class VDMInstrumentor {
 
             // Snoozing option for component level.
             if (component_level & vdm_components.size() > 0) {
-                for (Connection con : vdm_links) {
-                    if (isSourceComponent(con)) {
-                        //
-                        vdm_links.remove(con);
-                    }
-                }
+            
+        	   Iterator<Connection> it = vdm_links.iterator();
+        	   while (it.hasNext())
+        	   {
+        	      Connection con = it.next();
+        	      if (isSourceComponent(con)) {
+        	    	  it.remove();
+        	      }
+        	   }            	
+//            	for (Connection con : vdm_links) {
+//                    if (isSourceComponent(con)) {
+//                        //
+//                        vdm_links.remove(con);
+//                    }
+//                }
             }
+            
         }
 
         if (threats.contains("BG")) {
