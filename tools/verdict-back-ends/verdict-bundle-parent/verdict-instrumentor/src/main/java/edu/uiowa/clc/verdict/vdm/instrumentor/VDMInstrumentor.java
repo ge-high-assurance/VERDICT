@@ -105,17 +105,36 @@ public class VDMInstrumentor {
 
     protected String getComponentID(
             Map<String, HashSet<Connection>> components_map, Connection con) {
-        String ComponentID = null;
+        
+    	String ComponentID = null;
 
-        for (String cmpID : components_map.keySet()) {
-            HashSet<Connection> con_set = components_map.get(cmpID);
+        if (components_map.isEmpty()) {
+        	ConnectionEnd conDest = con.getDestination();
+        	Port dest_port = conDest.getComponentPort();
+        	
+        	if(dest_port != null) {
+        	
+        		ComponentID = dest_port.getId();
 
-            if (con_set.contains(con)) {
-                ComponentID = cmpID;
-                break;
-            }
+        	} else {
+        		CompInstancePort compInstance = conDest.getSubcomponentPort();
+        		
+        		ComponentInstance c = compInstance.getSubcomponent();
+        		ComponentID = c.getId();        		
+        	}
+        	
         }
-
+        else {
+	        for (String cmpID : components_map.keySet()) {
+	            HashSet<Connection> con_set = components_map.get(cmpID);
+	
+	            if (con_set.contains(con)) {
+	                ComponentID = cmpID;
+	                break;
+	            }
+	        }
+        }
+        
         return ComponentID;
     }
 
@@ -136,7 +155,7 @@ public class VDMInstrumentor {
                         enumType = cmpInstance.getSpecification();
                     }
 
-                    if (componentID.equals(enumType.getId())) {
+                    if (componentID.equalsIgnoreCase(enumType.getId())) {
                         return blockImpl;
                     }
                 }
@@ -266,26 +285,32 @@ public class VDMInstrumentor {
                 String cmpID = getComponentID(components_map, connection);
 
                 if (cmpID != null) {
-                    blockImpl = getBlockID(cmpID);
-
+                    //Find Block based on Connection
+                	blockImpl = getBlockID(cmpID);
+                    
                     String constant = instrument_link(cmpID, connection, blockImpl);
 
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-                } else if (threats.contains("NI")) {
-                    // Network Injection Case when no Components are present
-                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
-
-                    cmpID = cmpImpl.getType().getId();
-
-                    blockImpl = retrieve_block(cmpImpl);
-                    String constant = instrument_link(cmpID, connection, blockImpl);
-
-                    global_constants.add(constant);
-
-                    connections_map.put(connection, constant);
-                }
+                } 
+//                else if (threats.contains("NI")) {
+//                    // Network Injection Case when no Components are present
+//                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
+//
+//                    cmpID = cmpImpl.getType().getId();
+//                    //Find Block based on connection
+//                    blockImpl = retrieve_block(cmpImpl);
+//                    
+//                    
+//                    blockImpl = getBlockID(cmpID);
+//                    
+//                    String constant = instrument_link(cmpID, connection, blockImpl);
+//
+//                    global_constants.add(constant);
+//
+//                    connections_map.put(connection, constant);
+//                }
             }
         } // else {
         //            System.out.println("No Links found!");

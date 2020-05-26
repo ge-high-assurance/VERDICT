@@ -200,6 +200,7 @@ public class VDM2Lustre {
         NodeBody nodeBody = new NodeBody();
 
         // Option 1) Block Implementation
+//        retrieve_block(componentImpl);
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         // BlockImpl
@@ -932,4 +933,34 @@ public class VDM2Lustre {
         typeDeclarations.put(identifier, typeDeclaration);
         program.getTypeDeclaration().add(typeDeclaration);
     }
+   
+    protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+
+        BlockImpl blockImpl = null;
+
+        String cmpID = compImpl.getType().getId();
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+                    ComponentImpl impl = cmpInstance.getImplementation();
+                    ComponentType enumType = null;
+
+                    if (impl != null) {
+                        enumType = impl.getType();
+                    } else {
+                        enumType = cmpInstance.getSpecification();
+                    }
+
+                    if (cmpID.equals(enumType.getId())) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
+    }
+
 }
