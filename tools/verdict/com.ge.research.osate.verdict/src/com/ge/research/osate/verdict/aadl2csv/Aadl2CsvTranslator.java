@@ -3,7 +3,9 @@ package com.ge.research.osate.verdict.aadl2csv;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
@@ -37,6 +39,9 @@ import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.MemoryImplementation;
+import org.osate.aadl2.MemorySubcomponent;
+import org.osate.aadl2.MemoryType;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PortConnection;
@@ -48,6 +53,9 @@ import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertyOwner;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramSubcomponent;
+import org.osate.aadl2.SubprogramType;
 
 import com.ge.research.osate.verdict.dsl.VerdictUtil;
 import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
@@ -92,7 +100,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 */
 public class Aadl2CsvTranslator {
 	String scenario = "";
-	List<ComponentImplementation> allImpls = new ArrayList<>();
+	List<ComponentImplementation> compImpls = new ArrayList<>();
 	Map<Property, String> connPropertyToName = new LinkedHashMap<>();
 	Map<Property, String> componentPropertyToName = new LinkedHashMap<>();
 	Map<Property, String> abstractPropertyToName = new LinkedHashMap<>();
@@ -172,6 +180,12 @@ public class Aadl2CsvTranslator {
 				componentTypes.add((SystemType) obj);
 			} else if (obj instanceof BusType) {
 				componentTypes.add((BusType)obj);
+			} else if (obj instanceof SubprogramType) {
+				componentTypes.add((SubprogramType)obj);
+			} else if (obj instanceof ThreadType) {
+				componentTypes.add((ThreadType)obj);
+			} else if (obj instanceof MemoryType) {
+				componentTypes.add((MemoryType)obj);
 			} else if (obj instanceof DeviceType) {
 				componentTypes.add((DeviceType)obj);
 			} else if (obj instanceof AbstractType) {
@@ -179,15 +193,21 @@ public class Aadl2CsvTranslator {
 			} else if (obj instanceof ProcessType) {
 				componentTypes.add((ProcessType)obj);
 			} else if (obj instanceof SystemImplementation) {
-				allImpls.add((SystemImplementation) obj);
+				compImpls.add((SystemImplementation) obj);
+			} else if (obj instanceof SubprogramImplementation) {
+				compImpls.add((SubprogramImplementation) obj);
+			} else if (obj instanceof ThreadImplementation) {
+				compImpls.add((ThreadImplementation) obj);
+			} else if (obj instanceof MemoryImplementation) {
+				compImpls.add((MemoryImplementation) obj);
 			} else if (obj instanceof BusImplementation) {
-				allImpls.add((BusImplementation) obj);
+				compImpls.add((BusImplementation) obj);
 			} else if (obj instanceof AbstractImplementation) {
-				allImpls.add((AbstractImplementation) obj);
+				compImpls.add((AbstractImplementation) obj);
 			} else if (obj instanceof DeviceImplementation) {
-				allImpls.add((DeviceImplementation) obj);
+				compImpls.add((DeviceImplementation) obj);
 			} else if (obj instanceof ProcessImplementation) {
-				allImpls.add((ProcessImplementation) obj);
+				compImpls.add((ProcessImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {					
 					// Save property owner to be used later					
@@ -200,23 +220,32 @@ public class Aadl2CsvTranslator {
 								componentPropertyToName.put(prop, propName);
 								break;
 							}
+							case "thread": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}	
+							case "processor": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}
+							case "memory": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}							
 							case "connection": {
 								connPropertyToName.put(prop, propName);
 								break;
 							}
 							case "process": {
 								componentPropertyToName.put(prop, propName);
-//								processPropertyToName.put(prop, propName);
 								break;
 							}
 							case "abstract": {
 								componentPropertyToName.put(prop, propName);
-//								abstractPropertyToName.put(prop, propName);
 								break;
 							}
 							case "device": {
 								componentPropertyToName.put(prop, propName);
-//								devicePropertyToName.put(prop, propName);
 								break;
 							}
 							default: {
@@ -225,7 +254,7 @@ public class Aadl2CsvTranslator {
 						}				
 					}
 				}
-			}
+			} 
 		}
 		
 		for(ComponentType compType : componentTypes) {
@@ -278,7 +307,7 @@ public class Aadl2CsvTranslator {
 			}			
 		}
 		
-		for(ComponentImplementation impl : allImpls) {
+		for(ComponentImplementation impl : compImpls) {
 			compTypeNameToImpl.put(impl.getType().getName(), impl);
 			
 			if(!impl.getAllConnections().isEmpty()) {
@@ -309,7 +338,7 @@ public class Aadl2CsvTranslator {
 				"ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
 				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
 		
-		for(ComponentImplementation sysImpl : allImpls) {
+		for(ComponentImplementation sysImpl : compImpls) {
 			for(PropertyAssociation propAssoc : sysImpl.getOwnedPropertyAssociations()) {
 				 				
 				if(propAssoc.getOwnedValues().size() != 1) {
@@ -386,7 +415,7 @@ public class Aadl2CsvTranslator {
     	
         Table scnConnTable = new Table(headers);
         
-		for(ComponentImplementation compImpl : allImpls) {
+		for(ComponentImplementation compImpl : compImpls) {
 			if(compImpl.getOwnedConnections() != null && !compImpl.getOwnedConnections().isEmpty()) {
 				for(Connection conn : compImpl.getOwnedConnections()) {
 					String srcCompInstName = "";
@@ -435,6 +464,16 @@ public class Aadl2CsvTranslator {
 							srcCompName = ((ThreadSubcomponent)srcConnContext).getComponentType().getName();
 							srcCompImplName = ((ThreadSubcomponent)srcConnContext).getComponentImplementation() == null? 
 													"":((ThreadSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
+	    				} else if(srcConnContext instanceof MemorySubcomponent) {
+							srcCompCatName = ((MemorySubcomponent)srcConnContext).getCategory().getName();						
+							srcCompName = ((MemorySubcomponent)srcConnContext).getComponentType().getName();
+							srcCompImplName = ((MemorySubcomponent)srcConnContext).getComponentImplementation() == null? 
+													"":((MemorySubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
+	    				} else if(srcConnContext instanceof SubprogramSubcomponent) {
+							srcCompCatName = ((SubprogramSubcomponent)srcConnContext).getCategory().getName();						
+							srcCompName = ((SubprogramSubcomponent)srcConnContext).getComponentType().getName();
+							srcCompImplName = ((SubprogramSubcomponent)srcConnContext).getComponentImplementation() == null? 
+													"":((SubprogramSubcomponent)srcConnContext).getComponentImplementation().getName();	   	    					
 	    				} else {
 	    					throw new RuntimeException("Unsupported AADL component element type: " + srcConnContext);
 	    				}
@@ -462,16 +501,26 @@ public class Aadl2CsvTranslator {
 							destCompName = ((AbstractSubcomponent)destConnContext).getComponentType().getName();
 							destCompImplName = ((AbstractSubcomponent)destConnContext).getComponentImplementation() == null? 
 													"":((AbstractSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				}  else if(destConnContext instanceof DataSubcomponent) {
+	    				} else if(destConnContext instanceof DataSubcomponent) {
 							destCompCatName = ((DataSubcomponent)destConnContext).getCategory().getName();
 							destCompName = ((DataSubcomponent)destConnContext).getComponentType().getName();
 							destCompImplName = ((DataSubcomponent)destConnContext).getComponentImplementation() == null? 
 													"":((DataSubcomponent)destConnContext).getComponentImplementation().getName();
-	    				}  else if(destConnContext instanceof ThreadSubcomponent) {
+	    				} else if(destConnContext instanceof ThreadSubcomponent) {
 							destCompCatName = ((ThreadSubcomponent)destConnContext).getCategory().getName();
 							destCompName = ((ThreadSubcomponent)destConnContext).getComponentType().getName();
 							destCompImplName = ((ThreadSubcomponent)destConnContext).getComponentImplementation() == null? 
 													"":((ThreadSubcomponent)destConnContext).getComponentImplementation().getName();
+	    				} else if(destConnContext instanceof MemorySubcomponent) {
+							destCompCatName = ((MemorySubcomponent)destConnContext).getCategory().getName();
+							destCompName = ((MemorySubcomponent)destConnContext).getComponentType().getName();
+							destCompImplName = ((MemorySubcomponent)destConnContext).getComponentImplementation() == null? 
+													"":((MemorySubcomponent)destConnContext).getComponentImplementation().getName();
+	    				} else if(destConnContext instanceof SubprogramSubcomponent) {
+							destCompCatName = ((SubprogramSubcomponent)destConnContext).getCategory().getName();
+							destCompName = ((SubprogramSubcomponent)destConnContext).getComponentType().getName();
+							destCompImplName = ((SubprogramSubcomponent)destConnContext).getComponentImplementation() == null? 
+													"":((SubprogramSubcomponent)destConnContext).getComponentImplementation().getName();
 	    				} else {
 	    					throw new RuntimeException("Unsupported AADL component element type: " + destConnContext);
 	    				}						
@@ -600,7 +649,7 @@ public class Aadl2CsvTranslator {
 		
 		Table scnCompPropsTable = new Table(headers);	
 		
-		for(ComponentImplementation sysImpl : allImpls) {
+		for(ComponentImplementation sysImpl : compImpls) {
 			if(sysImpl.getOwnedSubcomponents() != null && !sysImpl.getOwnedSubcomponents().isEmpty()) {
 				for (Subcomponent subcomp : sysImpl.getOwnedSubcomponents()) {
 					String subcompCompTypeName = subcomp.getComponentType().getName();
