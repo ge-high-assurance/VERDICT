@@ -836,7 +836,7 @@ public class App {
         log("Output IML file: " + imlPath);
 
         try {
-            Binary.invokeBin(aadl2imlBin, "-o", imlPath, aadlPath);
+            Binary.invokeBin(aadl2imlBin, "-ps", "VERDICT_Properties", "-o", imlPath, aadlPath);
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute aadl2iml", e);
         }
