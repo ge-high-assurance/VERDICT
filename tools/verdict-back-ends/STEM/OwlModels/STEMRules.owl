@@ -18,7 +18,6 @@
     <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'STEMRules.sadl' and should not be directly edited.</rdfs:comment>
   </owl:Ontology>
   <j.0:Rule rdf:ID="Vul-CAPEC-125-1"/>
-  <j.0:Rule rdf:ID="Vul-CAPEC-151-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-74-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-2"/>
@@ -128,7 +127,6 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-21-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-390-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-74-2"/>
-  <j.0:Rule rdf:ID="Vul-CAPEC-151-5"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-130-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-242-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-1"/>
