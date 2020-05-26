@@ -40,7 +40,7 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		setPreferenceStore(preferenceStore);
 		setDescription("Preferences for Verdict (MBAS/CRV)");
 		// Set PROPERTY_SET to our default if it has no value yet
-		if (preferenceStore.getString(PROPERTY_SET).isBlank()) {
+		if (preferenceStore.getString(PROPERTY_SET).isEmpty()) {
 			preferenceStore.setValue(PROPERTY_SET, "VERDICT_Properties");
 		}
 	}
