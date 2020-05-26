@@ -668,6 +668,13 @@ let get_attributes prop_set_name e_name default_props properties =
   )
   default_props
   |> AttrMap.bindings
+  |> List.fold_left (fun acc (name, v) ->
+       match v with
+       | None -> acc
+       | Some (atype, value) -> { VI.name = name; atype; value } :: acc
+     )
+     []
+(*
   |> List.map (fun (name, v) ->
      match v with
      | None -> (
@@ -680,6 +687,7 @@ let get_attributes prop_set_name e_name default_props properties =
      )
      | Some (atype, value) -> { VI.name = name; atype; value }
   )
+*)
 
 let split_property_set_and_get_map { AD.name; AD.declarations } =
   let name = C.get_id name in
