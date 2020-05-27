@@ -54,6 +54,7 @@ type data_feature = {
   name: pid;
   adir: access_dir;
   dtype: qcref option;
+  properties: property_association list;
 }
 
 type data_type = {

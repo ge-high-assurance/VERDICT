@@ -202,6 +202,19 @@ sys_features_section:
 
 sys_feature:
   | dp = data_port { dp }
+  | da = data_access
+  {
+    let pdir =
+      match da.A.adir with
+      | A.Requires -> A.In
+      | A.Provides -> A.Out
+    in
+    { A.name = da.A.name;
+      A.dir = pdir;
+      A.dtype = da.A.dtype;
+      A.properties = da.A.properties;
+    }
+  }
   (* INCOMPLETE *)
 
 data_port:
@@ -580,12 +593,14 @@ data_feature:
 data_access:
   pid = ident ":" ad = access_direction;
   DATA ACCESS qcr = option(qcref) (* aadl2::DataSubcomponentType *)
+  prop_assocs = component_properties
   (* INCOMPLETE *)
   ";"
   {
     { A.name = pid;
       A.adir = ad;
       A.dtype = qcr;
+      A.properties = prop_assocs;
     }
   }
 
