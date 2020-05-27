@@ -15,6 +15,7 @@ type PortMode enum { In, Out };
 type Port {
 	name: Identifier;
 	mode: PortMode;
+	is_event: Bool;
 	ptype: Option<DataType>;
 	probe: Bool;
 };
