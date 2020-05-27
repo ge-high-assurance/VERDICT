@@ -26,11 +26,14 @@ You will need an installed [OSATE](https://osate.org/about-osate.html)
 We have tested and verified our plugin works in OSATE 2.6.1, 2.7.0,
 and 2.7.1; later versions may work as well and earlier versions may or
 may not work since we haven't tested the current plugin version in
-them.
+them.  Our OSATE plugin will function without the AGREE plugin for
+OSATE, but you may want to write both AGREE and VERDICT annexes when
+developing a model so you may want to install the AGREE plugin too.
 
-1. Download the latest
-   [OSATE](https://osate-build.sei.cmu.edu/download/osate/stable/latest/products/)
-   product for your operating system.
+1. Download the [OSATE
+   2.7.0](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.0-vfinal/products/)
+   product for your operating system.  (AGREE does not have a version
+   that works in OSATE 2.7.1 yet.)
 
 2. If necessary, refer to these [installation
    instructions](https://osate.org/download-and-install.html) to
@@ -38,15 +41,24 @@ them.
 
 3. Launch OSATE and navigate to Help > Install New Software...
 
-4. Paste the following URL in the Work With: field and press the Enter key.
+4. Paste the following URL in the Work With: field and press the Enter
+   key.  Select the AGREE item and then keep clicking Next through the
+   rest of the wizard (you will have to accept the license agreement
+   and install unsigned plugins) until you reach the end and click
+   Finish.
+
+`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.4.2`
+
+5. Restart OSATE when prompted and navigate to Help > Install New
+   Software... again.
+
+6. Paste the following URL in the Work With: field and press the Enter
+   key.  Select the VERDICT for OSATE item and then keep clicking Next
+   through the rest of the wizard (you will have to accept the license
+   agreement and install unsigned plugins) until you reach the end and
+   click Finish.
 
 `https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest`
-
-5. Select the VERDICT for OSATE item and then click Next.
-
-6. Keep clicking Next through the rest of the wizard (you will have to
-   accept the license agreement and install unsigned plugins) until
-   you reach the end and click Finish.
 
 7. Restart OSATE when prompted.
 
@@ -55,10 +67,14 @@ them.
 Our OSATE plugin has two ways to call our back-end programs.  Our
 plugin can run an executable jar called verdict-bundle or it can run a
 Docker image called gehighassurance/verdict in a temporary container.
-The latter way (running a Docker image) is easier to use, but you need
-to install Docker on your operating system first.  Note that we have
-pushed up our verdict image to Docker Hub so that anyone running
-Docker can pull down our verdict image.
+The latter way (running a Docker container) is easier to use, but you
+need to install Docker on your operating system first.  Note that we
+have pushed our verdict image to Docker Hub in order to make the image
+available to anyone running both Docker and our OSATE plugin.  You
+only have to tell our OSATE plugin the name of the Docker image you
+want it to use; the plugin will look for the image in the local Docker
+cache and then tell Docker to pull the image from Docker Hub if
+necessary.
 
 The instructions for installing Docker are operating system specific,
 so you will have to read and follow the appropriate instructions for
@@ -76,23 +92,35 @@ your operating system:
 - [Install Docker on other Linux operating
   systems](https://docs.docker.com/install/)
 
-If you are running Docker on Windows, you will also have to do two
-things to allow our plugin to communicate with Docker:
+If you are running Docker on Windows, you will also have to do the
+following things to allow our plugin to communicate with Docker:
 
-1. Go into General Settings in Docker Desktop, enable the checkbox
-   next to "Expose daemon on tcp://localhost:2375 without TLS", and
-   click the "Apply & Restart" button.
-
-2. Set an environment variable called DOCKER_HOST to the value
+1. Set an environment variable called DOCKER_HOST to the value
    "tcp://localhost:2375" to tell our plugin to connect to the daemon
    using the daemon's TCP port instead of the daemon's Unix file
    socket.
+
+2. Go into Settings in Docker Desktop and enable the checkbox
+   next to "Expose daemon on tcp://localhost:2375 without TLS".
+
+3. Click on Resources under Settings, click on FILE SHARING under
+   Resources, and add your drive letter to the list of directories
+   which Docker can bind mount into containers.
+
+4. Click the "Apply & Restart" button at the bottom to restart Docker
+   after these changes.
 
 If you want to check that Docker is installed and running correctly,
 run the following command to verify that it prints a "Docker is
 working" message.
 
 `docker run hello-world`
+
+In addition, you can go into Docker's Settings panel and configure
+Docker to use more resources if you want the back-end programs to run
+more quickly.  Our back-end programs tend to be CPU-bound, not
+memory-bound, so increasing the number of CPUs probably will be more
+effective than increasing the memory.
 
 ## Install our back-end programs
 

@@ -158,7 +158,7 @@ two Docker images before you can build our own Docker image:
 
 ```shell
 $ docker pull ocaml/opam2:latest
-$ docker pull openjdk:8-jre-slim-buster
+$ docker pull openjdk:11-jre-slim-buster
 ```
 
 You need to run the above commands only when you haven't downloaded a
