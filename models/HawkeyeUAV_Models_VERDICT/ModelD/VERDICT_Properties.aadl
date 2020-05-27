@@ -400,4 +400,18 @@ property set VERDICT_Properties is
 
  zeroize: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
 
+ -- Cyber Attack Properties from TA1
+ Configuration_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Physical_Theft_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Interception_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Hardware_Integrity_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Supply_Chain_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Brute_Force_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Fault_Injection_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Identity_Spoofing_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Excessive_Allocation_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Sniffing_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Buffer_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Flooding_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+
 end VERDICT_Properties;
