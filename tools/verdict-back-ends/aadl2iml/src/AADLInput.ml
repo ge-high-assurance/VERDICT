@@ -535,3 +535,17 @@ let merge_packages input =
     main_pkg :: property_sets
   )
 
+
+let get_verdict_properties prop_set_name input =
+  let lc_prop_set_name = String.lowercase_ascii prop_set_name in
+  let ast =
+    input |> List.find_opt (function
+      | AD.PropertySet (_, { AD.name }) -> 
+        String.lowercase_ascii (snd name) = lc_prop_set_name
+      | _ -> false
+    )
+  in
+  match ast with
+  | Some (AD.PropertySet (_, ps)) -> Some ps
+  | _ -> None
+

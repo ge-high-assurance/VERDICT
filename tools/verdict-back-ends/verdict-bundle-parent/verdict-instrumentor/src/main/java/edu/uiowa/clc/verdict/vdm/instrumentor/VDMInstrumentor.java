@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,14 +106,32 @@ public class VDMInstrumentor {
 
     protected String getComponentID(
             Map<String, HashSet<Connection>> components_map, Connection con) {
+
         String ComponentID = null;
 
-        for (String cmpID : components_map.keySet()) {
-            HashSet<Connection> con_set = components_map.get(cmpID);
+        if (components_map.isEmpty()) {
+            ConnectionEnd conDest = con.getDestination();
+            Port dest_port = conDest.getComponentPort();
 
-            if (con_set.contains(con)) {
-                ComponentID = cmpID;
-                break;
+            if (dest_port != null) {
+
+                ComponentID = dest_port.getId();
+
+            } else {
+                CompInstancePort compInstance = conDest.getSubcomponentPort();
+
+                ComponentInstance c = compInstance.getSubcomponent();
+                ComponentID = c.getId();
+            }
+
+        } else {
+            for (String cmpID : components_map.keySet()) {
+                HashSet<Connection> con_set = components_map.get(cmpID);
+
+                if (con_set.contains(con)) {
+                    ComponentID = cmpID;
+                    break;
+                }
             }
         }
 
@@ -136,7 +155,7 @@ public class VDMInstrumentor {
                         enumType = cmpInstance.getSpecification();
                     }
 
-                    if (componentID.equals(enumType.getId())) {
+                    if (componentID.equalsIgnoreCase(enumType.getId())) {
                         return blockImpl;
                     }
                 }
@@ -202,12 +221,20 @@ public class VDMInstrumentor {
 
             // Snoozing option for component level.
             if (component_level & vdm_components.size() > 0) {
-                for (Connection con : vdm_links) {
+
+                Iterator<Connection> it = vdm_links.iterator();
+                while (it.hasNext()) {
+                    Connection con = it.next();
                     if (isSourceComponent(con)) {
-                        //
-                        vdm_links.remove(con);
+                        it.remove();
                     }
                 }
+                //            	for (Connection con : vdm_links) {
+                //                    if (isSourceComponent(con)) {
+                //                        //
+                //                        vdm_links.remove(con);
+                //                    }
+                //                }
             }
         }
 
@@ -266,6 +293,7 @@ public class VDMInstrumentor {
                 String cmpID = getComponentID(components_map, connection);
 
                 if (cmpID != null) {
+                    // Find Block based on Connection
                     blockImpl = getBlockID(cmpID);
 
                     String constant = instrument_link(cmpID, connection, blockImpl);
@@ -273,19 +301,25 @@ public class VDMInstrumentor {
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-                } else if (threats.contains("NI")) {
-                    // Network Injection Case when no Components are present
-                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
-
-                    cmpID = cmpImpl.getType().getId();
-
-                    blockImpl = retrieve_block(cmpImpl);
-                    String constant = instrument_link(cmpID, connection, blockImpl);
-
-                    global_constants.add(constant);
-
-                    connections_map.put(connection, constant);
                 }
+                //                else if (threats.contains("NI")) {
+                //                    // Network Injection Case when no Components are present
+                //                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
+                //
+                //                    cmpID = cmpImpl.getType().getId();
+                //                    //Find Block based on connection
+                //                    blockImpl = retrieve_block(cmpImpl);
+                //
+                //
+                //                    blockImpl = getBlockID(cmpID);
+                //
+                //                    String constant = instrument_link(cmpID, connection,
+                // blockImpl);
+                //
+                //                    global_constants.add(constant);
+                //
+                //                    connections_map.put(connection, constant);
+                //                }
             }
         } // else {
         //            System.out.println("No Links found!");
@@ -1523,7 +1557,7 @@ public class VDMInstrumentor {
         String global_constant_Id = src_componentInstance.getName();
 
         if (instrumented_port_src.getMode() == instrumented_port_dest.getMode()) {
-            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+            instrumented_port_src.setName(src_port.getName());
 
             if (instrumented_port_src.getMode() == PortMode.IN) {
                 instrumented_port_src.setMode(PortMode.OUT);
@@ -1531,7 +1565,7 @@ public class VDMInstrumentor {
                 instrumented_port_dest.setMode(PortMode.IN);
             }
         } else {
-            instrumented_port_src.setName(src_port.getName() + "_instrumented");
+            instrumented_port_src.setName(src_port.getName());
         }
 
         if (dest_port.getMode() == PortMode.OUT) {
@@ -1573,8 +1607,6 @@ public class VDMInstrumentor {
 
         ContractSpec contractSpec = new ContractSpec();
         contractSpec.getGuarantee().add(true_guarantee_item);
-
-        // instrumented_cmp.setContract(contractSpec);
 
         // ---------------------------------------------
 
@@ -1643,11 +1675,11 @@ public class VDMInstrumentor {
         Connection new_con = new Connection();
         // Copying connection related artifacts
         new_con.setName(connection.getName() + "_instrumented_channel");
-        new_con.setConnType(connection.getConnType());
-        new_con.setFlowType(connection.getFlowType());
-
-        new_con.setDataEncrypted(connection.isEncryptedTransmission());
-        new_con.setAuthenticated(connection.isAuthenticated());
+        //        new_con.setConnType(connection.getConnType());
+        //        new_con.setFlowType(connection.getFlowType());
+        //
+        //        new_con.setDataEncrypted(connection.isEncryptedTransmission());
+        //        new_con.setAuthenticated(connection.isAuthenticated());
 
         new_con.setSource(con_end_inst);
 

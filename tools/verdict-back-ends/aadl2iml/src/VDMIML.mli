@@ -16,14 +16,14 @@ type plain_type = Int | Real | Bool
 
 type integer = string
 
-type type_decl_ref = int 
+type type_decl_ref = int
 
 type data_type =
   | PlainType of plain_type
   | SubrangeType of integer * integer
   | EnumType of identifier list
   | RecordType of (identifier * data_type) list
-  | UserDefinedType of type_decl_ref 
+  | UserDefinedType of type_decl_ref
 
 type type_declaration = {
   name: identifier;
@@ -34,7 +34,7 @@ type port_mode = In | Out
 
 type port = {
   name: identifier;
-  mode: port_mode; 
+  mode: port_mode;
   ptype: data_type option;
   probe: bool;
 }
@@ -248,103 +248,19 @@ type instance_type =
   | Specification of comp_type_ref
   | Implementation of comp_impl_ref
 
-type manufacturer_type = ThirdParty | InHouse
+type attribute_type = Integer | Real | Bool | String
 
-type kind_of_component = Software | Hardware | Human | Hybrid
-
-type situated_type = OnBoard | Remote
-
-type pedigree_type = InternallyDeveloped | COTS | Sourced
+type generic_attribute = {
+  name: string;
+  atype: attribute_type;
+  value: string;
+}
 
 type component_instance = {
   name: identifier;
   itype: instance_type;
-
-  manufacturer: manufacturer_type option;
-  pedigree: pedigree_type option;
-  category: string option;
-  component_type: kind_of_component option;
-  situated: situated_type option;
-  adversarially_tested: bool option;
-  has_sensitive_info: bool option;
-  inside_trusted_boundary: bool option;
-  canReceiveConfigUpdate: bool option;
-  canReceiveSWUpdate: bool option;
-  controlReceivedFromUntrusted: bool option;
-  controlSentToUntrusted: bool option;
-  dataReceivedFromUntrusted: bool option;
-  dataSentToUntrusted: bool option;
-
-  configuration_Attack: bool option;
-  physical_Theft_Attack: bool option;
-  interception_Attack: bool option;
-  hardware_Integrity_Attack: bool option;
-  supply_Chain_Attack: bool option;
-  brute_Force_Attack: bool option;
-  fault_Injection_Attack: bool option;
-  identity_Spoofing_Attack: bool option;
-  excessive_Allocation_Attack: bool option;
-  sniffing_Attack: bool option;
-  buffer_Attack: bool option;
-  flooding_Attack: bool option;
-
-  anti_jamming: bool option;
-  auditMessageResponses: bool option;
-  deviceAuthentication: bool option;
-  dosProtection: bool option;
-  encryptedStorage: bool option;
-  heterogeneity: bool option;
-  inputValidation: bool option;
-  logging: bool option;
-  memoryProtection: bool option;
-  physicalAccessControl: bool option;
-  removeIdentifyingInformation: bool option;
-  resourceAvailability: bool option;
-  resourceIsolation: bool option;
-  secureBoot: bool option;
-  sessionAuthenticity: bool option;
-  staticCodeAnalysis: bool option;
-  strongCryptoAlgorithms: bool option;
-  supplyChainSecurity: bool option;
-  systemAccessControl: bool option;
-  tamperProtection: bool option;
-  userAuthentication: bool option;
-
-  anti_jamming_dal: integer option;
-  auditMessageResponsesDAL: integer option;
-  deviceAuthenticationDAL: integer option;
-  dosProtectionDAL: integer option;
-  encryptedStorageDAL: integer option;
-  heterogeneity_dal: integer option;
-  inputValidationDAL: integer option;
-  loggingDAL: integer option;
-  memoryProtectionDAL: integer option;
-  physicalAccessControlDAL: integer option;
-  removeIdentifyingInformationDAL: integer option;
-  resourceAvailabilityDAL: integer option;
-  resourceIsolationDAL: integer option;
-  secureBootDAL: integer option;
-  sessionAuthenticityDAL: integer option;
-  staticCodeAnalysisDAL: integer option;
-  strongCryptoAlgorithmsDAL: integer option;
-  supplyChainSecurityDAL: integer option;
-  systemAccessControlDAL: integer option;
-  tamperProtectionDAL: integer option;
-  userAuthenticationDAL: integer option;
-
-  (*
-  broadcast_from_outside_tb: bool option;
-  wifi_from_outside_tb: bool option;
-  encryption: bool option;
-  anti_flooding: bool option;
-  anti_fuzzing: bool option;
-  encryption_dal: integer option;
-  anti_flooding_dal: integer option;
-  anti_fuzzing_dal: integer option;
-  *)
+  attributes: generic_attribute list;
 }
-
-type flow_type = Xdata | Xcontrol | Xrequest
 
 type port_ref = int
 
@@ -354,18 +270,9 @@ type connection_end =
   | ComponentCE of (comp_type_ref * port_ref)
   | SubcomponentCE of (comp_inst_ref * comp_type_ref * port_ref)
 
-type connection_type = Local | Remote
-
 type connection = {
   name: identifier;
-  ftype: flow_type option;
-  conn_type: connection_type option;
-  authenticated: bool option;
-  data_encrypted: bool option;
-  trustedConnection: bool option;
-  encryptedTransmission: bool option;
-  encryptedTransmissionDAL: integer option;
-  replayProtection: bool option;
+  attributes: generic_attribute list;
   source: connection_end;
   destination: connection_end;
 }

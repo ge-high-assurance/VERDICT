@@ -58,11 +58,12 @@ let mk_package_section header_items body_items =
 %token AADLBOOLEAN AADLSTRING AADLINTEGER AADLREAL ENUMERATION
 %token PROPERTY SET IS APPLIES TO INHERIT EXTENDS
 %token PACKAGE SYSTEM ABSTRACT IMPLEMENTATION FEATURES PROPERTIES
-%token SUBCOMPONENTS CONNECTIONS
-%token PUBLIC PRIVATE RENAMES
-%token TYPE NONE UNITS WITH OUT IN CONSTANT
+%token SUBCOMPONENTS CONNECTIONS CONNECTION
+%token PROCESS THREAD SUBPROGRAM PROCESSOR MEMORY DEVICE
+%token PROVIDES REQUIRES ACCESS PUBLIC PRIVATE RENAMES
+%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP
 %token LIST OF
-%token DATA PORT
+%token DATA PORT BUS
 %token <Lexing.lexbuf>ANNEX
 %token ANNEX_BLOCK_START "{**"
 %token ALL END
@@ -182,8 +183,8 @@ component_type:
   (* INCOMPLETE *)
 
 system_type:
-  system_or_abstract pid = ident
-  fs = features_section
+  system_or_like pid = ident
+  fs = sys_features_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
   END ID ";"
@@ -194,13 +195,26 @@ system_type:
     }
   }
 
-features_section:
+sys_features_section:
   | { [] }
   | FEATURES NONE ";" { [] }
-  | FEATURES fs = nonempty_list(feature) { fs }
+  | FEATURES fs = nonempty_list(sys_feature) { fs }
 
-feature:
+sys_feature:
   | dp = data_port { dp }
+  | da = data_access
+  {
+    let pdir =
+      match da.A.adir with
+      | A.Requires -> A.In
+      | A.Provides -> A.Out
+    in
+    { A.name = da.A.name;
+      A.dir = pdir;
+      A.dtype = da.A.dtype;
+      A.properties = da.A.properties;
+    }
+  }
   (* INCOMPLETE *)
 
 data_port:
@@ -233,10 +247,10 @@ component_implementation:
   (* INCOMPLETE *)
 
 system_implementation:
-  system_or_abstract IMPLEMENTATION
+  system_or_like IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = system_subcomponents_section
-  connections = connections_section
+  connections = sys_connections_section
   annexes = list(annex_subclause)
   (* INCOMPLETE *)
   END full_iname ";"
@@ -252,6 +266,7 @@ data_implementation:
   DATA IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = data_subcomponents_section
+  connections = data_connections_section
   (* INCOMPLETE *)
   END full_iname ";"
   {
@@ -259,6 +274,39 @@ data_implementation:
       A.subcomponents = subcomps;
     }
   }
+
+data_connections_section:
+  | { [] }
+  | CONNECTIONS NONE ";" { [] }
+  | CONNECTIONS cs = nonempty_list(data_connection) { cs }
+
+data_connection:
+  | ac = access_connection { ac }
+  (* INCOMPLETE *)
+
+access_connection:
+  pid = ident ":"
+  access_category
+  ACCESS
+  src = access_connection_end
+  cdir = connection_direction
+  dst = access_connection_end
+  (* INCOMPLETE *)
+  ";"
+  {
+    ()
+  }
+
+access_connection_end:
+  ce = connected_element { ce }
+  (* INCOMPLETE *)
+
+access_category:
+  | DATA {}
+  | BUS {}
+  | SUBPROGRAM {}
+  | SUBPROGRAM GROUP {}
+  | VIRTUAL BUS {}
 
 realization: pid = ident { pid } (* aadl2::ComponentType *)
 
@@ -302,7 +350,7 @@ data_subcomponent:
   }
 
 system_subcomponent:
-  pid = subcomponent_id system_or_abstract
+  pid = subcomponent_id system_or_like
   type_ref = option(subcomponent_type_ref)
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
@@ -333,12 +381,12 @@ qcref:
     (pn, Some pid)
   }
 
-connections_section:
+sys_connections_section:
   | { [] }
   | CONNECTIONS NONE ";" { [] }
-  | CONNECTIONS cs = nonempty_list(connection) { cs }
+  | CONNECTIONS cs = nonempty_list(sys_connection) { cs }
 
-connection:
+sys_connection:
   | pc = port_connection { pc }
   (* INCOMPLETE *)
 
@@ -521,15 +569,44 @@ package_properties:
 
 data_type:
   DATA pid = ident; ext_qcr = option(type_extension);
+  fs = data_features_section
   prop_assocs = component_properties
   (* INCOMPLETE *)
   END ID ";"
   {
     { A.name = pid;
       A.type_extension = ext_qcr;
+      A.features = fs;
       A.properties = prop_assocs;
     }
   }
+
+data_features_section:
+  | { [] }
+  | FEATURES NONE ";" { [] }
+  | FEATURES fs = nonempty_list(data_feature) { fs }
+
+data_feature:
+  | da = data_access { da }
+  (* INCOMPLETE *)
+
+data_access:
+  pid = ident ":" ad = access_direction;
+  DATA ACCESS qcr = option(qcref) (* aadl2::DataSubcomponentType *)
+  prop_assocs = component_properties
+  (* INCOMPLETE *)
+  ";"
+  {
+    { A.name = pid;
+      A.adir = ad;
+      A.dtype = qcr;
+      A.properties = prop_assocs;
+    }
+  }
+
+access_direction:
+  | REQUIRES { A.Requires }
+  | PROVIDES { A.Provides }
 
 type_extension:
   EXTENDS qcr = qcref { qcr }
@@ -544,12 +621,13 @@ component_properties:
 property_set:
   PROPERTY SET pid = ident IS
   i_units = list(property_set_imported_units)
-  list(property_set_body_item)
+  decls = list(property_set_body_item)
   list(annex_subclause)
   END ID ";"
   {
     {A.name = pid;
      A.imported_units = List.flatten i_units;
+     A.declarations = decls;
     }
   }
 
@@ -557,9 +635,9 @@ property_set_imported_units:
   WITH i_units = separated_nonempty_list(",", imported_unit) ";" { i_units }
 
 property_set_body_item:
-  | property_type ";" {}
-  | property_definition ";" {}
-  | property_constant ";" {}
+  | property_type ";" { A.UnsupportedDecl }
+  | def = property_definition ";" { A.PropertyDef def }
+  | property_constant ";" { A.UnsupportedDecl }
 
 property_type:
   | boolean_type {}
@@ -573,34 +651,57 @@ property_type:
   | reference_type {}
   | record_type {}*)
 
-boolean_type: ID ":" TYPE unnamed_boolean_type {}
+boolean_type: ident ":" TYPE unnamed_boolean_type {}
 
-string_type: ID ":" TYPE unnamed_string_type {}
+string_type: ident ":" TYPE unnamed_string_type {}
 
-enumeration_type: ID ":" TYPE unnamed_enumeration_type {}
+enumeration_type: ident ":" TYPE unnamed_enumeration_type {}
 
-units_type: ID ":" TYPE unnamed_units_type {}
+units_type: ident ":" TYPE unnamed_units_type {}
 
-real_type: ID ":" TYPE unnamed_real_type {}
+real_type: ident ":" TYPE unnamed_real_type {}
 
-integer_type: ID ":" TYPE unnamed_integer_type {}
+integer_type: ident ":" TYPE unnamed_integer_type {}
 
 property_definition:
-  ID ":" option(INHERIT)
+  pid = ident ":" inh = boption(INHERIT)
   referenced_property_type_or_unnamed_property_type
-  option(pair("=>", property_expression))
-  APPLIES TO "(" applies_to_element ")"
-  {}
+  odv = opt_default_value
+  APPLIES TO "(" ate = applies_to_element ")"
+  {
+    { A.name = pid;
+      A.is_inheritable = inh;
+      A.default_value = odv;
+      A.applies_to = ate;
+    }
+  }
+
+opt_default_value:
+  | { None }
+  | "=>" v = property_expression { Some v }
 
 applies_to_element:
-  | separated_nonempty_list(",", property_owner) {}
-  | all_reference {}
+  | l = separated_nonempty_list(",", property_owner)
+  {
+    l |> List.fold_left (fun acc e ->
+      match acc, e with
+      | A.All, _ -> A.All
+      | A.System, A.Connection -> A.All
+      | A.System, _ -> A.System
+      | A.Connection, A.System -> A.All
+      | A.Connection, _ -> A.Connection
+      | A.Other, _ -> e
+    )
+    A.Other
+  }
+  | all_reference
+  { A.All }
 
 property_owner:
   (* qm_reference rule has been expanded here to avoid shift/reduce conflicts *)
-  | qm_annex_ref nonempty_list(metaclass_name) {} (* qm_reference *)
-  | nonempty_list(metaclass_name) {} (* qm_reference *)
-  | qc_reference {}
+  | qm_annex_ref metaclass_name { A.Other } (* qm_reference *)
+  | mn = metaclass_name { mn } (* qm_reference *)
+  | qc_reference { A.Other }
 
 qm_annex_ref:
   "{" ID "}" "*" "*" {}
@@ -610,18 +711,25 @@ qc_reference: fqcref {} (* aadl2::ComponentClassifier *)
 fqcref: ID "::" separated_nonempty_list("::", ID) option(pair(".", ID)) {}
 
 metaclass_name:
-  | core_keyword {}
-  | ID {}
+  | ck = core_keyword { ck }
+  | ID { A.Other }
 
 core_keyword:
-  | system_or_abstract {}
-  | CONNECTIONS {}
-  | PORT {}
+  | system_or_like { A.System }
+  | CONNECTION { A.Connection }
+  | PORT { A.Other }
   (* INCOMPLETE *)
 
-system_or_abstract:
+system_or_like:
   | SYSTEM {}
   | ABSTRACT {}
+  | PROCESS {}
+  | THREAD GROUP? {}
+  | SUBPROGRAM GROUP? {}
+  | DEVICE {}
+  | VIRTUAL? BUS {}
+  | VIRTUAL? PROCESSOR {}
+  | MEMORY {}
 
 (*
 qm_reference:
@@ -632,7 +740,7 @@ qm_reference:
 all_reference: ALL {}
 
 property_constant:
-  ID ":" CONSTANT
+  ident ":" CONSTANT
   referenced_property_type_or_unnamed_property_type
   "=>" constant_property_expression
   {}

@@ -43,6 +43,7 @@ RUN opam switch 4.07 \
     ocamlbuild \
     ocamlfind \
     printbox \
+    xml-light \
     yojson \
  && echo '#use "topfind" ;;' >> /home/opam/.ocamlinit \
  && echo '#thread ;;' >> /home/opam/.ocamlinit \
@@ -79,7 +80,7 @@ RUN eval $(opam env) \
 # verdict binaries will run only on Debian, not Alpine (otherwise
 # openjdk:8-jre-alpine would be an even smaller base image)
 
-FROM openjdk:8-jre-slim-buster
+FROM openjdk:11-jre-slim-buster
 
 # Install graphviz and a lib we need from Debian repositories
 
@@ -102,7 +103,6 @@ COPY --from=builder /usr/local /usr/local
 
 USER verdict
 WORKDIR /data
-ENTRYPOINT ["java", "-jar", "/app/verdict.jar"]
-# Note these --add-open arguments would be needed for Java 11 LTS or Java 17 LTS
-#ENTRYPOINT ["java", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
+# Java 11 LTS needs --add-open arguments
+ENTRYPOINT ["java", "-Xmx1536m", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
 ENV GraphVizPath=/usr/bin

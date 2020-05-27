@@ -33,6 +33,8 @@ type aadl_annex =
   | VerdictAnnex of Position.t * VerdictAst.t
   | UnsupportedAnnex of Position.t * string
 
+type access_dir = Requires | Provides
+
 type port_dir = In | Out | InOut
 
 type data_port = {
@@ -48,9 +50,17 @@ type system_type = {
   annexes: aadl_annex list;
 }
 
+type data_feature = {
+  name: pid;
+  adir: access_dir;
+  dtype: qcref option;
+  properties: property_association list;
+}
+
 type data_type = {
   name: pid;
   type_extension: qcref option;
+  features: data_feature list;
   properties: property_association list;
 }
 
@@ -120,9 +130,27 @@ type aadl_package = {
   private_sec: package_section option;
 }
 
+type property_owner =
+  | All
+  | System
+  | Connection
+  | Other
+
+type property_definition = {
+  name: pid;
+  is_inheritable: bool;
+  default_value: property_expr option;
+  applies_to: property_owner;
+}
+
+type property_decl =
+  | UnsupportedDecl
+  | PropertyDef of property_definition
+
 type property_set = {
   name: pid;
   imported_units: pname list;
+  declarations: property_decl list;
 }
 
 type model_unit =
@@ -136,6 +164,8 @@ val equal_ids: pid -> pid -> bool
 val equal_qprefs: qpref -> qpref -> bool
 
 val mk_full_qpref: string -> string -> qpref
+
+val qpref_to_string : qpref -> string
 
 val find_assoc: qpref -> property_association list -> property_association option
 

@@ -2,11 +2,11 @@ package DeliveryDrone
 
 public
 	with Base_Types;
-    with Data_Types;
-    with Agree_Constants;
-    with Agree_Nodes;
-    with Agree_Constants;
-	with VERDICT_Properties;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with Agree_Constants;
+	with CASE_Consolidated_Properties;
 	with GNC;
 
 	system PositionEstimator 
@@ -58,7 +58,7 @@ public
 			cur_pos: out data port Data_Types::Position.impl;
 			pos_act_out: out data port Data_Types::Position.impl;
 			probe_dest_pos: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			
 		annex agree {**
 			-- high-level specification
@@ -183,13 +183,13 @@ public
 	        nav_cmd: out data port Base_Types::Boolean;					
 			camera: out data port Base_Types::Boolean;
 			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			constellation: out data port Data_Types::Constellation; 
 			launch_pos: out data port Data_Types::Position.impl;
 			probe_init_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; 
+			{CASE_Consolidated_Properties::probe => true; }; 
 			probe_abort_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; 
+			{CASE_Consolidated_Properties::probe => true; }; 
 			target_clear: out data port Base_Types::Boolean;
 			valid_marker: out data port Base_Types::Boolean;
 						
@@ -513,27 +513,27 @@ public
 			bus2: out data port Base_Types::Boolean;			
 			
 			radio_cmd: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			radio_response: out data port Data_Types::RadioResponse.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			delivery_status: out data port Data_Types::DeliveryStatus
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			
 			actuation_out: out data port Base_Types::Boolean;
 			probe_init_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_abort_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_constellation: out data port Data_Types::Constellation
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_launch_location: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_delivery_location: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			probe_fly_cmd: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
+			{CASE_Consolidated_Properties::probe => true; };
 			
 		annex agree {**			
 
@@ -639,358 +639,291 @@ public
 			radio: system Radio
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 7;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;
-				VERDICT_Properties::staticCodeAnalysis => true;
-				VERDICT_Properties::staticCodeAnalysisDAL => 7;
-				VERDICT_Properties::resourceAvailability => true;
-				VERDICT_Properties::resourceAvailabilityDAL => 7;
-				VERDICT_Properties::antiJamming => true;
-				VERDICT_Properties::antiJammingDAL => 7;
-				VERDICT_Properties::dosProtection => true;
-				VERDICT_Properties::dosProtectionDAL => 7;
-				VERDICT_Properties::deviceAuthentication => true;
-				VERDICT_Properties::deviceAuthenticationDAL => 7;
-				VERDICT_Properties::inputValidation => true;
-				VERDICT_Properties::inputValidationDAL => 7;
-				VERDICT_Properties::sessionAuthenticity => true;
-				VERDICT_Properties::sessionAuthenticityDAL => 7;
-				VERDICT_Properties::strongCryptoAlgorithms => true;
-				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
 				
 							
 			};
 			positionEstimator: system PositionEstimator
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => COTS; 
-				VERDICT_Properties::hasSensitiveInfo => true;
-				VERDICT_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => COTS; 
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
 		
-			 	VERDICT_Properties::adversariallyTested => false;
-			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				--CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
-				
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 7;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
 			};
 			navigation: system Navigation
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::hasSensitiveInfo => true;
-				VERDICT_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
-				
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 7;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;	
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
 			};
 			fc: system FlightControl
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::hasSensitiveInfo => true;
-				VERDICT_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
-				
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 7;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
 			};
 			actuation: system Actuation
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
 			 	-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::pedigree => Sourced;
-				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
-				VERDICT_Properties::hasSensitiveInfo => true;
-				VERDICT_Properties::canReceiveSWUpdate => true;
-				VERDICT_Properties::controlReceivedFromUntrusted => true;
-				VERDICT_Properties::dataReceivedFromUntrusted => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
 			
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
-				
-				VERDICT_Properties::secureBoot => true;
-				VERDICT_Properties::secureBootDAL => 7;
-				VERDICT_Properties::memoryProtection => true;
-				VERDICT_Properties::memoryProtectionDAL => 7;	
-				VERDICT_Properties::staticCodeAnalysis => true;
-				VERDICT_Properties::staticCodeAnalysisDAL => 7;
-				VERDICT_Properties::resourceAvailability => true;
-				VERDICT_Properties::resourceAvailabilityDAL => 7;
-				VERDICT_Properties::antiJamming => true;
-				VERDICT_Properties::antiJammingDAL => 7;
-				VERDICT_Properties::dosProtection => true;
-				VERDICT_Properties::dosProtectionDAL => 7;
-				VERDICT_Properties::deviceAuthentication => true;
-				VERDICT_Properties::deviceAuthenticationDAL => 7;
-				VERDICT_Properties::inputValidation => true;
-				VERDICT_Properties::inputValidationDAL => 7;
-				VERDICT_Properties::sessionAuthenticity => true;
-				VERDICT_Properties::sessionAuthenticityDAL => 7;
-				VERDICT_Properties::strongCryptoAlgorithms => true;
-				VERDICT_Properties::strongCryptoAlgorithmsDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
 				
 			};
 			camera: system Camera
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => true;
-				VERDICT_Properties::supplyChainSecurityDAL => 7;
-				VERDICT_Properties::physicalAccessControl => true;
-				VERDICT_Properties::physicalAccessControlDAL => 7;
-				VERDICT_Properties::systemAccessControl => true;
-				VERDICT_Properties::systemAccessControlDAL => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
 			};
 			
 			connector: system Connector
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::insideTrustedBoundary => true;
-			 	VERDICT_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+			 	CASE_Consolidated_Properties::componentType => Hybrid;
 			 	
-			 	VERDICT_Properties::pedigree => COTS;
-			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-			 	VERDICT_Properties::adversariallyTested => false;
+			 	CASE_Consolidated_Properties::pedigree => COTS;
+			 	--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 			};
-			
+
 		connections
 			c1: port positionEstimator.est_pos -> navigation.est_pos
-			{VERDICT_Properties::flowType => Xcontrol;
-			 VERDICT_Properties::trustedConnection => true;	
-			 VERDICT_Properties::encryptedTransmission => true;
-			 VERDICT_Properties::encryptedTransmissionDAL => 6;
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::encryptedTransmission => 6;
 			};
 			
 			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
-			{VERDICT_Properties::flowType => Xrequest;
-			 VERDICT_Properties::trustedConnection => false;
-			};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c2: port navigation.move -> fc.move
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
 			c3: port fc.fc_state -> navigation.flight_control_state
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c4: port deliveryPlanner.dest_location -> navigation.dest_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			
 			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status			
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c9: port camera.camera_out -> deliveryPlanner.camera_result			
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c10: port deliveryPlanner.radio_cmd -> radio.radio_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c11: port radio.radio_out -> deliveryPlanner.radio_response
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c12: port gnc.gps_pos -> positionEstimator.gps_pos
 			{
-			VERDICT_Properties::flowType => Xdata;
-			-- VERDICT_Properties::trustedConnection => false;
+			CASE_Consolidated_Properties::connectionType => Trusted;
+			--CASE_Consolidated_Properties::connectionType => Untrusted;
 			};
 			
 			c14a: port bus1 -> connector.bus_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Untrusted;};
 			
 			c14b: port connector.bus_out -> DeliveryPlanner.bus_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c15: port deliveryPlanner.bus_out -> bus2
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c16: port comm1 -> radio.comm_in
-			{VERDICT_Properties::flowType => Xdata;
-		     VERDICT_Properties::connectionType => Remote;
-			 VERDICT_Properties::authenticated => false;
-			 VERDICT_Properties::encryptedTransmission => false;
-			 --VERDICT_Properties::authenticated => true; -- Fix for Network Injection
-			 --VERDICT_Properties::encryptedTransmission => true; -- Fix for Network Injection
+			{CASE_Consolidated_Properties::connectionType => Untrusted;
+			CASE_Consolidated_Properties::deviceAuthentication => 0;
+			CASE_Consolidated_Properties::encryptedTransmission => 0;
+			 --CASE_Consolidated_Properties::deviceAuthentication => 7; -- Fix for Network Injection
+			 --CASE_Consolidated_Properties::encryptedTransmission => 5; -- Fix for Network Injection
 			};
 			
 			c17: port radio.comm_out -> comm2
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
 			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c19: port fc.motor_cmd -> actuation.motor_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c20: port actuation.response -> fc.actuation_response
-			{VERDICT_Properties::flowType => Xdata;};	
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
 			c22: port satellite0_sig_pos -> gnc.satellite0_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c23: port satellite1_sig_pos -> gnc.satellite1_pos
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
 			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c27: port deliveryPlanner.camera -> camera.camera_in			
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c28: port deliveryPlanner.radio_cmd -> radio_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c29: port radio.radio_out -> radio_response
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
-			{VERDICT_Properties::flowType => Xdata;}; 							
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c32: port actuation.response -> actuation_out
-			{VERDICT_Properties::flowType => Xdata;};	
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c33: port deliveryPlanner.constellation -> gnc.constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
 			{
-			VERDICT_Properties::flowType => Xdata;
-			--VERDICT_Properties::trustedConnection => false;
+			CASE_Consolidated_Properties::connectionType => Trusted;
+			--CASE_Consolidated_Properties::connectionType => Untrusted;
 			};
 			
 			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c37: port camera.health_status -> deliveryPlanner.cam_health_status
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c38: port gnc.probe_constellation -> probe_constellation
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c40: port gnc.probe_launch_pos -> probe_launch_location
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c41: port navigation.probe_dest_pos -> probe_delivery_location
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c43: port deliveryPlanner.nav_cmd -> probe_fly_cmd
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
-			{VERDICT_Properties::flowType => Xdata;};
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
 												
 	end DeliveryDroneSystem.impl;
 	

@@ -32,7 +32,6 @@ import com.utc.utrc.hermes.iml.iml.NumberLiteral;
 import com.utc.utrc.hermes.iml.iml.OptionalTermExpr;
 import com.utc.utrc.hermes.iml.iml.Property;
 import com.utc.utrc.hermes.iml.iml.PropertyList;
-import com.utc.utrc.hermes.iml.iml.Relation;
 import com.utc.utrc.hermes.iml.iml.RelationKind;
 import com.utc.utrc.hermes.iml.iml.SequenceTerm;
 import com.utc.utrc.hermes.iml.iml.SignedAtomicFormula;
@@ -46,11 +45,9 @@ import com.utc.utrc.hermes.iml.iml.TermExpression;
 import com.utc.utrc.hermes.iml.iml.TermMemberSelection;
 import com.utc.utrc.hermes.iml.iml.TruthValue;
 import com.utc.utrc.hermes.iml.iml.TupleConstructor;
-import com.utc.utrc.hermes.iml.iml.TypeRestriction;
 import com.utc.utrc.hermes.iml.iml.TypeWithProperties;
 import com.utc.utrc.hermes.iml.services.ImlGrammarAccess.TupleOrExpressionTypeElements;
 import java.util.ArrayList;
-import java.util.List;
 
 public class IModelVisitor implements IVisitor {
 
@@ -93,18 +90,27 @@ public class IModelVisitor implements IVisitor {
     @Override
     public void visit(NamedType e) {
         // TODO Auto-generated method stub
-        //		System.out.println(" : " + e.getName());
-
-        PropertyList pList = e.getPropertylist();
-
-        List<Relation> relList = e.getRelations();
-
-        TypeRestriction tr = e.getRestriction();
-
-        for (SymbolDeclaration sd : e.getSymbols()) {
-            // visit(sd);
-            //			System.out.println(sd.getName());
+        Type type = Type.get(e.getName());
+        if (type == Type.BOOL) {
+            this.iml_tokens.add(new Token(e));
+        } else if (type == Type.INT) {
+            this.iml_tokens.add(new Token(e));
+        } else if (type == Type.REAL) {
+            this.iml_tokens.add(new Token(e));
+        } else if (type == Type.STRING) {
+            this.iml_tokens.add(new Token(e));
         }
+
+        //        PropertyList pList = e.getPropertylist();
+        //
+        //        List<Relation> relList = e.getRelations();
+        //
+        //        TypeRestriction tr = e.getRestriction();
+        //
+        //        for (SymbolDeclaration sd : e.getSymbols()) {
+        //            // visit(sd);
+        //            //			System.out.println(sd.getName());
+        //        }
     }
 
     @Override
@@ -289,7 +295,7 @@ public class IModelVisitor implements IVisitor {
 
     @Override
     public void visit(TermExpression e) {
-
+        // 	System.out.println(e);
         if (e instanceof SymbolReferenceTerm) {
             visit((SymbolReferenceTerm) e);
         } else if (e instanceof InstanceConstructor) {
@@ -311,6 +317,7 @@ public class IModelVisitor implements IVisitor {
         } else if (e instanceof SequenceTerm) {
             visit((SequenceTerm) e);
         } else if (e instanceof TermMemberSelection) {
+
             visit((TermMemberSelection) e);
         } else if (e instanceof TailedExpression) {
             visit((TailedExpression) e);
@@ -320,6 +327,8 @@ public class IModelVisitor implements IVisitor {
         } else if (e instanceof Multiplication) {
             Multiplication m = (Multiplication) e;
             visit(m);
+        } else {
+            //        	System.out.println("Missing!!!!");
         }
     }
 
@@ -402,6 +411,16 @@ public class IModelVisitor implements IVisitor {
 
         if (symbol instanceof SymbolDeclaration) {
             visit((SymbolDeclaration) symbol);
+        } else if (symbol instanceof NamedType) {
+            // 2. NamedType
+            // visit((NamedType) e);
+            //        	System.out.println("Class ++++>" + symbol.getClass());
+            visit(symbol);
+            //        	if(symbol.getName("Bool")) {
+            //
+            //        	}
+
+            //        	visit((SymbolReferenceTerm)e);
         }
     }
 

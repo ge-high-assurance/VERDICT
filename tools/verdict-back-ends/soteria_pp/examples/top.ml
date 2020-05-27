@@ -2,6 +2,7 @@
 #thread ;;
 #require "core_extended" ;;
 #require "printbox";;
+#require "xml-light";;
 #directory "../_build";;
 
 #load "faultTree.cmo" ;;
@@ -18,6 +19,7 @@
 
 open Core ;;
 open PrintBox ;;
+open Xml ;;
 open FaultTree ;;
 open AttackDefenseTree ;;
 open Qualitative ;;

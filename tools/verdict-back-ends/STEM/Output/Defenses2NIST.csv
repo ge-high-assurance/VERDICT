@@ -21,6 +21,6 @@
 "StrongCryptoAlgorithms","SC-13","Cryptographic Protection"
 "SupplyChainSecurity","SA-12","Supply Chain Protection"
 "SystemAccessControl","PE-3-1","Information System Access Control"
-"TamperProtection","SA-18-1","Tamper Resistence and Detection"
+"TamperProtection","SA-18-1","Tamper Resistance and Detection"
 "UserAuthentication","IA-2-9;IA-2-4;IA-2-3;IA-2-11;IA-2-2;IA-2-1;IA-2;IA-2-8;IA-2-12","Network Access to Non-Privileged Accounts - Replay Resistant;Local Access to Non-Privileged Accounts;Local Access to Privileged Accounts;Remote Access - Separate Device;Network Access to Non-Privileged Accounts;Network Access to Privileged Accounts;Identification and Authentication (Organizational Users);Network Access to Privileged Accounts - Replay Resistant;Acceptance of PIV Credentials"
 "Zeroize","MP-6-8","Wiping of Information"

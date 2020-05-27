@@ -19,6 +19,8 @@ public enum Type {
     // Type
     EOF("EOF"),
     NAME("name"),
+    VALUE("value"),
+
     DEFINITION("definition"),
     NODE_TYPE("Node"),
     NODE("node"),
@@ -145,6 +147,9 @@ public enum Type {
 
     PORT_MODE("PortMode"),
     PORTS("ports"),
+
+    ATTRIBUTE_TYPE("AttributeType"),
+    GENERIC_ATTRIBUTE("GenericAttribute"),
 
     CYBER_RELATIONS("cyber_relations"),
     SAFETY_RELATIONS("safety_relations"),

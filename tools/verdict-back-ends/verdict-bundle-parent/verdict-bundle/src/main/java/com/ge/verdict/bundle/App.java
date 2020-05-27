@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -81,14 +82,29 @@ public class App {
     private static Options buildOptions() {
         Option aadl =
                 Option.builder()
+                        .desc("AADL input")
                         .longOpt("aadl")
-                        .numberOfArgs(2)
-                        .argName("AADL input directory")
+                        .numberOfArgs(3)
+                        .argName("AADL project directory")
                         .argName("aadl2iml binary")
+                        .argName("VERDICT Properties name")
                         .build();
 
-        Option iml = Option.builder().longOpt("iml").hasArg().argName("IML input file").build();
-        Option csv = Option.builder().longOpt("csv").hasArg().argName("CSV project name").build();
+        Option iml =
+                Option.builder()
+                        .desc("IML input")
+                        .longOpt("iml")
+                        .hasArg()
+                        .argName("IML file")
+                        .build();
+
+        Option csv =
+                Option.builder()
+                        .desc("CSV input")
+                        .longOpt("csv")
+                        .hasArg()
+                        .argName("Model name")
+                        .build();
 
         OptionGroup inputGroup = new OptionGroup();
         inputGroup.addOption(aadl);
@@ -98,20 +114,20 @@ public class App {
 
         Option mbas =
                 Option.builder()
+                        .desc("Run MBAS")
                         .longOpt("mbas")
                         .numberOfArgs(2)
                         .argName("STEM project dir")
                         .argName("Soteria++ binary")
-                        .desc("Run MBAS")
                         .build();
 
         Option crv =
                 Option.builder()
+                        .desc("Run CRV")
                         .longOpt("crv")
                         .numberOfArgs(2)
                         .argName("Kind2 output file (.xml or .json)")
                         .argName("kind2 binary")
-                        .desc("Run CRV")
                         .build();
 
         OptionGroup group = new OptionGroup();
@@ -121,15 +137,19 @@ public class App {
 
         Option debug =
                 Option.builder("d")
+                        .desc("Produce debug output")
                         .longOpt("debug")
                         .hasArg()
-                        .argName("Produce intermediary debug XML")
+                        .argName("Intermediary XML output directory")
                         .build();
 
         Options options = new Options();
         options.addOptionGroup(inputGroup);
         options.addOptionGroup(group);
         options.addOption(debug);
+
+        options.addOption("c", false, "Cyber Relations Inference");
+        options.addOption("s", false, "Safety Relations Inference");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -160,42 +180,51 @@ public class App {
     private static void printHelp() {
         String jarName = getJarName();
 
-        helpLine("Usage: %s (--aadl <args> | --iml <args>)", jarName);
+        helpLine("Usage: %s (--aadl <args> | --iml <args> | --csv <args>)", jarName);
         helpLine("       (--mbas <args> | --crv <args>) [-d, --debug <args>]");
         helpLine();
-        helpLine("Input: AADL or IML or CSV");
-        helpLine("  --aadl <dir> <aadl2iml> .. AADL project input");
-        helpLine("      <dir> ................ project directory");
+        helpLine("Input: Use AADL or IML or CSV input");
+        helpLine("  --aadl <dir> <aadl2iml bin> <property set> .. AADL input");
+        helpLine("      <dir> ................ AADL project directory");
+        helpLine("      <aadl2iml bin> ....... aadl2iml binary");
+        helpLine("      <property set> ....... VERDICT Properties name");
         helpLine();
-        helpLine("  --iml <file> ............. IML file input");
-        helpLine("      <file> ............... file");
+        helpLine("  --iml <file> ............. IML input");
+        helpLine("      <file> ............... IML file");
         helpLine();
-        helpLine("  --csv <project name> ............. Use csv input");
+        helpLine("  --csv <model name> ....... CSV input");
+        helpLine("      <model name> ......... Model name");
         helpLine();
         helpLine("Toolchain: MBAS (Model Based Architecture & Synthesis)");
-        helpLine("           or CRV (Cyber Resiliency Verifier)");
-        helpLine("  --mbas <stem_dir> <soteria++ bin>");
-        helpLine("      <stem_dir> ........... STEM project directory");
+        helpLine("  --mbas <stem dir> <soteria++ bin> [-c] [-s]");
+        helpLine("      <stem dir> ........... STEM project directory");
         helpLine("      <soteria++ bin> ...... Soteria++ binary");
+        helpLine("      -c ................... cyber relations inference");
+        helpLine("      -s ................... safety relations inference");
         helpLine();
+        helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
-
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
         helpLine("      -BA .................. blame assignment");
         helpLine(
                 "      -C ................... component-level blame assignment (default link-level)");
         helpLine(
-                "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-OT]");
+                "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
         helpLine();
-        helpLine("-d, --debug <dir> .......... debug output directory");
+        helpLine("-d, --debug <dir> .......... Produce debug output");
+        helpLine("      <dir> ................ Intermediary XML output directory");
     }
 
     private static void handleOpts(CommandLine opts) throws VerdictRunException {
         String debugDir = opts.hasOption('d') ? opts.getOptionValue('d') : null;
 
-        String aadlPath = null, imlPath = null, aadl2imlBin = null, modelName = null;
+        String aadlPath = null,
+                imlPath = null,
+                aadl2imlBin = null,
+                propertySet = null,
+                modelName = null;
         String csvProjectName = null;
 
         if (opts.hasOption("csv")) {
@@ -204,6 +233,7 @@ public class App {
             String[] aadlOpts = opts.getOptionValues("aadl");
             aadlPath = aadlOpts[0];
             aadl2imlBin = aadlOpts[1];
+            propertySet = aadlOpts[2];
             imlPath =
                     new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.iml")
                             .getAbsolutePath();
@@ -211,6 +241,7 @@ public class App {
         } else if (opts.hasOption("iml")) {
             aadlPath = null;
             aadl2imlBin = null;
+            propertySet = null;
             imlPath = opts.getOptionValue("iml");
             modelName = imlPath;
         } else {
@@ -222,11 +253,30 @@ public class App {
             String[] mbasOpts = opts.getOptionValues("mbas");
             String stemProjectDir = mbasOpts[0];
             String soteriaPpBin = mbasOpts[1];
+
+            boolean cyberInference = opts.hasOption("c");
+            boolean safetyInference = opts.hasOption("s");
+
             if (csvProjectName != null) {
-                runMbas(csvProjectName, stemProjectDir, debugDir, soteriaPpBin);
+                runMbas(
+                        csvProjectName,
+                        stemProjectDir,
+                        debugDir,
+                        soteriaPpBin,
+                        cyberInference,
+                        safetyInference);
                 sample.stop(Metrics.timer("Timer.mbas", "model", csvProjectName));
             } else {
-                runMbas(aadlPath, aadl2imlBin, imlPath, stemProjectDir, debugDir, soteriaPpBin);
+                runMbas(
+                        aadlPath,
+                        aadl2imlBin,
+                        propertySet,
+                        imlPath,
+                        stemProjectDir,
+                        debugDir,
+                        soteriaPpBin,
+                        cyberInference,
+                        safetyInference);
                 sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
             }
 
@@ -255,6 +305,7 @@ public class App {
             runCrv(
                     aadlPath,
                     aadl2imlBin,
+                    propertySet,
                     imlPath,
                     instrPath,
                     lustrePath,
@@ -317,7 +368,12 @@ public class App {
      * @throws VerdictRunException
      */
     public static void runMbas(
-            String modelName, String stemProjectDir, String debugDir, String soteriaPpBin)
+            String modelName,
+            String stemProjectDir,
+            String debugDir,
+            String soteriaPpBin,
+            boolean cyberInference,
+            boolean safetyInference)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -378,15 +434,25 @@ public class App {
         log("Soteria++ output directory: " + soteriaPpOutputDir);
         log("Soteria++ is running. Please be patient...");
 
+        // Soteria has optional arguments, so need to add all args to this list
+        List<String> args = new ArrayList<>();
+        args.add("-o");
+        args.add(soteriaPpOutputDir);
+        args.add(stemOutputDir);
+        if (cyberInference) {
+            args.add("-c");
+        }
+        if (safetyInference) {
+            args.add("-s");
+        }
+
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
                     soteriaPpBin,
                     soteriaPpOutputDir,
                     new PumpStreamHandler(),
-                    "-o",
-                    soteriaPpOutputDir,
-                    stemOutputDir);
+                    args.toArray(new String[args.size()]));
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
@@ -407,10 +473,13 @@ public class App {
     public static void runMbas(
             String aadlPath,
             String aadl2imlBin,
+            String propertySet,
             String imlPath,
             String stemProjectDir,
             String debugDir,
-            String soteriaPpBin)
+            String soteriaPpBin,
+            boolean cyberInference,
+            boolean safetyInference)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -455,7 +524,7 @@ public class App {
             checkFile(aadlPath, true, true, false, false, null);
             checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
-            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
+            runAadl2iml(aadlPath, imlPath, aadl2imlBin, propertySet);
             modelName = new File(aadlPath).getName();
             sample.stop(Metrics.timer("Timer.mbas.aadl2iml", "model", modelName));
         } else {
@@ -499,11 +568,6 @@ public class App {
         log("STEM project directory: " + stemProjectDir);
         log("STEM output directory: " + stemOutputDir);
         log("STEM graphs directory: " + stemGraphsDir);
-
-        //        hideErrorStream(
-        //                () -> {
-        //
-        //                });
         log("STEM is running. Please be patient...");
 
         VerdictStem stemRunner = new VerdictStem();
@@ -515,11 +579,6 @@ public class App {
                                         new File(stemOutputDir),
                                         new File(stemGraphsDir)));
 
-        //        if (!stem_output_csv.stream()
-        //                .allMatch(fname -> (new File(stemOutputDir, fname + ".csv").exists()))) {
-        //            throw new VerdictRunException("STEM failed to generate all required files");
-        //        }
-
         log("STEM finished!");
 
         logHeader("Soteria++");
@@ -528,15 +587,25 @@ public class App {
         log("Soteria++ output directory: " + soteriaPpOutputDir);
         log("Soteria++ is running. Please be patient...");
 
+        // Soteria has optional arguments, so need to add all args to this list
+        List<String> args = new ArrayList<>();
+        args.add("-o");
+        args.add(soteriaPpOutputDir);
+        args.add(stemOutputDir);
+        if (cyberInference) {
+            args.add("-c");
+        }
+        if (safetyInference) {
+            args.add("-s");
+        }
+
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
                     soteriaPpBin,
                     soteriaPpOutputDir,
                     new PumpStreamHandler(),
-                    "-o",
-                    soteriaPpOutputDir,
-                    stemOutputDir);
+                    args.toArray(new String[args.size()]));
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
@@ -558,6 +627,7 @@ public class App {
     public static void runCrv(
             String aadlPath,
             String aadl2imlBin,
+            String propertySet,
             String imlPath,
             String instrPath,
             String lustrePath,
@@ -598,7 +668,7 @@ public class App {
             checkFile(aadlPath, true, true, false, false, null);
             checkFile(aadl2imlBin, true, false, false, true, null);
             deleteFile(imlPath);
-            runAadl2iml(aadlPath, imlPath, aadl2imlBin);
+            runAadl2iml(aadlPath, imlPath, aadl2imlBin, propertySet);
             modelName = new File(aadlPath).getName();
             sample.stop(Metrics.timer("Timer.crv.aadl2iml", "model", modelName));
         } else {
@@ -787,16 +857,18 @@ public class App {
         }
     }
 
-    private static void runAadl2iml(String aadlPath, String imlPath, String aadl2imlBin)
+    private static void runAadl2iml(
+            String aadlPath, String imlPath, String aadl2imlBin, String propertySet)
             throws VerdictRunException {
         logHeader("AADL2IML");
 
         log("Converting AADL to IML");
         log("Input AADL project: " + aadlPath);
         log("Output IML file: " + imlPath);
+        log("VERDICT Properties Name: " + propertySet);
 
         try {
-            Binary.invokeBin(aadl2imlBin, "-o", imlPath, aadlPath);
+            Binary.invokeBin(aadl2imlBin, "-ps", propertySet, "-o", imlPath, aadlPath);
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute aadl2iml", e);
         }

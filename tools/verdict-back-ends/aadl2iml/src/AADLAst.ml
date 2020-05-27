@@ -33,6 +33,8 @@ type aadl_annex =
   | VerdictAnnex of Position.t * VerdictAst.t
   | UnsupportedAnnex of Position.t * string
 
+type access_dir = Requires | Provides
+
 type port_dir = In | Out | InOut
 
 type data_port = {
@@ -48,9 +50,17 @@ type system_type = {
   annexes: aadl_annex list;
 }
 
+type data_feature = {
+  name: pid;
+  adir: access_dir;
+  dtype: qcref option;
+  properties: property_association list;
+}
+
 type data_type = {
   name: pid;
   type_extension: qcref option;
+  features: data_feature list;
   properties: property_association list;
 }
 
@@ -120,9 +130,27 @@ type aadl_package = {
   private_sec: package_section option;
 }
 
+type property_owner =
+  | All
+  | System
+  | Connection
+  | Other
+
+type property_definition = {
+  name: pid;
+  is_inheritable: bool;
+  default_value: property_expr option;
+  applies_to: property_owner;
+}
+
+type property_decl =
+  | UnsupportedDecl
+  | PropertyDef of property_definition
+
 type property_set = {
   name: pid;
   imported_units: pname list;
+  declarations: property_decl list;
 }
 
 type model_unit =
@@ -172,7 +200,7 @@ let is_verdict_annex = function
   | VerdictAnnex _ -> true
   | _ -> false
 
-let is_system = function
+let is_system : component_category -> bool = function
   | System -> true
   | _ -> false
 
@@ -242,6 +270,9 @@ let pp_print_qpref ppf = function
   | Some ctx, pid -> (
     Format.fprintf ppf "%a::%a" pp_print_id ctx pp_print_id pid
   )
+
+let qpref_to_string qpref =
+  Format.asprintf "%a" pp_print_qpref qpref
 
 let pp_print_const_modifier ppf const =
   if const then Format.fprintf ppf "constant " else ()

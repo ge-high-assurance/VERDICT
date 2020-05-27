@@ -32,6 +32,10 @@
 	         </enabledWhen>               
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
+             commandId="com.ge.research.osate.verdict.commands.mbasSettings">
+       </handler>
+       <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
@@ -50,6 +54,12 @@
 	            style="push"
 	            tooltip="Run MBAA">
 	      </command>    
+	      <command
+	            commandId="com.ge.research.osate.verdict.commands.mbasSettings"
+	            label="&amp;MBAS Settings"
+	            style="push"
+	            tooltip="Click to change MBAS Settings">
+	       </command>
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
@@ -68,7 +78,7 @@
 	            commandId="com.ge.research.osate.verdict.commands.crvSettings"
 	            label="&amp;CRV Settings"
 	            style="push"
-	            tooltip="Click to Change CRV Settings">	            
+	            tooltip="Click to change CRV Settings">
 	       </command>
 		</menu>                                   	                         
          </menu>    
@@ -93,14 +103,19 @@
        </category>           
        <command
              categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.runCrv"
-             name="Run CRV">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
              name="Run MBAS">
        </command>     
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.mbasSettings"
+             name="MBAS Settings">
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.runCrv"
+             name="Run CRV">
+       </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.crvSettings"

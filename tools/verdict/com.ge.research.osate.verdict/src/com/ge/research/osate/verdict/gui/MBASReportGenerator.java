@@ -29,8 +29,8 @@ import org.w3c.dom.NodeList;
 //to be called from MBAS handler (just before the handler returns for static implementation
 //dynamic update can be implemented by creating two threads: one for MBAS tool and the other for this class)
 public class MBASReportGenerator implements Runnable {
-	private String fileName1;
-	private String fileName2;
+	private String applicableDefense;
+	private String implProperty;
 	public static IWorkbenchWindow window;
 	private List<MissionAttributes> missions = new ArrayList<MissionAttributes>();
 	private Map<String, List<MBASSafetyResult>> safetyResults;
@@ -38,8 +38,8 @@ public class MBASReportGenerator implements Runnable {
 
 	public MBASReportGenerator(String applicableDefense, String implProperty, String safetyApplicableDefense,
 			String safetyImplProperty, IWorkbenchWindow window, String capecFile, String nistFile) {
-		this.fileName1 = applicableDefense;
-		this.fileName2 = implProperty;
+		this.applicableDefense = applicableDefense;
+		this.implProperty = implProperty;
 		MBASReportGenerator.window = window;
 		IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IViewPart myView1 = wp.findView(MBASResultsView.ID);
@@ -68,7 +68,7 @@ public class MBASReportGenerator implements Runnable {
 
 	@Override
 	public void run() {
-		new MBASResultSummary(fileName1, fileName2);
+		new MBASResultSummary(applicableDefense, implProperty);
 	}
 
 	// invokes the MBAS Result viewer-tab in OSATE
@@ -91,16 +91,16 @@ public class MBASReportGenerator implements Runnable {
 		});
 	}
 
-	private Map<String, List<MBASSafetyResult>> loadSafetyResults(String applicableDefenseFile,
-			String implPropertyFile) {
+	private Map<String, List<MBASSafetyResult>> loadSafetyResults(String safetyApplicableDefense,
+			String safetyImplProperty) {
 		Map<String, List<MBASSafetyResult>> results = new LinkedHashMap<>();
 
-		// We don't use both files right now because AFAIK they are totally identical
+		// We don't use both files right now because AFAIK they are 99.9% identical
 
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(new File(applicableDefenseFile));
+			Document doc = dBuilder.parse(new File(safetyApplicableDefense));
 			doc.getDocumentElement().normalize();
 
 			NodeList missionNodes = doc.getElementsByTagName("Mission");

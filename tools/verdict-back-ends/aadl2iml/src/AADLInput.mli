@@ -26,3 +26,8 @@ val sort_model_units: input -> (input, sort_error) result
 
 val merge_packages: input -> input
 
+(* [get_verdict_properties n i a] returns [Some p] if there is an property set [p]
+   in [i] named [n], or [None] if no such property set exists.
+*)
+val get_verdict_properties: string -> input -> AADLAst.property_set option
+

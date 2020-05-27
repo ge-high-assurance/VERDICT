@@ -2,6 +2,14 @@ package iml.verdict;
 
 import iml.utils.*;
 
+type AttributeType enum { Int, Real, Bool, String };
+
+type GenericAttribute {
+	name: String;
+	atype: AttributeType;
+	value: String;
+};
+
 type PortMode enum { In, Out };
 
 type Port {
@@ -25,100 +33,12 @@ type ComponentImplKind enum { Block_Impl, Dataflow_Impl };
 
 type ComponentInstanceKind enum { Specification, Implementation };
 
-type ManufacturerType enum { ThirdParty, InHouse };
-
-type KindOfComponent enum { Software, Hardware, Human, Hybrid };
-
-type SituatedType enum { OnBoard, Remote };
-
-type PedigreeType enum { InternallyDeveloped, COTS, Sourced };
-
 type ComponentInstance {
 	name: Identifier;
 	kind: ComponentInstanceKind;
 	specification: ComponentType;
 	implementation: ComponentImpl;
-	
-	manufacturer: Option<ManufacturerType>;
-	pedigree: Option<PedigreeType>;
-	category: Option<String>;
-	component_type: Option<KindOfComponent>;
-	situated: Option<SituatedType>;
-	adversarially_tested : Option<Bool>;
-	has_sensitive_info: Option<Bool>;
-	inside_trusted_boundary: Option<Bool>;
-	canReceiveConfigUpdate: Option<Bool>;
-	canReceiveSWUpdate: Option<Bool>;
- 	controlReceivedFromUntrusted: Option<Bool>;
- 	controlSentToUntrusted: Option<Bool>;
- 	dataReceivedFromUntrusted: Option<Bool>;
- 	dataSentToUntrusted: Option<Bool>;
-
-	Configuration_Attack: Option<Bool>;
- 	Physical_Theft_Attack: Option<Bool>;
- 	Interception_Attack: Option<Bool>;
- 	Hardware_Integrity_Attack: Option<Bool>;
- 	Supply_Chain_Attack: Option<Bool>;
- 	Brute_Force_Attack: Option<Bool>;
- 	Fault_Injection_Attack: Option<Bool>;
- 	Identity_Spoofing_Attack: Option<Bool>;
- 	Excessive_Allocation_Attack: Option<Bool>;
- 	Sniffing_Attack: Option<Bool>;
- 	Buffer_Attack: Option<Bool>;
- 	Flooding_Attack: Option<Bool>;
-
-	anti_jamming: Option<Bool>;
-	auditMessageResponses: Option<Bool>;
- 	deviceAuthentication: Option<Bool>;
- 	dosProtection: Option<Bool>;
- 	encryptedStorage: Option<Bool>;
- 	heterogeneity: Option<Bool>;
- 	inputValidation: Option<Bool>;
- 	logging: Option<Bool>;
- 	memoryProtection: Option<Bool>;
- 	physicalAccessControl: Option<Bool>;
- 	removeIdentifyingInformation: Option<Bool>;
- 	resourceAvailability: Option<Bool>;
- 	resourceIsolation: Option<Bool>;
- 	secureBoot: Option<Bool>;
- 	sessionAuthenticity: Option<Bool>;
- 	staticCodeAnalysis: Option<Bool>;
- 	strongCryptoAlgorithms: Option<Bool>;
- 	supplyChainSecurity: Option<Bool>;
- 	systemAccessControl: Option<Bool>;
- 	tamperProtection: Option<Bool>;
- 	userAuthentication: Option<Bool>;
-
-	anti_jamming_dal: Option<Int>;
-	auditMessageResponsesDAL: Option<Int>;
- 	deviceAuthenticationDAL: Option<Int>;
- 	dosProtectionDAL: Option<Int>;
- 	encryptedStorageDAL: Option<Int>;
-	heterogeneity_dal: Option<Int>;
-	inputValidationDAL: Option<Int>;
- 	loggingDAL: Option<Int>;
- 	memoryProtectionDAL: Option<Int>;
- 	physicalAccessControlDAL: Option<Int>;
- 	removeIdentifyingInformationDAL: Option<Int>;
- 	resourceAvailabilityDAL: Option<Int>;
- 	resourceIsolationDAL: Option<Int>;
- 	secureBootDAL: Option<Int>;
- 	sessionAuthenticityDAL: Option<Int>;
- 	staticCodeAnalysisDAL: Option<Int>;
- 	strongCryptoAlgorithmsDAL: Option<Int>;
- 	supplyChainSecurityDAL: Option<Int>;
- 	systemAccessControlDAL: Option<Int>;
- 	tamperProtectionDAL: Option<Int>;
- 	userAuthenticationDAL: Option<Int>;
-	/*
-    encryption_dal: Option<Int>;
-    anti_flooding_dal: Option<Int>;
-    anti_fuzzing_dal: Option<Int>;
-    broadcast_from_outside_tb: Option<Bool>;
-	wifi_from_outside_tb: Option<Bool>;
-	encryption: Option<Bool>;
-	anti_flooding: Option<Bool>;
-	anti_fuzzing: Option<Bool>;*/
+	attributes: ArrayList<GenericAttribute>;
 };
 
 type ConnectionEndKind enum { ComponentCE, SubcomponentCE };
@@ -134,20 +54,9 @@ type ConnectionEnd {
 	subcomponent_port: CompInstPort;
 };
 
-type FlowType enum  { Xdata, Xcontrol, Xrequest };
-
-type ConnectionType enum { Local, Remote }; 
-
 type Connection {
 	name: Identifier;
-	conn_type: Option<ConnectionType>;
-	flow_type: Option<FlowType>;
-	authenticated: Option<Bool>;
-	data_encrypted: Option<Bool>;
-	trustedConnection: Option<Bool>;
- 	encryptedTransmission: Option<Bool>;
- 	encryptedTransmissionDAL: Option<Int>;
- 	replayProtection: Option<Bool>;
+	attributes: ArrayList<GenericAttribute>;
 	source: ConnectionEnd;
 	destination: ConnectionEnd;
 };

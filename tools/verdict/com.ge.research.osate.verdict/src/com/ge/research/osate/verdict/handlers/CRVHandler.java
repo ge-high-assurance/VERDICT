@@ -40,10 +40,14 @@ public class CRVHandler extends AbstractHandler {
 				@Override
 				public void run() {
 					try {
+						String propertySet = BundlePreferences.getPropertySet();
+						if (propertySet.isEmpty()) {
+							System.out.println("Please set VERDICT Properties name in Preferences");
+						}
 						String dockerImage = BundlePreferences.getDockerImage();
 						String bundleJar = BundlePreferences.getBundleJar();
 						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
-							System.out.println("Please set Verdict Bundle Jar path in Preferences");
+							System.out.println("Please set VERDICT Bundle Jar path in Preferences");
 							return;
 						}
 						String aadl2imlBin = BundlePreferences.getAadl2imlBin();
@@ -66,7 +70,7 @@ public class CRVHandler extends AbstractHandler {
 
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 
-						if (runBundle(bundleJar, dockerImage, selection.get(0), outputPath, aadl2imlBin, kind2Bin)) {
+						if (runBundle(bundleJar, dockerImage, selection.get(0), outputPath, aadl2imlBin, kind2Bin, propertySet)) {
 							// Run this code on the UI thread
 							mainThreadDisplay.asyncExec(() -> {
 								new CRVReportGenerator(outputPath, outputPathBa, iWindow);
@@ -85,7 +89,7 @@ public class CRVHandler extends AbstractHandler {
 	}
 
 	public static boolean runBundle(String bundleJar, String dockerImage, String inputPath, String outputPath,
-			String aadl2imlbin, String kind2bin) throws IOException {
+			String aadl2imlbin, String kind2bin, String propertySet) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		command
@@ -93,6 +97,7 @@ public class CRVHandler extends AbstractHandler {
 			.arg("--aadl")
 			.argBind(inputPath, "/app/model")
 			.arg2(aadl2imlbin, "/app/aadl2iml")
+			.arg(propertySet)
 			.arg("--crv")
 			.argBind(outputPath, "/app/tmp/crv_output.xml")
 			.arg2(kind2bin, "/app/kind2");
