@@ -54,6 +54,8 @@ import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessType;
+import org.osate.aadl2.ProcessorImplementation;
+import org.osate.aadl2.ProcessorType;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
@@ -202,6 +204,8 @@ public class Aadl2CsvTranslator {
 				componentTypes.add((ThreadGroupType)obj);
 			} else if (obj instanceof VirtualProcessorType) {
 				componentTypes.add((VirtualProcessorType)obj);
+			} else if (obj instanceof ProcessorType) {
+				componentTypes.add((ProcessorType)obj);
 			} else if (obj instanceof SystemImplementation) {
 				compImpls.add((SystemImplementation) obj);
 			} else if (obj instanceof SubprogramImplementation) {
@@ -222,6 +226,8 @@ public class Aadl2CsvTranslator {
 				compImpls.add((ThreadGroupImplementation) obj);
 			} else if (obj instanceof VirtualProcessorImplementation) {
 				compImpls.add((VirtualProcessorImplementation) obj);
+			} else if (obj instanceof ProcessorImplementation) {
+				compImpls.add((ProcessorImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {					
 					// Save property owner to be used later					
@@ -269,8 +275,13 @@ public class Aadl2CsvTranslator {
 							case "virtual processor": {
 								componentPropertyToName.put(prop, propName);
 								break;
-							}							
+							}
+							case "bus": {
+								componentPropertyToName.put(prop, propName);
+								break;
+							}
 							default: {
+								System.out.println("Warning: unsupported property applies to: " + propCat);
 								break;
 							}
 						}				
