@@ -63,6 +63,7 @@
     "constant",       P.CONSTANT ;
     "virtual",        P.VIRTUAL ;
     "group",          P.GROUP ;
+    "event",          P.EVENT ;
     "type",           P.TYPE ;
     "none",           P.NONE ;
     "inherit",        P.INHERIT ;

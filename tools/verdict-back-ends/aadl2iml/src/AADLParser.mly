@@ -61,7 +61,7 @@ let mk_package_section header_items body_items =
 %token SUBCOMPONENTS CONNECTIONS CONNECTION
 %token PROCESS THREAD SUBPROGRAM PROCESSOR MEMORY DEVICE
 %token PROVIDES REQUIRES ACCESS PUBLIC PRIVATE RENAMES
-%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP
+%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP EVENT
 %token LIST OF
 %token DATA PORT BUS
 %token <Lexing.lexbuf>ANNEX
@@ -202,6 +202,7 @@ sys_features_section:
 
 sys_feature:
   | dp = data_port { dp }
+  | ep = event_port { ep }
   | da = data_access
   {
     let pdir =
@@ -211,6 +212,7 @@ sys_feature:
     in
     { A.name = da.A.name;
       A.dir = pdir;
+      A.is_event = false;
       A.dtype = da.A.dtype;
       A.properties = da.A.properties;
     }
@@ -218,7 +220,8 @@ sys_feature:
   (* INCOMPLETE *)
 
 data_port:
-  pid = port_id; pdir = port_direction; DATA PORT
+  pid = port_id; pdir = port_direction;
+  ie = boption(EVENT); DATA PORT
   qcr = option(qcref); (* aadl2::DataSubcomponentType *)
   prop_assocs = property_associations
   (* INCOMPLETE *)
@@ -226,11 +229,25 @@ data_port:
   {
     { A.name = pid;
       A.dir = pdir;
+      A.is_event = ie;
       A.dtype = qcr;
       A.properties = prop_assocs;
     }
   }
+
+event_port:
+  pid = port_id; pdir = port_direction; EVENT PORT
+  prop_assocs = property_associations
   (* INCOMPLETE *)
+  ";"
+  {
+    { A.name = pid;
+      A.dir = pdir;
+      A.is_event = true;
+      A.dtype = None;
+      A.properties = prop_assocs;
+    }
+  }
 
 port_id:
   | pid = ident ":" { pid }

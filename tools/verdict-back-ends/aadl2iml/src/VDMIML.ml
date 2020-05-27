@@ -35,6 +35,7 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode;
+  is_event: bool;
   ptype: data_type option;
   probe: bool;
 }
@@ -43,7 +44,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod
 
-type unary_op = Not | UMinus | Pre | ToInt | ToReal
+type unary_op = Not | UMinus | Pre | ToInt | ToReal | Event
 
 type expr =
   | BinaryOp of binary_op * expr * expr
@@ -467,6 +468,7 @@ let get_unary_op_kind_and_field = function
   | Pre -> "Pre", "pre"
   | ToInt -> "ToInt", "to_int"
   | ToReal -> "ToReal", "to_real"
+  | Event -> "Event", "event"
 
 let rec pp_print_expr ind ppf expr =
   Format.fprintf ppf "e.kind = ExpressionKind.";
@@ -576,9 +578,10 @@ let pp_print_port_mode ppf = function
   | In -> Format.fprintf ppf "In"
   | Out -> Format.fprintf ppf "Out"
 
-let pp_print_port ind ppf { name; mode; ptype; probe } =
+let pp_print_port ind ppf { name; mode; is_event; ptype; probe } =
   Format.fprintf ppf "p.name = \"%s\" &&@," name;
   Format.fprintf ppf "p.mode = PortMode.%a &&@," pp_print_port_mode mode;
+  Format.fprintf ppf "p.is_event = %B &&@," is_event;
   Format.fprintf ppf "p.probe = %B &&@," probe;
   match ptype with
   | None -> Format.fprintf ppf "p.ptype = mk_none<DataType>"

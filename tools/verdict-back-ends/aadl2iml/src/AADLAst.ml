@@ -40,6 +40,7 @@ type port_dir = In | Out | InOut
 type data_port = {
   name: pid;
   dir: port_dir;
+  is_event: bool;
   dtype: qcref option;
   properties: property_association list;
 }
