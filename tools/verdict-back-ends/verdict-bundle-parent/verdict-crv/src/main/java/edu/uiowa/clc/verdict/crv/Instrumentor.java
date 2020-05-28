@@ -677,6 +677,8 @@ public class Instrumentor extends VDMInstrumentor {
                                             String scComponentKind;
                                             String scPedigree;
                                             int scStrongCryptoAlgorithms;
+                                            int scSupplyChainSecurity;
+                                            int scTamperProtection;
 
                                             if (connection.getSource().getSubcomponentPort()
                                                     != null) {
@@ -699,12 +701,12 @@ public class Instrumentor extends VDMInstrumentor {
                                                 GenericAttribute
                                                         sourceComponentComponentKindAttribute =
                                                                 getAttributeByName(
-                                                                        attributeList,
+                                                                        sourceComponentAttributeList,
                                                                         "ComponentType",
                                                                         sourceComponent.getName());
                                                 GenericAttribute sourceComponentPedigreeAttribute =
                                                         getAttributeByName(
-                                                                attributeList,
+                                                                sourceComponentAttributeList,
                                                                 "Pedigree",
                                                                 sourceComponent.getName());
                                                 GenericAttribute
@@ -712,6 +714,18 @@ public class Instrumentor extends VDMInstrumentor {
                                                                 getAttributeByName(
                                                                         sourceComponentAttributeList,
                                                                         "StrongCryptoAlgorithms",
+                                                                        sourceComponent.getName());
+                                                GenericAttribute
+                                                        sourceComponentSupplyChainSecurityAttribute =
+                                                                getAttributeByName(
+                                                                        sourceComponentAttributeList,
+                                                                        "SupplyChainSecurity",
+                                                                        sourceComponent.getName());
+                                                GenericAttribute
+                                                        sourceComponentTamperProtectionAttribute =
+                                                                getAttributeByName(
+                                                                        sourceComponentAttributeList,
+                                                                        "TamperProtection",
                                                                         sourceComponent.getName());
 
                                                 scInsideTrustedBoundary =
@@ -737,11 +751,26 @@ public class Instrumentor extends VDMInstrumentor {
                                                                 sourceComponentStrongCryptoAlgorithmsAttribute
                                                                         .getValue()
                                                                         .toString());
+
+                                                scSupplyChainSecurity =
+                                                        Integer.parseInt(
+                                                                sourceComponentSupplyChainSecurityAttribute
+                                                                        .getValue()
+                                                                        .toString());
+
+                                                scTamperProtection =
+                                                        Integer.parseInt(
+                                                                sourceComponentTamperProtectionAttribute
+                                                                        .getValue()
+                                                                        .toString());
+
                                             } else {
                                                 scInsideTrustedBoundary = true;
                                                 scComponentKind = "";
                                                 scPedigree = "";
                                                 scStrongCryptoAlgorithms = -1;
+                                                scSupplyChainSecurity = -1;
+                                                scTamperProtection = -1;
                                             }
 
                                             List<GenericAttribute> connectionAttributeList =
@@ -785,7 +814,13 @@ public class Instrumentor extends VDMInstrumentor {
                                                             || connectionType.equalsIgnoreCase(
                                                                     "trusted"))
                                                     && !scComponentKind.equalsIgnoreCase("hardware")
-                                                    && (scPedigree.equalsIgnoreCase("cots")
+                                                    && ((scPedigree.equalsIgnoreCase("cots")
+                                                                    || (scPedigree.equalsIgnoreCase(
+                                                                                    "sourced")
+                                                                            && scSupplyChainSecurity
+                                                                                    == 0
+                                                                            && scTamperProtection
+                                                                                    == 0))
                                                             || ((deviceAuthentication == 0
                                                                             && sessionAuthenticity
                                                                                     == 0)
@@ -913,6 +948,8 @@ public class Instrumentor extends VDMInstrumentor {
                                             String scComponentKind;
                                             String scPedigree;
                                             int scStrongCryptoAlgorithms;
+                                            int scSupplyChainSecurity;
+                                            int scTamperProtection;
 
                                             if (connection.getSource().getSubcomponentPort()
                                                     != null) {
@@ -935,12 +972,12 @@ public class Instrumentor extends VDMInstrumentor {
                                                 GenericAttribute
                                                         sourceComponentComponentKindAttribute =
                                                                 getAttributeByName(
-                                                                        attributeList,
+                                                                        sourceComponentAttributeList,
                                                                         "ComponentType",
                                                                         sourceComponent.getName());
                                                 GenericAttribute sourceComponentPedigreeAttribute =
                                                         getAttributeByName(
-                                                                attributeList,
+                                                                sourceComponentAttributeList,
                                                                 "Pedigree",
                                                                 sourceComponent.getName());
                                                 GenericAttribute
@@ -948,6 +985,18 @@ public class Instrumentor extends VDMInstrumentor {
                                                                 getAttributeByName(
                                                                         sourceComponentAttributeList,
                                                                         "StrongCryptoAlgorithms",
+                                                                        sourceComponent.getName());
+                                                GenericAttribute
+                                                        sourceComponentSupplyChainSecurityAttribute =
+                                                                getAttributeByName(
+                                                                        sourceComponentAttributeList,
+                                                                        "SupplyChainSecurity",
+                                                                        sourceComponent.getName());
+                                                GenericAttribute
+                                                        sourceComponentTamperProtectionAttribute =
+                                                                getAttributeByName(
+                                                                        sourceComponentAttributeList,
+                                                                        "TamperProtection",
                                                                         sourceComponent.getName());
 
                                                 scInsideTrustedBoundary =
@@ -973,11 +1022,26 @@ public class Instrumentor extends VDMInstrumentor {
                                                                 sourceComponentStrongCryptoAlgorithmsAttribute
                                                                         .getValue()
                                                                         .toString());
+
+                                                scSupplyChainSecurity =
+                                                        Integer.parseInt(
+                                                                sourceComponentSupplyChainSecurityAttribute
+                                                                        .getValue()
+                                                                        .toString());
+
+                                                scTamperProtection =
+                                                        Integer.parseInt(
+                                                                sourceComponentTamperProtectionAttribute
+                                                                        .getValue()
+                                                                        .toString());
+
                                             } else {
                                                 scInsideTrustedBoundary = true;
                                                 scComponentKind = "";
                                                 scPedigree = "";
                                                 scStrongCryptoAlgorithms = -1;
+                                                scSupplyChainSecurity = -1;
+                                                scTamperProtection = -1;
                                             }
 
                                             List<GenericAttribute> connectionAttributeList =
@@ -1021,7 +1085,13 @@ public class Instrumentor extends VDMInstrumentor {
                                                             || connectionType.equalsIgnoreCase(
                                                                     "untrusted"))
                                                     && !scComponentKind.equalsIgnoreCase("hardware")
-                                                    && (scPedigree.equalsIgnoreCase("cots")
+                                                    && ((scPedigree.equalsIgnoreCase("cots")
+                                                                    || (scPedigree.equalsIgnoreCase(
+                                                                                    "sourced")
+                                                                            && scSupplyChainSecurity
+                                                                                    == 0
+                                                                            && scTamperProtection
+                                                                                    == 0))
                                                             || ((deviceAuthentication == 0
                                                                             && sessionAuthenticity
                                                                                     == 0)
