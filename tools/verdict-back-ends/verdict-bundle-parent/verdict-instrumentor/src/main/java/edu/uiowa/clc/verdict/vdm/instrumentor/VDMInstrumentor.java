@@ -110,7 +110,7 @@ public class VDMInstrumentor {
         String ComponentID = null;
 
         if (components_map.isEmpty()) {
-            ConnectionEnd conDest = con.getDestination();
+            ConnectionEnd conDest = con.getSource();
             Port dest_port = conDest.getComponentPort();
 
             if (dest_port != null) {
@@ -125,14 +125,14 @@ public class VDMInstrumentor {
             }
 
         } else {
-            for (String cmpID : components_map.keySet()) {
-                HashSet<Connection> con_set = components_map.get(cmpID);
-
-                if (con_set.contains(con)) {
-                    ComponentID = cmpID;
-                    break;
-                }
-            }
+		    for (String cmpID : components_map.keySet()) {
+		        HashSet<Connection> con_set = components_map.get(cmpID);
+		
+		        if (con_set.contains(con)) {
+		            ComponentID = cmpID;
+		            break;
+		        }
+		    }
         }
 
         return ComponentID;
@@ -294,8 +294,13 @@ public class VDMInstrumentor {
 
                 if (cmpID != null) {
                     // Find Block based on Connection
-                    blockImpl = getBlockID(cmpID);
-
+                	
+                	if(components_map.isEmpty()) {
+                		blockImpl = retrieve_block(connection);
+                	} else {
+                		blockImpl = getBlockID(cmpID);
+                	}
+                    
                     String constant = instrument_link(cmpID, connection, blockImpl);
 
                     global_constants.add(constant);
@@ -414,6 +419,26 @@ public class VDMInstrumentor {
                 contractSpec.getWeaklyassume().add(weakly_assume_item);
             }
         }
+    }
+
+    protected BlockImpl retrieve_block(Connection input_con) {
+
+        BlockImpl blockImpl = null;
+
+
+        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+            if (cmpImpl.getBlockImpl() != null) {
+                blockImpl = cmpImpl.getBlockImpl();
+                for (Connection block_con : blockImpl.getConnection()) {
+
+                    if (block_con == input_con) {
+                        return blockImpl;
+                    }
+                }
+            }
+        }
+
+        return blockImpl;
     }
 
     //    protected ComponentImpl retrieve_cmp_impl(ComponentType componentType) {
