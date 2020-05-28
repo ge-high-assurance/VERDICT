@@ -181,21 +181,23 @@ public class VDMInstrumentor {
 	protected boolean isProbePort(Connection con) {
 
 		if (con != null) {
-			ConnectionEnd src_con = con.getDestination();
+			
+			ConnectionEnd dest_con = con.getDestination();
 
-			Port srcPort = src_con.getComponentPort();
+			Port dstPort = dest_con.getComponentPort();
 
-			if (srcPort == null) {
-				CompInstancePort instancePort = src_con.getSubcomponentPort();
-				srcPort = instancePort.getPort();
+			if (dstPort == null) {
+				CompInstancePort instancePort = dest_con.getSubcomponentPort();
+				dstPort = instancePort.getPort();
 			}
 
-			if (srcPort.isProbe()) {
-//				System.out.println("Snoozing Proble Port >>" + con.getName() + " >>" + srcPort.getName());
+			if (dstPort.isProbe()) {
+				System.out.println("Snoozing Proble Port " + dstPort.getName() + " in connection " + con.getName());
 				return true;
 			}
 
 		}
+		
 		return false;
 	}
 
@@ -277,19 +279,7 @@ public class VDMInstrumentor {
                 //                    }
                 //                }
             }
-            
-            //Snoorzing probe ports
-            if (vdm_components.size() > 0) {
-
-                Iterator<Connection> it = vdm_links.iterator();
-                while (it.hasNext()) {
-                    Connection con = it.next();
-                    if (isProbePort(con)) {
-                        it.remove();
-                    }
-                }
-            }            
-            
+                        
         }
 
         if (threats.contains("BG")) {
@@ -325,6 +315,19 @@ public class VDMInstrumentor {
                 // if (component.getName().equals("GPS")) {}
             }
         }
+        
+        //Snoorzing probe ports
+        if (vdm_links.size() > 0) {
+
+            Iterator<Connection> it = vdm_links.iterator();
+            while (it.hasNext()) {
+                Connection con = it.next();
+                if (isProbePort(con)) {
+                    it.remove();
+                }
+            }
+        }            
+
         //        else {
         //           System.out.println("No Component found!");
         //        }
