@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import verdict.vdm.vdm_data.DataType;
+import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_lustre.BinaryOperation;
 import verdict.vdm.vdm_lustre.ConstantDeclaration;
@@ -125,14 +126,14 @@ public class VDMInstrumentor {
             }
 
         } else {
-		    for (String cmpID : components_map.keySet()) {
-		        HashSet<Connection> con_set = components_map.get(cmpID);
-		
-		        if (con_set.contains(con)) {
-		            ComponentID = cmpID;
-		            break;
-		        }
-		    }
+            for (String cmpID : components_map.keySet()) {
+                HashSet<Connection> con_set = components_map.get(cmpID);
+
+                if (con_set.contains(con)) {
+                    ComponentID = cmpID;
+                    break;
+                }
+            }
         }
 
         return ComponentID;
@@ -175,6 +176,46 @@ public class VDMInstrumentor {
             }
         }
         return false;
+    }
+
+	protected boolean isProbePort(Connection con) {
+
+		if (con != null) {
+			ConnectionEnd src_con = con.getDestination();
+
+			Port srcPort = src_con.getComponentPort();
+
+			if (srcPort == null) {
+				CompInstancePort instancePort = src_con.getSubcomponentPort();
+				srcPort = instancePort.getPort();
+			}
+
+			if (srcPort.isProbe()) {
+//				System.out.println("Snoozing Proble Port >>" + con.getName() + " >>" + srcPort.getName());
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+    protected GenericAttribute getAttributeByName(
+            List<GenericAttribute> genericAttributes, String attributeName, String id) {
+        GenericAttribute genericAttribute = null;
+
+        for (GenericAttribute attribute : genericAttributes) {
+            if (attributeName.equalsIgnoreCase(attribute.getName())) {
+                genericAttribute = attribute;
+                break;
+            }
+        }
+
+        if (genericAttribute == null) {
+            throw new NullPointerException(
+                    "There is no <" + attributeName + "> attribute for <" + id + "> element.");
+        } else {
+            return genericAttribute;
+        }
     }
 
     protected void retrieve_component_and_channels(
@@ -236,6 +277,19 @@ public class VDMInstrumentor {
                 //                    }
                 //                }
             }
+            
+            //Snoorzing probe ports
+            if (vdm_components.size() > 0) {
+
+                Iterator<Connection> it = vdm_links.iterator();
+                while (it.hasNext()) {
+                    Connection con = it.next();
+                    if (isProbePort(con)) {
+                        it.remove();
+                    }
+                }
+            }            
+            
         }
 
         if (threats.contains("BG")) {
@@ -294,13 +348,13 @@ public class VDMInstrumentor {
 
                 if (cmpID != null) {
                     // Find Block based on Connection
-                	
-                	if(components_map.isEmpty()) {
-                		blockImpl = retrieve_block(connection);
-                	} else {
-                		blockImpl = getBlockID(cmpID);
-                	}
-                    
+
+                    if (components_map.isEmpty()) {
+                        blockImpl = retrieve_block(connection);
+                    } else {
+                        blockImpl = getBlockID(cmpID);
+                    }
+
                     String constant = instrument_link(cmpID, connection, blockImpl);
 
                     global_constants.add(constant);
@@ -424,7 +478,6 @@ public class VDMInstrumentor {
     protected BlockImpl retrieve_block(Connection input_con) {
 
         BlockImpl blockImpl = null;
-
 
         for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
             if (cmpImpl.getBlockImpl() != null) {
