@@ -106,36 +106,35 @@ public class VDMInstrumentor {
 
     protected String getComponentID(
             Map<String, HashSet<Connection>> components_map, Connection con) {
-        
-    	String ComponentID = null;
+
+        String ComponentID = null;
 
         if (components_map.isEmpty()) {
-        	ConnectionEnd conDest = con.getDestination();
-        	Port dest_port = conDest.getComponentPort();
-        	
-        	if(dest_port != null) {
-        	
-        		ComponentID = dest_port.getId();
+            ConnectionEnd conDest = con.getDestination();
+            Port dest_port = conDest.getComponentPort();
 
-        	} else {
-        		CompInstancePort compInstance = conDest.getSubcomponentPort();
-        		
-        		ComponentInstance c = compInstance.getSubcomponent();
-        		ComponentID = c.getId();        		
-        	}
-        	
+            if (dest_port != null) {
+
+                ComponentID = dest_port.getId();
+
+            } else {
+                CompInstancePort compInstance = conDest.getSubcomponentPort();
+
+                ComponentInstance c = compInstance.getSubcomponent();
+                ComponentID = c.getId();
+            }
+
+        } else {
+            for (String cmpID : components_map.keySet()) {
+                HashSet<Connection> con_set = components_map.get(cmpID);
+
+                if (con_set.contains(con)) {
+                    ComponentID = cmpID;
+                    break;
+                }
+            }
         }
-        else {
-	        for (String cmpID : components_map.keySet()) {
-	            HashSet<Connection> con_set = components_map.get(cmpID);
-	
-	            if (con_set.contains(con)) {
-	                ComponentID = cmpID;
-	                break;
-	            }
-	        }
-        }
-        
+
         return ComponentID;
     }
 
@@ -222,23 +221,21 @@ public class VDMInstrumentor {
 
             // Snoozing option for component level.
             if (component_level & vdm_components.size() > 0) {
-            
-        	   Iterator<Connection> it = vdm_links.iterator();
-        	   while (it.hasNext())
-        	   {
-        	      Connection con = it.next();
-        	      if (isSourceComponent(con)) {
-        	    	  it.remove();
-        	      }
-        	   }            	
-//            	for (Connection con : vdm_links) {
-//                    if (isSourceComponent(con)) {
-//                        //
-//                        vdm_links.remove(con);
-//                    }
-//                }
+
+                Iterator<Connection> it = vdm_links.iterator();
+                while (it.hasNext()) {
+                    Connection con = it.next();
+                    if (isSourceComponent(con)) {
+                        it.remove();
+                    }
+                }
+                //            	for (Connection con : vdm_links) {
+                //                    if (isSourceComponent(con)) {
+                //                        //
+                //                        vdm_links.remove(con);
+                //                    }
+                //                }
             }
-            
         }
 
         if (threats.contains("BG")) {
@@ -296,32 +293,33 @@ public class VDMInstrumentor {
                 String cmpID = getComponentID(components_map, connection);
 
                 if (cmpID != null) {
-                    //Find Block based on Connection
-                	blockImpl = getBlockID(cmpID);
-                    
+                    // Find Block based on Connection
+                    blockImpl = getBlockID(cmpID);
+
                     String constant = instrument_link(cmpID, connection, blockImpl);
 
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-                } 
-//                else if (threats.contains("NI")) {
-//                    // Network Injection Case when no Components are present
-//                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
-//
-//                    cmpID = cmpImpl.getType().getId();
-//                    //Find Block based on connection
-//                    blockImpl = retrieve_block(cmpImpl);
-//                    
-//                    
-//                    blockImpl = getBlockID(cmpID);
-//                    
-//                    String constant = instrument_link(cmpID, connection, blockImpl);
-//
-//                    global_constants.add(constant);
-//
-//                    connections_map.put(connection, constant);
-//                }
+                }
+                //                else if (threats.contains("NI")) {
+                //                    // Network Injection Case when no Components are present
+                //                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
+                //
+                //                    cmpID = cmpImpl.getType().getId();
+                //                    //Find Block based on connection
+                //                    blockImpl = retrieve_block(cmpImpl);
+                //
+                //
+                //                    blockImpl = getBlockID(cmpID);
+                //
+                //                    String constant = instrument_link(cmpID, connection,
+                // blockImpl);
+                //
+                //                    global_constants.add(constant);
+                //
+                //                    connections_map.put(connection, constant);
+                //                }
             }
         } // else {
         //            System.out.println("No Links found!");
