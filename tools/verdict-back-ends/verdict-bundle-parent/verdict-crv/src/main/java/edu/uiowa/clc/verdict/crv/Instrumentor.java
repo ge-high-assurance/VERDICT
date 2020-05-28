@@ -812,7 +812,7 @@ public class Instrumentor extends VDMInstrumentor {
 
                                             if ((!scInsideTrustedBoundary
                                                             || connectionType.equalsIgnoreCase(
-                                                                    "trusted"))
+                                                                    "untrusted"))
                                                     && !scComponentKind.equalsIgnoreCase("hardware")
                                                     && ((scPedigree.equalsIgnoreCase("cots")
                                                                     || (scPedigree.equalsIgnoreCase(
