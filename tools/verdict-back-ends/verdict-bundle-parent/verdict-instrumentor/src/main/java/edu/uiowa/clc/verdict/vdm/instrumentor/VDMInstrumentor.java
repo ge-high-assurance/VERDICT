@@ -176,7 +176,7 @@ public class VDMInstrumentor {
 
             if (dstPort.isProbe()) {
 //                System.out.println(
-//                        "Snoozing Proble Port "
+//                        "Snoozing Probe Port "
 //                                + dstPort.getName()
 //                                + " in connection "
 //                                + con.getName());
@@ -686,7 +686,9 @@ public class VDMInstrumentor {
             for (Connection con : comp_asmp.get(key)) {
 
                 String g_constant = connections.get(con);
-                constants.add(g_constant);
+                if(!isProbePort(con)) {
+                	constants.add(g_constant);
+                }
                 // System.out.println("COMP: " + key + " ==>" + g_constant);
             }
 
@@ -708,9 +710,11 @@ public class VDMInstrumentor {
             List<String> constants = new ArrayList<String>();
             for (Connection con : comp_asmp.get(key)) {
 
-                String g_constant = connections.get(con);
-                constants.add(g_constant);
-                comp_link.put(key, constants);
+            	if(!isProbePort(con)) {
+	                String g_constant = connections.get(con);
+	                constants.add(g_constant);
+	                comp_link.put(key, constants);
+            	}
             }
         }
 
@@ -760,7 +764,7 @@ public class VDMInstrumentor {
         }
 
         ContractSpec contractSpec = compImpl.getType().getContract();
-        System.out.println();
+//        System.out.println();
         ContractItem assume_item = new ContractItem();
 
         //        if (assume_expr == null) {
