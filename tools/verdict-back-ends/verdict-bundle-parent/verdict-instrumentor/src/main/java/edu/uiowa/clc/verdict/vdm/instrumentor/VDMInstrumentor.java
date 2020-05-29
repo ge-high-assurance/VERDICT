@@ -119,23 +119,6 @@ public class VDMInstrumentor {
             }
         }
 
-        if (ComponentID == null) {
-
-            ConnectionEnd conDest = con.getSource();
-            Port dest_port = conDest.getComponentPort();
-
-            if (dest_port != null) {
-
-                ComponentID = dest_port.getId();
-
-            } else {
-                CompInstancePort compInstance = conDest.getSubcomponentPort();
-
-                ComponentInstance c = compInstance.getSubcomponent();
-                ComponentID = c.getId();
-            }
-        }
-
         return ComponentID;
     }
 
@@ -192,11 +175,11 @@ public class VDMInstrumentor {
             }
 
             if (dstPort.isProbe()) {
-                System.out.println(
-                        "Snoozing Proble Port "
-                                + dstPort.getName()
-                                + " in connection "
-                                + con.getName());
+//                System.out.println(
+//                        "Snoozing Proble Port "
+//                                + dstPort.getName()
+//                                + " in connection "
+//                                + con.getName());
                 return true;
             }
         }
@@ -354,41 +337,42 @@ public class VDMInstrumentor {
                 if (cmpID != null) {
                     // Find Block based on Connection
 
-                    if (components_map.isEmpty()) {
-                        blockImpl = retrieve_block(connection);
-                    } else {
-                        blockImpl = getBlockID(cmpID);
-                    }
+                    blockImpl = getBlockID(cmpID);
 
                     String constant = instrument_link(cmpID, connection, blockImpl);
 
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-                }
-                //                else if (threats.contains("NI")) {
-                //                    // Network Injection Case when no Components are present
-                //                    ComponentImpl cmpImpl = retrieve_main_cmp_impl();
-                //
-                //                    cmpID = cmpImpl.getType().getId();
-                //                    //Find Block based on connection
-                //                    blockImpl = retrieve_block(cmpImpl);
-                //
-                //
-                //                    blockImpl = getBlockID(cmpID);
-                //
-                //                    String constant = instrument_link(cmpID, connection,
-                // blockImpl);
-                //
-                //                    global_constants.add(constant);
-                //
-                //                    connections_map.put(connection, constant);
-                //                }
-            }
-        } // else {
-        //            System.out.println("No Links found!");
-        //        }
+                    
+                } else {
+                	// Handle 'NI' as Special Case. 
+                    ConnectionEnd conDest = connection.getSource();
+                    Port dest_port = conDest.getComponentPort();
 
+                    if (dest_port != null) {
+
+                    	cmpID = dest_port.getId();
+
+                    } else {
+                        CompInstancePort compInstance = conDest.getSubcomponentPort();
+
+                        ComponentInstance compInst = compInstance.getSubcomponent();
+                        cmpID = compInst.getId();
+                    }
+
+                    blockImpl = retrieve_block(connection);
+
+                    String constant = instrument_link(cmpID, connection, blockImpl);
+
+                    global_constants.add(constant);
+
+                    connections_map.put(connection, constant);
+
+                }
+            }
+        } 
+        
         // Declare Global Constants
         for (String comp_id : global_constants) {
 
