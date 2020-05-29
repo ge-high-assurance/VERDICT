@@ -110,7 +110,17 @@ public class VDMInstrumentor {
 
         String ComponentID = null;
 
-        if (components_map.isEmpty()) {
+        for (String cmpID : components_map.keySet()) {
+            HashSet<Connection> con_set = components_map.get(cmpID);
+
+            if (con_set.contains(con)) {
+                ComponentID = cmpID;
+                break;
+            }
+        }
+
+        if (ComponentID == null) {
+
             ConnectionEnd conDest = con.getSource();
             Port dest_port = conDest.getComponentPort();
 
@@ -123,16 +133,6 @@ public class VDMInstrumentor {
 
                 ComponentInstance c = compInstance.getSubcomponent();
                 ComponentID = c.getId();
-            }
-
-        } else {
-            for (String cmpID : components_map.keySet()) {
-                HashSet<Connection> con_set = components_map.get(cmpID);
-
-                if (con_set.contains(con)) {
-                    ComponentID = cmpID;
-                    break;
-                }
             }
         }
 
@@ -178,28 +178,31 @@ public class VDMInstrumentor {
         return false;
     }
 
-	protected boolean isProbePort(Connection con) {
+    protected boolean isProbePort(Connection con) {
 
-		if (con != null) {
-			
-			ConnectionEnd dest_con = con.getDestination();
+        if (con != null) {
 
-			Port dstPort = dest_con.getComponentPort();
+            ConnectionEnd dest_con = con.getDestination();
 
-			if (dstPort == null) {
-				CompInstancePort instancePort = dest_con.getSubcomponentPort();
-				dstPort = instancePort.getPort();
-			}
+            Port dstPort = dest_con.getComponentPort();
 
-			if (dstPort.isProbe()) {
-				System.out.println("Snoozing Proble Port " + dstPort.getName() + " in connection " + con.getName());
-				return true;
-			}
+            if (dstPort == null) {
+                CompInstancePort instancePort = dest_con.getSubcomponentPort();
+                dstPort = instancePort.getPort();
+            }
 
-		}
-		
-		return false;
-	}
+            if (dstPort.isProbe()) {
+                System.out.println(
+                        "Snoozing Proble Port "
+                                + dstPort.getName()
+                                + " in connection "
+                                + con.getName());
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     protected GenericAttribute getAttributeByName(
             List<GenericAttribute> genericAttributes, String attributeName, String id) {
@@ -279,7 +282,6 @@ public class VDMInstrumentor {
                 //                    }
                 //                }
             }
-                        
         }
 
         if (threats.contains("BG")) {
@@ -315,8 +317,8 @@ public class VDMInstrumentor {
                 // if (component.getName().equals("GPS")) {}
             }
         }
-        
-        //Snoorzing probe ports
+
+        // Snoorzing probe ports
         if (vdm_links.size() > 0) {
 
             Iterator<Connection> it = vdm_links.iterator();
@@ -326,7 +328,7 @@ public class VDMInstrumentor {
                     it.remove();
                 }
             }
-        }            
+        }
 
         //        else {
         //           System.out.println("No Component found!");
