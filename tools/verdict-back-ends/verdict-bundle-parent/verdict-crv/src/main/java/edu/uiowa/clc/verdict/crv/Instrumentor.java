@@ -221,9 +221,9 @@ public class Instrumentor extends VDMInstrumentor {
         if (this.attack_cmp_link_map.containsKey(attack_type)) {
             HashSet<String> cmp_links = this.attack_cmp_link_map.get(attack_type);
             for (Connection con : vdm_links) {
-            	if(!isProbePort(con)) {
-            		cmp_links.addAll(get_ports(con));
-            	}
+                if (!isProbePort(con)) {
+                    cmp_links.addAll(get_ports(con));
+                }
             }
         }
         //        System.out.println(links);
@@ -248,7 +248,8 @@ public class Instrumentor extends VDMInstrumentor {
     }
 
     protected GenericAttribute getAttributeByName(
-            List<GenericAttribute> genericAttributes, String attributeName, String id) {
+            List<GenericAttribute> genericAttributes, String attributeName, String id)
+            throws CRVException {
         GenericAttribute genericAttribute = null;
 
         for (GenericAttribute attribute : genericAttributes) {
@@ -259,8 +260,9 @@ public class Instrumentor extends VDMInstrumentor {
         }
 
         if (genericAttribute == null) {
-            throw new NullPointerException(
-                    "There is no <" + attributeName + "> attribute for <" + id + "> element.");
+            throw new CRVException(
+                    "There is no [" + attributeName + "] attribute for [" + id + "] element.",
+                    ErrorCode.GENERIC_ATTRIBUTE_NOT_FOUND);
         } else {
             return genericAttribute;
         }
@@ -272,56 +274,59 @@ public class Instrumentor extends VDMInstrumentor {
     @Override
     public void locationSpoofing(HashSet<ComponentType> vdm_components) {
 
-        HashSet<String> components = new HashSet<String>();
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> locIdentificationDeviceSet =
-                new HashSet<String>(Arrays.asList("gps", "dme_vor", "iru", "lidar", "imu"));
+            HashSet<String> locIdentificationDeviceSet =
+                    new HashSet<String>(Arrays.asList("gps", "dme_vor", "iru", "lidar", "imu"));
 
-        BlockImpl blockImpl = null;
+            BlockImpl blockImpl = null;
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-            blockImpl = componentImpl.getBlockImpl();
+                blockImpl = componentImpl.getBlockImpl();
 
-            // BlockImpl
-            if (blockImpl != null) {
+                // BlockImpl
+                if (blockImpl != null) {
 
-                ComponentType componentType = componentImpl.getType();
+                    ComponentType componentType = componentImpl.getType();
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+                        componentType = componentInstance.getSpecification();
+                        ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    // Option 1) Specification
-                    if (componentType != null) {
+                        // Option 1) Specification
+                        if (componentType != null) {
 
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
+                        }
+                        // Option 2) Implementation
+                        else if (subcomponentImpl != null) {
 
-                        componentType = subcomponentImpl.getType();
-                    }
+                            componentType = subcomponentImpl.getType();
+                        }
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    GenericAttribute componentCategoryAttribute =
-                            getAttributeByName(
-                                    attributeList, "Category", componentInstance.getName());
+                        GenericAttribute componentCategoryAttribute =
+                                getAttributeByName(
+                                        attributeList, "Category", componentInstance.getName());
 
-                    String componentCategory = componentCategoryAttribute.getValue().toString();
+                        String componentCategory = componentCategoryAttribute.getValue().toString();
 
-                    if (locIdentificationDeviceSet.contains(componentCategory.toLowerCase())) {
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
+                        if (locIdentificationDeviceSet.contains(componentCategory.toLowerCase())) {
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
+                        }
                     }
                 }
             }
+
+            this.attack_cmp_link_map.put("LS", components);
+
+        } catch (CRVException e) {
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
-
-        this.attack_cmp_link_map.put("LS", components);
-
-        //		return components;
     }
 
     // NI:
@@ -336,97 +341,102 @@ public class Instrumentor extends VDMInstrumentor {
     @Override
     public void networkInjection(HashSet<Connection> vdm_links) {
 
-        HashSet<String> links = new HashSet<String>();
+        try {
+            HashSet<String> links = new HashSet<String>();
 
-        BlockImpl blockImpl = null;
+            BlockImpl blockImpl = null;
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-            blockImpl = componentImpl.getBlockImpl();
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+                blockImpl = componentImpl.getBlockImpl();
 
-            // BlockImpl
-            if (blockImpl != null) {
+                // BlockImpl
+                if (blockImpl != null) {
 
-                // Selection channels (Authentication = OFF & DataEncrypted = OFF)
-                for (Connection connection : blockImpl.getConnection()) {
+                    // Selection channels (Authentication = OFF & DataEncrypted = OFF)
+                    for (Connection connection : blockImpl.getConnection()) {
 
-                    boolean insideTrustedBoundary;
-                    int strongCryptoAlgorithms;
+                        boolean insideTrustedBoundary;
+                        int strongCryptoAlgorithms;
 
-                    if (connection.getSource().getSubcomponentPort() != null) {
-                        ComponentInstance sourceComponent =
-                                connection.getSource().getSubcomponentPort().getSubcomponent();
+                        if (connection.getSource().getSubcomponentPort() != null) {
+                            ComponentInstance sourceComponent =
+                                    connection.getSource().getSubcomponentPort().getSubcomponent();
 
-                        List<GenericAttribute> sourceComponentAttributeList =
-                                sourceComponent.getAttribute();
+                            List<GenericAttribute> sourceComponentAttributeList =
+                                    sourceComponent.getAttribute();
 
-                        GenericAttribute insideTrustedBoundaryAttribute =
+                            GenericAttribute insideTrustedBoundaryAttribute =
+                                    getAttributeByName(
+                                            sourceComponentAttributeList,
+                                            "InsideTrustedBoundary",
+                                            sourceComponent.getName());
+                            GenericAttribute strongCryptoAlgorithmsAttribute =
+                                    getAttributeByName(
+                                            sourceComponentAttributeList,
+                                            "StrongCryptoAlgorithms",
+                                            sourceComponent.getName());
+                            insideTrustedBoundary =
+                                    Boolean.parseBoolean(
+                                            insideTrustedBoundaryAttribute.getValue().toString());
+
+                            strongCryptoAlgorithms =
+                                    Integer.parseInt(
+                                            strongCryptoAlgorithmsAttribute.getValue().toString());
+                        } else {
+                            insideTrustedBoundary = true;
+                            strongCryptoAlgorithms = 1;
+                        }
+
+                        List<GenericAttribute> connectionAttributeList = connection.getAttribute();
+
+                        GenericAttribute connectionTypeAttribute =
                                 getAttributeByName(
-                                        sourceComponentAttributeList,
-                                        "InsideTrustedBoundary",
-                                        sourceComponent.getName());
-                        GenericAttribute strongCryptoAlgorithmsAttribute =
+                                        connectionAttributeList,
+                                        "ConnectionType",
+                                        connection.getName());
+                        GenericAttribute deviceAuthenticationAttribute =
                                 getAttributeByName(
-                                        sourceComponentAttributeList,
-                                        "StrongCryptoAlgorithms",
-                                        sourceComponent.getName());
-                        insideTrustedBoundary =
-                                Boolean.parseBoolean(
-                                        insideTrustedBoundaryAttribute.getValue().toString());
+                                        connectionAttributeList,
+                                        "DeviceAuthentication",
+                                        connection.getName());
+                        GenericAttribute sessionAuthenticityAttribute =
+                                getAttributeByName(
+                                        connectionAttributeList,
+                                        "SessionAuthenticity",
+                                        connection.getName());
 
-                        strongCryptoAlgorithms =
+                        String connectionType =
+                                connectionTypeAttribute.getValue().toString().toLowerCase();
+
+                        int deviceAuthentication =
                                 Integer.parseInt(
-                                        strongCryptoAlgorithmsAttribute.getValue().toString());
-                    } else {
-                        insideTrustedBoundary = true;
-                        strongCryptoAlgorithms = 1;
-                    }
+                                        deviceAuthenticationAttribute.getValue().toString());
 
-                    List<GenericAttribute> connectionAttributeList = connection.getAttribute();
+                        int sessionAuthenticity =
+                                Integer.parseInt(
+                                        sessionAuthenticityAttribute.getValue().toString());
 
-                    GenericAttribute connectionTypeAttribute =
-                            getAttributeByName(
-                                    connectionAttributeList,
-                                    "ConnectionType",
-                                    connection.getName());
-                    GenericAttribute deviceAuthenticationAttribute =
-                            getAttributeByName(
-                                    connectionAttributeList,
-                                    "DeviceAuthentication",
-                                    connection.getName());
-                    GenericAttribute sessionAuthenticityAttribute =
-                            getAttributeByName(
-                                    connectionAttributeList,
-                                    "SessionAuthenticity",
-                                    connection.getName());
+                        if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("untrusted"))
+                                && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
+                                        || strongCryptoAlgorithms == 0)) {
 
-                    String connectionType =
-                            connectionTypeAttribute.getValue().toString().toLowerCase();
-
-                    int deviceAuthentication =
-                            Integer.parseInt(deviceAuthenticationAttribute.getValue().toString());
-
-                    int sessionAuthenticity =
-                            Integer.parseInt(sessionAuthenticityAttribute.getValue().toString());
-
-                    if ((!insideTrustedBoundary || connectionType.equalsIgnoreCase("untrusted"))
-                            && ((deviceAuthentication == 0 && sessionAuthenticity == 0)
-                                    || strongCryptoAlgorithms == 0)) {
-
-                        vdm_links.add(connection);
-                        links.add(connection.getName());
+                            vdm_links.add(connection);
+                            links.add(connection.getName());
+                        }
                     }
                 }
             }
-        }
 
-        for (Connection con : vdm_links) {
-        	if(!isProbePort(con)){
-        		links.addAll(get_ports(con));
-        	}
-        }
-        this.attack_cmp_link_map.put("NI", links);
+            for (Connection con : vdm_links) {
+                if (!isProbePort(con)) {
+                    links.addAll(get_ports(con));
+                }
+            }
+            this.attack_cmp_link_map.put("NI", links);
 
-        // return links;
+        } catch (CRVException e) {
+        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+        }
     }
 
     private HashSet<String> get_ports(Connection link) {
@@ -479,105 +489,113 @@ public class Instrumentor extends VDMInstrumentor {
     @Override
     public void logicBomb(HashSet<ComponentType> vdm_components) {
 
-        HashSet<String> components = new HashSet<String>();
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> lbComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
+            HashSet<String> lbComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
 
-        BlockImpl blockImpl = null;
+            BlockImpl blockImpl = null;
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-            blockImpl = componentImpl.getBlockImpl();
+                blockImpl = componentImpl.getBlockImpl();
 
-            // BlockImpl
-            if (blockImpl != null) {
+                // BlockImpl
+                if (blockImpl != null) {
 
-                ComponentType componentType = componentImpl.getType();
+                    ComponentType componentType = componentImpl.getType();
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+                        componentType = componentInstance.getSpecification();
+                        ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    // Option 1) Specification
-                    if (componentType != null) {
+                        // Option 1) Specification
+                        if (componentType != null) {
 
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
+                        }
+                        // Option 2) Implementation
+                        else if (subcomponentImpl != null) {
 
-                        componentType = subcomponentImpl.getType();
-                    }
+                            componentType = subcomponentImpl.getType();
+                        }
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "AdversariallyTestedForTrojanOrLogicBomb",
-                                    componentInstance.getName());
-                    GenericAttribute pedigreeAttribute =
-                            getAttributeByName(
-                                    attributeList, "Pedigree", componentInstance.getName());
-                    GenericAttribute supplyChainSecurityAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "SupplyChainSecurity",
-                                    componentInstance.getName());
-                    GenericAttribute tamperProtectionAttribute =
-                            getAttributeByName(
-                                    attributeList, "TamperProtection", componentInstance.getName());
-                    GenericAttribute staticCodeAnalysisAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "StaticCodeAnalysis",
-                                    componentInstance.getName());
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "AdversariallyTestedForTrojanOrLogicBomb",
+                                        componentInstance.getName());
+                        GenericAttribute pedigreeAttribute =
+                                getAttributeByName(
+                                        attributeList, "Pedigree", componentInstance.getName());
+                        GenericAttribute supplyChainSecurityAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "SupplyChainSecurity",
+                                        componentInstance.getName());
+                        GenericAttribute tamperProtectionAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "TamperProtection",
+                                        componentInstance.getName());
+                        GenericAttribute staticCodeAnalysisAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "StaticCodeAnalysis",
+                                        componentInstance.getName());
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    int adversariallyTestedForTrojanOrLogicBomb =
-                            Integer.parseInt(
-                                    adversariallyTestedForTrojanOrLogicBombAttribute
-                                            .getValue()
-                                            .toString());
+                        int adversariallyTestedForTrojanOrLogicBomb =
+                                Integer.parseInt(
+                                        adversariallyTestedForTrojanOrLogicBombAttribute
+                                                .getValue()
+                                                .toString());
 
-                    String pedigree = pedigreeAttribute.getValue().toString().toLowerCase();
+                        String pedigree = pedigreeAttribute.getValue().toString().toLowerCase();
 
-                    int supplyChainSecurity =
-                            Integer.parseInt(supplyChainSecurityAttribute.getValue().toString());
+                        int supplyChainSecurity =
+                                Integer.parseInt(
+                                        supplyChainSecurityAttribute.getValue().toString());
 
-                    int tamperProtection =
-                            Integer.parseInt(tamperProtectionAttribute.getValue().toString());
+                        int tamperProtection =
+                                Integer.parseInt(tamperProtectionAttribute.getValue().toString());
 
-                    int staticCodeAnalysis =
-                            Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
+                        int staticCodeAnalysis =
+                                Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
 
-                    if (lbComponentTypeSet.contains(componentKind)
-                            && (pedigree.equalsIgnoreCase("cots")
-                                    || (pedigree.equalsIgnoreCase("sourced")
-                                            && supplyChainSecurity == 0
-                                            && tamperProtection == 0))
-                            && (adversariallyTestedForTrojanOrLogicBomb == 0
-                                    || staticCodeAnalysis == 0)) {
-                        // Store component
-                        // if (!vdm_components.contains(componentType)) {
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
-                        // }
+                        if (lbComponentTypeSet.contains(componentKind)
+                                && (pedigree.equalsIgnoreCase("cots")
+                                        || (pedigree.equalsIgnoreCase("sourced")
+                                                && supplyChainSecurity == 0
+                                                && tamperProtection == 0))
+                                && (adversariallyTestedForTrojanOrLogicBomb == 0
+                                        || staticCodeAnalysis == 0)) {
+                            // Store component
+                            // if (!vdm_components.contains(componentType)) {
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
+                            // }
+                        }
                     }
                 }
             }
+
+            this.attack_cmp_link_map.put("LB", components);
+
+        } catch (CRVException e) {
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
-
-        this.attack_cmp_link_map.put("LB", components);
-
-        //		return components;
     }
 
     // SV:
@@ -588,274 +606,293 @@ public class Instrumentor extends VDMInstrumentor {
     // Remote
     @Override
     public void softwareVirus(HashSet<ComponentType> vdm_components) {
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> components = new HashSet<String>();
+            HashSet<String> svComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
 
-        HashSet<String> svComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
+            BlockImpl blockImpl = null;
 
-        BlockImpl blockImpl = null;
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+                blockImpl = componentImpl.getBlockImpl();
 
-            blockImpl = componentImpl.getBlockImpl();
+                // BlockImpl
+                if (blockImpl != null) {
 
-            // BlockImpl
-            if (blockImpl != null) {
+                    ComponentType componentType = componentImpl.getType();
 
-                ComponentType componentType = componentImpl.getType();
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                        componentType = componentInstance.getSpecification();
+                        ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+                        // Option 1) Specification
+                        if (componentType != null) {
 
-                    // Option 1) Specification
-                    if (componentType != null) {
+                        }
+                        // Option 2) Implementation
+                        else if (subcomponentImpl != null) {
 
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
+                            componentType = subcomponentImpl.getType();
+                        }
 
-                        componentType = subcomponentImpl.getType();
-                    }
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute staticCodeAnalysisAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "StaticCodeAnalysis",
+                                        componentInstance.getName());
+                        GenericAttribute inputValidationAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "InputValidation",
+                                        componentInstance.getName());
+                        GenericAttribute memoryProtectionAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "MemoryProtection",
+                                        componentInstance.getName());
+                        GenericAttribute secureBootAttribute =
+                                getAttributeByName(
+                                        attributeList, "SecureBoot", componentInstance.getName());
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute staticCodeAnalysisAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "StaticCodeAnalysis",
-                                    componentInstance.getName());
-                    GenericAttribute inputValidationAttribute =
-                            getAttributeByName(
-                                    attributeList, "InputValidation", componentInstance.getName());
-                    GenericAttribute memoryProtectionAttribute =
-                            getAttributeByName(
-                                    attributeList, "MemoryProtection", componentInstance.getName());
-                    GenericAttribute secureBootAttribute =
-                            getAttributeByName(
-                                    attributeList, "SecureBoot", componentInstance.getName());
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        int staticCodeAnalysis =
+                                Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
 
-                    int staticCodeAnalysis =
-                            Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
+                        int inputValidation =
+                                Integer.parseInt(inputValidationAttribute.getValue().toString());
 
-                    int inputValidation =
-                            Integer.parseInt(inputValidationAttribute.getValue().toString());
+                        int memoryProtection =
+                                Integer.parseInt(memoryProtectionAttribute.getValue().toString());
 
-                    int memoryProtection =
-                            Integer.parseInt(memoryProtectionAttribute.getValue().toString());
+                        int secureBoot =
+                                Integer.parseInt(secureBootAttribute.getValue().toString());
 
-                    int secureBoot = Integer.parseInt(secureBootAttribute.getValue().toString());
+                        if (svComponentTypeSet.contains(componentKind.toLowerCase())
+                                && (staticCodeAnalysis == 0
+                                        || inputValidation == 0
+                                        || memoryProtection == 0
+                                        || secureBoot == 0)) {
 
-                    if (svComponentTypeSet.contains(componentKind.toLowerCase())
-                            && (staticCodeAnalysis == 0
-                                    || inputValidation == 0
-                                    || memoryProtection == 0
-                                    || secureBoot == 0)) {
+                            Boolean hasEligibleIncomingChannels = false;
 
-                        Boolean hasEligibleIncomingChannels = false;
+                            for (Port port : componentType.getPort()) {
 
-                        for (Port port : componentType.getPort()) {
+                                PortMode mode = port.getMode();
+                                if (mode == PortMode.IN) {
 
-                            PortMode mode = port.getMode();
-                            if (mode == PortMode.IN) {
+                                    for (Connection connection : blockImpl.getConnection()) {
 
-                                for (Connection connection : blockImpl.getConnection()) {
+                                        if (connection.getDestination().getSubcomponentPort()
+                                                != null) {
+                                            if (connection
+                                                            .getDestination()
+                                                            .getSubcomponentPort()
+                                                            .getPort()
+                                                    == port) {
 
-                                    if (connection.getDestination().getSubcomponentPort() != null) {
-                                        if (connection
-                                                        .getDestination()
-                                                        .getSubcomponentPort()
-                                                        .getPort()
-                                                == port) {
+                                                Boolean scInsideTrustedBoundary;
+                                                String scComponentKind;
+                                                String scPedigree;
+                                                int scStrongCryptoAlgorithms;
+                                                int scSupplyChainSecurity;
+                                                int scTamperProtection;
 
-                                            Boolean scInsideTrustedBoundary;
-                                            String scComponentKind;
-                                            String scPedigree;
-                                            int scStrongCryptoAlgorithms;
-                                            int scSupplyChainSecurity;
-                                            int scTamperProtection;
+                                                if (connection.getSource().getSubcomponentPort()
+                                                        != null) {
+                                                    ComponentInstance sourceComponent =
+                                                            connection
+                                                                    .getSource()
+                                                                    .getSubcomponentPort()
+                                                                    .getSubcomponent();
 
-                                            if (connection.getSource().getSubcomponentPort()
-                                                    != null) {
-                                                ComponentInstance sourceComponent =
-                                                        connection
-                                                                .getSource()
-                                                                .getSubcomponentPort()
-                                                                .getSubcomponent();
+                                                    List<GenericAttribute>
+                                                            sourceComponentAttributeList =
+                                                                    sourceComponent.getAttribute();
 
-                                                List<GenericAttribute>
-                                                        sourceComponentAttributeList =
-                                                                sourceComponent.getAttribute();
+                                                    GenericAttribute
+                                                            sourceComponentInsideTrustedBoundaryAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "InsideTrustedBoundary",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentComponentKindAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "ComponentType",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentPedigreeAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "Pedigree",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "StrongCryptoAlgorithms",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentSupplyChainSecurityAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "SupplyChainSecurity",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentTamperProtectionAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "TamperProtection",
+                                                                            sourceComponent
+                                                                                    .getName());
 
-                                                GenericAttribute
-                                                        sourceComponentInsideTrustedBoundaryAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "InsideTrustedBoundary",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentComponentKindAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "ComponentType",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute sourceComponentPedigreeAttribute =
+                                                    scInsideTrustedBoundary =
+                                                            Boolean.parseBoolean(
+                                                                    sourceComponentInsideTrustedBoundaryAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scComponentKind =
+                                                            sourceComponentComponentKindAttribute
+                                                                    .getValue()
+                                                                    .toString()
+                                                                    .toLowerCase();
+
+                                                    scPedigree =
+                                                            sourceComponentPedigreeAttribute
+                                                                    .getValue()
+                                                                    .toString()
+                                                                    .toLowerCase();
+
+                                                    scStrongCryptoAlgorithms =
+                                                            Integer.parseInt(
+                                                                    sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scSupplyChainSecurity =
+                                                            Integer.parseInt(
+                                                                    sourceComponentSupplyChainSecurityAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scTamperProtection =
+                                                            Integer.parseInt(
+                                                                    sourceComponentTamperProtectionAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                } else {
+                                                    scInsideTrustedBoundary = true;
+                                                    scComponentKind = "";
+                                                    scPedigree = "";
+                                                    scStrongCryptoAlgorithms = -1;
+                                                    scSupplyChainSecurity = -1;
+                                                    scTamperProtection = -1;
+                                                }
+
+                                                List<GenericAttribute> connectionAttributeList =
+                                                        connection.getAttribute();
+
+                                                GenericAttribute connectionTypeAttribute =
                                                         getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "Pedigree",
-                                                                sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentStrongCryptoAlgorithmsAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "StrongCryptoAlgorithms",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentSupplyChainSecurityAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "SupplyChainSecurity",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentTamperProtectionAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "TamperProtection",
-                                                                        sourceComponent.getName());
+                                                                connectionAttributeList,
+                                                                "ConnectionType",
+                                                                connection.getName());
+                                                GenericAttribute deviceAuthenticationAttribute =
+                                                        getAttributeByName(
+                                                                connectionAttributeList,
+                                                                "DeviceAuthentication",
+                                                                connection.getName());
+                                                GenericAttribute sessionAuthenticityAttribute =
+                                                        getAttributeByName(
+                                                                connectionAttributeList,
+                                                                "SessionAuthenticity",
+                                                                connection.getName());
 
-                                                scInsideTrustedBoundary =
-                                                        Boolean.parseBoolean(
-                                                                sourceComponentInsideTrustedBoundaryAttribute
-                                                                        .getValue()
-                                                                        .toString());
-
-                                                scComponentKind =
-                                                        sourceComponentComponentKindAttribute
+                                                String connectionType =
+                                                        connectionTypeAttribute
                                                                 .getValue()
                                                                 .toString()
                                                                 .toLowerCase();
 
-                                                scPedigree =
-                                                        sourceComponentPedigreeAttribute
-                                                                .getValue()
-                                                                .toString()
-                                                                .toLowerCase();
-
-                                                scStrongCryptoAlgorithms =
+                                                int deviceAuthentication =
                                                         Integer.parseInt(
-                                                                sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                deviceAuthenticationAttribute
                                                                         .getValue()
                                                                         .toString());
 
-                                                scSupplyChainSecurity =
+                                                int sessionAuthenticity =
                                                         Integer.parseInt(
-                                                                sourceComponentSupplyChainSecurityAttribute
+                                                                sessionAuthenticityAttribute
                                                                         .getValue()
                                                                         .toString());
 
-                                                scTamperProtection =
-                                                        Integer.parseInt(
-                                                                sourceComponentTamperProtectionAttribute
-                                                                        .getValue()
-                                                                        .toString());
+                                                if ((!scInsideTrustedBoundary
+                                                                || connectionType.equalsIgnoreCase(
+                                                                        "untrusted"))
+                                                        && !scComponentKind.equalsIgnoreCase(
+                                                                "hardware")
+                                                        && ((scPedigree.equalsIgnoreCase("cots")
+                                                                        || (scPedigree
+                                                                                        .equalsIgnoreCase(
+                                                                                                "sourced")
+                                                                                && scSupplyChainSecurity
+                                                                                        == 0
+                                                                                && scTamperProtection
+                                                                                        == 0))
+                                                                || ((deviceAuthentication == 0
+                                                                                && sessionAuthenticity
+                                                                                        == 0)
+                                                                        || scStrongCryptoAlgorithms
+                                                                                == 0))) {
 
-                                            } else {
-                                                scInsideTrustedBoundary = true;
-                                                scComponentKind = "";
-                                                scPedigree = "";
-                                                scStrongCryptoAlgorithms = -1;
-                                                scSupplyChainSecurity = -1;
-                                                scTamperProtection = -1;
+                                                    hasEligibleIncomingChannels = true;
+                                                }
+                                                break;
                                             }
-
-                                            List<GenericAttribute> connectionAttributeList =
-                                                    connection.getAttribute();
-
-                                            GenericAttribute connectionTypeAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "ConnectionType",
-                                                            connection.getName());
-                                            GenericAttribute deviceAuthenticationAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "DeviceAuthentication",
-                                                            connection.getName());
-                                            GenericAttribute sessionAuthenticityAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "SessionAuthenticity",
-                                                            connection.getName());
-
-                                            String connectionType =
-                                                    connectionTypeAttribute
-                                                            .getValue()
-                                                            .toString()
-                                                            .toLowerCase();
-
-                                            int deviceAuthentication =
-                                                    Integer.parseInt(
-                                                            deviceAuthenticationAttribute
-                                                                    .getValue()
-                                                                    .toString());
-
-                                            int sessionAuthenticity =
-                                                    Integer.parseInt(
-                                                            sessionAuthenticityAttribute
-                                                                    .getValue()
-                                                                    .toString());
-
-                                            if ((!scInsideTrustedBoundary
-                                                            || connectionType.equalsIgnoreCase(
-                                                                    "untrusted"))
-                                                    && !scComponentKind.equalsIgnoreCase("hardware")
-                                                    && ((scPedigree.equalsIgnoreCase("cots")
-                                                                    || (scPedigree.equalsIgnoreCase(
-                                                                                    "sourced")
-                                                                            && scSupplyChainSecurity
-                                                                                    == 0
-                                                                            && scTamperProtection
-                                                                                    == 0))
-                                                            || ((deviceAuthentication == 0
-                                                                            && sessionAuthenticity
-                                                                                    == 0)
-                                                                    || scStrongCryptoAlgorithms
-                                                                            == 0))) {
-
-                                                hasEligibleIncomingChannels = true;
-                                            }
-                                            break;
                                         }
                                     }
+                                }
+
+                                if (hasEligibleIncomingChannels) {
+                                    break;
                                 }
                             }
 
                             if (hasEligibleIncomingChannels) {
-                                break;
+                                vdm_components.add(componentType);
+                                components.add(componentType.getId());
                             }
-                        }
-
-                        if (hasEligibleIncomingChannels) {
-                            vdm_components.add(componentType);
-                            components.add(componentType.getId());
                         }
                     }
                 }
             }
+
+            this.attack_cmp_link_map.put("SV", components);
+
+        } catch (CRVException e) {
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
-
-        this.attack_cmp_link_map.put("SV", components);
-
-        //		return components;
     }
 
     // Remote Code Injection:
@@ -865,268 +902,286 @@ public class Instrumentor extends VDMInstrumentor {
     // Remote
     @Override
     public void remoteCodeInjection(HashSet<ComponentType> vdm_components) {
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> components = new HashSet<String>();
+            HashSet<String> rciComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
 
-        HashSet<String> rciComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("software", "swhwhybrid", "swhumanhybrid", "hybrid"));
+            BlockImpl blockImpl = null;
 
-        BlockImpl blockImpl = null;
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+                blockImpl = componentImpl.getBlockImpl();
 
-            blockImpl = componentImpl.getBlockImpl();
+                // BlockImpl
+                if (blockImpl != null) {
 
-            // BlockImpl
-            if (blockImpl != null) {
+                    ComponentType componentType = componentImpl.getType();
 
-                ComponentType componentType = componentImpl.getType();
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                        componentType = componentInstance.getSpecification();
+                        ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                    componentType = componentInstance.getSpecification();
-                    ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+                        // Option 1) Specification
+                        if (componentType != null) {
 
-                    // Option 1) Specification
-                    if (componentType != null) {
+                        }
+                        // Option 2) Implementation
+                        else if (subcomponentImpl != null) {
 
-                    }
-                    // Option 2) Implementation
-                    else if (subcomponentImpl != null) {
+                            componentType = subcomponentImpl.getType();
+                        }
 
-                        componentType = subcomponentImpl.getType();
-                    }
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute staticCodeAnalysisAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "StaticCodeAnalysis",
+                                        componentInstance.getName());
+                        GenericAttribute inputValidationAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "InputValidation",
+                                        componentInstance.getName());
+                        GenericAttribute memoryProtectionAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "MemoryProtection",
+                                        componentInstance.getName());
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute staticCodeAnalysisAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "StaticCodeAnalysis",
-                                    componentInstance.getName());
-                    GenericAttribute inputValidationAttribute =
-                            getAttributeByName(
-                                    attributeList, "InputValidation", componentInstance.getName());
-                    GenericAttribute memoryProtectionAttribute =
-                            getAttributeByName(
-                                    attributeList, "MemoryProtection", componentInstance.getName());
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        int staticCodeAnalysis =
+                                Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
 
-                    int staticCodeAnalysis =
-                            Integer.parseInt(staticCodeAnalysisAttribute.getValue().toString());
+                        int inputValidation =
+                                Integer.parseInt(inputValidationAttribute.getValue().toString());
 
-                    int inputValidation =
-                            Integer.parseInt(inputValidationAttribute.getValue().toString());
+                        int memoryProtection =
+                                Integer.parseInt(memoryProtectionAttribute.getValue().toString());
 
-                    int memoryProtection =
-                            Integer.parseInt(memoryProtectionAttribute.getValue().toString());
+                        if (rciComponentTypeSet.contains(componentKind.toLowerCase())
+                                && (staticCodeAnalysis == 0
+                                        || inputValidation == 0
+                                        || memoryProtection == 0)) {
 
-                    if (rciComponentTypeSet.contains(componentKind.toLowerCase())
-                            && (staticCodeAnalysis == 0
-                                    || inputValidation == 0
-                                    || memoryProtection == 0)) {
+                            Boolean hasEligibleIncomingChannels = false;
 
-                        Boolean hasEligibleIncomingChannels = false;
+                            for (Port port : componentType.getPort()) {
 
-                        for (Port port : componentType.getPort()) {
+                                PortMode mode = port.getMode();
+                                if (mode == PortMode.IN) {
 
-                            PortMode mode = port.getMode();
-                            if (mode == PortMode.IN) {
+                                    for (Connection connection : blockImpl.getConnection()) {
 
-                                for (Connection connection : blockImpl.getConnection()) {
+                                        if (connection.getDestination().getSubcomponentPort()
+                                                != null) {
+                                            if (connection
+                                                            .getDestination()
+                                                            .getSubcomponentPort()
+                                                            .getPort()
+                                                    == port) {
 
-                                    if (connection.getDestination().getSubcomponentPort() != null) {
-                                        if (connection
-                                                        .getDestination()
-                                                        .getSubcomponentPort()
-                                                        .getPort()
-                                                == port) {
+                                                Boolean scInsideTrustedBoundary;
+                                                String scComponentKind;
+                                                String scPedigree;
+                                                int scStrongCryptoAlgorithms;
+                                                int scSupplyChainSecurity;
+                                                int scTamperProtection;
 
-                                            Boolean scInsideTrustedBoundary;
-                                            String scComponentKind;
-                                            String scPedigree;
-                                            int scStrongCryptoAlgorithms;
-                                            int scSupplyChainSecurity;
-                                            int scTamperProtection;
+                                                if (connection.getSource().getSubcomponentPort()
+                                                        != null) {
+                                                    ComponentInstance sourceComponent =
+                                                            connection
+                                                                    .getSource()
+                                                                    .getSubcomponentPort()
+                                                                    .getSubcomponent();
 
-                                            if (connection.getSource().getSubcomponentPort()
-                                                    != null) {
-                                                ComponentInstance sourceComponent =
-                                                        connection
-                                                                .getSource()
-                                                                .getSubcomponentPort()
-                                                                .getSubcomponent();
+                                                    List<GenericAttribute>
+                                                            sourceComponentAttributeList =
+                                                                    sourceComponent.getAttribute();
 
-                                                List<GenericAttribute>
-                                                        sourceComponentAttributeList =
-                                                                sourceComponent.getAttribute();
+                                                    GenericAttribute
+                                                            sourceComponentInsideTrustedBoundaryAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "InsideTrustedBoundary",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentComponentKindAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "ComponentType",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentPedigreeAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "Pedigree",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentStrongCryptoAlgorithmsAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "StrongCryptoAlgorithms",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentSupplyChainSecurityAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "SupplyChainSecurity",
+                                                                            sourceComponent
+                                                                                    .getName());
+                                                    GenericAttribute
+                                                            sourceComponentTamperProtectionAttribute =
+                                                                    getAttributeByName(
+                                                                            sourceComponentAttributeList,
+                                                                            "TamperProtection",
+                                                                            sourceComponent
+                                                                                    .getName());
 
-                                                GenericAttribute
-                                                        sourceComponentInsideTrustedBoundaryAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "InsideTrustedBoundary",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentComponentKindAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "ComponentType",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute sourceComponentPedigreeAttribute =
+                                                    scInsideTrustedBoundary =
+                                                            Boolean.parseBoolean(
+                                                                    sourceComponentInsideTrustedBoundaryAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scComponentKind =
+                                                            sourceComponentComponentKindAttribute
+                                                                    .getValue()
+                                                                    .toString()
+                                                                    .toLowerCase();
+
+                                                    scPedigree =
+                                                            sourceComponentPedigreeAttribute
+                                                                    .getValue()
+                                                                    .toString()
+                                                                    .toLowerCase();
+
+                                                    scStrongCryptoAlgorithms =
+                                                            Integer.parseInt(
+                                                                    sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scSupplyChainSecurity =
+                                                            Integer.parseInt(
+                                                                    sourceComponentSupplyChainSecurityAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                    scTamperProtection =
+                                                            Integer.parseInt(
+                                                                    sourceComponentTamperProtectionAttribute
+                                                                            .getValue()
+                                                                            .toString());
+
+                                                } else {
+                                                    scInsideTrustedBoundary = true;
+                                                    scComponentKind = "";
+                                                    scPedigree = "";
+                                                    scStrongCryptoAlgorithms = -1;
+                                                    scSupplyChainSecurity = -1;
+                                                    scTamperProtection = -1;
+                                                }
+
+                                                List<GenericAttribute> connectionAttributeList =
+                                                        connection.getAttribute();
+
+                                                GenericAttribute connectionTypeAttribute =
                                                         getAttributeByName(
-                                                                sourceComponentAttributeList,
-                                                                "Pedigree",
-                                                                sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentStrongCryptoAlgorithmsAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "StrongCryptoAlgorithms",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentSupplyChainSecurityAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "SupplyChainSecurity",
-                                                                        sourceComponent.getName());
-                                                GenericAttribute
-                                                        sourceComponentTamperProtectionAttribute =
-                                                                getAttributeByName(
-                                                                        sourceComponentAttributeList,
-                                                                        "TamperProtection",
-                                                                        sourceComponent.getName());
+                                                                connectionAttributeList,
+                                                                "ConnectionType",
+                                                                connection.getName());
+                                                GenericAttribute deviceAuthenticationAttribute =
+                                                        getAttributeByName(
+                                                                connectionAttributeList,
+                                                                "DeviceAuthentication",
+                                                                connection.getName());
+                                                GenericAttribute sessionAuthenticityAttribute =
+                                                        getAttributeByName(
+                                                                connectionAttributeList,
+                                                                "SessionAuthenticity",
+                                                                connection.getName());
 
-                                                scInsideTrustedBoundary =
-                                                        Boolean.parseBoolean(
-                                                                sourceComponentInsideTrustedBoundaryAttribute
-                                                                        .getValue()
-                                                                        .toString());
-
-                                                scComponentKind =
-                                                        sourceComponentComponentKindAttribute
+                                                String connectionType =
+                                                        connectionTypeAttribute
                                                                 .getValue()
                                                                 .toString()
                                                                 .toLowerCase();
 
-                                                scPedigree =
-                                                        sourceComponentPedigreeAttribute
-                                                                .getValue()
-                                                                .toString()
-                                                                .toLowerCase();
-
-                                                scStrongCryptoAlgorithms =
+                                                int deviceAuthentication =
                                                         Integer.parseInt(
-                                                                sourceComponentStrongCryptoAlgorithmsAttribute
+                                                                deviceAuthenticationAttribute
                                                                         .getValue()
                                                                         .toString());
 
-                                                scSupplyChainSecurity =
+                                                int sessionAuthenticity =
                                                         Integer.parseInt(
-                                                                sourceComponentSupplyChainSecurityAttribute
+                                                                sessionAuthenticityAttribute
                                                                         .getValue()
                                                                         .toString());
 
-                                                scTamperProtection =
-                                                        Integer.parseInt(
-                                                                sourceComponentTamperProtectionAttribute
-                                                                        .getValue()
-                                                                        .toString());
+                                                if ((!scInsideTrustedBoundary
+                                                                || connectionType.equalsIgnoreCase(
+                                                                        "untrusted"))
+                                                        && !scComponentKind.equalsIgnoreCase(
+                                                                "hardware")
+                                                        && ((scPedigree.equalsIgnoreCase("cots")
+                                                                        || (scPedigree
+                                                                                        .equalsIgnoreCase(
+                                                                                                "sourced")
+                                                                                && scSupplyChainSecurity
+                                                                                        == 0
+                                                                                && scTamperProtection
+                                                                                        == 0))
+                                                                || ((deviceAuthentication == 0
+                                                                                && sessionAuthenticity
+                                                                                        == 0)
+                                                                        || scStrongCryptoAlgorithms
+                                                                                == 0))) {
 
-                                            } else {
-                                                scInsideTrustedBoundary = true;
-                                                scComponentKind = "";
-                                                scPedigree = "";
-                                                scStrongCryptoAlgorithms = -1;
-                                                scSupplyChainSecurity = -1;
-                                                scTamperProtection = -1;
+                                                    hasEligibleIncomingChannels = true;
+                                                }
+                                                break;
                                             }
-
-                                            List<GenericAttribute> connectionAttributeList =
-                                                    connection.getAttribute();
-
-                                            GenericAttribute connectionTypeAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "ConnectionType",
-                                                            connection.getName());
-                                            GenericAttribute deviceAuthenticationAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "DeviceAuthentication",
-                                                            connection.getName());
-                                            GenericAttribute sessionAuthenticityAttribute =
-                                                    getAttributeByName(
-                                                            connectionAttributeList,
-                                                            "SessionAuthenticity",
-                                                            connection.getName());
-
-                                            String connectionType =
-                                                    connectionTypeAttribute
-                                                            .getValue()
-                                                            .toString()
-                                                            .toLowerCase();
-
-                                            int deviceAuthentication =
-                                                    Integer.parseInt(
-                                                            deviceAuthenticationAttribute
-                                                                    .getValue()
-                                                                    .toString());
-
-                                            int sessionAuthenticity =
-                                                    Integer.parseInt(
-                                                            sessionAuthenticityAttribute
-                                                                    .getValue()
-                                                                    .toString());
-
-                                            if ((!scInsideTrustedBoundary
-                                                            || connectionType.equalsIgnoreCase(
-                                                                    "untrusted"))
-                                                    && !scComponentKind.equalsIgnoreCase("hardware")
-                                                    && ((scPedigree.equalsIgnoreCase("cots")
-                                                                    || (scPedigree.equalsIgnoreCase(
-                                                                                    "sourced")
-                                                                            && scSupplyChainSecurity
-                                                                                    == 0
-                                                                            && scTamperProtection
-                                                                                    == 0))
-                                                            || ((deviceAuthentication == 0
-                                                                            && sessionAuthenticity
-                                                                                    == 0)
-                                                                    || scStrongCryptoAlgorithms
-                                                                            == 0))) {
-
-                                                hasEligibleIncomingChannels = true;
-                                            }
-                                            break;
                                         }
                                     }
+                                }
+
+                                if (hasEligibleIncomingChannels) {
+                                    break;
                                 }
                             }
 
                             if (hasEligibleIncomingChannels) {
-                                break;
+                                vdm_components.add(componentType);
+                                components.add(componentType.getId());
                             }
-                        }
-
-                        if (hasEligibleIncomingChannels) {
-                            vdm_components.add(componentType);
-                            components.add(componentType.getId());
                         }
                     }
                 }
             }
+
+            this.attack_cmp_link_map.put("RI", components);
+
+        } catch (CRVException e) {
+            System.out.println("CRV Error " + e.getCode() + e.getMessage());
         }
-
-        this.attack_cmp_link_map.put("RI", components);
-
-        //		return components;
     }
 
     // HT
@@ -1138,84 +1193,92 @@ public class Instrumentor extends VDMInstrumentor {
     @Override
     public void hardwareTrojan(HashSet<ComponentType> vdm_components) {
 
-        HashSet<String> components = new HashSet<String>();
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> htComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("hardware", "swhwhybrid", "hwhumanhybrid", "hybrid"));
+            HashSet<String> htComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("hardware", "swhwhybrid", "hwhumanhybrid", "hybrid"));
 
-        BlockImpl blockImpl = null;
+            BlockImpl blockImpl = null;
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-            blockImpl = componentImpl.getBlockImpl();
+                blockImpl = componentImpl.getBlockImpl();
 
-            // BlockImpl
-            if (blockImpl != null) {
+                // BlockImpl
+                if (blockImpl != null) {
 
-                ComponentType componentType = componentImpl.getType();
+                    ComponentType componentType = componentImpl.getType();
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    componentType = getType(componentInstance);
+                        componentType = getType(componentInstance);
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "AdversariallyTestedForTrojanOrLogicBomb",
-                                    componentInstance.getName());
-                    GenericAttribute pedigreeAttribute =
-                            getAttributeByName(
-                                    attributeList, "Pedigree", componentInstance.getName());
-                    GenericAttribute supplyChainSecurityAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "SupplyChainSecurity",
-                                    componentInstance.getName());
-                    GenericAttribute tamperProtectionAttribute =
-                            getAttributeByName(
-                                    attributeList, "TamperProtection", componentInstance.getName());
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute adversariallyTestedForTrojanOrLogicBombAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "AdversariallyTestedForTrojanOrLogicBomb",
+                                        componentInstance.getName());
+                        GenericAttribute pedigreeAttribute =
+                                getAttributeByName(
+                                        attributeList, "Pedigree", componentInstance.getName());
+                        GenericAttribute supplyChainSecurityAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "SupplyChainSecurity",
+                                        componentInstance.getName());
+                        GenericAttribute tamperProtectionAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "TamperProtection",
+                                        componentInstance.getName());
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    int adversariallyTestedForTrojanOrLogicBomb =
-                            Integer.parseInt(
-                                    adversariallyTestedForTrojanOrLogicBombAttribute
-                                            .getValue()
-                                            .toString());
+                        int adversariallyTestedForTrojanOrLogicBomb =
+                                Integer.parseInt(
+                                        adversariallyTestedForTrojanOrLogicBombAttribute
+                                                .getValue()
+                                                .toString());
 
-                    String pedigree = pedigreeAttribute.getValue().toString().toLowerCase();
+                        String pedigree = pedigreeAttribute.getValue().toString().toLowerCase();
 
-                    int supplyChainSecurity =
-                            Integer.parseInt(supplyChainSecurityAttribute.getValue().toString());
+                        int supplyChainSecurity =
+                                Integer.parseInt(
+                                        supplyChainSecurityAttribute.getValue().toString());
 
-                    int tamperProtection =
-                            Integer.parseInt(tamperProtectionAttribute.getValue().toString());
+                        int tamperProtection =
+                                Integer.parseInt(tamperProtectionAttribute.getValue().toString());
 
-                    if (htComponentTypeSet.contains(componentKind)
-                            && adversariallyTestedForTrojanOrLogicBomb == 0
-                            && (pedigree.equalsIgnoreCase("cots")
-                                    || (pedigree.equalsIgnoreCase("sourced")
-                                            && supplyChainSecurity == 0
-                                            && tamperProtection == 0))) {
-                        // Store component
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
-                        // instrument_component(componentType, blockImpl);
+                        if (htComponentTypeSet.contains(componentKind)
+                                && adversariallyTestedForTrojanOrLogicBomb == 0
+                                && (pedigree.equalsIgnoreCase("cots")
+                                        || (pedigree.equalsIgnoreCase("sourced")
+                                                && supplyChainSecurity == 0
+                                                && tamperProtection == 0))) {
+                            // Store component
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
+                            // instrument_component(componentType, blockImpl);
+                        }
                     }
                 }
             }
+
+            this.attack_cmp_link_map.put("HT", components);
+
+        } catch (CRVException e) {
+        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
-
-        this.attack_cmp_link_map.put("HT", components);
-
-        //		return components;
     }
 
     // OT
@@ -1225,91 +1288,99 @@ public class Instrumentor extends VDMInstrumentor {
     // and (c.logging = 0 and (c.systemAccessControl = 0 and c.userAuthentication = 0))
     @Override
     public void outsiderThreat(HashSet<ComponentType> vdm_components) {
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> components = new HashSet<String>();
+            HashSet<String> otComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
 
-        HashSet<String> otComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+            BlockImpl blockImpl = null;
 
-        BlockImpl blockImpl = null;
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+                blockImpl = componentImpl.getBlockImpl();
 
-            blockImpl = componentImpl.getBlockImpl();
+                // BlockImpl
+                if (blockImpl != null) {
 
-            // BlockImpl
-            if (blockImpl != null) {
+                    ComponentType componentType = componentImpl.getType();
 
-                ComponentType componentType = componentImpl.getType();
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                        componentType = getType(componentInstance);
 
-                    componentType = getType(componentInstance);
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute insideTrustedBoundaryAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "InsideTrustedBoundary",
+                                        componentInstance.getName());
+                        GenericAttribute physicalAccessControlAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "PhysicalAccessControl",
+                                        componentInstance.getName());
+                        GenericAttribute loggingAttribute =
+                                getAttributeByName(
+                                        attributeList, "Logging", componentInstance.getName());
+                        GenericAttribute systemAccessControlAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "SystemAccessControl",
+                                        componentInstance.getName());
+                        GenericAttribute userAuthenticationAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "UserAuthentication",
+                                        componentInstance.getName());
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute insideTrustedBoundaryAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "InsideTrustedBoundary",
-                                    componentInstance.getName());
-                    GenericAttribute physicalAccessControlAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "PhysicalAccessControl",
-                                    componentInstance.getName());
-                    GenericAttribute loggingAttribute =
-                            getAttributeByName(
-                                    attributeList, "Logging", componentInstance.getName());
-                    GenericAttribute systemAccessControlAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "SystemAccessControl",
-                                    componentInstance.getName());
-                    GenericAttribute userAuthenticationAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "UserAuthentication",
-                                    componentInstance.getName());
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        Boolean insideTrustedBoundary =
+                                Boolean.parseBoolean(
+                                        insideTrustedBoundaryAttribute.getValue().toString());
 
-                    Boolean insideTrustedBoundary =
-                            Boolean.parseBoolean(
-                                    insideTrustedBoundaryAttribute.getValue().toString());
+                        int physicalAccessControl =
+                                Integer.parseInt(
+                                        physicalAccessControlAttribute.getValue().toString());
 
-                    int physicalAccessControl =
-                            Integer.parseInt(physicalAccessControlAttribute.getValue().toString());
+                        int logging = Integer.parseInt(loggingAttribute.getValue().toString());
 
-                    int logging = Integer.parseInt(loggingAttribute.getValue().toString());
+                        int systemAccessControl =
+                                Integer.parseInt(
+                                        systemAccessControlAttribute.getValue().toString());
 
-                    int systemAccessControl =
-                            Integer.parseInt(systemAccessControlAttribute.getValue().toString());
+                        int userAuthentication =
+                                Integer.parseInt(userAuthenticationAttribute.getValue().toString());
 
-                    int userAuthentication =
-                            Integer.parseInt(userAuthenticationAttribute.getValue().toString());
+                        if (otComponentTypeSet.contains(componentKind)
+                                && !insideTrustedBoundary
+                                && physicalAccessControl == 0
+                                && (logging == 0
+                                        && (systemAccessControl == 0 || userAuthentication == 0))) {
+                            // Store component
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
 
-                    if (otComponentTypeSet.contains(componentKind)
-                            && !insideTrustedBoundary
-                            && physicalAccessControl == 0
-                            && (logging == 0
-                                    && (systemAccessControl == 0 || userAuthentication == 0))) {
-                        // Store component
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
-
-                        // instrument_component(componentType, blockImpl);
+                            // instrument_component(componentType, blockImpl);
+                        }
                     }
                 }
             }
-        }
 
-        this.attack_cmp_link_map.put("OT", components);
+            this.attack_cmp_link_map.put("OT", components);
+
+        } catch (CRVException e) {
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+        }
     }
 
     // IT
@@ -1320,79 +1391,87 @@ public class Instrumentor extends VDMInstrumentor {
     @Override
     public void insiderThreat(HashSet<ComponentType> vdm_components) {
 
-        HashSet<String> components = new HashSet<String>();
+        try {
+            HashSet<String> components = new HashSet<String>();
 
-        HashSet<String> itComponentTypeSet =
-                new HashSet<String>(
-                        Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
+            HashSet<String> itComponentTypeSet =
+                    new HashSet<String>(
+                            Arrays.asList("human", "swhumanhybrid", "hwhumanhybrid", "hybrid"));
 
-        BlockImpl blockImpl = null;
+            BlockImpl blockImpl = null;
 
-        for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-            blockImpl = componentImpl.getBlockImpl();
+                blockImpl = componentImpl.getBlockImpl();
 
-            // BlockImpl
-            if (blockImpl != null) {
+                // BlockImpl
+                if (blockImpl != null) {
 
-                ComponentType componentType = componentImpl.getType();
+                    ComponentType componentType = componentImpl.getType();
 
-                for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+                    for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                    componentType = getType(componentInstance);
+                        componentType = getType(componentInstance);
 
-                    List<GenericAttribute> attributeList = componentInstance.getAttribute();
+                        List<GenericAttribute> attributeList = componentInstance.getAttribute();
 
-                    GenericAttribute componentKindAttribute =
-                            getAttributeByName(
-                                    attributeList, "ComponentType", componentInstance.getName());
-                    GenericAttribute insideTrustedBoundaryAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "InsideTrustedBoundary",
-                                    componentInstance.getName());
-                    GenericAttribute loggingAttribute =
-                            getAttributeByName(
-                                    attributeList, "Logging", componentInstance.getName());
-                    GenericAttribute systemAccessControlAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "SystemAccessControl",
-                                    componentInstance.getName());
-                    GenericAttribute userAuthenticationAttribute =
-                            getAttributeByName(
-                                    attributeList,
-                                    "UserAuthentication",
-                                    componentInstance.getName());
+                        GenericAttribute componentKindAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "ComponentType",
+                                        componentInstance.getName());
+                        GenericAttribute insideTrustedBoundaryAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "InsideTrustedBoundary",
+                                        componentInstance.getName());
+                        GenericAttribute loggingAttribute =
+                                getAttributeByName(
+                                        attributeList, "Logging", componentInstance.getName());
+                        GenericAttribute systemAccessControlAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "SystemAccessControl",
+                                        componentInstance.getName());
+                        GenericAttribute userAuthenticationAttribute =
+                                getAttributeByName(
+                                        attributeList,
+                                        "UserAuthentication",
+                                        componentInstance.getName());
 
-                    String componentKind =
-                            componentKindAttribute.getValue().toString().toLowerCase();
+                        String componentKind =
+                                componentKindAttribute.getValue().toString().toLowerCase();
 
-                    Boolean insideTrustedBoundary =
-                            Boolean.parseBoolean(
-                                    insideTrustedBoundaryAttribute.getValue().toString());
+                        Boolean insideTrustedBoundary =
+                                Boolean.parseBoolean(
+                                        insideTrustedBoundaryAttribute.getValue().toString());
 
-                    int logging = Integer.parseInt(loggingAttribute.getValue().toString());
+                        int logging = Integer.parseInt(loggingAttribute.getValue().toString());
 
-                    int systemAccessControl =
-                            Integer.parseInt(systemAccessControlAttribute.getValue().toString());
+                        int systemAccessControl =
+                                Integer.parseInt(
+                                        systemAccessControlAttribute.getValue().toString());
 
-                    int userAuthentication =
-                            Integer.parseInt(userAuthenticationAttribute.getValue().toString());
+                        int userAuthentication =
+                                Integer.parseInt(userAuthenticationAttribute.getValue().toString());
 
-                    if (itComponentTypeSet.contains(componentKind)
-                            && insideTrustedBoundary
-                            && (logging == 0
-                                    && (systemAccessControl == 0 || userAuthentication == 0))) {
-                        // Store component
-                        vdm_components.add(componentType);
-                        components.add(componentType.getId());
-                        // instrument_component(componentType, blockImpl);
+                        if (itComponentTypeSet.contains(componentKind)
+                                && insideTrustedBoundary
+                                && (logging == 0
+                                        && (systemAccessControl == 0 || userAuthentication == 0))) {
+                            // Store component
+                            vdm_components.add(componentType);
+                            components.add(componentType.getId());
+                            // instrument_component(componentType, blockImpl);
+                        }
                     }
                 }
             }
-        }
 
-        this.attack_cmp_link_map.put("IT", components);
+            this.attack_cmp_link_map.put("IT", components);
+
+        } catch (CRVException e) {
+        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+        }
     }
 }

@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import verdict.vdm.vdm_data.DataType;
-import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_lustre.BinaryOperation;
 import verdict.vdm.vdm_lustre.ConstantDeclaration;
@@ -175,35 +174,11 @@ public class VDMInstrumentor {
             }
 
             if (dstPort.isProbe()) {
-//                System.out.println(
-//                        "Snoozing Probe Port "
-//                                + dstPort.getName()
-//                                + " in connection "
-//                                + con.getName());
                 return true;
             }
         }
 
         return false;
-    }
-
-    protected GenericAttribute getAttributeByName(
-            List<GenericAttribute> genericAttributes, String attributeName, String id) {
-        GenericAttribute genericAttribute = null;
-
-        for (GenericAttribute attribute : genericAttributes) {
-            if (attributeName.equalsIgnoreCase(attribute.getName())) {
-                genericAttribute = attribute;
-                break;
-            }
-        }
-
-        if (genericAttribute == null) {
-            throw new NullPointerException(
-                    "There is no <" + attributeName + "> attribute for <" + id + "> element.");
-        } else {
-            return genericAttribute;
-        }
     }
 
     protected void retrieve_component_and_channels(
@@ -254,7 +229,7 @@ public class VDMInstrumentor {
                 Iterator<Connection> it = vdm_links.iterator();
                 while (it.hasNext()) {
                     Connection con = it.next();
-                    if (isSourceComponent(con) || isProbePort(con) ) {
+                    if (isSourceComponent(con) || isProbePort(con)) {
                         it.remove();
                     }
                 }
@@ -294,11 +269,11 @@ public class VDMInstrumentor {
                 //                }
 
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
-                
-                for(Connection link_con: vdm_cmp_links) {
-                	if (!isProbePort(link_con)) {
-                		vdm_links.add(link_con);
-                	}
+
+                for (Connection link_con : vdm_cmp_links) {
+                    if (!isProbePort(link_con)) {
+                        vdm_links.add(link_con);
+                    }
                 }
 
                 components_map.put(component.getId(), vdm_cmp_links);
