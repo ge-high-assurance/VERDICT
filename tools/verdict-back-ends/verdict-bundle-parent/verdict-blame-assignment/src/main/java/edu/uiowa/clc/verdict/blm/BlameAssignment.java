@@ -144,8 +144,9 @@ public class BlameAssignment {
                         //                        System.out.println("+++> LinkID --> :" +
                         // link.getLinkID());
                         if (link.isCompromised()) {
+                        	
                             Attack attack =
-                                    applicableAttack(link.getLinkID(), intrumented_cmp_link);
+                                    applicableAttack(link_to_port(link.getLinkID()), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
                             if (attack.getAttackId() != null) {
@@ -186,7 +187,7 @@ public class BlameAssignment {
             for (WeakAssumption wk : wk_assumptions) {
                 Link link = new Link();
 
-                link.setLinkID(link_to_port(wk.getwId()));
+                link.setLinkID(wk.getwId());
                 boolean c_status = !wk.getStatus();
                 link.setCompromised(c_status);
                 mina.getLinks().add(link);
@@ -203,7 +204,7 @@ public class BlameAssignment {
 
         //        System.out.println("Matching ID: " + cmp_link_id);
         for (String attack_id : intrumented_cmp_link.keySet()) {
-
+        	
             HashSet<String> comps_links = intrumented_cmp_link.get(attack_id);
 
             //            System.out.println("Attack ID: " + cmp_link_id);
