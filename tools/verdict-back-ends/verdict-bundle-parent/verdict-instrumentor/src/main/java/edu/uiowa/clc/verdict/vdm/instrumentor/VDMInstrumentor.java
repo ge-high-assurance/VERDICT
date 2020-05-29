@@ -109,8 +109,18 @@ public class VDMInstrumentor {
 
         String ComponentID = null;
 
-        if (components_map.isEmpty()) {
-            ConnectionEnd conDest = con.getSource();
+    	for (String cmpID : components_map.keySet()) {
+	        HashSet<Connection> con_set = components_map.get(cmpID);
+	
+	        if (con_set.contains(con)) {
+	            ComponentID = cmpID;
+	            break;
+	        }
+	    }
+    	
+    	if(ComponentID == null){
+
+    		ConnectionEnd conDest = con.getSource();
             Port dest_port = conDest.getComponentPort();
 
             if (dest_port != null) {
@@ -123,21 +133,12 @@ public class VDMInstrumentor {
                 ComponentInstance c = compInstance.getSubcomponent();
                 ComponentID = c.getId();
             }
-
-        } else {
-		    for (String cmpID : components_map.keySet()) {
-		        HashSet<Connection> con_set = components_map.get(cmpID);
-		
-		        if (con_set.contains(con)) {
-		            ComponentID = cmpID;
-		            break;
-		        }
-		    }
-        }
+    		
+    	}
 
         return ComponentID;
     }
-
+    
     protected BlockImpl getBlockID(String componentID) {
 
         BlockImpl blockImpl = null;
