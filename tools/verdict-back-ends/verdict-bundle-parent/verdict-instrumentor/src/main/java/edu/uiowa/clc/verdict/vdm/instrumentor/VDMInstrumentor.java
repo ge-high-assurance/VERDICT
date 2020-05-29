@@ -254,7 +254,7 @@ public class VDMInstrumentor {
                 Iterator<Connection> it = vdm_links.iterator();
                 while (it.hasNext()) {
                     Connection con = it.next();
-                    if (isSourceComponent(con)) {
+                    if (isSourceComponent(con) || isProbePort(con) ) {
                         it.remove();
                     }
                 }
@@ -294,7 +294,12 @@ public class VDMInstrumentor {
                 //                }
 
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
-                vdm_links.addAll(vdm_cmp_links);
+                
+                for(Connection link_con: vdm_cmp_links) {
+                	if (!isProbePort(link_con)) {
+                		vdm_links.add(link_con);
+                	}
+                }
 
                 components_map.put(component.getId(), vdm_cmp_links);
                 // if (component.getName().equals("GPS")) {}
@@ -344,15 +349,15 @@ public class VDMInstrumentor {
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-                    
+
                 } else {
-                	// Handle 'NI' as Special Case. 
+                    // Handle 'NI' as Special Case.
                     ConnectionEnd conDest = connection.getSource();
                     Port dest_port = conDest.getComponentPort();
 
                     if (dest_port != null) {
 
-                    	cmpID = dest_port.getId();
+                        cmpID = dest_port.getId();
 
                     } else {
                         CompInstancePort compInstance = conDest.getSubcomponentPort();
@@ -368,11 +373,10 @@ public class VDMInstrumentor {
                     global_constants.add(constant);
 
                     connections_map.put(connection, constant);
-
                 }
             }
-        } 
-        
+        }
+
         // Declare Global Constants
         for (String comp_id : global_constants) {
 

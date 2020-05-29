@@ -221,7 +221,9 @@ public class Instrumentor extends VDMInstrumentor {
         if (this.attack_cmp_link_map.containsKey(attack_type)) {
             HashSet<String> cmp_links = this.attack_cmp_link_map.get(attack_type);
             for (Connection con : vdm_links) {
-                cmp_links.addAll(get_ports(con));
+            	if(!isProbePort(con)) {
+            		cmp_links.addAll(get_ports(con));
+            	}
             }
         }
         //        System.out.println(links);
@@ -418,7 +420,9 @@ public class Instrumentor extends VDMInstrumentor {
         }
 
         for (Connection con : vdm_links) {
-            links.addAll(get_ports(con));
+        	if(!isProbePort(con)){
+        		links.addAll(get_ports(con));
+        	}
         }
         this.attack_cmp_link_map.put("NI", links);
 
