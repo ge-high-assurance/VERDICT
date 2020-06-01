@@ -1,0 +1,471 @@
+package CASE_Toy
+public
+	with Base_Types;
+	with Data_Model;
+	with VERDICT_Properties;
+	
+	data Position
+	end Position;
+
+	data implementation Position.impl
+		subcomponents
+			latitude: data Base_Types::Float;
+			longitude: data Base_Types::Float;
+	end Position.impl;
+
+	data PositionEvent
+	end PositionEvent;
+	
+	data implementation PositionEvent.impl
+		subcomponents
+			is_present: data Base_Types::Boolean;
+			value: data Position.impl;
+	end PositionEvent.impl;
+
+	data SatelliteConstellation
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("GPS", "Galileo");
+	end SatelliteConstellation;
+
+	data SatelliteSignals
+	end SatelliteSignals;
+
+	data implementation SatelliteSignals.impl
+		subcomponents
+			gps_sig: data Position.impl;
+			galileo_sig: data Position.impl;
+	end SatelliteSignals.impl;
+
+	data Status
+		properties
+			Data_Model::Data_Representation => Enum;
+			Data_Model::Enumerators => ("Confirmed", "Unconfirmed");
+	end Status;
+
+	annex agree {**
+		-- HasHappened(x) is true iff x has been true at least once so far
+		node HasHappened(x: bool) returns (y: bool);
+		let
+  			y = x or (false -> pre(y)) ;
+		tel;
+		
+		-- The definition of this predicate is actually irrelevant
+		-- for analysis purposes. It is here only to overcome
+		-- some limitations of AGREE 
+		node IsBadLocation(p: Position.impl) returns (f: bool);
+		let
+			f = (25.0 <= p.latitude and p.latitude <= 50.0) and 
+			    (-130.0 <= p.longitude and p.longitude <= -60.0);
+		tel;
+		
+		node FirstTimeHolds(x: bool) returns (r: bool);
+		let
+			r = x -> not pre(HasHappened(x)) and x;	
+		tel;
+		
+		node IsPresent(e: PositionEvent.impl) returns (is_present:bool);
+		let
+			is_present = e.is_present;
+		tel;
+		
+		node Value(e: PositionEvent.impl) returns (p: Position.impl);
+		let
+			p = e.value;
+		tel;
+	**};
+	
+	system DeliveryManager
+		features
+			-- Inputs
+			constellation: in data port SatelliteConstellation;
+			satellite_sig: in data port SatelliteSignals;
+			imu_ref: in data port Position.impl;
+			delivery_location_in: in data port Position.impl;
+			init: in data port Base_Types::Boolean;
+			-- Outputs
+			imu_out: out data port PositionEvent.impl;
+			gps_out: out data port PositionEvent.impl;
+			delivery_location_out: out data port PositionEvent.impl;
+	end DeliveryManager;
+
+	system DeliveryDriver
+		features
+			-- Inputs
+			delivery_location_in: in data port Position.impl;
+			init: in data port Base_Types::Boolean;
+			-- Outputs
+			delivery_location_out: out data port PositionEvent.impl;
+			
+		annex agree {**
+			guarantee "delivery_location_out value":
+				FirstTimeHolds(init) = IsPresent(delivery_location_out);
+			
+			guarantee "delivery_location_out presence":
+				(IsPresent(delivery_location_out) => Value(delivery_location_out) = delivery_location_in);
+		**};
+	end DeliveryDriver;
+
+	system IMU
+		features
+			-- Inputs
+			imu_ref: in data port Position.impl;
+			init: in data port Base_Types::Boolean;
+			-- Outputs
+			imu_out: out data port PositionEvent.impl;
+	end IMU;
+
+	system GPS
+		features
+			-- Inputs
+			constellation: in data port SatelliteConstellation;
+			satellite_sig: in data port SatelliteSignals;
+			init: in data port Base_Types::Boolean;
+			-- Outputs
+			gps_out: out data port PositionEvent.impl;
+	end GPS;
+
+	system implementation DeliveryManager.Impl
+		subcomponents
+			dd: system DeliveryDriver
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				VERDICT_Properties::staticCodeAnalysis => 7;
+			};
+			imu: system IMU
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::category => "IMU";
+				VERDICT_Properties::pedigree => Sourced;
+				VERDICT_Properties::supplyChainSecurity => 7;
+				VERDICT_Properties::tamperProtection => 7;
+			};
+			gps: system GPS
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::category => "GPS";
+				VERDICT_Properties::pedigree => Sourced;
+				VERDICT_Properties::supplyChainSecurity => 7;
+				VERDICT_Properties::tamperProtection => 7;
+			};
+		connections
+			i1: port delivery_location_in -> dd.delivery_location_in
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i2: port init -> dd.init
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			
+			i3: port imu_ref -> imu.imu_ref
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i4: port init -> imu.init
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i5: port constellation -> gps.constellation
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i6: port satellite_sig -> gps.satellite_sig
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i7: port init -> gps.init
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			
+			o1: port dd.delivery_location_out -> delivery_location_out
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			o2: port imu.imu_out -> imu_out
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			o3: port gps.gps_out -> gps_out
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+	end DeliveryManager.Impl;
+
+	system SystemBus
+		features
+			-- Inputs
+			imu_in: in data port PositionEvent.impl;
+			gps_in: in data port PositionEvent.impl;
+			delivery_location_in: in data port PositionEvent.impl;
+			-- Outputs
+			imu_out: out data port PositionEvent.impl;
+			gps_out: out data port PositionEvent.impl;
+			delivery_location_out: out data port PositionEvent.impl;
+			
+		annex agree {**
+			guarantee "imu_out presence":
+				IsPresent(imu_out)=IsPresent(imu_in);
+				
+			guarantee "imu_out value":
+				(IsPresent(imu_out) => imu_out=imu_in);
+				
+			guarantee "gps_out presence":
+				IsPresent(gps_out)=IsPresent(gps_in);
+				
+			guarantee "gps_out value":	
+				(IsPresent(gps_out) => gps_out=gps_in);
+				
+			guarantee "delivery_location_out presence":
+				IsPresent(delivery_location_out)=IsPresent(delivery_location_in);
+			
+			guarantee "delivery_location_out value":	
+				(IsPresent(delivery_location_out) => delivery_location_out=delivery_location_in);
+		**};
+	end SystemBus;
+
+	system Controller
+		features
+			-- Inputs
+			imu_in: in data port PositionEvent.impl;
+			gps_in: in data port PositionEvent.impl;
+			delivery_location_in: in data port PositionEvent.impl;
+			-- Outputs
+			status: out data port Status;
+			delivery_location_out: out data port Position.impl;
+			
+		annex agree {**
+			guarantee "status value":
+				(status = enum(Status, Confirmed)) = HasHappened(IsPresent(delivery_location_in));
+			
+			guarantee "delivery_location_out value (update)":	
+				FirstTimeHolds(IsPresent(delivery_location_in)) => delivery_location_out = Value(delivery_location_in);
+			
+			guarantee "delivery_location_out value (fixed point)":
+				true -> (HasHappened(false -> pre(IsPresent(delivery_location_in))) => delivery_location_out = pre(delivery_location_out));
+		**};
+	end Controller;
+
+	system Environment
+		features
+			constellation: out data port SatelliteConstellation;
+			satellite_sig: out data port SatelliteSignals;
+			imu_ref: out data port Position.impl;
+			delivery_location: out data port Position.impl;
+			init: out data port Base_Types::Boolean;
+		annex agree {**
+			guarantee "delivery location is not a bad location":
+				init => not IsBadLocation(delivery_location);
+			
+			guarantee "initialization only happens once":
+				true -> (pre(HasHappened(init)) => not init);			
+		**};
+	end Environment;
+
+	system UAVToySystem
+		features
+			-- Inputs
+			constellation: in data port SatelliteConstellation;
+			satellite_sig: in data port SatelliteSignals;
+			imu_ref: in data port Position.impl;
+			delivery_location_in: in data port Position.impl;
+			init: in data port Base_Types::Boolean;
+			-- Outputs
+			status: out data port Status;
+			-- Probe
+			delivery_location_out: out data port Position.impl
+			{VERDICT_Properties::probe => true;};
+			
+	end UAVToySystem;
+	
+	system implementation UAVToySystem.Impl
+		subcomponents
+			dm: system DeliveryManager.Impl
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
+				VERDICT_Properties::staticCodeAnalysis => 7;
+			};
+			sbus: system SystemBus
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::pedigree => Sourced;
+				VERDICT_Properties::supplyChainSecurity => 7;
+				VERDICT_Properties::tamperProtection => 7;
+			};
+			contr: system Controller
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+			};
+		
+		connections
+			i1: port constellation -> dm.constellation
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i2: port satellite_sig -> dm.satellite_sig
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i3: port imu_ref -> dm.imu_ref
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i4: port delivery_location_in -> dm.delivery_location_in
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			i5: port init -> dm.init
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			
+			c1: port dm.imu_out -> sbus.imu_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			c2: port dm.gps_out -> sbus.gps_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			c3: port dm.delivery_location_out -> sbus.delivery_location_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			
+			c4: port sbus.imu_out -> contr.imu_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			c5: port sbus.gps_out -> contr.gps_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			c6: port sbus.delivery_location_out -> contr.delivery_location_in
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			
+			o1: port contr.status -> status
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			
+			p1: port contr.delivery_location_out -> delivery_location_out;
+			 
+	end UAVToySystem.Impl;
+	
+	system CASE_Toy_Model
+		features
+			-- Outputs
+			status: out data port Status;
+			
+			-- Probe
+			delivery_location_in: out data port Position.impl
+			{
+				VERDICT_Properties::probe => true;
+			};
+			init: out data port Base_Types::Boolean
+			{
+				VERDICT_Properties::probe => true;
+			};
+			delivery_location_out: out data port Position.impl
+			{
+				VERDICT_Properties::probe => true;
+			};
+			
+		annex agree {**
+			eq dummy_pos: Position.impl = delivery_location_in;
+				
+			eq init_delivery_location: Position.impl =
+				if FirstTimeHolds(init) then delivery_location_in
+				else (dummy_pos -> pre(init_delivery_location));
+				
+			guarantee "P1: UAV system delivers only if delivery location is the one provided in the initialization":
+				status = enum(Status, Confirmed) => delivery_location_out = init_delivery_location;
+			
+			guarantee "P2: UAV system does not deliver in a bad location":
+				not (status = enum(Status, Confirmed) and IsBadLocation(delivery_location_out));
+		**};
+	end CASE_Toy_Model;
+	
+	system implementation CASE_Toy_Model.Impl
+		subcomponents
+			env: system Environment
+			{
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::strongCryptoAlgorithms => 7;
+				VERDICT_Properties::physicalAccessControl => 7;
+			};
+			uav_system: system UAVToySystem.Impl
+			{
+				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => SwHwHybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
+				VERDICT_Properties::staticCodeAnalysis => 7;
+				VERDICT_Properties::inputValidation => 7;
+				VERDICT_Properties::memoryProtection => 7;
+				VERDICT_Properties::secureBoot => 7;
+			};
+			
+		connections
+			c1: port env.constellation -> uav_system.constellation
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			c2: port env.satellite_sig -> uav_system.satellite_sig
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			c3: port env.imu_ref -> uav_system.imu_ref
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			c4: port env.delivery_location -> uav_system.delivery_location_in
+			{ 
+				VERDICT_Properties::deviceAuthentication => 0;
+				VERDICT_Properties::sessionAuthenticity => 0;
+			};
+			c5: port env.init -> uav_system.init
+			{ 
+				VERDICT_Properties::deviceAuthentication => 7;
+				VERDICT_Properties::sessionAuthenticity => 7;
+			};
+			
+			o1: port uav_system.status -> status
+			{
+				VERDICT_Properties::connectionType => Trusted;
+			};
+			
+			p1: port env.delivery_location -> delivery_location_in;
+			p2: port env.init -> init;
+			p3: port uav_system.delivery_location_out -> delivery_location_out;
+			
+	end CASE_Toy_Model.Impl;
+	
+end CASE_Toy;
