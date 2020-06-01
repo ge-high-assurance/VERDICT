@@ -32,6 +32,6 @@ jobs:
         dockerfile: tools/verdict-back-ends/Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: gehighassurance/verdict
+        repository: gehighassurance/verdict-dev
         tags: latest
         push: true

@@ -30,5 +30,9 @@ jobs:
       with:
         path: tools/verdict-back-ends
         dockerfile: tools/verdict-back-ends/Dockerfile
-        push: false
-        
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: gehighassurance/verdict
+        tags: latest
+        push: ${{ startsWith(github.ref, 'refs/tags/') }}
+        tag_with_ref: true
