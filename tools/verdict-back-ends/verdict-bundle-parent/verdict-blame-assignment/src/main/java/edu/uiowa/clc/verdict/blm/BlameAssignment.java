@@ -156,26 +156,30 @@ public class BlameAssignment {
                         }
                         //                        }
                     }
+                    
+                    //Renaming Links names to Support better readability
+                    rename_mina(violated_property);
 
                     LOGGY.info("Failed Property: " + violated_property.getPropertyID());
                     LOGGY.info("Applicable Attack: " + violated_property.getApplicableThreat());
                     LOGGY.info("MinA: " + violated_property.getMinA());
                     LOGGY.info("-------------------------------------------------------");
-
+                    
                     blame_assignment.getViolatedProperties().add(violated_property);
                 }
             }
         }
         //        LOGGY.info("------------Violated Properties----------");
-        rename_mina(blame_assignment);
+//        rename_mina(blame_assignment);
         
         return blame_assignment;
     }
 
-    private void rename_mina(BlameAssignment blame_assignment) {
+    private void rename_mina(ViolatedProperty violated_prop) {
     	
-    	for(ViolatedProperty bm: blame_assignment.violatedProperties) {
-    		MinA mina  = bm.getMinA();
+//    	for(ViolatedProperty bm: blame_assignment.violatedProperties) {
+//    		MinA mina  = bm.getMinA();
+    		MinA mina = violated_prop.getMinA();
     		
     		for(Link rename_link: mina.getLinks()) {
     			String link_name = rename_link.getLinkID();
@@ -183,7 +187,7 @@ public class BlameAssignment {
 //    			System.out.println(rename_link.getLinkID() + " <---> " + link_name);
     			rename_link.setLinkID(link_name);
     		}
-    	}
+//    	}
     }
     
     private MinA computeMinA(Vector<WeakAssumption> wk_assumptions, boolean component_level) {
