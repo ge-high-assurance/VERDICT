@@ -27,13 +27,13 @@ We have tested and verified our plugin works in OSATE 2.6.1, 2.7.0,
 and 2.7.1; later versions may work as well and earlier versions may or
 may not work since we haven't tested the current plugin version in
 them.  Our OSATE plugin will function without the AGREE plugin for
-OSATE, but you may want to write both AGREE and VERDICT annexes when
-developing a model so you may want to install the AGREE plugin too.
+OSATE, but you may want to install the AGREE plugin too so that you
+can write both AGREE and VERDICT annexes when developing a model.
 
 1. Download the [OSATE
    2.7.0](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.0-vfinal/products/)
    product for your operating system.  (AGREE does not have a version
-   that works in OSATE 2.7.1 yet.)
+   that works with OSATE 2.7.1 yet.)
 
 2. If necessary, refer to these [installation
    instructions](https://osate.org/download-and-install.html) to
@@ -65,15 +65,14 @@ developing a model so you may want to install the AGREE plugin too.
 ## Install Docker (to run our back-end programs)
 
 Our OSATE plugin has two ways to call our back-end programs.  Our
-plugin can run an executable jar called verdict-bundle or it can run a
-Docker image called gehighassurance/verdict in a temporary container.
-The latter way (running a Docker container) is easier to use, but you
-need to install Docker on your operating system first.  Note that we
-have pushed our verdict image to Docker Hub in order to make the image
-available to anyone running both Docker and our OSATE plugin.  You
-only have to tell our OSATE plugin the name of the Docker image you
-want it to use; the plugin will look for the image in the local Docker
-cache and then tell Docker to pull the image from Docker Hub if
+plugin can run an executable jar or it can run a Docker image in a
+temporary container.  The latter way (running a Docker container) is
+easier to use, but you need to install Docker on your operating system
+first.  Note that we have pushed our verdict image to Docker Hub in
+order to make the image available to anyone running both Docker and
+our OSATE plugin.  You only have to tell our OSATE plugin which Docker
+image you want to use; the plugin will look for the image in the local
+Docker cache and then tell Docker to pull the image from Docker Hub if
 necessary.
 
 The instructions for installing Docker are operating system specific,
@@ -92,7 +91,7 @@ your operating system:
 - [Install Docker on other Linux operating
   systems](https://docs.docker.com/install/)
 
-If you are running Docker on Windows, you will also have to do the
+If you are running Docker on Windows, you will have to do the
 following things to allow our plugin to communicate with Docker:
 
 1. Set an environment variable called DOCKER_HOST to the value
@@ -111,8 +110,8 @@ following things to allow our plugin to communicate with Docker:
    after these changes.
 
 If you want to check that Docker is installed and running correctly,
-run the following command to verify that it prints a "Docker is
-working" message.
+run the following command to verify that it prints a "Hello from
+Docker!" message.
 
 `docker run hello-world`
 
@@ -124,11 +123,11 @@ effective than increasing the memory.
 
 ## Install our back-end programs
 
-Even if you want our plugin to run a Docker image, you still need to
-unpack the "extern.zip" file containing our back-end programs and
-enter the path to the "STEM" folder when you configure our plugin.
-Here is how to configure our plugin to run either our Docker image or
-our back-end programs:
+Even if you use a Docker image, you still need to unpack the
+"extern.zip" file containing our back-end programs and enter the
+complete path to the "extern/STEM" folder when you configure our
+plugin.  Here is how to configure our plugin to run either our Docker
+image or our back-end programs:
 
 1. Download our most recent VERDICT
    [release's](https://github.com/ge-high-assurance/VERDICT/releases)
@@ -141,70 +140,77 @@ our back-end programs:
 3. Launch OSATE, go to Window > Preferences > Verdict > Verdict
    Settings, and fill out the following fields.
    
-4. Click the Browse... button next to the "STEM Project PATH:" field,
+4. Skip the "VERDICT Properties Name" field unless you are working on
+   the DeliveryDrone model or another model which uses a differently
+   named property set than "VERDICT_Properties".  If so, enter that
+   property set's name into the field, e.g.,
+   "CASE_Consolidated_Properties" for DeliveryDrone.
+
+5. Click the Browse... button next to the "STEM Project PATH:" field,
    navigate to the "STEM" folder inside the "extern" folder, and make
    it the field's setting.
 
-5. Click within the "Bundle Docker Image:" field, type
+6. Click within the "Bundle Docker Image:" field, type
    "gehighassurance/verdict" for our Docker image's name, and save
    your changes by clicking the "Apply and Close" button.  If you
    don't want to run our Docker image, make sure this field stays
    empty and follow steps 6-11 instead.
 
-6. Click the Browse... button next to the "Bundle Jar:" field,
+7. Click the Browse... button next to the "Bundle Jar:" field,
    navigate to the "verdict-bundle-1.0-SNAPSHOT-capsule.jar" file
    inside the "extern" folder, and make it the field's setting.
 
-7. Click the Browse... button next to the "Aadl2iml Binary:" field,
+8. Click the Browse... button next to the "Aadl2iml Binary:" field,
    navigate to the appropriate "aadl2iml" binary for your operating
    system inside either the "extern/mac" or "extern/nix" folders, and
    make it the field's setting.
 
-8. Click the Browse... button next to the "Kind2 Binary:" field,
+9. Click the Browse... button next to the "Kind2 Binary:" field,
    navigate to the appropriate "kind2" binary for your operating
    system inside either the "extern/mac" or "extern/nix" folders, and
    make it the field's setting.
 
-9. Click the Browse... button next to the "Soteria++ Binary:" field,
+10. Click the Browse... button next to the "Soteria++ Binary:" field,
    navigate to the appropriate "soteria_pp" binary for your operating
    system inside either the "extern/mac" or "extern/nix" folders, and
    make it the field's setting.
 
-10. Click the Browse... button next to the "GraphViz Path:" field,
+11. Click the Browse... button next to the "GraphViz Path:" field,
    navigate to the folder on your operating system where your
    [GraphViz](https://www.graphviz.org/download/) Graph Visualization
    software is installed, and make it the field's setting.  On Linux,
    that location probably would be "/usr/bin".
 
-11. Click the "Apply and Close" button to save all the settings that
-    you just entered into the fields.
+12. Click the "Apply and Close" button to save all the settings that
+   you just entered into the fields.
 
 ## Run our OSATE plugin
 
 Now you are ready to run our OSATE plugin on an AADL model.  You can
-pick one of the AADL models in our GitHub repository (for example,
-"models/DeliveryDrone") and use OSATE's "File > Import... > General >
-Projects from Folder" wizard to import that model into your OSATE
-workspace.  You can open the VERDICT_Properties.aadl file to see which
-VERDICT properties an AADL model can use.  You can open the
-"DeliveryDrone.aadl" file to see how that model uses AGREE annexes,
-VERDICT annexes, and VERDICT properties.  If OSATE asks you whether to
-convert the project to an Xtext project after you open an AADL file,
-answer yes since the project must have a Xtext nature to enable our
-OSATE plugin's functionality.
+pick one of the AADL models in our GitHub repository or the extern.zip
+file you unpacked (for example,
+"VERDICT/models/Thermostat_with_verdict_props" or
+"extern/examples/DeliveryDrone") and use OSATE's "File > Import... >
+General > Projects from Folder" wizard to import that model into your
+OSATE workspace.  You can open the model's AADL files to see how that
+model uses AGREE annexes, VERDICT annexes, and VERDICT properties.  If
+OSATE asks you whether to convert the project to an Xtext project
+after you open an AADL file, answer yes since the project must have a
+Xtext nature to enable our OSATE plugin's functionality.
 
-You invoke our OSATE plugin's functionality from the Verdict pulldown
-menu.  First click on a project's name in the AADL Navigator pane to
-make it the currently selected project, then pull down the Verdict
-menu and run MBAA or CRV as appropriate.  Our plugin will use Docker
-Java API calls to pull down the gehighassurance/verdict image from
+You can invoke our OSATE plugin's functionality from the Verdict
+pulldown menu.  First click on a project's name in the AADL Navigator
+pane to make it the currently selected project, then pull down the
+Verdict menu and run MBAA or CRV as appropriate.  Our plugin will use
+Docker Java API calls to pull down the appropriate Docker image from
 Docker Hub (only if the image isn't already in your Docker's local
-cache), start a temporary Docker container to run the desired command,
-and then display any output from the command.  If you don't enter
-anything for the image's name, the plugin will run the verdict-bundle
-jar in a subprocess directly on your system instead. The
-verdict-bundle jar will run the appropriate VERDICT back-end programs
-in additional subprocesses directly on your system as well.
+cache), start a temporary Docker container to run the MBAA or CRV
+command, and then display any output from that command.  If you use
+the executable jar instead of the Docker image, the plugin will run
+the executable jar in a subprocess directly on your system.  Both the
+temporary container and the executable jar will run several VERDICT
+back-end tool chain programs in additional subprocesses inside the
+temporary container or directly on your system as well.
 
 For further information about how to analyze a model's system
 architecture using our VERDICT tools, please read our VERDICT [User
@@ -212,4 +218,4 @@ Manual](https://github.com/ge-high-assurance/VERDICT/wiki/VERDICT-Modeling-Style
 
 ## Setting up CI/CD environment in GitHub Actions
 
-This is a placeholder. Testing build again.
+This is a placeholder.

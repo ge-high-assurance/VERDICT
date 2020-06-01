@@ -88,11 +88,11 @@ system, although you can use the following commands if you have an
 Ubuntu 18.04 LTS system:
 
 ```shell
-$ sudo apt install graphviz libgomp1
-$ sudo add-apt-repository ppa:avsm/ppa
+$ sudo apt install build-essential m4
+$ sudo add-apt-repository ppa:avsm/ppa  $ Skip this on Ubuntu 20.04
 $ sudo apt update
 $ sudo apt install opam
-$ opam init --disable-sandboxing  # Need --disable-sandboxing only on WSL
+$ opam init --disable-sandboxing  # Need --disable-sandboxing only on WSL1
 $ eval $(opam env)
 $ opam switch create ocaml 4.07.1
 $ eval $(opam env)
