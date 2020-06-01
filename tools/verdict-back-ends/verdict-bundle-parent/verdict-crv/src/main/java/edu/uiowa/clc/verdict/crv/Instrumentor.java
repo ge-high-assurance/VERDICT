@@ -435,7 +435,7 @@ public class Instrumentor extends VDMInstrumentor {
             this.attack_cmp_link_map.put("NI", links);
 
         } catch (CRVException e) {
-        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
     }
 
@@ -1277,7 +1277,7 @@ public class Instrumentor extends VDMInstrumentor {
             this.attack_cmp_link_map.put("HT", components);
 
         } catch (CRVException e) {
-        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
     }
 
@@ -1471,7 +1471,7 @@ public class Instrumentor extends VDMInstrumentor {
             this.attack_cmp_link_map.put("IT", components);
 
         } catch (CRVException e) {
-        	System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
+            System.out.println("\tCRV Error " + e.getCode() + " " + e.getMessage());
         }
     }
 }
