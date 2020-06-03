@@ -365,10 +365,27 @@ let merge_packages input =
       }
     in
 
+    let flatten_data_feature {AD.name; AD.adir; AD.dtype; AD.properties} =
+      {name;
+       adir;
+       AD.dtype = flatten_qcref_opt dtype;
+       properties;
+      }
+    in
+
+    let flatten_data_type {AD.name; AD.type_extension; AD.features; AD.properties} =
+      {name;
+       AD.type_extension = flatten_qcref_opt type_extension;
+       AD.features = List.map flatten_data_feature features;
+       properties;
+      }
+    in 
+
     let flatten_comp_type = function
       | AD.SystemType (pos, st) ->
         AD.SystemType (pos, flatten_system_type st)
-      | AD.DataType _ as dt -> dt
+      | AD.DataType (pos, dt) ->
+        AD.DataType (pos, flatten_data_type dt)
     in
 
     let flatten_subcomponent {AD.name; AD.type_ref; AD.category; AD.properties } =
