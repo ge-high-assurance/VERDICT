@@ -150,15 +150,16 @@ public class BlameAssignment {
                                             link_to_port(link.getLinkID()), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
+
+                            // Renaming Links names to support better readability
+                            rename_link(link);
+
                             if (attack.getAttackId() != null) {
                                 break;
                             }
                         }
                         //                        }
                     }
-
-                    // Renaming Links names to Support better readability
-                    rename_mina(violated_property);
 
                     LOGGY.info("Failed Property: " + violated_property.getPropertyID());
                     LOGGY.info("Applicable Attack: " + violated_property.getApplicableThreat());
@@ -173,21 +174,6 @@ public class BlameAssignment {
         //        rename_mina(blame_assignment);
 
         return blame_assignment;
-    }
-
-    private void rename_mina(ViolatedProperty violated_prop) {
-
-        //    	for(ViolatedProperty bm: blame_assignment.violatedProperties) {
-        //    		MinA mina  = bm.getMinA();
-        MinA mina = violated_prop.getMinA();
-
-        for (Link rename_link : mina.getLinks()) {
-            String link_name = rename_link.getLinkID();
-            link_name = link_name.replaceAll("_port_", ".");
-            //    			System.out.println(rename_link.getLinkID() + " <---> " + link_name);
-            rename_link.setLinkID(link_name);
-        }
-        //    	}
     }
 
     private MinA computeMinA(Vector<WeakAssumption> wk_assumptions, boolean component_level) {
@@ -246,16 +232,11 @@ public class BlameAssignment {
         return app_attack;
     }
 
-    //    private void printThreats(HashMap<String, HashSet<String>> intrumented_cmp_link) {
-    //        for (String attack_id : intrumented_cmp_link.keySet()) {
-    //            System.out.print(attack_id + ": [");
-    //            HashSet<String> comps_links = intrumented_cmp_link.get(attack_id);
-    //            for (String comp : comps_links) {
-    //                System.out.print(comp + ",");
-    //            }
-    //            System.out.println("]");
-    //        }
-    //    }
+    private void rename_link(Link selected_link) {
+        String link_name = selected_link.getLinkID();
+        link_name = link_name.replaceAll("_port_", ".");
+        selected_link.setLinkID(link_name);
+    }
 
     private String link_to_port(String link_ID) {
 
