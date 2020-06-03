@@ -132,6 +132,7 @@ public class BlameAssignment {
                                     applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
+
                             if (attack.getAttackId() != null) {
                                 break;
                             }
@@ -140,6 +141,7 @@ public class BlameAssignment {
 
                     // Effected Links
                     for (Link link : mina.getLinks()) {
+
                         //                        if (link.isCompromised()) {
                         //                        System.out.println("+++> LinkID --> :" +
                         // link.getLinkID());
@@ -151,14 +153,15 @@ public class BlameAssignment {
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
 
-                            // Renaming Links names to support better readability
-                            rename_link(link);
-
                             if (attack.getAttackId() != null) {
                                 break;
                             }
                         }
-                        //                        }
+                    }
+
+                    // Renaming link to support better readability
+                    for (Link link : mina.getLinks()) {
+                        rename_link(link);
                     }
 
                     LOGGY.info("Failed Property: " + violated_property.getPropertyID());
@@ -235,15 +238,19 @@ public class BlameAssignment {
     private void rename_link(Link selected_link) {
         String link_name = selected_link.getLinkID();
         link_name = link_name.replaceAll("_port_", ".");
+
         selected_link.setLinkID(link_name);
     }
 
     private String link_to_port(String link_ID) {
+        //    	System.out.print(link_ID);
 
         Matcher m = p.matcher(link_ID);
         if (m.find()) {
             link_ID = m.group(1);
         }
+
+        //        System.out.print(" <--> " + link_ID);
 
         return link_ID;
     }
