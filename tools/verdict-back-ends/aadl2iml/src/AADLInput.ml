@@ -446,6 +446,7 @@ let merge_packages input =
 
     match um with
     | AD.AADLPackage (pos, pkg) -> (
+      (* Disabled optimization. Qualified names referencing to its own package are valid.
       let imported_units =
         AD.get_imported_units um
         |> PkgNameSet.of_list
@@ -455,6 +456,8 @@ let merge_packages input =
       else (
         AD.AADLPackage (pos, flatten_pkg pkg)
       )
+      *)
+      AD.AADLPackage (pos, flatten_pkg pkg)
     )
     | AD.PropertySet _ -> assert false
   in
