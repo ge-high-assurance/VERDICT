@@ -10,6 +10,8 @@
     @author William D. Smith
 *)
 
+exception DataTypeNotFound of string
+
 module AD = AADLAst
 module AG = AGREEAst
 module VE = VerdictAst
@@ -70,8 +72,15 @@ let get_enumerators properties =
 let equal_ids id1 id2 =
   String.lowercase_ascii id1 = String.lowercase_ascii id2
 
+let failwith_unsupported_data_type pos qcr =
+  let msg =
+    Format.asprintf "%a: error: data type '%a' not found"
+      Position.pp_print_position pos C.pp_print_qcref qcr
+  in
+  raise (DataTypeNotFound msg)
+
 let get_data_type type_decls = function
-  | ([pid], _) -> (
+  | ([pid], _) as qcr -> (
     let id = C.get_id pid in
     let ep =
       Utils.element_position
@@ -97,12 +106,13 @@ let get_data_type type_decls = function
       | "float_64" -> VI.PlainType VI.Real
       | "character" -> VI.PlainType VI.Int
       | "string" -> VI.PlainType VI.Int
-      | _ -> failwith "Unsupported data type found"
+      | _ -> failwith_unsupported_data_type (C.get_pos pid) qcr
     )
     | Some (_, pos) -> VI.UserDefinedType pos
   )
-  | (pname, _) -> (
-    match String.lowercase_ascii (C.pname_to_string pname) with
+  | (pname, _) as qcr -> (
+    let pname_str = C.pname_to_string pname in
+    match String.lowercase_ascii pname_str with
     | "base_types::boolean" -> VI.PlainType VI.Bool
     | "base_types::integer" -> VI.PlainType VI.Int
     | "base_types::integer_8" -> VI.PlainType VI.Int
@@ -119,7 +129,11 @@ let get_data_type type_decls = function
     | "base_types::float_64" -> VI.PlainType VI.Real
     | "base_types::character" -> VI.PlainType VI.Int
     | "base_types::string" -> VI.PlainType VI.Int
-    | _ -> failwith "Unsupported data type found" 
+    | _ -> (
+      match pname with
+      | pid :: _ -> failwith_unsupported_data_type (C.get_pos pid) qcr
+      | _ -> assert false
+    )
   )
 
 let data_to_type_decls data_types data_impls =
@@ -1129,7 +1143,7 @@ let aadl_ast_to_vdm_iml v_props = function
   | AD.AADLPackage (_, { AD.name ; AD.public_sec }) -> (
     match public_sec with
     | None -> None
-    | Some sec -> (
+    | Some sec -> try (
       let pkg =
         let pkg_name = aadl_pname_to_iml_pname name in
         { VI.name = pkg_name;
@@ -1137,6 +1151,10 @@ let aadl_ast_to_vdm_iml v_props = function
         }
       in
       Some pkg
+    )
+    with DataTypeNotFound msg -> (
+      Format.eprintf "%s@." msg;
+      None
     )
   )
   | _ -> None
