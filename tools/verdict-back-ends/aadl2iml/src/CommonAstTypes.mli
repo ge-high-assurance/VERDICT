@@ -25,6 +25,8 @@ val pp_print_id: Format.formatter -> pid -> unit
 
 val get_id: pid -> string
 
+val get_pos: pid -> Position.t
+
 val pname_to_string: pname -> string
 
 val compare_pnames: pname -> pname -> int
