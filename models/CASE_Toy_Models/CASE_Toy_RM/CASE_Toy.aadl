@@ -220,19 +220,19 @@ public
 				IsPresent(imu_out)=IsPresent(imu_in);
 				
 			guarantee "imu_out value":
-				(IsPresent(imu_out) => imu_out=imu_in);
+				(IsPresent(imu_out) => Value(imu_out)=Value(imu_in));
 				
 			guarantee "gps_out presence":
 				IsPresent(gps_out)=IsPresent(gps_in);
 				
 			guarantee "gps_out value":	
-				(IsPresent(gps_out) => gps_out=gps_in);
+				(IsPresent(gps_out) => Value(gps_out)=Value(gps_in));
 				
 			guarantee "delivery_location_out presence":
 				IsPresent(delivery_location_out)=IsPresent(delivery_location_in);
 			
 			guarantee "delivery_location_out value":	
-				(IsPresent(delivery_location_out) => delivery_location_out=delivery_location_in);
+				(IsPresent(delivery_location_out) => Value(delivery_location_out)=Value(delivery_location_in));
 		**};
 	end SystemBus;
 
