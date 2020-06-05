@@ -221,25 +221,12 @@ public class VDMInstrumentor {
 
         if (threats.contains("NI")) {
             System.out.println("Network Injection Instrumentation");
-            networkInjection(vdm_links);
 
-            // Snoozing option for component level.
-            if (component_level & vdm_components.size() > 0) {
-
-                Iterator<Connection> it = vdm_links.iterator();
-                while (it.hasNext()) {
-                    Connection con = it.next();
-                    if (isSourceComponent(con) || isProbePort(con)) {
-                        it.remove();
-                    }
-                }
-                //            	for (Connection con : vdm_links) {
-                //                    if (isSourceComponent(con)) {
-                //                        //
-                //                        vdm_links.remove(con);
-                //                    }
-                //                }
+            // Snooze links for component level blame assignment.
+            if (!component_level) {
+                networkInjection(vdm_links);
             }
+            
         }
 
         if (threats.contains("BG")) {
@@ -1414,7 +1401,8 @@ public class VDMInstrumentor {
 
         if (src_port != null) {
             String identifier = compImpl.getId();
-            identifier = identifier.replace(".I", "_I");
+            //            identifier = identifier.replace(".I", "_I");
+            identifier = identifier.replace(".", "_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1531,7 +1519,8 @@ public class VDMInstrumentor {
 
         if (src_port != null) {
             String identifier = compImpl.getId();
-            identifier = identifier.replace(".I", "_I");
+            //            identifier = identifier.replace(".I", "_I");
+            identifier = identifier.replace(".", "_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1557,7 +1546,8 @@ public class VDMInstrumentor {
 
         if (dest_port != null) {
             String identifier = compImpl.getId();
-            identifier = identifier.replace(".I", "_I");
+            //            identifier = identifier.replace(".I", "_I");
+            identifier = identifier.replace(".", "_");
 
             dest_componentInstance.setId(identifier);
             dest_componentInstance.setName(identifier);
