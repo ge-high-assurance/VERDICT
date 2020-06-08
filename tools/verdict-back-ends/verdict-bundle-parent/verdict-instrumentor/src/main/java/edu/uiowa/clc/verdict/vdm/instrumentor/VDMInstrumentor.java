@@ -226,10 +226,9 @@ public class VDMInstrumentor {
             if (!component_level) {
                 networkInjection(vdm_links);
             }
-            
         }
 
-        if (threats.contains("BG")) {
+        if (threats.contains("BN")) {
             System.out.println("Benign");
             vdm_components.clear();
             vdm_links.clear();
@@ -239,7 +238,12 @@ public class VDMInstrumentor {
 
         // Removed Once component Implemtation assumption.
         ComponentImpl componentImpl = retrieve_main_cmp_impl();
-        BlockImpl blockImpl = componentImpl.getBlockImpl();
+
+        BlockImpl blockImpl = null;
+
+        if (componentImpl != null) {
+            blockImpl = componentImpl.getBlockImpl();
+        }
 
         Map<String, HashSet<Connection>> components_map =
                 new HashMap<String, HashSet<Connection>>();
@@ -406,26 +410,29 @@ public class VDMInstrumentor {
             dec_var_const(connection_comp_map);
 
         } else if (blame_assignment && !component_level) {
+
             ComponentImpl compImpl = retrieve_main_cmp_impl();
 
-            //            if (compImpl.getBlockImpl() == null) {
-            //            compImpl = retrieve_block(compImpl);
-            //            }
+            if (compImpl != null) {
+                //                if (compImpl.getBlockImpl() == null) {
+                //                    compImpl = retrieve_block_impl(compImpl);
+                //                }
 
-            ContractSpec contractSpec = compImpl.getType().getContract();
+                ContractSpec contractSpec = compImpl.getType().getContract();
 
-            for (String key : global_constants) {
-                Expression wk_expr = new Expression();
-                wk_expr.setIdentifier(key);
+                for (String key : global_constants) {
+                    Expression wk_expr = new Expression();
+                    wk_expr.setIdentifier(key);
 
-                Expression not_wkexpr = new Expression();
-                not_wkexpr.setNot(wk_expr);
+                    Expression not_wkexpr = new Expression();
+                    not_wkexpr.setNot(wk_expr);
 
-                // Adding weakly assume variables
-                ContractItem weakly_assume_item = new ContractItem();
-                weakly_assume_item.setName(link_name(key) + " is not instrumented");
-                weakly_assume_item.setExpression(not_wkexpr);
-                contractSpec.getWeaklyassume().add(weakly_assume_item);
+                    // Adding weakly assume variables
+                    ContractItem weakly_assume_item = new ContractItem();
+                    weakly_assume_item.setName(link_name(key) + " is not instrumented");
+                    weakly_assume_item.setExpression(not_wkexpr);
+                    contractSpec.getWeaklyassume().add(weakly_assume_item);
+                }
             }
         }
     }
@@ -683,6 +690,9 @@ public class VDMInstrumentor {
         return comp_link;
     }
 
+    /*
+     * Declare and Define weak assumptions for the blame assignment.
+     */
     protected void dec_var_asmp_const(
             Map<String, List<String>> connection_comp_map,
             boolean blame_assignment,
@@ -721,28 +731,23 @@ public class VDMInstrumentor {
         // Adding Xor assumption for components.
         ComponentImpl compImpl = retrieve_main_cmp_impl();
 
-        if (compImpl.getBlockImpl() == null) {
-            compImpl = retrieve_block_impl(compImpl);
-        }
+        if (compImpl != null) {
 
-        ContractSpec contractSpec = compImpl.getType().getContract();
-        //        System.out.println();
-        ContractItem assume_item = new ContractItem();
+            if (compImpl.getBlockImpl() == null) {
+                compImpl = retrieve_block_impl(compImpl);
+            }
 
-        //        if (assume_expr == null) {
-        //            if (default_var != null) {
-        //                assume_expr = new Expression();
-        //                assume_expr.setIdentifier(default_var);
-        //            }
-        //        }
+            ContractSpec contractSpec = compImpl.getType().getContract();
+            ContractItem assume_item = new ContractItem();
 
-        if (assume_expr != null) {
-            assume_item.setExpression(assume_expr);
-            contractSpec.getAssume().add(assume_item);
-        }
+            if (assume_expr != null) {
+                assume_item.setExpression(assume_expr);
+                contractSpec.getAssume().add(assume_item);
+            }
 
-        if (blame_assignment == false && contractSpec != null) {
-            contractSpec.getSymbol().addAll(vars_dec);
+            if (blame_assignment == false && contractSpec != null) {
+                contractSpec.getSymbol().addAll(vars_dec);
+            }
         }
     }
 

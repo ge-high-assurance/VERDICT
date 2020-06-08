@@ -898,6 +898,9 @@ public class VDM2Lustre {
     public void visit(TypeDeclaration typeDeclaration, LustreProgram program) {
 
         String identifier = typeDeclaration.getName();
+        // Renaming dot[.] in Type Declaration Identifier.
+        //        identifier = identifier.replace(".", "_id_");
+        //        typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
 
