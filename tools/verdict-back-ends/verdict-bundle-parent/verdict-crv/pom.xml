@@ -35,6 +35,23 @@
             <groupId>edu.uiowa.clc.verdict.blm</groupId>
             <artifactId>verdict-blame-assignment</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>edu.uiowa.clc.verdict.vdm</groupId>
+            <artifactId>iml-verdict-translator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
