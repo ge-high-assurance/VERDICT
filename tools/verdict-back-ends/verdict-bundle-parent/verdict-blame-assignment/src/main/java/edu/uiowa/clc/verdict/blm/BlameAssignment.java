@@ -132,6 +132,7 @@ public class BlameAssignment {
                                     applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
+
                             if (attack.getAttackId() != null) {
                                 break;
                             }
@@ -140,19 +141,27 @@ public class BlameAssignment {
 
                     // Effected Links
                     for (Link link : mina.getLinks()) {
+
                         //                        if (link.isCompromised()) {
                         //                        System.out.println("+++> LinkID --> :" +
                         // link.getLinkID());
                         if (link.isCompromised()) {
+
                             Attack attack =
-                                    applicableAttack(link.getLinkID(), intrumented_cmp_link);
+                                    applicableAttack(
+                                            link_to_port(link.getLinkID()), intrumented_cmp_link);
                             attack.setAttackDescription(attack.getAttackDescription());
                             violated_property.setApplicableThreat(attack);
+
                             if (attack.getAttackId() != null) {
                                 break;
                             }
                         }
-                        //                        }
+                    }
+
+                    // Renaming link to support better readability
+                    for (Link link : mina.getLinks()) {
+                        rename_link(link);
                     }
 
                     LOGGY.info("Failed Property: " + violated_property.getPropertyID());
@@ -165,6 +174,7 @@ public class BlameAssignment {
             }
         }
         //        LOGGY.info("------------Violated Properties----------");
+        //        rename_mina(blame_assignment);
 
         return blame_assignment;
     }
@@ -186,7 +196,7 @@ public class BlameAssignment {
             for (WeakAssumption wk : wk_assumptions) {
                 Link link = new Link();
 
-                link.setLinkID(link_to_port(wk.getwId()));
+                link.setLinkID(wk.getwId());
                 boolean c_status = !wk.getStatus();
                 link.setCompromised(c_status);
                 mina.getLinks().add(link);
@@ -225,23 +235,22 @@ public class BlameAssignment {
         return app_attack;
     }
 
-    //    private void printThreats(HashMap<String, HashSet<String>> intrumented_cmp_link) {
-    //        for (String attack_id : intrumented_cmp_link.keySet()) {
-    //            System.out.print(attack_id + ": [");
-    //            HashSet<String> comps_links = intrumented_cmp_link.get(attack_id);
-    //            for (String comp : comps_links) {
-    //                System.out.print(comp + ",");
-    //            }
-    //            System.out.println("]");
-    //        }
-    //    }
+    private void rename_link(Link selected_link) {
+        String link_name = selected_link.getLinkID();
+        link_name = link_name.replaceAll("_port_", ".");
+
+        selected_link.setLinkID(link_name);
+    }
 
     private String link_to_port(String link_ID) {
+        //    	System.out.print(link_ID);
 
         Matcher m = p.matcher(link_ID);
         if (m.find()) {
             link_ID = m.group(1);
         }
+
+        //        System.out.print(" <--> " + link_ID);
 
         return link_ID;
     }

@@ -10,6 +10,8 @@
     @author William D. Smith
 *)
 
+exception DataTypeNotFound of string
+
 module AD = AADLAst
 module AG = AGREEAst
 module VE = VerdictAst
@@ -70,9 +72,23 @@ let get_enumerators properties =
 let equal_ids id1 id2 =
   String.lowercase_ascii id1 = String.lowercase_ascii id2
 
+let failwith_unsupported_data_type pos qcr =
+  let msg =
+    Format.asprintf "%a: error: data type '%a' not found"
+      Position.pp_print_position pos C.pp_print_qcref qcr
+  in
+  raise (DataTypeNotFound msg)
+
+let realization_full_name (r_pid, i_pid) =
+  Format.asprintf "%a.%a" C.pp_print_id r_pid C.pp_print_id i_pid
+
 let get_data_type type_decls = function
-  | ([pid], _) -> (
-    let id = C.get_id pid in
+  | ([pid], i_pid) as qcr -> (
+    let id =
+      match i_pid with
+      | None -> C.get_id pid
+      | Some i_pid -> realization_full_name (pid, i_pid)
+    in
     let ep =
       Utils.element_position
         (fun ({VI.name}: VI.type_declaration) -> equal_ids name id)
@@ -97,12 +113,13 @@ let get_data_type type_decls = function
       | "float_64" -> VI.PlainType VI.Real
       | "character" -> VI.PlainType VI.Int
       | "string" -> VI.PlainType VI.Int
-      | _ -> failwith "Unsupported data type found"
+      | _ -> failwith_unsupported_data_type (C.get_pos pid) qcr
     )
     | Some (_, pos) -> VI.UserDefinedType pos
   )
-  | (pname, _) -> (
-    match String.lowercase_ascii (C.pname_to_string pname) with
+  | (pname, _) as qcr -> (
+    let pname_str = C.pname_to_string pname in
+    match String.lowercase_ascii pname_str with
     | "base_types::boolean" -> VI.PlainType VI.Bool
     | "base_types::integer" -> VI.PlainType VI.Int
     | "base_types::integer_8" -> VI.PlainType VI.Int
@@ -119,15 +136,19 @@ let get_data_type type_decls = function
     | "base_types::float_64" -> VI.PlainType VI.Real
     | "base_types::character" -> VI.PlainType VI.Int
     | "base_types::string" -> VI.PlainType VI.Int
-    | _ -> failwith "Unsupported data type found" 
+    | _ -> (
+      match pname with
+      | pid :: _ -> failwith_unsupported_data_type (C.get_pos pid) qcr
+      | _ -> assert false
+    )
   )
 
 let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
-    let add_type ({AD.name; AD.type_extension; AD.features; AD.properties}: AD.data_type) =
+    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
       match type_extension with
       | Some _ ->
-        ({VI.name = C.get_id name; VI.definition = None}, (type_extension, features))
+        ({VI.name = C.get_id name; VI.definition = None}, type_extension)
       | None -> (
         let def =
           match AD.find_assoc data_repr_qpref properties with
@@ -151,33 +172,26 @@ let data_to_type_decls data_types data_impls =
             | _ -> failwith ("Found unexpected data representation value")
           )
         in
-        ({VI.name = C.get_id name; VI.definition = def}, (None, features))
+        ({VI.name = C.get_id name; VI.definition = def}, None)
       )
     in
     List.map add_type data_types
   in
+  let type_decls_with_extension_id =
+    let tdwei =
+      data_impls |> List.map (fun {AD.name; AD.subcomponents} ->
+        let name = realization_full_name name in
+        ({name; VI.definition = None}, None)
+      )
+    in
+    List.rev_append (List.rev type_decls_with_extension_id) tdwei
+  in
   let type_decls = List.map fst type_decls_with_extension_id in
   let type_decls =
-    let set_type_aliases ((type_decl, (ext_id, features))
-      : (VI.type_declaration * (C.qcref option * AD.data_feature list))) =
+    let set_type_aliases ((type_decl, ext_id)
+      : (VI.type_declaration * C.qcref option)) =
       match ext_id with
-      | None -> (
-        match features with
-        | [] -> type_decl
-        | _ -> (
-          let process_feature {AD.name; AD.dtype} =
-            match dtype with
-            | None -> failwith ("Record field definition without a type is not supported")
-            | Some qcr -> (C.get_id name, get_data_type type_decls qcr)
-          in
-          let record_fields =
-            List.map process_feature features
-          in
-          { VI.name = type_decl.VI.name;
-            VI.definition = Some (VI.RecordType record_fields)
-          }
-        )
-      )
+      | None -> type_decl
       | Some qcr ->
         { VI.name = type_decl.VI.name;
           VI.definition = Some (get_data_type type_decls qcr)
@@ -186,7 +200,7 @@ let data_to_type_decls data_types data_impls =
     List.map set_type_aliases type_decls_with_extension_id
   in
   let process_data_impl type_decls {AD.name; AD.subcomponents} =
-    let type_name = C.get_id (fst name) in
+    let type_name = realization_full_name name in
     let process_subcomponent {AD.name; AD.type_ref} =
       match type_ref with
       | None -> failwith ("Record field definition without a type is not supported")
@@ -1131,7 +1145,7 @@ let aadl_ast_to_vdm_iml v_props = function
   | AD.AADLPackage (_, { AD.name ; AD.public_sec }) -> (
     match public_sec with
     | None -> None
-    | Some sec -> (
+    | Some sec -> try (
       let pkg =
         let pkg_name = aadl_pname_to_iml_pname name in
         { VI.name = pkg_name;
@@ -1139,6 +1153,10 @@ let aadl_ast_to_vdm_iml v_props = function
         }
       in
       Some pkg
+    )
+    with DataTypeNotFound msg -> (
+      Format.eprintf "%s@." msg;
+      None
     )
   )
   | _ -> None

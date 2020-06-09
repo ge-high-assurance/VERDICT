@@ -54,12 +54,6 @@
 	            style="push"
 	            tooltip="Run MBAA">
 	      </command>    
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.mbasSettings"
-	            label="&amp;MBAS Settings"
-	            style="push"
-	            tooltip="Click to change MBAS Settings">
-	       </command>
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
@@ -108,11 +102,6 @@
        </command>     
        <command
              categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.mbasSettings"
-             name="MBAS Settings">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runCrv"
              name="Run CRV">
        </command>
@@ -127,7 +116,7 @@
              name="Cyber Requirements/Relations Editor">
        </command>                 
     </extension>
-    
+
    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition

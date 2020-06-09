@@ -104,5 +104,5 @@ COPY --from=builder /usr/local /usr/local
 USER verdict
 WORKDIR /data
 # Java 11 LTS needs --add-open arguments
-ENTRYPOINT ["java", "-Xmx1g", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
+ENTRYPOINT ["java", "-Xmx1536m", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
 ENV GraphVizPath=/usr/bin

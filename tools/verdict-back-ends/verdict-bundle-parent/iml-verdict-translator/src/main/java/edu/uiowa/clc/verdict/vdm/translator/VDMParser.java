@@ -1022,6 +1022,9 @@ public class VDMParser extends Parser {
             if (token.type == Type.IDENTIFIER) {
 
                 String identifier = Identifier();
+                // Renaming dot[.] in Type Declaration Identifier.
+                identifier = identifier.replace(".", "_");
+
                 typeDeclaration.setName(identifier);
 
             } else if (token.type == Type.OPTION) {
@@ -1037,7 +1040,8 @@ public class VDMParser extends Parser {
                         typeDeclaration.setDefinition(dataType);
                     }
                 } else {
-                    System.out.println("Found Data Type with No Definition!!!!!!!!!!!");
+                    //                    System.out.println("Found Data Type with No
+                    // Definition!!!!!!!!!!!");
                 }
             }
         }

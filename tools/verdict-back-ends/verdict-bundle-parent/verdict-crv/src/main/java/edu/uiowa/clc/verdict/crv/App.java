@@ -27,6 +27,7 @@ import org.apache.commons.cli.ParseException;
 import verdict.vdm.vdm_model.Model;
 
 // Coordinate All processes.
+// 0. IML2VDM - Disabled.
 // 1. Instrumentor
 // 2. LustreTranslator
 // 3. BlameAssignment
@@ -44,7 +45,7 @@ public class App {
 
         CommandLine cmdLine = cmdLineOptions(args);
 
-        //        File eg_file = new File("hawkUAV/model_A.xml");
+        // File eg_file = new File("hawkUAV/model_A.xml");
         File vdmFile = null;
         if (cmdLine.hasOption("o")) {
             String inputPath = cmdLine.getOptionValue("i");
@@ -63,13 +64,30 @@ public class App {
         File bm_outputFile = null;
 
         LOGGY.info("************************(VERDICT CRV)******************************");
+
         // Loadl DataModel
         VerdictLustreTranslator translator = new VerdictLustreTranslator();
 
         if (vdmFile.canRead()) {
+            String InputFile = vdmFile.getAbsolutePath();
 
-            Model vdm_model = translator.unmarshalFromXml(vdmFile);
+            String fileExt = InputFile.substring(InputFile.lastIndexOf(".") + 1);
+            Model vdm_model = null;
 
+            if (fileExt.equals("iml")) {
+                // Use IML model
+                //                vdm_model = ResourceTest.setup(InputFile);
+
+                // Store VDM in a temporary file
+                translator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
+            } else if (fileExt.equals("xml")) {
+                // Use VDM model
+                vdm_model = translator.unmarshalFromXml(vdmFile);
+            } else {
+
+                LOGGY.warn("Invalid Model Input File: " + fileExt);
+                System.exit(-1);
+            }
             LOGGY.info("**********Instrumentation Invoked****************");
 
             Instrumentor instrumentor = new Instrumentor(vdm_model);
@@ -87,9 +105,9 @@ public class App {
             VDM2Lustre vdm2lus = new VDM2Lustre(vdm_model);
             Model lustreModel = vdm2lus.translate();
 
-            //            LOGGY.info("Done");
-            //            VDM2Lustre vdm2Lustre = new VDM2Lustre(vdm_model);
-            //            vdm_model = vdm2Lustre.translate();
+            // LOGGY.info("Done");
+            // VDM2Lustre vdm2Lustre = new VDM2Lustre(vdm_model);
+            // vdm_model = vdm2Lustre.translate();
 
             if (cmdLine.hasOption("o")) {
                 String outputPath = cmdLine.getOptionValue("o");
@@ -100,28 +118,31 @@ public class App {
 
             if (cmdLine.hasOption("r")) {
                 String outputFile = cmdLine.getOptionValue("r");
-                //                LOGGY.info(outputFile);
+                // LOGGY.info(outputFile);
 
                 bm_outputFile = new File(outputFile);
             }
 
             if (cmdLine.hasOption("k")) {
                 String outputFile = cmdLine.getOptionValue("k");
-                //                LOGGY.info(outputFile);
+                // LOGGY.info(outputFile);
                 kind2_resultFile = new File(outputFile);
 
-                //                if (kind2_resultFile.exists()) {
-                //                    kind2_resultFile.createNewFile();
-                //                }
+                // if (kind2_resultFile.exists()) {
+                // kind2_resultFile.createNewFile();
+                // }
             }
             {
                 kind2_resultFile = new File(kind2TmpDumpFile);
             }
 
-            VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
-            lustreOutputer.marshalToLustre(lustreModel, lustreFile);
+            // VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
+            // lustreOutputer.marshalToLustre(lustreModel, lustreFile);
 
-            //            translator.marshalToLustre(vdm_model, lustreFile);
+            VDMLustreTranslator lustreOutputer = new VDMLustreTranslator();
+            lustreOutputer.dumpLustre(lustreModel, lustreFile);
+
+            // translator.marshalToLustre(vdm_model, lustreFile);
 
             LOGGY.info("*************Executor*******************");
 

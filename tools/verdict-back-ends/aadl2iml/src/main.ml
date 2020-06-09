@@ -59,6 +59,41 @@ let expand_dirs input_files =
   in
   loop [] input_files
 
+
+let process_aadl_project input output_file verdict_props =
+  let input = AADLInput.merge_packages (List.rev input) in
+  match List.find_opt AADLAst.is_aadl_package input with
+  | None -> ()
+  | Some ast -> (
+    match AADL2VDMIML.aadl_ast_to_vdm_iml verdict_props ast with
+    | None -> ()
+    | Some vdm_iml -> (
+      if output_file = "" then
+        Format.printf "%a@." VDMIML.pp_print_vdm_iml vdm_iml
+      else
+        write_vdm_iml_model_to_file vdm_iml output_file
+    )
+  )
+ 
+let process_aadl_project_error_version input output_file prop_set_name =
+  (*List.iter process_ast (AADLInput.merge_packages (List.rev input));*)
+  match AADLInput.get_verdict_properties prop_set_name input with
+  | None -> Format.eprintf "Property set '%s' not found!@." prop_set_name
+  | Some verdict_props -> process_aadl_project input output_file verdict_props
+
+let process_aadl_project_warning_version input output_file prop_set_name =
+  let verdict_props =
+    match AADLInput.get_verdict_properties prop_set_name input with
+    | Some vp -> vp
+    | None -> (
+      Format.eprintf "WARNING: Property set '%s' not found!@." prop_set_name;
+      let name = (Position.dummy_pos, prop_set_name) in
+      AADLAst.({ name; imported_units = []; declarations = [] }) 
+    )
+  in
+  process_aadl_project input output_file verdict_props
+
+
 let process_input_files input_files output_file prop_set_name =
 
   try (
@@ -67,23 +102,8 @@ let process_input_files input_files output_file prop_set_name =
     | Ok input -> (
       match AADLInput.sort_model_units input with
       | Ok input -> (
-        (*List.iter process_ast (AADLInput.merge_packages (List.rev input));*)
-        match AADLInput.get_verdict_properties prop_set_name input with
-        | None -> Format.eprintf "Property set '%s' not found!@." prop_set_name
-        | Some verdict_props ->
-          let input = AADLInput.merge_packages (List.rev input) in
-          match List.find_opt AADLAst.is_aadl_package input with
-          | None -> ()
-          | Some ast -> (
-            match AADL2VDMIML.aadl_ast_to_vdm_iml verdict_props ast with
-            | None -> ()
-            | Some vdm_iml -> (
-              if output_file = "" then
-                Format.printf "%a@." VDMIML.pp_print_vdm_iml vdm_iml
-              else
-                write_vdm_iml_model_to_file vdm_iml output_file
-            )
-          )
+        (* process_aadl_project_error_version input output_file prop_set_name *)
+        process_aadl_project_warning_version input output_file prop_set_name
       )
       | Error _ ->
         Format.eprintf "Cycle found!@."

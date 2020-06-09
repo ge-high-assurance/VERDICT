@@ -109,6 +109,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 public class Aadl2CsvTranslator {
 	String scenario = "";
 	List<ComponentImplementation> compImpls = new ArrayList<>();
+	Map<String, List<Property>> propSetNameToCompProps = new LinkedHashMap<>();
+	Map<String, List<Property>> propSetNameToConnProps = new LinkedHashMap<>();
 	Map<Property, String> connPropertyToName = new LinkedHashMap<>();
 	Map<Property, String> componentPropertyToName = new LinkedHashMap<>();
 	Map<Property, String> abstractPropertyToName = new LinkedHashMap<>();
@@ -229,6 +231,12 @@ public class Aadl2CsvTranslator {
 			} else if (obj instanceof ProcessorImplementation) {
 				compImpls.add((ProcessorImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
+//				String propertySetName = ((PropertySetImpl)obj).getName();
+				List<Property> compProps = new ArrayList<Property>();
+				Set<Property> compPropSet = new HashSet<Property>();
+				List<Property> connProps = new ArrayList<Property>();
+				Set<Property> connPropSet = new HashSet<Property>();
+				
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {					
 					// Save property owner to be used later					
 					for(PropertyOwner po : prop.getAppliesTos()) {
@@ -238,46 +246,57 @@ public class Aadl2CsvTranslator {
 						switch(propCat) {
 							case "system": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							case "thread": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}	
 							case "processor": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							case "memory": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}							
 							case "connection": {
 								connPropertyToName.put(prop, propName);
+								connPropSet.add(prop);
 								break;
 							}
 							case "process": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							case "abstract": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							case "device": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
-							case "thread group": {
+							case "threadgroup": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
-							case "virtual processor": {
+							case "virtualprocessor": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							case "bus": {
 								componentPropertyToName.put(prop, propName);
+								compPropSet.add(prop);
 								break;
 							}
 							default: {
@@ -287,6 +306,11 @@ public class Aadl2CsvTranslator {
 						}				
 					}
 				}
+//				compProps.addAll(compPropSet);
+//				connProps.addAll(connPropSet);
+				
+//				propSetNameToCompProps.put(propertySetName, compProps);
+//				propSetNameToConnProps.put(propertySetName, connProps);
 			} 
 		}
 		
@@ -445,6 +469,13 @@ public class Aadl2CsvTranslator {
     					     "SrcPortName", "SrcPortType", "DestComp", "DestImpl", "DestCompInstance", "DestCompCategory",
     					     "DestPortName", "DestPortType"));
     	headers.addAll(connPropertyToName.values());
+    	
+//		for(Map.Entry<String, List<Property>> entry : propSetNameToConnProps.entrySet()) {
+//			for(Property prop : entry.getValue()) {
+//				headers.add(prop.getName());
+//			}
+//		}    	
+    	
     	
         Table scnConnTable = new Table(headers);
         
@@ -671,6 +702,12 @@ public class Aadl2CsvTranslator {
 		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "Comp", "Impl", "CompInstance"));
 		headers.addAll(componentPropertyToName.values());
 		
+//		for(Map.Entry<String, List<Property>> entry : propSetNameToCompProps.entrySet()) {
+//			for(Property prop : entry.getValue()) {
+//				headers.add(prop.getName());
+//			}
+//		}
+		
 		Table scnCompPropsTable = new Table(headers);	
 		
 		for(ComponentImplementation sysImpl : compImpls) {
@@ -684,6 +721,25 @@ public class Aadl2CsvTranslator {
 					scnCompPropsTable.addValue(subcomp.getComponentType().getName());
 					scnCompPropsTable.addValue(subcompCompTypeName.equalsIgnoreCase(subcompTypeName)?"":subcompTypeName);
 					scnCompPropsTable.addValue(subcomp.getName());					
+					
+//					for(Map.Entry<String, List<Property>> entry : propSetNameToCompProps.entrySet()) {
+//						for(Property prop : entry.getValue()) {
+//							if(isApplicableToCat(prop, compCatName)) {
+//								String value = "";
+//								PropertyAcc propAcc = subcomp.getPropertyValue(prop);
+//								PropertyExpression defPropExpr = prop.getDefaultValue();
+//								
+//								if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+//									value = getStrRepofPropVal(subcomp.getPropertyValue(prop));	
+//								} else if(defPropExpr != null) {
+//									value = getStrRepofExpr(defPropExpr)[0];
+//								}
+//								scnCompPropsTable.addValue(value);
+//							} else {
+//								scnCompPropsTable.addValue("");	
+//							}
+//						}
+//					}					
 					
 					for(Property prop : componentPropertyToName.keySet()) {
 						if(isApplicableToCat(prop, compCatName)) {

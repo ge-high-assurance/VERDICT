@@ -25,6 +25,8 @@ let pp_print_id ppf (_, id) = Format.fprintf ppf "%s" id
 
 let get_id (_, id) = id
 
+let get_pos (pos, _) = pos
+
 let pp_print_pname ppf pn =
   let pp_sep ppf () = Format.fprintf ppf "::" in
   Format.pp_print_list ~pp_sep pp_print_id ppf pn
