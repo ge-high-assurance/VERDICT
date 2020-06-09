@@ -16,7 +16,6 @@ import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
 import edu.uiowa.clc.verdict.util.Exec;
 import edu.uiowa.clc.verdict.util.LOGGY;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
-import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.cli.CommandLine;
@@ -28,6 +27,7 @@ import org.apache.commons.cli.ParseException;
 import verdict.vdm.vdm_model.Model;
 
 // Coordinate All processes.
+// 0. IML2VDM - Disabled.
 // 1. Instrumentor
 // 2. LustreTranslator
 // 3. BlameAssignment
@@ -76,7 +76,7 @@ public class App {
 
             if (fileExt.equals("iml")) {
                 // Use IML model
-                vdm_model = ResourceTest.setup(InputFile);
+                //                vdm_model = ResourceTest.setup(InputFile);
 
                 // Store VDM in a temporary file
                 translator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
@@ -136,8 +136,8 @@ public class App {
                 kind2_resultFile = new File(kind2TmpDumpFile);
             }
 
-            //            VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
-            //            lustreOutputer.marshalToLustre(lustreModel, lustreFile);
+            // VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
+            // lustreOutputer.marshalToLustre(lustreModel, lustreFile);
 
             VDMLustreTranslator lustreOutputer = new VDMLustreTranslator();
             lustreOutputer.dumpLustre(lustreModel, lustreFile);
