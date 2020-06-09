@@ -354,7 +354,7 @@ public class VDM2Lustre {
             String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                user_defined_type = user_defined_type + "_Impl";
+                //                user_defined_type = user_defined_type + "_Impl";
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -405,7 +405,7 @@ public class VDM2Lustre {
             if (recordLiteral != null) {
 
                 String identifier = recordLiteral.getRecordType();
-                identifier = identifier.replace(".i", "_I");
+                identifier = identifier.replace(".", "_");
                 recordLiteral.setRecordType(identifier);
 
                 for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
@@ -493,7 +493,7 @@ public class VDM2Lustre {
             //            String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                user_defined_type = user_defined_type + "_Impl";
+                //                user_defined_type = user_defined_type + "_Impl";
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -525,7 +525,7 @@ public class VDM2Lustre {
         }
 
         if (user_defined_type != null) {
-            user_defined_type = user_defined_type + "_Impl";
+            //            user_defined_type = user_defined_type + "_Impl";
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -880,7 +880,7 @@ public class VDM2Lustre {
         //        Expression expr = constantDeclaration.getDefinition();
 
         if (user_defined_type != null) {
-            user_defined_type = user_defined_type + "_Impl";
+            //            user_defined_type = user_defined_type + "_Impl";
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -908,7 +908,7 @@ public class VDM2Lustre {
             RecordType record_type = data_type.getRecordType();
 
             if (record_type != null) {
-                identifier = identifier + "_Impl";
+                //                identifier = identifier + "_Impl";
 
                 List<RecordField> record_fields = record_type.getRecordField();
 
@@ -919,7 +919,8 @@ public class VDM2Lustre {
                     String user_defined_type = data_type.getUserDefinedType();
 
                     if (user_defined_type != null) {
-                        user_defined_type = user_defined_type + "_Impl";
+                        //                        user_defined_type = user_defined_type + "_Impl";
+
                         for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
                             if (user_defined_type.equals(type_declaration.getName())) {
                                 data_type.setUserDefinedType(user_defined_type);

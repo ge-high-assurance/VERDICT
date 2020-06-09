@@ -1023,7 +1023,7 @@ public class VDMParser extends Parser {
 
                 String identifier = Identifier();
                 // Renaming dot[.] in Type Declaration Identifier.
-                identifier = identifier.replace(".", "_dot_");
+                identifier = identifier.replace(".", "_");
 
                 typeDeclaration.setName(identifier);
 
