@@ -198,6 +198,17 @@ system_type:
 sys_features_section:
   | { [] }
   | FEATURES NONE ";" { [] }
+  | FEATURES fs = sys_feature_list { fs }
+
+sys_feature_list:
+  | dp = data_port { [dp] }
+  | ep = event_port { [ep] }
+  | dp = data_port; fs =  sys_feature_list { dp :: fs }
+  | ep = event_port; fs =  sys_feature_list { ep :: fs }
+  | data_access { [] }
+  | data_access; fs =  sys_feature_list { fs }
+
+(*
   | FEATURES fs = nonempty_list(sys_feature) { fs }
 
 sys_feature:
@@ -218,6 +229,7 @@ sys_feature:
     }
   }
   (* INCOMPLETE *)
+*)
 
 data_port:
   pid = port_id; pdir = port_direction;
@@ -401,7 +413,16 @@ qcref:
 sys_connections_section:
   | { [] }
   | CONNECTIONS NONE ";" { [] }
-  | CONNECTIONS cs = nonempty_list(sys_connection) { cs }
+  | CONNECTIONS cs = sys_connection_list { cs }
+
+sys_connection_list:
+  | c = sys_connection
+  { [ c ] }
+  | access_connection { [] }
+  | c = sys_connection; cs = sys_connection_list
+  { c :: cs }
+  | access_connection; cs = sys_connection_list
+  { cs }
 
 sys_connection:
   | pc = port_connection { pc }
