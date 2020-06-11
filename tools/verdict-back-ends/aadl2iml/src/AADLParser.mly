@@ -81,6 +81,8 @@ let mk_package_section header_items body_items =
 %token RCURLY_BRACKET "}"
 %token LPAREN "("
 %token RPAREN ")"
+%token LSQUARE_BRACKET "["
+%token RSQUARE_BRACKET "]"
 %token PLUS "+"
 %token MINUS "-"
 %token STAR "*"
@@ -235,6 +237,7 @@ data_port:
   pid = port_id; pdir = port_direction;
   ie = boption(EVENT); DATA PORT
   qcr = option(qcref); (* aadl2::DataSubcomponentType *)
+  array_dimension?
   prop_assocs = property_associations
   (* INCOMPLETE *)
   ";"
@@ -249,6 +252,7 @@ data_port:
 
 event_port:
   pid = port_id; pdir = port_direction; EVENT PORT
+  array_dimension?
   prop_assocs = property_associations
   (* INCOMPLETE *)
   ";"
@@ -367,6 +371,7 @@ data_subcomponents_section_item:
 data_subcomponent:
   pid = subcomponent_id DATA
   type_ref = option(subcomponent_type_ref)
+  array_dimension?
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
   ";"
@@ -377,6 +382,15 @@ data_subcomponent:
       A.properties = prop_assocs;
     }
   }
+
+array_dimension:
+  "[" array_size? "]" {}
+
+array_size:
+  | int_value {}
+  | qpref {}
+
+int_value: INTEGER_LIT {}
 
 system_subcomponent:
   pid = subcomponent_id system_or_like

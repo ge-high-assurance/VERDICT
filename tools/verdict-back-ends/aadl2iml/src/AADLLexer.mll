@@ -126,6 +126,8 @@ rule token = parse
   | '}'              { P.RCURLY_BRACKET }
   | '('              { P.LPAREN }
   | ')'              { P.RPAREN }
+  | '['              { P.LSQUARE_BRACKET }
+  | ']'              { P.RSQUARE_BRACKET }
 
   | '+'              { P.PLUS }
   | '-'              { P.MINUS }
