@@ -557,6 +557,11 @@ public class VDMParser extends Parser {
                 expression.setPre(pre_expr);
                 return expression;
             }
+            if (type == Type.EVENT) {
+                Expression event_expr = expression();
+                expression.setEvent(event_expr);
+                return expression;
+            }
             if (type == Type.TO_REAL) {
                 Expression real_expr = expression();
                 expression.setToReal(real_expr);
@@ -1175,7 +1180,9 @@ public class VDMParser extends Parser {
     // type Port {
     // name: Identifier;
     // mode: PortMode;
+    // is_event: Bool;
     // ptype: Option<DataType>;
+    // probe: Bool;
     // };
 
     public Port port(String componentID) {
@@ -1199,10 +1206,29 @@ public class VDMParser extends Parser {
                 PortMode portMode = portMode();
                 port.setMode(portMode);
             } else if (token.type == Type.BOOL) {
-                consume(Type.BOOL);
-                boolean value = token.getTruthValue();
-                consume(Type.Boolean);
-                port.setProbe(value);
+
+                //                consume(Type.BOOL);
+
+                String type_value = this.token.sd.getName();
+                Type type = Type.get(type_value);
+
+                if (type == Type.PROBE) {
+                    consume(Type.PROBE);
+
+                    boolean is_probe = token.getTruthValue();
+
+                    port.setProbe(is_probe);
+                    consume(Type.Boolean);
+
+                } else if (type == Type.IS_EVENT) {
+                    consume(Type.IS_EVENT);
+
+                    boolean is_event = token.getTruthValue();
+
+                    port.setEvent(is_event);
+                    consume(Type.Boolean);
+                }
+
             } else if (token.type == Type.OPTION) {
                 consume(Type.OPTION);
 
