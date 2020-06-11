@@ -25,6 +25,7 @@
         <module>verdict-crv</module>
         <module>verdict-stem-runner</module>
         <module>verdict-bundle</module>
+        <module>verdict-synthesis</module>
     </modules>
 
     <!-- Define dep versions here for consistency between modules -->
@@ -90,6 +91,11 @@
             <dependency>
                 <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-test-instrumentor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-synthesis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
