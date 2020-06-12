@@ -15,8 +15,8 @@ public final class DNot implements DTree {
         return "(not " + child.prettyPrint() + ")";
     }
 
-	@Override
-	public BoolExpr smt(Context context) {
-		return context.mkNot(child.smt(context));
-	}
+    @Override
+    public BoolExpr smt(Context context) {
+        return context.mkNot(child.smt(context));
+    }
 }
