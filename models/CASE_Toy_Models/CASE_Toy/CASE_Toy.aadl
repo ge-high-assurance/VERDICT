@@ -133,6 +133,9 @@ public
 				VERDICT_Properties::componentType => SwHwHybrid;
 				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
 				VERDICT_Properties::staticCodeAnalysis => 7;
+				VERDICT_Properties::inputValidation => 7;
+				VERDICT_Properties::memoryProtection => 7;
+				VERDICT_Properties::secureBoot => 7;
 			};
 			imu: system IMU
 			{
@@ -258,22 +261,6 @@ public
 		**};
 	end Controller;
 
-	system Environment
-		features
-			constellation: out data port SatelliteConstellation;
-			satellite_sig: out data port SatelliteSignals;
-			imu_ref: out data port Position.impl;
-			delivery_location: out data port Position.impl;
-			init: out data port Base_Types::Boolean;
-		annex agree {**
-			guarantee "delivery location is not a bad location":
-				init => not IsBadLocation(delivery_location);
-			
-			guarantee "initialization only happens once":
-				true -> (pre(HasHappened(init)) => not init);			
-		**};
-	end Environment;
-
 	system UAVToySystem
 		features
 			-- Inputs
@@ -286,8 +273,27 @@ public
 			status: out data port Status;
 			-- Probe
 			delivery_location_out: out data port Position.impl
-			{VERDICT_Properties::probe => true;};
+			{
+				VERDICT_Properties::probe => true;
+			};
 			
+		annex agree {**
+			assume "delivery location is not a bad location":
+				init => not IsBadLocation(delivery_location_in);
+			
+			assume "initialization only happens once":
+				true -> (pre(HasHappened(init)) => not init);
+				
+			eq init_delivery_location: Position.impl =
+				if FirstTimeHolds(init) then delivery_location_in
+				else (delivery_location_in -> pre(init_delivery_location));
+				
+			guarantee "P1: UAV system delivers only if delivery location is the one provided in the initialization":
+				status = enum(Status, Confirmed) => delivery_location_out = init_delivery_location;
+			
+			guarantee "P2: UAV system does not deliver in a bad location":
+				not (status = enum(Status, Confirmed) and IsBadLocation(delivery_location_out));			
+		**};
 	end UAVToySystem;
 	
 	system implementation UAVToySystem.Impl
@@ -298,6 +304,9 @@ public
 				VERDICT_Properties::componentType => SwHwHybrid;
 				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
 				VERDICT_Properties::staticCodeAnalysis => 7;
+				VERDICT_Properties::inputValidation => 7;
+				VERDICT_Properties::memoryProtection => 7;
+				VERDICT_Properties::secureBoot => 7;
 			};
 			sbus: system SystemBus
 			{
@@ -332,8 +341,7 @@ public
 			};
 			i4: port delivery_location_in -> dm.delivery_location_in
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				VERDICT_Properties::connectionType => Untrusted;
 			};
 			i5: port init -> dm.init
 			{ 
@@ -375,97 +383,5 @@ public
 			p1: port contr.delivery_location_out -> delivery_location_out;
 			 
 	end UAVToySystem.Impl;
-	
-	system CASE_Toy_Model
-		features
-			-- Outputs
-			status: out data port Status;
-			
-			-- Probe
-			delivery_location_in: out data port Position.impl
-			{
-				VERDICT_Properties::probe => true;
-			};
-			init: out data port Base_Types::Boolean
-			{
-				VERDICT_Properties::probe => true;
-			};
-			delivery_location_out: out data port Position.impl
-			{
-				VERDICT_Properties::probe => true;
-			};
-			
-		annex agree {**
-			eq dummy_pos: Position.impl = delivery_location_in;
-				
-			eq init_delivery_location: Position.impl =
-				if FirstTimeHolds(init) then delivery_location_in
-				else (dummy_pos -> pre(init_delivery_location));
-				
-			guarantee "P1: UAV system delivers only if delivery location is the one provided in the initialization":
-				status = enum(Status, Confirmed) => delivery_location_out = init_delivery_location;
-			
-			guarantee "P2: UAV system does not deliver in a bad location":
-				not (status = enum(Status, Confirmed) and IsBadLocation(delivery_location_out));
-		**};
-	end CASE_Toy_Model;
-	
-	system implementation CASE_Toy_Model.Impl
-		subcomponents
-			env: system Environment
-			{
-				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::strongCryptoAlgorithms => 7;
-				VERDICT_Properties::physicalAccessControl => 7;
-			};
-			uav_system: system UAVToySystem.Impl
-			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				VERDICT_Properties::staticCodeAnalysis => 7;
-				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::memoryProtection => 7;
-				VERDICT_Properties::secureBoot => 7;
-			};
-			
-		connections
-			c1: port env.constellation -> uav_system.constellation
-			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
-			};
-			c2: port env.satellite_sig -> uav_system.satellite_sig
-			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
-			};
-			c3: port env.imu_ref -> uav_system.imu_ref
-			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
-			};
-			c4: port env.delivery_location -> uav_system.delivery_location_in
-			{ 
-				VERDICT_Properties::deviceAuthentication => 0;
-				VERDICT_Properties::sessionAuthenticity => 0;
-			};
-			c5: port env.init -> uav_system.init
-			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
-			};
-			
-			o1: port uav_system.status -> status
-			{
-				VERDICT_Properties::connectionType => Trusted;
-			};
-			
-			p1: port env.delivery_location -> delivery_location_in;
-			p2: port env.init -> init;
-			p3: port uav_system.delivery_location_out -> delivery_location_out;
-			
-	end CASE_Toy_Model.Impl;
-	
+
 end CASE_Toy;
