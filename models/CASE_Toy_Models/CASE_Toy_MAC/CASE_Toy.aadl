@@ -2,7 +2,7 @@ package CASE_Toy
 public
 	with Base_Types;
 	with Data_Model;
-	with VERDICT_Properties;
+	with CASE_Consolidated_Properties;
 	
 	data Position
 	end Position;
@@ -153,86 +153,86 @@ public
 		subcomponents
 			dd: system DeliveryDriver
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
-				VERDICT_Properties::staticCodeAnalysis => 7;
-				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::memoryProtection => 7;
-				VERDICT_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
 			};
 			imu: system IMU
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::category => "IMU";
-				VERDICT_Properties::pedigree => Sourced;
-				VERDICT_Properties::supplyChainSecurity => 7;
-				VERDICT_Properties::tamperProtection => 7;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::category => "IMU";
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::tamperProtection => 7;
 			};
 			gps: system GPS
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::category => "GPS";
-				VERDICT_Properties::pedigree => Sourced;
-				VERDICT_Properties::supplyChainSecurity => 7;
-				VERDICT_Properties::tamperProtection => 7;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::category => "GPS";
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::tamperProtection => 7;
 			};
 		connections
 			i1: port delivery_location_in -> dd.delivery_location_in
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i2: port init -> dd.init
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			
 			i3: port imu_ref -> imu.imu_ref
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i4: port init -> imu.init
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i5: port constellation -> gps.constellation
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i6: port satellite_sig -> gps.satellite_sig
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i7: port init -> gps.init
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i8: port mac -> dd.mac
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			
 			o1: port dd.delivery_location_out -> delivery_location_out
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			o2: port imu.imu_out -> imu_out
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			o3: port gps.gps_out -> gps_out
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 	end DeliveryManager.Impl;
 
@@ -302,11 +302,11 @@ public
 			-- Probe
 			status: out data port Status
 			{
-				VERDICT_Properties::probe => true;
+				CASE_Consolidated_Properties::probe => true;
 			};
 			delivery_location_out: out data port Position.impl
 			{
-				VERDICT_Properties::probe => true;
+				CASE_Consolidated_Properties::probe => true;
 			};
 			
 		annex agree {**
@@ -334,84 +334,84 @@ public
 		subcomponents
 			dm: system DeliveryManager.Impl
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
-				VERDICT_Properties::staticCodeAnalysis => 7;
-				VERDICT_Properties::inputValidation => 7;
-				VERDICT_Properties::memoryProtection => 7;
-				VERDICT_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
 			};
 			sbus: system SystemBus
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::pedigree => Sourced;
-				VERDICT_Properties::supplyChainSecurity => 7;
-				VERDICT_Properties::tamperProtection => 7;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::tamperProtection => 7;
 			};
 			contr: system Controller
 			{
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::componentType => SwHwHybrid;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => SwHwHybrid;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
 			};
 		
 		connections
 			i1: port constellation -> dm.constellation
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i2: port satellite_sig -> dm.satellite_sig
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i3: port imu_ref -> dm.imu_ref
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i4: port delivery_location_in -> dm.delivery_location_in
 			{ 
-				VERDICT_Properties::connectionType => Untrusted;
+				CASE_Consolidated_Properties::connectionType => Untrusted;
 			};
 			i5: port init -> dm.init
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			i6: port mac -> dm.mac
 			{ 
-				VERDICT_Properties::deviceAuthentication => 7;
-				VERDICT_Properties::sessionAuthenticity => 7;
+				CASE_Consolidated_Properties::deviceAuthentication => 7;
+				CASE_Consolidated_Properties::sessionAuthenticity => 7;
 			};
 			
 			c1: port dm.imu_out -> sbus.imu_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			c2: port dm.gps_out -> sbus.gps_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			c3: port dm.delivery_location_out -> sbus.delivery_location_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			
 			c4: port sbus.imu_out -> contr.imu_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			c5: port sbus.gps_out -> contr.gps_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			c6: port sbus.delivery_location_out -> contr.delivery_location_in
 			{
-				VERDICT_Properties::connectionType => Trusted;
+				CASE_Consolidated_Properties::connectionType => Trusted;
 			};
 			
 			p1: port contr.status -> status;
