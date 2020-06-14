@@ -52,7 +52,8 @@ public
 		
 		-- The definition of this predicate is actually irrelevant
 		-- for analysis purposes. It is here only to overcome
-		-- some limitations of AGREE 
+		-- a limitation of AGREE, namely, the lack of support
+		-- for uninterpreted predicates.
 		node IsBadLocation(p: Position.impl) returns (f: bool);
 		let
 			f = (25.0 <= p.latitude and p.latitude <= 50.0) and 
@@ -269,9 +270,11 @@ public
 			imu_ref: in data port Position.impl;
 			delivery_location_in: in data port Position.impl;
 			init: in data port Base_Types::Boolean;
-			-- Outputs
-			status: out data port Status;
 			-- Probe
+			status: out data port Status
+			{
+				VERDICT_Properties::probe => true;
+			};
 			delivery_location_out: out data port Position.impl
 			{
 				VERDICT_Properties::probe => true;
@@ -375,12 +378,9 @@ public
 				VERDICT_Properties::connectionType => Trusted;
 			};
 			
-			o1: port contr.status -> status
-			{
-				VERDICT_Properties::connectionType => Trusted;
-			};
+			p1: port contr.status -> status;
 			
-			p1: port contr.delivery_location_out -> delivery_location_out;
+			p2: port contr.delivery_location_out -> delivery_location_out;
 			 
 	end UAVToySystem.Impl;
 
