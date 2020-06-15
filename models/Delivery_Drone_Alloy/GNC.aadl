@@ -15,8 +15,7 @@ public
 			-- outputs
 			gps_pos: out data port Data_Types::Position.impl;
 			gps_health_status: out data port Base_Types::Boolean;
-			gps_probe_constellation: out data port Data_Types::Constellation
-			{ VERDICT_Properties::probe => true; };
+			gps_probe_constellation: out data port Data_Types::Constellation;
 	end GPS;
 
 	system IMU
@@ -55,18 +54,34 @@ public
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hybrid;
-				-- VERDICT_Properties::manufacturer => InHouse; -- Fix for Logic Bomb / Hardware Trojan
+				VERDICT_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with connectionType for c12 and c34 to Untrusted
 				VERDICT_Properties::pedigree => COTS;
-				VERDICT_Properties::category => GPSCat;	
-				VERDICT_Properties::adversariallyTested => false;															
+				VERDICT_Properties::category => GPSCat;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				
+				VERDICT_Properties::adversariallyTested => false;
+
+				-- VERDICT Cyber Defenses & DAL Mitigations
+				
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::staticCodeAnalysis => false;
+				VERDICT_Properties::strongCryptoAlgorithms => false;												
 			};
 			imu: system IMU
 			{ 
 				-- VERDICT Component Properties
-				VERDICT_Properties::category => IMUCat;
 				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => Sourced;
+				VERDICT_Properties::category => IMUCat;
+				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				
+				-- VERDICT Cyber Defenses & DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::secureBoot => false;
 			};
 		connections
 			i1: port gnc_constellation -> gps.gps_constellation;

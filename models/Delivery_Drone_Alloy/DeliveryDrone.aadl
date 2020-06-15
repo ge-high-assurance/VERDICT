@@ -29,8 +29,7 @@ public
 			nav_move: out data port Base_Types::Boolean;				
 			nav_cur_pos: out data port Data_Types::Position.impl;
 			nav_pos_act_out: out data port Data_Types::Position.impl;
-			nav_probe_dest_pos: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
+			nav_probe_dest_pos: out data port Data_Types::Position.impl;
 	end Navigation;
 	
 	system FlightControl
@@ -74,14 +73,11 @@ public
 			dp_bus_out: out data port Base_Types::Boolean;
 	        dp_nav_cmd: out data port Base_Types::Boolean;					
 			dp_camera: out data port Base_Types::Boolean;
-			dp_probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
-			{ VERDICT_Properties::probe => true; };
+			dp_probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
 			dp_constellation: out data port Data_Types::Constellation; 
 			launch_pos: out data port Data_Types::Position.impl;
-			dp_probe_init_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; 
-			dp_probe_abort_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; }; 
+			dp_probe_init_mode: out data port Base_Types::Boolean;
+			dp_probe_abort_mode: out data port Base_Types::Boolean;
 			dp_target_clear: out data port Base_Types::Boolean;
 			dp_valid_marker: out data port Base_Types::Boolean;
 	end DeliveryPlanner;
@@ -134,28 +130,18 @@ public
 			dds_comm2: out data port Base_Types::Boolean;
 			dds_bus2: out data port Base_Types::Boolean;			
 			
-			dds_radio_cmd: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
-			dds_radio_response: out data port Data_Types::RadioResponse.impl
-			{ VERDICT_Properties::probe => true; };
-			dds_delivery_status: out data port Data_Types::DeliveryStatus
-			{ VERDICT_Properties::probe => true; };
+			dds_radio_cmd: out data port Base_Types::Boolean;
+			dds_radio_response: out data port Data_Types::RadioResponse.impl;
+			dds_delivery_status: out data port Data_Types::DeliveryStatus;
 			
 			dds_actuation_out: out data port Base_Types::Boolean;
-			dds_probe_init_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_abort_mode: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_constellation: out data port Data_Types::Constellation
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_launch_location: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_delivery_location: out data port Data_Types::Position.impl
-			{ VERDICT_Properties::probe => true; };
-			dds_probe_fly_cmd: out data port Base_Types::Boolean
-			{ VERDICT_Properties::probe => true; };
+			dds_probe_init_mode: out data port Base_Types::Boolean;
+			dds_probe_abort_mode: out data port Base_Types::Boolean;
+			dds_probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
+			dds_probe_constellation: out data port Data_Types::Constellation;
+			dds_probe_launch_location: out data port Data_Types::Position.impl;
+			dds_probe_delivery_location: out data port Data_Types::Position.impl;
+			dds_probe_fly_cmd: out data port Base_Types::Boolean;
 	end DeliveryDroneSystem;
 	
 	system implementation DeliveryDroneSystem.Impl
@@ -166,155 +152,255 @@ public
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::staticCodeAnalysis => false;
+				VERDICT_Properties::strongCryptoAlgorithms => false;
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;	
 			};
 			positionEstimator: system PositionEstimator
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => COTS; 
-			 	VERDICT_Properties::adversariallyTested => false;
-			 	--VERDICT_Properties::adversariallyTested => true; -- Fix for Logic Bomb
+
+		
+				VERDICT_Properties::adversariallyTested => false;
+				--VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::staticCodeAnalysis => false;
+				VERDICT_Properties::strongCryptoAlgorithms => false;
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 				
 			};
 			navigation: system Navigation
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 
 			};
 			fc: system FlightControl
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 			};
 			actuation: system Actuation
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
 			 	-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Software;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => Sourced;
 				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				
+	
+			
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::secureBoot => false;
+				VERDICT_Properties::staticCodeAnalysis => false;
+				VERDICT_Properties::strongCryptoAlgorithms => false;
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+				
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 
 			};
 			camera: system Camera
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
+				VERDICT_Properties::insideTrustedBoundary => true;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
+				
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				VERDICT_Properties::supplyChainSecurity => false;
+				VERDICT_Properties::systemAccessControl => false;
 			};
 			
 			connector: system Connector
 			{
 				-- VERDICT Component Properties
-			 	VERDICT_Properties::componentType => Hybrid;
-			 	
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::insideTrustedBoundary => true;
 			 	VERDICT_Properties::pedigree => COTS;
 			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-			 	VERDICT_Properties::adversariallyTested => false;
+				
+				VERDICT_Properties::adversariallyTested => false;
 			};
 			
 		connections
-			c1: port positionEstimator.pos_est_est_pos -> navigation.nav_est_pos;
+			c1: port positionEstimator.pos_est_est_pos -> navigation.nav_est_pos
+			{VERDICT_Properties::connectionType => Trusted;};			
 			
-			c1b: port deliveryPlanner.launch_pos -> gnc.gnc_launch_pos;
+			c1b: port deliveryPlanner.launch_pos -> gnc.gnc_launch_pos
+			{VERDICT_Properties::connectionType => Trusted;};			
 			
-			c2: port navigation.nav_move -> fc.fc_move;
+			c2: port navigation.nav_move -> fc.fc_move
+			{VERDICT_Properties::connectionType => Trusted;};
 
-			c3: port fc.fc_fc_state -> navigation.nav_flight_control_state;
+			c3: port fc.fc_fc_state -> navigation.nav_flight_control_state
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c4: port deliveryPlanner.dp_dest_location -> navigation.nav_dest_pos;
+			c4: port deliveryPlanner.dp_dest_location -> navigation.nav_dest_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c5: port navigation.nav_cur_pos -> deliveryPlanner.dp_cur_pos;
+			c5: port navigation.nav_cur_pos -> deliveryPlanner.dp_cur_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c7: port deliveryItemMechanism.dim_delivery_status_out -> deliveryPlanner.dp_delivery_status;
+			c7: port deliveryItemMechanism.dim_delivery_status_out -> deliveryPlanner.dp_delivery_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c9: port camera.cm_camera_out -> deliveryPlanner.dp_camera_result;
+			c9: port camera.cm_camera_out -> deliveryPlanner.dp_camera_result
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c10: port deliveryPlanner.dp_radio_cmd -> radio.rd_radio_in;
+			c10: port deliveryPlanner.dp_radio_cmd -> radio.rd_radio_in
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c11: port radio.rd_radio_out -> deliveryPlanner.dp_radio_response;
+			c11: port radio.rd_radio_out -> deliveryPlanner.dp_radio_response
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c12: port gnc.gnc_gps_pos -> positionEstimator.pos_est_gps_pos;
+			c12: port gnc.gnc_gps_pos -> positionEstimator.pos_est_gps_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c14a: port dds_bus1 -> connector.conn_bus_in;
+			c14a: port dds_bus1 -> connector.conn_bus_in
+			{VERDICT_Properties::connectionType => Untrusted;};
 			
-			c14b: port connector.conn_bus_out -> DeliveryPlanner.dp_bus_in;
+			c14b: port connector.conn_bus_out -> DeliveryPlanner.dp_bus_in
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c15: port deliveryPlanner.dp_bus_out -> dds_bus2;
+			c15: port deliveryPlanner.dp_bus_out -> dds_bus2
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c16: port dds_comm1 -> radio.rd_comm_in
-			{VERDICT_Properties::connectionType => Remote;
-			 VERDICT_Properties::authenticated => false;
-			 VERDICT_Properties::dataEncrypted => false;
-			};
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c17: port radio.rd_comm_out -> dds_comm2;
+			c17: port radio.rd_comm_out -> dds_comm2
+			{VERDICT_Properties::connectionType => Trusted;};
 
-			c18a: port gnc.gnc_imu_pos -> positionEstimator.pos_est_imu_pos;
+			c18a: port gnc.gnc_imu_pos -> positionEstimator.pos_est_imu_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c19: port fc.fc_motor_cmd -> actuation.motor_cmd;
+			c19: port fc.fc_motor_cmd -> actuation.motor_cmd
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c20: port actuation.response -> fc.fc_actuation_response;	
+			c20: port actuation.response -> fc.fc_actuation_response
+			{VERDICT_Properties::connectionType => Trusted;};	
 
-			c22: port dds_satellite0_sig_pos -> gnc.gnc_satellite0_pos;
+			c22: port dds_satellite0_sig_pos -> gnc.gnc_satellite0_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c23: port dds_satellite1_sig_pos -> gnc.gnc_satellite1_pos;
+			c23: port dds_satellite1_sig_pos -> gnc.gnc_satellite1_pos
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c24: port navigation.nav_pos_act_out -> positionEstimator.pos_est_pos_act_in;
+			c24: port navigation.nav_pos_act_out -> positionEstimator.pos_est_pos_act_in
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c25: port deliveryPlanner.dp_delivery_cmd -> deliveryItemMechanism.dim_delivery_cmd_in;
+			c25: port deliveryPlanner.dp_delivery_cmd -> deliveryItemMechanism.dim_delivery_cmd_in
+			{VERDICT_Properties::connectionType => Trusted;};
 
-			c26: port deliveryPlanner.dp_nav_cmd -> navigation.nav_cmd;
+			c26: port deliveryPlanner.dp_nav_cmd -> navigation.nav_cmd
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c27: port deliveryPlanner.dp_camera -> camera.cm_camera_in;
+			c27: port deliveryPlanner.dp_camera -> camera.cm_camera_in
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c28: port deliveryPlanner.dp_radio_cmd -> dds_radio_cmd;
+			c28: port deliveryPlanner.dp_radio_cmd -> dds_radio_cmd
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c29: port radio.rd_radio_out -> dds_radio_response;
+			c29: port radio.rd_radio_out -> dds_radio_response
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c30: port deliveryItemMechanism.dim_delivery_status_out -> dds_delivery_status;
+			c30: port deliveryItemMechanism.dim_delivery_status_out -> dds_delivery_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c31: port deliveryPlanner.dp_delivery_cmd -> dds_probe_delivery_cmd; 							
+			c31: port deliveryPlanner.dp_delivery_cmd -> dds_probe_delivery_cmd
+			{VERDICT_Properties::connectionType => Trusted;}; 							
 			
-			c32: port actuation.response -> dds_actuation_out;	
+			c32: port actuation.response -> dds_actuation_out
+			{VERDICT_Properties::connectionType => Trusted;};	
 			
-			c33: port deliveryPlanner.dp_constellation -> gnc.gnc_constellation;
+			c33: port deliveryPlanner.dp_constellation -> gnc.gnc_constellation
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c34: port gnc.gnc_gps_health_status -> deliveryPlanner.dp_gps_health_status;
+			c34: port gnc.gnc_gps_health_status -> deliveryPlanner.dp_gps_health_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c35: port gnc.gnc_imu_health_status -> deliveryPlanner.dp_imu_health_status;
+			c35: port gnc.gnc_imu_health_status -> deliveryPlanner.dp_imu_health_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c36: port radio.rd_health_status -> deliveryPlanner.dp_rdo_health_status;
+			c36: port radio.rd_health_status -> deliveryPlanner.dp_rdo_health_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c37: port camera.cm_health_status -> deliveryPlanner.dp_cam_health_status;
+			c37: port camera.cm_health_status -> deliveryPlanner.dp_cam_health_status
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c38: port gnc.gnc_probe_constellation -> dds_probe_constellation;
+			c38: port gnc.gnc_probe_constellation -> dds_probe_constellation
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c39: port deliveryPlanner.dp_probe_init_mode -> dds_probe_init_mode;
+			c39: port deliveryPlanner.dp_probe_init_mode -> dds_probe_init_mode
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c40: port gnc.gnc_probe_launch_pos -> dds_probe_launch_location;
+			c40: port gnc.gnc_probe_launch_pos -> dds_probe_launch_location
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c41: port navigation.nav_probe_dest_pos -> dds_probe_delivery_location;
+			c41: port navigation.nav_probe_dest_pos -> dds_probe_delivery_location
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c42: port deliveryItemMechanism.dim_package_is_secure -> deliveryPlanner.dp_package_is_secure;
+			c42: port deliveryItemMechanism.dim_package_is_secure -> deliveryPlanner.dp_package_is_secure
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c43: port deliveryPlanner.dp_nav_cmd -> dds_probe_fly_cmd;
+			c43: port deliveryPlanner.dp_nav_cmd -> dds_probe_fly_cmd
+			{VERDICT_Properties::connectionType => Trusted;};
 			
-			c44: port deliveryPlanner.dp_probe_abort_mode -> dds_probe_abort_mode;
+			c44: port deliveryPlanner.dp_probe_abort_mode -> dds_probe_abort_mode
+			{VERDICT_Properties::connectionType => Trusted;};
+			
 		properties 
 			VERDICT_Properties::componentType => Hybrid;
 			VERDICT_Properties::pedigree => COTS;

@@ -1,16 +1,120 @@
 property set VERDICT_Properties is
--- Port properties
- probe: aadlboolean applies to (port);
+
+
+ --- MBAA:
+ --- 	componentType is a property used to determine whether the system is subject to attacks targeting software, hardware, humans, or hybrid
+ --- 	(software and hardware). For example, systems that represent software only will not be subject to CAPEC-440 Hardware Integrity Attack.
+ --- CRV:
+ --- 	A componentType designates whether a component is a Software, Hardware, Human, Software-Hardware Hybrid, Software-Human Hybrid, 
+ ---	Hardware-Human Hybrid, or Hybrid.
+ --- 	This helps CRV to decide what sort of attack can the component be susceptible to. For instance, a Hybrid component can be susceptible
+ --- 	to both hardware trojan and software Virus/Worm/Malware attacks whereas a Human component can only be susceptible to insider/outsider threat.
+
+ componentType: enumeration (Software, Hardware, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid, Hybrid) => Hybrid applies to (abstract, bus, device, system, process, processor, thread);
+
+
+ --- MBAA:
+ --- 	insideTrustedBoundary designates a system that will be analyzed for their potential to be attacked. Also, systems where insideTrustedBoundary=TRUE
+ --- 	will not be considered the initial source of attacks.
+ --- CRV:
+ --- 	If a component's insideTrustedBoundary property is true, it signifies to CRV that the component is inside the system's trusted boundary. 
+ ---	For instance, if a human component is inside the trusted boundary of the system, then an insider attack can occur. Or, a connection coming from
+ ---	a component which is not inside the trusted boundary is also susceptible to Network Injection attack. 
+
+ insideTrustedBoundary: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+
+
+ --- MBAA:
+ --- 	pedigree is a property used to infer the level of trust in a system. A "COTS" component will be untrusted and considered a
+ --- 	potential source of attacks, whereas "Sourced" and "InternallyDeveloped" components will be trusted. Both of these can be explicitly
+ --- 	overridden by the insideTrustedBoundary property.
+ ---
+ --- CRV:
+ --- 	The pedigree component property allows CRV to decide whether a component can be susceptible to a Hardware
+ --- 	Trojan, Remote Code Injection, Software Virus/Worm/Malware, a Logic Bomb attack. If a component is designated
+ --- 	as "InternallyDeveloped", it is neither susceptible to a hardware trojan nor a logic bomb attack. For other values,
+ --- 	however, they can be susceptible to the attacks.
+ pedigree: enumeration (InternallyDeveloped, COTS, Sourced) => COTS applies to (abstract, bus, device, system, process, processor, thread);
+
 
 -- Connection properties, including defenses and DAL values
- connectionType: enumeration (Local, Remote) applies to (connection);
- authenticated: aadlboolean applies to (connection);
- dataEncrypted: aadlboolean applies to (connection);
+ connectionType: enumeration (Trusted, Untrusted) => Untrusted applies to (connection);
 
 -- Component properties 
- pedigree: enumeration (InternallyDeveloped, COTS, Sourced) applies to (system);
  category: enumeration (IMUCat, GPSCat, LIDARCat) applies to (system);
- componentType: enumeration (Software, Hardware, Human, Hybrid) applies to (system);
- adversariallyTested: aadlboolean applies to (system);
+ 
+ 
+-- Defense properties
+systemAccessControl: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+
+
+ --- MBAA:
+ --- staticCodeAnalysis
+ ---          SA-11 (1) Static Code Analysis
+ ---                         Enhancement SA-11 (1) is an organizational control specifying the use of software tools to look for common
+ ---                         source code patterns that can be exploited by known attacks.
+ --- CRV:
+ ---    staticCodeAnalysis describes the quality of security analysis that has been performed on the component's implementation source code. Components
+ ---	with zero staticCodeAnalysis may open the door to attacks such as Remote Code Injection and Software Virus/Worm/Malware.
+
+staticCodeAnalysis: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- secureBoot
+ ---          SI-7 (1) Integrity Checks
+ ---          SI-7 (5) Automated Response to Integrity Violations
+ ---          SI-7 (6) Cryptographic Protection
+ ---          SI-7 (9) Verify Boot Process
+ ---          SI-7 (15) Code Authentication
+ ---                         SI-7 Enhancement (1) specifies integrity checks of software, firmware, and information on a system. Enhancement SI-7 (5) defines
+ ---                         the response to detected violations of these checks. Enhancement SI-7 (6) specifies cryptographic algorithms should
+ ---                         be used to perform these checks. Enhancement SI-7 (9) specifies the checks be performed on the boot process to ensures
+ ---                         the system is operating correctly prior to execution. Enhancement SI-7 (15) specifies the checks be performed on all
+ ---                         new software prior to installation and execution to ensure no malicious code is injected.
+ --- CRV:
+ ---    secureBoot is a security mechanism to make sure a device boots using only software that is trusted by the Original Equipment Manufacturer (OEM).
+ ---	Absence of secureBoot (value 0) makes a component vulnerable to Software Virus/Worm/Malware.
+secureBoot: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- strongCryptoAlgorithms
+ ---          SC-13 Cryptographic Protection
+ ---                         SC-13 is an enhancement to controls specifying the use of cryptographic algorithms. Application of this control
+ ---                         ensures only approved algorithms are used and their implementation is sufficient to protect against known attacks.
+ --- CRV:
+ ---    strongCryptoAlgorithms signifies the strength level of cryptographic algorithms in a component's cipher suite. A zero value of strongCryptoAlgorithms
+ ---	for a component means it could expose other components (at the receiving end of its channels) to Network Injection, Remote Code Injection, and 
+ ---	Software Virus/Worm/Malware.
+ strongCryptoAlgorithms: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ 
+  --- MBAA:
+ --- supplyChainSecurity
+ ---          SA-12 Supply Chain Protection
+ ---                         SA-12 is an organizational control listing best practices for acquiring services, systems, components securely. These
+ ---                         best practices include supplier reviews, operational security, component validation, and component identification
+ ---                         and traceability.
+ --- CRV:
+ ---    If there is no supply chain security for a sourced software/hardware component, that is, supplyChainSecurity=0, CRV considers that component to be susceptible 
+ ---    to software and hardware attacks such as Logic bomb and hardware trojans. 
+ supplyChainSecurity: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ 
+ --- MBAA:
+ --- tamperProtection
+ ---          SA-18 (1) [Tamper Resistance and Detection] Multiple Phases of SDLC
+ ---                         Enhancement SA-18 (1) describes multiple technical countermeasures to prevent reverse engineering or tampering with a
+ ---                         component. These countermeasures can include obfuscation, self-checking, and customization.
+ --- CRV:
+ ---    tamperProtection describes the strength level of security mechanism used to protect sensitive information from being changed by an unauthorized 
+ ---	entity. When we have zero tamperProtection, the component is susceptible to Hardware Trojans and Logic Bomb/Software Trojan.
+ 
+ tamperProtection: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ 
+
+--- CRV:
+ --- 	If adversariallyTestedForTrojanOrLogicBomb property of a component is assigned an integer greater than '0', it suggests CRV that even if the
+ --- 	component's pedigree is sourced/COTS, it is not susceptible to hardware trojan or logic bomb type of attacks.
+
+ adversariallyTested: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ 
  
 end VERDICT_Properties;

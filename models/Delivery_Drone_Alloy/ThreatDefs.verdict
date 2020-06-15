@@ -19,6 +19,19 @@ ThreatEffect {
 					privacy violations, and other unwanted outcomes."
 };
 
+
+ThreatEffect {
+	id = "Insider Threats"
+	entities = {s : system | s.componentType = Human}
+	reference = "CAPEC-594"	
+	description = "An adversary injects traffic into the target's network connection. 
+				   The adversary is therefore able to degrade or disrupt the connection, 
+				   and potentially modify the content. This is not a flooding attack, 
+                   as the adversary is not focusing on exhausting resources. Instead, 
+                   the adversary is crafting a specific input to affect the system 
+                   in a particular way. (Traffic Injection)"
+};
+
 ThreatEffect {
 	id = "Network Injection"
 	entities = {s : system | 
