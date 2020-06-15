@@ -1,5 +1,6 @@
 package com.ge.verdict.synthesis;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -18,7 +19,14 @@ public class App {
      */
 
     public static void main(String[] args) {
-		Optional<Set<DLeaf>> selected = VerdictSynthesis.performSynthesis(buildDemo());
+		if (args.length < 1) {
+			throw new RuntimeException("Must specify cost model!");
+		}
+
+		String costModelXml = args[0];
+
+		CostModel costModel = new CostModel(new File(costModelXml));
+		Optional<Set<DLeaf>> selected = VerdictSynthesis.performSynthesis(buildDemo(), costModel, 5);
 		if (selected.isPresent()) {
 			for (DLeaf leaf : selected.get()) {
 				System.out.println("Selected leaf: " + leaf.prettyPrint());

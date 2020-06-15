@@ -14,7 +14,7 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Status;
 
 public class VerdictSynthesis {
-	public static Optional<Set<DLeaf>> performSynthesis(DTree tree) {
+	public static Optional<Set<DLeaf>> performSynthesis(DTree tree, CostModel costModel, int targetDal) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
@@ -22,7 +22,8 @@ public class VerdictSynthesis {
 
         for (DLeaf leaf : leaves) {
 			// this id ("cover") doesn't matter but we have to specify something
-            optimizer.AssertSoft(context.mkNot(leaf.smt(context)), 1, "cover");
+			optimizer.AssertSoft(context.mkNot(leaf.smt(context)),
+					costModel.cost(leaf.defenseProperty, leaf.component, targetDal), "cover");
         }
 
         optimizer.Assert(tree.smt(context));
