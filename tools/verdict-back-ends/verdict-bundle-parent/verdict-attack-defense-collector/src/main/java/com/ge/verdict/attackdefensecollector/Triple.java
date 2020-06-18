@@ -1,8 +1,16 @@
-package com.ge.verdict.synthesis.util;
+package com.ge.verdict.attackdefensecollector;
 
 import java.util.Objects;
 
-public final class Triple<L, M, R> {
+/**
+ * A generic pair. Correctly implements equals() and hashCode(), so may be used as a key to a hash
+ * map. Note that the L and R types must themselves correctly implement equals() and hashCode() for
+ * this to work correctly.
+ *
+ * @param <L> type of left value
+ * @param <R> type of right value
+ */
+public class Triple<L, M, R> {
     public final L left;
     public final M middle;
     public final R right;
@@ -15,13 +23,12 @@ public final class Triple<L, M, R> {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Triple) {
+        if (other instanceof Pair<?, ?>) {
             Triple<?, ?, ?> otherTriple = (Triple<?, ?, ?>) other;
             return left.equals(otherTriple.left)
                     && middle.equals(otherTriple.middle)
                     && right.equals(otherTriple.right);
         }
-
         return false;
     }
 

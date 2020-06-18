@@ -1,13 +1,12 @@
 package com.ge.verdict.synthesis.dtree;
 
+import com.ge.verdict.synthesis.util.Pair;
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.ge.verdict.synthesis.util.Pair;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
 
 /**
  * Represents a component-defense pair. Each component-defense pair is represented by a unique
@@ -17,14 +16,15 @@ public class DLeaf implements DTree {
     public final int id;
     public final String component;
     public final String defenseProperty;
-	public final int cost;
+    public final int cost;
     /** This is purely informative, but should not distinguish different leaves. */
     public final String attack;
 
-	public static DLeaf createIfNeeded(String component, String defenseProperty, String attack, int cost) {
+    public static DLeaf createIfNeeded(
+            String component, String defenseProperty, String attack, int cost) {
         Pair<String, String> key = new Pair<>(component, defenseProperty);
         if (!componentDefenseMap.containsKey(key)) {
-			componentDefenseMap.put(key, new DLeaf(component, defenseProperty, attack, cost));
+            componentDefenseMap.put(key, new DLeaf(component, defenseProperty, attack, cost));
         }
         return componentDefenseMap.get(key);
     }
@@ -42,11 +42,11 @@ public class DLeaf implements DTree {
         return componentDefenseMap.values();
     }
 
-	private DLeaf(String component, String defenseProperty, String attack, int cost) {
+    private DLeaf(String component, String defenseProperty, String attack, int cost) {
         this.component = component;
         this.defenseProperty = defenseProperty;
         this.attack = attack;
-		this.cost = cost;
+        this.cost = cost;
 
         id = idCounter++;
         idMap.put(id, this);
