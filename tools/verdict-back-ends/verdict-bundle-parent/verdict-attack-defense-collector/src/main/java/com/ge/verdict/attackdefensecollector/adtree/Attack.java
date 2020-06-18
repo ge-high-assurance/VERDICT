@@ -1,18 +1,17 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
-import java.util.Locale;
-import java.util.Objects;
-
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.NameResolver;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
+import java.util.Locale;
+import java.util.Objects;
 
 /** An attack on a system, a fundamental unit of the attack-defense tree. */
 public class Attack extends ADTree {
     /** The system to which the attack applies. */
-	private NameResolver<SystemModel> system;
+    private NameResolver<SystemModel> system;
     /** The name of the attack. */
     private String attackName;
     /** The description of the attack. */

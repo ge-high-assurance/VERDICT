@@ -7,4 +7,6 @@ public interface DTree {
     public String prettyPrint();
 
     public BoolExpr smt(Context context);
+
+	public DTree flattenNot();
 }

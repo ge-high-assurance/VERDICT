@@ -1,13 +1,19 @@
 package com.ge.verdict.synthesis;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
+import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
-import java.io.File;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
 
 public class App {
     /*
@@ -17,24 +23,33 @@ public class App {
      * in the Docker image.
      */
 
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            throw new RuntimeException("Must specify cost model!");
+	public static void main(String[] args) throws IOException, MalformedInputException {
+		if (args.length < 2) {
+			throw new RuntimeException("Must specify STEM output directory and cost model XML!");
         }
 
-        String costModelXml = args[0];
+		String stemOutDir = args[0];
+		String costModelXml = args[1];
 
-        CostModel costModel = new CostModel(new File(costModelXml));
-        Optional<Set<DLeaf>> selected =
-                VerdictSynthesis.performSynthesis(buildDemo(), costModel, 5);
-        if (selected.isPresent()) {
-            for (DLeaf leaf : selected.get()) {
-                System.out.println("Selected leaf: " + leaf.prettyPrint());
-            }
-        }
-    }
+		CostModel costModel = new CostModel(new File(costModelXml));
 
-    private static DTree buildDemo() {
+		AttackDefenseCollector collector = new AttackDefenseCollector(stemOutDir);
+		List<Result> results = collector.perform();
+
+		for (Result result : results) {
+			System.out.println();
+			System.out.println("Result for cyber req: " + result.cyberReq.getName());
+			DTree dtree = DTreeConstructor.construct(result.adtree, costModel, result.cyberReq.getSeverityDal());
+			Optional<Set<DLeaf>> selected = VerdictSynthesis.performSynthesis(dtree);
+			if (selected.isPresent()) {
+				for (DLeaf leaf : selected.get()) {
+					System.out.println("Selected leaf: " + leaf.prettyPrint());
+				}
+			}
+		}
+	}
+
+	private static DTree buildDemo() {
         return new DOr(
                 Arrays.asList(
                         new DAnd(

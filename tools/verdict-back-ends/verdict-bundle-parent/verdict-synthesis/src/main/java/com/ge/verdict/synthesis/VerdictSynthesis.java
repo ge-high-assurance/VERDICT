@@ -1,5 +1,10 @@
 package com.ge.verdict.synthesis;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.microsoft.z3.Context;
@@ -7,14 +12,10 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Status;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
 
 public class VerdictSynthesis {
     public static Optional<Set<DLeaf>> performSynthesis(
-            DTree tree, CostModel costModel, int targetDal) {
+			DTree tree) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
@@ -22,10 +23,7 @@ public class VerdictSynthesis {
 
         for (DLeaf leaf : leaves) {
             // this id ("cover") doesn't matter but we have to specify something
-            optimizer.AssertSoft(
-                    context.mkNot(leaf.smt(context)),
-                    costModel.cost(leaf.defenseProperty, leaf.component, targetDal),
-                    "cover");
+			optimizer.AssertSoft(context.mkNot(leaf.smt(context)), leaf.cost, "cover");
         }
 
         optimizer.Assert(tree.smt(context));

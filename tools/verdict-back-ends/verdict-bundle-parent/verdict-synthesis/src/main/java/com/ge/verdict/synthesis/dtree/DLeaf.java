@@ -1,12 +1,13 @@
 package com.ge.verdict.synthesis.dtree;
 
-import com.ge.verdict.synthesis.util.Pair;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.ge.verdict.synthesis.util.Pair;
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
 
 /**
  * Represents a component-defense pair. Each component-defense pair is represented by a unique
@@ -79,4 +80,9 @@ public class DLeaf implements DTree {
     public BoolExpr smt(Context context) {
         return context.mkBoolConst(smtName());
     }
+
+	@Override
+	public DTree flattenNot() {
+		return this;
+	}
 }

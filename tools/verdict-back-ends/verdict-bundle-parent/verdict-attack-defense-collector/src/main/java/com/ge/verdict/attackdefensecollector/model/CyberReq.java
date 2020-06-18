@@ -1,8 +1,9 @@
 package com.ge.verdict.attackdefensecollector.model;
 
-import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ge.verdict.attackdefensecollector.Prob;
 
 /**
  * A cyber requirement. Comprised of a name, a mission to which it belongs, a severity (probability
@@ -18,7 +19,7 @@ public class CyberReq {
     /** The name of the mission to which this cyber requirement belongs. */
     private String mission;
     /** The severity (probability target) of this cyber requirement. */
-    private Prob severity;
+	private int severityDal;
     /** The condition cyber expression. */
     private CyberExpr condition;
 
@@ -30,26 +31,26 @@ public class CyberReq {
      * @param severity the severity (probability target)
      * @param condition the condition cyber expression
      */
-    public CyberReq(String name, String mission, Prob severity, CyberExpr condition) {
+	public CyberReq(String name, String mission, int severity, CyberExpr condition) {
         this.name = name;
         this.mission = mission;
-        this.severity = severity;
+		this.severityDal = severity;
         this.condition = condition;
     }
 
     /**
-     * Construct a new cyber requirement. (Used for CSV input.)
-     *
-     * @param name the name of the cyber requirement
-     * @param mission the mission to which this cyber requirement belongs
-     * @param severity the severity (probability target)
-     * @param portName the condition port name
-     * @param portCia the condition port CIA concern
-     */
-    public CyberReq(String name, String mission, Prob severity, String portName, CIA portCia) {
+	 * Construct a new cyber requirement. (Used for CSV input.)
+	 *
+	 * @param name the name of the cyber requirement
+	 * @param mission the mission to which this cyber requirement belongs
+	 * @param severityDal the severity (probability target)
+	 * @param portName the condition port name
+	 * @param portCia the condition port CIA concern
+	 */
+	public CyberReq(String name, String mission, int severityDal, String portName, CIA portCia) {
         this.name = name;
         this.mission = mission;
-        this.severity = severity;
+		this.severityDal = severityDal;
         condition = new PortConcern(portName, portCia);
     }
 
@@ -85,10 +86,15 @@ public class CyberReq {
         return mission;
     }
 
-    /** @return the severity (probability target) of this cybe requirement */
-    public Prob getSeverity() {
-        return severity;
+	/** @return the severity (probability target) of this cyber requirement */
+	public Prob getSeverity() {
+		return Prob.fromDal(severityDal);
     }
+
+	/** @return the severity DAL (target DAL) of this cyber requirement */
+	public int getSeverityDal() {
+		return severityDal;
+	}
 
     /** @return the condition cyber expression under which this cyber requirement is triggered */
     public CyberExpr getCondition() {
