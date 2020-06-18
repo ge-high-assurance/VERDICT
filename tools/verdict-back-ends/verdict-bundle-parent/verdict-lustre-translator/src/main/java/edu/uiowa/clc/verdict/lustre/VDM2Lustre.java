@@ -483,6 +483,10 @@ public class VDM2Lustre {
             }
 
             Expression expr = symbol.getDefinition();
+
+            expr = visitExpression(expr);
+            symbol.setDefinition(expr);
+
             recordLiteral(expr);
         }
 
