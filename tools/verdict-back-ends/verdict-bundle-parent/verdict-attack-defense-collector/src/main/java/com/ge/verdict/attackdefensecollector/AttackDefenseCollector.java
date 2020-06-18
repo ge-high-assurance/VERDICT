@@ -71,15 +71,15 @@ public class AttackDefenseCollector {
     }
 
     /**
-     * Builds a NameResolver for a specified connection model.
-     *
-     * <p>This method should only be called if the connection model has alreedy been added to the
-     * connection model resolution table. Calling this method without first adding the connection
-     * model to the table will throw an exception.
-     *
-     * @param connection the connection to build the resolver from
-     * @return a resolver to the specified connection
-     */
+	 * Builds a NameResolver for a specified connection model.
+	 *
+	 * <p>This method should only be called if the connection model has already been added to the
+	 * connection model resolution table. Calling this method without first adding the connection
+	 * model to the table will throw an exception.
+	 *
+	 * @param connection the connection to build the resolver from
+	 * @return a resolver to the specified connection
+	 */
     private NameResolver<ConnectionModel> resolver(ConnectionModel connection) {
         if (!connections.containsKey(connection.getName())) {
             throw new RuntimeException(
@@ -91,48 +91,47 @@ public class AttackDefenseCollector {
     }
 
     /**
-     * Loads the model from the specified input directory in the CSV format. Specifically, requires
-     * the following files:
-     *
-     * <ul>
-     *   <li>CAPEC.csv
-     *   <li>CompDep.csv
-     *   <li>Defenses.csv
-     *   <li>Mission.csv
-     *   <li>ScnArch.csv
-     *   <li>ScnComp.csv
-     * </ul>
-     *
-     * @param inputDir the directory from which to load the files
-     * @throws IOException if there was an IO exception while trying to read the files (or one or
-     *     more file does not exist)
-     * @throws CSVFile.MalformedInputException if a CSV file is malformed
-     */
+	 * Loads the model from the specified input directory in the CSV format. Specifically, requires
+	 * the following files:
+	 *
+	 * <ul>
+	 *   <li>CAPEC.csv
+	 *   <li>CompDep.csv
+	 *   <li>Defenses.csv
+	 *   <li>Mission.csv
+	 *   <li>ScnArch.csv
+	 *   <li>ScnComp.csv
+	 * </ul>
+	 *
+	 * TODO take advantage of additional files added recently
+	 *
+	 * @param inputDir the directory from which to load the files
+	 * @throws IOException if there was an IO exception while trying to read the files (or one or
+	 *     more file does not exist)
+	 * @throws CSVFile.MalformedInputException if a CSV file is malformed
+	 */
     public AttackDefenseCollector(String inputDir)
             throws IOException, CSVFile.MalformedInputException {
         /*
-         * Important notes:
-         *
-         * We store systems (both component implementations and instances) by their "name".
-         * Instances use the instance name. But implementations don't have a name provided
-         * by the CSV input. So for the implementations we use the component type name
-         * instead.
-         *
-         * We also keep track of which component instances/implementations are associated
-         * with which component types for things like cyber relations, which are defined
-         * over component types, not instances or implementations. There is no explicit
-         * mapping from component instances to component types (or vice versa), so we
-         * instead use ScnComp.csv (the list of connections) to obtain this information
-         * because it lists both the component types and instances (in the case that it
-         * is an instance, rather than an implementation) for the connection end points.
-         * This means that we don't know about any components that don't have connections.
-         * In practice all components should have connections, but this is still something
-         * to keep in mind.
-         *
-         * In short, the CSV input model is really bad and we should switch to VDM ASAP
-         * (which would itself be greatly aided by switching to the threat model
-         * interpreter from STEM).
-         */
+		 * Important notes:
+		 *
+		 * We store systems by their "name". For component instances, this is the instance
+		 * name. But some component implementations don't have an instance (particularly
+		 * top-level systems), so we use the implementation name instead.
+		 *
+		 * We also keep track of which systems are associated with which component
+		 * types/implementations for things like cyber relations, which are defined
+		 * over component types, not instances or implementations. There is no explicit
+		 * mapping from component instances to component types (or vice versa), so we
+		 * instead use ScnComp.csv (the list of connections) to obtain this information
+		 * because it lists both the component types and instances (in the case that it
+		 * is an instance, rather than an implementation) for the connection end points.
+		 * This means that we don't know about any components that don't have connections.
+		 * In practice all components should have connections, but this is still something
+		 * to keep in mind.
+		 *
+		 * TODO update to use ScnCompProps.csv
+		 */
 
         systems = new LinkedHashMap<>();
         connections = new LinkedHashMap<>();
@@ -252,7 +251,10 @@ public class AttackDefenseCollector {
             }
         }
 
-        // Top-level systems don't have instances...
+		// Top-level systems don't have instances... so we need to store them by
+		// implementation names. But do this in a second pass so that we don't
+		// only pick up component implementations that definitely don't have
+		// instances.
         for (CSVFile.RowData row : scnConnectionsCsv.getRowDatas()) {
             String sourceImplName = row.getCell("SrcImpl");
             String destImplName = row.getCell("DestImpl");
@@ -336,6 +338,7 @@ public class AttackDefenseCollector {
                     // and component implementations
                     Util.putSetMap(compImplToSystem, sourceImplName, source);
                     Util.putSetMap(compImplToSystem, destImplName, dest);
+					// Note that this might be redundant now but not 100% sure
                 }
             }
         }
