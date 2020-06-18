@@ -366,9 +366,9 @@ public class VDM2Lustre {
 
         TypeDeclaration eventTypeDeclaration = new TypeDeclaration();
 
-        String user_defined_type = dataType.getUserDefinedType();
+        if (dataType != null) {
 
-        if (user_defined_type != null) {
+            String user_defined_type = dataType.getUserDefinedType();
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -387,10 +387,20 @@ public class VDM2Lustre {
 
                 eventTypeDeclaration.setDefinition(eventDefinition);
                 eventTypeDeclaration.setName(definedType);
-
-            } else {
-                // None Type for Event Type.
             }
+
+        } else {
+            // None DataType
+            String definedType = "EventDataType";
+
+            eventTypeDeclaration.setName(definedType);
+
+            DataType eventDefinition = new DataType();
+            RecordType eventRecord = getEventrecord(null);
+            eventDefinition.setRecordType(eventRecord);
+
+            eventTypeDeclaration.setDefinition(eventDefinition);
+            eventTypeDeclaration.setName(definedType);
         }
 
         return eventTypeDeclaration;
@@ -412,14 +422,16 @@ public class VDM2Lustre {
         eventRecord.getRecordField().add(eventField);
 
         // value: UserDefined
-        RecordField eventValue = new RecordField();
-        DataType valueType = new DataType();
-        valueType.setUserDefinedType(userDefineType);
-        ;
-        eventValue.setName("value");
-        eventValue.setType(valueType);
+        if (userDefineType != null) {
+            RecordField eventValue = new RecordField();
 
-        eventRecord.getRecordField().add(eventValue);
+            DataType valueType = new DataType();
+            valueType.setUserDefinedType(userDefineType);
+
+            eventValue.setName("value");
+            eventValue.setType(valueType);
+            eventRecord.getRecordField().add(eventValue);
+        }
 
         return eventRecord;
     }
