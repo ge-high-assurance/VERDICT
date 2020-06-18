@@ -13,15 +13,6 @@ public
 			longitude: data Base_Types::Float;
 	end Position.impl;
 
-	data PositionEvent
-	end PositionEvent;
-	
-	data implementation PositionEvent.impl
-		subcomponents
-			is_present: data Base_Types::Boolean;
-			value: data Position.impl;
-	end PositionEvent.impl;
-
 	data SatelliteConstellation
 		properties
 			Data_Model::Data_Representation => Enum;
@@ -85,16 +76,6 @@ public
 		let
 			r = x -> not pre(HasHappened(x)) and x;	
 		tel;
-		
-		node IsPresent(e: PositionEvent.impl) returns (is_present:bool);
-		let
-			is_present = e.is_present;
-		tel;
-		
-		node Value(e: PositionEvent.impl) returns (p: Position.impl);
-		let
-			p = e.value;
-		tel;
 	**};
 	
 	system DeliveryManager
@@ -107,9 +88,9 @@ public
 			init: in data port Base_Types::Boolean;
 			mac: in data port MAC.impl;
 			-- Outputs
-			imu_out: out data port PositionEvent.impl;
-			gps_out: out data port PositionEvent.impl;
-			delivery_location_out: out data port PositionEvent.impl;
+			imu_out: out event data port Position.impl;
+			gps_out: out event data port Position.impl;
+			delivery_location_out: out event data port Position.impl;
 	end DeliveryManager;
 
 	system DeliveryDriver
@@ -119,14 +100,14 @@ public
 			init: in data port Base_Types::Boolean;
 			mac: in data port MAC.impl;
 			-- Outputs
-			delivery_location_out: out data port PositionEvent.impl;
+			delivery_location_out: out event data port Position.impl;
 			
 		annex agree {**
 			guarantee "delivery_location_out value":
-				FirstTimeHolds(init and mac=ComputeMAC(delivery_location_in)) = IsPresent(delivery_location_out);
+				FirstTimeHolds(init and mac=ComputeMAC(delivery_location_in)) = event(delivery_location_out);
 			
 			guarantee "delivery_location_out presence":
-				(IsPresent(delivery_location_out) => Value(delivery_location_out) = delivery_location_in);
+				(event(delivery_location_out) => delivery_location_out = delivery_location_in);
 		**};
 	end DeliveryDriver;
 
@@ -136,7 +117,7 @@ public
 			imu_ref: in data port Position.impl;
 			init: in data port Base_Types::Boolean;
 			-- Outputs
-			imu_out: out data port PositionEvent.impl;
+			imu_out: out event data port Position.impl;
 	end IMU;
 
 	system GPS
@@ -146,7 +127,7 @@ public
 			satellite_sig: in data port SatelliteSignals;
 			init: in data port Base_Types::Boolean;
 			-- Outputs
-			gps_out: out data port PositionEvent.impl;
+			gps_out: out event data port Position.impl;
 	end GPS;
 
 	system implementation DeliveryManager.Impl
@@ -239,54 +220,54 @@ public
 	system SystemBus
 		features
 			-- Inputs
-			imu_in: in data port PositionEvent.impl;
-			gps_in: in data port PositionEvent.impl;
-			delivery_location_in: in data port PositionEvent.impl;
+			imu_in: in event data port Position.impl;
+			gps_in: in event data port Position.impl;
+			delivery_location_in: in event data port Position.impl;
 			-- Outputs
-			imu_out: out data port PositionEvent.impl;
-			gps_out: out data port PositionEvent.impl;
-			delivery_location_out: out data port PositionEvent.impl;
+			imu_out: out event data port Position.impl;
+			gps_out: out event data port Position.impl;
+			delivery_location_out: out event data port Position.impl;
 			
 		annex agree {**
 			guarantee "imu_out presence":
-				IsPresent(imu_out)=IsPresent(imu_in);
+				event(imu_out)=event(imu_in);
 				
 			guarantee "imu_out value":
-				(IsPresent(imu_out) => Value(imu_out)=Value(imu_in));
+				(event(imu_out) => imu_out=imu_in);
 				
 			guarantee "gps_out presence":
-				IsPresent(gps_out)=IsPresent(gps_in);
+				event(gps_out)=event(gps_in);
 				
 			guarantee "gps_out value":	
-				(IsPresent(gps_out) => Value(gps_out)=Value(gps_in));
+				(event(gps_out) => gps_out=gps_in);
 				
 			guarantee "delivery_location_out presence":
-				IsPresent(delivery_location_out)=IsPresent(delivery_location_in);
+				event(delivery_location_out)=event(delivery_location_in);
 			
 			guarantee "delivery_location_out value":	
-				(IsPresent(delivery_location_out) => Value(delivery_location_out)=Value(delivery_location_in));
+				(event(delivery_location_out) => delivery_location_out=delivery_location_in);
 		**};
 	end SystemBus;
 
 	system Controller
 		features
 			-- Inputs
-			imu_in: in data port PositionEvent.impl;
-			gps_in: in data port PositionEvent.impl;
-			delivery_location_in: in data port PositionEvent.impl;
+			imu_in: in event data port Position.impl;
+			gps_in: in event data port Position.impl;
+			delivery_location_in: in event data port Position.impl;
 			-- Outputs
 			status: out data port Status;
 			delivery_location_out: out data port Position.impl;
 			
 		annex agree {**
 			guarantee "status value":
-				(status = enum(Status, Confirmed)) = HasHappened(IsPresent(delivery_location_in));
+				(status = enum(Status, Confirmed)) = HasHappened(event(delivery_location_in));
 			
 			guarantee "delivery_location_out value (update)":	
-				FirstTimeHolds(IsPresent(delivery_location_in)) => delivery_location_out = Value(delivery_location_in);
+				FirstTimeHolds(event(delivery_location_in)) => delivery_location_out = delivery_location_in;
 			
 			guarantee "delivery_location_out value (fixed point)":
-				true -> (HasHappened(false -> pre(IsPresent(delivery_location_in))) => delivery_location_out = pre(delivery_location_out));
+				true -> (HasHappened(false -> pre(event(delivery_location_in))) => delivery_location_out = pre(delivery_location_out));
 		**};
 	end Controller;
 
