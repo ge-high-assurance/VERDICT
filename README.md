@@ -57,19 +57,6 @@ behavioral models analyzed by VERDICT MBAS and CRV.
 
 ![VERDICT Workflow Diagram](docs/images/VERDICT-Workflow-Diagram.png)
 
-## VERDICT's OSATE Plug-in Architecture
-
-The VERDICT tool contains a user interface front-end (an OSATE
-plug-in) which runs the VERDICT back-end tools from OSATE's integrated
-development environment.  There is a clear separation between the
-functionality of the OSATE plug-in and the back-end tools, which also
-can be used separately on their own.  The OSATE plug-in simply calls
-the back-end tools and informs the user of the results.  The diagram
-below shows how the back-end tools are invoked by the plug-in to
-perform architectural and behavioral analysis of AADL models.
-
-![VERDICT Plugin Diagram](docs/images/VERDICT-Plugin-Diagram.png)
-
 Distribution Statement A: Approved for Public Release, Distribution Unlimited
 
 Copyright © 2020, General Electric Company, Board of Trustees of the University of Iowa

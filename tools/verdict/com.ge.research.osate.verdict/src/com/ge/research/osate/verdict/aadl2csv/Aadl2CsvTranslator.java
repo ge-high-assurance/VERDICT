@@ -1190,12 +1190,16 @@ public class Aadl2CsvTranslator {
 		// Obtain all AADL files contents in the project
 		List<EObject> objects = new ArrayList<>();
 		
-		for (File file : dir.listFiles()) {
-			if (file.getAbsolutePath().endsWith(".aadl")) {
-				aadlFileNames.add(file.getAbsolutePath());
+		List<File> dirs = collectAllDirs(dir);
+		
+		for(File subdir: dirs) {
+			for (File file : subdir.listFiles()) {
+				if (file.getAbsolutePath().endsWith(".aadl")) {
+					aadlFileNames.add(file.getAbsolutePath());
+				}
 			}
 		}
-		
+
 		final Resource[] resources = new Resource[aadlFileNames.size()];
 		for (int i = 0; i < aadlFileNames.size(); i++) {
 			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
@@ -1217,6 +1221,25 @@ public class Aadl2CsvTranslator {
 		return objects;
 	}
 	
+	List<File> collectAllDirs(File dir) {
+		List<File> allDirs = new ArrayList<File>();
+		allDirs.add(dir);
+		for(File file : dir.listFiles()) {
+			if(file.isDirectory()) {
+				allDirs.add(file);
+				collectDir(file, allDirs);
+			}
+		}
+		return allDirs;
+	}
+	void collectDir(File dir, List<File> allDirs) {
+		for(File file : dir.listFiles()) {
+			if(file.isDirectory()) {
+				allDirs.add(file);
+				collectDir(file, allDirs);
+			}
+		}
+	}
 	/**
 	 * Extract ports cia from cyber relations
 	 * */
