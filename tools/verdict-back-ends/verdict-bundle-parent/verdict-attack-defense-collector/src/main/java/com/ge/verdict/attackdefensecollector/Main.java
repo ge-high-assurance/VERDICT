@@ -8,7 +8,8 @@ import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 public class Main {
     public static void main(String[] args) throws IOException, CSVFile.MalformedInputException {
         long start = System.currentTimeMillis();
-        AttackDefenseCollector attackDefenseCollector = new AttackDefenseCollector(args[0]);
+		AttackDefenseCollector attackDefenseCollector = new AttackDefenseCollector(args[0],
+				args.length > 1 && "--inference".equals(args[1]));
 		List<Result> results = attackDefenseCollector.perform();
 		for (Result result : results) {
 			Logger.println();

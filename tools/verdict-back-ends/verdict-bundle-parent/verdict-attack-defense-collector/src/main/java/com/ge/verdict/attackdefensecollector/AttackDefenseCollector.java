@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
@@ -19,6 +20,8 @@ import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
+import com.ge.verdict.attackdefensecollector.model.CyberExpr;
+import com.ge.verdict.attackdefensecollector.model.CyberOr;
 import com.ge.verdict.attackdefensecollector.model.CyberRel;
 import com.ge.verdict.attackdefensecollector.model.CyberReq;
 import com.ge.verdict.attackdefensecollector.model.PortConcern;
@@ -92,26 +95,28 @@ public class AttackDefenseCollector {
     }
 
     /**
-     * Loads the model from the specified input directory in the CSV format. Specifically, requires
-     * the following files:
-     *
-     * <ul>
-     *   <li>CAPEC.csv
-     *   <li>CompDep.csv
-     *   <li>Defenses.csv
-     *   <li>Mission.csv
-     *   <li>ScnArch.csv
-     *   <li>ScnComp.csv
-     * </ul>
-     *
-     * TODO take advantage of additional files added recently
-     *
-     * @param inputDir the directory from which to load the files
-     * @throws IOException if there was an IO exception while trying to read the files (or one or
-     *     more file does not exist)
-     * @throws CSVFile.MalformedInputException if a CSV file is malformed
-     */
-    public AttackDefenseCollector(String inputDir)
+	 * Loads the model from the specified input directory in the CSV format. Specifically, requires
+	 * the following files:
+	 *
+	 * <ul>
+	 *   <li>CAPEC.csv
+	 *   <li>CompDep.csv
+	 *   <li>Defenses.csv
+	 *   <li>Mission.csv
+	 *   <li>ScnArch.csv
+	 *   <li>ScnComp.csv
+	 * </ul>
+	 *
+	 * TODO take advantage of additional files added recently
+	 *
+	 * @param inputDir the directory from which to load the files
+	 * @param inference whether or not to infer cyber relations in systems with no cyber relations
+	 * @throws IOException if there was an IO exception while trying to read the files (or one or
+	 *     more file does not exist)
+	 * @throws CSVFile.MalformedInputException if a CSV file is malformed
+	 */
+	public AttackDefenseCollector(String inputDir,
+			boolean inference)
             throws IOException, CSVFile.MalformedInputException {
         /*
          * Important notes:
@@ -415,22 +420,20 @@ public class AttackDefenseCollector {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
 
-            Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
+			if (!"Connection".equals(systemTypeName)) {
+				Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
 
-            String attackName = row.getCell("CAPEC");
-            String attackDesc = row.getCell("CAPECDescription");
-            Prob likelihood = Prob.certain();
-            // Look at all three columns to figure out which one is being used
-            CIA cia =
-                    CIA.fromStrings(
-                            row.getCell("Confidentiality"),
-                            row.getCell("Integrity"),
-                            row.getCell("Availability"));
+				String attackName = row.getCell("CAPEC");
+				String attackDesc = row.getCell("CAPECDescription");
+				Prob likelihood = Prob.certain();
+				// Look at all three columns to figure out which one is being used
+				CIA cia = CIA.fromStrings(row.getCell("Confidentiality"), row.getCell("Integrity"),
+						row.getCell("Availability"));
 
-            // Apply to all systems of this component type (unless particular instance specified)
-            for (SystemModel system : systems) {
-                system.addAttack(
-                        new Attack(resolver(system), attackName, attackDesc, likelihood, cia));
+				// Apply to all systems of this component type (unless particular instance specified)
+				for (SystemModel system : systems) {
+					system.addAttack(new Attack(resolver(system), attackName, attackDesc, likelihood, cia));
+				}
             }
         }
 
@@ -488,6 +491,31 @@ public class AttackDefenseCollector {
                 defense.addDefenseClause(clause);
             }
         }
+
+		if (inference) {
+			// Inference
+			int inferenceCounter = 0;
+			for (SystemModel system : systems.values()) {
+				// We can't check subcomponents because it isn't actually populated...
+				if (system.getCyberRels().isEmpty() && system.getInternalIncomingConnections().isEmpty()
+						&& system.getInternalOutgoingConnections().isEmpty()) {
+					Logger.println("Inferring cyber relations for system " + system.getName());
+
+					// We don't have explicit lists of ports, but we have the connections.
+					// If a port is not mentioned in a connection, then it doesn't matter
+					// anyway because it can't be traced.
+					for (ConnectionModel outgoing : system.getOutgoingConnections()) {
+						for (CIA cia : CIA.values()) {
+							CyberExpr condition = new CyberOr(system.getIncomingConnections().stream()
+									.map(incoming -> new PortConcern(incoming.getDestinationPortName(), cia))
+									.collect(Collectors.toList()));
+							system.addCyberRel(new CyberRel("_inference" + (inferenceCounter++), condition,
+									new PortConcern(outgoing.getSourcePortName(), cia)));
+						}
+					}
+				}
+			}
+		}
     }
 
     /**

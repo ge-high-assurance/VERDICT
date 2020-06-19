@@ -30,12 +30,13 @@ public class App {
 
 		String stemOutDir = args[0];
 		String costModelXml = args[1];
+		boolean inference = args.length > 2 && "--inference".equals(args[2]);
 
 		final CostModel costModel = timed("Load cost model", () -> new CostModel(new File(costModelXml)));
 
 		AttackDefenseCollector collector = timed("Load CSV", () -> {
 			try {
-				return new AttackDefenseCollector(stemOutDir);
+				return new AttackDefenseCollector(stemOutDir, inference);
 			} catch (IOException | MalformedInputException e) {
 				throw new RuntimeException(e);
 			}
