@@ -9,12 +9,16 @@
 
 package edu.uiowa.clc.verdict.lustre;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import verdict.vdm.vdm_data.DataType;
+import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.RecordType;
 import verdict.vdm.vdm_data.TypeDeclaration;
@@ -24,6 +28,7 @@ import verdict.vdm.vdm_lustre.Contract;
 import verdict.vdm.vdm_lustre.ContractItem;
 import verdict.vdm.vdm_lustre.ContractSpec;
 import verdict.vdm.vdm_lustre.Expression;
+import verdict.vdm.vdm_lustre.ExpressionList;
 import verdict.vdm.vdm_lustre.FieldDefinition;
 import verdict.vdm.vdm_lustre.IfThenElse;
 import verdict.vdm.vdm_lustre.LustreProgram;
@@ -34,6 +39,7 @@ import verdict.vdm.vdm_lustre.NodeEquation;
 import verdict.vdm.vdm_lustre.NodeEquationLHS;
 import verdict.vdm.vdm_lustre.NodeParameter;
 import verdict.vdm.vdm_lustre.RecordLiteral;
+import verdict.vdm.vdm_lustre.RecordProjection;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_lustre.VariableDeclaration;
 import verdict.vdm.vdm_model.BlockImpl;
@@ -52,9 +58,12 @@ public class VDM2Lustre {
     private Model vdm_model;
     private HashMap<String, TypeDeclaration> typeDeclarations = null;
 
+    private HashMap<String, DataType> eventDeclarations = null;
+
     public VDM2Lustre(Model vdm_model) {
         this.vdm_model = vdm_model;
         this.typeDeclarations = new HashMap<String, TypeDeclaration>();
+        this.eventDeclarations = new HashMap<String, DataType>();
     }
 
     public Model translate() {
@@ -95,6 +104,16 @@ public class VDM2Lustre {
         // Copying over Constant Declarations
         for (ConstantDeclaration constDec : program.getConstantDeclaration()) {
             visit(constDec);
+        }
+
+        // Event Ports
+        for (ComponentType componentType : vdm_model.getComponentType()) {
+
+            // Event Ports to Data Ports;
+            for (Port port : componentType.getPort()) {
+                // Update event_ports
+                visit(port);
+            }
         }
 
         // B) Component Type
@@ -156,6 +175,11 @@ public class VDM2Lustre {
 
         // Port
         for (Port port : componentType.getPort()) {
+
+            if (port.isEvent() != null && port.isEvent()) {
+                this.eventDeclarations.put(port.getName(), port.getType());
+            }
+
             visit(port, node);
         }
 
@@ -171,10 +195,11 @@ public class VDM2Lustre {
             //            }
 
             ContractItem true_guarantee_item = new ContractItem();
-            //            true_guarantee_item.setName("true");
+
             Expression true_expr = new Expression();
             Boolean true_lit = new Boolean("true");
             true_expr.setBoolLiteral(true_lit);
+
             true_guarantee_item.setExpression(true_expr);
 
             contractSpec = new ContractSpec();
@@ -188,6 +213,7 @@ public class VDM2Lustre {
 
             if (contractSpec.getGuarantee().size() != 0) {
                 node.setContract(contractSpec);
+                this.eventDeclarations.clear();
             }
         }
 
@@ -263,6 +289,12 @@ public class VDM2Lustre {
 
         // Port
         for (Port port : componentType.getPort()) {
+
+            //            //Event Port Definition
+            //            for (Port port : componentType.getPort()) {
+            //            visit(port);
+            //            }
+
             // MODE
             PortMode port_mode = port.getMode();
 
@@ -298,6 +330,112 @@ public class VDM2Lustre {
         nodeBody.getEquation().add(node_eq);
     }
 
+    // Event Ports
+    public void visit(Port port) {
+
+        // Print Event Ports.
+        if (port.isEvent() != null && port.isEvent()) {
+
+            DataType dataType = port.getType();
+
+            DataType eventType = getEventType(dataType);
+
+            port.setType(eventType);
+        }
+    }
+
+    protected DataType getEventType(DataType dataType) {
+
+        LustreProgram lustreProgram = vdm_model.getDataflowCode();
+
+        DataType eventType = new DataType();
+        TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);
+
+        String eventTypeName = eventTypeDeclaration.getName();
+        eventType.setUserDefinedType(eventTypeName);
+
+        if (!typeDeclarations.containsKey(eventTypeName)) {
+            typeDeclarations.put(eventTypeName, eventTypeDeclaration);
+            lustreProgram.getTypeDeclaration().add(eventTypeDeclaration);
+        }
+
+        return eventType;
+    }
+
+    protected TypeDeclaration defineEventDeclaration(DataType dataType) {
+
+        TypeDeclaration eventTypeDeclaration = new TypeDeclaration();
+
+        if (dataType != null) {
+
+            String user_defined_type = dataType.getUserDefinedType();
+
+            boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+
+            if (implemented_type) {
+
+                TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
+
+                user_defined_type = baseType.getName();
+                String definedType = user_defined_type.replace("_", "Event_");
+
+                eventTypeDeclaration.setName(definedType);
+
+                DataType eventDefinition = new DataType();
+                RecordType eventRecord = getEventrecord(user_defined_type);
+                eventDefinition.setRecordType(eventRecord);
+
+                eventTypeDeclaration.setDefinition(eventDefinition);
+                eventTypeDeclaration.setName(definedType);
+            }
+
+        } else {
+            // None DataType
+            String definedType = "EventDataType";
+
+            eventTypeDeclaration.setName(definedType);
+
+            DataType eventDefinition = new DataType();
+            RecordType eventRecord = getEventrecord(null);
+            eventDefinition.setRecordType(eventRecord);
+
+            eventTypeDeclaration.setDefinition(eventDefinition);
+            eventTypeDeclaration.setName(definedType);
+        }
+
+        return eventTypeDeclaration;
+    }
+
+    protected RecordType getEventrecord(String userDefineType) {
+
+        // Define a Record
+        RecordType eventRecord = new RecordType();
+
+        // is_present: bool
+        RecordField eventField = new RecordField();
+
+        DataType boolType = new DataType();
+        boolType.setPlainType(PlainType.BOOL);
+        eventField.setName("is_present");
+        eventField.setType(boolType);
+
+        eventRecord.getRecordField().add(eventField);
+
+        // value: UserDefined
+        if (userDefineType != null) {
+            RecordField eventValue = new RecordField();
+
+            DataType valueType = new DataType();
+            valueType.setUserDefinedType(userDefineType);
+
+            eventValue.setName("value");
+            eventValue.setType(valueType);
+            eventRecord.getRecordField().add(eventValue);
+        }
+
+        return eventRecord;
+    }
+
     public void visit(Port port, Node node) {
 
         PortMode port_mode = port.getMode();
@@ -326,15 +464,8 @@ public class VDM2Lustre {
             Matcher m = inst_pattern.matcher(node.getName());
 
             if (m.matches()) {
-                // Instrumented component Instance ID
-                //                	System.out.println("Imported Node: " + node.getName());
-                //                	String return_type = node_parameter.getName();
-                //                	System.out.println("Return Parameter: " +
-                // node_parameter.getName()+"_instrumented");
                 node_parameter.setName(node_parameter.getName() + "_instrumented");
             }
-
-            //            }
         }
     }
 
@@ -364,6 +495,10 @@ public class VDM2Lustre {
             }
 
             Expression expr = symbol.getDefinition();
+
+            expr = visitExpression(expr);
+            symbol.setDefinition(expr);
+
             recordLiteral(expr);
         }
 
@@ -386,6 +521,7 @@ public class VDM2Lustre {
                 visit(contractItem);
             }
         }
+
         // remove MBAS guarantee
         contractSpec.getGuarantee().removeAll(mbas_guarantee);
     }
@@ -393,6 +529,10 @@ public class VDM2Lustre {
     public void visit(ContractItem contractItem) {
 
         Expression expr = contractItem.getExpression();
+
+        expr = visitExpression(expr);
+        contractItem.setExpression(expr);
+
         recordLiteral(expr);
     }
 
@@ -433,6 +573,7 @@ public class VDM2Lustre {
                 if (op != null) {
 
                     Expression lhs_expr = op.getLhsOperand();
+
                     recordLiteral(lhs_expr);
 
                     Expression rhs_expr = op.getRhsOperand();
@@ -446,9 +587,7 @@ public class VDM2Lustre {
                 } else {
 
                     Expression pre_expr = expr.getPre();
-                    if (pre_expr != null) {
-                        recordLiteral(pre_expr);
-                    }
+                    recordLiteral(pre_expr);
                 }
 
                 NodeCall nodeCall = expr.getCall();
@@ -463,12 +602,354 @@ public class VDM2Lustre {
         }
     }
 
+    protected BinaryOperation binaryOP(BinaryOperation op) {
+
+        BinaryOperation op_exp = new BinaryOperation();
+
+        Expression lhs = op.getLhsOperand();
+        lhs = visitExpression(lhs);
+
+        Expression rhs = op.getRhsOperand();
+        rhs = visitExpression(rhs);
+
+        op_exp.setLhsOperand(lhs);
+        op_exp.setRhsOperand(rhs);
+
+        return op_exp;
+    }
+
+    protected Expression visitExpression(Expression expr) {
+
+        Expression u_Expr = new Expression();
+
+        // Binary Operators
+        if (expr != null) {
+
+            BinaryOperation op = expr.getEqual();
+
+            if (op != null) {
+
+                u_Expr.setEqual(binaryOP(op));
+            }
+
+            op = expr.getNotEqual();
+
+            if (op != null) {
+
+                u_Expr.setNotEqual(binaryOP(op));
+            }
+
+            op = expr.getImplies();
+
+            if (op != null) {
+
+                u_Expr.setImplies(binaryOP(op));
+            }
+
+            op = expr.getAnd();
+
+            if (op != null) {
+
+                u_Expr.setAnd(binaryOP(op));
+            }
+
+            op = expr.getOr();
+
+            if (op != null) {
+
+                u_Expr.setOr(binaryOP(op));
+            }
+
+            op = expr.getXor();
+
+            if (op != null) {
+
+                u_Expr.setXor(binaryOP(op));
+            }
+
+            op = expr.getArrow();
+
+            if (op != null) {
+
+                u_Expr.setArrow(binaryOP(op));
+            }
+
+            op = expr.getLessThanOrEqualTo();
+
+            if (op != null) {
+
+                u_Expr.setLessThanOrEqualTo(binaryOP(op));
+            }
+
+            op = expr.getLessThan();
+
+            if (op != null) {
+
+                u_Expr.setLessThan(binaryOP(op));
+            }
+
+            op = expr.getGreaterThan();
+
+            if (op != null) {
+
+                u_Expr.setGreaterThan(binaryOP(op));
+            }
+
+            op = expr.getGreaterThanOrEqualTo();
+
+            if (op != null) {
+
+                u_Expr.setGreaterThanOrEqualTo(binaryOP(op));
+            }
+
+            op = expr.getMinus();
+
+            if (op != null) {
+
+                u_Expr.setMinus(binaryOP(op));
+            }
+
+            op = expr.getPlus();
+
+            if (op != null) {
+
+                u_Expr.setPlus(binaryOP(op));
+            }
+
+            op = expr.getDiv();
+
+            if (op != null) {
+
+                u_Expr.setDiv(binaryOP(op));
+            }
+
+            op = expr.getTimes();
+
+            if (op != null) {
+
+                u_Expr.setTimes(binaryOP(op));
+            }
+
+            op = expr.getMod();
+
+            if (op != null) {
+
+                u_Expr.setMod(binaryOP(op));
+            }
+
+            op = expr.getCartesianExpression();
+
+            if (op != null) {
+
+                u_Expr.setCartesianExpression(binaryOP(op));
+            }
+
+            IfThenElse cond_op = expr.getConditionalExpression();
+
+            if (cond_op != null) {
+
+                Expression cond_expr = cond_op.getCondition();
+                cond_expr = visitExpression(cond_expr);
+
+                Expression then_expr = cond_op.getThenBranch();
+                then_expr = visitExpression(then_expr);
+
+                Expression else_expr = cond_op.getElseBranch();
+                else_expr = visitExpression(else_expr);
+
+                cond_op.setCondition(cond_expr);
+                cond_op.setThenBranch(then_expr);
+                cond_op.setElseBranch(else_expr);
+
+                u_Expr.setConditionalExpression(cond_op);
+            }
+
+            // Record Literal
+            RecordLiteral recordLiteral = expr.getRecordLiteral();
+
+            if (recordLiteral != null) {
+
+                Expression fieldExpr;
+
+                for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
+                    fieldExpr = fieldDef.getFieldValue();
+                    visitExpression(fieldExpr);
+                }
+
+                u_Expr.setRecordLiteral(recordLiteral);
+            }
+
+            // Record Project
+            RecordProjection recordProj = expr.getRecordProjection();
+
+            if (recordProj != null) {
+                Expression recordRef = recordProj.getRecordReference();
+
+                recordRef = visitExpression(recordRef);
+                recordProj.setRecordReference(recordRef);
+
+                u_Expr.setRecordProjection(recordProj);
+            }
+
+            // Unary Operators
+            Expression notExpr = expr.getNot();
+
+            if (notExpr != null) {
+                notExpr = visitExpression(notExpr);
+                u_Expr.setNot(notExpr);
+            }
+
+            Expression negExpr = expr.getNegative();
+
+            if (negExpr != null) {
+                negExpr = visitExpression(negExpr);
+                u_Expr.setNegative(negExpr);
+                ;
+            }
+
+            Expression preExpr = expr.getPre();
+
+            if (preExpr != null) {
+
+                preExpr = visitExpression(preExpr);
+                u_Expr.setPre(preExpr);
+            }
+
+            Expression toIntExpr = expr.getToInt();
+
+            if (toIntExpr != null) {
+
+                toIntExpr = visitExpression(toIntExpr);
+                u_Expr.setToInt(toIntExpr);
+            }
+
+            Expression toRealExpr = expr.getToReal();
+
+            if (toRealExpr != null) {
+
+                toRealExpr = visitExpression(toRealExpr);
+                u_Expr.setToReal(toRealExpr);
+            }
+
+            Boolean b = expr.isBoolLiteral();
+
+            if (b != null) {
+                u_Expr.setBoolLiteral(b);
+            }
+
+            BigInteger int_value = expr.getIntLiteral();
+
+            if (int_value != null) {
+                u_Expr.setIntLiteral(int_value);
+            }
+
+            BigDecimal real_value = expr.getRealLiteral();
+
+            if (real_value != null) {
+                u_Expr.setRealLiteral(real_value);
+            }
+
+            // Identifier
+            String identifier = expr.getIdentifier();
+
+            if (identifier != null) {
+                // Check respective EventType and add value Projection.
+
+                if (eventDeclarations.containsKey(identifier)) {
+
+                    u_Expr = eventExpression(expr, false);
+
+                } else {
+                    u_Expr.setIdentifier(identifier);
+                }
+            }
+
+            // NodeCall
+            NodeCall nodeCall = expr.getCall();
+
+            if (nodeCall != null) {
+                u_Expr.setCall(nodeCall);
+
+                List<Expression> arguments = new Vector<Expression>();
+
+                for (Expression argExpr : nodeCall.getArgument()) {
+                    argExpr = visitExpression(argExpr);
+                    arguments.add(argExpr);
+                }
+
+                nodeCall.getArgument().clear();
+                nodeCall.getArgument().addAll(arguments);
+
+                u_Expr.setCall(nodeCall);
+            }
+
+            // Event Expression
+            Expression event = expr.getEvent();
+
+            if (event != null) {
+                u_Expr = eventExpression(event, true);
+                //	    		System.out.println(expr + "^^^ Updated to Event ^^^ " + event);
+            }
+
+            ExpressionList expList = expr.getExpressionList();
+
+            if (expList != null) {
+                ExpressionList uList = new ExpressionList();
+                for (Expression aexpr : expList.getExpression()) {
+                    expr = visitExpression(aexpr);
+                    uList.getExpression().add(expr);
+                }
+                expList.getExpression().clear();
+                u_Expr.setExpressionList(uList);
+            }
+
+            //            ExpressionList arrayExpList = expr.getArrayExpression();
+            //
+            //	    	if(expList != null) {
+            //	    		List<Expression> uList = new ArrayList<Expression>();
+            //	    		for(Expression aexpr: arrayExpList.getExpression()) {
+            //	    			expr = visitExpression(aexpr);
+            //	    			uList.add(expr);
+            //	    		}
+            //	    		arrayExpList.getExpression().clear();
+            //	    		arrayExpList.getExpression().addAll(uList);
+            //	    		u_Expr.setArrayExpression(arrayExpList);
+            //	    	}
+
+        }
+
+        return u_Expr;
+    }
+
+    protected Expression eventExpression(Expression expr, boolean event_type) {
+
+        Expression eventExpression = new Expression();
+
+        if (expr != null) {
+
+            RecordProjection recordProject = new RecordProjection();
+
+            if (event_type) {
+                recordProject.setFieldId("is_present");
+            } else {
+                recordProject.setFieldId("value");
+            }
+            recordProject.setRecordReference(expr);
+
+            eventExpression.setRecordProjection(recordProject);
+        }
+
+        return eventExpression;
+    }
+
     public void visit(Node node, LustreProgram program) {
 
+        // Collect Input Event DataTypes
         for (NodeParameter node_param : node.getInputParameter()) {
             visit(node_param);
         }
 
+        // Collect Output Event DataTypes
         for (NodeParameter node_param : node.getOutputParameter()) {
             visit(node_param);
         }
@@ -506,13 +987,27 @@ public class VDM2Lustre {
         for (NodeEquation node_equation : nodeBody.getEquation()) {
             visit(node_equation);
         }
+
+        // Update Expression related to Events
+        //        for (NodeEquation node_equation : nodeBody.getEquation()) {
+        //        	visitNodeEq(node_equation);
+        //        }
     }
+
+    //    protected void visitNodeEq(NodeEquation node_eq) {
+    //
+    //    	Expression rhs_expr = node_eq.getRhs();
+    //    	visitExpression(rhs_expr);
+    //    }
 
     public void visit(NodeEquation node_equation) {
 
         Expression expr = node_equation.getRhs();
-
         recordLiteral(expr);
+
+        //        expr = visitExpression(expr);
+        //        node_equation.setRhs(expr);
+
     }
 
     public void visit(NodeParameter node_param) {
@@ -541,8 +1036,6 @@ public class VDM2Lustre {
 
     // Connect -> NodeCall
     public void visit(Connection connection, NodeBody nodeBody) {
-
-        NodeEquation eq = new NodeEquation();
 
         // R.H.S
         ConnectionEnd src = connection.getSource();
@@ -668,10 +1161,10 @@ public class VDM2Lustre {
                         String inst_cmp = "(.+)_Inst_.*";
                         Pattern inst_pattern = Pattern.compile(inst_cmp);
 
-                        String node_id = "";
-                        if (node_called != null) {
-                            node_id = node_called.getNodeId();
-                        }
+                        //                        String node_id = "";
+                        //                        if (node_called != null) {
+                        //                            node_id = node_called.getNodeId();
+                        //                        }
 
                         //                    System.out.println(" = " + node_id + " (" + arg_value
                         // +
@@ -825,7 +1318,7 @@ public class VDM2Lustre {
                         // Then
                         ifelse.setThenBranch(called_expr);
                         // Else
-                        Expression arg = new Expression();
+                        //                        Expression arg = new Expression();
                         ifelse.setElseBranch(arg_expr);
 
                         // NodeCalled Expr

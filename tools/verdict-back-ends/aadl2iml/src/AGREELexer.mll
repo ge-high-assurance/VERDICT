@@ -74,6 +74,7 @@ rule token = parse
   | "true"           { P.TRUE }
   | "false"          { P.FALSE }
   | "prev"           { P.PREV }
+  | "event"          { P.EVENT }
 
   | "**}"            { P.ANNEX_BLOCK_END }
   | "<=>"            { P.EQUIV }

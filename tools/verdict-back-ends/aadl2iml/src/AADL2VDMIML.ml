@@ -237,10 +237,11 @@ let aadl_dir_to_iml_mode = function
   | AD.InOut -> failwith "Input-Output ports are not supported"
 
 let aadl_port_to_iml_port prop_set_name type_decls
-  {AD.name; AD.dir; AD.dtype; AD.properties }
+  {AD.name; AD.dir; AD.is_event; AD.dtype; AD.properties }
 =
   {VI.name = C.get_id name;
    VI.mode = aadl_dir_to_iml_mode dir;
+   VI.is_event = is_event;
    VI.ptype = (
      match dtype with
      | None -> None
@@ -290,6 +291,7 @@ let agree_unary_op_to_iml_unary_op = function
   | AG.Pre -> VI.Pre
   | AG.FloorCast -> VI.ToInt
   | AG.RealCast -> VI.ToReal
+  | AG.Event -> VI.Event
 
 let rec agree_expr_to_iml_expr = function
   | AG.BinaryOp (_, op, e1, e2) ->

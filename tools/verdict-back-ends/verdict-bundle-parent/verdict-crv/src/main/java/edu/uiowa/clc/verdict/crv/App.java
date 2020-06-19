@@ -76,7 +76,7 @@ public class App {
 
             if (fileExt.equals("iml")) {
                 // Use IML model
-                //                vdm_model = ResourceTest.setup(InputFile);
+                // vdm_model = ResourceTest.setup(InputFile);
 
                 // Store VDM in a temporary file
                 translator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
@@ -100,7 +100,7 @@ public class App {
                 vdm_model = translator.unmarshalFromXml(new File(vdmTmpDumpFile));
             }
 
-            LOGGY.info("********Dataflow to Lustre code Printing************");
+            LOGGY.info("********Dataflow to Lustre code Printing*********");
 
             VDM2Lustre vdm2lus = new VDM2Lustre(vdm_model);
             Model lustreModel = vdm2lus.translate();
@@ -144,7 +144,7 @@ public class App {
 
             // translator.marshalToLustre(vdm_model, lustreFile);
 
-            LOGGY.info("*************Executor*******************");
+            LOGGY.info("******************Executor***********************");
 
             int exitCode = Exec.run_kind2(lustreFile, kind2_resultFile);
 
@@ -158,7 +158,7 @@ public class App {
                 LOGGY.warn("Kind2 TIMED OUT!!!");
             }
 
-            LOGGY.info("*************Blame Assignment*******************");
+            LOGGY.info("*************Blame Assignment***********");
 
             BlameAssignment bm = new BlameAssignment();
             bm =

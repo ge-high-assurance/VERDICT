@@ -1589,6 +1589,12 @@ public class VDMInstrumentor {
 
         instrumented_port_dest.setType(dest_port.getType());
 
+        if (dest_port.isEvent() != null && dest_port.isEvent()) {
+            instrumented_port_dest.setEvent(true);
+        } else {
+            instrumented_port_dest.setEvent(false);
+        }
+
         instrumented_cmp.getPort().add(instrumented_port_dest);
 
         // Input port
@@ -1598,6 +1604,12 @@ public class VDMInstrumentor {
 
         instrumented_port_src.setName(src_componentInstance + "_port_" + src_port.getName());
         instrumented_port_src.setMode(src_port.getMode());
+
+        if (src_port.isEvent() != null && src_port.isEvent()) {
+            instrumented_port_src.setEvent(true);
+        } else {
+            instrumented_port_src.setEvent(false);
+        }
 
         String global_constant_Id = src_componentInstance.getName();
 

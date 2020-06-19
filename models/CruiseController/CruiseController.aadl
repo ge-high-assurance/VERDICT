@@ -1,14 +1,7 @@
 package CruiseController
 public
 	with Base_Types;
-	with Data_Model;
 	with VERDICT_Properties;
-
-	data EventType
-		properties
-			Data_Model::Data_Representation => Enum;
-			Data_Model::Enumerators => ("PRESENT", "ABSENT");
-	end EventType;
 
 	annex agree {**
 
@@ -46,11 +39,6 @@ public
 		node InitiallyHolds(X:bool) returns (Y:bool);
 		let
 		  Y = X -> true;
-		tel;
-		
-		node IsPresent(E:EventType) returns (is_present:bool);
-		let
-			is_present = (E = enum(EventType, PRESENT));
 		tel;
 		
 		node Abs(x:real) returns(y: real);
@@ -157,17 +145,17 @@ public
 
 	system MeasureSpeed
 		features
-			rotate: in data port EventType;
-			second: in data port EventType;
+			rotate: in event port;
+			second: in event port;
 			speed: out data port Base_Types::Float;
 		annex agree {**
-			eq nc: int = 0 -> pre(count) + (if IsPresent(rotate) then 1 else 0);
-			eq count: int = if IsPresent(second) then 0 else nc;
+			eq nc: int = 0 -> pre(count) + (if event(rotate) then 1 else 0);
+			eq count: int = if event(second) then 0 else nc;
 			guarantee "Speed is initially zero": InitiallyHolds(speed = 0.0);
 			guarantee "Speed is updated every second":
-							true -> (IsPresent(second) => speed = ( K * real(nc)));
+							true -> (event(second) => speed = ( K * real(nc)));
 			guarantee "Speed stays unchanged when it is not updated":
-							true -> (not IsPresent(second) => speed = pre(speed));
+							true -> (not event(second) => speed = pre(speed));
 		**};
 	end MeasureSpeed;
 
@@ -222,8 +210,8 @@ public
 			inc: in data port Base_Types::Boolean;
 			dec: in data port Base_Types::Boolean;
 			brake_cancel: in data port Base_Types::Boolean;
-			rotate: in data port EventType;
-			second: in data port EventType;
+			rotate: in event port;
+			second: in event port;
 			filter_is_enabled: in data port Base_Types::Boolean;
 			force: out data port Base_Types::Float;
 			enabled: out data port Base_Types::Boolean;
