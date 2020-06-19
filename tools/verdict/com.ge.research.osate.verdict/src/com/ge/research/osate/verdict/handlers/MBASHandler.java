@@ -73,12 +73,12 @@ public class MBASHandler extends AbstractHandler {
 						File graphsFolder = new File(stemProjPath, "Graphs");
 
 						if (dataFolder.exists() && dataFolder.isDirectory()) {
-							deleteFilesInDir("cvs", dataFolder);
+							deleteFilesInDir("csv", dataFolder);
 						} else {
 							dataFolder.mkdir();
 						}
 						if (outputFolder.exists() && outputFolder.isDirectory()) {
-							deleteFilesInDir("cvs", outputFolder);
+							deleteFilesInDir("csv", outputFolder);
 						} else {
 							outputFolder.mkdir();
 						}
@@ -87,12 +87,12 @@ public class MBASHandler extends AbstractHandler {
 						} else {
 							graphsFolder.mkdir();
 						}
-						
+
 						File projectDir = new File(selection.get(0));
 						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-						
+
 						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
-						
+
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
 								graphVizPath)) {
 							// Soteria++ output directory
@@ -137,7 +137,7 @@ public class MBASHandler extends AbstractHandler {
 		}
 		return null;
 	}
-	
+
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
 		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
 		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
@@ -166,7 +166,7 @@ public class MBASHandler extends AbstractHandler {
 		int code = command.runJarOrImage();
 		return code == 0;
 	}
-	
+
 	/**
 	 * Delete all files with given extension in given folder
 	 */
