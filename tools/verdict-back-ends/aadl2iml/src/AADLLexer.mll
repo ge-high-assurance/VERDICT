@@ -63,6 +63,7 @@
     "constant",       P.CONSTANT ;
     "virtual",        P.VIRTUAL ;
     "group",          P.GROUP ;
+    "event",          P.EVENT ;
     "type",           P.TYPE ;
     "none",           P.NONE ;
     "inherit",        P.INHERIT ;
@@ -125,6 +126,8 @@ rule token = parse
   | '}'              { P.RCURLY_BRACKET }
   | '('              { P.LPAREN }
   | ')'              { P.RPAREN }
+  | '['              { P.LSQUARE_BRACKET }
+  | ']'              { P.RSQUARE_BRACKET }
 
   | '+'              { P.PLUS }
   | '-'              { P.MINUS }

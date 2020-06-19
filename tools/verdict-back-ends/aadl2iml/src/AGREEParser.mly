@@ -54,7 +54,7 @@ let add_range rg = function
 %token PLUS "+"
 %token MINUS "-"
 %token POWER "^"
-%token PREV
+%token PREV EVENT
 %token <string>ID
 %token <string>INTEGER_LIT
 %token <string>REAL_LIT
@@ -326,6 +326,8 @@ expr:
     { A.Call (mk_pos $startpos, n, args) }
   | PREV "(" e1 = expr "," e2 = expr ")"
     { A.Prev (mk_pos $startpos, e1, e2) }
+  | EVENT "(" e = expr ")"
+    { A.UnaryOp (mk_pos $startpos, A.Event, e) }
   | r = expr "{" fs = separated_nonempty_list(";", record_field_def) "}"
     { A.RecordExpr (mk_pos $startpos, r, fs) }
   | l = REAL_LIT

@@ -61,7 +61,7 @@ let mk_package_section header_items body_items =
 %token SUBCOMPONENTS CONNECTIONS CONNECTION
 %token PROCESS THREAD SUBPROGRAM PROCESSOR MEMORY DEVICE
 %token PROVIDES REQUIRES ACCESS PUBLIC PRIVATE RENAMES
-%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP
+%token TYPE NONE UNITS WITH OUT IN CONSTANT VIRTUAL GROUP EVENT
 %token LIST OF
 %token DATA PORT BUS
 %token <Lexing.lexbuf>ANNEX
@@ -81,6 +81,8 @@ let mk_package_section header_items body_items =
 %token RCURLY_BRACKET "}"
 %token LPAREN "("
 %token RPAREN ")"
+%token LSQUARE_BRACKET "["
+%token RSQUARE_BRACKET "]"
 %token PLUS "+"
 %token MINUS "-"
 %token STAR "*"
@@ -198,10 +200,22 @@ system_type:
 sys_features_section:
   | { [] }
   | FEATURES NONE ";" { [] }
+  | FEATURES fs = sys_feature_list { fs }
+
+sys_feature_list:
+  | dp = data_port { [dp] }
+  | ep = event_port { [ep] }
+  | dp = data_port; fs =  sys_feature_list { dp :: fs }
+  | ep = event_port; fs =  sys_feature_list { ep :: fs }
+  | data_access { [] }
+  | data_access; fs =  sys_feature_list { fs }
+
+(*
   | FEATURES fs = nonempty_list(sys_feature) { fs }
 
 sys_feature:
   | dp = data_port { dp }
+  | ep = event_port { ep }
   | da = data_access
   {
     let pdir =
@@ -211,26 +225,45 @@ sys_feature:
     in
     { A.name = da.A.name;
       A.dir = pdir;
+      A.is_event = false;
       A.dtype = da.A.dtype;
       A.properties = da.A.properties;
     }
   }
   (* INCOMPLETE *)
+*)
 
 data_port:
-  pid = port_id; pdir = port_direction; DATA PORT
+  pid = port_id; pdir = port_direction;
+  ie = boption(EVENT); DATA PORT
   qcr = option(qcref); (* aadl2::DataSubcomponentType *)
+  array_dimension?
   prop_assocs = property_associations
   (* INCOMPLETE *)
   ";"
   {
     { A.name = pid;
       A.dir = pdir;
+      A.is_event = ie;
       A.dtype = qcr;
       A.properties = prop_assocs;
     }
   }
+
+event_port:
+  pid = port_id; pdir = port_direction; EVENT PORT
+  array_dimension?
+  prop_assocs = property_associations
   (* INCOMPLETE *)
+  ";"
+  {
+    { A.name = pid;
+      A.dir = pdir;
+      A.is_event = true;
+      A.dtype = None;
+      A.properties = prop_assocs;
+    }
+  }
 
 port_id:
   | pid = ident ":" { pid }
@@ -338,6 +371,7 @@ data_subcomponents_section_item:
 data_subcomponent:
   pid = subcomponent_id DATA
   type_ref = option(subcomponent_type_ref)
+  array_dimension?
   prop_assocs = contained_property_associations
   (* INCOMPLETE *)
   ";"
@@ -348,6 +382,15 @@ data_subcomponent:
       A.properties = prop_assocs;
     }
   }
+
+array_dimension:
+  "[" array_size? "]" {}
+
+array_size:
+  | int_value {}
+  | qpref {}
+
+int_value: INTEGER_LIT {}
 
 system_subcomponent:
   pid = subcomponent_id system_or_like
@@ -384,7 +427,16 @@ qcref:
 sys_connections_section:
   | { [] }
   | CONNECTIONS NONE ";" { [] }
-  | CONNECTIONS cs = nonempty_list(sys_connection) { cs }
+  | CONNECTIONS cs = sys_connection_list { cs }
+
+sys_connection_list:
+  | c = sys_connection
+  { [ c ] }
+  | access_connection { [] }
+  | c = sys_connection; cs = sys_connection_list
+  { c :: cs }
+  | access_connection; cs = sys_connection_list
+  { cs }
 
 sys_connection:
   | pc = port_connection { pc }

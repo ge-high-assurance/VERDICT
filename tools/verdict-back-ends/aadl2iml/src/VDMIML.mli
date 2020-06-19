@@ -35,6 +35,7 @@ type port_mode = In | Out
 type port = {
   name: identifier;
   mode: port_mode;
+  is_event: bool;
   ptype: data_type option;
   probe: bool;
 }
@@ -43,7 +44,7 @@ type binary_op =
   | Arrow | Impl | Equiv | Or | And | Lt | Lte | Gt | Gte | Eq | Neq
   | Plus | Minus | Times | Div | IntDiv | Mod
 
-type unary_op = Not | UMinus | Pre | ToInt | ToReal
+type unary_op = Not | UMinus | Pre | ToInt | ToReal | Event
 
 type expr =
   | BinaryOp of binary_op * expr * expr

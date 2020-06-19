@@ -91,6 +91,7 @@
                 type="vdm_lustre:ArraySelection">
             </element>
             <element name="merge" type="vdm_lustre:MergeOperation"></element>
+            <element name="event" type="vdm_lustre:Expression"></element>
         </choice>
     </complexType>
 

@@ -8,7 +8,7 @@ type ExpressionKind enum {
 	Times, Div, IntDiv, Mod, Not, And, Or, Xor, Implies,
 	LessThan, GreaterThan,
 	LessThanOrEqualTo, GreaterThanOrEqualTo,
-	Equal, NotEqual, ConditionalExpr, Arrow, Pre, Call,
+	Equal, NotEqual, ConditionalExpr, Arrow, Pre, Event, Call,
 	ExpressionList
 };
 
@@ -74,6 +74,7 @@ type Expression {
 	conditional_expr: IfThenElse;
 	arrow: BinaryOperation;
 	pre: Expression;
+	event: Expression;
 	call: NodeCall;
 	expression_list: ArrayList<Expression>;
 };

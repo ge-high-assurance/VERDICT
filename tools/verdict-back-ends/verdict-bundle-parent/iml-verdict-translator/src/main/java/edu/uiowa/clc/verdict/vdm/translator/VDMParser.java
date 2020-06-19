@@ -532,43 +532,37 @@ public class VDMParser extends Parser {
             // ID
             if (type == Type.Id) {
                 return idExpr();
-            }
-            if (type == Type.INT_Lit) {
+            } else if (type == Type.INT_Lit) {
                 return intExpr();
-            }
-            if (type == Type.REAL_Lit) {
+            } else if (type == Type.REAL_Lit) {
                 return realExpr();
-            }
-            if (type == Type.BOOL_Lit) {
+            } else if (type == Type.BOOL_Lit) {
                 return boolExpr();
-            }
-            if (type == Type.NEG) {
+            } else if (type == Type.NEG) {
                 Expression neg_expr = expression();
                 expression.setNegative(neg_expr);
                 return expression;
-            }
-            if (type == Type.NOT) {
+            } else if (type == Type.NOT) {
                 Expression not_expr = expression();
                 expression.setNot(not_expr);
                 return expression;
-            }
-            if (type == Type.PRE) {
+            } else if (type == Type.PRE) {
                 Expression pre_expr = expression();
                 expression.setPre(pre_expr);
                 return expression;
-            }
-            if (type == Type.TO_REAL) {
+            } else if (type == Type.EVENT) {
+                Expression event_expr = expression();
+                expression.setEvent(event_expr);
+                return expression;
+            } else if (type == Type.TO_REAL) {
                 Expression real_expr = expression();
                 expression.setToReal(real_expr);
                 return expression;
-            }
-            if (type == Type.TO_INT) {
+            } else if (type == Type.TO_INT) {
                 Expression int_expr = expression();
                 expression.setToInt(int_expr);
                 return expression;
-            }
-
-            if (token.type == Type.BINARY_OP) {
+            } else if (token.type == Type.BINARY_OP) {
                 // OP
                 // EQ
                 // AND
@@ -577,82 +571,63 @@ public class VDMParser extends Parser {
                 if (type == Type.EQ) {
                     // BinaryOperation eq = binaryExpression();
                     expression.setEqual(op);
-                }
-                if (type == Type.AND) {
+                } else if (type == Type.AND) {
                     /// BinaryOperation and = binaryExpression();
                     expression.setAnd(op);
-                }
-                if (type == Type.OR) {
+                } else if (type == Type.OR) {
                     // BinaryOperation or = binaryExpression();
                     expression.setOr(op);
-                }
-                if (type == Type.IMPLIES) {
+                } else if (type == Type.IMPLIES) {
                     // BinaryOperation implies = binaryExpression();
                     expression.setImplies(op);
-                }
-                if (type == Type.PLUS) {
+                } else if (type == Type.PLUS) {
                     expression.setPlus(op);
-                }
-                if (type == Type.MINUS) {
+                } else if (type == Type.MINUS) {
                     expression.setMinus(op);
-                }
-                if (type == Type.DIV) {
+                } else if (type == Type.DIV) {
                     expression.setDiv(op);
-                }
-                if (type == Type.TIMES) {
+                } else if (type == Type.TIMES) {
                     expression.setTimes(op);
-                }
-                if (type == Type.XOR) {
+                } else if (type == Type.XOR) {
                     expression.setXor(op);
-                }
-                if (type == Type.MOD) {
+                } else if (type == Type.MOD) {
                     expression.setMod(op);
-                }
-                if (type == Type.LEQ) {
+                } else if (type == Type.LEQ) {
                     // BinaryOperation leq = binaryExpression();
                     expression.setLessThanOrEqualTo(op);
-                }
-                if (type == Type.LE) {
+                } else if (type == Type.LE) {
                     // BinaryOperation leq = binaryExpression();
                     expression.setLessThan(op);
-                }
-                if (type == Type.GEQ) {
+                } else if (type == Type.GEQ) {
                     // BinaryOperation leq = binaryExpression();
                     expression.setGreaterThanOrEqualTo(op);
-                }
-                if (type == Type.GE) {
+                } else if (type == Type.GE) {
                     // BinaryOperation leq = binaryExpression();
                     expression.setGreaterThan(op);
-                }
-                if (type == Type.ARROW) {
+                } else if (type == Type.ARROW) {
                     // BinaryOperation arrow = binaryExpression();
                     expression.setArrow(op);
-                }
-                if (type == Type.NEQ) {
+                } else if (type == Type.NEQ) {
                     // BinaryOperation neq = binaryExpression();
                     expression.setNotEqual(op);
                 }
-            }
-            if (token.type == Type.ITE) {
+            } else if (token.type == Type.ITE) {
                 if (type == Type.CND_EXPR) {
                     IfThenElse ite = ITE();
                     expression.setConditionalExpression(ite);
                 }
-            }
-            if (token.type == Type.RECORD_PROJECTION) {
+            } else if (token.type == Type.RECORD_PROJECTION) {
 
                 if (type == Type.RECORD_PROJECTION) {
                     RecordProjection record_expr = recordProjection();
                     expression.setRecordProjection(record_expr);
                 }
-            }
-            if (token.type == Type.RECORD_LITERAL) {
+            } else if (token.type == Type.RECORD_LITERAL) {
                 if (type == Type.RECORD_LITERAL) {
                     RecordLiteral recordLit = recordLiteral();
                     expression.setRecordLiteral(recordLit);
                 }
-            }
-            if (token.type == Type.NODE_CALL) {
+            } else if (token.type == Type.NODE_CALL) {
                 if (type == Type.CALL) {
                     NodeCall nodeCall = nodeCall();
                     expression.setCall(nodeCall);
@@ -1175,7 +1150,9 @@ public class VDMParser extends Parser {
     // type Port {
     // name: Identifier;
     // mode: PortMode;
+    // is_event: Bool;
     // ptype: Option<DataType>;
+    // probe: Bool;
     // };
 
     public Port port(String componentID) {
@@ -1199,10 +1176,29 @@ public class VDMParser extends Parser {
                 PortMode portMode = portMode();
                 port.setMode(portMode);
             } else if (token.type == Type.BOOL) {
-                consume(Type.BOOL);
-                boolean value = token.getTruthValue();
-                consume(Type.Boolean);
-                port.setProbe(value);
+
+                //                consume(Type.BOOL);
+
+                String type_value = this.token.sd.getName();
+                Type type = Type.get(type_value);
+
+                if (type == Type.PROBE) {
+                    consume(Type.PROBE);
+
+                    boolean is_probe = token.getTruthValue();
+
+                    port.setProbe(is_probe);
+                    consume(Type.Boolean);
+
+                } else if (type == Type.IS_EVENT) {
+                    consume(Type.IS_EVENT);
+
+                    boolean is_event = token.getTruthValue();
+
+                    port.setEvent(is_event);
+                    consume(Type.Boolean);
+                }
+
             } else if (token.type == Type.OPTION) {
                 consume(Type.OPTION);
 

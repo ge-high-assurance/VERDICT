@@ -136,6 +136,7 @@ public enum Type {
     SAFETY_EXP_KIND("SafetyExprKind"),
 
     PROBE("probe"),
+    IS_EVENT("is_event"),
     // Safety related stuff ends
 
     SEVERITY("Severity"),
@@ -346,6 +347,8 @@ public enum Type {
 
     NOT("Not"),
     PRE("Pre"),
+    //    EVENT("Event"),
+
     EQ("Equal"),
     AND("And"),
     OR("Or"),

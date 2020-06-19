@@ -93,6 +93,7 @@
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="probe" type="boolean" use="required"></attribute>
+        <attribute name="event" type="boolean"></attribute>
     </complexType>
 
     <simpleType name="PortMode">
