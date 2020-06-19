@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
@@ -503,14 +504,12 @@ public class AttackDefenseCollector {
         for (SystemModel system : systems.values()) {
             for (CyberReq cyberReq : system.getCyberReqs()) {
                 Optional<ADTree> treeOpt = system.trace(cyberReq.getCondition());
-                if (treeOpt.isPresent()) {
-                    // Crush the tree to remove redundant nodes
-                    ADTree adtree = treeOpt.get().crush();
-                    // Compute probability of attack
-                    Prob computed = adtree.compute();
+				// Crush the tree to remove redundant nodes
+				ADTree adtree = treeOpt.isPresent() ? treeOpt.get().crush() : new ADOr(Collections.emptyList(), true);
+				// Compute probability of attack
+				Prob computed = adtree.compute();
 
-					output.add(new Result(system, cyberReq, adtree, computed));
-                }
+				output.add(new Result(system, cyberReq, adtree, computed));
             }
         }
 

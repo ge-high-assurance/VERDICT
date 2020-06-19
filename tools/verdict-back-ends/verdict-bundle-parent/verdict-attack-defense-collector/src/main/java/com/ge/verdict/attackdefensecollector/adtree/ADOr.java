@@ -15,6 +15,19 @@ public class ADOr extends ADTree {
     /** The child attack-defense trees. */
     private List<ADTree> adtrees;
 
+	/**
+	 * Constructs an OR attack-defense tree.
+	 *
+	 * @param adtrees the list of children
+	 * @param allowEmpty whether or not to allow an empty list
+	 */
+	public ADOr(List<ADTree> adtrees, boolean allowEmpty) {
+		if (adtrees.isEmpty() && !allowEmpty) {
+			throw new RuntimeException("Created empty ADOr");
+		}
+		this.adtrees = adtrees;
+	}
+
     /**
      * Constructs an OR attack-defense tree.
      *
@@ -23,10 +36,7 @@ public class ADOr extends ADTree {
      * @param adtrees the list of children
      */
     public ADOr(List<ADTree> adtrees) {
-        if (adtrees.isEmpty()) {
-            throw new RuntimeException("Created empty ADOr");
-        }
-        this.adtrees = adtrees;
+		this(adtrees, false);
     }
 
     /**
