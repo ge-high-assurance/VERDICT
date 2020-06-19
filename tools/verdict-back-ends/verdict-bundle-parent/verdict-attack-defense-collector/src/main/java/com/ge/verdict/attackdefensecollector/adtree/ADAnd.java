@@ -1,14 +1,13 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
+import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
-import com.ge.verdict.attackdefensecollector.Prob;
 
 /** A conjunction of several attack-defense trees. An ADAnd always contains at least one child. */
 public class ADAnd extends ADTree {
@@ -51,9 +50,9 @@ public class ADAnd extends ADTree {
         this(Arrays.asList(adtrees));
     }
 
-	public List<ADTree> children() {
-		return adtrees;
-	}
+    public List<ADTree> children() {
+        return adtrees;
+    }
 
     @Override
     public ADTree crush() {

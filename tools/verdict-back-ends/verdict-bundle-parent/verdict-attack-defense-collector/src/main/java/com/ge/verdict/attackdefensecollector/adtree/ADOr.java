@@ -1,5 +1,7 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
+import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -7,26 +9,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
-import com.ge.verdict.attackdefensecollector.Prob;
-
 /** A disjunction of several attack-defense trees. An ADOr always contains at least one child. */
 public class ADOr extends ADTree {
     /** The child attack-defense trees. */
     private List<ADTree> adtrees;
 
-	/**
-	 * Constructs an OR attack-defense tree.
-	 *
-	 * @param adtrees the list of children
-	 * @param allowEmpty whether or not to allow an empty list
-	 */
-	public ADOr(List<ADTree> adtrees, boolean allowEmpty) {
-		if (adtrees.isEmpty() && !allowEmpty) {
-			throw new RuntimeException("Created empty ADOr");
-		}
-		this.adtrees = adtrees;
-	}
+    /**
+     * Constructs an OR attack-defense tree.
+     *
+     * @param adtrees the list of children
+     * @param allowEmpty whether or not to allow an empty list
+     */
+    public ADOr(List<ADTree> adtrees, boolean allowEmpty) {
+        if (adtrees.isEmpty() && !allowEmpty) {
+            throw new RuntimeException("Created empty ADOr");
+        }
+        this.adtrees = adtrees;
+    }
 
     /**
      * Constructs an OR attack-defense tree.
@@ -36,7 +35,7 @@ public class ADOr extends ADTree {
      * @param adtrees the list of children
      */
     public ADOr(List<ADTree> adtrees) {
-		this(adtrees, false);
+        this(adtrees, false);
     }
 
     /**
@@ -61,9 +60,9 @@ public class ADOr extends ADTree {
         this(Arrays.asList(adtrees));
     }
 
-	public List<ADTree> children() {
-		return adtrees;
-	}
+    public List<ADTree> children() {
+        return adtrees;
+    }
 
     @Override
     public ADTree crush() {

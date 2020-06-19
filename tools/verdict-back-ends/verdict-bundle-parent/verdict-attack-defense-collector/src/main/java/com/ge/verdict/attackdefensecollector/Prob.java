@@ -96,22 +96,22 @@ public class Prob {
         }
     }
 
-	public static int dalOfSeverity(String severity) {
-		switch (severity.toLowerCase()) {
-		case "catastrophic":
-			return 9;
-		case "hazardous":
-			return 7;
-		case "major":
-			return 5;
-		case "minor":
-			return 3;
-		case "none":
-			return 0;
-		default:
-			throw new RuntimeException("Invalid severity: " + severity);
-		}
-	}
+    public static int dalOfSeverity(String severity) {
+        switch (severity.toLowerCase()) {
+            case "catastrophic":
+                return 9;
+            case "hazardous":
+                return 7;
+            case "major":
+                return 5;
+            case "minor":
+                return 3;
+            case "none":
+                return 0;
+            default:
+                throw new RuntimeException("Invalid severity: " + severity);
+        }
+    }
 
     /**
      * Construct a probability from a severity level (case-insensitive). Valid severity levels are:
@@ -121,7 +121,7 @@ public class Prob {
      * @return the probability
      */
     public static Prob fromSeverity(String severity) {
-		return fromDal(dalOfSeverity(severity));
+        return fromDal(dalOfSeverity(severity));
     }
 
     /** @return the probability of zero (impossibility). */

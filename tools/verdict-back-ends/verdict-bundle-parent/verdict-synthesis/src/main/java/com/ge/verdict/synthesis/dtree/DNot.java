@@ -17,16 +17,16 @@ public final class DNot implements DTree {
 
     @Override
     public BoolExpr smt(Context context) {
-		// We could encode NOT, but this would invalidate the analysis
-		throw new RuntimeException("cannot encode NOT nodes");
+        // We could encode NOT, but this would invalidate the analysis
+        throw new RuntimeException("cannot encode NOT nodes");
     }
 
-	@Override
-	public DTree flattenNot() {
-		if (child instanceof DNot) {
-			return ((DNot) child).child;
-		} else {
-			throw new RuntimeException("unable to flatten NOT node: " + prettyPrint());
-		}
-	}
+    @Override
+    public DTree flattenNot() {
+        if (child instanceof DNot) {
+            return ((DNot) child).child;
+        } else {
+            throw new RuntimeException("unable to flatten NOT node: " + prettyPrint());
+        }
+    }
 }

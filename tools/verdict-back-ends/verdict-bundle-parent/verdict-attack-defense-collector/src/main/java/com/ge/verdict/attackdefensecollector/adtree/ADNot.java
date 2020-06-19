@@ -1,9 +1,8 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
-import java.util.Objects;
-
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
+import java.util.Objects;
 
 /** A negation of an attack-defense tree. */
 public class ADNot extends ADTree {
@@ -19,9 +18,9 @@ public class ADNot extends ADTree {
         this.adtree = adtree;
     }
 
-	public ADTree child() {
-		return adtree;
-	}
+    public ADTree child() {
+        return adtree;
+    }
 
     @Override
     public ADTree crush() {

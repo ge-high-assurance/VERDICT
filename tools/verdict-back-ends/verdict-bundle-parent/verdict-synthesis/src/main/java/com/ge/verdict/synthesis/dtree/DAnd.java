@@ -1,11 +1,10 @@
 package com.ge.verdict.synthesis.dtree;
 
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
 
 public final class DAnd implements DTree {
     public final List<DTree> children;
@@ -30,8 +29,8 @@ public final class DAnd implements DTree {
                         .toArray(new BoolExpr[0]));
     }
 
-	@Override
-	public DTree flattenNot() {
-		return new DAnd(children.stream().map(DTree::flattenNot).collect(Collectors.toList()));
-	}
+    @Override
+    public DTree flattenNot() {
+        return new DAnd(children.stream().map(DTree::flattenNot).collect(Collectors.toList()));
+    }
 }

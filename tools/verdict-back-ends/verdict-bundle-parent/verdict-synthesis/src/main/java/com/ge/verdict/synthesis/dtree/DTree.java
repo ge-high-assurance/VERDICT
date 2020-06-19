@@ -8,5 +8,5 @@ public interface DTree {
 
     public BoolExpr smt(Context context);
 
-	public DTree flattenNot();
+    public DTree flattenNot();
 }
