@@ -1,17 +1,5 @@
 package com.ge.verdict.attackdefensecollector;
 
-import com.ge.verdict.attackdefensecollector.adtree.ADOr;
-import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
-import com.ge.verdict.attackdefensecollector.model.CIA;
-import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
-import com.ge.verdict.attackdefensecollector.model.CyberExpr;
-import com.ge.verdict.attackdefensecollector.model.CyberOr;
-import com.ge.verdict.attackdefensecollector.model.CyberRel;
-import com.ge.verdict.attackdefensecollector.model.CyberReq;
-import com.ge.verdict.attackdefensecollector.model.PortConcern;
-import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +13,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
+import com.ge.verdict.attackdefensecollector.adtree.ADTree;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.model.CIA;
+import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
+import com.ge.verdict.attackdefensecollector.model.CyberExpr;
+import com.ge.verdict.attackdefensecollector.model.CyberOr;
+import com.ge.verdict.attackdefensecollector.model.CyberRel;
+import com.ge.verdict.attackdefensecollector.model.CyberReq;
+import com.ge.verdict.attackdefensecollector.model.PortConcern;
+import com.ge.verdict.attackdefensecollector.model.SystemModel;
 
 /**
  * Main class of the attack-defense collector implementation.
@@ -445,53 +446,51 @@ public class AttackDefenseCollector {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
 
-            Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
+			if ("Connection".equals(systemTypeName)) {
+				// TODO support connections
+			} else {
+				Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
 
-            String attackName = row.getCell("CAPEC");
-            CIA cia =
-                    CIA.fromStrings(
-                            row.getCell("Confidentiality"),
-                            row.getCell("Integrity"),
-                            row.getCell("Availability"));
-            List<String> defenseNames =
-                    Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";"));
-            List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
-            List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
-            // Prob likelihood = Prob.not(Prob.fromDal(row.getCell("DAL"), Prob.certain()));
+				String attackName = row.getCell("CAPEC");
+				CIA cia = CIA.fromStrings(row.getCell("Confidentiality"), row.getCell("Integrity"),
+						row.getCell("Availability"));
+				List<String> defenseNames = Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";"));
+				List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
+				List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
+				// Prob likelihood = Prob.not(Prob.fromDal(row.getCell("DAL"), Prob.certain()));
 
-            if (defenseNames.size() != implProps.size()
-                    || defenseNames.size() != likelihoodStrings.size()) {
-                throw new RuntimeException(
-                        "ApplicableDefenseProperties, ImplProperties, and DAL must have same cardinality");
-            }
+				if (defenseNames.size() != implProps.size() || defenseNames.size() != likelihoodStrings.size()) {
+					throw new RuntimeException(
+							"ApplicableDefenseProperties, ImplProperties, and DAL must have same cardinality");
+				}
 
-            // Apply to all systems of the this component type (unless particular instance
-            // specified)
-            for (SystemModel system : systems) {
-                // Each row is a conjunction
-                // And there are potentially multiple such rows, forming a DNF
-                Defense defense = system.getDefenseByAttackAndCia(attackName, cia);
-                if (defense == null) {
-                    defense = new Defense(system.getAttackByNameAndCia(attackName, cia));
-                    system.addDefense(defense);
-                }
+				// Apply to all systems of the this component type (unless particular instance
+				// specified)
+				for (SystemModel system : systems) {
+					// Each row is a conjunction
+					// And there are potentially multiple such rows, forming a DNF
+					Defense defense = system.getDefenseByAttackAndCia(attackName, cia);
+					if (defense == null) {
+						Attack attack = system.getAttackByNameAndCia(attackName, cia);
+						if (attack == null) {
+							throw new RuntimeException("could not find attack: " + attackName + ", " + cia);
+						}
+						defense = new Defense(attack);
+						system.addDefense(defense);
+					}
 
-                // TODO get defense descriptions from Defenses2NIST?
+					// TODO get defense descriptions from Defenses2NIST?
 
-                List<Defense.DefenseLeaf> clause = new ArrayList<>();
-                for (int i = 0; i < defenseNames.size(); i++) {
-                    if (!"null".equals(defenseNames.get(i))) {
-                        Optional<Pair<String, Prob>> impl =
-                                "null".equals(implProps.get(i))
-                                        ? Optional.empty()
-                                        : Optional.of(
-                                                new Pair<>(
-                                                        implProps.get(i),
-                                                        Prob.fromDal(likelihoodStrings.get(i))));
-                        clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
-                    }
-                }
-                defense.addDefenseClause(clause);
+					List<Defense.DefenseLeaf> clause = new ArrayList<>();
+					for (int i = 0; i < defenseNames.size(); i++) {
+						if (!"null".equals(defenseNames.get(i))) {
+							Optional<Pair<String, Prob>> impl = "null".equals(implProps.get(i)) ? Optional.empty()
+									: Optional.of(new Pair<>(implProps.get(i), Prob.fromDal(likelihoodStrings.get(i))));
+							clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
+						}
+					}
+					defense.addDefenseClause(clause);
+				}
             }
         }
 
