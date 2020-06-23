@@ -21,6 +21,7 @@
         <module>com.ge.research.osate.verdict.feature</module>
         <module>com.ge.research.osate.verdict.target</module>
         <module>com.ge.research.osate.verdict.updatesite</module>
+        <module>com.ge.research.osate.verdict.vdm</module>
     </modules>
 
     <!-- Disable unusable repositories, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478 -->

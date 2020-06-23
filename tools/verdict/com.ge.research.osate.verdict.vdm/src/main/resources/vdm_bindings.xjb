@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings version="2.1"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <jaxb:bindings schemaLocation="vdm_data.xsd"
+        node="//xs:schema">
+        <jaxb:bindings>
+            <namespace:prefix name="vdm_data" />
+        </jaxb:bindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="vdm_kind2.xsd"
+        node="//xs:schema">
+        <jaxb:bindings>
+            <namespace:prefix name="vdm_kind2" />
+        </jaxb:bindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="vdm_lustre.xsd"
+        node="//xs:schema">
+        <jaxb:bindings>
+            <namespace:prefix name="vdm_lustre" />
+        </jaxb:bindings>
+    </jaxb:bindings>
+    <jaxb:bindings schemaLocation="vdm_model.xsd"
+        node="//xs:schema">
+        <jaxb:bindings>
+            <namespace:prefix name="vdm_model" />
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>
