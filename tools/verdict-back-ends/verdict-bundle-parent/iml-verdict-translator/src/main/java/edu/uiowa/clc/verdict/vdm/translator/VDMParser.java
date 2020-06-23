@@ -1026,13 +1026,19 @@ public class VDMParser extends Parser {
 
     public TypeDeclaration getTypeDeclaration() {
 
-        TypeDeclaration typeDeclaration;
+        TypeDeclaration typeDeclaration = null;
         // consume(Type.COMPONENT_TYPE);
         consume(Type.MODEL);
 
         int typeDeclaration_index = arrayList_element();
-        typeDeclaration = typeDeclarations.get(typeDeclaration_index);
-
+       
+		try {
+			typeDeclaration = typeDeclarations.get(typeDeclaration_index);
+		} catch (IndexOutOfBoundsException exp) {
+			System.out.println("Forward reference in datatype declaration is not supported!");
+			System.exit(-1);
+		}
+        
         return typeDeclaration;
     }
 
