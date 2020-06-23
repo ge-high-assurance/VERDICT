@@ -1,17 +1,16 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
-import com.ge.verdict.attackdefensecollector.NameResolver;
 import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.CIA;
-import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import java.util.Locale;
 import java.util.Objects;
 
 /** An attack on a system, a fundamental unit of the attack-defense tree. */
 public class Attack extends ADTree {
-    /** The system to which the attack applies. */
-    private NameResolver<SystemModel> system;
+    /** The attackable to which the attack applies. */
+    private Attackable attackable;
     /** The name of the attack. */
     private String attackName;
     /** The description of the attack. */
@@ -31,12 +30,12 @@ public class Attack extends ADTree {
      * @param cia the CIA concern affected by the attack
      */
     public Attack(
-            NameResolver<SystemModel> system,
+            Attackable attackable,
             String attackName,
             String attackDescription,
             Prob prob,
             CIA cia) {
-        this.system = system;
+        this.attackable = attackable;
         this.attackName = attackName;
         this.attackDescription = attackDescription;
         this.prob = prob;
@@ -48,9 +47,9 @@ public class Attack extends ADTree {
         return attackName;
     }
 
-    /** @return the system to which the attack applies */
-    public SystemModel getSystem() {
-        return system.get();
+    /** @return the attackable to which the attack applies */
+    public Attackable getAttackable() {
+        return attackable;
     }
 
     /** @return the description of the attack */
@@ -78,14 +77,20 @@ public class Attack extends ADTree {
     public void prettyPrint(IndentedStringBuilder builder) {
         // systemName:cia:attackName
         builder.append(
-                String.format(Locale.US, "%s:%s:%s", system.getName(), cia.toString(), attackName));
+                String.format(
+                        Locale.US,
+                        "%s:%s:%s",
+                        attackable.getParentName(),
+                        cia.toString(),
+                        attackName));
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof Attack) {
             Attack otherAttack = (Attack) other;
-            return otherAttack.system.getName().equals(system.getName())
+            return otherAttack.attackable.isSystem() == attackable.isSystem()
+                    && otherAttack.attackable.getParentName().equals(attackable.getParentName())
                     && otherAttack.attackName.equals(attackName)
                     && otherAttack.attackDescription.equals(attackDescription)
                     && otherAttack.prob.equals(prob)
@@ -98,6 +103,6 @@ public class Attack extends ADTree {
 
     @Override
     public int hashCode() {
-        return Objects.hash(system.getName(), attackName, attackDescription, prob, cia);
+        return Objects.hash(attackable.getParentName(), attackName, attackDescription, prob, cia);
     }
 }

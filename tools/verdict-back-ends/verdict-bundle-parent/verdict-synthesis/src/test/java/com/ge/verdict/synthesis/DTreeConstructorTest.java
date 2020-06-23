@@ -1,6 +1,5 @@
 package com.ge.verdict.synthesis;
 
-import com.ge.verdict.attackdefensecollector.NameResolver;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
@@ -47,12 +46,7 @@ public class DTreeConstructorTest {
         SystemModel system = new SystemModel("S1");
 
         Attack attack1 =
-                new Attack(
-                        new NameResolver<>("S1", Collections.singletonMap("S1", system)),
-                        "A1",
-                        "An attack",
-                        Prob.certain(),
-                        CIA.I);
+                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
         Defense defense1 = new Defense(attack1);
         defense1.addDefenseClause(
                 Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));

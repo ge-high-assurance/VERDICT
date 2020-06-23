@@ -12,6 +12,7 @@ import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +45,22 @@ public class DTreeConstructor {
             return new DOr(Collections.emptyList());
         } else {
             DTree result = resultOpt.get().flattenNot();
-            // TODO
+
+            Set<Attack> defendedAttacks = new HashSet<>();
+            for (Defense defense : defenses) {
+                if (!attacks.contains(defense.getAttack())) {
+                    throw new RuntimeException(
+                            "defense references undefined attack: "
+                                    + defense.getAttack().getName());
+                }
+                defendedAttacks.add(defense.getAttack());
+            }
+            for (Attack attack : attacks) {
+                if (!defendedAttacks.contains(attack)) {
+                    throw new RuntimeException("attack " + attack.getName() + " has no defense");
+                }
+            }
+
             return result;
         }
     }
@@ -104,8 +120,8 @@ public class DTreeConstructor {
                                                                 leaf -> {
                                                                     String system =
                                                                             defense.getAttack()
-                                                                                    .getSystem()
-                                                                                    .getName();
+                                                                                    .getAttackable()
+                                                                                    .getParentName();
                                                                     String attack =
                                                                             defense.getAttack()
                                                                                     .getName();

@@ -104,7 +104,7 @@ public class Defense extends ADTree {
     @Override
     public void prettyPrint(IndentedStringBuilder builder) {
         // systemName:(defenseImpliedPropertyFormula)
-        builder.append(String.format(Locale.US, "%s:(", attack.getSystem().getName()));
+        builder.append(String.format(Locale.US, "%s:(", attack.getAttackable().getParentName()));
 
         // Print the DNF
         for (int i = 0; i < defenseDnf.size(); i++) {
