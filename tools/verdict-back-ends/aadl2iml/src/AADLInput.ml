@@ -88,7 +88,7 @@ let sort_model_units input =
     let add_unit_model um = function
       | None -> Some (false, [], Some um)
       | Some (is_perm, deps, None) -> Some (is_perm, deps, Some um)
-      | _ -> assert false
+      | _ -> failwith("Duplicated AADL unit model detected!")
     in
     let f map = function
       | AD.AADLPackage (_, { AD.name }) as um -> (
