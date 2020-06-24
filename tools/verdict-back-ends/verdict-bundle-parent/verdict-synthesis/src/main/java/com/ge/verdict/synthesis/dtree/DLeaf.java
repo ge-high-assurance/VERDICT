@@ -22,43 +22,44 @@ public class DLeaf implements DTree {
     /** This is purely informative, but should not distinguish different leaves. */
     public final String attack;
 
-    public static DLeaf createIfNeeded(
-            String component, String defenseProperty, String attack, int cost) {
-        Pair<String, String> key = new Pair<>(component, defenseProperty);
-        if (!componentDefenseMap.containsKey(key)) {
-            componentDefenseMap.put(key, new DLeaf(component, defenseProperty, attack, cost));
+    public static final class Factory {
+        private final Map<Pair<String, String>, DLeaf> componentDefenseMap = new LinkedHashMap<>();
+
+        private int idCounter = 0;
+        private final Map<Integer, DLeaf> idMap = new HashMap<>();
+
+        public DLeaf createIfNeeded(
+                String component, String defenseProperty, String attack, int cost) {
+            Pair<String, String> key = new Pair<>(component, defenseProperty);
+            if (!componentDefenseMap.containsKey(key)) {
+                DLeaf dleaf = new DLeaf(component, defenseProperty, attack, cost, idCounter++);
+                idMap.put(dleaf.id, dleaf);
+                componentDefenseMap.put(key, dleaf);
+            }
+            return componentDefenseMap.get(key);
         }
-        return componentDefenseMap.get(key);
-    }
 
-    public static DLeaf fromId(int id) {
-        DLeaf leaf = idMap.get(id);
-        if (leaf != null) {
-            return leaf;
-        } else {
-            throw new UndefinedIdException("Undefined ID: " + id);
+        public DLeaf fromId(int id) {
+            DLeaf leaf = idMap.get(id);
+            if (leaf != null) {
+                return leaf;
+            } else {
+                throw new UndefinedIdException("Undefined ID: " + id);
+            }
+        }
+
+        public Collection<DLeaf> allLeaves() {
+            return componentDefenseMap.values();
         }
     }
 
-    public static Collection<DLeaf> allLeaves() {
-        return componentDefenseMap.values();
-    }
-
-    private DLeaf(String component, String defenseProperty, String attack, int cost) {
+    private DLeaf(String component, String defenseProperty, String attack, int cost, int id) {
         this.component = component;
         this.defenseProperty = defenseProperty;
         this.attack = attack;
         this.cost = cost;
-
-        id = idCounter++;
-        idMap.put(id, this);
+        this.id = id;
     }
-
-    private static final Map<Pair<String, String>, DLeaf> componentDefenseMap =
-            new LinkedHashMap<>();
-
-    private static int idCounter = 0;
-    private static final Map<Integer, DLeaf> idMap = new HashMap<>();
 
     public static class UndefinedIdException extends RuntimeException {
         private static final long serialVersionUID = 1L;
@@ -90,5 +91,10 @@ public class DLeaf implements DTree {
     @Override
     public DTree flattenNot() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return prettyPrint();
     }
 }

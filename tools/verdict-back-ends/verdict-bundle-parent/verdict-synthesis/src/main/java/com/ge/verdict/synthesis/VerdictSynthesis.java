@@ -22,26 +22,31 @@ public class VerdictSynthesis {
         MAXSAT
     }
 
-    public static Optional<Set<DLeaf>> performSynthesis(DTree tree, Approach approach) {
+    public static Optional<Set<DLeaf>> performSynthesis(
+            DTree tree, DLeaf.Factory factory, Approach approach) {
         switch (approach) {
             case MAXSMT:
-                return performSynthesisMaxSmt(tree);
+                return performSynthesisMaxSmt(tree, factory);
             case MAXSAT:
-                return performSynthesisMaxSat(tree);
+                return performSynthesisMaxSat(tree, factory);
             default:
                 throw new RuntimeException("excuse me");
         }
     }
 
-    public static Optional<Set<DLeaf>> performSynthesisMaxSmt(DTree tree) {
+    public static Optional<Set<DLeaf>> performSynthesisMaxSmt(DTree tree, DLeaf.Factory factory) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
-        Collection<DLeaf> leaves = DLeaf.allLeaves();
+        Collection<DLeaf> leaves = factory.allLeaves();
 
         for (DLeaf leaf : leaves) {
+            // System.out.println("LEAF: " + leaf + ", COST: " + leaf.cost + " [MaxSMT]");
+
             // this id ("cover") doesn't matter but we have to specify something
-            optimizer.AssertSoft(context.mkNot(leaf.toZ3(context)), leaf.cost, "cover");
+            if (leaf.cost > 0) {
+                optimizer.AssertSoft(context.mkNot(leaf.toZ3(context)), leaf.cost, "cover");
+            }
         }
 
         optimizer.Assert(tree.toZ3(context));
@@ -71,16 +76,21 @@ public class VerdictSynthesis {
         }
     }
 
-    public static Optional<Set<DLeaf>> performSynthesisMaxSat(DTree tree) {
+    public static Optional<Set<DLeaf>> performSynthesisMaxSat(
+            DTree tree, DLeaf.Factory dleafFactory) {
         FormulaFactory factory = new FormulaFactory();
         MaxSATSolver solver = MaxSATSolver.wmsu3();
 
         Formula cnf = tree.toLogicNG(factory).cnf();
 
-        Collection<DLeaf> leaves = DLeaf.allLeaves();
+        Collection<DLeaf> leaves = dleafFactory.allLeaves();
 
         for (DLeaf leaf : leaves) {
-            solver.addSoftFormula(factory.not(leaf.toLogicNG(factory)), leaf.cost);
+            // System.out.println("LEAF: " + leaf + ", COST: " + leaf.cost + " [MaxSAT]");
+
+            if (leaf.cost > 0) {
+                solver.addSoftFormula(factory.not(leaf.toLogicNG(factory)), leaf.cost);
+            }
         }
 
         // implicitly converts formula to CNF

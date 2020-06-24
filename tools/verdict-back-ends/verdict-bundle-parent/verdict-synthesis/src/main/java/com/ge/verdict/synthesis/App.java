@@ -49,6 +49,7 @@ public class App {
         for (Result result : results) {
             System.out.println();
             System.out.println("Result for cyber req: " + result.cyberReq.getName());
+            DLeaf.Factory factory = new DLeaf.Factory();
             DTree dtree =
                     timed(
                             "Construct defense tree",
@@ -56,13 +57,14 @@ public class App {
                                     DTreeConstructor.construct(
                                             result.adtree,
                                             costModel,
-                                            result.cyberReq.getSeverityDal()));
+                                            result.cyberReq.getSeverityDal(),
+                                            factory));
             Optional<Set<DLeaf>> selected =
                     timed(
                             "Perform synthesis",
                             () ->
                                     VerdictSynthesis.performSynthesis(
-                                            dtree, VerdictSynthesis.Approach.MAXSMT));
+                                            dtree, factory, VerdictSynthesis.Approach.MAXSMT));
             if (selected.isPresent()) {
                 for (DLeaf leaf : selected.get()) {
                     System.out.println("Selected leaf: " + leaf.prettyPrint());

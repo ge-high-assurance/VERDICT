@@ -26,7 +26,9 @@ public class DTreeConstructorTest {
         // Note: comparing the results of prettyPrint() instead of the trees directly
         // because we have not implemented equals for the DTree classes
 
-        DTree leaf = DLeaf.createIfNeeded("A", "A", "A", 0);
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        DTree leaf = factory.createIfNeeded("A", "A", "A", 0);
         DTree dtree = new DNot(new DNot(leaf));
         Assertions.assertThat(dtree.flattenNot().prettyPrint()).isEqualTo(leaf.prettyPrint());
 
@@ -39,6 +41,8 @@ public class DTreeConstructorTest {
 
     @Test
     public void testConstruct() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+
         CostModel dummyCosts =
                 new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
         int dal = 5;
@@ -62,14 +66,15 @@ public class DTreeConstructorTest {
                                                         Collections.singletonList(
                                                                 new DAnd(
                                                                         Collections.singletonList(
-                                                                                DLeaf
+                                                                                factory
                                                                                         .createIfNeeded(
                                                                                                 "S1",
                                                                                                 "D1",
                                                                                                 "A1",
                                                                                                 dal)))))))));
 
-        Assertions.assertThat(DTreeConstructor.construct(adtree, dummyCosts, dal).prettyPrint())
+        Assertions.assertThat(
+                        DTreeConstructor.construct(adtree, dummyCosts, dal, factory).prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 }

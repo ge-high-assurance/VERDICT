@@ -2,6 +2,7 @@ package com.ge.verdict.synthesis.dtree;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,10 @@ public final class DAnd implements DTree {
 
     public DAnd(List<DTree> children) {
         this.children = Collections.unmodifiableList(children);
+    }
+
+    public DAnd(DTree... children) {
+        this.children = Arrays.asList(children);
     }
 
     @Override

@@ -20,18 +20,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DTreeConstructor {
-    public static DTree construct(ADTree adtree, CostModel costModel, int dal) {
-        return (new DTreeConstructor(costModel, dal)).perform(adtree);
+    public static DTree construct(
+            ADTree adtree, CostModel costModel, int dal, DLeaf.Factory factory) {
+        return (new DTreeConstructor(costModel, dal, factory)).perform(adtree);
     }
 
     private final CostModel costModel;
+    private final DLeaf.Factory factory;
     private final int dal;
 
     private final Set<Attack> attacks;
     private final Set<Defense> defenses;
 
-    private DTreeConstructor(CostModel costModel, int dal) {
+    private DTreeConstructor(CostModel costModel, int dal, DLeaf.Factory factory) {
         this.costModel = costModel;
+        this.factory = factory;
         this.dal = dal;
 
         attacks = new LinkedHashSet<>();
@@ -102,7 +105,7 @@ public class DTreeConstructor {
                                     .collect(Collectors.toList())));
         } else if (adtree instanceof ADNot) {
             ADNot adnot = (ADNot) adtree;
-            return constructInternal(adnot.child()).map(child -> new DNot(child));
+            return constructInternal(adnot.child()).map(DNot::new);
         } else {
             throw new RuntimeException(
                     "got invalid adtree type: " + adtree.getClass().getCanonicalName());
@@ -126,7 +129,7 @@ public class DTreeConstructor {
                                                                             defense.getAttack()
                                                                                     .getName();
                                                                     String defenseProp = leaf.left;
-                                                                    return DLeaf.createIfNeeded(
+                                                                    return factory.createIfNeeded(
                                                                             system,
                                                                             defenseProp,
                                                                             attack,

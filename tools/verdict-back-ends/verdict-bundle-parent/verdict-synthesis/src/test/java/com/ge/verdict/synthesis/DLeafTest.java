@@ -7,10 +7,12 @@ import org.junit.Test;
 public class DLeafTest {
     @Test
     public void testUnique() {
-        DLeaf leaf1 = DLeaf.createIfNeeded("A", "A", "A", 0);
-        DLeaf leaf1Dup = DLeaf.createIfNeeded("A", "A", "A", 0);
-        DLeaf leaf2 = DLeaf.createIfNeeded("A", "B", "A", 0);
-        DLeaf leaf3 = DLeaf.createIfNeeded("B", "A", "A", 0);
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        DLeaf leaf1 = factory.createIfNeeded("A", "A", "A", 0);
+        DLeaf leaf1Dup = factory.createIfNeeded("A", "A", "A", 0);
+        DLeaf leaf2 = factory.createIfNeeded("A", "B", "A", 0);
+        DLeaf leaf3 = factory.createIfNeeded("B", "A", "A", 0);
 
         // should be aliases because the whole point is to uniquely identify instances
         Assertions.assertThat(leaf1 == leaf1Dup).isTrue();
@@ -20,11 +22,13 @@ public class DLeafTest {
 
     @Test
     public void testLookup() {
-        DLeaf leaf1 = DLeaf.createIfNeeded("A", "A", "A", 0);
-        DLeaf leaf2 = DLeaf.createIfNeeded("B", "B", "A", 0);
+        DLeaf.Factory factory = new DLeaf.Factory();
 
-        Assertions.assertThat(DLeaf.fromId(leaf1.id) == leaf1).isTrue();
-        Assertions.assertThat(DLeaf.fromId(leaf2.id) == leaf2).isTrue();
-        Assertions.assertThat(DLeaf.fromId(leaf1.id) == leaf2).isFalse();
+        DLeaf leaf1 = factory.createIfNeeded("A", "A", "A", 0);
+        DLeaf leaf2 = factory.createIfNeeded("B", "B", "A", 0);
+
+        Assertions.assertThat(factory.fromId(leaf1.id) == leaf1).isTrue();
+        Assertions.assertThat(factory.fromId(leaf2.id) == leaf2).isTrue();
+        Assertions.assertThat(factory.fromId(leaf1.id) == leaf2).isFalse();
     }
 }
