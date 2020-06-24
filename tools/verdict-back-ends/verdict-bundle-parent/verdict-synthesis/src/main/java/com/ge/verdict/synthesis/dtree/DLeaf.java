@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /**
  * Represents a component-defense pair. Each component-defense pair is represented by a unique
@@ -76,8 +78,13 @@ public class DLeaf implements DTree {
     }
 
     @Override
-    public BoolExpr smt(Context context) {
+    public BoolExpr toZ3(Context context) {
         return context.mkBoolConst(smtName());
+    }
+
+    @Override
+    public Variable toLogicNG(FormulaFactory factory) {
+        return factory.variable(smtName());
     }
 
     @Override

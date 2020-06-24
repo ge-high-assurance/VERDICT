@@ -58,7 +58,11 @@ public class App {
                                             costModel,
                                             result.cyberReq.getSeverityDal()));
             Optional<Set<DLeaf>> selected =
-                    timed("Perform synthesis", () -> VerdictSynthesis.performSynthesis(dtree));
+                    timed(
+                            "Perform synthesis",
+                            () ->
+                                    VerdictSynthesis.performSynthesis(
+                                            dtree, VerdictSynthesis.Approach.MAXSMT));
             if (selected.isPresent()) {
                 for (DLeaf leaf : selected.get()) {
                     System.out.println("Selected leaf: " + leaf.prettyPrint());
