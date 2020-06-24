@@ -59,4 +59,9 @@ public class PortConcern extends CyberExpr {
     public int hashCode() {
         return Objects.hash(portName, cia);
     }
+
+    @Override
+    public String toString() {
+        return portName + ":" + cia.toString();
+    }
 }

@@ -11,9 +11,29 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import org.logicng.datastructures.Assignment;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.solvers.MaxSATSolver;
 
 public class VerdictSynthesis {
-    public static Optional<Set<DLeaf>> performSynthesis(DTree tree) {
+    public static enum Approach {
+        MAXSMT,
+        MAXSAT
+    }
+
+    public static Optional<Set<DLeaf>> performSynthesis(DTree tree, Approach approach) {
+        switch (approach) {
+            case MAXSMT:
+                return performSynthesisMaxSmt(tree);
+            case MAXSAT:
+                return performSynthesisMaxSat(tree);
+            default:
+                throw new RuntimeException("excuse me");
+        }
+    }
+
+    public static Optional<Set<DLeaf>> performSynthesisMaxSmt(DTree tree) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
@@ -21,16 +41,16 @@ public class VerdictSynthesis {
 
         for (DLeaf leaf : leaves) {
             // this id ("cover") doesn't matter but we have to specify something
-            optimizer.AssertSoft(context.mkNot(leaf.smt(context)), leaf.cost, "cover");
+            optimizer.AssertSoft(context.mkNot(leaf.toZ3(context)), leaf.cost, "cover");
         }
 
-        optimizer.Assert(tree.smt(context));
+        optimizer.Assert(tree.toZ3(context));
 
         if (optimizer.Check().equals(Status.SATISFIABLE)) {
             Set<DLeaf> output = new LinkedHashSet<>();
             Model model = optimizer.getModel();
             for (DLeaf leaf : leaves) {
-                Expr expr = model.eval(leaf.smt(context), true);
+                Expr expr = model.eval(leaf.toZ3(context), true);
                 switch (expr.getBoolValue()) {
                     case Z3_L_TRUE:
                         output.add(leaf);
@@ -48,6 +68,42 @@ public class VerdictSynthesis {
         } else {
             System.err.println("Synthesis: SMT not satisfiable, is input tree valid?");
             return Optional.empty();
+        }
+    }
+
+    public static Optional<Set<DLeaf>> performSynthesisMaxSat(DTree tree) {
+        FormulaFactory factory = new FormulaFactory();
+        MaxSATSolver solver = MaxSATSolver.wmsu3();
+
+        Formula cnf = tree.toLogicNG(factory).cnf();
+
+        Collection<DLeaf> leaves = DLeaf.allLeaves();
+
+        for (DLeaf leaf : leaves) {
+            solver.addSoftFormula(factory.not(leaf.toLogicNG(factory)), leaf.cost);
+        }
+
+        // implicitly converts formula to CNF
+        solver.addHardFormula(cnf);
+
+        switch (solver.solve()) {
+            case OPTIMUM:
+                Set<DLeaf> output = new LinkedHashSet<>();
+                Assignment model = solver.model();
+                for (DLeaf leaf : leaves) {
+                    if (model.evaluateLit(leaf.toLogicNG(factory))) {
+                        output.add(leaf);
+                    }
+                }
+                return Optional.of(output);
+            case UNDEF:
+                System.err.println("Synthesis: SAT undefined, is input tree valid?");
+                return Optional.empty();
+            case UNSATISFIABLE:
+                System.err.println("Synthesis: SAT not satisfiable, is input tree valid?");
+                return Optional.empty();
+            default:
+                throw new RuntimeException("impossible");
         }
     }
 }

@@ -289,7 +289,7 @@ public class SystemModel {
      * <p>Avoids entering infinite loops by keeping track of pairs of connections and CIAs that have
      * already been traced.
      *
-     * <p>Builds DP maps (with concretize()) on first invocation.
+     * <p>Builds maps (with concretize()) on first invocation.
      *
      * @param concern the port and CIA to trace
      * @param cyclePrevention a set of previously-traced connections and CIAs, used to prevent
@@ -299,8 +299,6 @@ public class SystemModel {
     protected Optional<ADTree> trace(
             PortConcern concern, Set<Pair<ConnectionModel, CIA>> cyclePrevention) {
         if (!isConcretized()) {
-            // Build DP maps
-            // Is this really DP (dynamic programming)? Kinda sorta.
             concretize();
         }
 
@@ -329,8 +327,6 @@ public class SystemModel {
 
         // Search in cyber relations
         for (CyberRel cyberRel : Util.guardedGet(outputConcernToCyberRel, concern)) {
-            // If we have a cyber relation, then we found the trace, even if it doesn't lead to
-            // anything
             hasCyberRel = true;
             if (cyberRel.getInput().isPresent()) {
                 // Trace cyber relation
@@ -352,8 +348,10 @@ public class SystemModel {
         for (ConnectionModel internalConnection :
                 Util.guardedGet(sourcePortToIncomingInternalConnection, concern.getPortName())) {
             traceInputConcern(
-                    new PortConcern(internalConnection.getSourcePortName(), concern.getCia()),
-                    cyclePrevention);
+                            new PortConcern(
+                                    internalConnection.getSourcePortName(), concern.getCia()),
+                            cyclePrevention)
+                    .map(children::add);
         }
 
         if (children.isEmpty()) {

@@ -2,6 +2,8 @@ package com.ge.verdict.synthesis.dtree;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 public final class DNot implements DTree {
     public final DTree child;
@@ -16,8 +18,13 @@ public final class DNot implements DTree {
     }
 
     @Override
-    public BoolExpr smt(Context context) {
+    public BoolExpr toZ3(Context context) {
         // We could encode NOT, but this would invalidate the analysis
+        throw new RuntimeException("cannot encode NOT nodes");
+    }
+
+    @Override
+    public Formula toLogicNG(FormulaFactory factory) {
         throw new RuntimeException("cannot encode NOT nodes");
     }
 
