@@ -1,5 +1,17 @@
 package com.ge.verdict.attackdefensecollector;
 
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
+import com.ge.verdict.attackdefensecollector.adtree.ADTree;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.model.CIA;
+import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
+import com.ge.verdict.attackdefensecollector.model.CyberExpr;
+import com.ge.verdict.attackdefensecollector.model.CyberOr;
+import com.ge.verdict.attackdefensecollector.model.CyberRel;
+import com.ge.verdict.attackdefensecollector.model.CyberReq;
+import com.ge.verdict.attackdefensecollector.model.PortConcern;
+import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,19 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.ge.verdict.attackdefensecollector.adtree.ADOr;
-import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
-import com.ge.verdict.attackdefensecollector.model.CIA;
-import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
-import com.ge.verdict.attackdefensecollector.model.CyberExpr;
-import com.ge.verdict.attackdefensecollector.model.CyberOr;
-import com.ge.verdict.attackdefensecollector.model.CyberRel;
-import com.ge.verdict.attackdefensecollector.model.CyberReq;
-import com.ge.verdict.attackdefensecollector.model.PortConcern;
-import com.ge.verdict.attackdefensecollector.model.SystemModel;
-
 /**
  * Main class of the attack-defense collector implementation.
  *
@@ -37,7 +36,7 @@ public class AttackDefenseCollector {
     /** Resolution table for system models. */
     private Map<String, SystemModel> systems;
     /** Resolution table for connection models. */
-    private Map<String, ConnectionModel> connections;
+    private Map<String, Set<ConnectionModel>> connections;
 
     /**
      * Get the system model with the specified name, creating it and adding it to the resolution
@@ -72,26 +71,6 @@ public class AttackDefenseCollector {
                     "Building resolver for system: " + system.getName() + " without adding to map");
         }
         return new NameResolver<>(system.getName(), systems);
-    }
-
-    /**
-     * Builds a NameResolver for a specified connection model.
-     *
-     * <p>This method should only be called if the connection model has already been added to the
-     * connection model resolution table. Calling this method without first adding the connection
-     * model to the table will throw an exception.
-     *
-     * @param connection the connection to build the resolver from
-     * @return a resolver to the specified connection
-     */
-    private NameResolver<ConnectionModel> resolver(ConnectionModel connection) {
-        if (!connections.containsKey(connection.getName())) {
-            throw new RuntimeException(
-                    "Building resolver for connection: "
-                            + connection.getName()
-                            + " without adding to map");
-        }
-        return new NameResolver<>(connection.getName(), connections);
     }
 
     /**
@@ -227,6 +206,8 @@ public class AttackDefenseCollector {
         // requirements
         Map<Pair<SystemModel, String>, Pair<SystemModel, String>> outgoingConnectionMap =
                 new HashMap<>();
+        // For some reason the connection names in CAPEC.csv and Defenses.csv are confusing
+        Map<String, String> connectionAttackNames = new HashMap<>();
 
         // Build component type and implementation maps
         for (CSVFile.RowData row : scnConnectionsCsv.getRowDatas()) {
@@ -285,6 +266,8 @@ public class AttackDefenseCollector {
             String sourcePort = row.getCell("SrcPortName");
             String destPort = row.getCell("DestPortName");
 
+            connectionAttackNames.put(name + row.getCell("Impl") + row.getCell("Comp"), name);
+
             // If instance is empty, then that means we have a component implementation
             // (one example is the top-level system)
             boolean internalIncoming = sourceInstName.length() == 0;
@@ -314,27 +297,27 @@ public class AttackDefenseCollector {
                             new ConnectionModel(
                                     name, resolver(source), resolver(dest), sourcePort, destPort);
 
-                    //					Logger.println("loaded connection: " + name + " from (" + sourceTypeName
-                    // + ", "
-                    //							+ sourceImplName + ", " + sourceInstName + ") to (" + destTypeName + ",
-                    // " + destImplName
-                    //							+ ", " + destInstName + ")");
+                    /*
+                     * Logger.println("loaded connection: " + name + " from (" + sourceTypeName + ", " + sourceImplName
+                     * + ", " + sourceInstName + ") to (" + destTypeName + ", " + destImplName + ", "
+                     * + destInstName + ")");
+                     */
 
-                    connections.put(name, connection);
+                    Util.putSetMap(connections, name, connection);
 
                     // Store connection in a different place depending on internal/external and
                     // outgoing/incoming
                     if (internalIncoming) {
-                        source.addIncomingInternalConnection(resolver(connection));
-                        dest.addIncomingConnection(resolver(connection));
+                        source.addIncomingInternalConnection(connection);
+                        dest.addIncomingConnection(connection);
                     } else if (internalOutgoing) {
-                        source.addOutgoingConnection(resolver(connection));
-                        dest.addOutgoingInternalConnection(resolver(connection));
+                        source.addOutgoingConnection(connection);
+                        dest.addOutgoingInternalConnection(connection);
                         outgoingConnectionMap.put(
                                 new Pair<>(source, sourcePort), new Pair<>(dest, destPort));
                     } else {
-                        source.addOutgoingConnection(resolver(connection));
-                        dest.addIncomingConnection(resolver(connection));
+                        source.addOutgoingConnection(connection);
+                        dest.addIncomingConnection(connection);
                     }
 
                     // Associate these system models with the component types
@@ -419,25 +402,39 @@ public class AttackDefenseCollector {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
 
-            if (!"Connection".equals(systemTypeName)) {
-                Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
+            String attackName = row.getCell("CAPEC");
+            String attackDesc = row.getCell("CAPECDescription");
+            Prob likelihood = Prob.certain();
+            // Look at all three columns to figure out which one is being used
+            CIA cia =
+                    CIA.fromStrings(
+                            row.getCell("Confidentiality"),
+                            row.getCell("Integrity"),
+                            row.getCell("Availability"));
 
-                String attackName = row.getCell("CAPEC");
-                String attackDesc = row.getCell("CAPECDescription");
-                Prob likelihood = Prob.certain();
-                // Look at all three columns to figure out which one is being used
-                CIA cia =
-                        CIA.fromStrings(
-                                row.getCell("Confidentiality"),
-                                row.getCell("Integrity"),
-                                row.getCell("Availability"));
-
-                // Apply to all systems of this component type (unless particular instance
-                // specified)
-                for (SystemModel system : systems) {
-                    system.addAttack(
-                            new Attack(resolver(system), attackName, attackDesc, likelihood, cia));
+            if ("Connection".equals(systemTypeName)) {
+                String connectionName = connectionAttackNames.get(systemInstName);
+                for (ConnectionModel connection : connections.get(connectionName)) {
+                    connection
+                            .getAttackable()
+                            .addAttack(
+                                    new Attack(
+                                            connection.getAttackable(),
+                                            attackName,
+                                            attackDesc,
+                                            likelihood,
+                                            cia));
                 }
+            } else {
+                SystemModel system = getSystem(systemInstName);
+                system.getAttackable()
+                        .addAttack(
+                                new Attack(
+                                        system.getAttackable(),
+                                        attackName,
+                                        attackDesc,
+                                        likelihood,
+                                        cia));
             }
         }
 
@@ -446,51 +443,79 @@ public class AttackDefenseCollector {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
 
-			if ("Connection".equals(systemTypeName)) {
-				// TODO support connections
-			} else {
-				Set<SystemModel> systems = Collections.singleton(getSystem(systemInstName));
+            String attackName = row.getCell("CAPEC");
+            CIA cia =
+                    CIA.fromStrings(
+                            row.getCell("Confidentiality"),
+                            row.getCell("Integrity"),
+                            row.getCell("Availability"));
+            List<String> defenseNames =
+                    Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";"));
+            List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
+            List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
+            // Prob likelihood = Prob.not(Prob.fromDal(row.getCell("DAL"), Prob.certain()));
 
-				String attackName = row.getCell("CAPEC");
-				CIA cia = CIA.fromStrings(row.getCell("Confidentiality"), row.getCell("Integrity"),
-						row.getCell("Availability"));
-				List<String> defenseNames = Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";"));
-				List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
-				List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
-				// Prob likelihood = Prob.not(Prob.fromDal(row.getCell("DAL"), Prob.certain()));
+            if (defenseNames.size() != implProps.size()
+                    || defenseNames.size() != likelihoodStrings.size()) {
+                throw new RuntimeException(
+                        "ApplicableDefenseProperties, ImplProperties, and DAL must have same cardinality");
+            }
 
-				if (defenseNames.size() != implProps.size() || defenseNames.size() != likelihoodStrings.size()) {
-					throw new RuntimeException(
-							"ApplicableDefenseProperties, ImplProperties, and DAL must have same cardinality");
-				}
+            List<Defense> defenses = new ArrayList<>();
+            List<Defense.DefenseLeaf> clause = new ArrayList<>();
 
-				// Apply to all systems of the this component type (unless particular instance
-				// specified)
-				for (SystemModel system : systems) {
-					// Each row is a conjunction
-					// And there are potentially multiple such rows, forming a DNF
-					Defense defense = system.getDefenseByAttackAndCia(attackName, cia);
-					if (defense == null) {
-						Attack attack = system.getAttackByNameAndCia(attackName, cia);
-						if (attack == null) {
-							throw new RuntimeException("could not find attack: " + attackName + ", " + cia);
-						}
-						defense = new Defense(attack);
-						system.addDefense(defense);
-					}
+            if ("Connection".equals(systemTypeName)) {
+                String connectionName = connectionAttackNames.get(systemInstName);
+                for (ConnectionModel connection : connections.get(connectionName)) {
+                    Defense defense =
+                            connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
+                    if (defense == null) {
+                        Attack attack =
+                                connection.getAttackable().getAttackByNameAndCia(attackName, cia);
+                        if (attack == null) {
+                            throw new RuntimeException(
+                                    "could not find attack: " + attackName + ", " + cia);
+                        }
+                        defense = new Defense(attack);
+                        connection.getAttackable().addDefense(defense);
+                    }
+                    defenses.add(defense);
+                }
+            } else {
+                SystemModel system = getSystem(systemInstName);
 
-					// TODO get defense descriptions from Defenses2NIST?
+                Defense defense = system.getAttackable().getDefenseByAttackAndCia(attackName, cia);
+                if (defense == null) {
+                    Attack attack = system.getAttackable().getAttackByNameAndCia(attackName, cia);
+                    if (attack == null) {
+                        throw new RuntimeException(
+                                "could not find attack: " + attackName + ", " + cia);
+                    }
+                    defense = new Defense(attack);
+                    system.getAttackable().addDefense(defense);
+                }
+                defenses.add(defense);
+            }
 
-					List<Defense.DefenseLeaf> clause = new ArrayList<>();
-					for (int i = 0; i < defenseNames.size(); i++) {
-						if (!"null".equals(defenseNames.get(i))) {
-							Optional<Pair<String, Prob>> impl = "null".equals(implProps.get(i)) ? Optional.empty()
-									: Optional.of(new Pair<>(implProps.get(i), Prob.fromDal(likelihoodStrings.get(i))));
-							clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
-						}
-					}
-					defense.addDefenseClause(clause);
-				}
+            // TODO get defense descriptions from Defenses2NIST?
+
+            for (int i = 0; i < defenseNames.size(); i++) {
+                if (!"null".equals(defenseNames.get(i))) {
+                    Optional<Pair<String, Prob>> impl =
+                            "null".equals(implProps.get(i))
+                                    ? Optional.empty()
+                                    : Optional.of(
+                                            new Pair<>(
+                                                    implProps.get(i),
+                                                    Prob.fromDal(likelihoodStrings.get(i))));
+                    clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
+                }
+            }
+
+            // Each row is a conjunction
+            // And there are potentially multiple such rows, forming a DNF
+            for (Defense defense : defenses) {
+                defense.addDefenseClause(clause);
             }
         }
 
@@ -503,7 +528,6 @@ public class AttackDefenseCollector {
                         && system.getInternalIncomingConnections().isEmpty()
                         && system.getInternalOutgoingConnections().isEmpty()) {
                     Logger.println("Inferring cyber relations for system " + system.getName());
-
                     // We don't have explicit lists of ports, but we have the connections.
                     // If a port is not mentioned in a connection, then it doesn't matter
                     // anyway because it can't be traced.
