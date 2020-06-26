@@ -51,6 +51,14 @@
             <artifactId>verdict-crv</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-attack-defense-collector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-synthesis</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-graphite</artifactId>
         </dependency>

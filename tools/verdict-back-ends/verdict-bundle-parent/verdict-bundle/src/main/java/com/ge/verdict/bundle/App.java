@@ -1,9 +1,16 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.bundle;
 
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
+import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
+import com.ge.verdict.synthesis.CostModel;
+import com.ge.verdict.synthesis.DTreeConstructor;
+import com.ge.verdict.synthesis.VerdictSynthesis;
+import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
@@ -24,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -150,6 +159,8 @@ public class App {
 
         options.addOption("c", false, "Cyber Relations Inference");
         options.addOption("s", false, "Safety Relations Inference");
+        // TODO don't have a good short option because "s" is already taken
+        options.addOption("y", "synthesis", false, "Perform synthesis instead of Soteria++");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -201,6 +212,7 @@ public class App {
         helpLine("      <soteria++ bin> ...... Soteria++ binary");
         helpLine("      -c ................... cyber relations inference");
         helpLine("      -s ................... safety relations inference");
+        helpLine("      --synthesis .......... perform synthesis instead of Soteria++");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
@@ -258,13 +270,26 @@ public class App {
             boolean safetyInference = opts.hasOption("s");
 
             if (csvProjectName != null) {
-                runMbas(
-                        csvProjectName,
-                        stemProjectDir,
-                        debugDir,
-                        soteriaPpBin,
-                        cyberInference,
-                        safetyInference);
+                if (opts.hasOption("y")) {
+                    String costModelPath = "";
+
+                    runMbasSynthesis(
+                            csvProjectName,
+                            stemProjectDir,
+                            debugDir,
+                            soteriaPpBin,
+                            cyberInference,
+                            safetyInference,
+                            costModelPath);
+                } else {
+                    runMbas(
+                            csvProjectName,
+                            stemProjectDir,
+                            debugDir,
+                            soteriaPpBin,
+                            cyberInference,
+                            safetyInference);
+                }
                 sample.stop(Metrics.timer("Timer.mbas", "model", csvProjectName));
             } else {
                 runMbas(
@@ -456,6 +481,116 @@ public class App {
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
+        }
+
+        logHeader("Finished");
+    }
+
+    /**
+     * Run MBAS Synthesis with csv files input
+     *
+     * @param modelName
+     * @param stemDir output directory for STEM input files
+     * @param soteriaDir output directory for Soteria++ input files
+     * @throws VerdictRunException
+     */
+    public static void runMbasSynthesis(
+            String modelName,
+            String stemProjectDir,
+            String debugDir,
+            String soteriaPpBin,
+            boolean cyberInference,
+            boolean safetyInference,
+            String costModelPath)
+            throws VerdictRunException {
+
+        String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
+        String stemOutputDir = (new File(stemProjectDir, "Output")).getAbsolutePath();
+        String stemGraphsDir = (new File(stemProjectDir, "Graphs")).getAbsolutePath();
+        String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
+        File soteriaOutputDir = new File(stemOutputDir, "Soteria_Output");
+        soteriaOutputDir.mkdirs();
+        String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
+
+        checkFile(stemCsvDir, true, true, true, false, null);
+        checkFile(stemOutputDir, true, true, true, false, null);
+        checkFile(stemGraphsDir, true, true, true, false, null);
+        checkFile(stemSadlFile, true, false, false, false, null);
+        checkFile(soteriaPpOutputDir, true, true, true, false, null);
+        checkFile(soteriaPpBin, true, false, false, true, null);
+        checkFile(costModelPath, true, false, false, false, "xml");
+
+        deleteDirectoryContents(stemGraphsDir);
+        deleteDirectoryContents(soteriaPpOutputDir);
+
+        if (debugDir != null) {
+            logHeader("DEBUGGING XML OUTPUT");
+        }
+
+        try {
+            // Copy Soteria++ pngs
+            for (String soteria_png : soteria_pngs) {
+                Binary.copyResource(
+                        "soteria_pngs/" + soteria_png + ".png",
+                        new File(soteriaPpOutputDir, soteria_png + ".png"),
+                        false);
+            }
+        } catch (Binary.ExecutionException e) {
+            throw new VerdictRunException("Failed to copy Soteria++ pngs", e);
+        }
+
+        logHeader("STEM");
+
+        log("STEM project directory: " + stemProjectDir);
+        log("STEM output directory: " + stemOutputDir);
+        log("STEM graphs directory: " + stemGraphsDir);
+        log("STEM is running. Please be patient...");
+
+        VerdictStem stemRunner = new VerdictStem();
+        Metrics.timer("Timer.mbas.stem", "model", modelName)
+                .record(
+                        () ->
+                                stemRunner.runStem(
+                                        new File(stemProjectDir),
+                                        new File(stemOutputDir),
+                                        new File(stemGraphsDir)));
+
+        log("STEM finished!");
+
+        logHeader("Synthesis");
+
+        try {
+            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
+
+            CostModel costModel = new CostModel(new File(costModelPath));
+
+            AttackDefenseCollector collector =
+                    new AttackDefenseCollector(stemOutputDir, cyberInference);
+            List<AttackDefenseCollector.Result> results = collector.perform();
+
+            for (AttackDefenseCollector.Result result : results) {
+                DLeaf.Factory factory = new DLeaf.Factory();
+                DTree dtree =
+                        DTreeConstructor.construct(
+                                result.adtree,
+                                costModel,
+                                result.cyberReq.getSeverityDal(),
+                                factory);
+                Optional<Set<DLeaf>> selected =
+                        VerdictSynthesis.performSynthesis(
+                                dtree, factory, VerdictSynthesis.Approach.MAXSMT);
+                if (selected.isPresent()) {
+                    for (DLeaf leaf : selected.get()) {
+                        log("Selected leaf: " + leaf.prettyPrint());
+                    }
+                } else {
+                    logError("Synthesis failed for requirement: " + result.cyberReq.getName());
+                }
+            }
+
+            sample.stop(Metrics.timer("Timer.mbas.synthesis", "model", modelName));
+        } catch (IOException | MalformedInputException e) {
+            throw new VerdictRunException("Failed to execute synthesis", e);
         }
 
         logHeader("Finished");
