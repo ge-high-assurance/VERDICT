@@ -32,6 +32,15 @@
 	         </enabledWhen>               
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.MBASSynthesisHandler"
+             commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
+       <handler
              class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
@@ -53,7 +62,13 @@
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
 	            style="push"
 	            tooltip="Run MBAA">
-	      </command>    
+	      </command>
+	      <command
+	            commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+	            label="&amp;Run Model Based Architecture Synthesis (MBAS)"
+	            style="push"
+	            tooltip="Run MBAS">
+	      </command>
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
@@ -105,7 +120,12 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
              name="Run MBAS">
-       </command>     
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+             name="Run MBAS Synthesis">
+       </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runCrv"

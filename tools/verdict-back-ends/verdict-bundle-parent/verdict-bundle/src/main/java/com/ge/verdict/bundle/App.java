@@ -160,7 +160,7 @@ public class App {
         options.addOption("c", false, "Cyber Relations Inference");
         options.addOption("s", false, "Safety Relations Inference");
         // TODO don't have a good short option because "s" is already taken
-        options.addOption("y", "synthesis", false, "Perform synthesis instead of Soteria++");
+        options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -212,7 +212,9 @@ public class App {
         helpLine("      <soteria++ bin> ...... Soteria++ binary");
         helpLine("      -c ................... cyber relations inference");
         helpLine("      -s ................... safety relations inference");
-        helpLine("      --synthesis .......... perform synthesis instead of Soteria++");
+        helpLine(
+                "      --synthesis <cost model xml>"
+                        + "                             perform synthesis instead of Soteria++");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
@@ -271,7 +273,7 @@ public class App {
 
             if (csvProjectName != null) {
                 if (opts.hasOption("y")) {
-                    String costModelPath = "";
+                    String costModelPath = opts.getOptionValue("y");
 
                     runMbasSynthesis(
                             csvProjectName,
@@ -580,6 +582,8 @@ public class App {
                         VerdictSynthesis.performSynthesis(
                                 dtree, factory, VerdictSynthesis.Approach.MAXSMT);
                 if (selected.isPresent()) {
+                    log("");
+                    log("Cyber requirment: " + result.cyberReq.getName());
                     for (DLeaf leaf : selected.get()) {
                         log("Selected leaf: " + leaf.prettyPrint());
                     }
