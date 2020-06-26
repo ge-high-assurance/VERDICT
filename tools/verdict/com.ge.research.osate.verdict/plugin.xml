@@ -59,7 +59,13 @@
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
-      	  </command>	      
+      	  </command>
+      	  <command
+      	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
+      	        label="&amp;MBAS Settings"
+      	        style="push"
+      	        tooltip="Click to change MBAS Settings">
+      	  </command>
 		</menu> 
 		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
           <command
@@ -104,6 +110,11 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runCrv"
              name="Run CRV">
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.mbasSettings"
+             name="MBAS Settings">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
