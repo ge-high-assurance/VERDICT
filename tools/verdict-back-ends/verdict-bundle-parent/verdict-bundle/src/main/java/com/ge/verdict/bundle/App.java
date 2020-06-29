@@ -583,7 +583,7 @@ public class App {
                                 dtree, factory, VerdictSynthesis.Approach.MAXSMT);
                 if (selected.isPresent()) {
                     log("");
-                    log("Cyber requirment: " + result.cyberReq.getName());
+                    log("Cyber requirement: " + result.cyberReq.getName());
                     for (DLeaf leaf : selected.get()) {
                         log("Selected leaf: " + leaf.prettyPrint());
                     }
