@@ -11,6 +11,7 @@ import com.ge.verdict.synthesis.DTreeConstructor;
 import com.ge.verdict.synthesis.VerdictSynthesis;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
@@ -578,15 +579,16 @@ public class App {
                                 costModel,
                                 result.cyberReq.getSeverityDal(),
                                 factory);
-                Optional<Set<DLeaf>> selected =
+                Optional<Pair<Set<DLeaf>, Double>> selected =
                         VerdictSynthesis.performSynthesis(
                                 dtree, factory, VerdictSynthesis.Approach.MAXSMT);
                 if (selected.isPresent()) {
                     log("");
                     log("Cyber requirement: " + result.cyberReq.getName());
-                    for (DLeaf leaf : selected.get()) {
+                    for (DLeaf leaf : selected.get().left) {
                         log("Selected leaf: " + leaf.prettyPrint());
                     }
+                    log("Total cost: " + selected.get().right);
                 } else {
                     logError("Synthesis failed for requirement: " + result.cyberReq.getName());
                 }

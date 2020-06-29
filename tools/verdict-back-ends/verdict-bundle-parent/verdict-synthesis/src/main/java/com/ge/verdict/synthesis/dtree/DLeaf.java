@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.math3.fraction.Fraction;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Variable;
 
@@ -18,7 +19,8 @@ public class DLeaf implements DTree {
     public final int id;
     public final String component;
     public final String defenseProperty;
-    public final int cost;
+    public final Fraction cost;
+    public int normalizedCost = -1;
     /** This is purely informative, but should not distinguish different leaves. */
     public final String attack;
 
@@ -29,7 +31,7 @@ public class DLeaf implements DTree {
         private final Map<Integer, DLeaf> idMap = new HashMap<>();
 
         public DLeaf createIfNeeded(
-                String component, String defenseProperty, String attack, int cost) {
+                String component, String defenseProperty, String attack, double cost) {
             Pair<String, String> key = new Pair<>(component, defenseProperty);
             if (!componentDefenseMap.containsKey(key)) {
                 DLeaf dleaf = new DLeaf(component, defenseProperty, attack, cost, idCounter++);
@@ -53,11 +55,12 @@ public class DLeaf implements DTree {
         }
     }
 
-    private DLeaf(String component, String defenseProperty, String attack, int cost, int id) {
+    private DLeaf(String component, String defenseProperty, String attack, double cost, int id) {
         this.component = component;
         this.defenseProperty = defenseProperty;
         this.attack = attack;
-        this.cost = cost;
+        // using this sigma should mitigate any floating point error
+        this.cost = new Fraction(cost, 0.0000001, 10);
         this.id = id;
     }
 

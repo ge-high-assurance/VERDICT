@@ -30,7 +30,7 @@ public class CostModel {
         }
     }
 
-    private Map<Triple<String, String, Integer>, Integer> model;
+    private Map<Triple<String, String, Integer>, Double> model;
 
     /**
      * Load the cost model from the given XML file.
@@ -50,15 +50,15 @@ public class CostModel {
      * @param dal
      * @return
      */
-    public int cost(String defense, String component, int dal) {
-        Integer lookup = model.get(new Triple<>(defense, component, dal));
+    public double cost(String defense, String component, int dal) {
+        Double lookup = model.get(new Triple<>(defense, component, dal));
         // default to linear model
         return lookup != null ? lookup : dal;
     }
 
     /** Print the cost function. Used for diagnostic purposes. */
     public void printMap() {
-        for (Entry<Triple<String, String, Integer>, Integer> mapping : model.entrySet()) {
+        for (Entry<Triple<String, String, Integer>, Double> mapping : model.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -79,7 +79,7 @@ public class CostModel {
                 String defense = rule.getAttribute("defense");
                 String component = rule.getAttribute("component");
                 int dal = parseDal(rule.getAttribute("dal"));
-                int cost = parseCost(rule.getTextContent());
+                double cost = parseCost(rule.getTextContent());
                 model.put(new Triple<>(defense, component, dal), cost);
             }
         } catch (IOException | SAXException | ParserConfigurationException e) {
@@ -107,11 +107,11 @@ public class CostModel {
         return dal;
     }
 
-    private static int parseCost(String costStr) {
+    private static double parseCost(String costStr) {
         if ("INF".equals(costStr)) {
             throw new ParseException("INF not supported yet");
         }
-        int cost = Integer.parseInt(costStr);
+        double cost = Double.parseDouble(costStr);
         if (cost < 0) {
             throw new ParseException("negative cost: " + costStr);
         }

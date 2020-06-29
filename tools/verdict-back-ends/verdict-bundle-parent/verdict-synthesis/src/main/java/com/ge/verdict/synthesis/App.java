@@ -5,6 +5,7 @@ import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -59,16 +60,17 @@ public class App {
                                             costModel,
                                             result.cyberReq.getSeverityDal(),
                                             factory));
-            Optional<Set<DLeaf>> selected =
+            Optional<Pair<Set<DLeaf>, Double>> selected =
                     timed(
                             "Perform synthesis",
                             () ->
                                     VerdictSynthesis.performSynthesis(
                                             dtree, factory, VerdictSynthesis.Approach.MAXSMT));
             if (selected.isPresent()) {
-                for (DLeaf leaf : selected.get()) {
+                for (DLeaf leaf : selected.get().left) {
                     System.out.println("Selected leaf: " + leaf.prettyPrint());
                 }
+                System.out.println("Total cost: " + selected.get().right);
             }
         }
 

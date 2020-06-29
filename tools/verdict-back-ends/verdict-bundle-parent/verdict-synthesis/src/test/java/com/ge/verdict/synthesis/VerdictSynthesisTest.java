@@ -5,8 +5,13 @@ import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.util.Pair;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Arrays;
 import org.junit.Test;
@@ -42,17 +47,18 @@ public class VerdictSynthesisTest {
 
         DTree tree = new DOr(new DAnd(cd1, cd2), new DAnd(cd2, cd3), new DAnd(cd1, cd3));
 
-        Optional<Set<DLeaf>> output = VerdictSynthesis.performSynthesis(tree, factory, approach);
+        Optional<Pair<Set<DLeaf>, Double>> output =
+                VerdictSynthesis.performSynthesis(tree, factory, approach);
 
         Assertions.assertThat(output.isPresent()).isTrue();
-        Assertions.assertThat(output.get().size()).isEqualTo(selected.length);
+        Assertions.assertThat(output.get().left.size()).isEqualTo(selected.length);
         for (String comp : selected) {
-            Assertions.assertThat(output.get().stream())
+            Assertions.assertThat(output.get().left.stream())
                     .withFailMessage(
                             "Expected: "
                                     + stringOfArray(selected)
                                     + ", output: "
-                                    + stringOfIterable(output.get())
+                                    + stringOfIterable(output.get().left)
                                     + ", does not contain component: "
                                     + comp
                                     + ", approach: "
@@ -68,5 +74,33 @@ public class VerdictSynthesisTest {
             performSynthesisTestInternal(new int[] {3, 2, 1}, new String[] {"C3", "C2"}, approach);
             performSynthesisTestInternal(new int[] {1, 3, 2}, new String[] {"C1", "C3"}, approach);
         }
+    }
+
+    @Test
+    public void decimalCostsTest() {
+        CostModel costs =
+                new CostModel(new File(getClass().getResource("decimalCosts.xml").getPath()));
+
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        List<DLeaf> leaves = new ArrayList<>();
+        DLeaf leafA = factory.createIfNeeded("A", "A", "A", costs.cost("A", "A", 1));
+        DLeaf leafB = factory.createIfNeeded("B", "B", "B", costs.cost("B", "B", 1));
+        DLeaf leafC = factory.createIfNeeded("C", "C", "C", costs.cost("C", "C", 1));
+        leaves.add(leafA);
+        leaves.add(leafB);
+        leaves.add(leafC);
+
+        Assertions.assertThat(leafA.cost).isEqualByComparingTo(new Fraction(42, 10));
+        Assertions.assertThat(leafB.cost).isEqualByComparingTo(new Fraction(35, 1000));
+        Assertions.assertThat(leafC.cost).isEqualByComparingTo(new Fraction(1077, 100));
+
+        int costLcm = VerdictSynthesis.normalizeCosts(leaves);
+
+        Assertions.assertThat(costLcm).isEqualTo(200);
+
+        Assertions.assertThat(leafA.normalizedCost).isEqualTo(840);
+        Assertions.assertThat(leafB.normalizedCost).isEqualTo(7);
+        Assertions.assertThat(leafC.normalizedCost).isEqualTo(2154);
     }
 }
