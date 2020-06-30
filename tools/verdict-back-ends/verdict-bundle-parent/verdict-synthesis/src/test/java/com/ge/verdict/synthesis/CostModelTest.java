@@ -13,4 +13,18 @@ public class CostModelTest {
         Assertions.assertThat(costs.cost("D1", "C1", 2)).isEqualTo(2);
         Assertions.assertThat(costs.cost("D2", "C2", 3)).isEqualTo(3);
     }
+
+    @Test
+    public void testDefaults() {
+        CostModel costs =
+                new CostModel(new File(getClass().getResource("defaultCosts.xml").getPath()));
+        Assertions.assertThat(costs.cost("A", "A", 1)).isEqualTo(16);
+        Assertions.assertThat(costs.cost("A", "B", 1)).isEqualTo(15);
+        Assertions.assertThat(costs.cost("B", "A", 1)).isEqualTo(14);
+        Assertions.assertThat(costs.cost("A", "A", 2)).isEqualTo(13);
+        Assertions.assertThat(costs.cost("B", "B", 1)).isEqualTo(12);
+        Assertions.assertThat(costs.cost("A", "B", 2)).isEqualTo(11);
+        Assertions.assertThat(costs.cost("B", "A", 2)).isEqualTo(10);
+        Assertions.assertThat(costs.cost("B", "B", 2)).isEqualTo(9);
+    }
 }

@@ -1,5 +1,6 @@
 package com.ge.verdict.synthesis;
 
+import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,17 @@ public class CostModel {
         }
     }
 
-    private Map<Triple<String, String, Integer>, Double> model;
+    // All combinations of (component, defense, DAL).
+    // This whole many maps approach isn't very pretty, but no more
+    // elegant approach immediately comes to mind so here we are.
+    private Map<Triple<String, String, Integer>, Double> compDefDalModel;
+    private Map<Pair<String, String>, Double> compDefModel;
+    private Map<Pair<String, Integer>, Double> compDalModel;
+    private Map<Pair<String, Integer>, Double> defDalModel;
+    private Map<String, Double> compModel;
+    private Map<String, Double> defModel;
+    private Map<Integer, Double> dalModel;
+    private double defaultModel;
 
     /**
      * Load the cost model from the given XML file.
@@ -38,7 +49,15 @@ public class CostModel {
      * @param costModelXml
      */
     public CostModel(File costModelXml) {
-        model = new LinkedHashMap<>();
+        compDefDalModel = new LinkedHashMap<>();
+        compDefModel = new LinkedHashMap<>();
+        compDalModel = new LinkedHashMap<>();
+        defDalModel = new LinkedHashMap<>();
+        compModel = new LinkedHashMap<>();
+        defModel = new LinkedHashMap<>();
+        dalModel = new LinkedHashMap<>();
+        defaultModel = 1;
+
         load(costModelXml);
     }
 
@@ -51,14 +70,42 @@ public class CostModel {
      * @return
      */
     public double cost(String defense, String component, int dal) {
-        Double lookup = model.get(new Triple<>(defense, component, dal));
-        // default to linear model
-        return lookup != null ? lookup : dal;
+        // TODO currently no default linear scaling of DAL
+
+        Double lookup = compDefDalModel.get(new Triple<>(component, defense, dal));
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = compDefModel.get(new Pair<>(component, defense));
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = compDalModel.get(new Pair<>(component, dal));
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = defDalModel.get(new Pair<>(defense, dal));
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = compModel.get(component);
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = defModel.get(defense);
+        if (lookup != null) {
+            return lookup;
+        }
+        lookup = dalModel.get(dal);
+        if (lookup != null) {
+            return lookup;
+        }
+        return defaultModel;
     }
 
     /** Print the cost function. Used for diagnostic purposes. */
     public void printMap() {
-        for (Entry<Triple<String, String, Integer>, Double> mapping : model.entrySet()) {
+        for (Entry<Triple<String, String, Integer>, Double> mapping : compDefDalModel.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -69,6 +116,47 @@ public class CostModel {
                             + " to "
                             + mapping.getValue());
         }
+        for (Entry<Pair<String, String>, Double> mapping : compDefModel.entrySet()) {
+            System.out.println(
+                    "map "
+                            + mapping.getKey().left
+                            + ", "
+                            + mapping.getKey().right
+                            + " to "
+                            + mapping.getValue());
+        }
+        for (Entry<Pair<String, Integer>, Double> mapping : compDalModel.entrySet()) {
+            System.out.println(
+                    "map "
+                            + mapping.getKey().left
+                            + ", "
+                            + mapping.getKey().right
+                            + " to "
+                            + mapping.getValue());
+        }
+        for (Entry<Pair<String, Integer>, Double> mapping : defDalModel.entrySet()) {
+            System.out.println(
+                    "map "
+                            + mapping.getKey().left
+                            + ", "
+                            + mapping.getKey().right
+                            + " to "
+                            + mapping.getValue());
+        }
+        for (Entry<String, Double> mapping : compModel.entrySet()) {
+            System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
+        }
+        for (Entry<String, Double> mapping : defModel.entrySet()) {
+            System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
+        }
+        for (Entry<Integer, Double> mapping : dalModel.entrySet()) {
+            System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
+        }
+        System.out.println("default: " + defaultModel);
+    }
+
+    private boolean isEmptyStr(String str) {
+        return str.length() == 0;
     }
 
     private void load(File costModelXml) {
@@ -76,11 +164,38 @@ public class CostModel {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document xml = parser.parse(costModelXml);
             for (Element rule : extractElements(xml.getDocumentElement(), "cost")) {
-                String defense = rule.getAttribute("defense");
                 String component = rule.getAttribute("component");
-                int dal = parseDal(rule.getAttribute("dal"));
+                String defense = rule.getAttribute("defense");
+                String dalStr = rule.getAttribute("dal");
+
+                for (int i = 0; i < rule.getAttributes().getLength(); i++) {
+                    String name = rule.getAttributes().item(i).getNodeName();
+                    if (!name.equals("component")
+                            && !name.equals("defense")
+                            && !name.equals("dal")) {
+                        throw new ParseException("Unrecognized tag: " + name);
+                    }
+                }
+
                 double cost = parseCost(rule.getTextContent());
-                model.put(new Triple<>(defense, component, dal), cost);
+
+                if (isEmptyStr(component) && isEmptyStr(defense) && isEmptyStr(dalStr)) {
+                    defaultModel = cost;
+                } else if (isEmptyStr(component) && isEmptyStr(defense)) {
+                    dalModel.put(parseDal(dalStr), cost);
+                } else if (isEmptyStr(component) && isEmptyStr(dalStr)) {
+                    defModel.put(defense, cost);
+                } else if (isEmptyStr(defense) && isEmptyStr(dalStr)) {
+                    compModel.put(component, cost);
+                } else if (isEmptyStr(component)) {
+                    defDalModel.put(new Pair<>(defense, parseDal(dalStr)), cost);
+                } else if (isEmptyStr(defense)) {
+                    compDalModel.put(new Pair<>(component, parseDal(dalStr)), cost);
+                } else if (isEmptyStr(dalStr)) {
+                    compDefModel.put(new Pair<>(component, defense), cost);
+                } else {
+                    compDefDalModel.put(new Triple<>(component, defense, parseDal(dalStr)), cost);
+                }
             }
         } catch (IOException | SAXException | ParserConfigurationException e) {
             throw new ParseException(e);
