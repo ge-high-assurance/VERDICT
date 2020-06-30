@@ -1,7 +1,5 @@
 package com.ge.verdict.synthesis;
 
-import com.ge.verdict.synthesis.util.Pair;
-import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,14 +7,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.ge.verdict.synthesis.util.Pair;
+import com.ge.verdict.synthesis.util.Triple;
 
 public class CostModel {
     public static class ParseException extends RuntimeException {
@@ -70,7 +73,7 @@ public class CostModel {
      * @return
      */
     public double cost(String defense, String component, int dal) {
-        // TODO currently no default linear scaling of DAL
+		// If DAL is not specified, we default to using DAL to linearly scale cost
 
         Double lookup = compDefDalModel.get(new Triple<>(component, defense, dal));
         if (lookup != null) {
@@ -78,7 +81,7 @@ public class CostModel {
         }
         lookup = compDefModel.get(new Pair<>(component, defense));
         if (lookup != null) {
-            return lookup;
+            return lookup * dal;
         }
         lookup = compDalModel.get(new Pair<>(component, dal));
         if (lookup != null) {
@@ -90,17 +93,17 @@ public class CostModel {
         }
         lookup = compModel.get(component);
         if (lookup != null) {
-            return lookup;
+            return lookup * dal;
         }
         lookup = defModel.get(defense);
         if (lookup != null) {
-            return lookup;
+            return lookup * dal;
         }
         lookup = dalModel.get(dal);
         if (lookup != null) {
             return lookup;
         }
-        return defaultModel;
+        return defaultModel * dal;
     }
 
     /** Print the cost function. Used for diagnostic purposes. */

@@ -21,10 +21,10 @@ public class CostModelTest {
         Assertions.assertThat(costs.cost("A", "A", 1)).isEqualTo(16);
         Assertions.assertThat(costs.cost("A", "B", 1)).isEqualTo(15);
         Assertions.assertThat(costs.cost("B", "A", 1)).isEqualTo(14);
-        Assertions.assertThat(costs.cost("A", "A", 2)).isEqualTo(13);
+        Assertions.assertThat(costs.cost("A", "A", 2)).isEqualTo(26);
         Assertions.assertThat(costs.cost("B", "B", 1)).isEqualTo(12);
-        Assertions.assertThat(costs.cost("A", "B", 2)).isEqualTo(11);
-        Assertions.assertThat(costs.cost("B", "A", 2)).isEqualTo(10);
-        Assertions.assertThat(costs.cost("B", "B", 2)).isEqualTo(9);
+        Assertions.assertThat(costs.cost("A", "B", 2)).isEqualTo(22);
+        Assertions.assertThat(costs.cost("B", "A", 2)).isEqualTo(20);
+        Assertions.assertThat(costs.cost("B", "B", 2)).isEqualTo(18);
     }
 }
