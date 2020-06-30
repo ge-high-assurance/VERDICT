@@ -105,19 +105,21 @@ public class VerdictSynthesis {
 
             return Optional.of(new Pair<>(output, ((double) totalNormalizedCost) / costLcd));
         } else {
-            System.err.println("Synthesis: SMT not satisfiable, is input tree valid?");
+            System.err.println(
+                    "Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
             return Optional.empty();
         }
     }
 
     public static Optional<Pair<Set<DLeaf>, Double>> performSynthesisMaxSat(
             DTree tree, DLeaf.Factory dleafFactory) {
+        Collection<DLeaf> leaves = dleafFactory.allLeaves();
+
         FormulaFactory factory = new FormulaFactory();
-        MaxSATSolver solver = MaxSATSolver.wmsu3();
+        // if no soft clauses then the weighted version fails for some reason
+        MaxSATSolver solver = leaves.isEmpty() ? MaxSATSolver.msu3() : MaxSATSolver.wmsu3();
 
         Formula cnf = tree.toLogicNG(factory).cnf();
-
-        Collection<DLeaf> leaves = dleafFactory.allLeaves();
 
         int costLcd = normalizeCosts(leaves);
 
@@ -148,7 +150,8 @@ public class VerdictSynthesis {
                 System.err.println("Synthesis: SAT undefined, is input tree valid?");
                 return Optional.empty();
             case UNSATISFIABLE:
-                System.err.println("Synthesis: SAT not satisfiable, is input tree valid?");
+                System.err.println(
+                        "Synthesis: SAT not satisfiable, perhaps there are unmitigatable attacks");
                 return Optional.empty();
             default:
                 throw new RuntimeException("impossible");

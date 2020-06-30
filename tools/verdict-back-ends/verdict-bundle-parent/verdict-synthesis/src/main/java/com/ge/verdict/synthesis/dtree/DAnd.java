@@ -5,7 +5,9 @@ import com.microsoft.z3.Context;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
@@ -45,7 +47,16 @@ public final class DAnd implements DTree {
     }
 
     @Override
-    public DTree flattenNot() {
-        return new DAnd(children.stream().map(DTree::flattenNot).collect(Collectors.toList()));
+    public Optional<DTree> prepare() {
+        return Optional.of(
+                new DAnd(
+                        children.stream()
+                                .map(DTree::prepare)
+                                .flatMap(
+                                        opt ->
+                                                opt.isPresent()
+                                                        ? Stream.of(opt.get())
+                                                        : Stream.empty())
+                                .collect(Collectors.toList())));
     }
 }

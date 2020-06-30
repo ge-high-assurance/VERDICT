@@ -2,6 +2,7 @@ package com.ge.verdict.synthesis.dtree;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
+import java.util.Optional;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
@@ -29,9 +30,9 @@ public final class DNot implements DTree {
     }
 
     @Override
-    public DTree flattenNot() {
+    public Optional<DTree> prepare() {
         if (child instanceof DNot) {
-            return ((DNot) child).child;
+            return Optional.of(((DNot) child).child);
         } else {
             throw new RuntimeException("unable to flatten NOT node: " + prettyPrint());
         }

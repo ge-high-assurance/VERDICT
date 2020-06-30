@@ -6,14 +6,16 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,16 +31,16 @@ public class DTreeConstructor {
     private final DLeaf.Factory factory;
     private final int dal;
 
-    private final Set<Attack> attacks;
     private final Set<Defense> defenses;
+    private final Map<Attack, Set<ALeaf>> attackALeafMap;
 
     private DTreeConstructor(CostModel costModel, int dal, DLeaf.Factory factory) {
         this.costModel = costModel;
         this.factory = factory;
         this.dal = dal;
 
-        attacks = new LinkedHashSet<>();
         defenses = new LinkedHashSet<>();
+        attackALeafMap = new LinkedHashMap<>();
     }
 
     private DTree perform(ADTree adtree) {
@@ -47,32 +49,49 @@ public class DTreeConstructor {
         if (!resultOpt.isPresent()) {
             return new DOr(Collections.emptyList());
         } else {
-            DTree result = resultOpt.get().flattenNot();
+            DTree result = resultOpt.get();
 
-            Set<Attack> defendedAttacks = new HashSet<>();
             for (Defense defense : defenses) {
-                if (!attacks.contains(defense.getAttack())) {
+                if (!attackALeafMap.containsKey(defense.getAttack())) {
                     throw new RuntimeException(
                             "defense references undefined attack: "
                                     + defense.getAttack().getName());
                 }
-                defendedAttacks.add(defense.getAttack());
-            }
-            for (Attack attack : attacks) {
-                if (!defendedAttacks.contains(attack)) {
-                    throw new RuntimeException("attack " + attack.getName() + " has no defense");
+                // set each defended attack leaf to mitigated so that
+                // it isn't included in the final tree
+                for (ALeaf aleaf : attackALeafMap.get(defense.getAttack())) {
+                    aleaf.setMitigated();
                 }
             }
 
-            return result;
+            Set<ALeaf> unmitigated = new LinkedHashSet<>();
+            for (Set<ALeaf> set : attackALeafMap.values()) {
+                for (ALeaf aleaf : set) {
+                    if (!aleaf.isMitigated()) {
+                        unmitigated.add(aleaf);
+                    }
+                }
+            }
+
+            for (ALeaf aleaf : unmitigated) {
+                System.out.println("Warning: Unmitigated attack: " + aleaf.getAttack().toString());
+            }
+
+            Optional<DTree> prepared = result.prepare();
+            return prepared.orElse(new DOr(Collections.emptyList()));
         }
     }
 
     private Optional<DTree> constructInternal(ADTree adtree) {
         if (adtree instanceof Attack) {
             Attack attack = (Attack) adtree;
-            attacks.add(attack);
-            return Optional.empty();
+            ALeaf aleaf = new ALeaf(attack);
+            // keep track of all attack leaves
+            if (!attackALeafMap.containsKey(attack)) {
+                attackALeafMap.put(attack, new LinkedHashSet<>());
+            }
+            attackALeafMap.get(attack).add(aleaf);
+            return Optional.of(aleaf);
         } else if (adtree instanceof Defense) {
             Defense defense = (Defense) adtree;
             defenses.add(defense);

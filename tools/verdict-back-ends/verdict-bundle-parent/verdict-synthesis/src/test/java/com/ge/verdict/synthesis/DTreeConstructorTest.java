@@ -9,12 +9,14 @@ import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
+import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -30,13 +32,13 @@ public class DTreeConstructorTest {
 
         DTree leaf = factory.createIfNeeded("A", "A", "A", 0);
         DTree dtree = new DNot(new DNot(leaf));
-        Assertions.assertThat(dtree.flattenNot().prettyPrint()).isEqualTo(leaf.prettyPrint());
+        Assertions.assertThat(dtree.prepare().get().prettyPrint()).isEqualTo(leaf.prettyPrint());
 
         DTree dtree2 =
                 new DAnd(Collections.singletonList(new DOr(Collections.singletonList(dtree))));
         DTree dtree3 =
                 new DAnd(Collections.singletonList(new DOr(Collections.singletonList(leaf))));
-        Assertions.assertThat(dtree2.flattenNot().prettyPrint()).isEqualTo(dtree3.prettyPrint());
+        Assertions.assertThat(dtree2.prepare().get().prettyPrint()).isEqualTo(dtree3.prettyPrint());
     }
 
     @Test
@@ -72,6 +74,62 @@ public class DTreeConstructorTest {
                                                                                                 "D1",
                                                                                                 "A1",
                                                                                                 dal)))))))));
+
+        Assertions.assertThat(
+                        DTreeConstructor.construct(adtree, dummyCosts, dal, factory).prettyPrint())
+                .isEqualTo(dtree.prettyPrint());
+    }
+
+    @Test
+    public void testUnmitigated() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        CostModel dummyCosts =
+                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        int dal = 5;
+
+        SystemModel system = new SystemModel("S1");
+
+        Attack attack1 =
+                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+
+        DTree dtree = new ALeaf(attack1);
+
+        Assertions.assertThat(
+                        DTreeConstructor.construct(attack1, dummyCosts, dal, factory).prettyPrint())
+                .isEqualTo(dtree.prettyPrint());
+    }
+
+    @Test
+    public void testUnmitigatedMixed() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        CostModel dummyCosts =
+                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        int dal = 5;
+
+        SystemModel system = new SystemModel("S1");
+
+        Attack attack1 =
+                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack2 =
+                new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.I);
+        Defense defense1 = new Defense(attack1);
+        defense1.addDefenseClause(
+                Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
+
+        ADTree adtree = new ADOr(new ADNot(defense1), attack1, attack2);
+
+        DTree dtree =
+                new DAnd(
+                        Arrays.asList(
+                                new DOr(
+                                        Collections.singletonList(
+                                                new DAnd(
+                                                        Collections.singletonList(
+                                                                factory.createIfNeeded(
+                                                                        "S1", "D1", "A1", dal))))),
+                                new ALeaf(attack2)));
 
         Assertions.assertThat(
                         DTreeConstructor.construct(adtree, dummyCosts, dal, factory).prettyPrint())

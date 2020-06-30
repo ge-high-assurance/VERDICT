@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.math3.fraction.Fraction;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Variable;
@@ -92,8 +93,8 @@ public class DLeaf implements DTree {
     }
 
     @Override
-    public DTree flattenNot() {
-        return this;
+    public Optional<DTree> prepare() {
+        return Optional.of(this);
     }
 
     @Override

@@ -1,6 +1,11 @@
 package com.ge.verdict.synthesis;
 
+import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.model.CIA;
+import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.synthesis.VerdictSynthesis.Approach;
+import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DOr;
@@ -102,5 +107,46 @@ public class VerdictSynthesisTest {
         Assertions.assertThat(leafA.normalizedCost).isEqualTo(840);
         Assertions.assertThat(leafB.normalizedCost).isEqualTo(7);
         Assertions.assertThat(leafC.normalizedCost).isEqualTo(2154);
+    }
+
+    @Test
+    public void unmitigatedTest() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+        SystemModel system = new SystemModel("S1");
+        DTree dtree =
+                new ALeaf(
+                        new Attack(
+                                system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I));
+
+        for (Approach approach : Approach.values()) {
+            Assertions.assertThat(VerdictSynthesis.performSynthesis(dtree, factory, approach))
+                    .isEmpty();
+        }
+    }
+
+    @Test
+    public void unmitigatedMixedTest() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+        SystemModel system = new SystemModel("S1");
+        DLeaf dleaf = factory.createIfNeeded("S1", "D1", "A2", 5);
+        DTree dtree =
+                new DOr(
+                        new ALeaf(
+                                new Attack(
+                                        system.getAttackable(),
+                                        "A1",
+                                        "An attack",
+                                        Prob.certain(),
+                                        CIA.I)),
+                        dleaf);
+
+        for (Approach approach : Approach.values()) {
+            Optional<Pair<Set<DLeaf>, Double>> result =
+                    VerdictSynthesis.performSynthesis(dtree, factory, approach);
+            Assertions.assertThat(result.isPresent());
+            Assertions.assertThat(result.get().left).hasSize(1);
+            Assertions.assertThat(result.get().left).contains(dleaf);
+            Assertions.assertThat(result.get().right).isEqualTo(5);
+        }
     }
 }
