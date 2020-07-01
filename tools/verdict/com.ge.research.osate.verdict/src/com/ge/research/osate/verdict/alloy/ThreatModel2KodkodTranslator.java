@@ -39,10 +39,13 @@ public class ThreatModel2KodkodTranslator {
 		varNameToRelMap.put(kodkodModel.FALSE, kodkodModel.nameToUnaryRelMap.get(kodkodModel.FALSE));
 		varNameToRelMap.put(kodkodModel.CONNECTION, kodkodModel.connectionUnaryRel);
 		varNameToRelMap.put(kodkodModel.CONNECTIONS, kodkodModel.connectionsBinaryRel);
+		varNameToRelMap.put(kodkodModel.SRCCONNECTIONS, kodkodModel.srcConnectionsBinaryRel);
 		varNameToRelMap.put(kodkodModel.SUBCOMPONENTS, kodkodModel.subcomponentsBinaryRel);
 		varNameToRelMap.put(kodkodModel.PORT, kodkodModel.portUnaryRel);
 		varNameToRelMap.put(kodkodModel.SRCPORT, kodkodModel.srcPortBinaryRel);
 		varNameToRelMap.put(kodkodModel.DESTPORT, kodkodModel.destPortBinaryRel);
+		varNameToRelMap.put(kodkodModel.SRCCOMP, kodkodModel.srcCompBinaryRel);
+		varNameToRelMap.put(kodkodModel.DESTCOMP, kodkodModel.destCompBinaryRel);
 		varNameToRelMap.put(kodkodModel.SYSTEM, kodkodModel.systemUnaryRel);
 		varNameToRelMap.put(kodkodModel.PORTS, kodkodModel.portsBinaryRel);
 		// Add all property names and its value names

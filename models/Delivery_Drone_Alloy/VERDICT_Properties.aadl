@@ -10,7 +10,7 @@ property set VERDICT_Properties is
  --- 	This helps CRV to decide what sort of attack can the component be susceptible to. For instance, a Hybrid component can be susceptible
  --- 	to both hardware trojan and software Virus/Worm/Malware attacks whereas a Human component can only be susceptible to insider/outsider threat.
 
- componentType: enumeration (Software, Hardware, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid, Hybrid) => Hybrid applies to (abstract, bus, device, system, process, processor, thread);
+ componentType: enumeration (Software, Hardware, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid, Hybrid) => Hybrid applies to (system);
 
 
  --- MBAA:
@@ -21,7 +21,7 @@ property set VERDICT_Properties is
  ---	For instance, if a human component is inside the trusted boundary of the system, then an insider attack can occur. Or, a connection coming from
  ---	a component which is not inside the trusted boundary is also susceptible to Network Injection attack. 
 
- insideTrustedBoundary: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ insideTrustedBoundary: aadlboolean => false applies to (system);
 
 
  --- MBAA:
@@ -34,18 +34,52 @@ property set VERDICT_Properties is
  --- 	Trojan, Remote Code Injection, Software Virus/Worm/Malware, a Logic Bomb attack. If a component is designated
  --- 	as "InternallyDeveloped", it is neither susceptible to a hardware trojan nor a logic bomb attack. For other values,
  --- 	however, they can be susceptible to the attacks.
- pedigree: enumeration (InternallyDeveloped, COTS, Sourced) => COTS applies to (abstract, bus, device, system, process, processor, thread);
+ pedigree: enumeration (InternallyDeveloped, COTS, Sourced) => COTS applies to (system);
 
 
 -- Connection properties, including defenses and DAL values
  connectionType: enumeration (Trusted, Untrusted) => Untrusted applies to (connection);
+ 
+  --- MBAA:
+ --- deviceAuthentication
+ ---          IA-3 Device Identification and Authentication
+ ---          IA-3 (1) Cryptographic Bidirectional Authentication
+ ---                         IA-3 specifies general verification of the identity of other connected systems, while enhancement IA-3 (1) establishes
+ ---                         requirements for mutual verification of identity through cryptographic algorithms.
+ --- CRV:
+ ---    The deviceAuthentication cyber-defense property is applied to channels instead of components, which indicates whether or not 
+ ---    the component originates this connection is authenticated, and if so (values greater than 0) how strong is that. Channels with zero 
+ ---	deviceAuthentication are susceptible to Network Injection, Remote Code Injection, or Software Virus/Worm/Malware.
+ 
+ deviceAuthentication: aadlboolean => false applies to (connection);
+ 	
+ --- MBAA:
+ --- encryptedTransmission
+ ---          SC-8 Transmission Confidentiality and Integrity
+ ---                         SC-8 generally covers protection of the confidentiality of communications between two components, which
+ ---                         can include encryption of the data payload, protection of the header or protocol fields, and confidentiality
+ ---                         of data just prior to sending and just after receipt.
+
+ encryptedTransmission: aadlboolean => false applies to (connection);
+
+ --- MBAA:
+ --- sessionAuthenticity
+ ---          SC-23 Session Authenticity
+ ---                         SC-23 specifies technical means to maintain the authenticity of communications after establishing initial
+ ---                         identity. Mitigations focus on unique randomly generated session identifiers.
+ --- CRV:
+ ---    The sessionAuthenticity cyber-defense property is applied to channels instead of components, which indicates whether or not 
+ ---    the connection session is authenticated, and if so (values greater than 0) how strong is that. Channels with zero sessionAuthenticity are
+ ---	susceptible to Network Injection, Remote Code Injection, or Software Virus/Worm/Malware.
+
+ sessionAuthenticity: aadlboolean => false applies to (connection);
 
 -- Component properties 
  category: enumeration (IMUCat, GPSCat, LIDARCat) applies to (system);
  
  
 -- Defense properties
-systemAccessControl: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+systemAccessControl: aadlboolean => false applies to (system);
 
 
  --- MBAA:
@@ -57,7 +91,7 @@ systemAccessControl: aadlboolean => false applies to (abstract, bus, device, sys
  ---    staticCodeAnalysis describes the quality of security analysis that has been performed on the component's implementation source code. Components
  ---	with zero staticCodeAnalysis may open the door to attacks such as Remote Code Injection and Software Virus/Worm/Malware.
 
-staticCodeAnalysis: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+staticCodeAnalysis: aadlboolean => false applies to (system);
 
  --- MBAA:
  --- secureBoot
@@ -74,7 +108,7 @@ staticCodeAnalysis: aadlboolean => false applies to (abstract, bus, device, syst
  --- CRV:
  ---    secureBoot is a security mechanism to make sure a device boots using only software that is trusted by the Original Equipment Manufacturer (OEM).
  ---	Absence of secureBoot (value 0) makes a component vulnerable to Software Virus/Worm/Malware.
-secureBoot: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+secureBoot: aadlboolean => false applies to (system);
 
  --- MBAA:
  --- strongCryptoAlgorithms
@@ -85,7 +119,7 @@ secureBoot: aadlboolean => false applies to (abstract, bus, device, system, proc
  ---    strongCryptoAlgorithms signifies the strength level of cryptographic algorithms in a component's cipher suite. A zero value of strongCryptoAlgorithms
  ---	for a component means it could expose other components (at the receiving end of its channels) to Network Injection, Remote Code Injection, and 
  ---	Software Virus/Worm/Malware.
- strongCryptoAlgorithms: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ strongCryptoAlgorithms: aadlboolean => false applies to (system);
  
   --- MBAA:
  --- supplyChainSecurity
@@ -96,7 +130,7 @@ secureBoot: aadlboolean => false applies to (abstract, bus, device, system, proc
  --- CRV:
  ---    If there is no supply chain security for a sourced software/hardware component, that is, supplyChainSecurity=0, CRV considers that component to be susceptible 
  ---    to software and hardware attacks such as Logic bomb and hardware trojans. 
- supplyChainSecurity: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ supplyChainSecurity: aadlboolean => false applies to (system);
  
  --- MBAA:
  --- tamperProtection
@@ -107,14 +141,37 @@ secureBoot: aadlboolean => false applies to (abstract, bus, device, system, proc
  ---    tamperProtection describes the strength level of security mechanism used to protect sensitive information from being changed by an unauthorized 
  ---	entity. When we have zero tamperProtection, the component is susceptible to Hardware Trojans and Logic Bomb/Software Trojan.
  
- tamperProtection: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ tamperProtection: aadlboolean => false applies to (system);
+
+
+
+ --- MBAA:
+ --- inputValidation
+ ---          SI-10 Information Input Validation
+ ---          SI-10 (5) Restrict Inputs to Trusted Sources and Approved Formats
+ ---                         SI-10 specifies checking of the validity of incoming communications. Validity checks can be performed based
+ ---                         on a whitelisted character set, packet length, numerical ranges, or a list of acceptable values, as well as many
+ ---                         other factors. Enhancement SI-10 (5) focuses on enforcing only known trusted sources and valid message formats.
+ --- CRV:
+ ---	inputValidation for a component describes at which level of strongness a component exercises input validation. If there is zero inputValidation
+ ---	for a component, it is susceptible to Remote Code Injection attack or Software Virus/Worm/Malware.
+
+ inputValidation: aadlboolean => false applies to (system);
  
+ 
+  --- MBAA:
+ --- memoryProtection
+ ---          SI-16 Memory Protection
+ ---                         SI-16 describes protections from unauthorized code execution, including non-executable regions of memory and
+ ---                         address space layout randomization.
+
+ memoryProtection: aadlboolean => false applies to (system);
 
 --- CRV:
  --- 	If adversariallyTestedForTrojanOrLogicBomb property of a component is assigned an integer greater than '0', it suggests CRV that even if the
  --- 	component's pedigree is sourced/COTS, it is not susceptible to hardware trojan or logic bomb type of attacks.
 
- adversariallyTested: aadlboolean => false applies to (abstract, bus, device, system, process, processor, thread);
+ adversariallyTested: aadlboolean => false applies to (system);
  
  
 end VERDICT_Properties;

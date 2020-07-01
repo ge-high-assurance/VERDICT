@@ -142,8 +142,8 @@ public class ThreatModelUtil {
 		// Connection fields
 		connection.addField("srcPort", port);
 		connection.addField("destPort", port);
-		connection.addField("src", system);
-		connection.addField("dest", system);
+		connection.addField("srcComp", system);
+		connection.addField("destComp", system);
 
 		// Port direction
 		BuiltInType portDir = new BuiltInType("portDirection");
@@ -157,6 +157,7 @@ public class ThreatModelUtil {
 		// System fields
 		system.addField("subcomponents", system.getListType());
 		system.addField("connections", connection.getListType());
+		system.addField("incomingConnections", connection.getListType());
 		system.addField("ports", port.getListType());
 
 		// Get the path to the current resource, used to get the project path

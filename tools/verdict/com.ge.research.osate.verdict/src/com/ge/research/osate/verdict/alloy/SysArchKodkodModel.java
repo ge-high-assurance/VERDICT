@@ -31,12 +31,15 @@ public class SysArchKodkodModel {
 	final String PORTS = "ports";
 	final String FALSE = "false";
 	final String SYSTEM = "system";
+	final String SRCCOMP = "srcComp";
 	final String SRCPORT = "srcPort";
+	final String DESTCOMP = "destComp";
 	final String DESTPORT = "destPort";
 	
 	final String CONNECTION = "connection";
 	
 	final String CONNECTIONS = "connections";
+	final String SRCCONNECTIONS = "incomingConnections";
 	final String SUBCOMPONENTS = "subcomponents";
 	
 	final String ENUM = "_Enum";
@@ -77,8 +80,8 @@ public class SysArchKodkodModel {
 	/**
 	 * Binary Relations
 	 * */	
-	public final Relation inPortsBinaryRel, outPortsBinaryRel, portsBinaryRel, srcPortBinaryRel, destPortBinaryRel,
-						  connectionsBinaryRel, subcomponentsBinaryRel;
+	public final Relation inPortsBinaryRel, outPortsBinaryRel, portsBinaryRel, srcCompBinaryRel, srcPortBinaryRel, destCompBinaryRel, destPortBinaryRel,
+						  connectionsBinaryRel, srcConnectionsBinaryRel, subcomponentsBinaryRel;
 	
 	public SysArchKodkodModel() {
 		portUnaryRel = mkUnaryRel(PORT);
@@ -103,10 +106,13 @@ public class SysArchKodkodModel {
 		inPortsBinaryRel = mkBinaryRel(systemUnaryRel, inPortUnaryRel, false, "inPorts");
 		outPortsBinaryRel = mkBinaryRel(systemUnaryRel, outPortUnaryRel, false, "outPorts");
 		 
+		srcCompBinaryRel = mkBinaryRel(connectionUnaryRel, systemUnaryRel, true, SRCCOMP);
 		srcPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, SRCPORT);
+		destCompBinaryRel = mkBinaryRel(connectionUnaryRel, systemUnaryRel, true, DESTCOMP);
 		destPortBinaryRel = mkBinaryRel(connectionUnaryRel, portUnaryRel, true, DESTPORT);
 		
 		connectionsBinaryRel = mkBinaryRel(systemUnaryRel, connectionUnaryRel, false, CONNECTIONS);
+		srcConnectionsBinaryRel = mkBinaryRel(systemUnaryRel, connectionUnaryRel, false, SRCCONNECTIONS);
 		subcomponentsBinaryRel = mkBinaryRel(systemUnaryRel, systemUnaryRel, false, SUBCOMPONENTS);
 	}
 	
@@ -256,9 +262,12 @@ public class SysArchKodkodModel {
         b.bound(portsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(portUnaryRel)));
         b.bound(inPortsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(inPortUnaryRel)));
         b.bound(outPortsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(outPortUnaryRel)));
+        b.bound(srcCompBinaryRel, unaryRelToBoundMap.get(connectionUnaryRel).product(unaryRelToBoundMap.get(systemUnaryRel)));
+        b.bound(destCompBinaryRel, unaryRelToBoundMap.get(connectionUnaryRel).product(unaryRelToBoundMap.get(systemUnaryRel)));        
         b.bound(srcPortBinaryRel, unaryRelToBoundMap.get(connectionUnaryRel).product(unaryRelToBoundMap.get(portUnaryRel)));
         b.bound(destPortBinaryRel, unaryRelToBoundMap.get(connectionUnaryRel).product(unaryRelToBoundMap.get(portUnaryRel)));
         b.bound(connectionsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(connectionUnaryRel)));
+        b.bound(srcConnectionsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(connectionUnaryRel)));
         b.bound(subcomponentsBinaryRel, unaryRelToBoundMap.get(systemUnaryRel).product(unaryRelToBoundMap.get(systemUnaryRel)));
         
         for(Map.Entry<Relation, Pair<Relation, Relation>> propRelToDomainRangeRel : binaryRelToDomainRangeRelMap.entrySet()) {

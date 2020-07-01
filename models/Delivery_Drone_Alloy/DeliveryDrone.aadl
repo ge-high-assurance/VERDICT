@@ -404,8 +404,7 @@ public
 		properties 
 			VERDICT_Properties::componentType => Hybrid;
 			VERDICT_Properties::pedigree => COTS;
-			VERDICT_Properties::adversariallyTested => false;			
-												
+			VERDICT_Properties::adversariallyTested => false;												
 	end DeliveryDroneSystem.impl;
 	
 end DeliveryDrone;
