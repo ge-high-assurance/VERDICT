@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 public class MBASSettingsPanel extends ApplicationWindow {
 	public static boolean cyberInference = false;
 	public static boolean safetyInference = false;
+	public static boolean usePartialSolution = false;
 
 	private Font font;
 	private Font boldFont;
@@ -83,6 +84,11 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		safetyButton.setFont(font);
 		safetyButton.setSelection(safetyInference);
 
+		Button partialSolution = new Button(selectionButtonGroup, SWT.CHECK);
+		partialSolution.setText("Use Partial Solutions in Synthesis");
+		partialSolution.setFont(font);
+		partialSolution.setSelection(usePartialSolution);
+
 		Group selDeAllButtons = new Group(composite, SWT.NONE);
 		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		selDeAllButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
@@ -95,6 +101,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {
 				cyberButton.setSelection(true);
 				safetyButton.setSelection(true);
+				partialSolution.setSelection(true);
 			}
 		});
 
@@ -106,6 +113,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {
 				cyberButton.setSelection(false);
 				safetyButton.setSelection(false);
+				partialSolution.setSelection(false);
 			}
 		});
 
@@ -137,6 +145,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent event) {
 				cyberInference = cyberButton.getSelection();
 				safetyInference = safetyButton.getSelection();
+				usePartialSolution = partialSolution.getSelection();
 				composite.getShell().close();
 			}
 		});

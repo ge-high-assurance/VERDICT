@@ -162,6 +162,7 @@ public class App {
         options.addOption("s", false, "Safety Relations Inference");
         // TODO don't have a good short option because "s" is already taken
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
+        options.addOption("p", false, "Use partial solutions in synthesis");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -216,6 +217,7 @@ public class App {
         helpLine(
                 "      --synthesis <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
+        helpLine("      -p ................... synthesis partial solutions");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
@@ -275,6 +277,7 @@ public class App {
             if (csvProjectName != null) {
                 if (opts.hasOption("y")) {
                     String costModelPath = opts.getOptionValue("y");
+                    boolean partialSolution = opts.hasOption("p");
 
                     runMbasSynthesis(
                             csvProjectName,
@@ -283,6 +286,7 @@ public class App {
                             soteriaPpBin,
                             cyberInference,
                             safetyInference,
+                            partialSolution,
                             costModelPath);
                 } else {
                     runMbas(
@@ -504,6 +508,7 @@ public class App {
             String soteriaPpBin,
             boolean cyberInference,
             boolean safetyInference,
+            boolean partialSolution,
             String costModelPath)
             throws VerdictRunException {
 
@@ -578,6 +583,7 @@ public class App {
                                 result.adtree,
                                 costModel,
                                 result.cyberReq.getSeverityDal(),
+                                partialSolution,
                                 factory);
                 Optional<Pair<Set<DLeaf>, Double>> selected =
                         VerdictSynthesis.performSynthesis(
@@ -586,7 +592,18 @@ public class App {
                     log("");
                     log("Cyber requirement: " + result.cyberReq.getName());
                     for (DLeaf leaf : selected.get().left) {
-                        log("Selected leaf: " + leaf.prettyPrint());
+                        // if using partial solutions, don't report already-implemented defenses
+                        if (!(partialSolution
+                                && leaf.implDal >= result.cyberReq.getSeverityDal())) {
+                            log(
+                                    "Selected leaf: "
+                                            + leaf.prettyPrint()
+                                            + ", DAL "
+                                            + result.cyberReq.getSeverityDal()
+                                            + (leaf.implDal > 0
+                                                    ? ", current DAL " + leaf.implDal
+                                                    : ""));
+                        }
                     }
                     log("Total cost: " + selected.get().right);
                 } else {

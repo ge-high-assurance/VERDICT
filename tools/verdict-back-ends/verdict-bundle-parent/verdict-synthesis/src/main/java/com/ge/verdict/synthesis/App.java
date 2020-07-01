@@ -30,7 +30,8 @@ public class App {
 
         String stemOutDir = args[0];
         String costModelXml = args[1];
-        boolean inference = args.length > 2 && "--inference".equals(args[2]);
+        boolean inference = arrayContains(args, "--inference");
+        boolean partialSolution = arrayContains(args, "--partial-solution");
 
         final CostModel costModel =
                 timed("Load cost model", () -> new CostModel(new File(costModelXml)));
@@ -59,6 +60,7 @@ public class App {
                                             result.adtree,
                                             costModel,
                                             result.cyberReq.getSeverityDal(),
+                                            partialSolution,
                                             factory));
             Optional<Pair<Set<DLeaf>, Double>> selected =
                     timed(
@@ -88,5 +90,14 @@ public class App {
                         + (System.currentTimeMillis() - startTime)
                         + " milliseconds");
         return ret;
+    }
+
+    private static boolean arrayContains(String[] arr, String search) {
+        for (String str : arr) {
+            if (str.equals(search)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

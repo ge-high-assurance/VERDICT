@@ -128,6 +128,9 @@ public class MBASSynthesisHandler extends AbstractHandler {
 		if (MBASSettingsPanel.safetyInference) {
 			command.arg("-s");
 		}
+		if (MBASSettingsPanel.usePartialSolution) {
+			command.arg("-p");
+		}
 
 		int code = command.runJarOrImage();
 		return code == 0;

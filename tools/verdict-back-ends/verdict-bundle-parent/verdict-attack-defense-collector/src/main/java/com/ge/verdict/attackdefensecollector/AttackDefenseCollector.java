@@ -501,13 +501,13 @@ public class AttackDefenseCollector {
 
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
-                    Optional<Pair<String, Prob>> impl =
+                    Optional<Pair<String, Integer>> impl =
                             "null".equals(implProps.get(i))
                                     ? Optional.empty()
                                     : Optional.of(
                                             new Pair<>(
                                                     implProps.get(i),
-                                                    Prob.fromDal(likelihoodStrings.get(i))));
+                                                    Integer.parseInt(likelihoodStrings.get(i))));
                     clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
                 }
             }

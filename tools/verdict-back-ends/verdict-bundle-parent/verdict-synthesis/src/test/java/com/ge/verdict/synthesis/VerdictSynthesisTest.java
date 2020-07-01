@@ -1,7 +1,12 @@
 package com.ge.verdict.synthesis;
 
 import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
+import com.ge.verdict.attackdefensecollector.adtree.ADNot;
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
+import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.synthesis.VerdictSynthesis.Approach;
@@ -13,6 +18,7 @@ import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -46,9 +52,9 @@ public class VerdictSynthesisTest {
 
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        DLeaf cd1 = factory.createIfNeeded("C1", "D1", "A1", costs[0]);
-        DLeaf cd2 = factory.createIfNeeded("C2", "D2", "A2", costs[1]);
-        DLeaf cd3 = factory.createIfNeeded("C3", "D3", "A3", costs[2]);
+        DLeaf cd1 = factory.createIfNeeded("C1", "D1", "A1", 0, costs[0]);
+        DLeaf cd2 = factory.createIfNeeded("C2", "D2", "A2", 0, costs[1]);
+        DLeaf cd3 = factory.createIfNeeded("C3", "D3", "A3", 0, costs[2]);
 
         DTree tree = new DOr(new DAnd(cd1, cd2), new DAnd(cd2, cd3), new DAnd(cd1, cd3));
 
@@ -89,9 +95,9 @@ public class VerdictSynthesisTest {
         DLeaf.Factory factory = new DLeaf.Factory();
 
         List<DLeaf> leaves = new ArrayList<>();
-        DLeaf leafA = factory.createIfNeeded("A", "A", "A", costs.cost("A", "A", 1));
-        DLeaf leafB = factory.createIfNeeded("B", "B", "B", costs.cost("B", "B", 1));
-        DLeaf leafC = factory.createIfNeeded("C", "C", "C", costs.cost("C", "C", 1));
+        DLeaf leafA = factory.createIfNeeded("A", "A", "A", 0, costs.cost("A", "A", 1));
+        DLeaf leafB = factory.createIfNeeded("B", "B", "B", 0, costs.cost("B", "B", 1));
+        DLeaf leafC = factory.createIfNeeded("C", "C", "C", 0, costs.cost("C", "C", 1));
         leaves.add(leafA);
         leaves.add(leafB);
         leaves.add(leafC);
@@ -128,7 +134,7 @@ public class VerdictSynthesisTest {
     public void unmitigatedMixedTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
         SystemModel system = new SystemModel("S1");
-        DLeaf dleaf = factory.createIfNeeded("S1", "D1", "A2", 5);
+        DLeaf dleaf = factory.createIfNeeded("S1", "D1", "A2", 0, 5);
         DTree dtree =
                 new DOr(
                         new ALeaf(
@@ -147,6 +153,58 @@ public class VerdictSynthesisTest {
             Assertions.assertThat(result.get().left).hasSize(1);
             Assertions.assertThat(result.get().left).contains(dleaf);
             Assertions.assertThat(result.get().right).isEqualTo(5);
+        }
+    }
+
+    @Test
+    public void partialSolutionTest() {
+        CostModel costModel =
+                new CostModel(new File(getClass().getResource("partialCosts.xml").getPath()));
+        int dal = 2;
+
+        SystemModel system = new SystemModel("C1");
+
+        Attack attack1 =
+                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Defense defense1 = new Defense(attack1);
+        defense1.addDefenseClause(
+                Collections.singletonList(
+                        new Defense.DefenseLeaf(
+                                "D1",
+                                Optional.of(
+                                        new com.ge.verdict.attackdefensecollector.Pair<>(
+                                                "D1", 1)))));
+
+        ADTree adtree = new ADOr(new ADAnd(new ADNot(defense1), attack1));
+
+        for (Approach approach : Approach.values()) {
+            {
+                DLeaf.Factory factoryPartial = new DLeaf.Factory();
+
+                Optional<Pair<Set<DLeaf>, Double>> resultPartial =
+                        VerdictSynthesis.performSynthesis(
+                                DTreeConstructor.construct(
+                                        adtree, costModel, dal, true, factoryPartial),
+                                factoryPartial,
+                                approach);
+
+                Assertions.assertThat(resultPartial.isPresent());
+                Assertions.assertThat(resultPartial.get().right).isEqualTo(1);
+            }
+
+            {
+                DLeaf.Factory factoryTotal = new DLeaf.Factory();
+
+                Optional<Pair<Set<DLeaf>, Double>> resultTotal =
+                        VerdictSynthesis.performSynthesis(
+                                DTreeConstructor.construct(
+                                        adtree, costModel, dal, false, factoryTotal),
+                                factoryTotal,
+                                approach);
+
+                Assertions.assertThat(resultTotal.isPresent());
+                Assertions.assertThat(resultTotal.get().right).isEqualTo(2);
+            }
         }
     }
 }

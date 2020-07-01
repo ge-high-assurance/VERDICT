@@ -20,7 +20,11 @@ public class DLeaf implements DTree {
     public final int id;
     public final String component;
     public final String defenseProperty;
+    /** The DAL of the current implementation, 0 if no implemented property. */
+    public final int implDal;
+    /** The cost of this leaf. */
     public final Fraction cost;
+    /** The cost normalized to an integer, populated late. */
     public int normalizedCost = -1;
     /** This is purely informative, but should not distinguish different leaves. */
     public final String attack;
@@ -32,10 +36,11 @@ public class DLeaf implements DTree {
         private final Map<Integer, DLeaf> idMap = new HashMap<>();
 
         public DLeaf createIfNeeded(
-                String component, String defenseProperty, String attack, double cost) {
+                String component, String defenseProperty, String attack, int implDal, double cost) {
             Pair<String, String> key = new Pair<>(component, defenseProperty);
             if (!componentDefenseMap.containsKey(key)) {
-                DLeaf dleaf = new DLeaf(component, defenseProperty, attack, cost, idCounter++);
+                DLeaf dleaf =
+                        new DLeaf(component, defenseProperty, attack, implDal, cost, idCounter++);
                 idMap.put(dleaf.id, dleaf);
                 componentDefenseMap.put(key, dleaf);
             }
@@ -56,10 +61,17 @@ public class DLeaf implements DTree {
         }
     }
 
-    private DLeaf(String component, String defenseProperty, String attack, double cost, int id) {
+    private DLeaf(
+            String component,
+            String defenseProperty,
+            String attack,
+            int implDal,
+            double cost,
+            int id) {
         this.component = component;
         this.defenseProperty = defenseProperty;
         this.attack = attack;
+        this.implDal = implDal;
         // using this sigma should mitigate any floating point error
         this.cost = new Fraction(cost, 0.0000001, 10);
         this.id = id;
@@ -79,7 +91,7 @@ public class DLeaf implements DTree {
 
     @Override
     public String prettyPrint() {
-        return smtName() + "=(" + component + "," + defenseProperty + ")";
+        return smtName() + "=(" + component + "," + defenseProperty + "," + implDal + ")";
     }
 
     @Override

@@ -116,8 +116,7 @@ public class VerdictSynthesis {
         Collection<DLeaf> leaves = dleafFactory.allLeaves();
 
         FormulaFactory factory = new FormulaFactory();
-        // if no soft clauses then the weighted version fails for some reason
-        MaxSATSolver solver = leaves.isEmpty() ? MaxSATSolver.msu3() : MaxSATSolver.wmsu3();
+        MaxSATSolver solver = MaxSATSolver.wbo();
 
         Formula cnf = tree.toLogicNG(factory).cnf();
 

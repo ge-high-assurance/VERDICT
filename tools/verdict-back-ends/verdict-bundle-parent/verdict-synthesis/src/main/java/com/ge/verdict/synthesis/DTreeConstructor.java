@@ -23,21 +23,28 @@ import java.util.stream.Stream;
 
 public class DTreeConstructor {
     public static DTree construct(
-            ADTree adtree, CostModel costModel, int dal, DLeaf.Factory factory) {
-        return (new DTreeConstructor(costModel, dal, factory)).perform(adtree);
+            ADTree adtree,
+            CostModel costModel,
+            int dal,
+            boolean usePartialSolution,
+            DLeaf.Factory factory) {
+        return (new DTreeConstructor(costModel, dal, usePartialSolution, factory)).perform(adtree);
     }
 
     private final CostModel costModel;
     private final DLeaf.Factory factory;
     private final int dal;
+    private final boolean usePartialSolution;
 
     private final Set<Defense> defenses;
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
 
-    private DTreeConstructor(CostModel costModel, int dal, DLeaf.Factory factory) {
+    private DTreeConstructor(
+            CostModel costModel, int dal, boolean usePartialSolution, DLeaf.Factory factory) {
         this.costModel = costModel;
         this.factory = factory;
         this.dal = dal;
+        this.usePartialSolution = usePartialSolution;
 
         defenses = new LinkedHashSet<>();
         attackALeafMap = new LinkedHashMap<>();
@@ -138,26 +145,23 @@ public class DTreeConstructor {
                                 term ->
                                         new DAnd(
                                                 term.stream()
-                                                        .map(
-                                                                leaf -> {
-                                                                    String system =
-                                                                            defense.getAttack()
-                                                                                    .getAttackable()
-                                                                                    .getParentName();
-                                                                    String attack =
-                                                                            defense.getAttack()
-                                                                                    .getName();
-                                                                    String defenseProp = leaf.left;
-                                                                    return factory.createIfNeeded(
-                                                                            system,
-                                                                            defenseProp,
-                                                                            attack,
-                                                                            costModel.cost(
-                                                                                    defenseProp,
-                                                                                    system,
-                                                                                    dal));
-                                                                })
+                                                        .map(leaf -> constructDLeaf(defense, leaf))
                                                         .collect(Collectors.toList())))
                         .collect(Collectors.toList()));
+    }
+
+    private DLeaf constructDLeaf(Defense defense, Defense.DefenseLeaf leaf) {
+        String system = defense.getAttack().getAttackable().getParentName();
+        String attack = defense.getAttack().getName();
+        String defenseProp = leaf.left;
+        int implDal = leaf.right.isPresent() ? leaf.right.get().right : 0;
+
+        double targetCost = costModel.cost(defenseProp, system, dal);
+        double implCost = costModel.cost(defenseProp, system, implDal);
+
+        // this handles if implDal > targetDal
+        double cost = usePartialSolution ? Math.max(targetCost - implCost, 0) : targetCost;
+
+        return factory.createIfNeeded(system, defenseProp, attack, implDal, cost);
     }
 }

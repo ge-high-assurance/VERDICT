@@ -30,8 +30,8 @@ public class Defense extends ADTree {
      * Each leaf contains a defense name and, if the property is implemented, a pair of the
      * implemented property name and the DAL to which it is implemented.
      */
-    public static final class DefenseLeaf extends Pair<String, Optional<Pair<String, Prob>>> {
-        public DefenseLeaf(String left, Optional<Pair<String, Prob>> right) {
+    public static final class DefenseLeaf extends Pair<String, Optional<Pair<String, Integer>>> {
+        public DefenseLeaf(String left, Optional<Pair<String, Integer>> right) {
             super(left, right);
         }
     }
@@ -92,7 +92,10 @@ public class Defense extends ADTree {
         for (List<DefenseLeaf> term : defenseDnf) {
             Prob termTotal = Prob.impossible();
             for (DefenseLeaf leaf : term) {
-                Prob prob = leaf.right.isPresent() ? leaf.right.get().right : Prob.certain();
+                Prob prob =
+                        leaf.right.isPresent()
+                                ? Prob.fromDal(leaf.right.get().right)
+                                : Prob.certain();
                 termTotal = Prob.or(termTotal, prob);
             }
             total = Prob.and(total, termTotal);
