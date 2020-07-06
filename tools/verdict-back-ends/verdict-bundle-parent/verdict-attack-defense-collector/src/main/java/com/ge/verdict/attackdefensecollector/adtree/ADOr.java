@@ -1,5 +1,6 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.Arrays;
@@ -8,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 /** A disjunction of several attack-defense trees. An ADOr always contains at least one child. */
 public class ADOr extends ADTree {
@@ -114,6 +117,14 @@ public class ADOr extends ADTree {
                 builder.newLine();
             }
         }
+    }
+
+    @Override
+    public Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
+        return factory.or(
+                adtrees.stream()
+                        .map(adtree -> adtree.toLogicNg(factory, cache))
+                        .collect(Collectors.toList()));
     }
 
     @Override

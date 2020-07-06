@@ -1,11 +1,14 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import java.util.Locale;
 import java.util.Objects;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /** An attack on a system, a fundamental unit of the attack-defense tree. */
 public class Attack extends ADTree {
@@ -83,6 +86,19 @@ public class Attack extends ADTree {
                         attackable.getParentName(),
                         cia.toString(),
                         attackName));
+    }
+
+    @Override
+    public Variable toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
+        if (cache.attackToVar.containsKey(this)) {
+            return cache.attackToVar.get(this);
+        } else {
+            String name = "attack_" + toString();
+            Variable var = factory.variable(name);
+            cache.attackToVar.put(this, var);
+            cache.varToAttack.put(name, this);
+            return var;
+        }
     }
 
     @Override

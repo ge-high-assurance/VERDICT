@@ -585,10 +585,15 @@ public class AttackDefenseCollector {
             for (CyberReq cyberReq : system.getCyberReqs()) {
                 Optional<ADTree> treeOpt = system.trace(cyberReq.getCondition());
                 // Crush the tree to remove redundant nodes
-                ADTree adtree =
+                ADTree crushed =
                         treeOpt.isPresent()
                                 ? treeOpt.get().crush()
                                 : new ADOr(Collections.emptyList(), true);
+
+                // not enabling this for now because it is potentially inefficient
+                // ADTree adtree = CutSetGenerator.generate(crushed);
+                ADTree adtree = crushed;
+
                 // Compute probability of attack
                 Prob computed = adtree.compute();
 

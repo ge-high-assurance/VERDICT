@@ -1,5 +1,6 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.Arrays;
@@ -8,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 /** A conjunction of several attack-defense trees. An ADAnd always contains at least one child. */
 public class ADAnd extends ADTree {
@@ -95,6 +98,14 @@ public class ADAnd extends ADTree {
                 builder.append(" /\\ ");
             }
         }
+    }
+
+    @Override
+    public Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
+        return factory.and(
+                adtrees.stream()
+                        .map(adtree -> adtree.toLogicNg(factory, cache))
+                        .collect(Collectors.toList()));
     }
 
     @Override

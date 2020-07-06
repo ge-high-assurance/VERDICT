@@ -1,5 +1,6 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.Prob;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /**
  * A defense to an attack on a system, a fundamental unit of the attack-defense tree.
@@ -137,6 +140,19 @@ public class Defense extends ADTree {
         }
 
         builder.append(")");
+    }
+
+    @Override
+    public Variable toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
+        if (cache.defenseToVar.containsKey(this)) {
+            return cache.defenseToVar.get(this);
+        } else {
+            String name = "defense_" + toString();
+            Variable var = factory.variable(name);
+            cache.defenseToVar.put(this, var);
+            cache.varToDefense.put(name, this);
+            return var;
+        }
     }
 
     @Override

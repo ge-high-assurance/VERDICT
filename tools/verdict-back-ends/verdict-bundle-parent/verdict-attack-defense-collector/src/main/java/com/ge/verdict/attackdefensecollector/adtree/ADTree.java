@@ -1,7 +1,10 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 /**
  * An attack-defense tree. May be comprised of attacks, defenses, AND, OR and NOT. The fundamental
@@ -43,6 +46,8 @@ public abstract class ADTree {
      * @param builder the indented string builder
      */
     public abstract void prettyPrint(IndentedStringBuilder builder);
+
+    public abstract Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache);
 
     @Override
     public abstract boolean equals(Object other);

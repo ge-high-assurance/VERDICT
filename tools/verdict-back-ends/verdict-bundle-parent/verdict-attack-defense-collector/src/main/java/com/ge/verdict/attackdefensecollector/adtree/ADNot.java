@@ -1,8 +1,11 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import java.util.Objects;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 /** A negation of an attack-defense tree. */
 public class ADNot extends ADTree {
@@ -45,6 +48,11 @@ public class ADNot extends ADTree {
         // NOT child
         builder.append("NOT ");
         adtree.prettyPrint(builder);
+    }
+
+    @Override
+    public Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
+        return factory.not(adtree.toLogicNg(factory, cache));
     }
 
     @Override
