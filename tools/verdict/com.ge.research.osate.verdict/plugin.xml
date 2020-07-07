@@ -13,6 +13,15 @@
 	         </enabledWhen>
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.MBASHandler"
+             commandId="com.ge.research.osate.verdict.commands.runMbas">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
+       <handler
              class="com.ge.research.osate.verdict.handlers.WzrdHandler"
              commandId="com.ge.research.osate.verdict.commands.runWzrd"
              enablesFor="1">
@@ -23,15 +32,10 @@
           </enabledWhen>
        </handler>              
        <handler
-             class="com.ge.research.osate.verdict.handlers.MBASHandler"
-             commandId="com.ge.research.osate.verdict.commands.runMbas">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
-       </handler>
-       <handler
+             class="com.ge.research.osate.verdict.handlers.StopHandler"
+             commandId="com.ge.research.osate.verdict.commands.stop">
+        </handler>
+        <handler
              class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
@@ -40,6 +44,7 @@
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
     </extension>
+
     <extension 
     	point="org.eclipse.ui.menus">
        <menuContribution
@@ -87,8 +92,17 @@
                 tooltip="Select to launch wizard to edit cyber requirements/relations">                
 	      </command>
 	   </menuContribution>       
-       
+       <menuContribution
+             locationURI="toolbar:org.eclipse.ui.console.ConsoleView">
+	      <command
+	            commandId="com.ge.research.osate.verdict.commands.stop"
+				icon="icons/stop.gif"
+                style="push"
+                tooltip="Stop MBAS/CRV">
+	      </command>
+	   </menuContribution>       
     </extension>
+
     <extension
           point="org.eclipse.ui.commands">
        <category
@@ -107,6 +121,11 @@
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.stop"
+             name="Stop MBAS/CRV">
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.crvSettings"
              name="CRV Settings">
        </command>
@@ -117,7 +136,7 @@
        </command>                 
     </extension>
 
-   <extension
+    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
             id="com.ge.research.osate.verdict.expressions.eObjectSelected">
@@ -145,8 +164,8 @@
 	            </and>  
 	         </with>
       </definition>
-   </extension>        
-  <extension
+    </extension>        
+    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
             id="com.ge.research.osate.verdict.expressions.eCompSelected">
@@ -201,7 +220,7 @@
           </with>
          </or>
       </definition>
-   </extension>  
+    </extension>  
    
    <!-- CRV & MBAS results tabs -->
    <extension point="org.eclipse.ui.views">
