@@ -45,6 +45,11 @@ public class ALeaf implements DTree {
     }
 
     @Override
+    public BoolExpr toZ3Multi(Context context) {
+        return toZ3(context);
+    }
+
+    @Override
     public Formula toLogicNG(FormulaFactory factory) {
         if (isMitigated()) {
             throw new RuntimeException(

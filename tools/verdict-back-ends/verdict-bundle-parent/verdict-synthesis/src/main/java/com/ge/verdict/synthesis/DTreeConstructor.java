@@ -1,5 +1,6 @@
 package com.ge.verdict.synthesis;
 
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
@@ -15,6 +16,7 @@ import com.ge.verdict.synthesis.dtree.DTree;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,18 +24,56 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DTreeConstructor {
+    /**
+     * Construct a defense tree for multiple cyber requirements.
+     *
+     * @param results
+     * @param costModel
+     * @param usePartialSolution
+     * @param factory
+     * @return
+     */
+    public static DTree construct(
+            List<AttackDefenseCollector.Result> results,
+            CostModel costModel,
+            boolean usePartialSolution,
+            DLeaf.Factory factory) {
+        return new DAnd(
+                results.stream()
+                        .map(
+                                result ->
+                                        construct(
+                                                result.adtree,
+                                                costModel,
+                                                result.cyberReq.getSeverityDal(),
+                                                usePartialSolution,
+                                                factory))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Construct a defense tree for one cyber requirement.
+     *
+     * @param adtree
+     * @param costModel
+     * @param targetDal
+     * @param usePartialSolution
+     * @param factory
+     * @return
+     */
     public static DTree construct(
             ADTree adtree,
             CostModel costModel,
-            int dal,
+            int targetDal,
             boolean usePartialSolution,
             DLeaf.Factory factory) {
-        return (new DTreeConstructor(costModel, dal, usePartialSolution, factory)).perform(adtree);
+        return (new DTreeConstructor(costModel, targetDal, usePartialSolution, factory))
+                .perform(adtree);
     }
 
     private final CostModel costModel;
     private final DLeaf.Factory factory;
-    private final int dal;
+    private final int targetDal;
     private final boolean usePartialSolution;
 
     private final Set<Defense> defenses;
@@ -43,7 +83,7 @@ public class DTreeConstructor {
             CostModel costModel, int dal, boolean usePartialSolution, DLeaf.Factory factory) {
         this.costModel = costModel;
         this.factory = factory;
-        this.dal = dal;
+        this.targetDal = dal;
         this.usePartialSolution = usePartialSolution;
 
         defenses = new LinkedHashSet<>();
@@ -156,12 +196,14 @@ public class DTreeConstructor {
         String defenseProp = leaf.left;
         int implDal = leaf.right.isPresent() ? leaf.right.get().right : 0;
 
-        double targetCost = costModel.cost(defenseProp, system, dal);
-        double implCost = costModel.cost(defenseProp, system, implDal);
-
-        // this handles if implDal > targetDal
-        double cost = usePartialSolution ? Math.max(targetCost - implCost, 0) : targetCost;
-
-        return factory.createIfNeeded(system, defenseProp, attack, implDal, cost);
+        return new DLeaf(
+                system,
+                defenseProp,
+                attack,
+                implDal,
+                targetDal,
+                costModel,
+                factory,
+                usePartialSolution);
     }
 }

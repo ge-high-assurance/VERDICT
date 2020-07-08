@@ -4,6 +4,7 @@ import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
 import java.io.File;
@@ -62,15 +63,41 @@ public class App {
                                             result.cyberReq.getSeverityDal(),
                                             partialSolution,
                                             factory));
-            Optional<Pair<Set<DLeaf>, Double>> selected =
+            Optional<Pair<Set<ComponentDefense>, Double>> selected =
                     timed(
                             "Perform synthesis",
                             () ->
-                                    VerdictSynthesis.performSynthesis(
-                                            dtree, factory, VerdictSynthesis.Approach.MAXSMT));
+                                    VerdictSynthesis.performSynthesisSingle(
+                                            dtree,
+                                            result.cyberReq.getSeverityDal(),
+                                            factory,
+                                            VerdictSynthesis.Approach.MAXSMT));
             if (selected.isPresent()) {
-                for (DLeaf leaf : selected.get().left) {
-                    System.out.println("Selected leaf: " + leaf.prettyPrint());
+                for (ComponentDefense pair : selected.get().left) {
+                    System.out.println("Selected leaf: " + pair.toString());
+                }
+                System.out.println("Total cost: " + selected.get().right);
+            }
+        }
+
+        System.out.println("\n\n\n");
+
+        {
+            DLeaf.Factory factory = new DLeaf.Factory();
+            DTree dtree =
+                    timed(
+                            "Construct defense tree",
+                            () ->
+                                    DTreeConstructor.construct(
+                                            results, costModel, partialSolution, factory));
+            Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
+                    timed(
+                            "Perform synthesis",
+                            () -> VerdictSynthesis.performSynthesisMultiple(dtree, factory));
+            if (selected.isPresent()) {
+                for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
+                    System.out.println(
+                            "Selected leaf: " + pair.left.toString() + " to DAL " + pair.right);
                 }
                 System.out.println("Total cost: " + selected.get().right);
             }

@@ -25,6 +25,12 @@ public final class DNot implements DTree {
     }
 
     @Override
+    public BoolExpr toZ3Multi(Context context) {
+        // We could encode NOT, but this would invalidate the analysis
+        throw new RuntimeException("cannot encode NOT nodes");
+    }
+
+    @Override
     public Formula toLogicNG(FormulaFactory factory) {
         throw new RuntimeException("cannot encode NOT nodes");
     }

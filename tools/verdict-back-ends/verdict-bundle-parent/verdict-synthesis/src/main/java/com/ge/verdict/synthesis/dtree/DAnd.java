@@ -39,6 +39,15 @@ public final class DAnd implements DTree {
     }
 
     @Override
+    public BoolExpr toZ3Multi(Context context) {
+        return context.mkAnd(
+                children.stream()
+                        .map((child) -> child.toZ3Multi(context))
+                        .collect(Collectors.toList())
+                        .toArray(new BoolExpr[0]));
+    }
+
+    @Override
     public Formula toLogicNG(FormulaFactory factory) {
         return factory.and(
                 children.stream()

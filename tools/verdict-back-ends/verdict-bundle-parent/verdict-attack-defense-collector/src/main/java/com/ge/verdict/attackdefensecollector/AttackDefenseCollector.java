@@ -610,7 +610,7 @@ public class AttackDefenseCollector {
         public final ADTree adtree;
         public final Prob prob;
 
-        private Result(SystemModel system, CyberReq cyberReq, ADTree adtree, Prob prob) {
+        public Result(SystemModel system, CyberReq cyberReq, ADTree adtree, Prob prob) {
             super();
             this.system = system;
             this.cyberReq = cyberReq;

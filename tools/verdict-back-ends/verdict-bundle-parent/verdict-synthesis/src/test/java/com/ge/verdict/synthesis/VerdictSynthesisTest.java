@@ -13,6 +13,7 @@ import com.ge.verdict.synthesis.VerdictSynthesis.Approach;
 import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
 import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
@@ -52,14 +53,25 @@ public class VerdictSynthesisTest {
 
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        DLeaf cd1 = factory.createIfNeeded("C1", "D1", "A1", 0, costs[0]);
-        DLeaf cd2 = factory.createIfNeeded("C2", "D2", "A2", 0, costs[1]);
-        DLeaf cd3 = factory.createIfNeeded("C3", "D3", "A3", 0, costs[2]);
+        double[] doubleCosts0 = new double[10];
+        double[] doubleCosts1 = new double[10];
+        double[] doubleCosts2 = new double[10];
+        for (int i = 0; i < 10; i++) {
+            doubleCosts0[i] = costs[0];
+            doubleCosts1[i] = costs[1];
+            doubleCosts2[i] = costs[2];
+        }
+
+        int targetDal = 1;
+
+        DLeaf cd1 = new DLeaf("C1", "D1", "A1", 0, targetDal, doubleCosts0, factory);
+        DLeaf cd2 = new DLeaf("C2", "D2", "A2", 0, targetDal, doubleCosts1, factory);
+        DLeaf cd3 = new DLeaf("C3", "D3", "A3", 0, targetDal, doubleCosts2, factory);
 
         DTree tree = new DOr(new DAnd(cd1, cd2), new DAnd(cd2, cd3), new DAnd(cd1, cd3));
 
-        Optional<Pair<Set<DLeaf>, Double>> output =
-                VerdictSynthesis.performSynthesis(tree, factory, approach);
+        Optional<Pair<Set<ComponentDefense>, Double>> output =
+                VerdictSynthesis.performSynthesisSingle(tree, targetDal, factory, approach);
 
         Assertions.assertThat(output.isPresent()).isTrue();
         Assertions.assertThat(output.get().left.size()).isEqualTo(selected.length);
@@ -74,7 +86,7 @@ public class VerdictSynthesisTest {
                                     + comp
                                     + ", approach: "
                                     + approach.toString())
-                    .anyMatch(leaf -> leaf.component.equals(comp));
+                    .anyMatch(pair -> pair.component.equals(comp));
         }
     }
 
@@ -94,25 +106,30 @@ public class VerdictSynthesisTest {
 
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        List<DLeaf> leaves = new ArrayList<>();
-        DLeaf leafA = factory.createIfNeeded("A", "A", "A", 0, costs.cost("A", "A", 1));
-        DLeaf leafB = factory.createIfNeeded("B", "B", "B", 0, costs.cost("B", "B", 1));
-        DLeaf leafC = factory.createIfNeeded("C", "C", "C", 0, costs.cost("C", "C", 1));
-        leaves.add(leafA);
-        leaves.add(leafB);
-        leaves.add(leafC);
+        int targetDal = 1;
 
-        Assertions.assertThat(leafA.cost).isEqualByComparingTo(new Fraction(42, 10));
-        Assertions.assertThat(leafB.cost).isEqualByComparingTo(new Fraction(35, 1000));
-        Assertions.assertThat(leafC.cost).isEqualByComparingTo(new Fraction(1077, 100));
+        List<ComponentDefense> leaves = new ArrayList<>();
+        DLeaf leafA = new DLeaf("A", "A", "A", 0, targetDal, costs, factory, false);
+        DLeaf leafB = new DLeaf("B", "B", "B", 0, targetDal, costs, factory, false);
+        DLeaf leafC = new DLeaf("C", "C", "C", 0, targetDal, costs, factory, false);
+        leaves.add(leafA.componentDefense);
+        leaves.add(leafB.componentDefense);
+        leaves.add(leafC.componentDefense);
+
+        Assertions.assertThat(leafA.componentDefense.dalToRawCost(targetDal))
+                .isEqualByComparingTo(new Fraction(42, 10));
+        Assertions.assertThat(leafB.componentDefense.dalToRawCost(targetDal))
+                .isEqualByComparingTo(new Fraction(35, 1000));
+        Assertions.assertThat(leafC.componentDefense.dalToRawCost(targetDal))
+                .isEqualByComparingTo(new Fraction(1077, 100));
 
         int costLcm = VerdictSynthesis.normalizeCosts(leaves);
 
         Assertions.assertThat(costLcm).isEqualTo(200);
 
-        Assertions.assertThat(leafA.normalizedCost).isEqualTo(840);
-        Assertions.assertThat(leafB.normalizedCost).isEqualTo(7);
-        Assertions.assertThat(leafC.normalizedCost).isEqualTo(2154);
+        Assertions.assertThat(leafA.componentDefense.dalToNormCost(targetDal)).isEqualTo(840);
+        Assertions.assertThat(leafB.componentDefense.dalToNormCost(targetDal)).isEqualTo(7);
+        Assertions.assertThat(leafC.componentDefense.dalToNormCost(targetDal)).isEqualTo(2154);
     }
 
     @Test
@@ -125,7 +142,8 @@ public class VerdictSynthesisTest {
                                 system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I));
 
         for (Approach approach : Approach.values()) {
-            Assertions.assertThat(VerdictSynthesis.performSynthesis(dtree, factory, approach))
+            Assertions.assertThat(
+                            VerdictSynthesis.performSynthesisSingle(dtree, 1, factory, approach))
                     .isEmpty();
         }
     }
@@ -134,7 +152,9 @@ public class VerdictSynthesisTest {
     public void unmitigatedMixedTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
         SystemModel system = new SystemModel("S1");
-        DLeaf dleaf = factory.createIfNeeded("S1", "D1", "A2", 0, 5);
+        int targetDal = 1;
+        double[] costs = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+        DLeaf dleaf = new DLeaf("S1", "D1", "A2", 0, targetDal, costs, factory);
         DTree dtree =
                 new DOr(
                         new ALeaf(
@@ -147,11 +167,11 @@ public class VerdictSynthesisTest {
                         dleaf);
 
         for (Approach approach : Approach.values()) {
-            Optional<Pair<Set<DLeaf>, Double>> result =
-                    VerdictSynthesis.performSynthesis(dtree, factory, approach);
+            Optional<Pair<Set<ComponentDefense>, Double>> result =
+                    VerdictSynthesis.performSynthesisSingle(dtree, targetDal, factory, approach);
             Assertions.assertThat(result.isPresent());
             Assertions.assertThat(result.get().left).hasSize(1);
-            Assertions.assertThat(result.get().left).contains(dleaf);
+            Assertions.assertThat(result.get().left).contains(dleaf.componentDefense);
             Assertions.assertThat(result.get().right).isEqualTo(5);
         }
     }
@@ -181,10 +201,11 @@ public class VerdictSynthesisTest {
             {
                 DLeaf.Factory factoryPartial = new DLeaf.Factory();
 
-                Optional<Pair<Set<DLeaf>, Double>> resultPartial =
-                        VerdictSynthesis.performSynthesis(
+                Optional<Pair<Set<ComponentDefense>, Double>> resultPartial =
+                        VerdictSynthesis.performSynthesisSingle(
                                 DTreeConstructor.construct(
                                         adtree, costModel, dal, true, factoryPartial),
+                                dal,
                                 factoryPartial,
                                 approach);
 
@@ -195,10 +216,11 @@ public class VerdictSynthesisTest {
             {
                 DLeaf.Factory factoryTotal = new DLeaf.Factory();
 
-                Optional<Pair<Set<DLeaf>, Double>> resultTotal =
-                        VerdictSynthesis.performSynthesis(
+                Optional<Pair<Set<ComponentDefense>, Double>> resultTotal =
+                        VerdictSynthesis.performSynthesisSingle(
                                 DTreeConstructor.construct(
                                         adtree, costModel, dal, false, factoryTotal),
+                                dal,
                                 factoryTotal,
                                 approach);
 
@@ -206,5 +228,21 @@ public class VerdictSynthesisTest {
                 Assertions.assertThat(resultTotal.get().right).isEqualTo(2);
             }
         }
+    }
+
+    @Test
+    public void multipleRequirementsTest() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+        double[] costs = {2, 5, 9, 15, 16, 18, 20, 25, 30, 37};
+        DLeaf leaf1 = new DLeaf("S1", "D1", "A2", 0, 3, costs, factory);
+        DLeaf leaf2 = new DLeaf("S1", "D1", "A2", 0, 4, costs, factory);
+        DTree dtree = new DAnd(leaf1, leaf2);
+
+        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
+                VerdictSynthesis.performSynthesisMultiple(dtree, factory);
+        Assertions.assertThat(result.isPresent());
+        Assertions.assertThat(result.get().left).hasSize(1);
+        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 4));
+        Assertions.assertThat(result.get().right).isEqualTo(16);
     }
 }
