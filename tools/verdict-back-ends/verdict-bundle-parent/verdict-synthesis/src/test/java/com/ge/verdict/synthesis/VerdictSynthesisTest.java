@@ -1,5 +1,17 @@
 package com.ge.verdict.synthesis;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Arrays;
+import org.junit.Test;
+
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
@@ -17,16 +29,6 @@ import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import org.apache.commons.math3.fraction.Fraction;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Arrays;
-import org.junit.Test;
 
 public class VerdictSynthesisTest {
     private <T> String stringOfIterable(Iterable<T> it) {
@@ -239,7 +241,7 @@ public class VerdictSynthesisTest {
         DTree dtree = new DAnd(leaf1, leaf2);
 
         Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
-                VerdictSynthesis.performSynthesisMultiple(dtree, factory);
+				VerdictSynthesis.performSynthesisMultiple(dtree, factory, false);
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().left).hasSize(1);
         Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 4));

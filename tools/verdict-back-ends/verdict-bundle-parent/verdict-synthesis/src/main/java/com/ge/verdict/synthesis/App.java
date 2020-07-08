@@ -1,5 +1,12 @@
 package com.ge.verdict.synthesis;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
@@ -7,12 +14,6 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
 
 public class App {
     /*
@@ -33,6 +34,12 @@ public class App {
         String costModelXml = args[1];
         boolean inference = arrayContains(args, "--inference");
         boolean partialSolution = arrayContains(args, "--partial-solution");
+		boolean dumpSmtLib = arrayContains(args, "--dump-smtlib");
+
+		if (dumpSmtLib) {
+			System.out.println("Will dump SMT-LIB format to verdict-synthesis-dump.smtlib for debugging");
+			System.out.println("Parent directory: " + System.getProperty("user.dir"));
+		}
 
         final CostModel costModel =
                 timed("Load cost model", () -> new CostModel(new File(costModelXml)));
@@ -93,7 +100,7 @@ public class App {
             Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
                     timed(
                             "Perform synthesis",
-                            () -> VerdictSynthesis.performSynthesisMultiple(dtree, factory));
+							() -> VerdictSynthesis.performSynthesisMultiple(dtree, factory, dumpSmtLib));
             if (selected.isPresent()) {
                 for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
                     System.out.println(

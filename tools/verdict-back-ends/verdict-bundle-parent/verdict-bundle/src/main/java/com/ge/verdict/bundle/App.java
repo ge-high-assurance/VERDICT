@@ -10,6 +10,7 @@ import com.ge.verdict.synthesis.CostModel;
 import com.ge.verdict.synthesis.DTreeConstructor;
 import com.ge.verdict.synthesis.VerdictSynthesis;
 import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
@@ -33,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -576,39 +576,31 @@ public class App {
                     new AttackDefenseCollector(stemOutputDir, cyberInference);
             List<AttackDefenseCollector.Result> results = collector.perform();
 
-            for (AttackDefenseCollector.Result result : results) {
-                DLeaf.Factory factory = new DLeaf.Factory();
-                DTree dtree =
-                        DTreeConstructor.construct(
-                                result.adtree,
-                                costModel,
-                                result.cyberReq.getSeverityDal(),
-                                partialSolution,
-                                factory);
-                Optional<Pair<Set<DLeaf>, Double>> selected =
-                        VerdictSynthesis.performSynthesis(
-                                dtree, factory, VerdictSynthesis.Approach.MAXSMT);
-                if (selected.isPresent()) {
-                    log("");
-                    log("Cyber requirement: " + result.cyberReq.getName());
-                    for (DLeaf leaf : selected.get().left) {
-                        // if using partial solutions, don't report already-implemented defenses
-                        if (!(partialSolution
-                                && leaf.implDal >= result.cyberReq.getSeverityDal())) {
-                            log(
-                                    "Selected leaf: "
-                                            + leaf.prettyPrint()
-                                            + ", DAL "
-                                            + result.cyberReq.getSeverityDal()
-                                            + (leaf.implDal > 0
-                                                    ? ", current DAL " + leaf.implDal
-                                                    : ""));
-                        }
+            DLeaf.Factory factory = new DLeaf.Factory();
+            DTree dtree = DTreeConstructor.construct(results, costModel, partialSolution, factory);
+            Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
+                    VerdictSynthesis.performSynthesisMultiple(dtree, factory);
+
+            if (selected.isPresent()) {
+                System.out.println("Synthesis results:");
+                for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
+                    // if using partial solutions, don't report already-implemented defenses
+                    if (!(partialSolution && pair.left.implDal >= pair.right)) {
+                        log(
+                                "Selected: "
+                                        + pair.left.defenseProperty
+                                        + " for "
+                                        + pair.left.component
+                                        + " to DAL "
+                                        + pair.right
+                                        + (partialSolution && pair.left.implDal > 0
+                                                ? " (upgrading from DAL " + pair.left.implDal + ")"
+                                                : ""));
                     }
-                    log("Total cost: " + selected.get().right);
-                } else {
-                    logError("Synthesis failed for requirement: " + result.cyberReq.getName());
                 }
+                log("Total cost: " + selected.get().right);
+            } else {
+                logError("Synthesis failed");
             }
 
             sample.stop(Metrics.timer("Timer.mbas.synthesis", "model", modelName));

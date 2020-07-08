@@ -1,5 +1,24 @@
 package com.ge.verdict.synthesis;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.util.ArithmeticUtils;
+import org.logicng.datastructures.Assignment;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.solvers.MaxSATSolver;
+
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DTree;
@@ -12,20 +31,6 @@ import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Status;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.logicng.datastructures.Assignment;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.solvers.MaxSATSolver;
 
 public class VerdictSynthesis {
     public static enum Approach {
@@ -34,7 +39,7 @@ public class VerdictSynthesis {
     }
 
     public static Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>>
-            performSynthesisMultiple(DTree tree, DLeaf.Factory factory) {
+			performSynthesisMultiple(DTree tree, DLeaf.Factory factory, boolean dumpSmtLib) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
@@ -60,6 +65,17 @@ public class VerdictSynthesis {
                                 .map(pair -> pair.toZ3Multi(context))
                                 .collect(Collectors.toList())
                                 .toArray(new ArithExpr[] {})));
+
+        if (dumpSmtLib) {
+			try {
+        		PrintWriter writer = new PrintWriter("verdict-synthesis-dump.smtlib", "UTF-8");
+        		writer.println(optimizer.toString());
+        		writer.flush();
+				writer.close();
+			} catch (FileNotFoundException | UnsupportedEncodingException e) {
+				e.printStackTrace();
+        	}
+        }
 
         if (optimizer.Check().equals(Status.SATISFIABLE)) {
             List<Pair<ComponentDefense, Integer>> output = new ArrayList<>();
