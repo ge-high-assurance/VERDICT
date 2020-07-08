@@ -31,6 +31,9 @@ public class VerdictBundleCommand {
     private List<String> args = new ArrayList<>();
     private List<String> binds = new ArrayList<>();
     private List<String> env = new ArrayList<>();
+    
+    // Stop docker if necessary
+    private Container container = null;
 
     /** Tells us whether to run verdict-bundle via java or docker. */
     private boolean isImage() {
@@ -145,6 +148,30 @@ public class VerdictBundleCommand {
     }
 
     /**
+     * Stops any currently running verdict-bundle.  Needs synchronization
+     * due to two threads accessing container field.
+     */
+	public synchronized void stop() {
+		VerdictLogger.warning("STOP button pushed");
+		if (container != null) {
+			try {
+				container.stop();
+			} catch (UnexpectedResponseException | IOException e) {
+				VerdictLogger.severe("Unable to stop container: " + e);
+			}
+		}
+		// I've looked and there isn't any way to stop a running
+		// Execute object through its public API.  We'd have to break
+		// through its public API abstraction somehow.  To be done later 
+		// if there's enough need for it.
+	}
+    
+    /** Needs synchronization due to two threads accessing container field. */
+    private synchronized void setContainer(Container container) {
+    	this.container = container;
+    }
+    
+    /**
      * Runs verdict-bundle image with docker using the docker-client Java API.
      *
      * @return Exit code from verdict-bundle
@@ -153,7 +180,7 @@ public class VerdictBundleCommand {
         try {
             // Connect to a Unix or TCP socket, although we must change tcp to http
             String unixSocket = "/var/run/docker.sock";
-            String tcpSocket = System.getenv("DOCKER_HOST");
+            String tcpSocket = System.getProperty("DOCKER_HOST", System.getenv("DOCKER_HOST"));
             tcpSocket = (tcpSocket != null) ? tcpSocket.replace("tcp:", "http:") : null;
             Docker docker =
                     (tcpSocket != null)
@@ -199,6 +226,8 @@ public class VerdictBundleCommand {
             // Start the container and wait for it to exit
             VerdictLogger.info("Running image: " + dockerImage + " " + String.join(" ", args));
             try {
+            	setContainer(container);
+            	StopHandler.enable(this);
                 container.start();
                 VerdictLogger.info("Started, now waiting for container to finish: " + containerId);
                 int statusCode = container.waitOn(null);
@@ -211,7 +240,9 @@ public class VerdictBundleCommand {
                 return statusCode;
             } finally {
                 // Always remove the container before we return
-                container.remove();
+            	StopHandler.disable();
+            	setContainer(null);
+            	container.remove();
             }
         } catch (IOException | UnexpectedResponseException e) {
             VerdictLogger.severe("Unable to run command: " + e);
@@ -238,9 +269,12 @@ public class VerdictBundleCommand {
 
         try {
             VerdictLogger.info("Running command: " + String.join(" ", args));
+            StopHandler.enable(this);
             return executor.execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+        	StopHandler.disable();
         }
     }
 
