@@ -1,6 +1,4 @@
 property set VERDICT_Properties is
-
-
  --- MBAA:
  --- 	componentType is a property used to determine whether the system is subject to attacks targeting software, hardware, humans, or hybrid
  --- 	(software and hardware). For example, systems that represent software only will not be subject to CAPEC-440 Hardware Integrity Attack.
@@ -10,7 +8,7 @@ property set VERDICT_Properties is
  --- 	This helps CRV to decide what sort of attack can the component be susceptible to. For instance, a Hybrid component can be susceptible
  --- 	to both hardware trojan and software Virus/Worm/Malware attacks whereas a Human component can only be susceptible to insider/outsider threat.
 
- componentType: enumeration (Software, Hardware, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid, Hybrid) => Hybrid applies to (system);
+ componentType: enumeration (Software, Hardware, Hybrid) => Hybrid applies to (system);
 
 
  --- MBAA:
@@ -75,7 +73,7 @@ property set VERDICT_Properties is
  sessionAuthenticity: aadlboolean => false applies to (connection);
 
 -- Component properties 
- category: enumeration (IMUCat, GPSCat, LIDARCat) applies to (system);
+ category: enumeration (IMU, GPS, LIDAR) applies to (system);
  
  
 -- Defense properties
@@ -172,6 +170,5 @@ secureBoot: aadlboolean => false applies to (system);
  --- 	component's pedigree is sourced/COTS, it is not susceptible to hardware trojan or logic bomb type of attacks.
 
  adversariallyTested: aadlboolean => false applies to (system);
- 
  
 end VERDICT_Properties;

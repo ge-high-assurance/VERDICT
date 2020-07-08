@@ -4,7 +4,25 @@ public
 	with Base_Types;
     with Data_Types;
 	with VERDICT_Properties;
-	with GNC;
+	
+	system GNC
+		features
+			-- inputs
+			gnc_constellation: in data port Data_Types::Constellation;
+			gnc_satellite0_pos: in data port Data_Types::Position.impl;
+			gnc_satellite1_pos: in data port Data_Types::Position.impl;
+			gnc_launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gnc_gps_pos: out data port Data_Types::Position.impl;
+			gnc_gps_health_status: out data port Base_Types::Boolean;
+			gnc_probe_constellation: out data port Data_Types::Constellation;
+			gnc_imu_pos: out data port Data_Types::Position.impl;
+			gnc_imu_health_status: out data port Base_Types::Boolean;
+			gnc_probe_launch_pos: out data port Data_Types::Position.impl;
+			
+		
+	end GNC;	
 
 	system PositionEstimator 
 		features
@@ -76,8 +94,8 @@ public
 			dp_probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl;
 			dp_constellation: out data port Data_Types::Constellation; 
 			launch_pos: out data port Data_Types::Position.impl;
-			dp_probe_init_mode: out data port Base_Types::Boolean;
-			dp_probe_abort_mode: out data port Base_Types::Boolean;
+			dp_probe_init_mode: out data port Base_Types::Boolean; 
+			dp_probe_abort_mode: out data port Base_Types::Boolean; 
 			dp_target_clear: out data port Base_Types::Boolean;
 			dp_valid_marker: out data port Base_Types::Boolean;
 	end DeliveryPlanner;
@@ -146,140 +164,75 @@ public
 	
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
-			gnc: system GNC::GNC.Impl;
+			gnc: system GNC{
+			   VERDICT_Properties::pedigree => COTS;
+			   VERDICT_Properties::category => GPS;
+			};
 			
 			radio: system Radio
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::secureBoot => false;
-				VERDICT_Properties::staticCodeAnalysis => false;
-				VERDICT_Properties::strongCryptoAlgorithms => false;
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;	
+				VERDICT_Properties::pedigree => COTS;
 			};
 			positionEstimator: system PositionEstimator
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => COTS; 
-
-		
-				VERDICT_Properties::adversariallyTested => false;
-				--VERDICT_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::secureBoot => false;
-				VERDICT_Properties::staticCodeAnalysis => false;
-				VERDICT_Properties::strongCryptoAlgorithms => false;
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
-				
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped; 
 			};
 			navigation: system Navigation
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::secureBoot => false;
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
 
 			};
 			fc: system FlightControl
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::insideTrustedBoundary => true;
+				VERDICT_Properties::componentType => Hybrid;
 				VERDICT_Properties::pedigree => InternallyDeveloped;
-
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::secureBoot => false;
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
 			};
 			actuation: system Actuation
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::pedigree => COTS;
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
 			 	-- VERDICT Component Properties
-				VERDICT_Properties::componentType => Software;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => Sourced;
-				--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
-				
-	
-			
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::secureBoot => false;
-				VERDICT_Properties::staticCodeAnalysis => false;
-				VERDICT_Properties::strongCryptoAlgorithms => false;
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::componentType => Hybrid;
+				VERDICT_Properties::pedigree => InternallyDeveloped;
 			};
 			deliveryItemMechanism: system DeliveryItemMechanism
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::pedigree => COTS;
 
 			};
 			camera: system Camera
 			{
 				-- VERDICT Component Properties
 				VERDICT_Properties::componentType => Hardware;
-				VERDICT_Properties::insideTrustedBoundary => true;
-				VERDICT_Properties::pedigree => InternallyDeveloped;
-				
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				VERDICT_Properties::supplyChainSecurity => false;
-				VERDICT_Properties::systemAccessControl => false;
+				VERDICT_Properties::pedigree => COTS;
 			};
 			
 			connector: system Connector
 			{
 				-- VERDICT Component Properties
-				VERDICT_Properties::componentType => Hybrid;
-				VERDICT_Properties::insideTrustedBoundary => true;
+			 	VERDICT_Properties::componentType => Hybrid;			 	
 			 	VERDICT_Properties::pedigree => COTS;
-			 	--VERDICT_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
-				
-				VERDICT_Properties::adversariallyTested => false;
 			};
 			
 		connections
 			c1: port positionEstimator.pos_est_est_pos -> navigation.nav_est_pos
-			{VERDICT_Properties::connectionType => Trusted;};			
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c1b: port deliveryPlanner.launch_pos -> gnc.gnc_launch_pos
-			{VERDICT_Properties::connectionType => Trusted;};			
+			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c2: port navigation.nav_move -> fc.fc_move
 			{VERDICT_Properties::connectionType => Trusted;};
@@ -300,7 +253,11 @@ public
 			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c10: port deliveryPlanner.dp_radio_cmd -> radio.rd_radio_in
-			{VERDICT_Properties::connectionType => Trusted;};
+		    {VERDICT_Properties::connectionType => Trusted;
+			 VERDICT_Properties::deviceAuthentication => false;
+			 VERDICT_Properties::encryptedTransmission => false;
+			 VERDICT_Properties::sessionAuthenticity => false;
+			};
 			
 			c11: port radio.rd_radio_out -> deliveryPlanner.dp_radio_response
 			{VERDICT_Properties::connectionType => Trusted;};
@@ -318,7 +275,7 @@ public
 			{VERDICT_Properties::connectionType => Trusted;};
 			
 			c16: port dds_comm1 -> radio.rd_comm_in
-			{VERDICT_Properties::connectionType => Trusted;};
+			{VERDICT_Properties::connectionType => Untrusted;};
 			
 			c17: port radio.rd_comm_out -> dds_comm2
 			{VERDICT_Properties::connectionType => Trusted;};
@@ -333,7 +290,7 @@ public
 			{VERDICT_Properties::connectionType => Trusted;};	
 
 			c22: port dds_satellite0_sig_pos -> gnc.gnc_satellite0_pos
-			{VERDICT_Properties::connectionType => Trusted;};
+			{VERDICT_Properties::connectionType => Untrusted;};
 			
 			c23: port dds_satellite1_sig_pos -> gnc.gnc_satellite1_pos
 			{VERDICT_Properties::connectionType => Trusted;};
@@ -400,11 +357,11 @@ public
 			
 			c44: port deliveryPlanner.dp_probe_abort_mode -> dds_probe_abort_mode
 			{VERDICT_Properties::connectionType => Trusted;};
-			
 		properties 
 			VERDICT_Properties::componentType => Hybrid;
 			VERDICT_Properties::pedigree => COTS;
-			VERDICT_Properties::adversariallyTested => false;												
+			VERDICT_Properties::adversariallyTested => false;			
+												
 	end DeliveryDroneSystem.impl;
 	
 end DeliveryDrone;

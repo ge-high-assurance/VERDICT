@@ -1,8 +1,9 @@
 ThreatEffect {
 	id = "Content Spoofing"
-	entities = {s : system | s.category = GPSCat 
-							 or s.category = IMUCat 
-							 or s.category = LIDARCat}
+	entities = {s : system | (s.category = GPS 
+							 or s.category = IMU 
+							 or s.category = LIDAR) 
+							 and (exists c : connection, s.incomingConnections contains c and  c.connectionType = Untrusted)}
 	reference = "CAPEC-148"
 	
 	description = "An adversary modifies content to make it contain something other than what the original 
@@ -19,88 +20,85 @@ ThreatEffect {
 					privacy violations, and other unwanted outcomes."
 };
 
+ThreatEffect {
+	id = "Network Injection"
+	entities = {s : system | 
+					(exists c : connection, 
+						s.incomingConnections contains c and 
+						c.connectionType = Untrusted and 
+						c.srcComp.insideTrustedBoundary = false and
+						c.deviceAuthentication = false 
+						 	 and c.encryptedTransmission = false
+						 	 and c.sessionAuthenticity = false)}
+	reference = "CAPEC-594"	
+	description = "An adversary injects traffic into the target's network connection. 
+				   The adversary is therefore able to degrade or disrupt the connection, 
+				   and potentially modify the content. This is not a flooding attack, 
+                   as the adversary is not focusing on exhausting resources. Instead, 
+                   the adversary is crafting a specific input to affect the system 
+                   in a particular way. (Traffic Injection)"
+};
+
+ThreatEffect {
+	id = "Logic Bomb"
+	entities = {s : system | (s.componentType = Software 
+							     or s.componentType = Hybrid) 
+							  and (s.pedigree = COTS 
+							  	  or (s.pedigree = Sourced 
+							  	  	  and s.supplyChainSecurity = false 
+							  	  	  and s.tamperProtection = false))
+							  and s.adversariallyTested = false
+							  and s.staticCodeAnalysis = false}
+	reference = "CAPEC-441"	
+	description = "An adversary installs or adds malicious logic (also known as malware) 
+				   into a seemingly benign component of a fielded system. This logic is 
+                   often hidden from the user of the system and works behind the scenes 
+                   to achieve negative impacts. With the proliferation of mass digital 
+                   storage and inexpensive multimedia devices, Bluetooth and 802.11 support, 
+                   new attack vectors for spreading malware are emerging for things we once 
+                   thought of as innocuous greeting cards, picture frames, or digital projectors. 
+                   This pattern of attack focuses on systems already fielded and used 
+                   in operation as opposed to systems and their components that are 
+                   still under development and part of the supply chain. (Malicious Logic Insertion)"
+};
 
 
---ThreatEffect {
---	id = "Network Injection"
---	entities = {s : system | 
---					(exists c : connection, 
---						s.incomingConnections contains c and 
---						c.connectionType = Untrusted and 
---						c.srcComp.insideTrustedBoundary = false and
---						(c.srcComp.strongCryptoAlgorithms = false
---						 or (c.deviceAuthentication = false 
---						 	 and c.encryptedTransmission = false
---						 	 and c.sessionAuthenticity = false)))
---	}
---	reference = "CAPEC-594"	
---	description = "An adversary injects traffic into the target's network connection. 
---				   The adversary is therefore able to degrade or disrupt the connection, 
---				   and potentially modify the content. This is not a flooding attack, 
---                   as the adversary is not focusing on exhausting resources. Instead, 
---                   the adversary is crafting a specific input to affect the system 
---                   in a particular way. (Traffic Injection)"
---};
---
---ThreatEffect {
---	id = "Logic Bomb"
---	entities = {s : system | (s.componentType = Software 
---							     or s.componentType = Hybrid) 
---							  and (s.pedigree = COTS 
---							  	  or (s.pedigree = Sourced 
---							  	  	  and s.supplyChainSecurity = false 
---							  	  	  and s.tamperProtection = false))
---							  and s.adversariallyTested = false
---							  and s.staticCodeAnalysis = false}
---	reference = "CAPEC-441"	
---	description = "An adversary installs or adds malicious logic (also known as malware) 
---				   into a seemingly benign component of a fielded system. This logic is 
---                   often hidden from the user of the system and works behind the scenes 
---                   to achieve negative impacts. With the proliferation of mass digital 
---                   storage and inexpensive multimedia devices, Bluetooth and 802.11 support, 
---                   new attack vectors for spreading malware are emerging for things we once 
---                   thought of as innocuous greeting cards, picture frames, or digital projectors. 
---                   This pattern of attack focuses on systems already fielded and used 
---                   in operation as opposed to systems and their components that are 
---                   still under development and part of the supply chain. (Malicious Logic Insertion)"
---};
---
---
---ThreatEffect {
---	id = "Remote Code Injection"
---	entities = {s : system | (s.componentType = Software or s.componentType = Hybrid) 
---							  and (s.pedigree = Sourced or s.pedigree = COTS)
---							  and (exists c : connection, 
---							  		s.incomingConnections contains c
---							  		and c.srcComp.insideTrustedBoundary = false
---							  		and (not (c.srcComp.componentType = Hardware))  
---							  		and (c.srcComp.pedigree = COTS 
---							  			or (c.deviceAuthentication = false
---							  				and c.encryptedTransmission = false
---							  				and c.sessionAuthenticity = false)
---							  		))
---							  and (s.inputValidation = false or s.memoryProtection = false
---							  	   or s.secureBoot = false)}
---	reference = "CAPEC-242"	
---	description = "The target software does not validate user-controlled 
---				   input such that the execution of a process may be altered 
---                   by sending code in through legitimate data channels, using 
---                   no other mechanism. (Code Injection)"
---};
---
---ThreatEffect {
---	id = "Hardware Trojan"
---	entities = {s : system | (s.componentType = Hardware or s.componentType = Hybrid) 
---							  and ((s.pedigree = Sourced and s.supplyChainSecurity = false 
---							  	   and s.tamperProtection = false) or s.pedigree = COTS)}
---	reference = "CAPEC-438, CAPEC-439, CAPEC-440"
---	description = "An adversary exploits a weakness in the system production or 
---				   maintenance process and causes a change to be made to a 
---				   technology, product, component, or sub-component or a new 
---				   one installed during its deployed use at the victim location 
---				   for the purpose of carrying out an attack. (Modification 
---				   During Manufacture, Distribution, and Maintenance)"
---};
+ThreatEffect {
+	id = "Remote Code Injection"
+	entities = {s : system | (s.componentType = Software or s.componentType = Hybrid) 
+							  and (s.pedigree = Sourced or s.pedigree = COTS)
+							  and (exists c : connection, 
+							  		s.incomingConnections contains c
+							  		and c.srcComp.insideTrustedBoundary = false
+							  		and (not (c.srcComp.componentType = Hardware))  
+							  		and (c.srcComp.pedigree = COTS 
+							  			or (c.deviceAuthentication = false
+							  				and c.encryptedTransmission = false
+							  				and c.sessionAuthenticity = false)
+							  		))
+							  and (s.inputValidation = false or s.memoryProtection = false
+							  	   or s.secureBoot = false)}
+	reference = "CAPEC-242"	
+	description = "The target software does not validate user-controlled 
+				   input such that the execution of a process may be altered 
+                   by sending code in through legitimate data channels, using 
+                   no other mechanism. (Code Injection)"
+};
+
+ThreatEffect {
+	id = "Hardware Trojan"
+	entities = {s : system | (s.componentType = Hardware or s.componentType = Hybrid) 
+							  and ((s.pedigree = Sourced and s.supplyChainSecurity = false 
+							  	   and s.tamperProtection = false) or s.pedigree = COTS)}
+	reference = "CAPEC-438, CAPEC-439, CAPEC-440"
+	description = "An adversary exploits a weakness in the system production or 
+				   maintenance process and causes a change to be made to a 
+				   technology, product, component, or sub-component or a new 
+				   one installed during its deployed use at the victim location 
+				   for the purpose of carrying out an attack. (Modification 
+				   During Manufacture, Distribution, and Maintenance)"
+};
+
 
 ThreatDefense {
 	id = "Heterogeneity"
@@ -108,17 +106,17 @@ ThreatDefense {
 	reference = "SC-39"
 }
 
---ThreatDefense {
---	id = "Device Identification and Authentication"
---	threats = "Network Injection", "Remote Code Injection", "Logic Bomb"
---	reference = "IA-3"
---}
---
---ThreatDefense {
---	id = "Supply Chain Protection"
---	threats = "Hardware Trojan"
---	reference = "SA-12"
---}
+ThreatDefense {
+	id = "Device Identification and Authentication"
+	threats = "Network Injection", "Remote Code Injection", "Logic Bomb"
+	reference = "IA-3"
+}
+
+ThreatDefense {
+	id = "Supply Chain Protection"
+	threats = "Hardware Trojan"
+	reference = "SA-12"
+}
 
 
 
