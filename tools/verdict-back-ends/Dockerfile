@@ -38,7 +38,7 @@ RUN opam switch 4.07 \
     camlp4 \
     core \
     core_extended \
-    menhir \
+    menhir<=20200211 \
     num \
     ocamlbuild \
     ocamlfind \
