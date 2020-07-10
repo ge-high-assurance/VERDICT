@@ -1,17 +1,6 @@
 package com.ge.verdict.synthesis;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.commons.math3.fraction.Fraction;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Arrays;
-import org.junit.Test;
-
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
@@ -20,6 +9,7 @@ import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import com.ge.verdict.attackdefensecollector.model.CIA;
+import com.ge.verdict.attackdefensecollector.model.CyberReq;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.synthesis.VerdictSynthesis.Approach;
 import com.ge.verdict.synthesis.dtree.ALeaf;
@@ -29,6 +19,16 @@ import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.apache.commons.math3.fraction.Fraction;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class VerdictSynthesisTest {
     private <T> String stringOfIterable(Iterable<T> it) {
@@ -111,9 +111,9 @@ public class VerdictSynthesisTest {
         int targetDal = 1;
 
         List<ComponentDefense> leaves = new ArrayList<>();
-        DLeaf leafA = new DLeaf("A", "A", "A", 0, targetDal, costs, factory, false);
-        DLeaf leafB = new DLeaf("B", "B", "B", 0, targetDal, costs, factory, false);
-        DLeaf leafC = new DLeaf("C", "C", "C", 0, targetDal, costs, factory, false);
+        DLeaf leafA = new DLeaf("A", "A", "A", 0, targetDal, costs, factory, false, false);
+        DLeaf leafB = new DLeaf("B", "B", "B", 0, targetDal, costs, factory, false, false);
+        DLeaf leafC = new DLeaf("C", "C", "C", 0, targetDal, costs, factory, false, false);
         leaves.add(leafA.componentDefense);
         leaves.add(leafB.componentDefense);
         leaves.add(leafC.componentDefense);
@@ -206,7 +206,7 @@ public class VerdictSynthesisTest {
                 Optional<Pair<Set<ComponentDefense>, Double>> resultPartial =
                         VerdictSynthesis.performSynthesisSingle(
                                 DTreeConstructor.construct(
-                                        adtree, costModel, dal, true, factoryPartial),
+                                        adtree, costModel, dal, true, false, factoryPartial),
                                 dal,
                                 factoryPartial,
                                 approach);
@@ -221,7 +221,7 @@ public class VerdictSynthesisTest {
                 Optional<Pair<Set<ComponentDefense>, Double>> resultTotal =
                         VerdictSynthesis.performSynthesisSingle(
                                 DTreeConstructor.construct(
-                                        adtree, costModel, dal, false, factoryTotal),
+                                        adtree, costModel, dal, false, false, factoryTotal),
                                 dal,
                                 factoryTotal,
                                 approach);
@@ -241,10 +241,97 @@ public class VerdictSynthesisTest {
         DTree dtree = new DAnd(leaf1, leaf2);
 
         Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
-				VerdictSynthesis.performSynthesisMultiple(dtree, factory, false);
+                VerdictSynthesis.performSynthesisMultiple(dtree, factory, false, false);
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().left).hasSize(1);
         Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 4));
         Assertions.assertThat(result.get().right).isEqualTo(16);
+    }
+
+    @Test
+    public void meritAssignmentTest() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+        double[] costs1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        double[] costs2 = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11};
+        DLeaf leaf1 = new DLeaf("S1", "D1", "A1", 3, 3, costs1, factory);
+        DLeaf leaf2 = new DLeaf("S1", "D2", "A2", 3, 3, costs2, factory);
+        DTree dtree = new DOr(leaf1, leaf2);
+
+        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
+                VerdictSynthesis.performSynthesisMultiple(dtree, factory, true, false);
+        Assertions.assertThat(result.isPresent());
+        Assertions.assertThat(result.get().left).hasSize(2);
+        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 3));
+        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf2.componentDefense, 0));
+        Assertions.assertThat(result.get().right).isEqualTo(4);
+    }
+
+    @Test
+    public void biggerMeritAssignmentTest() {
+        CostModel costModel =
+                new CostModel(new File(getClass().getResource("meritCosts.xml").getPath()));
+
+        SystemModel system = new SystemModel("C1");
+
+        Attack attack1 =
+                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Defense defense1 = new Defense(attack1);
+        defense1.addDefenseClause(
+                Collections.singletonList(
+                        new Defense.DefenseLeaf(
+                                "D1",
+                                Optional.of(
+                                        new com.ge.verdict.attackdefensecollector.Pair<>(
+                                                "D1", 1)))));
+        Attack attack2 =
+                new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.I);
+        Defense defense2 = new Defense(attack2);
+        defense2.addDefenseClause(
+                Collections.singletonList(
+                        new Defense.DefenseLeaf(
+                                "D2",
+                                Optional.of(
+                                        new com.ge.verdict.attackdefensecollector.Pair<>(
+                                                "D2", 1)))));
+
+        ADTree adtree =
+                new ADAnd(
+                        new ADOr(new ADAnd(new ADNot(defense1), attack1)),
+                        new ADOr(new ADAnd(new ADNot(defense2), attack2)));
+
+        DLeaf.Factory factory = new DLeaf.Factory();
+
+        List<AttackDefenseCollector.Result> results =
+                Arrays.asList(
+                        new AttackDefenseCollector.Result(
+                                system,
+                                new CyberReq("req1", "mission1", 1, "port1", CIA.I),
+                                adtree,
+                                Prob.certain()));
+
+        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
+                VerdictSynthesis.performSynthesisMultiple(
+                        DTreeConstructor.construct(results, costModel, true, true, factory),
+                        factory,
+                        true,
+                        false);
+
+        Assertions.assertThat(result.isPresent());
+        Assertions.assertThat(result.get().left.size()).isEqualTo(2);
+        Assertions.assertThat(result.get().right).isEqualTo(1);
+    }
+
+    @Test
+    public void totalCostTest() {
+        double[] costs = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18};
+
+        DLeaf.Factory factory = new DLeaf.Factory();
+        new DLeaf("C1", "D1", "A1", 3, 7, costs, factory); // this one counts as 3*2
+        new DLeaf(
+                "C1", "D1", "A1", 3, 5, costs,
+                factory); // this one is a duplicate so it doesn't count
+        new DLeaf("C1", "D2", "A2", 4, 7, costs, factory); // this one counts as 4*2
+
+        Assertions.assertThat(VerdictSynthesis.totalImplCost(factory)).isEqualTo(new Fraction(14));
     }
 }

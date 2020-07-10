@@ -5,6 +5,7 @@ import com.ge.verdict.synthesis.util.Pair;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
+import com.microsoft.z3.IntNum;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -108,7 +109,13 @@ public class DLeaf implements DTree {
         public int normCostToDal(int normCost) {
             Integer val = normCostToDal.get(normCost);
             if (val == null) {
-                throw new RuntimeException("invalid normCost: " + normCost);
+                StringBuilder valid = new StringBuilder();
+                for (Integer key : normCostToDal.keySet()) {
+                    valid.append(key);
+                    valid.append(",");
+                }
+                throw new RuntimeException(
+                        "invalid normCost: " + normCost + ", valid: " + valid.toString());
             }
             return val;
         }
@@ -195,7 +202,8 @@ public class DLeaf implements DTree {
             int targetDal,
             CostModel costModel,
             Factory factory,
-            boolean usePartialSolution) {
+            boolean usePartialSolution,
+            boolean meritAssignment) {
 
         double implCost = costModel.cost(defenseProperty, component, implDal);
 
@@ -203,7 +211,10 @@ public class DLeaf implements DTree {
         for (int dal = 0; dal < costs.length; dal++) {
             double targetCost = costModel.cost(defenseProperty, component, dal);
             // this handles if implDal > targetDal
-            costs[dal] = usePartialSolution ? Math.max(targetCost - implCost, 0) : targetCost;
+            costs[dal] =
+                    usePartialSolution && !meritAssignment
+                            ? Math.max(targetCost - implCost, 0)
+                            : targetCost;
         }
 
         componentDefense =
@@ -244,9 +255,9 @@ public class DLeaf implements DTree {
 
     @Override
     public BoolExpr toZ3Multi(Context context) {
-        return context.mkGe(
-                componentDefense.toZ3Multi(context),
-                context.mkInt(componentDefense.dalToNormCost(targetDal)));
+        ArithExpr var = componentDefense.toZ3Multi(context);
+        IntNum target = context.mkInt(componentDefense.dalToNormCost(targetDal));
+        return context.mkGe(var, target);
     }
 
     @Override

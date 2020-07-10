@@ -131,6 +131,9 @@ public class MBASSynthesisHandler extends AbstractHandler {
 		if (MBASSettingsPanel.usePartialSolution) {
 			command.arg("-p");
 		}
+		if (MBASSettingsPanel.performMeritAssignment) {
+			command.arg("-m");
+		}
 
 		int code = command.runJarOrImage();
 		return code == 0;

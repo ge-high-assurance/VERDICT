@@ -26,6 +26,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 	public static boolean cyberInference = false;
 	public static boolean safetyInference = false;
 	public static boolean usePartialSolution = false;
+	public static boolean performMeritAssignment = false;
 
 	private Font font;
 	private Font boldFont;
@@ -89,6 +90,11 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		partialSolution.setFont(font);
 		partialSolution.setSelection(usePartialSolution);
 
+		Button meritAssignment = new Button(selectionButtonGroup, SWT.CHECK);
+		meritAssignment.setText("Merit Assignment for Synthesis");
+		meritAssignment.setFont(font);
+		meritAssignment.setSelection(performMeritAssignment);
+
 		Group selDeAllButtons = new Group(composite, SWT.NONE);
 		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		selDeAllButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
@@ -102,6 +108,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 				cyberButton.setSelection(true);
 				safetyButton.setSelection(true);
 				partialSolution.setSelection(true);
+				meritAssignment.setSelection(true);
 			}
 		});
 
@@ -114,6 +121,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 				cyberButton.setSelection(false);
 				safetyButton.setSelection(false);
 				partialSolution.setSelection(false);
+				meritAssignment.setSelection(false);
 			}
 		});
 
@@ -146,6 +154,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 				cyberInference = cyberButton.getSelection();
 				safetyInference = safetyButton.getSelection();
 				usePartialSolution = partialSolution.getSelection();
+				performMeritAssignment = meritAssignment.getSelection();
 				composite.getShell().close();
 			}
 		});

@@ -83,7 +83,7 @@ public class DTreeConstructorTest {
                                                                                         factory)))))))));
 
         Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, factory)
+                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
                                 .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
@@ -104,7 +104,7 @@ public class DTreeConstructorTest {
         DTree dtree = new ALeaf(attack1);
 
         Assertions.assertThat(
-                        DTreeConstructor.construct(attack1, dummyCosts, dal, false, factory)
+                        DTreeConstructor.construct(attack1, dummyCosts, dal, false, false, factory)
                                 .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
@@ -144,7 +144,7 @@ public class DTreeConstructorTest {
                                 new ALeaf(attack2)));
 
         Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, factory)
+                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
                                 .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
@@ -181,7 +181,7 @@ public class DTreeConstructorTest {
                         new DOr(new DAnd(new DLeaf("S1", "D2", "A2", 0, dal, costs, factory))));
 
         Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, true, factory)
+                        DTreeConstructor.construct(adtree, dummyCosts, dal, true, false, factory)
                                 .prepare()
                                 .get()
                                 .prettyPrint())
@@ -229,6 +229,7 @@ public class DTreeConstructorTest {
                                                         5,
                                                         dummyCosts,
                                                         factory,
+                                                        false,
                                                         false)))),
                         new DOr(
                                 new DOr(
@@ -241,10 +242,11 @@ public class DTreeConstructorTest {
                                                         7,
                                                         dummyCosts,
                                                         factory,
+                                                        false,
                                                         false)))));
 
         Assertions.assertThat(
-                        DTreeConstructor.construct(results, dummyCosts, false, factory)
+                        DTreeConstructor.construct(results, dummyCosts, false, false, factory)
                                 .prepare()
                                 .get()
                                 .prettyPrint())

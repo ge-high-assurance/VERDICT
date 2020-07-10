@@ -72,6 +72,8 @@ public class CostModel {
     public double cost(String defense, String component, int dal) {
         // If DAL is not specified, we default to using DAL to linearly scale cost
 
+        // System.out.println("Loading cost: " + defense + ", " + component + ", " + dal);
+
         Double lookup = compDefDalModel.get(new Triple<>(component, defense, dal));
         if (lookup != null) {
             return lookup;

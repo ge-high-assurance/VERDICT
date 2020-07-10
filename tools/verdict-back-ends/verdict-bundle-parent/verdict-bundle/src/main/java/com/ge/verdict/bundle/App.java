@@ -163,6 +163,7 @@ public class App {
         // TODO don't have a good short option because "s" is already taken
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
         options.addOption("p", false, "Use partial solutions in synthesis");
+        options.addOption("m", false, "Perform merit assignment in synthesis");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -218,6 +219,7 @@ public class App {
                 "      --synthesis <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
         helpLine("      -p ................... synthesis partial solutions");
+        helpLine("      -m ................... synthesis merit assignment");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
@@ -277,7 +279,8 @@ public class App {
             if (csvProjectName != null) {
                 if (opts.hasOption("y")) {
                     String costModelPath = opts.getOptionValue("y");
-                    boolean partialSolution = opts.hasOption("p");
+                    boolean meritAssignment = opts.hasOption("m");
+                    boolean partialSolution = opts.hasOption("p") || meritAssignment;
 
                     runMbasSynthesis(
                             csvProjectName,
@@ -287,6 +290,7 @@ public class App {
                             cyberInference,
                             safetyInference,
                             partialSolution,
+                            meritAssignment,
                             costModelPath);
                 } else {
                     runMbas(
@@ -509,6 +513,7 @@ public class App {
             boolean cyberInference,
             boolean safetyInference,
             boolean partialSolution,
+            boolean meritAssignment,
             String costModelPath)
             throws VerdictRunException {
 
@@ -577,28 +582,71 @@ public class App {
             List<AttackDefenseCollector.Result> results = collector.perform();
 
             DLeaf.Factory factory = new DLeaf.Factory();
-            DTree dtree = DTreeConstructor.construct(results, costModel, partialSolution, factory);
+            DTree dtree =
+                    DTreeConstructor.construct(
+                            results, costModel, partialSolution, meritAssignment, factory);
             Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
-                    VerdictSynthesis.performSynthesisMultiple(dtree, factory);
+                    VerdictSynthesis.performSynthesisMultiple(
+                            dtree, factory, meritAssignment, false);
 
             if (selected.isPresent()) {
-                System.out.println("Synthesis results:");
+                log("Synthesis results:");
                 for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
-                    // if using partial solutions, don't report already-implemented defenses
-                    if (!(partialSolution && pair.left.implDal >= pair.right)) {
-                        log(
-                                "Selected: "
-                                        + pair.left.defenseProperty
-                                        + " for "
-                                        + pair.left.component
-                                        + " to DAL "
-                                        + pair.right
-                                        + (partialSolution && pair.left.implDal > 0
-                                                ? " (upgrading from DAL " + pair.left.implDal + ")"
-                                                : ""));
+                    if (meritAssignment) {
+                        // Only report downgraded DALs
+                        if (pair.right < pair.left.implDal) {
+                            if (pair.right == 0) {
+                                log(
+                                        "Remove: "
+                                                + pair.left.defenseProperty
+                                                + " for "
+                                                + pair.left.component
+                                                + " (was DAL "
+                                                + pair.left.implDal
+                                                + ")");
+                            } else {
+                                log(
+                                        "Downgrade: "
+                                                + pair.left.defenseProperty
+                                                + " for "
+                                                + pair.left.component
+                                                + " to DAL "
+                                                + pair.right
+                                                + " (from DAL "
+                                                + pair.left.implDal
+                                                + ")");
+                            }
+                        }
+                    } else {
+                        // if using partial solutions, don't report already-implemented defenses
+                        if (!(partialSolution && pair.left.implDal >= pair.right)) {
+                            log(
+                                    "Selected: "
+                                            + pair.left.defenseProperty
+                                            + " for "
+                                            + pair.left.component
+                                            + " to DAL "
+                                            + pair.right
+                                            + (partialSolution && pair.left.implDal > 0
+                                                    ? " (upgrading from DAL "
+                                                            + pair.left.implDal
+                                                            + ")"
+                                                    : ""));
+                        }
                     }
                 }
-                log("Total cost: " + selected.get().right);
+
+                if (meritAssignment) {
+                    double originalCost = VerdictSynthesis.totalImplCost(factory).doubleValue();
+                    log(
+                            "Saved cost: "
+                                    + (originalCost - selected.get().right)
+                                    + " (original cost: "
+                                    + originalCost
+                                    + ")");
+                } else {
+                    log("Total cost: " + selected.get().right);
+                }
             } else {
                 logError("Synthesis failed");
             }

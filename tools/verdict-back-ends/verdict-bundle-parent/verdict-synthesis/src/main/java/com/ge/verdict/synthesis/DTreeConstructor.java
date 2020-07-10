@@ -37,7 +37,12 @@ public class DTreeConstructor {
             List<AttackDefenseCollector.Result> results,
             CostModel costModel,
             boolean usePartialSolution,
+            boolean meritAssignment,
             DLeaf.Factory factory) {
+        if (meritAssignment && !usePartialSolution) {
+            throw new RuntimeException(
+                    "Cannot enable merit assignment without also enabling partial solutions!");
+        }
         return new DAnd(
                 results.stream()
                         .map(
@@ -47,6 +52,7 @@ public class DTreeConstructor {
                                                 costModel,
                                                 result.cyberReq.getSeverityDal(),
                                                 usePartialSolution,
+                                                meritAssignment,
                                                 factory))
                         .collect(Collectors.toList()));
     }
@@ -66,8 +72,10 @@ public class DTreeConstructor {
             CostModel costModel,
             int targetDal,
             boolean usePartialSolution,
+            boolean meritAssignment,
             DLeaf.Factory factory) {
-        return (new DTreeConstructor(costModel, targetDal, usePartialSolution, factory))
+        return (new DTreeConstructor(
+                        costModel, targetDal, usePartialSolution, meritAssignment, factory))
                 .perform(adtree);
     }
 
@@ -75,16 +83,22 @@ public class DTreeConstructor {
     private final DLeaf.Factory factory;
     private final int targetDal;
     private final boolean usePartialSolution;
+    private final boolean meritAssignment;
 
     private final Set<Defense> defenses;
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
 
     private DTreeConstructor(
-            CostModel costModel, int dal, boolean usePartialSolution, DLeaf.Factory factory) {
+            CostModel costModel,
+            int dal,
+            boolean usePartialSolution,
+            boolean meritAssignment,
+            DLeaf.Factory factory) {
         this.costModel = costModel;
         this.factory = factory;
         this.targetDal = dal;
         this.usePartialSolution = usePartialSolution;
+        this.meritAssignment = meritAssignment;
 
         defenses = new LinkedHashSet<>();
         attackALeafMap = new LinkedHashMap<>();
@@ -204,6 +218,7 @@ public class DTreeConstructor {
                 targetDal,
                 costModel,
                 factory,
-                usePartialSolution);
+                usePartialSolution,
+                meritAssignment);
     }
 }
