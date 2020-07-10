@@ -128,14 +128,26 @@ public class BlameAssignment {
                     for (Component cmp : mina.getComponents()) {
 
                         if (cmp.isCompromised()) {
-                            Attack attack =
+                        	List<Attack> attacks =
                                     applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
-                            attack.setAttackDescription(attack.getAttackDescription());
-                            violated_property.setApplicableThreat(attack);
-
-                            if (attack.getAttackId() != null) {
-                                break;
+//                            attack.setAttackDescription(attack.getAttackDescription());
+                            //
+                            // violated_property.setApplicableThreat(attack);
+                            for (Attack attack_found: attacks) {
+                            	boolean present = false;
+                            	for(Attack eAttack: violated_property.getApplicableThreat()) {
+                            		if(attack_found.getAttackId().equals(eAttack.getAttackId())) {
+                            			present = true;
+                            		}
+                            	}
+                            	if(!present) {
+                            		violated_property.getApplicableThreat().add(attack_found);
+                            	}
                             }
+
+                            //                            if (attack.getAttackId() != null) {
+                            //                                break;
+                            //                            }
                         }
                     }
 
@@ -147,15 +159,27 @@ public class BlameAssignment {
                         // link.getLinkID());
                         if (link.isCompromised()) {
 
-                            Attack attack =
+                            List<Attack> attacks =
                                     applicableAttack(
                                             link_to_port(link.getLinkID()), intrumented_cmp_link);
-                            attack.setAttackDescription(attack.getAttackDescription());
-                            violated_property.setApplicableThreat(attack);
-
-                            if (attack.getAttackId() != null) {
-                                break;
+//                            attack.setAttackDescription(attack.getAttackDescription());
+                            //
+                            // violated_property.setApplicableThreat(attack);
+                            for (Attack attack_found: attacks) {
+                            	boolean present = false;
+                            	for(Attack eAttack: violated_property.getApplicableThreat()) {
+                            		if(attack_found.getAttackId().equals(eAttack.getAttackId())) {
+                            			present = true;
+                            		}
+                            	}
+                            	if(!present) {
+                            		violated_property.getApplicableThreat().add(attack_found);
+                            	}
                             }
+
+                            //                            if (attack.getAttackId() != null) {
+                            //                                break;
+                            //                            }
                         }
                     }
 
@@ -165,7 +189,11 @@ public class BlameAssignment {
                     }
 
                     LOGGY.info("Failed Property: " + violated_property.getPropertyID());
-                    LOGGY.info("Applicable Attack: " + violated_property.getApplicableThreat());
+
+                    for (Attack atk : violated_property.getApplicableThreat()) {
+                        LOGGY.info("Applicable Attack: " + atk.getAttackId());
+                    }
+
                     LOGGY.info("MinA: " + violated_property.getMinA());
                     LOGGY.info("-------------------------------------------------------");
 
@@ -206,10 +234,10 @@ public class BlameAssignment {
     }
 
     // AttackID, Component Set
-    private Attack applicableAttack(
+    private List<Attack> applicableAttack(
             String cmp_link_id, HashMap<String, HashSet<String>> intrumented_cmp_link) {
 
-        Attack app_attack = new Attack();
+        List<Attack> attacks = new ArrayList<Attack>();
 
         //        System.out.println("Matching ID: " + cmp_link_id);
         for (String attack_id : intrumented_cmp_link.keySet()) {
@@ -224,15 +252,19 @@ public class BlameAssignment {
 
                 //                System.out.println("MATCHED: " + attack_id + " >>>>>>>>>>> " +
                 // cmp_link_id);
-
+            	Attack app_attack = new Attack();
+            	
                 AttackType type = AttackType.valueOf(attack_id);
                 app_attack.setAttackId(type);
-                // app_attack.setAttackDescription();
-                break;
+                app_attack.setAttackDescription(app_attack.getAttackDescription());
+                
+                attacks.add(app_attack);
+                
+//                break;
             }
         }
 
-        return app_attack;
+        return attacks;
     }
 
     private void rename_link(Link selected_link) {
