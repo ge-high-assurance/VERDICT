@@ -17,28 +17,30 @@
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-attack-defense-collector</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft</groupId>
-            <artifactId>z3</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.logicng</groupId>
-            <artifactId>logicng</artifactId>
-            <version>1.6.2</version>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>z3-native-libs</artifactId>
+            <classifier>api</classifier>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.logicng</groupId>
+            <artifactId>logicng</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>z3-native-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>javax.activation</artifactId>
@@ -63,11 +65,53 @@
 
     <build>
         <plugins>
+            <!-- Unpack z3-native-libs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-native-libs</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeClassifiers>api</excludeClassifiers>
+                            <excludes>META-INF/</excludes>
+                            <includeArtifactIds>z3-native-libs</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/native-libs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Run unit tests with native libs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <environmentVariables>
+                        <DYLD_LIBRARY_PATH>${project.build.directory}/native-libs</DYLD_LIBRARY_PATH>
+                        <LD_LIBRARY_PATH>${project.build.directory}/native-libs</LD_LIBRARY_PATH>
+                        <PATH>${project.build.directory}/native-libs${path.separator}${env.PATH}</PATH>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
+            <!-- Add native libs to capsule -->
             <plugin>
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
                     <appClass>com.ge.verdict.synthesis.App</appClass>
+                    <caplets>SharedLibraryPathCapsule</caplets>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.build.directory}/native-libs</directory>
+                            <includes>
+                                <include>*</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>

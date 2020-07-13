@@ -15,13 +15,10 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class App {
-    /*
-     * Note: currently must set LD_LIBRARY_PATH. For testing purposes
-     * this can be done in Eclipse run configurations, but we will have
-     * to figure this out in a cross-platform way and also set it up
-     * in the Docker image.
-     */
 
+    /*
+     * Note: please specify how to run this app for testing purposes.
+     */
     public static void main(String[] args) {
         if (args.length < 2) {
             throw new RuntimeException("Must specify STEM output directory and cost model XML!");

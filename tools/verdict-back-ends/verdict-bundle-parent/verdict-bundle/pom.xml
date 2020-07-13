@@ -20,6 +20,10 @@
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-attack-defense-collector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
         </dependency>
         <dependency>
@@ -36,11 +40,11 @@
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-test-instrumentor</artifactId>
+            <artifactId>verdict-synthesis</artifactId>
         </dependency>
         <dependency>
-            <groupId>edu.uiowa.clc.verdict.vdm</groupId>
-            <artifactId>iml-verdict-translator</artifactId>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-test-instrumentor</artifactId>
         </dependency>
         <dependency>
             <groupId>edu.uiowa.clc.verdict.blm</groupId>
@@ -51,12 +55,8 @@
             <artifactId>verdict-crv</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-attack-defense-collector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-synthesis</artifactId>
+            <groupId>edu.uiowa.clc.verdict.vdm</groupId>
+            <artifactId>iml-verdict-translator</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -68,6 +68,11 @@
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>z3-native-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
@@ -76,11 +81,41 @@
 
     <build>
         <plugins>
+            <!-- Unpack z3-native-libs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-native-libs</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeClassifiers>api</excludeClassifiers>
+                            <excludes>META-INF/</excludes>
+                            <includeArtifactIds>z3-native-libs</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/native-libs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Add native libs to capsule -->
             <plugin>
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
                     <appClass>com.ge.verdict.bundle.App</appClass>
+                    <caplets>SharedLibraryPathCapsule</caplets>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.build.directory}/native-libs</directory>
+                            <includes>
+                                <include>*</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>
