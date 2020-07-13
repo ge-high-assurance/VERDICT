@@ -11,11 +11,6 @@
     <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
     <packaging>eclipse-plugin</packaging>
     
-    <dependencies>
-        <!-- JAXB dependencies needed only under Java 9 or later -->
-        <!-- Dependencies needed only by tests -->
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
