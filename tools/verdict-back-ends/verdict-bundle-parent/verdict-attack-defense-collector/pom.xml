@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-data-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.logicng</groupId>
             <artifactId>logicng</artifactId>
         </dependency>

@@ -1,17 +1,5 @@
 package com.ge.verdict.attackdefensecollector;
 
-import com.ge.verdict.attackdefensecollector.adtree.ADOr;
-import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
-import com.ge.verdict.attackdefensecollector.model.CIA;
-import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
-import com.ge.verdict.attackdefensecollector.model.CyberExpr;
-import com.ge.verdict.attackdefensecollector.model.CyberOr;
-import com.ge.verdict.attackdefensecollector.model.CyberRel;
-import com.ge.verdict.attackdefensecollector.model.CyberReq;
-import com.ge.verdict.attackdefensecollector.model.PortConcern;
-import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +13,31 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
+import com.ge.verdict.attackdefensecollector.adtree.ADTree;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.model.CIA;
+import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
+import com.ge.verdict.attackdefensecollector.model.CyberAnd;
+import com.ge.verdict.attackdefensecollector.model.CyberExpr;
+import com.ge.verdict.attackdefensecollector.model.CyberNot;
+import com.ge.verdict.attackdefensecollector.model.CyberOr;
+import com.ge.verdict.attackdefensecollector.model.CyberRel;
+import com.ge.verdict.attackdefensecollector.model.CyberReq;
+import com.ge.verdict.attackdefensecollector.model.PortConcern;
+import com.ge.verdict.attackdefensecollector.model.SystemModel;
+import com.ge.verdict.vdm.VdmTranslator;
+
+import verdict.vdm.vdm_model.CIAPort;
+import verdict.vdm.vdm_model.ComponentImpl;
+import verdict.vdm.vdm_model.ComponentInstance;
+import verdict.vdm.vdm_model.ComponentType;
+import verdict.vdm.vdm_model.Connection;
+import verdict.vdm.vdm_model.Mission;
+import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Severity;
 
 /**
  * Main class of the attack-defense collector implementation.
@@ -121,18 +134,6 @@ public class AttackDefenseCollector {
         connections = new LinkedHashMap<>();
 
         // Load all the files as CSV
-        CSVFile capecCsv =
-                new CSVFile(
-                        new File(inputDir, "CAPEC.csv"),
-                        true,
-                        "CompType",
-                        "CompInst",
-                        "CAPEC",
-                        "CAPECDescription",
-                        "Confidentiality",
-                        "Integrity",
-                        "Availability",
-                        "LikelihoodOfSuccess");
         CSVFile compDepCsv =
                 new CSVFile(
                         new File(inputDir, "CompDep.csv"),
@@ -141,19 +142,6 @@ public class AttackDefenseCollector {
                         "InputCIA",
                         "OutputPort",
                         "OutputCIA");
-        CSVFile defensesCsv =
-                new CSVFile(
-                        new File(inputDir, "Defenses.csv"),
-                        true,
-                        "CompType",
-                        "CompInst",
-                        "CAPEC",
-                        "Confidentiality",
-                        "Integrity",
-                        "Availability",
-                        "ApplicableDefenseProperties",
-                        "ImplProperties",
-                        "DAL");
         CSVFile missionCsv =
                 new CSVFile(
                         new File(inputDir, "Mission.csv"),
@@ -169,13 +157,6 @@ public class AttackDefenseCollector {
                         "CompOutputDependency",
                         "DependentCompOutputCIA",
                         "ReqType");
-        CSVFile scnCompPropsCsv =
-                new CSVFile(
-                        new File(inputDir, "ScnCompProps.csv"),
-                        "Scenario",
-                        "Comp",
-                        "Impl",
-                        "CompInstance");
         CSVFile scnConnectionsCsv =
                 new CSVFile(
                         new File(inputDir, "ScnConnections.csv"),
@@ -397,6 +378,42 @@ public class AttackDefenseCollector {
             }
         }
 
+        loadAttacksDefenses(inputDir, connectionAttackNames);
+
+        if (inference) {
+            performInference();
+        }
+    }
+
+    private void loadAttacksDefenses(String inputDir, Map<String, String> connectionNameMap)
+            throws CSVFile.MalformedInputException, IOException {
+        // Load all the files as CSV
+        CSVFile capecCsv =
+                new CSVFile(
+                        new File(inputDir, "CAPEC.csv"),
+                        true,
+                        "CompType",
+                        "CompInst",
+                        "CAPEC",
+                        "CAPECDescription",
+                        "Confidentiality",
+                        "Integrity",
+                        "Availability",
+                        "LikelihoodOfSuccess");
+        CSVFile defensesCsv =
+                new CSVFile(
+                        new File(inputDir, "Defenses.csv"),
+                        true,
+                        "CompType",
+                        "CompInst",
+                        "CAPEC",
+                        "Confidentiality",
+                        "Integrity",
+                        "Availability",
+                        "ApplicableDefenseProperties",
+                        "ImplProperties",
+                        "DAL");
+
         // Load attacks
         for (CSVFile.RowData row : capecCsv.getRowDatas()) {
             String systemTypeName = row.getCell("CompType");
@@ -413,7 +430,7 @@ public class AttackDefenseCollector {
                             row.getCell("Availability"));
 
             if ("Connection".equals(systemTypeName)) {
-                String connectionName = connectionAttackNames.get(systemInstName);
+                String connectionName = connectionNameMap.get(systemInstName);
                 for (ConnectionModel connection : connections.get(connectionName)) {
                     connection
                             .getAttackable()
@@ -465,7 +482,7 @@ public class AttackDefenseCollector {
             List<Defense.DefenseLeaf> clause = new ArrayList<>();
 
             if ("Connection".equals(systemTypeName)) {
-                String connectionName = connectionAttackNames.get(systemInstName);
+                String connectionName = connectionNameMap.get(systemInstName);
                 for (ConnectionModel connection : connections.get(connectionName)) {
                     Defense defense =
                             connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
@@ -518,23 +535,42 @@ public class AttackDefenseCollector {
                 defense.addDefenseClause(clause);
             }
         }
+    }
 
-        if (inference) {
-            // Inference
-            int inferenceCounter = 0;
-            for (SystemModel system : systems.values()) {
-                // We can't check subcomponents because it isn't actually populated...
-                if (system.getCyberRels().isEmpty()
-                        && system.getInternalIncomingConnections().isEmpty()
-                        && system.getInternalOutgoingConnections().isEmpty()) {
-                    Logger.println("Inferring cyber relations for system " + system.getName());
-                    // We don't have explicit lists of ports, but we have the connections.
-                    // If a port is not mentioned in a connection, then it doesn't matter
-                    // anyway because it can't be traced.
-                    for (ConnectionModel outgoing : system.getOutgoingConnections()) {
-                        // For each of C, I, A, we have X -> X
-                        for (CIA cia : CIA.values()) {
-                            CyberExpr condition =
+    private void performInference() {
+        int inferenceCounter = 0;
+        for (SystemModel system : systems.values()) {
+            // We can't check subcomponents because it isn't actually populated...
+            if (system.getCyberRels().isEmpty()
+                    && system.getInternalIncomingConnections().isEmpty()
+                    && system.getInternalOutgoingConnections().isEmpty()) {
+                Logger.println("Inferring cyber relations for system " + system.getName());
+                // We don't have explicit lists of ports, but we have the connections.
+                // If a port is not mentioned in a connection, then it doesn't matter
+                // anyway because it can't be traced.
+                for (ConnectionModel outgoing : system.getOutgoingConnections()) {
+                    // For each of C, I, A, we have X -> X
+                    for (CIA cia : CIA.values()) {
+                        CyberExpr condition =
+                                new CyberOr(
+                                        system.getIncomingConnections().stream()
+                                                .map(
+                                                        incoming ->
+                                                                new PortConcern(
+                                                                        incoming
+                                                                                .getDestinationPortName(),
+                                                                        cia))
+                                                .collect(Collectors.toList()));
+                        system.addCyberRel(
+                                new CyberRel(
+                                        "_inference" + (inferenceCounter++),
+                                        condition,
+                                        new PortConcern(outgoing.getSourcePortName(), cia)));
+                    }
+                    // We also have I -> A
+                    system.addCyberRel(
+                            new CyberRel(
+                                    "_inference" + (inferenceCounter++),
                                     new CyberOr(
                                             system.getIncomingConnections().stream()
                                                     .map(
@@ -542,31 +578,260 @@ public class AttackDefenseCollector {
                                                                     new PortConcern(
                                                                             incoming
                                                                                     .getDestinationPortName(),
-                                                                            cia))
-                                                    .collect(Collectors.toList()));
-                            system.addCyberRel(
-                                    new CyberRel(
-                                            "_inference" + (inferenceCounter++),
-                                            condition,
-                                            new PortConcern(outgoing.getSourcePortName(), cia)));
-                        }
-                        // We also have I -> A
-                        system.addCyberRel(
-                                new CyberRel(
-                                        "_inference" + (inferenceCounter++),
-                                        new CyberOr(
-                                                system.getIncomingConnections().stream()
-                                                        .map(
-                                                                incoming ->
-                                                                        new PortConcern(
-                                                                                incoming
-                                                                                        .getDestinationPortName(),
-                                                                                CIA.I))
-                                                        .collect(Collectors.toList())),
-                                        new PortConcern(outgoing.getSourcePortName(), CIA.A)));
-                    }
+                                                                            CIA.I))
+                                                    .collect(Collectors.toList())),
+                                    new PortConcern(outgoing.getSourcePortName(), CIA.A)));
                 }
             }
+        }
+    }
+
+    public AttackDefenseCollector(File vdm, File inputDir, boolean inference)
+            throws CSVFile.MalformedInputException, IOException {
+        Model model = (new VdmTranslator()).unmarshalFromXml(vdm);
+
+        systems = new LinkedHashMap<>();
+        connections = new LinkedHashMap<>();
+
+        // Keep track of component instances associated with each component type and impl
+        Map<String, Set<SystemModel>> compTypeToSystem = new HashMap<>();
+        Map<String, Set<SystemModel>> compImplToSystem = new HashMap<>();
+
+        Map<String, String> connectionAttackNames = new HashMap<>();
+
+        // Load all instances as systems
+        for (ComponentImpl impl : model.getComponentImpl()) {
+            for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
+                SystemModel system = getSystem(inst.getName());
+                Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                if (inst.getImplementation() != null) {
+                    Util.putSetMap(compImplToSystem, inst.getImplementation().getName(), system);
+                }
+            }
+        }
+
+        List<SystemModel> topLevelSystemContenders = new ArrayList<>();
+
+        // Load top-level systems that don't exist as instances
+        for (ComponentImpl impl : model.getComponentImpl()) {
+            if (!compImplToSystem.containsKey(impl.getName())) {
+                SystemModel system = getSystem(impl.getName());
+                Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
+                Util.putSetMap(compImplToSystem, impl.getName(), system);
+
+                topLevelSystemContenders.add(system);
+            }
+        }
+
+        SystemModel topLevelSystem;
+
+        if (topLevelSystemContenders.isEmpty()) {
+            throw new RuntimeException("No top-level systems!");
+        } else if (topLevelSystemContenders.size() > 1) {
+            throw new RuntimeException(
+                    "Multiple top-level system contenders: "
+                            + String.join(
+                                    ", ",
+                                    topLevelSystemContenders.stream()
+                                            .map(SystemModel::getName)
+                                            .collect(Collectors.toList())));
+        } else {
+            topLevelSystem = topLevelSystemContenders.get(0);
+        }
+
+        for (ComponentImpl impl : model.getComponentImpl()) {
+            for (Connection conn : impl.getBlockImpl().getConnection()) {
+                boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
+                boolean internalOutgoing = conn.getDestination().getSubcomponentPort() == null;
+
+//                String sourcePort =
+//                        internalIncoming
+//                                ? conn.getSource().getComponentPort().getName()
+//                                : conn.getSource().getSubcomponentPort().getPort().getName();
+//                String destPort =
+//                        internalOutgoing
+//                                ? conn.getDestination().getComponentPort().getName()
+//                                : conn.getDestination().getSubcomponentPort().getPort().getName();
+
+				String sourcePort, destPort;
+				if (internalIncoming) {
+					sourcePort = conn.getSource().getComponentPort().getName();
+				} else {
+					if (conn.getSource().getSubcomponentPort().getPort() != null) {
+						sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
+					} else {
+						System.out.println("Null in port: " + conn.getName());
+						sourcePort = "null";
+					}
+				}
+				if (internalOutgoing) {
+					destPort = conn.getDestination().getComponentPort().getName();
+				} else {
+					if (conn.getDestination().getSubcomponentPort().getPort() != null) {
+						destPort = conn.getDestination().getSubcomponentPort().getPort().getName();
+					} else {
+						System.out.println("Null out port: " + conn.getName());
+						destPort = "null";
+					}
+				}
+
+                Collection<SystemModel> sources =
+                        internalIncoming
+                                ? compImplToSystem.get(impl.getName())
+                                : Collections.singleton(
+                                        getSystem(
+                                                conn.getSource()
+                                                        .getSubcomponentPort()
+                                                        .getSubcomponent()
+                                                        .getName()));
+                Collection<SystemModel> dests =
+                        internalOutgoing
+                                ? compImplToSystem.get(impl.getName())
+                                : Collections.singleton(
+                                        getSystem(
+                                                conn.getDestination()
+                                                        .getSubcomponentPort()
+                                                        .getSubcomponent()
+                                                        .getName()));
+
+                for (SystemModel source : sources) {
+                    for (SystemModel dest : dests) {
+                        ConnectionModel connection =
+                                new ConnectionModel(
+                                        conn.getName(),
+                                        resolver(source),
+                                        resolver(dest),
+                                        sourcePort,
+                                        destPort);
+
+//						System.out.println("ADDING CONNECTION " + conn.getName() + " from " + source.getName() + ":"
+//								+ sourcePort + " to " + dest.getName() + ":" + destPort);
+
+                        Util.putSetMap(connections, conn.getName(), connection);
+
+                        // Store connection in a different place depending on internal/external and
+                        // outgoing/incoming
+                        if (internalIncoming) {
+                            source.addIncomingInternalConnection(connection);
+                            dest.addIncomingConnection(connection);
+                        } else if (internalOutgoing) {
+                            source.addOutgoingConnection(connection);
+                            dest.addOutgoingInternalConnection(connection);
+                        } else {
+                            source.addOutgoingConnection(connection);
+                            dest.addIncomingConnection(connection);
+                        }
+                    }
+                }
+
+                connectionAttackNames.put(
+                        conn.getName() + impl.getName() + impl.getType().getName(), conn.getName());
+            }
+        }
+
+        for (ComponentType type : model.getComponentType()) {
+            for (verdict.vdm.vdm_model.CyberRel rel : type.getCyberRel()) {
+                for (SystemModel system : compTypeToSystem.get(type.getName())) {
+					if (rel.getInputs() != null) {
+						system.addCyberRel(new CyberRel(rel.getId(), convertCyberExpr(rel.getInputs()),
+								convertCIAPort(rel.getOutput())));
+					} else {
+						system.addCyberRel(new CyberRel(rel.getId(), convertCIAPort(rel.getOutput())));
+					}
+                }
+            }
+        }
+
+        Map<String, verdict.vdm.vdm_model.CyberReq> cyberReqMap = new HashMap<>();
+        Map<String, verdict.vdm.vdm_model.SafetyReq> safetyReqMap = new HashMap<>();
+
+        for (verdict.vdm.vdm_model.CyberReq req : model.getCyberReq()) {
+			cyberReqMap.put(req.getId(), req);
+        }
+
+        for (verdict.vdm.vdm_model.SafetyReq req : model.getSafetyReq()) {
+			safetyReqMap.put(req.getId(), req);
+        }
+
+        for (Mission mission : model.getMission()) {
+            for (String reqName : mission.getCyberReqs()) {
+                if (cyberReqMap.containsKey(reqName)) {
+                    verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
+                    topLevelSystem.addCyberReq(
+                            new CyberReq(
+									req.getId(),
+									mission.getId(),
+                                    convertSeverity(req.getSeverity()),
+                                    convertCyberExpr(req.getCondition())));
+
+                } else if (safetyReqMap.containsKey(reqName)) {
+                    verdict.vdm.vdm_model.SafetyReq req = safetyReqMap.get(reqName);
+                    // TODO support safety reqs
+                } else {
+                    throw new RuntimeException(
+                            "Undefined cyber/safety requirement \""
+                                    + reqName
+                                    + "\" in mission \""
+                                    + mission.getName()
+                                    + "\"");
+                }
+            }
+        }
+
+        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames);
+
+        if (inference) {
+            performInference();
+        }
+    }
+
+    public static CyberExpr convertCyberExpr(verdict.vdm.vdm_model.CyberExpr expr) {
+		if (expr.getAnd() != null) {
+			return new CyberAnd(expr.getAnd().getExpr().stream().map(AttackDefenseCollector::convertCyberExpr)
+					.collect(Collectors.toList()));
+		} else if (expr.getOr() != null) {
+			return new CyberOr(expr.getOr().getExpr().stream().map(AttackDefenseCollector::convertCyberExpr)
+					.collect(Collectors.toList()));
+		} else if (expr.getNot() != null) {
+			return new CyberNot(convertCyberExpr(expr.getNot()));
+		} else if (expr.getPort() != null) {
+			return convertCIAPort(expr.getPort());
+		} else {
+			throw new RuntimeException("impossible");
+        }
+    }
+
+    public static PortConcern convertCIAPort(CIAPort port) {
+        return new PortConcern(port.getName(), convertCIA(port.getCia()));
+    }
+
+    public static CIA convertCIA(verdict.vdm.vdm_model.CIA cia) {
+        switch (cia) {
+            case CONFIDENTIALITY:
+                return CIA.C;
+            case INTEGRITY:
+                return CIA.I;
+            case AVAILABILITY:
+                return CIA.A;
+            default:
+                throw new RuntimeException("impossible");
+        }
+    }
+
+    public static int convertSeverity(Severity severity) {
+        switch (severity) {
+            case NONE:
+                return 0;
+            case MINOR:
+                return 3;
+            case MAJOR:
+                return 5;
+            case HAZARDOUS:
+                return 7;
+            case CATASTROPHIC:
+                return 9;
+            default:
+                throw new RuntimeException("impossible");
         }
     }
 
