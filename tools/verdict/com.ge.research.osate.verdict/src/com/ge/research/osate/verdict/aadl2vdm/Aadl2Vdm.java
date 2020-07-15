@@ -326,7 +326,7 @@ public class Aadl2Vdm {
 				
 				//populating "name"
 				packComponent.setName(sysType.getName());
-				System.err.println("Translating Systype --> "+ sysType.getName());
+
 				
 				//populating "compCateg"
 				packComponent.setCompCateg("system");
@@ -345,7 +345,7 @@ public class Aadl2Vdm {
 					else if(dataPort.isOut()) {
 						modeString = "out";
 					}
-					else System.out.println("Warning: unsupported port mode");
+
 					
 			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
 			    	
@@ -426,14 +426,12 @@ public class Aadl2Vdm {
                     verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
                      
                     if(aSafetyRel.getFaultSrc() != null) {
-                		System.err.println("--------------- Debug messages for SafetyRel ---------------> "+id);
+
                         verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
                         packSafetyRel.setFaultSrc(faultSrc);
                     }                    
 
-					if (id == null || comment == null || description == null) {
-						System.err.println("NULL found at 3");
-					}
+
 
                     packSafetyRel.setId(id);
                     packSafetyRel.setComment(comment);
@@ -476,7 +474,7 @@ public class Aadl2Vdm {
 
                     
                     if(aSafetyReq.getCondition() != null) {
-                		System.err.println("--------------- Debug messages for SafetyReq ---------------> "+id);
+
                         verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
                         packSafetyReq.setCondition(condition);
                     }                    
@@ -505,7 +503,7 @@ public class Aadl2Vdm {
                     verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
                     
                     if(aCyberReq.getCondition() != null) {
-                		System.err.println("--------------- Debug messages for CyberRel ---------------> "+id);
+
                         verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
                         packCyberReq.setCondition(condition);
                     }
@@ -560,7 +558,6 @@ public class Aadl2Vdm {
 	 */
 	public Model translateSystemImplObjects(List<SystemImplementation> systemImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) { 
 		
-		System.err.println("---------------------------------------- Debug messages for translateSystemImplObjects() ----------------------------------------");
 		
 		//creating an object for each implementation first as we will need it later
 		for(SystemImplementation aSystemImpl : systemImpls) {
@@ -569,7 +566,7 @@ public class Aadl2Vdm {
 
 			//setting "name" field of packCompImpl, will need later
 			packCompImpl.setName(aSystemImpl.getName());
-			System.err.println("Created object for Implementation ---> "+aSystemImpl.getName());
+
 			
 			//Note: Will skip "Nodebody" field for now
 
@@ -583,7 +580,7 @@ public class Aadl2Vdm {
 		//Getting the reference of the object previously created and populating
 		for(SystemImplementation aSystemImpl : systemImpls) {
 			
-			System.err.println("Populating Rest of ---> "+aSystemImpl.getName());
+
 			
 			//variable to refer to previously created object
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();;
@@ -592,15 +589,14 @@ public class Aadl2Vdm {
 			for (verdict.vdm.vdm_model.ComponentImpl anImplObj : m2.getComponentImpl()) {
 				if(anImplObj.getName().equals(aSystemImpl.getName())) {
 					packCompImpl = anImplObj;
-					System.err.println("Found previously created object to populate");
+
 				}
 			}
 									
 			//setting "type" field of packCompImpl
 			for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
 				if(aSystemImpl.getTypeName().equals(cType.getName())){
-					packCompImpl.setType(cType);
-					System.out.println("SysImpl assigned Typename --> "+cType.getName());					
+					packCompImpl.setType(cType);				
 				}
 			}//End of setting "type"
 
@@ -758,21 +754,7 @@ public class Aadl2Vdm {
     				
     				//setting name
     				packConn.setName(aConn.getFullName());
-    				
-    				System.out.println("Printing connection details of connection -->"+aConn.getFullName());
-    				System.out.println("srcCompInstName = "+srcCompInstName);
-    				System.out.println("destCompInstName = "+destCompInstName);
-    				System.out.println("srcCompName = "+srcCompName);
-    				System.out.println("destCompName = "+destCompName);
-    				System.out.println("srcCompImplName = "+srcCompImplName);
-    				System.out.println("destCompImplName = "+destCompImplName);
-    				System.out.println("srcCompCatName = "+srcCompCatName);
-    				System.out.println("destCompCatName = "+destCompCatName);
-    				System.out.println("srcPortTypeName = "+srcPortTypeName);
-    				System.out.println("destPortTypeName = "+destPortTypeName);
-    				System.out.println("srcPortName = "+srcPortName);
-    				System.out.println("destPortName = "+destPortName);
-    				
+    				    				
     				
     				//--- Populate packConn below ---  
 
@@ -1409,7 +1391,6 @@ public class Aadl2Vdm {
 		
     	if(expr instanceof SLOr) { //HAS to be an LOr since LExpr can only be an LOr 		    		  		
     		if(((SLOr)expr).getExprs().size() == 1){      //Is a solo disjunct
-    			System.out.println("(expr.getExprs().size() == 1)");
     			
     			/**
     			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -1440,9 +1421,6 @@ public class Aadl2Vdm {
     		throw new RuntimeException("Warning -- LExpr should be an LOr"); //Should never occur, but keeping for sanity
     	}		
     	
-    	
-		System.out.println("allportnames:"+allPortNames);
-		System.out.println("allportCias:"+allPortCIAs);	
 		
 		
 			
