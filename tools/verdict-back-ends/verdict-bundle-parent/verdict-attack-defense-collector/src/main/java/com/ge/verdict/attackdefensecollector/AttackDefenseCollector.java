@@ -1,19 +1,5 @@
 package com.ge.verdict.attackdefensecollector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -29,7 +15,19 @@ import com.ge.verdict.attackdefensecollector.model.CyberReq;
 import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.VdmTranslator;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
@@ -644,36 +642,39 @@ public class AttackDefenseCollector {
                 boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
                 boolean internalOutgoing = conn.getDestination().getSubcomponentPort() == null;
 
-//                String sourcePort =
-//                        internalIncoming
-//                                ? conn.getSource().getComponentPort().getName()
-//                                : conn.getSource().getSubcomponentPort().getPort().getName();
-//                String destPort =
-//                        internalOutgoing
-//                                ? conn.getDestination().getComponentPort().getName()
-//                                : conn.getDestination().getSubcomponentPort().getPort().getName();
+                //                String sourcePort =
+                //                        internalIncoming
+                //                                ? conn.getSource().getComponentPort().getName()
+                //                                :
+                // conn.getSource().getSubcomponentPort().getPort().getName();
+                //                String destPort =
+                //                        internalOutgoing
+                //                                ?
+                // conn.getDestination().getComponentPort().getName()
+                //                                :
+                // conn.getDestination().getSubcomponentPort().getPort().getName();
 
-				String sourcePort, destPort;
-				if (internalIncoming) {
-					sourcePort = conn.getSource().getComponentPort().getName();
-				} else {
-					if (conn.getSource().getSubcomponentPort().getPort() != null) {
-						sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
-					} else {
-						System.out.println("Null in port: " + conn.getName());
-						sourcePort = "null";
-					}
-				}
-				if (internalOutgoing) {
-					destPort = conn.getDestination().getComponentPort().getName();
-				} else {
-					if (conn.getDestination().getSubcomponentPort().getPort() != null) {
-						destPort = conn.getDestination().getSubcomponentPort().getPort().getName();
-					} else {
-						System.out.println("Null out port: " + conn.getName());
-						destPort = "null";
-					}
-				}
+                String sourcePort, destPort;
+                if (internalIncoming) {
+                    sourcePort = conn.getSource().getComponentPort().getName();
+                } else {
+                    if (conn.getSource().getSubcomponentPort().getPort() != null) {
+                        sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
+                    } else {
+                        System.out.println("Null in port: " + conn.getName());
+                        sourcePort = "null";
+                    }
+                }
+                if (internalOutgoing) {
+                    destPort = conn.getDestination().getComponentPort().getName();
+                } else {
+                    if (conn.getDestination().getSubcomponentPort().getPort() != null) {
+                        destPort = conn.getDestination().getSubcomponentPort().getPort().getName();
+                    } else {
+                        System.out.println("Null out port: " + conn.getName());
+                        destPort = "null";
+                    }
+                }
 
                 Collection<SystemModel> sources =
                         internalIncoming
@@ -704,8 +705,9 @@ public class AttackDefenseCollector {
                                         sourcePort,
                                         destPort);
 
-//						System.out.println("ADDING CONNECTION " + conn.getName() + " from " + source.getName() + ":"
-//								+ sourcePort + " to " + dest.getName() + ":" + destPort);
+                        //						System.out.println("ADDING CONNECTION " + conn.getName() + " from "
+                        // + source.getName() + ":"
+                        //								+ sourcePort + " to " + dest.getName() + ":" + destPort);
 
                         Util.putSetMap(connections, conn.getName(), connection);
 
@@ -732,12 +734,16 @@ public class AttackDefenseCollector {
         for (ComponentType type : model.getComponentType()) {
             for (verdict.vdm.vdm_model.CyberRel rel : type.getCyberRel()) {
                 for (SystemModel system : compTypeToSystem.get(type.getName())) {
-					if (rel.getInputs() != null) {
-						system.addCyberRel(new CyberRel(rel.getId(), convertCyberExpr(rel.getInputs()),
-								convertCIAPort(rel.getOutput())));
-					} else {
-						system.addCyberRel(new CyberRel(rel.getId(), convertCIAPort(rel.getOutput())));
-					}
+                    if (rel.getInputs() != null) {
+                        system.addCyberRel(
+                                new CyberRel(
+                                        rel.getId(),
+                                        convertCyberExpr(rel.getInputs()),
+                                        convertCIAPort(rel.getOutput())));
+                    } else {
+                        system.addCyberRel(
+                                new CyberRel(rel.getId(), convertCIAPort(rel.getOutput())));
+                    }
                 }
             }
         }
@@ -746,11 +752,11 @@ public class AttackDefenseCollector {
         Map<String, verdict.vdm.vdm_model.SafetyReq> safetyReqMap = new HashMap<>();
 
         for (verdict.vdm.vdm_model.CyberReq req : model.getCyberReq()) {
-			cyberReqMap.put(req.getId(), req);
+            cyberReqMap.put(req.getId(), req);
         }
 
         for (verdict.vdm.vdm_model.SafetyReq req : model.getSafetyReq()) {
-			safetyReqMap.put(req.getId(), req);
+            safetyReqMap.put(req.getId(), req);
         }
 
         for (Mission mission : model.getMission()) {
@@ -759,8 +765,8 @@ public class AttackDefenseCollector {
                     verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
                     topLevelSystem.addCyberReq(
                             new CyberReq(
-									req.getId(),
-									mission.getId(),
+                                    req.getId(),
+                                    mission.getId(),
                                     convertSeverity(req.getSeverity()),
                                     convertCyberExpr(req.getCondition())));
 
@@ -786,18 +792,22 @@ public class AttackDefenseCollector {
     }
 
     public static CyberExpr convertCyberExpr(verdict.vdm.vdm_model.CyberExpr expr) {
-		if (expr.getAnd() != null) {
-			return new CyberAnd(expr.getAnd().getExpr().stream().map(AttackDefenseCollector::convertCyberExpr)
-					.collect(Collectors.toList()));
-		} else if (expr.getOr() != null) {
-			return new CyberOr(expr.getOr().getExpr().stream().map(AttackDefenseCollector::convertCyberExpr)
-					.collect(Collectors.toList()));
-		} else if (expr.getNot() != null) {
-			return new CyberNot(convertCyberExpr(expr.getNot()));
-		} else if (expr.getPort() != null) {
-			return convertCIAPort(expr.getPort());
-		} else {
-			throw new RuntimeException("impossible");
+        if (expr.getAnd() != null) {
+            return new CyberAnd(
+                    expr.getAnd().getExpr().stream()
+                            .map(AttackDefenseCollector::convertCyberExpr)
+                            .collect(Collectors.toList()));
+        } else if (expr.getOr() != null) {
+            return new CyberOr(
+                    expr.getOr().getExpr().stream()
+                            .map(AttackDefenseCollector::convertCyberExpr)
+                            .collect(Collectors.toList()));
+        } else if (expr.getNot() != null) {
+            return new CyberNot(convertCyberExpr(expr.getNot()));
+        } else if (expr.getPort() != null) {
+            return convertCIAPort(expr.getPort());
+        } else {
+            throw new RuntimeException("impossible");
         }
     }
 
