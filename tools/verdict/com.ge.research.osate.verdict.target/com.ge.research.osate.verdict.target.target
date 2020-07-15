@@ -16,6 +16,7 @@
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">
             <unit id="javax.xml.bind" version="0.0.0"/>
+            <unit id="javax.xml.stream" version="0.0.0"/>
             <repository location="http://download.eclipse.org/releases/2019-09/201909181001"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="false" type="InstallableUnit">

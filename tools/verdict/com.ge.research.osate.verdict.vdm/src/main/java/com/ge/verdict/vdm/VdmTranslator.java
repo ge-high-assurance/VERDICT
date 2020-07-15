@@ -15,15 +15,13 @@ import verdict.vdm.vdm_model.ObjectFactory;
 /** Translate a Verdict data model to or from an XML file. */
 public class VdmTranslator {
 
-
-
     /**
      * Marshal a Verdict data model to an XML file.
      *
      * @param model Verdict data model to marshal
      * @param outputFile XML file to write to
      */
-    public void marshalToXml(Model model, File outputFile) {
+    public static void marshalToXml(Model model, File outputFile) {
         // Skip and warn if output file can't be created
         if (canWrite(outputFile)) {
             try {
@@ -48,7 +46,7 @@ public class VdmTranslator {
      * @param inputFile XML file to unmarshal from
      * @return Verdict data model from XML file
      */
-    public Model unmarshalFromXml(File inputFile) {
+    public static Model unmarshalFromXml(File inputFile) {
         try {
             // Set up input file as source to unmarshal from
             StreamSource source = new StreamSource(inputFile);
@@ -70,7 +68,7 @@ public class VdmTranslator {
      * @param outputFile File to write to
      * @return true If file is writable, false otherwise
      */
-    protected boolean canWrite(File outputFile) {
+    protected static boolean canWrite(File outputFile) {
         File outputDir = outputFile.getParentFile();
         boolean canWrite = true;
 
