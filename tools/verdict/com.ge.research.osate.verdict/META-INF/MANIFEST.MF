@@ -10,7 +10,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.ge.research.osate.verdict.Activator
 Require-Bundle: com.ge.research.osate.verdict.dsl,
  com.ge.research.osate.verdict.dsl.ui,
- com.ge.research.osate.verdict.vdm,
  org.apache.ant,
  org.eclipse.emf.ecore.editor,
  org.eclipse.jface,
