@@ -109,7 +109,7 @@ import verdict.vdm.vdm_model.CyberExprList;
 import verdict.vdm.vdm_model.EventHappens;
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.Model;
-import com.ge.research.verdict.vdm.VdmTranslator;
+//import com.ge.research.verdict.vdm.VdmTranslator;
 
 
 
@@ -135,10 +135,10 @@ public class Aadl2Vdm {
 		    Model m = new Model();
 			m = populateVDMFromAadlObjects(preprocessAadlFiles(inputDir), m);			
 			System.err.println("Working Directory = " + System.getProperty("user.dir"));
-			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
-			System.err.println("Created File object to store Xml");
-			VdmTranslator.marshalToXml(m, testXml);
-			System.err.println("Marshalled Model to XML");
+//			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
+//			System.err.println("Created File object to store Xml");
+//			VdmTranslator.marshalToXml(m, testXml);
+//			System.err.println("Marshalled Model to XML");
 			return m;
 	   }	
 	   
