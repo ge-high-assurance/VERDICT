@@ -232,9 +232,9 @@ public class Aadl2CsvTranslator {
 				compImpls.add((ProcessorImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
 //				String propertySetName = ((PropertySetImpl)obj).getName();
-				List<Property> compProps = new ArrayList<Property>();
+//				List<Property> compProps = new ArrayList<Property>();
 				Set<Property> compPropSet = new HashSet<Property>();
-				List<Property> connProps = new ArrayList<Property>();
+//				List<Property> connProps = new ArrayList<Property>();
 				Set<Property> connPropSet = new HashSet<Property>();
 				
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {					

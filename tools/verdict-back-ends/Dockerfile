@@ -58,13 +58,13 @@ RUN opam switch 4.07 \
     camlp4 \
     core \
     core_extended \
-    menhir \
     num \
     ocamlbuild \
     ocamlfind \
     printbox \
     xml-light \
     yojson \
+ && opam install "menhir<=20200211" \
  && echo '#use "topfind" ;;' >> /home/opam/.ocamlinit \
  && echo '#thread ;;' >> /home/opam/.ocamlinit \
  && echo '#load "stdlib.cma" ;;' >> /home/opam/.ocamlinit \
