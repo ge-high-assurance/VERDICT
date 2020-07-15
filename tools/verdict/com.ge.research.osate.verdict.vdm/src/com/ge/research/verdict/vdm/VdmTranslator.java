@@ -1,5 +1,5 @@
 /* See LICENSE in project directory */
-package com.ge.verdict.vdm;
+package com.ge.research.verdict.vdm;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class VdmTranslator {
      * @param model Verdict data model to marshal
      * @param outputFile XML file to write to
      */
-    public void marshalToXml(Model model, File outputFile) {
+    public static void marshalToXml(Model model, File outputFile) {
         // Skip and warn if output file can't be created
         if (canWrite(outputFile)) {
             try {
@@ -70,7 +70,7 @@ public class VdmTranslator {
      * @param outputFile File to write to
      * @return true If file is writable, false otherwise
      */
-    protected boolean canWrite(File outputFile) {
+    protected static boolean canWrite(File outputFile) {
         File outputDir = outputFile.getParentFile();
         boolean canWrite = true;
 

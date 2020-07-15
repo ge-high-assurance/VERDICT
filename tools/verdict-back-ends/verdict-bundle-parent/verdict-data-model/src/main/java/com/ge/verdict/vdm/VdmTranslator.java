@@ -50,7 +50,7 @@ public class VdmTranslator {
      * @param inputFile XML file to unmarshal from
      * @return Verdict data model from XML file
      */
-    public Model unmarshalFromXml(File inputFile) {
+    public static Model unmarshalFromXml(File inputFile) {
         try {
             // Set up input file as source to unmarshal from
             StreamSource source = new StreamSource(inputFile);

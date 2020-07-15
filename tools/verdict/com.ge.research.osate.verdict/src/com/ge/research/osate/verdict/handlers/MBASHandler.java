@@ -14,6 +14,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
 import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
+import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
@@ -40,12 +41,13 @@ public class MBASHandler extends AbstractHandler {
 			Thread mbasAnalysisThread = new Thread() {
 				@Override
 				public void run() {
-					try {
+//					try {
 						String stemProjPath = BundlePreferences.getStemDir();
 						if (stemProjPath.isEmpty()) {
 							System.out.println("Please set STEM directory path in Preferences");
 							return;
 						}
+/**
 						String dockerImage = BundlePreferences.getDockerImage();
 						String bundleJar = BundlePreferences.getBundleJar();
 						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
@@ -60,12 +62,12 @@ public class MBASHandler extends AbstractHandler {
 						String graphVizPath = BundlePreferences.getGraphVizPath();
 						if (dockerImage.isEmpty() && graphVizPath.isEmpty()) {
 							System.out.println("Please set GraphViz path in Preferences");
-							return;
+							return;							
 						}
-
+**/
 						VerdictHandlersUtils.printGreeting();
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
-
+/**
 						// Create CSVData, Output, Graphs folders if they don't exist
 						// If they exist, delete all the csv and svg files
 						File dataFolder = new File(stemProjPath, "CSVData");
@@ -87,10 +89,13 @@ public class MBASHandler extends AbstractHandler {
 						} else {
 							graphsFolder.mkdir();
 						}
-
+**/
 						File projectDir = new File(selection.get(0));
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+						//Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+						Aadl2Vdm aadl2vdm = new Aadl2Vdm();
 
+						aadl2vdm.execute(projectDir);	
+						/**
 						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
@@ -123,14 +128,19 @@ public class MBASHandler extends AbstractHandler {
 									System.err.println("Info: No Soteria++ output generated!");
 								}
 							});
+						
 							// Display safety related text.
 //							VerdictHandlersUtils.openSafetyTxtInDir(soteriaOut);
 						}
-					} catch (IOException e) {
-						VerdictLogger.severe(e.toString());
-					} finally {
-						VerdictHandlersUtils.finishRun();
-					}
+**/						
+//					} catch (IOException e) {
+//						VerdictLogger.severe(e.toString());
+//					} finally {
+//						VerdictHandlersUtils.finishRun();					
+//					} 
+				
+				VerdictHandlersUtils.finishRun();		
+						
 				}
 			};
 			mbasAnalysisThread.start();
