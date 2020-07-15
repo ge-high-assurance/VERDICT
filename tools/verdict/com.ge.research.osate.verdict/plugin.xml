@@ -30,15 +30,6 @@
                    definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">
              </reference>
           </enabledWhen>
-       </handler>              
-       <handler
-             class="com.ge.research.osate.verdict.handlers.MBASHandler"
-             commandId="com.ge.research.osate.verdict.commands.runMbas">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
        </handler>
        <handler
              class="com.ge.research.osate.verdict.handlers.MBASSynthesisHandler"
@@ -158,6 +149,7 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.mbasSettings"
              name="MBAS Settings">
+       </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.stop"
