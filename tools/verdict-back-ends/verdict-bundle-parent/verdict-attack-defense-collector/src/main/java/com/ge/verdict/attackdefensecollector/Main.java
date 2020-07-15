@@ -1,22 +1,22 @@
 package com.ge.verdict.attackdefensecollector;
 
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
-
 public class Main {
     public static void main(String[] args) throws IOException, CSVFile.MalformedInputException {
         long start = System.currentTimeMillis();
-		// this argument parsing is pretty bad. but we shouldn't be using this anyway.
-		boolean inference = arrayContains(args, "--inference");
-		AttackDefenseCollector attackDefenseCollector;
-		if (arrayContains(args, "--vdm")) {
-			attackDefenseCollector = new AttackDefenseCollector(new File(args[1]), new File(args[0]), inference);
-		} else {
-			attackDefenseCollector = new AttackDefenseCollector(args[0], inference);
-		}
+        // this argument parsing is pretty bad. but we shouldn't be using this anyway.
+        boolean inference = arrayContains(args, "--inference");
+        AttackDefenseCollector attackDefenseCollector;
+        if (arrayContains(args, "--vdm")) {
+            attackDefenseCollector =
+                    new AttackDefenseCollector(new File(args[1]), new File(args[0]), inference);
+        } else {
+            attackDefenseCollector = new AttackDefenseCollector(args[0], inference);
+        }
         List<Result> results = attackDefenseCollector.perform();
         for (Result result : results) {
             Logger.println();
@@ -36,12 +36,12 @@ public class Main {
         Logger.println("Total time: " + (System.currentTimeMillis() - start) + " milliseconds");
     }
 
-	private static boolean arrayContains(String[] arr, String val) {
-		for (String elem : arr) {
-			if (elem.equals(val)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private static boolean arrayContains(String[] arr, String val) {
+        for (String elem : arr) {
+            if (elem.equals(val)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
