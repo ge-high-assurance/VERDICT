@@ -12,9 +12,10 @@ import java.util.List;
 
 //this class stores contents related to Blame-assignment (used by CRV Results viewer-tab)
 public class BlameAssignmentInfo {
-	private String threatDescription = "";
+//	private String threatDescription = "";
 	private List<String> components = new ArrayList<>();
 	private List<String> links = new ArrayList<>();
+	private List<String> threats = new ArrayList<String>();
 	private List<String> componentsUncompromised = new ArrayList<>();
 	private List<String> linksUncompromised = new ArrayList<>();
 
@@ -62,11 +63,12 @@ public class BlameAssignmentInfo {
 		return buildStringList(linksUncompromised);
 	}
 
-	public void setThreat(String str) {
-		threatDescription = str;
+	public void addThreat(String str) {
+		this.threats.add(str);
 	}
 
-	public String getThreat() {
-		return threatDescription;
+	public String getThreats() {
+		return buildStringList(this.threats);
 	}
+
 }
