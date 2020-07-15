@@ -109,7 +109,7 @@ import verdict.vdm.vdm_model.CyberExprList;
 import verdict.vdm.vdm_model.EventHappens;
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.Model;
-//import com.ge.research.osate.verdict.vdm.VdmTranslator;
+import com.ge.research.verdict.vdm.VdmTranslator;
 
 
 
@@ -134,11 +134,11 @@ public class Aadl2Vdm {
 			System.err.println("Successfully entered Aadl2Vdm Translator! \n\n\n");
 		    Model m = new Model();
 			m = populateVDMFromAadlObjects(preprocessAadlFiles(inputDir), m);			
-//			System.err.println("Working Directory = " + System.getProperty("user.dir"));
-//			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
-//			System.err.println("Created File object to store Xml");
-//			VdmTranslator.marshalToXml(m, testXml);
-//			System.err.println("Marshalled Model to XML");
+			System.err.println("Working Directory = " + System.getProperty("user.dir"));
+			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
+			System.err.println("Created File object to store Xml");
+			VdmTranslator.marshalToXml(m, testXml);
+			System.err.println("Marshalled Model to XML");
 			return m;
 	   }	
 	   
@@ -163,10 +163,8 @@ public class Aadl2Vdm {
 		// extracting data from the AADLObject 
 		for(EObject obj : objects) {
 			if (obj instanceof SystemType) {
-				//componentTypes.add((SystemType) obj);
 				systemTypes.add((SystemType) obj);
 			} else if (obj instanceof SystemImplementation) {
-				//compImpls.add((SystemImplementation) obj);
 				systemImpls.add((SystemImplementation) obj);
 			} else if(obj instanceof PropertySetImpl) {
 				Set<Property> compPropSet = new HashSet<Property>();
@@ -245,6 +243,7 @@ public class Aadl2Vdm {
 			
 		} // end of extracting data from the AADLObject
 		
+
 		
 		/* Translating all System Types */
 		model = translateSystemTypeObjects(systemTypes, model);
@@ -322,12 +321,12 @@ public class Aadl2Vdm {
 
 				//Note: Not populating "contract" for now
 				
-				//ISSUE: There is no getId() function for systemType 
-				packComponent.setId(sysType.getName());
+//ISSUE: There is no getId() function for systemType 
+				packComponent.setId(sysType.getQualifiedName());
 				
 				//populating "name"
 				packComponent.setName(sysType.getName());
-
+				System.err.println("Translating Systype --> "+ sysType.getName());
 				
 				//populating "compCateg"
 				packComponent.setCompCateg("system");
@@ -348,11 +347,11 @@ public class Aadl2Vdm {
 					}
 					else System.out.println("Warning: unsupported port mode");
 					
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString);
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
 			    	
 			    	//Note: Not populating "type" for now
 			    	
-			    	//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
 
 			    	//add to port list of component
@@ -370,7 +369,8 @@ public class Aadl2Vdm {
 					String comment = sanitizeValue(anEvent.getComment());
 					String description = sanitizeValue(anEvent.getDescription());
 										
-					//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
 					
 					
 					packEvent.setId(id);
@@ -406,6 +406,7 @@ public class Aadl2Vdm {
                     packCyberRel.setDescription(description);
                     packCyberRel.setOutput(output);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
                     
 					//adding to the list of component's Cyber relations
 					packComponent.getCyberRel().add(packCyberRel);									
@@ -425,9 +426,14 @@ public class Aadl2Vdm {
                     verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
                      
                     if(aSafetyRel.getFaultSrc() != null) {
+                		System.err.println("--------------- Debug messages for SafetyRel ---------------> "+id);
                         verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
                         packSafetyRel.setFaultSrc(faultSrc);
                     }                    
+
+					if (id == null || comment == null || description == null) {
+						System.err.println("NULL found at 3");
+					}
 
                     packSafetyRel.setId(id);
                     packSafetyRel.setComment(comment);
@@ -470,7 +476,7 @@ public class Aadl2Vdm {
 
                     
                     if(aSafetyReq.getCondition() != null) {
-
+                		System.err.println("--------------- Debug messages for SafetyReq ---------------> "+id);
                         verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
                         packSafetyReq.setCondition(condition);
                     }                    
@@ -499,6 +505,7 @@ public class Aadl2Vdm {
                     verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
                     
                     if(aCyberReq.getCondition() != null) {
+                		System.err.println("--------------- Debug messages for CyberRel ---------------> "+id);
                         verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
                         packCyberReq.setCondition(condition);
                     }
@@ -533,7 +540,6 @@ public class Aadl2Vdm {
                     
                     //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
 
-                    packMission.setName(id);
                     
 					//adding to the list of model's Mission
 					m1.getMission().add(packMission);									
@@ -553,7 +559,9 @@ public class Aadl2Vdm {
 	 * @return
 	 */
 	public Model translateSystemImplObjects(List<SystemImplementation> systemImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) { 
-				
+		
+		System.err.println("---------------------------------------- Debug messages for translateSystemImplObjects() ----------------------------------------");
+		
 		//creating an object for each implementation first as we will need it later
 		for(SystemImplementation aSystemImpl : systemImpls) {
 			//to pack the sysImpl as a VDM componentImpl
@@ -561,11 +569,12 @@ public class Aadl2Vdm {
 
 			//setting "name" field of packCompImpl, will need later
 			packCompImpl.setName(aSystemImpl.getName());
+			System.err.println("Created object for Implementation ---> "+aSystemImpl.getName());
 			
 			//Note: Will skip "Nodebody" field for now
 
 			//ISSUE: No "id" field in Component implementations
-			packCompImpl.setId(aSystemImpl.getName());
+			packCompImpl.setId(aSystemImpl.getQualifiedName());
 			
 			//adding object to "componentImpl" field of m2
 			m2.getComponentImpl().add(packCompImpl);
@@ -574,6 +583,8 @@ public class Aadl2Vdm {
 		//Getting the reference of the object previously created and populating
 		for(SystemImplementation aSystemImpl : systemImpls) {
 			
+			System.err.println("Populating Rest of ---> "+aSystemImpl.getName());
+			
 			//variable to refer to previously created object
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();;
 			
@@ -581,6 +592,7 @@ public class Aadl2Vdm {
 			for (verdict.vdm.vdm_model.ComponentImpl anImplObj : m2.getComponentImpl()) {
 				if(anImplObj.getName().equals(aSystemImpl.getName())) {
 					packCompImpl = anImplObj;
+					System.err.println("Found previously created object to populate");
 				}
 			}
 									
@@ -588,6 +600,7 @@ public class Aadl2Vdm {
 			for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
 				if(aSystemImpl.getTypeName().equals(cType.getName())){
 					packCompImpl.setType(cType);
+					System.out.println("SysImpl assigned Typename --> "+cType.getName());					
 				}
 			}//End of setting "type"
 
@@ -601,7 +614,7 @@ public class Aadl2Vdm {
 				verdict.vdm.vdm_model.ComponentInstance packSubComp = new verdict.vdm.vdm_model.ComponentInstance();
 
 				//ISSUE: No "id" field in subcomponents
-				packSubComp.setId(aSubComp.getFullName());
+				packSubComp.setId(aSubComp.getQualifiedName());
 
 				//setting "name" field of packSubComp
 				packSubComp.setName(aSubComp.getFullName());
@@ -610,6 +623,7 @@ public class Aadl2Vdm {
 				for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
 					if(aSubComp.getComponentType().getName().equals(cType.getName())){
 						packSubComp.setSpecification(cType);
+					
 					}
 				}
 				
@@ -617,6 +631,7 @@ public class Aadl2Vdm {
 				for(verdict.vdm.vdm_model.ComponentImpl cImpl : m2.getComponentImpl()) {
 					if(aSubComp.getSubcomponentType().getName().equals(cImpl.getName())){
 						packSubComp.setImplementation(cImpl);
+					
 					}
 				}
 				
@@ -643,10 +658,13 @@ public class Aadl2Vdm {
 							//setting the "name" and "value" field of anAttribute
 							anAttribute.setName(componentPropertyToName.get(prop));
 							anAttribute.setValue(value);
-						
+					
+
 							QName type = new QName(prop.getQualifiedName().toString());
 							anAttribute.setType(type);
-														
+							
+
+							
 							//adding asAttribute to packSubComp
 							packSubComp.getAttribute().add(anAttribute);							
 						}						
@@ -654,6 +672,7 @@ public class Aadl2Vdm {
 						continue;	
 					}
 				}
+
 				
 				
 				//adding packSubComp to packBlockImpl
@@ -739,7 +758,21 @@ public class Aadl2Vdm {
     				
     				//setting name
     				packConn.setName(aConn.getFullName());
-    				    				
+    				
+    				System.out.println("Printing connection details of connection -->"+aConn.getFullName());
+    				System.out.println("srcCompInstName = "+srcCompInstName);
+    				System.out.println("destCompInstName = "+destCompInstName);
+    				System.out.println("srcCompName = "+srcCompName);
+    				System.out.println("destCompName = "+destCompName);
+    				System.out.println("srcCompImplName = "+srcCompImplName);
+    				System.out.println("destCompImplName = "+destCompImplName);
+    				System.out.println("srcCompCatName = "+srcCompCatName);
+    				System.out.println("destCompCatName = "+destCompCatName);
+    				System.out.println("srcPortTypeName = "+srcPortTypeName);
+    				System.out.println("destPortTypeName = "+destPortTypeName);
+    				System.out.println("srcPortName = "+srcPortName);
+    				System.out.println("destPortName = "+destPortName);
+    				
     				
     				//--- Populate packConn below ---  
 
@@ -747,7 +780,8 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packSrcEnd = new verdict.vdm.vdm_model.ConnectionEnd();
     				
 					//to pack "componentPort"  of packSrcEnd
-    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmPort(srcPortName,srcPortTypeName);
+    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName());
+    				
     				
     				//If source port is independent of a component instance
     				if(srcCompInstName.equals("")) {
@@ -759,6 +793,7 @@ public class Aadl2Vdm {
         				//putting a reference to appropriate "subcomponent" from packBlockImpl in "subcomponent" of packSrcEndCompInstPort
         				for (verdict.vdm.vdm_model.ComponentInstance checkCompInst : packBlockImpl.getSubcomponent()) {
         					if(checkCompInst.getName().equals(srcCompInstName)) {
+
         						packSrcEndCompInstPort.setSubcomponent(checkCompInst);
         						break;
         					} else continue;
@@ -776,7 +811,8 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packDestEnd = new verdict.vdm.vdm_model.ConnectionEnd();
     				
 					//to pack "componentPort"  of packSrcEnd
-    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(srcPortName,srcPortTypeName);
+    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName());
+    				
     				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
@@ -788,6 +824,7 @@ public class Aadl2Vdm {
         				//putting a reference to appropriate "subcomponent" from packBlockImpl in "subcomponent" of packSrcEndCompInstPort
         				for (verdict.vdm.vdm_model.ComponentInstance checkCompInst : packBlockImpl.getSubcomponent()) {
         					if(checkCompInst.getName().equals(destCompInstName)) {
+
         						packDestEndCompInstPort.setSubcomponent(checkCompInst);
         						break;
         					} else continue;
@@ -822,10 +859,14 @@ public class Aadl2Vdm {
 							//setting the "name" and "value" field of anAttribute
 							aConnAttribute.setName(connPropertyToName.get(prop));
 							aConnAttribute.setValue(value);
-					
+							
+
 							QName type = new QName(prop.getQualifiedName().toString());
 							aConnAttribute.setType(type);
-														
+							
+							
+
+							
 							//adding asAttribute to packSubComp
 							packConn.getAttribute().add(aConnAttribute);
 						}
@@ -878,6 +919,7 @@ public class Aadl2Vdm {
 		
     	if(expr instanceof LOr) { //HAS to be an LOr since LExpr can only be an LOr 		    		  		
     		if(((LOr)expr).getExprs().size() == 1){      //Is a solo disjunct
+
     			
     			/**
     			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -907,7 +949,8 @@ public class Aadl2Vdm {
     	} else {
     		throw new RuntimeException("Warning -- LExpr should be an LOr"); //Should never occur, but keeping for sanity
     	}		
-    			
+    	
+		
 		//return the CyberExpr
 		return packCyberExpr;
 	}
@@ -922,18 +965,24 @@ public class Aadl2Vdm {
 	verdict.vdm.vdm_model.CyberExpr handleAndCyberExpr(LAnd andExpr, List<String> allPortNames, List<String> allPortCIAs){
 		//to pack this CyberExpr
 		verdict.vdm.vdm_model.CyberExpr packCyberExpr = new verdict.vdm.vdm_model.CyberExpr();
-				
+		
+		
 		if(andExpr.getExprs().size() == 1){      //Is a Port or a Not
+
 			
 			LExpr subAndExpr = andExpr.getExprs().get(0);
 			
-    		if(subAndExpr instanceof LPort) {    			
+    		if(subAndExpr instanceof LPort) {
+
+    			
     			verdict.vdm.vdm_model.CIAPort port = handleCIAPort(subAndExpr, allPortNames, allPortCIAs);
     			
     			//setting "port" field of packCyberExp
     			packCyberExpr.setPort(port);    			
     			
     		} else if(subAndExpr instanceof LNot) {
+
+
 	            verdict.vdm.vdm_model.CyberExprKind kind = verdict.vdm.vdm_model.CyberExprKind.fromValue("Not");
 	            packCyberExpr.setKind(kind); //setting "kind" of expression  
 
@@ -943,6 +992,8 @@ public class Aadl2Vdm {
     			//set the "not" of packCyberExpr
     			packCyberExpr.setNot(packNotCyberExpr);    		
     		} else if(subAndExpr instanceof LOr) {
+
+    			    			
     			/**
     			 * If it is a single conjunct, just send it to handleOrCyberExpr 
     			 * and return the same package returned by handleAndCyberExpr 
@@ -950,6 +1001,7 @@ public class Aadl2Vdm {
     			packCyberExpr = handleOrCyberExpr(subAndExpr, allPortNames, allPortCIAs);	    			
     		}		
 		} else if(andExpr.getExprs().size() > 1){ //collection of conjuncts
+
 			
             verdict.vdm.vdm_model.CyberExprKind kind = verdict.vdm.vdm_model.CyberExprKind.fromValue("And");
             packCyberExpr.setKind(kind); //setting "kind" of expression            
@@ -965,7 +1017,7 @@ public class Aadl2Vdm {
     			packOrList.getExpr().add(packConjunctCyberExpr);     			
 			}
     		
-    		//setting the "and" field of packCyberExpr
+    		//setting the "or" field of packCyberExpr
     		packCyberExpr.setAnd(packOrList);    			
 		} 
 		
@@ -984,12 +1036,18 @@ public class Aadl2Vdm {
 		//to pack this CyberExpr
 		verdict.vdm.vdm_model.CyberExpr packCyberExpr = new verdict.vdm.vdm_model.CyberExpr();
 		
+
+		
 		if(orExpr instanceof LPort) {
+
+			
 			verdict.vdm.vdm_model.CIAPort port = handleCIAPort(orExpr, allPortNames, allPortCIAs);
 		
 			//setting "port" field of packCyberExp
 			packCyberExpr.setPort(port);			
 		} else if(orExpr instanceof LNot) {
+
+			
             verdict.vdm.vdm_model.CyberExprKind kind = verdict.vdm.vdm_model.CyberExprKind.fromValue("Not");
             packCyberExpr.setKind(kind); //setting "kind" of expression  
 
@@ -999,6 +1057,8 @@ public class Aadl2Vdm {
 			//set the "not" of packCyberExpr
 			packCyberExpr.setNot(packNotCyberExpr); 			
 		} else if(((LOr)orExpr).getExprs().size() == 1){      //Is a solo disjunct
+
+			
 			/**
 			 * If it is a single disjunct, just send it to handleAndCyberExpr 
 			 * and return the same package returned by handleAndCyberExpr 
@@ -1006,6 +1066,8 @@ public class Aadl2Vdm {
 			LAnd soloAndExpr = ((LOr)orExpr).getExprs().get(0); 
 			packCyberExpr = handleAndCyberExpr(soloAndExpr, allPortNames, allPortCIAs);	    					    			
 		} else if (((LOr)orExpr).getExprs().size() > 1) { 
+
+			
     		verdict.vdm.vdm_model.CyberExprKind kind = verdict.vdm.vdm_model.CyberExprKind.fromValue("Or");
             packCyberExpr.setKind(kind); //setting "kind" of expression            
 
@@ -1020,7 +1082,7 @@ public class Aadl2Vdm {
     			packAndList.getExpr().add(packDisjunctCyberExpr); 
 			}
     		
-    		//setting the "or" field of packCyberExpr
+    		//setting the "and" field of packCyberExpr
     		packCyberExpr.setOr(packAndList);
 		}
 		
@@ -1038,17 +1100,23 @@ public class Aadl2Vdm {
 		//to pack this CyberExpr
 		verdict.vdm.vdm_model.CyberExpr packCyberExpr = new verdict.vdm.vdm_model.CyberExpr();
 		
+
+		
 		if(notExpr.getExpr() instanceof LPort){
+
+			
 			verdict.vdm.vdm_model.CIAPort port = handleCIAPort((LPort)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 			//setting "port" field of packCyberExp
 			packCyberExpr.setPort(port);
 			
 		} else if(notExpr.getExpr() instanceof LOr){
+
 			
 			packCyberExpr = handleOrCyberExpr((LOr)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof LAnd){
+
 			
 			packCyberExpr = handleAndCyberExpr((LAnd)notExpr.getExpr(), allPortNames, allPortCIAs);		
 		}
@@ -1095,6 +1163,7 @@ public class Aadl2Vdm {
 		
     	if(expr instanceof SLOr) { //HAS to be an LOr since SLExpr can only be an SLOr 		    		  		
     		if(((SLOr)expr).getExprs().size() == 1){      //Is a solo disjunct
+
     			
     			/**
     			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -1118,18 +1187,19 @@ public class Aadl2Vdm {
         			packAndList.getExpr().add(packDisjunctSafetyReqExpr); 
     			}
         		
-        		//setting the "or" field of packSafetyReqExpr
+        		//setting the "and" field of packSafetyReq
         		packSafetyReqExpr.setOr(packAndList);
     		}   		
     	} else {
     		throw new RuntimeException("Warning -- LExpr should be an LOr"); //Should never occur, but keeping for sanity
     	}		
-    	    				
+    	    	
+			
 		return packSafetyReqExpr;
 	}
 
 	/**
-	 * to handle SLAnd expressions while creating a SafetyReqExpr object
+	 * to handle LAnd expressions while creating a SafetyReqExpr object
 	 * @param andExpr
 	 * @param allPortNames
 	 * @param allPortCIAs
@@ -1139,17 +1209,22 @@ public class Aadl2Vdm {
 		//to pack this SafetyReqExpr
 		verdict.vdm.vdm_model.SafetyReqExpr packSafetyReqExpr = new verdict.vdm.vdm_model.SafetyReqExpr();
 		
+
+		
 		if(andExpr.getExprs().size() == 1){      //Is a Port or a Not
+
 			
 			SLExpr subAndExpr = andExpr.getExprs().get(0);
 			
     		if(subAndExpr instanceof SLPort) {
+
     			
     			verdict.vdm.vdm_model.IAPort port = handleIAPort(subAndExpr, allPortNames, allPortCIAs);
     			
-    			//setting "port" field of packSafetyReqExp
+    			//setting "port" field of packSafetyReq
     			packSafetyReqExpr.setPort(port);    			
     		} else if(subAndExpr instanceof SLNot) {
+
 
 	            verdict.vdm.vdm_model.SafetyReqExprKind kind = verdict.vdm.vdm_model.SafetyReqExprKind.fromValue("Not");
 	            packSafetyReqExpr.setKind(kind); //setting "kind" of expression  
@@ -1157,9 +1232,10 @@ public class Aadl2Vdm {
     			//to pack the SafetyReqExpr for the Not
     			verdict.vdm.vdm_model.SafetyReqExpr packNotSafetyReqExpr= handleNotSafetyReqExpr((SLNot)subAndExpr, allPortNames, allPortCIAs); 
 	        
-    			//set the "not" of packCyberExpr
+    			//set the "not" of packSafetyReqExpr
     			packSafetyReqExpr.setNot(packNotSafetyReqExpr);    		
     		} else if(subAndExpr instanceof SLOr) {
+
     				
     			/**
     			 * If it is a single conjunct, just send it to handleOrCyberExpr 
@@ -1168,6 +1244,7 @@ public class Aadl2Vdm {
     			packSafetyReqExpr = handleOrSafetyReqExpr(subAndExpr, allPortNames, allPortCIAs);	    			
     		}		
 		} else if(andExpr.getExprs().size() > 1){ //collection of conjuncts
+
 			
             verdict.vdm.vdm_model.SafetyReqExprKind kind = verdict.vdm.vdm_model.SafetyReqExprKind.fromValue("And");
             packSafetyReqExpr.setKind(kind); //setting "kind" of expression            
@@ -1183,7 +1260,7 @@ public class Aadl2Vdm {
     			packOrList.getExpr().add(packConjunctSafetyReqExpr);     			
 			}
     		
-    		//setting the "and" field of packSafetyReqExpr
+    		//setting the "or" field of packSafetyReqExpr
     		packSafetyReqExpr.setAnd(packOrList);    			
 		} 
 				
@@ -1192,7 +1269,7 @@ public class Aadl2Vdm {
 	
     
 	/**
-	 * to handle SLOr expressions while creating a SafetyReqExpr object
+	 * to handle LOr expressions while creating a SafetyReqExpr object
 	 * @param orExpr
 	 * @param allPortNames
 	 * @param allPortCIAs
@@ -1202,14 +1279,18 @@ public class Aadl2Vdm {
 		//to pack this SafetyReqExpr
 		verdict.vdm.vdm_model.SafetyReqExpr packSafetyReqExpr = new verdict.vdm.vdm_model.SafetyReqExpr();
 		
+
+		
 		if(orExpr instanceof SLPort) {
+
 			
 			verdict.vdm.vdm_model.IAPort port = handleIAPort(orExpr, allPortNames, allPortCIAs);
 		
-			//setting "port" field of packCyberExp
+			//setting "port" field of packSafetyReqExp
 			packSafetyReqExpr.setPort(port);
 			
 		} else if(orExpr instanceof SLNot) {
+
 			
             verdict.vdm.vdm_model.SafetyReqExprKind kind = verdict.vdm.vdm_model.SafetyReqExprKind.fromValue("Not");
             packSafetyReqExpr.setKind(kind); //setting "kind" of expression  
@@ -1220,6 +1301,7 @@ public class Aadl2Vdm {
 			//set the "not" of packSafetyReqExpr
 			packSafetyReqExpr.setNot(packNotCyberExpr); 			
 		} else if(((SLOr)orExpr).getExprs().size() == 1){      //Is a solo disjunct
+
 			
 			/**
 			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -1229,6 +1311,7 @@ public class Aadl2Vdm {
 			packSafetyReqExpr = handleAndSafetyReqExpr(soloAndExpr, allPortNames, allPortCIAs);	
     					    			
 		} else if (((SLOr)orExpr).getExprs().size() > 1) { 
+
 			
     		verdict.vdm.vdm_model.SafetyReqExprKind kind = verdict.vdm.vdm_model.SafetyReqExprKind.fromValue("Or");
             packSafetyReqExpr.setKind(kind); //setting "kind" of expression            
@@ -1244,7 +1327,7 @@ public class Aadl2Vdm {
     			packAndList.getExpr().add(packDisjunctSafetyReqExpr); 
 			}
     		
-    		//setting the "or" field of packSafetyReqExpr
+    		//setting the "and" field of packSafetyReqExpr
     		packSafetyReqExpr.setOr(packAndList);
 		}
 		
@@ -1252,7 +1335,7 @@ public class Aadl2Vdm {
 	}	
 	
 	/**
-	 * to handle SLNot expressions while creating a SafetyReqExpr object
+	 * to handle LNot expressions while creating a SafetyReqExpr object
 	 * @param notExpr
 	 * @param allPortNames
 	 * @param allPortCIAs
@@ -1262,7 +1345,10 @@ public class Aadl2Vdm {
 		//to pack this SafetyReqExpr
 		verdict.vdm.vdm_model.SafetyReqExpr packSafetyReqExpr = new verdict.vdm.vdm_model.SafetyReqExpr();
 		
+
+		
 		if(notExpr.getExpr() instanceof SLPort){
+
 			
 			verdict.vdm.vdm_model.IAPort port = handleIAPort((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
@@ -1270,10 +1356,12 @@ public class Aadl2Vdm {
 			packSafetyReqExpr.setPort(port);
 			
 		} else if(notExpr.getExpr() instanceof SLOr){
+
 			
 			packSafetyReqExpr = handleOrSafetyReqExpr((SLOr)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof SLAnd){
+
 			
 			packSafetyReqExpr = handleAndSafetyReqExpr((SLAnd)notExpr.getExpr(), allPortNames, allPortCIAs);		
 		}
@@ -1321,6 +1409,7 @@ public class Aadl2Vdm {
 		
     	if(expr instanceof SLOr) { //HAS to be an LOr since LExpr can only be an LOr 		    		  		
     		if(((SLOr)expr).getExprs().size() == 1){      //Is a solo disjunct
+    			System.out.println("(expr.getExprs().size() == 1)");
     			
     			/**
     			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -1344,19 +1433,24 @@ public class Aadl2Vdm {
         			packAndList.getExpr().add(packDisjunctSafetyRelExpr); 
     			}
         		
-        		//setting the "or" field of SafetyRelExpr
+        		//setting the "and" field of packSafetyRelExpr
         		packSafetyRelExpr.setOr(packAndList);
     		}   		
     	} else {
     		throw new RuntimeException("Warning -- LExpr should be an LOr"); //Should never occur, but keeping for sanity
-    	}				
+    	}		
+    	
+    	
+		System.out.println("allportnames:"+allPortNames);
+		System.out.println("allportCias:"+allPortCIAs);	
+		
 		
 			
 		return packSafetyRelExpr;
 	}
 
 	/**
-	 * to handle SLAnd expressions while creating a SafetyRelExpr object
+	 * to handle LAnd expressions while creating a SafetyRelExpr object
 	 * @param andExpr
 	 * @param allPortNames
 	 * @param allPortCIAs
@@ -1366,17 +1460,22 @@ public class Aadl2Vdm {
 		//to pack this SafetyRelExpr
 		verdict.vdm.vdm_model.SafetyRelExpr packSafetyRelExpr = new verdict.vdm.vdm_model.SafetyRelExpr();
 		
+
+		
 		if(andExpr.getExprs().size() == 1){      //Is a Port or a Not or a Happens or a Not
+
 			
 			SLExpr subAndExpr = andExpr.getExprs().get(0);
 			
     		if(subAndExpr instanceof SLPort) {
+
     			
     			verdict.vdm.vdm_model.IAPort port = handleIAPort(subAndExpr, allPortNames, allPortCIAs);
     			
     			//setting "port" field of packSafetyRelExpr
     			packSafetyRelExpr.setPort(port);    			
     		} else if(subAndExpr instanceof SLNot) {
+
 
 	            verdict.vdm.vdm_model.SafetyRelExprKind kind = verdict.vdm.vdm_model.SafetyRelExprKind.fromValue("Not");
 	            packSafetyRelExpr.setKind(kind); //setting "kind" of expression  
@@ -1387,6 +1486,7 @@ public class Aadl2Vdm {
     			//set the "not" of packSafetyRelExpr
     			packSafetyRelExpr.setNot(packNotSafetyRelExpr);    		
     		} else if(subAndExpr instanceof FExpr ) {
+
     			
     			verdict.vdm.vdm_model.EventHappens fault = handleEventHappens(subAndExpr, allPortNames, allPortCIAs);
     			
@@ -1394,6 +1494,7 @@ public class Aadl2Vdm {
     			packSafetyRelExpr.setFault(fault);    			
     			
     		} else if(subAndExpr instanceof SLOr) {
+
     			
     			
     			/**
@@ -1403,6 +1504,7 @@ public class Aadl2Vdm {
     			packSafetyRelExpr = handleOrSafetyRelExpr(subAndExpr, allPortNames, allPortCIAs);	    			
     		}		
 		} else if(andExpr.getExprs().size() > 1){ //collection of conjuncts
+
 			
             verdict.vdm.vdm_model.SafetyRelExprKind kind = verdict.vdm.vdm_model.SafetyRelExprKind.fromValue("And");
             packSafetyRelExpr.setKind(kind); //setting "kind" of expression            
@@ -1418,7 +1520,7 @@ public class Aadl2Vdm {
     			packOrList.getExpr().add(packConjunctSafetyRelExpr);     			
 			}
     		
-    		//setting the "and" field of packSafetyRelExpr
+    		//setting the "or" field of packSafetyRelExpr
     		packSafetyRelExpr.setAnd(packOrList);    			
 		} 
 		
@@ -1427,7 +1529,7 @@ public class Aadl2Vdm {
 	
     
 	/**
-	 * to handle SLOr expressions while creating a SafetyRelExpr object
+	 * to handle LOr expressions while creating a SafetyRelExpr object
 	 * @param orExpr
 	 * @param allPortNames
 	 * @param allPortCIAs
@@ -1436,8 +1538,11 @@ public class Aadl2Vdm {
 	verdict.vdm.vdm_model.SafetyRelExpr handleOrSafetyRelExpr(SLExpr orExpr, List<String> allPortNames, List<String> allPortCIAs){
 		//to pack this SafetyRelExpr
 		verdict.vdm.vdm_model.SafetyRelExpr packSafetyRelExpr = new verdict.vdm.vdm_model.SafetyRelExpr();
+
+
 		
 		if(orExpr instanceof SLPort) {
+
 			
 			verdict.vdm.vdm_model.IAPort port = handleIAPort(orExpr, allPortNames, allPortCIAs);
 		
@@ -1445,17 +1550,19 @@ public class Aadl2Vdm {
 			packSafetyRelExpr.setPort(port);
 			
 		} else if(orExpr instanceof SLNot) {
+
 			
             verdict.vdm.vdm_model.SafetyRelExprKind kind = verdict.vdm.vdm_model.SafetyRelExprKind.fromValue("Not");
             packSafetyRelExpr.setKind(kind); //setting "kind" of expression  
 
-			//to pack the CyberExpr for the Not
+			//to pack the SafetyRelExpr for the Not
 			verdict.vdm.vdm_model.SafetyRelExpr packNotCyberExpr= handleNotSafetyRelExpr((SLNot)orExpr, allPortNames, allPortCIAs); 
         
 			//set the "not" of packSafetyRelExpr
 			packSafetyRelExpr.setNot(packNotCyberExpr); 
 			
 		} else if(orExpr instanceof FExpr ) {
+
 			
 			verdict.vdm.vdm_model.EventHappens fault = handleEventHappens(orExpr, allPortNames, allPortCIAs);
 			
@@ -1463,6 +1570,7 @@ public class Aadl2Vdm {
 			packSafetyRelExpr.setFault(fault);    			
 			
 		} else if(((SLOr)orExpr).getExprs().size() == 1){      //Is a solo disjunct
+
 			
 			/**
 			 * If it is a single disjunct, just send it to handleAndCyberExpr 
@@ -1472,6 +1580,7 @@ public class Aadl2Vdm {
 			packSafetyRelExpr = handleAndSafetyRelExpr(soloAndExpr, allPortNames, allPortCIAs);	
     					    			
 		} else if (((SLOr)orExpr).getExprs().size() > 1) { 
+
 			
     		verdict.vdm.vdm_model.SafetyRelExprKind kind = verdict.vdm.vdm_model.SafetyRelExprKind.fromValue("Or");
             packSafetyRelExpr.setKind(kind); //setting "kind" of expression            
@@ -1480,14 +1589,14 @@ public class Aadl2Vdm {
             verdict.vdm.vdm_model.SafetyRelExprList packAndList= new verdict.vdm.vdm_model.SafetyRelExprList();
                       
     		for(SLAnd andExpr : ((SLOr)orExpr).getExprs()) { //for each disjunct (each disjunct is a LAnd)
-    			//to pack the SafetyRelExpr for this disjunct
+    			//to pack the SafetyRelExprfor this disjunct
     			verdict.vdm.vdm_model.SafetyRelExpr packDisjunctSafetyRelExpr= handleAndSafetyRelExpr(andExpr, allPortNames, allPortCIAs); 			
 
     			//adding to the list of disjuncts
     			packAndList.getExpr().add(packDisjunctSafetyRelExpr); 
 			}
     		
-    		//setting the "or" field of packSafetyRelExpr
+    		//setting the "and" field of packSafetyRelExpr
     		packSafetyRelExpr.setOr(packAndList);
 		}		
 				
@@ -1504,8 +1613,11 @@ public class Aadl2Vdm {
 	verdict.vdm.vdm_model.SafetyRelExpr handleNotSafetyRelExpr(SLNot notExpr, List<String> allPortNames, List<String> allPortCIAs){
 		//to pack this SafetyRelExpr
 		verdict.vdm.vdm_model.SafetyRelExpr packSafetyRelExpr = new verdict.vdm.vdm_model.SafetyRelExpr();
+				
+
 		
 		if(notExpr.getExpr() instanceof SLPort){
+
 			
 			verdict.vdm.vdm_model.IAPort port = handleIAPort((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
@@ -1513,6 +1625,7 @@ public class Aadl2Vdm {
 			packSafetyRelExpr.setPort(port);
 			
 		} else if(notExpr.getExpr() instanceof FExpr){
+
 			
 			verdict.vdm.vdm_model.EventHappens fault = handleEventHappens((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
@@ -1520,10 +1633,12 @@ public class Aadl2Vdm {
 			packSafetyRelExpr.setFault(fault);
 			
 		} else if(notExpr.getExpr() instanceof SLOr){
+
 			
 			packSafetyRelExpr = handleOrSafetyRelExpr((SLOr)notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof SLAnd){
+
 			
 			packSafetyRelExpr = handleAndSafetyRelExpr((SLAnd)notExpr.getExpr(), allPortNames, allPortCIAs);		
 		}
@@ -1562,10 +1677,10 @@ public class Aadl2Vdm {
      * @param modeString
      * @return
      */
-	verdict.vdm.vdm_model.Port createVdmPort(String portName, String modeString){
+	verdict.vdm.vdm_model.Port createVdmPort(String portName, String modeString, String qualifiedname){
 		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
 		newPort.setProbe(false);
-		newPort.setId(portName);
+		newPort.setId(qualifiedname);
 		newPort.setName(portName);
 		newPort.setMode(convertToVdmPortMode(modeString));		
 		return newPort;
@@ -1614,11 +1729,9 @@ public class Aadl2Vdm {
 	}
 
 				
-   /**
-    * To convert a String cia to VDM CIA   
-    * @param cia
-    * @return
-    */
+    /**
+     * To convert a String cia to VDM CIA
+     * */    
     verdict.vdm.vdm_model.CIA convertToVdmCia(String cia) {
     	String full = cia;
     	if(cia != null && cia.length() == 1) {
@@ -1643,11 +1756,9 @@ public class Aadl2Vdm {
     }
 
     
-   /**
-    * To convert a String ia to VDM IA    
-    * @param ia
-    * @return
-    */
+    /**
+     * To convert a String ia to VDM IA
+     * */    
     verdict.vdm.vdm_model.IA convertToVdmIa(String ia){
     	String full = ia;
     	if(ia != null && ia.length() == 1) {
@@ -1670,10 +1781,8 @@ public class Aadl2Vdm {
 
     
     /**
-     * To convert a String to VDM PortMode   
-     * @param s
-     * @return
-     */
+     * To convert a String to VDM PortMode
+    * */    
     verdict.vdm.vdm_model.PortMode convertToVdmPortMode(String s){
     	verdict.vdm.vdm_model.PortMode portModeObj = verdict.vdm.vdm_model.PortMode.fromValue(s);
     	return portModeObj;
@@ -1689,7 +1798,7 @@ public class Aadl2Vdm {
     }
 
     
-/** The following auxiliary functions were borrowed verbatim from com.ge.research.osate.verdict.aadl2csv.Asdl2CsvTranslator.java */   
+/** The auxiliary functions below were borrowed verbatim from com.ge.research.osate.verdict.aadl2csv.Asdl2CsvTranslator.java */   
     
 	/**
 	 * @author Paul Meng
