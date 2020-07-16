@@ -238,7 +238,14 @@ public class VDM2Lustre {
 
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
+                
+                // Option Check)
+                
+                if(componentType == null && subcomponentImpl == null) {
+                	System.out.println(componentInstance.getName() + " subcomponent is missing both a specification and an implemention. Please provide some specification or an implementation to continue.");
+                	System.exit(-1);
+                }
+                
                 // Option 1) Implementation
                 if (subcomponentImpl != null) {
 
@@ -346,7 +353,7 @@ public class VDM2Lustre {
 
     protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
 
-//        LustreProgram lustreProgram = vdm_model.getDataflowCode();
+        //        LustreProgram lustreProgram = vdm_model.getDataflowCode();
 
         DataType eventType = new DataType();
         TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);
