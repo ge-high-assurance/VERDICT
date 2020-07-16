@@ -5,6 +5,9 @@ import java.util.List;
 
 public class GsnNode {
 
+	/** An integer describing the level of a node */
+	protected int nodeLevel;
+	
     /** A unique Id for each node */
     protected String nodeId;
 
@@ -23,7 +26,27 @@ public class GsnNode {
 
     /** List of context nodes of a node */
     protected List<GsnNode> inContextOf;
+    
+    
+    /**
+     * Gets the value of the nodeLevel property.
+     *
+     * @return possible object is {@link int }
+     */
+    public int getNodeLevel() {
+        return nodeLevel;
+    }
 
+    /**
+     * Sets the value of the nodeLevel property.
+     *
+     * @param value allowed object is {@link int }
+     */
+    public void setNodeLevel(int value) {
+        this.nodeLevel = value;
+    }
+
+    
     /**
      * Gets the value of the nodeId property.
      *

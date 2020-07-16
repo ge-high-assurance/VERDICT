@@ -8,6 +8,7 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import guru.nidi.graphviz.model.MutableGraph;
+import static guru.nidi.graphviz.model.Factory.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.*;
 
-import static guru.nidi.graphviz.model.Factory.*;
+
 
 public class CreateGSN {
 
@@ -43,6 +44,62 @@ public class CreateGSN {
         
         
         
+    }
+    
+    /**
+     * FOR TESTING PURPOSES ONLY
+     */
+    public static void traverseGSN(GsnNode node) {
+    	
+    	if (node.getNodeType().equalsIgnoreCase("context")) {
+    		for(int i=0; i<=node.getNodeLevel();i++) {
+    			System.out.print('*');
+    		}
+    		System.out.println("Context:- "+ node.getNodeId());
+    	} else if (node.getNodeType().equalsIgnoreCase("solution")) {
+    		for(int i=0; i<=node.getNodeLevel();i++) {
+    			System.out.print('*');
+    		}
+    		System.out.println("Solution:- "+node.getNodeId());
+    		if(!(node.getInContextOf() == null)) {
+    			for (GsnNode subNode : node.getInContextOf()) {
+    				traverseGSN(subNode);
+    			}
+    		}
+    	} else if (node.getNodeType().equalsIgnoreCase("goal")) {
+    		for(int i=0; i<=node.getNodeLevel();i++) {
+    			System.out.print('*');
+    		}
+    		System.out.println("Goal:- "+node.getNodeId());
+    		if(!(node.getInContextOf() == null)) {
+    			for (GsnNode subNode : node.getInContextOf()) {
+    				traverseGSN(subNode);
+    			}
+    		}
+    		if(!(node.getSupportedBy() == null)) {
+    			for (GsnNode subNode : node.getSupportedBy()) {
+    				traverseGSN(subNode);
+    			}
+    		}
+    	} else if (node.getNodeType().equalsIgnoreCase("strategy")) {
+    		for(int i=0; i<=node.getNodeLevel();i++) {
+    			System.out.print('*');
+    		}
+    		System.out.println("Strategy:- "+node.getNodeId());
+    		if(!(node.getInContextOf() == null)) {
+    			for (GsnNode subNode : node.getInContextOf()) {
+    				traverseGSN(subNode);
+    			}
+    		}
+    		if(!(node.getSupportedBy() == null)) {
+    			for (GsnNode subNode : node.getSupportedBy()) {
+    				traverseGSN(subNode);
+    			}
+    		}
+    	}
+
+    	
+    	
     }
 
     /**
@@ -83,6 +140,8 @@ public class CreateGSN {
 
         // get a list of all GSN fragments from model
         List<GsnNode> gsnFragments = getFragments(xmlModel, nListCyber, nListSafety);
+        
+        traverseGSN(gsnFragments.get(0));
     }
 
     /**
@@ -123,27 +182,38 @@ public class CreateGSN {
         // Populate the rootnode with the mission goal
         missionNode.setNodeType("goal");
         missionNode.setNodeId(mission.getId());
+        missionNode.setNodeLevel(0);
+        System.out.println("Mission: "+mission.getId() );
         // to set goal of missionNode
         Goal missionGoal = new Goal();
         missionGoal.setDisplayText(mission.getDescription());
         missionNode.setGoal(missionGoal);
 
+        
+        
         // INCOMPLETE: add contexts to missionNode
+        List<String> missionContext = new ArrayList<>();
+        missionContext.add(model.getName());
+        System.out.println("-------------------"+ missionContext);
+        missionNode.getInContextOf().addAll(addContexts(missionContext,0));
 
         // create a strategy node to support the mission goal
         GsnNode strategyNode = new GsnNode();
         strategyNode.setNodeType("strategy");
+        strategyNode.setNodeLevel(1);
         strategyNode.setNodeId("Strategy::" + mission.getId());
+        System.out.println("----Strategy: "+strategyNode.getNodeId());
 
         String strategyText = "By conjunction of subgoals: ";
 
-        // add requirements to supportedBy of srategyNode
+        // add requirements to supportedBy of StrategyNode
         for (String subReqId : mission.getCyberReqs()) {
             strategyText = strategyText + subReqId + " ";
 
             // check if reqId is Cyber or Safety req
             for (CyberReq cyberReq : model.getCyberReq()) {
                 if (cyberReq.getId().equals(subReqId)) {
+                    System.out.println("--------Requirement: "+subReqId);
                     strategyNode
                             .getSupportedBy()
                             .add(populateCyberRequirementNode(cyberReq, model, cyberResults));
@@ -151,6 +221,7 @@ public class CreateGSN {
             }
             for (SafetyReq safetyReq : model.getSafetyReq()) {
                 if (safetyReq.getId().equals(subReqId)) {
+                    System.out.println("--------Requirement: "+subReqId);
                     strategyNode
                             .getSupportedBy()
                             .add(populateSafetyRequirementNode(safetyReq, model, safetyResults));
@@ -198,6 +269,7 @@ public class CreateGSN {
 
         // Populate the rootnode with the requirement subgoal
         reqNode.setNodeType("goal");
+        reqNode.setNodeLevel(2);
         reqNode.setNodeId(cyberReq.getId());
         // to populate goal of node
         Goal reqNodeGoal = new Goal();
@@ -206,12 +278,19 @@ public class CreateGSN {
 
         // INCOMPLETE: add contexts to reqNode --> WILL NEED TO DEVELOP CyberExpr and SafetyExpr
         // parsers
-
+        List<String> reqContextPorts = getCyberExprPorts(cyberReq.getCondition());
+        reqNode.getInContextOf().addAll(addContexts(reqContextPorts,2));
+        
+        
         // create a strategy node to support the requirement subgoal
         GsnNode strategyNode = new GsnNode();
+        strategyNode.setNodeLevel(3);
         strategyNode.setNodeType("strategy");
         strategyNode.setNodeId("Strategy::" + cyberReq.getId());
-        // to populate srategy of strategyNode
+        System.out.println("------------Strategy: "+strategyNode.getNodeId());
+
+        
+        // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
         strat.setDisplayText("By Soteria++ analysis of attack-defense trees");
 
@@ -254,12 +333,18 @@ public class CreateGSN {
 
         // INCOMPLETE: add contexts to reqNode --> WILL NEED TO DEVELOP CyberExpr and SafetyExpr
         // parsers
+        List<String> reqContextPorts = getSafetyReqExprPorts(safetyReq.getCondition());
+        reqNode.getInContextOf().addAll(addContexts(reqContextPorts,2));
 
         // create a strategy node to support the requirement subgoal
         GsnNode strategyNode = new GsnNode();
+        strategyNode.setNodeLevel(3);
         strategyNode.setNodeType("strategy");
         strategyNode.setNodeId("Strategy::" + safetyReq.getId());
-        // to populate srategy of strategyNode
+        System.out.println("------------Strategy: "+strategyNode.getNodeId());
+
+        
+        // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
         strat.setDisplayText("By Soteria++ analysis of attack-defense trees");
 
@@ -292,8 +377,9 @@ public class CreateGSN {
         GsnNode solutionNode = new GsnNode();
 
         // Populate the rootnode with solution details
+        solutionNode.setNodeLevel(4);
         solutionNode.setNodeType("solution");
-        solutionNode.setNodeId("CMinCut::" + reqId);
+        solutionNode.setNodeId("Soteria_Out::" + reqId);
         // to set solution of solutionNode
         Solution sol = new Solution();
         sol.setDisplayText("Soteria++ minimal cutset for " + reqId);
@@ -313,12 +399,13 @@ public class CreateGSN {
             }
         }
 
-        System.out.println(reqId + " --------------------> Found probabilities");
         // Check below if solution supports the requirement
         if (Double.parseDouble(computed_p) <= Double.parseDouble(acceptable_p)) {
             sol.setStatus(true);
+            System.out.println("---------------- Found Solution -> "+ true);
         } else {
             sol.setStatus(false);
+            System.out.println("---------------- Found Solution -> "+ false);
         }
 
         // add sol to solutionNode
@@ -326,4 +413,123 @@ public class CreateGSN {
 
         return solutionNode;
     }
+    
+
+//    public static List<String> getCyberReqContextPortIds(CyberReq cyberReq){
+//    	
+//    	//get the condition CyberExpression
+//    	CyberExpr condition = cyberReq.getCondition();
+//    	
+//    	List<String> portIds = getCyberExprPorts(cyberReq.getCondition());
+//    	
+//    	System.out.println("------------Cyber Requirement ports: "+portIds);
+//    	
+//    	return portIds;
+//    }
+    
+    /**
+     *  Creates a list of all port Ids from a CyberExpr
+     * @param cyberExpr
+     * @return
+     */
+    public static List<String> getCyberExprPorts(CyberExpr cyberExpr){   	   
+    	//to pack return list
+    	List<String> returnList = new ArrayList<>();
+    	
+    	if (!(cyberExpr.getPort()==null)) { //base case: if a port
+        	returnList.add(cyberExpr.getPort().getName());    		
+    	} else { 
+    		if (cyberExpr.getKind().value().equalsIgnoreCase("or")) { //if an or expression 
+				for(CyberExpr subExpr : cyberExpr.getOr().getExpr()) {
+					returnList.addAll(getCyberExprPorts(subExpr));
+				}
+    		} else if (cyberExpr.getKind().value().equalsIgnoreCase("and")) {//if an and expression
+    					for(CyberExpr subExpr : cyberExpr.getAnd().getExpr()) {
+    						returnList.addAll(getCyberExprPorts(subExpr));
+    			}    			
+    		} else if (cyberExpr.getKind().value().equalsIgnoreCase("not")) {//if a not expression
+    			returnList.addAll(getCyberExprPorts(cyberExpr.getNot()));
+    		} 
+    	}
+    	
+    	return returnList;
+    }
+
+    
+//   public static List<String> getSafetyReqContextPortIds(SafetyReq safetyReq){
+//    	
+//    	List<String> portIds = getSafetyReqExprPorts(safetyReq.getCondition());
+//    	
+//    	System.out.println("------------Cyber Requirement ports: "+portIds);
+//    	
+//    	return portIds;
+//    }
+    
+    
+    /**
+     * Creates a list of all portIds from a SafetyReqExpr
+     * @param safetyExpr
+     * @return
+     */
+    public static List<String> getSafetyReqExprPorts(SafetyReqExpr safetyExpr){   	   
+    	//to pack return list
+    	List<String> returnList = new ArrayList<>();
+    	
+    	if (!(safetyExpr.getPort()==null)) { //base case: if a port
+        	returnList.add(safetyExpr.getPort().getName());    		
+    	} else { 
+    		if (safetyExpr.getKind().value().equalsIgnoreCase("or")) { //if an or expression 
+				for(SafetyReqExpr subExpr : safetyExpr.getOr().getExpr()) {
+					returnList.addAll(getSafetyReqExprPorts(subExpr));
+				}
+    		} else if (safetyExpr.getKind().value().equalsIgnoreCase("and")) {//if an and expression
+    					for(SafetyReqExpr subExpr : safetyExpr.getAnd().getExpr()) {
+    						returnList.addAll(getSafetyReqExprPorts(subExpr));
+    			}    			
+    		} else if (safetyExpr.getKind().value().equalsIgnoreCase("not")) {//if a not expression
+    			returnList.addAll(getSafetyReqExprPorts(safetyExpr.getNot()));
+    		} 
+    	}
+    	
+    	return returnList;
+    }    
+    
+    
+    /**
+     * Creates and returns a list of GsnNodes that can be
+     * assigned as inContextOf for another Node
+     * @param contextNames
+     * @return
+     */
+    public static List<GsnNode> addContexts(List<String> contextNames, int parentLavel){
+    	//A list of GsnNodes to contain the "inContextOf"
+    	List<GsnNode> inContextOf = new ArrayList<>();
+    	
+    	//Level of all the contexts
+    	int contextLevel = parentLavel;
+    	
+    	for(String context : contextNames) {
+    		
+    		System.out.println("-------------------"+ context);
+    		//a gsnNode for the context
+    		GsnNode contextNode = new GsnNode();
+    		
+    		//assigning values to the contextnode
+    		contextNode.setNodeType("context");    		
+    		contextNode.setNodeId(context);
+    		contextNode.setNodeLevel(contextLevel);
+    		
+    		//pack the context
+    		Context nodeContext = new Context();
+    		nodeContext.setDisplayText(context);
+    		
+    		contextNode.setContext(nodeContext);
+    		
+    		//adding to the list
+    		inContextOf.add(contextNode);    		
+    	}
+    	
+    	return inContextOf;
+    }
+    
 }
