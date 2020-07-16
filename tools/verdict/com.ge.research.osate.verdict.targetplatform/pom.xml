@@ -8,6 +8,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>com.ge.research.osate.verdict.target</artifactId>
+    <artifactId>com.ge.research.osate.verdict.targetplatform</artifactId>
     <packaging>eclipse-target-definition</packaging>
 </project>

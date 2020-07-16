@@ -104,7 +104,7 @@ public class Aadl2Vdm {
 			System.err.println("Working Directory = " + System.getProperty("user.dir"));
 			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
 			System.err.println("Created File object to store Xml");
-			(new VdmTranslator()).marshalToXml(m, testXml);
+			VdmTranslator.marshalToXml(m, testXml);
 			System.err.println("Marshalled Model to XML");
 			return m;
 	   }

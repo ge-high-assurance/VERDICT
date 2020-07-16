@@ -23,8 +23,7 @@
        </handler>
        <handler
              class="com.ge.research.osate.verdict.handlers.WzrdHandler"
-             commandId="com.ge.research.osate.verdict.commands.runWzrd"
-             enablesFor="1">
+             commandId="com.ge.research.osate.verdict.commands.runWzrd">
           <enabledWhen>
              <reference
                    definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">

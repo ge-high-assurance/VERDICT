@@ -19,7 +19,7 @@
         <module>com.ge.research.osate.verdict.dsl.ide</module>
         <module>com.ge.research.osate.verdict.dsl.ui</module>
         <module>com.ge.research.osate.verdict.feature</module>
-        <module>com.ge.research.osate.verdict.target</module>
+        <module>com.ge.research.osate.verdict.targetplatform</module>
         <module>com.ge.research.osate.verdict.updatesite</module>
         <module>com.ge.research.osate.verdict.vdm</module>
     </modules>
@@ -82,7 +82,7 @@
                     <target>
                         <artifact>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>com.ge.research.osate.verdict.target</artifactId>
+                            <artifactId>com.ge.research.osate.verdict.targetplatform</artifactId>
                             <version>${project.version}</version>
                         </artifact>
                     </target>
