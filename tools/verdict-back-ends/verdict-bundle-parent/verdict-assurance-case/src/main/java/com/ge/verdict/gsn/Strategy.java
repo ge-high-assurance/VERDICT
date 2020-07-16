@@ -3,17 +3,13 @@ package com.ge.verdict.gsn;
 public class Strategy {
 
     /** An unique Id */
-	protected String id;
+    protected String id;
 
     /** Some text to display */
-	protected String displayText;
-	
-    /** Strategy status
-     * true if all sub-goals passed
-     * false if even one sub-goal failed
-     */
-    protected boolean status; 
-	
+    protected String displayText;
+
+    /** Strategy status true if all sub-goals passed false if even one sub-goal failed */
+    protected boolean status;
 
     /**
      * Gets the value of the id property.
@@ -50,8 +46,7 @@ public class Strategy {
     public void setDisplayText(String value) {
         this.displayText = value;
     }
-    
-    
+
     /**
      * Gets the value of the status property.
      *

@@ -2,17 +2,13 @@ package com.ge.verdict.gsn;
 
 public class Solution {
     /** An unique Id */
-	protected String id;
+    protected String id;
 
     /** Some text to display */
-	protected String displayText;	
-	
-    /** Solution status
-     * true if supports goal
-     * false if does not support goal
-     */
-    protected boolean status; 
-	
+    protected String displayText;
+
+    /** Solution status true if supports goal false if does not support goal */
+    protected boolean status;
 
     /**
      * Gets the value of the id property.
@@ -49,8 +45,7 @@ public class Solution {
     public void setDisplayText(String value) {
         this.displayText = value;
     }
-    
-    
+
     /**
      * Gets the value of the status property.
      *

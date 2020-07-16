@@ -6,13 +6,9 @@ public class Goal {
 
     /** Some text to display */
     protected String displayText;
-    
-    /** Goal status
-     * true if passed
-     * false if failed
-     */
-    protected boolean status; 
-    
+
+    /** Goal status true if passed false if failed */
+    protected boolean status;
 
     /**
      * Gets the value of the id property.
@@ -49,8 +45,7 @@ public class Goal {
     public void setDisplayText(String value) {
         this.displayText = value;
     }
-    
-    
+
     /**
      * Gets the value of the status property.
      *

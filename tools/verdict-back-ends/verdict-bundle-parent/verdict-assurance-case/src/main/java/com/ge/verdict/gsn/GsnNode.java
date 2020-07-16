@@ -13,6 +13,7 @@ public class GsnNode {
 
     /** To store relevant information based on nodeType */
     protected Goal goal;
+
     protected Strategy strategy;
     protected Solution solution;
     protected Context context;
