@@ -87,6 +87,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <?m2e ignore?>
                         <id>unpack-native-libs</id>
                         <phase>package</phase>
                         <goals>
