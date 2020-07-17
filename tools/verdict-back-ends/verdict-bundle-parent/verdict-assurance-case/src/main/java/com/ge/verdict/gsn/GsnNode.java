@@ -3,11 +3,12 @@ package com.ge.verdict.gsn;
 import java.util.ArrayList;
 import java.util.List;
 
+/** @author Saswata paul */
 public class GsnNode {
 
-	/** An integer describing the level of a node */
-	protected int nodeLevel;
-	
+    /** An integer describing the level of a node */
+    protected int nodeLevel;
+
     /** A unique Id for each node */
     protected String nodeId;
 
@@ -26,8 +27,7 @@ public class GsnNode {
 
     /** List of context nodes of a node */
     protected List<GsnNode> inContextOf;
-    
-    
+
     /**
      * Gets the value of the nodeLevel property.
      *
@@ -46,7 +46,6 @@ public class GsnNode {
         this.nodeLevel = value;
     }
 
-    
     /**
      * Gets the value of the nodeId property.
      *
