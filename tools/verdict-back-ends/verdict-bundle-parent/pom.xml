@@ -72,6 +72,11 @@
             </dependency>
             <dependency>
                 <groupId>com.ge.verdict</groupId>
+                <artifactId>com.microsoft.z3</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-attack-defense-collector</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -114,12 +119,6 @@
                 <groupId>com.ge.verdict</groupId>
                 <artifactId>z3-native-libs</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ge.verdict</groupId>
-                <artifactId>z3-native-libs</artifactId>
-                <version>${project.version}</version>
-                <classifier>api</classifier>
             </dependency>
             <dependency>
                 <groupId>com.sun.activation</groupId>

@@ -16,12 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-attack-defense-collector</artifactId>
+            <artifactId>com.microsoft.z3</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
-            <artifactId>z3-native-libs</artifactId>
-            <classifier>api</classifier>
+            <artifactId>verdict-attack-defense-collector</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -71,6 +70,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
+                        <?m2e ignore?>
                         <id>unpack-native-libs</id>
                         <phase>process-test-resources</phase>
                         <goals>

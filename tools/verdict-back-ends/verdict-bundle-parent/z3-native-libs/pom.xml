@@ -104,25 +104,23 @@
                     <excludeResources>true</excludeResources>
                 </configuration>
             </plugin>
-            <!-- Install com.microsoft.z3 api jar as well as z3-native-libs jar -->
+            <!-- Install com.microsoft.z3 jar as well as z3-native-libs jar -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-z3-jar</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
-                            <goal>attach-artifact</goal>
+                            <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${project.build.directory}/z3-${z3.version}-x64-win/bin/com.microsoft.z3.jar</file>
-                                    <type>jar</type>
-                                    <classifier>api</classifier>
-                                </artifact>
-                            </artifacts>
+                            <file>${project.build.directory}/z3-${z3.version}-x64-win/bin/com.microsoft.z3.jar</file>
+                            <artifactId>com.microsoft.z3</artifactId>
+                            <generatePom>true</generatePom>
+                            <groupId>com.ge.verdict</groupId>
+                            <packaging>jar</packaging>
+                            <version>${project.version}</version>
                         </configuration>
                     </execution>
                 </executions>
