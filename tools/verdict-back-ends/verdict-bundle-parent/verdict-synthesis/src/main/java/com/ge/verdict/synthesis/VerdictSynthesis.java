@@ -49,7 +49,8 @@ public class VerdictSynthesis {
 
         Collection<ComponentDefense> pairs = factory.allComponentDefensePairs();
 
-        int costLcd = normalizeCosts(pairs);
+        // currently not using the LCD
+        normalizeCosts(pairs);
 
         optimizer.Assert(tree.toZ3Multi(context));
 

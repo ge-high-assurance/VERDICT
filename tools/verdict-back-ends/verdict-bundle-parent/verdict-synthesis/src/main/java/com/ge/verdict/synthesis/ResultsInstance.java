@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -24,6 +25,21 @@ public class ResultsInstance {
     public final boolean partialSolution, meritAssignment, inputSat;
     public final double inputCost, outputCost;
     public final List<Item> items;
+
+    private static final String ROOT_TAG = "synthesis";
+    private static final String ROOT_PARTIAL_SOLUTION = "partialSolution";
+    private static final String ROOT_MERIT_ASSIGNMENT = "meritAssignment";
+    private static final String ROOT_INPUT_SAT = "inputSat";
+    private static final String ROOT_INPUT_COST = "inputCost";
+    private static final String ROOT_OUTPUT_COST = "outputCost";
+
+    private static final String ITEM_TAG = "item";
+    private static final String ITEM_COMPONENT = "component";
+    private static final String ITEM_DEFENSE_PROPERTY = "defenseProperty";
+    private static final String ITEM_INPUT_DAL = "inputDal";
+    private static final String ITEM_OUTPUT_DAL = "outputDal";
+    private static final String ITEM_INPUT_COST = "inputCost";
+    private static final String ITEM_OUTPUT_COST = "outputCost";
 
     public static class Item {
         public final String component, defenseProperty;
@@ -44,6 +60,26 @@ public class ResultsInstance {
             this.outputDal = outputDal;
             this.inputCost = inputCost;
             this.outputCost = outputCost;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                    component, defenseProperty, inputDal, outputDal, inputCost, outputCost);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof Item) {
+                Item otherItem = (Item) other;
+                return component.equals(otherItem.component)
+                        && defenseProperty.equals(otherItem.defenseProperty)
+                        && inputDal == otherItem.inputDal
+                        && outputDal == otherItem.outputDal
+                        && inputCost == otherItem.inputCost
+                        && outputCost == otherItem.outputCost;
+            }
+            return false;
         }
     }
 
@@ -70,53 +106,53 @@ public class ResultsInstance {
 
         List<Item> items = new ArrayList<>();
 
-        NodeList nodes = root.getElementsByTagName("item");
+        NodeList nodes = root.getElementsByTagName(ITEM_TAG);
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if (node instanceof Element) {
                 Element elem = (Element) node;
                 items.add(
                         new Item(
-                                elem.getAttribute("component"),
-                                elem.getAttribute("defenseProperty"),
-                                Integer.parseInt(elem.getAttribute("inputDal")),
-                                Integer.parseInt(elem.getAttribute("outputDal")),
-                                Double.parseDouble(elem.getAttribute("inputCost")),
-                                Double.parseDouble(elem.getAttribute("outputal"))));
+                                elem.getAttribute(ITEM_COMPONENT),
+                                elem.getAttribute(ITEM_DEFENSE_PROPERTY),
+                                Integer.parseInt(elem.getAttribute(ITEM_INPUT_DAL)),
+                                Integer.parseInt(elem.getAttribute(ITEM_OUTPUT_DAL)),
+                                Double.parseDouble(elem.getAttribute(ITEM_INPUT_COST)),
+                                Double.parseDouble(elem.getAttribute(ITEM_OUTPUT_COST))));
             }
         }
 
         return new ResultsInstance(
-                Boolean.parseBoolean(root.getAttribute("partial")),
-                Boolean.parseBoolean(root.getAttribute("meritAssignment")),
-                Boolean.parseBoolean(root.getAttribute("inputSat")),
-                Double.parseDouble(root.getAttribute("inputCost")),
-                Double.parseDouble(root.getAttribute("outputCost")),
+                Boolean.parseBoolean(root.getAttribute(ROOT_PARTIAL_SOLUTION)),
+                Boolean.parseBoolean(root.getAttribute(ROOT_MERIT_ASSIGNMENT)),
+                Boolean.parseBoolean(root.getAttribute(ROOT_INPUT_SAT)),
+                Double.parseDouble(root.getAttribute(ROOT_INPUT_COST)),
+                Double.parseDouble(root.getAttribute(ROOT_OUTPUT_COST)),
                 items);
     }
 
     private void toStreamResult(StreamResult target) {
         try {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element root = doc.createElement("synthesis");
+            Element root = doc.createElement(ROOT_TAG);
             doc.appendChild(root);
 
-            root.setAttribute("partialSolution", Boolean.toString(partialSolution));
-            root.setAttribute("meritAssignment", Boolean.toString(meritAssignment));
-            root.setAttribute("inputSat", Boolean.toString(inputSat));
-            root.setAttribute("inputCost", Double.toString(inputCost));
-            root.setAttribute("outputCost", Double.toString(outputCost));
+            root.setAttribute(ROOT_PARTIAL_SOLUTION, Boolean.toString(partialSolution));
+            root.setAttribute(ROOT_MERIT_ASSIGNMENT, Boolean.toString(meritAssignment));
+            root.setAttribute(ROOT_INPUT_SAT, Boolean.toString(inputSat));
+            root.setAttribute(ROOT_INPUT_COST, Double.toString(inputCost));
+            root.setAttribute(ROOT_OUTPUT_COST, Double.toString(outputCost));
 
             for (Item item : items) {
-                Element elem = doc.createElement("item");
+                Element elem = doc.createElement(ITEM_TAG);
                 root.appendChild(elem);
 
-                elem.setAttribute("component", item.component);
-                elem.setAttribute("defenseProperty", item.defenseProperty);
-                elem.setAttribute("inputDal", Integer.toString(item.inputDal));
-                elem.setAttribute("outputDal", Integer.toString(item.outputDal));
-                elem.setAttribute("inputCost", Double.toString(item.inputCost));
-                elem.setAttribute("outputCost", Double.toString(item.outputCost));
+                elem.setAttribute(ITEM_COMPONENT, item.component);
+                elem.setAttribute(ITEM_DEFENSE_PROPERTY, item.defenseProperty);
+                elem.setAttribute(ITEM_INPUT_DAL, Integer.toString(item.inputDal));
+                elem.setAttribute(ITEM_OUTPUT_DAL, Integer.toString(item.outputDal));
+                elem.setAttribute(ITEM_INPUT_COST, Double.toString(item.inputCost));
+                elem.setAttribute(ITEM_OUTPUT_COST, Double.toString(item.outputCost));
             }
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -127,11 +163,75 @@ public class ResultsInstance {
         }
     }
 
-    public void toFile(File file) {
+    public void toFileXml(File file) {
         toStreamResult(new StreamResult(file));
     }
 
-    public void toStream(PrintStream stream) {
+    public void toStreamXml(PrintStream stream) {
         toStreamResult(new StreamResult(stream));
+    }
+
+    public void prettyPrint(PrintStream stream) {
+        int maxLength =
+                Math.min(
+                        items.stream()
+                                .map(
+                                        item ->
+                                                item.component.length()
+                                                        + item.defenseProperty.length())
+                                .reduce(0, Math::max),
+                        50);
+
+        for (Item item : items) {
+            int extraSpaces =
+                    Math.max(
+                            maxLength - item.component.length() - item.defenseProperty.length(), 0);
+            stream.println(
+                    "("
+                            + item.component
+                            + ", "
+                            + item.defenseProperty
+                            + "): "
+                            + new String(new char[extraSpaces]).replace("\0", " ")
+                            + "DAL "
+                            + item.inputDal
+                            + " (cost "
+                            + item.inputCost
+                            + ") --> DAL "
+                            + item.outputDal
+                            + " (cost "
+                            + item.outputCost
+                            + ")");
+        }
+
+        stream.println();
+        stream.println(
+                "Input parameters - partialSolution: "
+                        + partialSolution
+                        + ", meritAssignment: "
+                        + meritAssignment
+                        + ", inputSat: "
+                        + inputSat);
+        stream.println("Total cost: " + inputCost + " --> " + outputCost);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                partialSolution, meritAssignment, inputSat, inputCost, outputCost, items);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof ResultsInstance) {
+            ResultsInstance otherRes = (ResultsInstance) other;
+            return partialSolution == otherRes.partialSolution
+                    && meritAssignment == otherRes.meritAssignment
+                    && inputSat == otherRes.inputSat
+                    && inputCost == otherRes.inputCost
+                    && outputCost == otherRes.outputCost
+                    && items.equals(otherRes.items);
+        }
+        return false;
     }
 }

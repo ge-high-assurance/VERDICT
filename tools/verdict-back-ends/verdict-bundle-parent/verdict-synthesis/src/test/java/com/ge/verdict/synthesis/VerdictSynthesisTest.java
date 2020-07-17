@@ -19,16 +19,20 @@ import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
+import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class VerdictSynthesisTest {
     private <T> String stringOfIterable(Iterable<T> it) {
@@ -240,12 +244,16 @@ public class VerdictSynthesisTest {
         DLeaf leaf2 = new DLeaf("S1", "D1", "A2", 0, 4, costs, factory);
         DTree dtree = new DAnd(leaf1, leaf2);
 
-        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
-                VerdictSynthesis.performSynthesisMultiple(dtree, factory, false, false);
+        CostModel costModel = new CostModel(new Triple<>("S1", "D1", costs));
+
+        Optional<ResultsInstance> result =
+                VerdictSynthesis.performSynthesisMultiple(
+                        dtree, factory, costModel, false, false, false, false);
         Assertions.assertThat(result.isPresent());
-        Assertions.assertThat(result.get().left).hasSize(1);
-        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 4));
-        Assertions.assertThat(result.get().right).isEqualTo(16);
+        Assertions.assertThat(result.get().items).hasSize(1);
+        Assertions.assertThat(result.get().items)
+                .contains(new ResultsInstance.Item("S1", "D1", 0, 4, 2, 16));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(16);
     }
 
     @Test
@@ -257,13 +265,19 @@ public class VerdictSynthesisTest {
         DLeaf leaf2 = new DLeaf("S1", "D2", "A2", 3, 3, costs2, factory);
         DTree dtree = new DOr(leaf1, leaf2);
 
-        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
-                VerdictSynthesis.performSynthesisMultiple(dtree, factory, true, false);
+        CostModel costModel =
+                new CostModel(new Triple<>("S1", "D1", costs1), new Triple<>("S1", "D2", costs2));
+
+        Optional<ResultsInstance> result =
+                VerdictSynthesis.performSynthesisMultiple(
+                        dtree, factory, costModel, true, true, true, false);
         Assertions.assertThat(result.isPresent());
-        Assertions.assertThat(result.get().left).hasSize(2);
-        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf1.componentDefense, 3));
-        Assertions.assertThat(result.get().left).contains(new Pair<>(leaf2.componentDefense, 0));
-        Assertions.assertThat(result.get().right).isEqualTo(4);
+        Assertions.assertThat(result.get().items).hasSize(2);
+        Assertions.assertThat(result.get().items)
+                .contains(new ResultsInstance.Item("S1", "D1", 3, 3, 3, 3));
+        Assertions.assertThat(result.get().items)
+                .contains(new ResultsInstance.Item("S1", "D2", 3, 0, 5, 1));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(4);
     }
 
     @Test
@@ -309,16 +323,19 @@ public class VerdictSynthesisTest {
                                 adtree,
                                 Prob.certain()));
 
-        Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> result =
+        Optional<ResultsInstance> result =
                 VerdictSynthesis.performSynthesisMultiple(
                         DTreeConstructor.construct(results, costModel, true, true, factory),
                         factory,
+                        costModel,
+                        true,
+                        true,
                         true,
                         false);
 
         Assertions.assertThat(result.isPresent());
-        Assertions.assertThat(result.get().left.size()).isEqualTo(2);
-        Assertions.assertThat(result.get().right).isEqualTo(1);
+        Assertions.assertThat(result.get().items.size()).isEqualTo(2);
+        Assertions.assertThat(result.get().outputCost).isEqualTo(1);
     }
 
     @Test
@@ -333,5 +350,27 @@ public class VerdictSynthesisTest {
         new DLeaf("C1", "D2", "A2", 4, 7, costs, factory); // this one counts as 4*2
 
         Assertions.assertThat(VerdictSynthesis.totalImplCost(factory)).isEqualTo(new Fraction(14));
+    }
+
+    @Test
+    public void resultsXmlTest() {
+        DLeaf.Factory factory = new DLeaf.Factory();
+        double[] costs = {2, 5, 9, 15, 16, 18, 20, 25, 30, 37};
+        DTree dtree = new DLeaf("S1", "D1", "A2", 0, 3, costs, factory);
+        CostModel costModel = new CostModel(new Triple<>("S1", "D1", costs));
+
+        Optional<ResultsInstance> result =
+                VerdictSynthesis.performSynthesisMultiple(
+                        dtree, factory, costModel, false, false, false, false);
+        Assertions.assertThat(result.isPresent());
+
+        try {
+            File file = File.createTempFile("testOutput", ".xml");
+            result.get().toFileXml(file);
+            Assertions.assertThat(result.get()).isEqualTo(ResultsInstance.fromFile(file));
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+            e.printStackTrace();
+            Assertions.fail(e.toString());
+        }
     }
 }

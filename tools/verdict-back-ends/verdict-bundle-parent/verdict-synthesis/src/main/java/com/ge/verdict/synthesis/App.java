@@ -114,7 +114,7 @@ public class App {
                                             meritAssignment,
                                             dumpSmtLib));
             if (selected.isPresent()) {
-                selected.get().toStream(System.out);
+                selected.get().toStreamXml(System.out);
             } else {
                 System.out.println("Failure?");
             }

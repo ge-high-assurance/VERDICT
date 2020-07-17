@@ -62,6 +62,35 @@ public class CostModel {
     }
 
     /**
+     * Used for testing.
+     *
+     * @param component
+     * @param defense
+     * @param costs
+     */
+    @SafeVarargs
+    public CostModel(Triple<String, String, double[]>... costs) {
+        compDefDalModel = new LinkedHashMap<>();
+        compDefModel = new LinkedHashMap<>();
+        compDalModel = new LinkedHashMap<>();
+        defDalModel = new LinkedHashMap<>();
+        compModel = new LinkedHashMap<>();
+        defModel = new LinkedHashMap<>();
+        dalModel = new LinkedHashMap<>();
+        defaultModel = 1;
+
+        for (Triple<String, String, double[]> triple : costs) {
+            if (triple.right.length != 10) {
+                throw new RuntimeException("invalid costs");
+            }
+            for (int dal = 0; dal < 10; dal++) {
+                compDefDalModel.put(
+                        new Triple<>(triple.left, triple.middle, dal), triple.right[dal]);
+            }
+        }
+    }
+
+    /**
      * Evaluate the cost function on the given inputs.
      *
      * @param defense
