@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
+    <name>com.ge.research.osate.verdict.vdm</name>
     <packaging>eclipse-plugin</packaging>
     
     <build>
