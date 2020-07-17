@@ -101,18 +101,22 @@ public class App {
                                             partialSolution,
                                             meritAssignment,
                                             factory));
-            Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
+            Optional<ResultsInstance> selected =
                     timed(
                             "Perform synthesis",
                             () ->
                                     VerdictSynthesis.performSynthesisMultiple(
-                                            dtree, factory, meritAssignment, dumpSmtLib));
+                                            dtree,
+                                            factory,
+                                            costModel,
+                                            partialSolution,
+                                            true,
+                                            meritAssignment,
+                                            dumpSmtLib));
             if (selected.isPresent()) {
-                for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
-                    System.out.println(
-                            "Selected leaf: " + pair.left.toString() + " to DAL " + pair.right);
-                }
-                System.out.println("Total cost: " + selected.get().right);
+                selected.get().toStream(System.out);
+            } else {
+                System.out.println("Failure?");
             }
         }
 

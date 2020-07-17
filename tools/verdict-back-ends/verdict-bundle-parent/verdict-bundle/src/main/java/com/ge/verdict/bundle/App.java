@@ -1,30 +1,6 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.bundle;
 
-import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
-import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
-import com.ge.verdict.lustre.VerdictLustreTranslator;
-import com.ge.verdict.mbas.VDM2CSV;
-import com.ge.verdict.stem.VerdictStem;
-import com.ge.verdict.synthesis.CostModel;
-import com.ge.verdict.synthesis.DTreeConstructor;
-import com.ge.verdict.synthesis.VerdictSynthesis;
-import com.ge.verdict.synthesis.dtree.DLeaf;
-import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
-import com.ge.verdict.synthesis.dtree.DTree;
-import com.ge.verdict.synthesis.util.Pair;
-import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
-import com.ge.verdict.vdm.VdmTranslator;
-import edu.uiowa.clc.verdict.blm.BlameAssignment;
-import edu.uiowa.clc.verdict.crv.Instrumentor;
-import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
-import edu.uiowa.clc.verdict.util.XMLProcessor;
-import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.simple.SimpleConfig;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -46,6 +23,32 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
+import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
+import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.lustre.VerdictLustreTranslator;
+import com.ge.verdict.mbas.VDM2CSV;
+import com.ge.verdict.stem.VerdictStem;
+import com.ge.verdict.synthesis.CostModel;
+import com.ge.verdict.synthesis.DTreeConstructor;
+import com.ge.verdict.synthesis.ResultsInstance;
+import com.ge.verdict.synthesis.VerdictSynthesis;
+import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
+import com.ge.verdict.vdm.VdmTranslator;
+
+import edu.uiowa.clc.verdict.blm.BlameAssignment;
+import edu.uiowa.clc.verdict.crv.Instrumentor;
+import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
+import edu.uiowa.clc.verdict.util.XMLProcessor;
+import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleConfig;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import verdict.vdm.vdm_model.Model;
 
 public class App {
@@ -581,72 +584,76 @@ public class App {
                     new AttackDefenseCollector(stemOutputDir, cyberInference);
             List<AttackDefenseCollector.Result> results = collector.perform();
 
+			boolean sat = results.stream().allMatch(result -> Prob.lte(result.prob, result.cyberReq.getSeverity()));
+			boolean performMeritAssignment = meritAssignment && sat;
+
             DLeaf.Factory factory = new DLeaf.Factory();
             DTree dtree =
                     DTreeConstructor.construct(
-                            results, costModel, partialSolution, meritAssignment, factory);
-            Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>> selected =
+							results, costModel, partialSolution, performMeritAssignment, factory);
+			Optional<ResultsInstance> selected =
                     VerdictSynthesis.performSynthesisMultiple(
-                            dtree, factory, meritAssignment, false);
+							dtree, factory, costModel, partialSolution, sat, performMeritAssignment, false);
 
             if (selected.isPresent()) {
                 log("Synthesis results:");
-                for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
-                    if (meritAssignment) {
-                        // Only report downgraded DALs
-                        if (pair.right < pair.left.implDal) {
-                            if (pair.right == 0) {
-                                log(
-                                        "Remove: "
-                                                + pair.left.defenseProperty
-                                                + " for "
-                                                + pair.left.component
-                                                + " (was DAL "
-                                                + pair.left.implDal
-                                                + ")");
-                            } else {
-                                log(
-                                        "Downgrade: "
-                                                + pair.left.defenseProperty
-                                                + " for "
-                                                + pair.left.component
-                                                + " to DAL "
-                                                + pair.right
-                                                + " (from DAL "
-                                                + pair.left.implDal
-                                                + ")");
-                            }
-                        }
-                    } else {
-                        // if using partial solutions, don't report already-implemented defenses
-                        if (!(partialSolution && pair.left.implDal >= pair.right)) {
-                            log(
-                                    "Selected: "
-                                            + pair.left.defenseProperty
-                                            + " for "
-                                            + pair.left.component
-                                            + " to DAL "
-                                            + pair.right
-                                            + (partialSolution && pair.left.implDal > 0
-                                                    ? " (upgrading from DAL "
-                                                            + pair.left.implDal
-                                                            + ")"
-                                                    : ""));
-                        }
-                    }
-                }
-
-                if (meritAssignment) {
-                    double originalCost = VerdictSynthesis.totalImplCost(factory).doubleValue();
-                    log(
-                            "Saved cost: "
-                                    + (originalCost - selected.get().right)
-                                    + " (original cost: "
-                                    + originalCost
-                                    + ")");
-                } else {
-                    log("Total cost: " + selected.get().right);
-                }
+//                for (Pair<ComponentDefense, Integer> pair : selected.get().left) {
+//                    if (meritAssignment) {
+//                        // Only report downgraded DALs
+//                        if (pair.right < pair.left.implDal) {
+//                            if (pair.right == 0) {
+//                                log(
+//                                        "Remove: "
+//                                                + pair.left.defenseProperty
+//                                                + " for "
+//                                                + pair.left.component
+//                                                + " (was DAL "
+//                                                + pair.left.implDal
+//                                                + ")");
+//                            } else {
+//                                log(
+//                                        "Downgrade: "
+//                                                + pair.left.defenseProperty
+//                                                + " for "
+//                                                + pair.left.component
+//                                                + " to DAL "
+//                                                + pair.right
+//                                                + " (from DAL "
+//                                                + pair.left.implDal
+//                                                + ")");
+//                            }
+//                        }
+//                    } else {
+//                        // if using partial solutions, don't report already-implemented defenses
+//                        if (!(partialSolution && pair.left.implDal >= pair.right)) {
+//                            log(
+//                                    "Selected: "
+//                                            + pair.left.defenseProperty
+//                                            + " for "
+//                                            + pair.left.component
+//                                            + " to DAL "
+//                                            + pair.right
+//                                            + (partialSolution && pair.left.implDal > 0
+//                                                    ? " (upgrading from DAL "
+//                                                            + pair.left.implDal
+//                                                            + ")"
+//                                                    : ""));
+//                        }
+//                    }
+//                }
+//
+//                if (meritAssignment) {
+//                    double originalCost = VerdictSynthesis.totalImplCost(factory).doubleValue();
+//                    log(
+//                            "Saved cost: "
+//                                    + (originalCost - selected.get().right)
+//                                    + " (original cost: "
+//                                    + originalCost
+//                                    + ")");
+//            } else {
+//                log("Total cost: " + selected.get().right);
+//            }
+                selected.get().toStream(System.out);
             } else {
                 logError("Synthesis failed");
             }

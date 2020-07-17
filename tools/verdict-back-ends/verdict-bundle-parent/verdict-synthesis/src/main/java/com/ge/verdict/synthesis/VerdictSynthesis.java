@@ -36,12 +36,14 @@ public class VerdictSynthesis {
         MAXSAT
     }
 
-    public static Optional<Pair<List<Pair<ComponentDefense, Integer>>, Double>>
-            performSynthesisMultiple(
-                    DTree tree,
-                    DLeaf.Factory factory,
-                    boolean meritAssignment,
-                    boolean dumpSmtLib) {
+    public static Optional<ResultsInstance> performSynthesisMultiple(
+            DTree tree,
+            DLeaf.Factory factory,
+            CostModel costModel,
+            boolean partialSolution,
+            boolean inputSat,
+            boolean meritAssignment,
+            boolean dumpSmtLib) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
@@ -100,18 +102,38 @@ public class VerdictSynthesis {
         }
 
         if (optimizer.Check().equals(Status.SATISFIABLE)) {
-            List<Pair<ComponentDefense, Integer>> output = new ArrayList<>();
-            int totalNormalizedCost = 0;
+            List<ResultsInstance.Item> items = new ArrayList<>();
+            double totalInputCost = 0, totalOutputCost = 0;
             Model model = optimizer.getModel();
             for (ComponentDefense pair : pairs) {
                 IntNum expr = (IntNum) model.eval(pair.toZ3Multi(context), true);
                 int normCost = expr.getInt();
                 int dal = pair.normCostToDal(normCost);
-                totalNormalizedCost += normCost;
-                output.add(new Pair<>(pair, dal));
-            }
 
-            return Optional.of(new Pair<>(output, ((double) totalNormalizedCost) / costLcd));
+                double inputCost =
+                        costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
+                double outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
+
+                totalInputCost += inputCost;
+                totalOutputCost += outputCost;
+
+                items.add(
+                        new ResultsInstance.Item(
+                                pair.component,
+                                pair.defenseProperty,
+                                pair.implDal,
+                                dal,
+                                inputCost,
+                                outputCost));
+            }
+            return Optional.of(
+                    new ResultsInstance(
+                            partialSolution,
+                            meritAssignment,
+                            inputSat,
+                            totalInputCost,
+                            totalOutputCost,
+                            items));
         } else {
             System.err.println(
                     "Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
