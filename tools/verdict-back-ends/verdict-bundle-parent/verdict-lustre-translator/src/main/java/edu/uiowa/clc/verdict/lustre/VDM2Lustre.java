@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2019-2020, Board of Trustees of the University of Iowa.
    All rights reserved.
 
@@ -242,7 +243,8 @@ public class VDM2Lustre {
                 // Option Check)
                 
                 if(componentType == null && subcomponentImpl == null) {
-                	System.out.println(componentInstance.getName() + " subcomponent is missing both a specification and an implemention. Please provide some specification or an implementation to continue.");
+                	System.out.println(componentInstance.getName() + " subcomponent is missing both a specification and an implemention.");
+                	System.out.println("Please provide some specification or an implementation to continue.");
                 	System.exit(-1);
                 }
                 
