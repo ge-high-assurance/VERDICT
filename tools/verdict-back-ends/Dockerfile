@@ -38,6 +38,7 @@ RUN opam switch 4.07 \
     camlp4 \
     core \
     core_extended \
+    dune \
     num \
     ocamlbuild \
     ocamlfind \
@@ -93,7 +94,7 @@ RUN apt-get update -qq \
 
 # Copy the binaries we need to call
 
-COPY --from=builder /src/aadl2iml/main.native /app/aadl2iml
+COPY --from=builder /src/aadl2iml/bin/aadl2iml /app/aadl2iml
 COPY --from=builder /src/kind2/bin/kind2 /app/kind2
 COPY --from=builder /src/soteria_pp/soteria_pp.native /app/soteria_pp
 COPY verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0-SNAPSHOT-capsule.jar /app/verdict.jar
