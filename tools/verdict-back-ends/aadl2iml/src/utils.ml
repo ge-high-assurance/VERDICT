@@ -10,7 +10,7 @@
 let element_position p l =
   let rec aux i = function
     | [] -> None
-    | h :: tl when p h -> Some (h, i)
+    | h :: _ when p h -> Some (h, i)
     | _ :: tl -> aux (i+1) tl
   in
   aux 0 l

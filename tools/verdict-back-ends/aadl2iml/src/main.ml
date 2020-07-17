@@ -10,11 +10,8 @@
 let process_ast ast =
   (*Format.printf "@[<v>== AADL Model ==@,%a@]@."
     AADLAst.pp_print_ast ast ;
-  Format.printf "@[<v>== IML Model ==@,%a@]@."
-    AADL2IML.pp_print_aadl_ast_as_iml ast;*)
-
+  *)
   Format.printf "%a@." AADLAst.pp_print_ast ast
-  (* Format.printf "%a@." AADL2IML.pp_print_aadl_ast_as_iml ast *)
 
 let read_input_from_files filenames =
   let rec loop acc = function
@@ -54,7 +51,7 @@ let expand_dirs input_files =
         |> loop result
     | f::fs when has_aadl_extension f ->
         loop (f::result) fs
-    | f::fs -> loop result fs
+    | _::fs -> loop result fs
     | []    -> result
   in
   loop [] input_files
