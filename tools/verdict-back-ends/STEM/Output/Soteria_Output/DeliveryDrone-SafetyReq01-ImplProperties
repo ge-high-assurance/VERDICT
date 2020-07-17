@@ -1,0 +1,30 @@
+digraph G {
+rankdir=BT 
+layout = dot
+splines = true
+overlap = false
+sep ="+10, +10"
+esep ="+8, +8"
+outputorder=edgesfirst
+10 [label ="Or", shape=none, margin=0, height=0, width=0, image="or.png"]
+9 [label = "radio: loa_event", shape = box]
+8 [label = "positionEstimator: loa_event", shape = box]
+7 [label = "navigation: loa_event", shape = box]
+6 [label = "imu: loa_event", shape = box]
+5 [label = "gps: loa_event", shape = box]
+4 [label = "fc: loa_event", shape = box]
+3 [label = "deliveryPlanner: loa_event", shape = box]
+2 [label = "deliveryItemMechanism: loa_event", shape = box]
+1 [label = "camera: loa_event", shape = box]
+0 [label = "actuation: loa_event", shape = box]
+9 -> 10
+8 -> 10
+7 -> 10
+6 -> 10
+5 -> 10
+4 -> 10
+3 -> 10
+2 -> 10
+1 -> 10
+0 -> 10
+}

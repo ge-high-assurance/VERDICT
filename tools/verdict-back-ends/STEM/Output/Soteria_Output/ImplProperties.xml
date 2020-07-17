@@ -1,0 +1,1353 @@
+<?xml version="1.0"?>
+<Results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Mission label="MReq01">
+    <Requirement label="CyberReq01" defenseType="ImplProperties" computed_p="1e-05" acceptable_p="1e-07">
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-123"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-125"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="dosProtection" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-130"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="resourceAvailability" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-131"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="resourceAvailability" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-151"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="heterogeneity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-25"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-26"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-28"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="inputValidation" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-123"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-125"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="dosProtection" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-130"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="resourceAvailability" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-131"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="resourceAvailability" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-151"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="heterogeneity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-25"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-26"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-28"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="inputValidation" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-137"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-175"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-242"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-248"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-586"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-594"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-607"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(antiJamming and failSafe)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-74"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and staticCodeAnalysis)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-137"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-175"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-242"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-248"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-586"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-594"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-607"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(antiJamming and failSafe)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-74"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and staticCodeAnalysis)" profile=""/>
+        </Defense>
+      </Cutset>
+    </Requirement>
+    <Requirement label="CyberReq02" defenseType="ImplProperties" computed_p="1e-05" acceptable_p="1e-07">
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-05">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="actuation" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="actuation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="camera" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="camera" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryItemMechanism" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryItemMechanism" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-123"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-151"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="heterogeneity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-26"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-28"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="inputValidation" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-123"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-151"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="heterogeneity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-26"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="staticCodeAnalysis" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-28"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="inputValidation" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-438"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-439"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="supplyChainSecurity" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-390"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="systemAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-440"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-507"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="radio" attack="CAPEC-624"/>
+        </Attack>
+        <Defense>
+          <Component comp="radio" suggested="physicalAccessControl" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-137"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-175"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-242"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-248"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-586"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-594"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="deliveryPlanner" attack="CAPEC-74"/>
+        </Attack>
+        <Defense>
+          <Component comp="deliveryPlanner" suggested="(inputValidation and staticCodeAnalysis)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="fc" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="fc" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="gps" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="gps" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="imu" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="imu" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="navigation" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="navigation" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-137"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-175"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-176"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-184"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-242"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-248"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-549"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(memoryProtection and remoteAttestation and secureBoot)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-586"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-594"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and logging)" profile=""/>
+        </Defense>
+      </Cutset>
+      <Cutset likelihood="1e-07">
+        <Attack>
+          <Component comp="positionEstimator" attack="CAPEC-74"/>
+        </Attack>
+        <Defense>
+          <Component comp="positionEstimator" suggested="(inputValidation and staticCodeAnalysis)" profile=""/>
+        </Defense>
+      </Cutset>
+    </Requirement>
+  </Mission>
+</Results>

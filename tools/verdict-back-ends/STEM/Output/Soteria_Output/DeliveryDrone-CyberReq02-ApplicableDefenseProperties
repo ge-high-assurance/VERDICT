@@ -1,0 +1,1113 @@
+digraph G {
+rankdir=BT 
+layout = dot
+splines = true
+overlap = false
+sep ="+10, +10"
+esep ="+8, +8"
+outputorder=edgesfirst
+481 [label ="Or", shape=none, margin=0, height=0, width=0, image="or.png"]
+480 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+479 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+478 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+477 [label = "radio: SecureBoot", shape = box]
+476 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+475 [label = "radio: RemoteAttestation", shape = box]
+474 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+473 [label = "radio: MemoryProtection", shape = box]
+472 [label = "radio: CAPEC-549", shape = box]
+471 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+470 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+469 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+468 [label = "radio: TamperProtection", shape = box]
+467 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+466 [label = "radio: PhysicalAccessControl", shape = box]
+465 [label = "radio: CAPEC-440", shape = box]
+464 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+463 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+462 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+461 [label = "radio: SecureBoot", shape = box]
+460 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+459 [label = "radio: RemoteAttestation", shape = box]
+458 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+457 [label = "radio: MemoryProtection", shape = box]
+456 [label = "radio: CAPEC-184", shape = box]
+455 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+454 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+453 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+452 [label = "radio: SecureBoot", shape = box]
+451 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+450 [label = "radio: RemoteAttestation", shape = box]
+449 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+448 [label = "radio: MemoryProtection", shape = box]
+447 [label = "radio: CAPEC-176", shape = box]
+446 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+445 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+444 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+443 [label = "positionEstimator: StaticCodeAnalysis", shape = box]
+442 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+441 [label = "positionEstimator: InputValidation", shape = box]
+440 [label = "positionEstimator: CAPEC-74", shape = box]
+439 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+438 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+437 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+436 [label = "positionEstimator: Logging", shape = box]
+435 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+434 [label = "positionEstimator: InputValidation", shape = box]
+433 [label = "positionEstimator: CAPEC-594", shape = box]
+432 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+431 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+430 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+429 [label = "positionEstimator: Logging", shape = box]
+428 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+427 [label = "positionEstimator: InputValidation", shape = box]
+426 [label = "positionEstimator: CAPEC-586", shape = box]
+425 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+424 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+423 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+422 [label = "positionEstimator: SecureBoot", shape = box]
+421 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+420 [label = "positionEstimator: RemoteAttestation", shape = box]
+419 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+418 [label = "positionEstimator: MemoryProtection", shape = box]
+417 [label = "positionEstimator: CAPEC-549", shape = box]
+416 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+415 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+414 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+413 [label = "positionEstimator: Logging", shape = box]
+412 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+411 [label = "positionEstimator: InputValidation", shape = box]
+410 [label = "positionEstimator: CAPEC-248", shape = box]
+409 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+408 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+407 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+406 [label = "positionEstimator: Logging", shape = box]
+405 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+404 [label = "positionEstimator: InputValidation", shape = box]
+403 [label = "positionEstimator: CAPEC-242", shape = box]
+402 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+401 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+400 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+399 [label = "positionEstimator: SecureBoot", shape = box]
+398 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+397 [label = "positionEstimator: RemoteAttestation", shape = box]
+396 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+395 [label = "positionEstimator: MemoryProtection", shape = box]
+394 [label = "positionEstimator: CAPEC-184", shape = box]
+393 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+392 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+391 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+390 [label = "positionEstimator: SecureBoot", shape = box]
+389 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+388 [label = "positionEstimator: RemoteAttestation", shape = box]
+387 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+386 [label = "positionEstimator: MemoryProtection", shape = box]
+385 [label = "positionEstimator: CAPEC-176", shape = box]
+384 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+383 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+382 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+381 [label = "positionEstimator: Logging", shape = box]
+380 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+379 [label = "positionEstimator: InputValidation", shape = box]
+378 [label = "positionEstimator: CAPEC-175", shape = box]
+377 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+376 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+375 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+374 [label = "positionEstimator: Logging", shape = box]
+373 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+372 [label = "positionEstimator: InputValidation", shape = box]
+371 [label = "positionEstimator: CAPEC-137", shape = box]
+370 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+369 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+368 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+367 [label = "navigation: SecureBoot", shape = box]
+366 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+365 [label = "navigation: RemoteAttestation", shape = box]
+364 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+363 [label = "navigation: MemoryProtection", shape = box]
+362 [label = "navigation: CAPEC-549", shape = box]
+361 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+360 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+359 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+358 [label = "navigation: SecureBoot", shape = box]
+357 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+356 [label = "navigation: RemoteAttestation", shape = box]
+355 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+354 [label = "navigation: MemoryProtection", shape = box]
+353 [label = "navigation: CAPEC-184", shape = box]
+352 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+351 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+350 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+349 [label = "navigation: SecureBoot", shape = box]
+348 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+347 [label = "navigation: RemoteAttestation", shape = box]
+346 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+345 [label = "navigation: MemoryProtection", shape = box]
+344 [label = "navigation: CAPEC-176", shape = box]
+343 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+342 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+341 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+340 [label = "imu: SecureBoot", shape = box]
+339 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+338 [label = "imu: RemoteAttestation", shape = box]
+337 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+336 [label = "imu: MemoryProtection", shape = box]
+335 [label = "imu: CAPEC-549", shape = box]
+334 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+333 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+332 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+331 [label = "imu: TamperProtection", shape = box]
+330 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+329 [label = "imu: PhysicalAccessControl", shape = box]
+328 [label = "imu: CAPEC-440", shape = box]
+327 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+326 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+325 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+324 [label = "imu: SecureBoot", shape = box]
+323 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+322 [label = "imu: RemoteAttestation", shape = box]
+321 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+320 [label = "imu: MemoryProtection", shape = box]
+319 [label = "imu: CAPEC-184", shape = box]
+318 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+317 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+316 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+315 [label = "imu: SecureBoot", shape = box]
+314 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+313 [label = "imu: RemoteAttestation", shape = box]
+312 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+311 [label = "imu: MemoryProtection", shape = box]
+310 [label = "imu: CAPEC-176", shape = box]
+309 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+308 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+307 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+306 [label = "gps: SecureBoot", shape = box]
+305 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+304 [label = "gps: RemoteAttestation", shape = box]
+303 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+302 [label = "gps: MemoryProtection", shape = box]
+301 [label = "gps: CAPEC-549", shape = box]
+300 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+299 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+298 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+297 [label = "gps: TamperProtection", shape = box]
+296 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+295 [label = "gps: PhysicalAccessControl", shape = box]
+294 [label = "gps: CAPEC-440", shape = box]
+293 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+292 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+291 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+290 [label = "gps: SecureBoot", shape = box]
+289 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+288 [label = "gps: RemoteAttestation", shape = box]
+287 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+286 [label = "gps: MemoryProtection", shape = box]
+285 [label = "gps: CAPEC-184", shape = box]
+284 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+283 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+282 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+281 [label = "gps: SecureBoot", shape = box]
+280 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+279 [label = "gps: RemoteAttestation", shape = box]
+278 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+277 [label = "gps: MemoryProtection", shape = box]
+276 [label = "gps: CAPEC-176", shape = box]
+275 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+274 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+273 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+272 [label = "fc: SecureBoot", shape = box]
+271 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+270 [label = "fc: RemoteAttestation", shape = box]
+269 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+268 [label = "fc: MemoryProtection", shape = box]
+267 [label = "fc: CAPEC-549", shape = box]
+266 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+265 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+264 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+263 [label = "fc: SecureBoot", shape = box]
+262 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+261 [label = "fc: RemoteAttestation", shape = box]
+260 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+259 [label = "fc: MemoryProtection", shape = box]
+258 [label = "fc: CAPEC-184", shape = box]
+257 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+256 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+255 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+254 [label = "fc: SecureBoot", shape = box]
+253 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+252 [label = "fc: RemoteAttestation", shape = box]
+251 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+250 [label = "fc: MemoryProtection", shape = box]
+249 [label = "fc: CAPEC-176", shape = box]
+248 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+247 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+246 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+245 [label = "deliveryPlanner: StaticCodeAnalysis", shape = box]
+244 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+243 [label = "deliveryPlanner: InputValidation", shape = box]
+242 [label = "deliveryPlanner: CAPEC-74", shape = box]
+241 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+240 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+239 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+238 [label = "deliveryPlanner: Logging", shape = box]
+237 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+236 [label = "deliveryPlanner: InputValidation", shape = box]
+235 [label = "deliveryPlanner: CAPEC-594", shape = box]
+234 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+233 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+232 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+231 [label = "deliveryPlanner: Logging", shape = box]
+230 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+229 [label = "deliveryPlanner: InputValidation", shape = box]
+228 [label = "deliveryPlanner: CAPEC-586", shape = box]
+227 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+226 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+225 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+224 [label = "deliveryPlanner: SecureBoot", shape = box]
+223 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+222 [label = "deliveryPlanner: RemoteAttestation", shape = box]
+221 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+220 [label = "deliveryPlanner: MemoryProtection", shape = box]
+219 [label = "deliveryPlanner: CAPEC-549", shape = box]
+218 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+217 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+216 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+215 [label = "deliveryPlanner: Logging", shape = box]
+214 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+213 [label = "deliveryPlanner: InputValidation", shape = box]
+212 [label = "deliveryPlanner: CAPEC-248", shape = box]
+211 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+210 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+209 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+208 [label = "deliveryPlanner: Logging", shape = box]
+207 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+206 [label = "deliveryPlanner: InputValidation", shape = box]
+205 [label = "deliveryPlanner: CAPEC-242", shape = box]
+204 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+203 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+202 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+201 [label = "deliveryPlanner: SecureBoot", shape = box]
+200 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+199 [label = "deliveryPlanner: RemoteAttestation", shape = box]
+198 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+197 [label = "deliveryPlanner: MemoryProtection", shape = box]
+196 [label = "deliveryPlanner: CAPEC-184", shape = box]
+195 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+194 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+193 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+192 [label = "deliveryPlanner: SecureBoot", shape = box]
+191 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+190 [label = "deliveryPlanner: RemoteAttestation", shape = box]
+189 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+188 [label = "deliveryPlanner: MemoryProtection", shape = box]
+187 [label = "deliveryPlanner: CAPEC-176", shape = box]
+186 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+185 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+184 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+183 [label = "deliveryPlanner: Logging", shape = box]
+182 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+181 [label = "deliveryPlanner: InputValidation", shape = box]
+180 [label = "deliveryPlanner: CAPEC-175", shape = box]
+179 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+178 [label ="d-Or", shape=none, margin=0, height=0, width=0, image="or_gray.png"]
+177 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+176 [label = "deliveryPlanner: Logging", shape = box]
+175 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+174 [label = "deliveryPlanner: InputValidation", shape = box]
+173 [label = "deliveryPlanner: CAPEC-137", shape = box]
+172 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+171 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+170 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+169 [label = "deliveryItemMechanism: TamperProtection", shape = box]
+168 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+167 [label = "deliveryItemMechanism: PhysicalAccessControl", shape = box]
+166 [label = "deliveryItemMechanism: CAPEC-440", shape = box]
+165 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+164 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+163 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+162 [label = "camera: TamperProtection", shape = box]
+161 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+160 [label = "camera: PhysicalAccessControl", shape = box]
+159 [label = "camera: CAPEC-440", shape = box]
+158 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+157 [label ="d-And", shape=none, margin=0, height=0, width=0, image="and_gray.png"]
+156 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+155 [label = "actuation: TamperProtection", shape = box]
+154 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+153 [label = "actuation: PhysicalAccessControl", shape = box]
+152 [label = "actuation: CAPEC-440", shape = box]
+151 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+150 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+149 [label = "radio: PhysicalAccessControl", shape = box]
+148 [label = "radio: CAPEC-624", shape = box]
+147 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+146 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+145 [label = "radio: PhysicalAccessControl", shape = box]
+144 [label = "radio: CAPEC-507", shape = box]
+143 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+142 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+141 [label = "radio: SystemAccessControl", shape = box]
+140 [label = "radio: CAPEC-390", shape = box]
+139 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+138 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+137 [label = "positionEstimator: PhysicalAccessControl", shape = box]
+136 [label = "positionEstimator: CAPEC-624", shape = box]
+135 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+134 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+133 [label = "positionEstimator: SupplyChainSecurity", shape = box]
+132 [label = "positionEstimator: CAPEC-439", shape = box]
+131 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+130 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+129 [label = "positionEstimator: SupplyChainSecurity", shape = box]
+128 [label = "positionEstimator: CAPEC-438", shape = box]
+127 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+126 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+125 [label = "positionEstimator: InputValidation", shape = box]
+124 [label = "positionEstimator: CAPEC-28", shape = box]
+123 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+122 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+121 [label = "positionEstimator: StaticCodeAnalysis", shape = box]
+120 [label = "positionEstimator: CAPEC-26", shape = box]
+119 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+118 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+117 [label = "positionEstimator: Heterogeneity", shape = box]
+116 [label = "positionEstimator: CAPEC-151", shape = box]
+115 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+114 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+113 [label = "positionEstimator: StaticCodeAnalysis", shape = box]
+112 [label = "positionEstimator: CAPEC-123", shape = box]
+111 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+110 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+109 [label = "navigation: PhysicalAccessControl", shape = box]
+108 [label = "navigation: CAPEC-624", shape = box]
+107 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+106 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+105 [label = "imu: PhysicalAccessControl", shape = box]
+104 [label = "imu: CAPEC-624", shape = box]
+103 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+102 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+101 [label = "imu: PhysicalAccessControl", shape = box]
+100 [label = "imu: CAPEC-507", shape = box]
+99 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+98 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+97 [label = "imu: SupplyChainSecurity", shape = box]
+96 [label = "imu: CAPEC-439", shape = box]
+95 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+94 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+93 [label = "imu: SupplyChainSecurity", shape = box]
+92 [label = "imu: CAPEC-438", shape = box]
+91 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+90 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+89 [label = "imu: SystemAccessControl", shape = box]
+88 [label = "imu: CAPEC-390", shape = box]
+87 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+86 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+85 [label = "gps: PhysicalAccessControl", shape = box]
+84 [label = "gps: CAPEC-624", shape = box]
+83 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+82 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+81 [label = "gps: PhysicalAccessControl", shape = box]
+80 [label = "gps: CAPEC-507", shape = box]
+79 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+78 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+77 [label = "gps: SupplyChainSecurity", shape = box]
+76 [label = "gps: CAPEC-439", shape = box]
+75 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+74 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+73 [label = "gps: SupplyChainSecurity", shape = box]
+72 [label = "gps: CAPEC-438", shape = box]
+71 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+70 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+69 [label = "gps: SystemAccessControl", shape = box]
+68 [label = "gps: CAPEC-390", shape = box]
+67 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+66 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+65 [label = "fc: PhysicalAccessControl", shape = box]
+64 [label = "fc: CAPEC-624", shape = box]
+63 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+62 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+61 [label = "deliveryPlanner: PhysicalAccessControl", shape = box]
+60 [label = "deliveryPlanner: CAPEC-624", shape = box]
+59 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+58 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+57 [label = "deliveryPlanner: SupplyChainSecurity", shape = box]
+56 [label = "deliveryPlanner: CAPEC-439", shape = box]
+55 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+54 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+53 [label = "deliveryPlanner: SupplyChainSecurity", shape = box]
+52 [label = "deliveryPlanner: CAPEC-438", shape = box]
+51 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+50 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+49 [label = "deliveryPlanner: InputValidation", shape = box]
+48 [label = "deliveryPlanner: CAPEC-28", shape = box]
+47 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+46 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+45 [label = "deliveryPlanner: StaticCodeAnalysis", shape = box]
+44 [label = "deliveryPlanner: CAPEC-26", shape = box]
+43 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+42 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+41 [label = "deliveryPlanner: Heterogeneity", shape = box]
+40 [label = "deliveryPlanner: CAPEC-151", shape = box]
+39 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+38 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+37 [label = "deliveryPlanner: StaticCodeAnalysis", shape = box]
+36 [label = "deliveryPlanner: CAPEC-123", shape = box]
+35 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+34 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+33 [label = "deliveryItemMechanism: PhysicalAccessControl", shape = box]
+32 [label = "deliveryItemMechanism: CAPEC-624", shape = box]
+31 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+30 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+29 [label = "deliveryItemMechanism: PhysicalAccessControl", shape = box]
+28 [label = "deliveryItemMechanism: CAPEC-507", shape = box]
+27 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+26 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+25 [label = "deliveryItemMechanism: SystemAccessControl", shape = box]
+24 [label = "deliveryItemMechanism: CAPEC-390", shape = box]
+23 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+22 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+21 [label = "camera: PhysicalAccessControl", shape = box]
+20 [label = "camera: CAPEC-624", shape = box]
+19 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+18 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+17 [label = "camera: PhysicalAccessControl", shape = box]
+16 [label = "camera: CAPEC-507", shape = box]
+15 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+14 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+13 [label = "camera: SystemAccessControl", shape = box]
+12 [label = "camera: CAPEC-390", shape = box]
+11 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+10 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+9 [label = "actuation: PhysicalAccessControl", shape = box]
+8 [label = "actuation: CAPEC-624", shape = box]
+7 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+6 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+5 [label = "actuation: PhysicalAccessControl", shape = box]
+4 [label = "actuation: CAPEC-507", shape = box]
+3 [label ="And", shape=none, margin=0, height=0, width=0, image="and.png"]
+2 [label ="
+Not", shape=none, margin=0, height=0, width=0, image="not_gray.png"]
+1 [label = "actuation: SystemAccessControl", shape = box]
+0 [label = "actuation: CAPEC-390", shape = box]
+480 -> 481
+471 -> 481
+464 -> 481
+455 -> 481
+446 -> 481
+439 -> 481
+432 -> 481
+425 -> 481
+416 -> 481
+409 -> 481
+402 -> 481
+393 -> 481
+384 -> 481
+377 -> 481
+370 -> 481
+361 -> 481
+352 -> 481
+343 -> 481
+334 -> 481
+327 -> 481
+318 -> 481
+309 -> 481
+300 -> 481
+293 -> 481
+284 -> 481
+275 -> 481
+266 -> 481
+257 -> 481
+248 -> 481
+241 -> 481
+234 -> 481
+227 -> 481
+218 -> 481
+211 -> 481
+204 -> 481
+195 -> 481
+186 -> 481
+179 -> 481
+172 -> 481
+165 -> 481
+158 -> 481
+151 -> 481
+147 -> 481
+143 -> 481
+139 -> 481
+135 -> 481
+131 -> 481
+127 -> 481
+123 -> 481
+119 -> 481
+115 -> 481
+111 -> 481
+107 -> 481
+103 -> 481
+99 -> 481
+95 -> 481
+91 -> 481
+87 -> 481
+83 -> 481
+79 -> 481
+75 -> 481
+71 -> 481
+67 -> 481
+63 -> 481
+59 -> 481
+55 -> 481
+51 -> 481
+47 -> 481
+43 -> 481
+39 -> 481
+35 -> 481
+31 -> 481
+27 -> 481
+23 -> 481
+19 -> 481
+15 -> 481
+11 -> 481
+7 -> 481
+3 -> 481
+479 -> 480
+472 -> 480
+478 -> 479
+476 -> 479
+474 -> 479
+477 -> 478
+475 -> 476
+473 -> 474
+470 -> 471
+465 -> 471
+469 -> 470
+467 -> 470
+468 -> 469
+466 -> 467
+463 -> 464
+456 -> 464
+462 -> 463
+460 -> 463
+458 -> 463
+461 -> 462
+459 -> 460
+457 -> 458
+454 -> 455
+447 -> 455
+453 -> 454
+451 -> 454
+449 -> 454
+452 -> 453
+450 -> 451
+448 -> 449
+445 -> 446
+440 -> 446
+444 -> 445
+442 -> 445
+443 -> 444
+441 -> 442
+438 -> 439
+433 -> 439
+437 -> 438
+435 -> 438
+436 -> 437
+434 -> 435
+431 -> 432
+426 -> 432
+430 -> 431
+428 -> 431
+429 -> 430
+427 -> 428
+424 -> 425
+417 -> 425
+423 -> 424
+421 -> 424
+419 -> 424
+422 -> 423
+420 -> 421
+418 -> 419
+415 -> 416
+410 -> 416
+414 -> 415
+412 -> 415
+413 -> 414
+411 -> 412
+408 -> 409
+403 -> 409
+407 -> 408
+405 -> 408
+406 -> 407
+404 -> 405
+401 -> 402
+394 -> 402
+400 -> 401
+398 -> 401
+396 -> 401
+399 -> 400
+397 -> 398
+395 -> 396
+392 -> 393
+385 -> 393
+391 -> 392
+389 -> 392
+387 -> 392
+390 -> 391
+388 -> 389
+386 -> 387
+383 -> 384
+378 -> 384
+382 -> 383
+380 -> 383
+381 -> 382
+379 -> 380
+376 -> 377
+371 -> 377
+375 -> 376
+373 -> 376
+374 -> 375
+372 -> 373
+369 -> 370
+362 -> 370
+368 -> 369
+366 -> 369
+364 -> 369
+367 -> 368
+365 -> 366
+363 -> 364
+360 -> 361
+353 -> 361
+359 -> 360
+357 -> 360
+355 -> 360
+358 -> 359
+356 -> 357
+354 -> 355
+351 -> 352
+344 -> 352
+350 -> 351
+348 -> 351
+346 -> 351
+349 -> 350
+347 -> 348
+345 -> 346
+342 -> 343
+335 -> 343
+341 -> 342
+339 -> 342
+337 -> 342
+340 -> 341
+338 -> 339
+336 -> 337
+333 -> 334
+328 -> 334
+332 -> 333
+330 -> 333
+331 -> 332
+329 -> 330
+326 -> 327
+319 -> 327
+325 -> 326
+323 -> 326
+321 -> 326
+324 -> 325
+322 -> 323
+320 -> 321
+317 -> 318
+310 -> 318
+316 -> 317
+314 -> 317
+312 -> 317
+315 -> 316
+313 -> 314
+311 -> 312
+308 -> 309
+301 -> 309
+307 -> 308
+305 -> 308
+303 -> 308
+306 -> 307
+304 -> 305
+302 -> 303
+299 -> 300
+294 -> 300
+298 -> 299
+296 -> 299
+297 -> 298
+295 -> 296
+292 -> 293
+285 -> 293
+291 -> 292
+289 -> 292
+287 -> 292
+290 -> 291
+288 -> 289
+286 -> 287
+283 -> 284
+276 -> 284
+282 -> 283
+280 -> 283
+278 -> 283
+281 -> 282
+279 -> 280
+277 -> 278
+274 -> 275
+267 -> 275
+273 -> 274
+271 -> 274
+269 -> 274
+272 -> 273
+270 -> 271
+268 -> 269
+265 -> 266
+258 -> 266
+264 -> 265
+262 -> 265
+260 -> 265
+263 -> 264
+261 -> 262
+259 -> 260
+256 -> 257
+249 -> 257
+255 -> 256
+253 -> 256
+251 -> 256
+254 -> 255
+252 -> 253
+250 -> 251
+247 -> 248
+242 -> 248
+246 -> 247
+244 -> 247
+245 -> 246
+243 -> 244
+240 -> 241
+235 -> 241
+239 -> 240
+237 -> 240
+238 -> 239
+236 -> 237
+233 -> 234
+228 -> 234
+232 -> 233
+230 -> 233
+231 -> 232
+229 -> 230
+226 -> 227
+219 -> 227
+225 -> 226
+223 -> 226
+221 -> 226
+224 -> 225
+222 -> 223
+220 -> 221
+217 -> 218
+212 -> 218
+216 -> 217
+214 -> 217
+215 -> 216
+213 -> 214
+210 -> 211
+205 -> 211
+209 -> 210
+207 -> 210
+208 -> 209
+206 -> 207
+203 -> 204
+196 -> 204
+202 -> 203
+200 -> 203
+198 -> 203
+201 -> 202
+199 -> 200
+197 -> 198
+194 -> 195
+187 -> 195
+193 -> 194
+191 -> 194
+189 -> 194
+192 -> 193
+190 -> 191
+188 -> 189
+185 -> 186
+180 -> 186
+184 -> 185
+182 -> 185
+183 -> 184
+181 -> 182
+178 -> 179
+173 -> 179
+177 -> 178
+175 -> 178
+176 -> 177
+174 -> 175
+171 -> 172
+166 -> 172
+170 -> 171
+168 -> 171
+169 -> 170
+167 -> 168
+164 -> 165
+159 -> 165
+163 -> 164
+161 -> 164
+162 -> 163
+160 -> 161
+157 -> 158
+152 -> 158
+156 -> 157
+154 -> 157
+155 -> 156
+153 -> 154
+150 -> 151
+148 -> 151
+149 -> 150
+146 -> 147
+144 -> 147
+145 -> 146
+142 -> 143
+140 -> 143
+141 -> 142
+138 -> 139
+136 -> 139
+137 -> 138
+134 -> 135
+132 -> 135
+133 -> 134
+130 -> 131
+128 -> 131
+129 -> 130
+126 -> 127
+124 -> 127
+125 -> 126
+122 -> 123
+120 -> 123
+121 -> 122
+118 -> 119
+116 -> 119
+117 -> 118
+114 -> 115
+112 -> 115
+113 -> 114
+110 -> 111
+108 -> 111
+109 -> 110
+106 -> 107
+104 -> 107
+105 -> 106
+102 -> 103
+100 -> 103
+101 -> 102
+98 -> 99
+96 -> 99
+97 -> 98
+94 -> 95
+92 -> 95
+93 -> 94
+90 -> 91
+88 -> 91
+89 -> 90
+86 -> 87
+84 -> 87
+85 -> 86
+82 -> 83
+80 -> 83
+81 -> 82
+78 -> 79
+76 -> 79
+77 -> 78
+74 -> 75
+72 -> 75
+73 -> 74
+70 -> 71
+68 -> 71
+69 -> 70
+66 -> 67
+64 -> 67
+65 -> 66
+62 -> 63
+60 -> 63
+61 -> 62
+58 -> 59
+56 -> 59
+57 -> 58
+54 -> 55
+52 -> 55
+53 -> 54
+50 -> 51
+48 -> 51
+49 -> 50
+46 -> 47
+44 -> 47
+45 -> 46
+42 -> 43
+40 -> 43
+41 -> 42
+38 -> 39
+36 -> 39
+37 -> 38
+34 -> 35
+32 -> 35
+33 -> 34
+30 -> 31
+28 -> 31
+29 -> 30
+26 -> 27
+24 -> 27
+25 -> 26
+22 -> 23
+20 -> 23
+21 -> 22
+18 -> 19
+16 -> 19
+17 -> 18
+14 -> 15
+12 -> 15
+13 -> 14
+10 -> 11
+8 -> 11
+9 -> 10
+6 -> 7
+4 -> 7
+5 -> 6
+2 -> 3
+0 -> 3
+1 -> 2
+}

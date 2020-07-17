@@ -47,13 +47,14 @@ public class Main {
                 new FileInputStream(
                         "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot"); ) {
             MutableGraph g = new Parser().read(dot);
-            // Graphviz.fromGraph(g).render(Format.SVG).toFile(new
-            // File("/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg"));
             Graphviz.fromGraph(g)
-                    .render(Format.PNG)
+            		.width(1400)
+                    .render(Format.SVG)
                     .toFile(
                             new File(
-                                    "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.png"));
+                                    "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg"));
+            // Graphviz.fromGraph(g).render(Format.PNG).toFile(new
+            // File("/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.png"));
         }
     }
 

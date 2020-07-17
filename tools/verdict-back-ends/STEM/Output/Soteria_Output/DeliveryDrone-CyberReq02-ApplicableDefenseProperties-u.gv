@@ -1,0 +1,2644 @@
+digraph G {
+	graph [esep="+8, +8",
+		layout=dot,
+		outputorder=edgesfirst,
+		overlap=false,
+		rankdir=BT,
+		sep="+10, +10",
+		splines=true
+	];
+	481	 [height=0,
+		image="or.png",
+		label=Or,
+		margin=0,
+		shape=none,
+		width=0];
+	480	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	480 -> 481;
+	479	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	479 -> 480;
+	478	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	478 -> 479;
+	477	 [label="radio: SecureBoot",
+		shape=box];
+	477 -> 478;
+	476	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	476 -> 479;
+	475	 [label="radio: RemoteAttestation",
+		shape=box];
+	475 -> 476;
+	474	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	474 -> 479;
+	473	 [label="radio: MemoryProtection",
+		shape=box];
+	473 -> 474;
+	472	 [label="radio: CAPEC-549",
+		shape=box];
+	472 -> 480;
+	471	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	471 -> 481;
+	470	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	470 -> 471;
+	469	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	469 -> 470;
+	468	 [label="radio: TamperProtection",
+		shape=box];
+	468 -> 469;
+	467	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	467 -> 470;
+	466	 [label="radio: PhysicalAccessControl",
+		shape=box];
+	466 -> 467;
+	465	 [label="radio: CAPEC-440",
+		shape=box];
+	465 -> 471;
+	464	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	464 -> 481;
+	463	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	463 -> 464;
+	462	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	462 -> 463;
+	461	 [label="radio: SecureBoot",
+		shape=box];
+	461 -> 462;
+	460	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	460 -> 463;
+	459	 [label="radio: RemoteAttestation",
+		shape=box];
+	459 -> 460;
+	458	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	458 -> 463;
+	457	 [label="radio: MemoryProtection",
+		shape=box];
+	457 -> 458;
+	456	 [label="radio: CAPEC-184",
+		shape=box];
+	456 -> 464;
+	455	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	455 -> 481;
+	454	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	454 -> 455;
+	453	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	453 -> 454;
+	452	 [label="radio: SecureBoot",
+		shape=box];
+	452 -> 453;
+	451	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	451 -> 454;
+	450	 [label="radio: RemoteAttestation",
+		shape=box];
+	450 -> 451;
+	449	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	449 -> 454;
+	448	 [label="radio: MemoryProtection",
+		shape=box];
+	448 -> 449;
+	447	 [label="radio: CAPEC-176",
+		shape=box];
+	447 -> 455;
+	446	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	446 -> 481;
+	445	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	445 -> 446;
+	444	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	444 -> 445;
+	443	 [label="positionEstimator: StaticCodeAnalysis",
+		shape=box];
+	443 -> 444;
+	442	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	442 -> 445;
+	441	 [label="positionEstimator: InputValidation",
+		shape=box];
+	441 -> 442;
+	440	 [label="positionEstimator: CAPEC-74",
+		shape=box];
+	440 -> 446;
+	439	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	439 -> 481;
+	438	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	438 -> 439;
+	437	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	437 -> 438;
+	436	 [label="positionEstimator: Logging",
+		shape=box];
+	436 -> 437;
+	435	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	435 -> 438;
+	434	 [label="positionEstimator: InputValidation",
+		shape=box];
+	434 -> 435;
+	433	 [label="positionEstimator: CAPEC-594",
+		shape=box];
+	433 -> 439;
+	432	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	432 -> 481;
+	431	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	431 -> 432;
+	430	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	430 -> 431;
+	429	 [label="positionEstimator: Logging",
+		shape=box];
+	429 -> 430;
+	428	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	428 -> 431;
+	427	 [label="positionEstimator: InputValidation",
+		shape=box];
+	427 -> 428;
+	426	 [label="positionEstimator: CAPEC-586",
+		shape=box];
+	426 -> 432;
+	425	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	425 -> 481;
+	424	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	424 -> 425;
+	423	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	423 -> 424;
+	422	 [label="positionEstimator: SecureBoot",
+		shape=box];
+	422 -> 423;
+	421	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	421 -> 424;
+	420	 [label="positionEstimator: RemoteAttestation",
+		shape=box];
+	420 -> 421;
+	419	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	419 -> 424;
+	418	 [label="positionEstimator: MemoryProtection",
+		shape=box];
+	418 -> 419;
+	417	 [label="positionEstimator: CAPEC-549",
+		shape=box];
+	417 -> 425;
+	416	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	416 -> 481;
+	415	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	415 -> 416;
+	414	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	414 -> 415;
+	413	 [label="positionEstimator: Logging",
+		shape=box];
+	413 -> 414;
+	412	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	412 -> 415;
+	411	 [label="positionEstimator: InputValidation",
+		shape=box];
+	411 -> 412;
+	410	 [label="positionEstimator: CAPEC-248",
+		shape=box];
+	410 -> 416;
+	409	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	409 -> 481;
+	408	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	408 -> 409;
+	407	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	407 -> 408;
+	406	 [label="positionEstimator: Logging",
+		shape=box];
+	406 -> 407;
+	405	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	405 -> 408;
+	404	 [label="positionEstimator: InputValidation",
+		shape=box];
+	404 -> 405;
+	403	 [label="positionEstimator: CAPEC-242",
+		shape=box];
+	403 -> 409;
+	402	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	402 -> 481;
+	401	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	401 -> 402;
+	400	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	400 -> 401;
+	399	 [label="positionEstimator: SecureBoot",
+		shape=box];
+	399 -> 400;
+	398	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	398 -> 401;
+	397	 [label="positionEstimator: RemoteAttestation",
+		shape=box];
+	397 -> 398;
+	396	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	396 -> 401;
+	395	 [label="positionEstimator: MemoryProtection",
+		shape=box];
+	395 -> 396;
+	394	 [label="positionEstimator: CAPEC-184",
+		shape=box];
+	394 -> 402;
+	393	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	393 -> 481;
+	392	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	392 -> 393;
+	391	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	391 -> 392;
+	390	 [label="positionEstimator: SecureBoot",
+		shape=box];
+	390 -> 391;
+	389	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	389 -> 392;
+	388	 [label="positionEstimator: RemoteAttestation",
+		shape=box];
+	388 -> 389;
+	387	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	387 -> 392;
+	386	 [label="positionEstimator: MemoryProtection",
+		shape=box];
+	386 -> 387;
+	385	 [label="positionEstimator: CAPEC-176",
+		shape=box];
+	385 -> 393;
+	384	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	384 -> 481;
+	383	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	383 -> 384;
+	382	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	382 -> 383;
+	381	 [label="positionEstimator: Logging",
+		shape=box];
+	381 -> 382;
+	380	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	380 -> 383;
+	379	 [label="positionEstimator: InputValidation",
+		shape=box];
+	379 -> 380;
+	378	 [label="positionEstimator: CAPEC-175",
+		shape=box];
+	378 -> 384;
+	377	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	377 -> 481;
+	376	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	376 -> 377;
+	375	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	375 -> 376;
+	374	 [label="positionEstimator: Logging",
+		shape=box];
+	374 -> 375;
+	373	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	373 -> 376;
+	372	 [label="positionEstimator: InputValidation",
+		shape=box];
+	372 -> 373;
+	371	 [label="positionEstimator: CAPEC-137",
+		shape=box];
+	371 -> 377;
+	370	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	370 -> 481;
+	369	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	369 -> 370;
+	368	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	368 -> 369;
+	367	 [label="navigation: SecureBoot",
+		shape=box];
+	367 -> 368;
+	366	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	366 -> 369;
+	365	 [label="navigation: RemoteAttestation",
+		shape=box];
+	365 -> 366;
+	364	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	364 -> 369;
+	363	 [label="navigation: MemoryProtection",
+		shape=box];
+	363 -> 364;
+	362	 [label="navigation: CAPEC-549",
+		shape=box];
+	362 -> 370;
+	361	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	361 -> 481;
+	360	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	360 -> 361;
+	359	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	359 -> 360;
+	358	 [label="navigation: SecureBoot",
+		shape=box];
+	358 -> 359;
+	357	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	357 -> 360;
+	356	 [label="navigation: RemoteAttestation",
+		shape=box];
+	356 -> 357;
+	355	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	355 -> 360;
+	354	 [label="navigation: MemoryProtection",
+		shape=box];
+	354 -> 355;
+	353	 [label="navigation: CAPEC-184",
+		shape=box];
+	353 -> 361;
+	352	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	352 -> 481;
+	351	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	351 -> 352;
+	350	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	350 -> 351;
+	349	 [label="navigation: SecureBoot",
+		shape=box];
+	349 -> 350;
+	348	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	348 -> 351;
+	347	 [label="navigation: RemoteAttestation",
+		shape=box];
+	347 -> 348;
+	346	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	346 -> 351;
+	345	 [label="navigation: MemoryProtection",
+		shape=box];
+	345 -> 346;
+	344	 [label="navigation: CAPEC-176",
+		shape=box];
+	344 -> 352;
+	343	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	343 -> 481;
+	342	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	342 -> 343;
+	341	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	341 -> 342;
+	340	 [label="imu: SecureBoot",
+		shape=box];
+	340 -> 341;
+	339	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	339 -> 342;
+	338	 [label="imu: RemoteAttestation",
+		shape=box];
+	338 -> 339;
+	337	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	337 -> 342;
+	336	 [label="imu: MemoryProtection",
+		shape=box];
+	336 -> 337;
+	335	 [label="imu: CAPEC-549",
+		shape=box];
+	335 -> 343;
+	334	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	334 -> 481;
+	333	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	333 -> 334;
+	332	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	332 -> 333;
+	331	 [label="imu: TamperProtection",
+		shape=box];
+	331 -> 332;
+	330	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	330 -> 333;
+	329	 [label="imu: PhysicalAccessControl",
+		shape=box];
+	329 -> 330;
+	328	 [label="imu: CAPEC-440",
+		shape=box];
+	328 -> 334;
+	327	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	327 -> 481;
+	326	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	326 -> 327;
+	325	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	325 -> 326;
+	324	 [label="imu: SecureBoot",
+		shape=box];
+	324 -> 325;
+	323	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	323 -> 326;
+	322	 [label="imu: RemoteAttestation",
+		shape=box];
+	322 -> 323;
+	321	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	321 -> 326;
+	320	 [label="imu: MemoryProtection",
+		shape=box];
+	320 -> 321;
+	319	 [label="imu: CAPEC-184",
+		shape=box];
+	319 -> 327;
+	318	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	318 -> 481;
+	317	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	317 -> 318;
+	316	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	316 -> 317;
+	315	 [label="imu: SecureBoot",
+		shape=box];
+	315 -> 316;
+	314	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	314 -> 317;
+	313	 [label="imu: RemoteAttestation",
+		shape=box];
+	313 -> 314;
+	312	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	312 -> 317;
+	311	 [label="imu: MemoryProtection",
+		shape=box];
+	311 -> 312;
+	310	 [label="imu: CAPEC-176",
+		shape=box];
+	310 -> 318;
+	309	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	309 -> 481;
+	308	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	308 -> 309;
+	307	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	307 -> 308;
+	306	 [label="gps: SecureBoot",
+		shape=box];
+	306 -> 307;
+	305	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	305 -> 308;
+	304	 [label="gps: RemoteAttestation",
+		shape=box];
+	304 -> 305;
+	303	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	303 -> 308;
+	302	 [label="gps: MemoryProtection",
+		shape=box];
+	302 -> 303;
+	301	 [label="gps: CAPEC-549",
+		shape=box];
+	301 -> 309;
+	300	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	300 -> 481;
+	299	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	299 -> 300;
+	298	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	298 -> 299;
+	297	 [label="gps: TamperProtection",
+		shape=box];
+	297 -> 298;
+	296	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	296 -> 299;
+	295	 [label="gps: PhysicalAccessControl",
+		shape=box];
+	295 -> 296;
+	294	 [label="gps: CAPEC-440",
+		shape=box];
+	294 -> 300;
+	293	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	293 -> 481;
+	292	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	292 -> 293;
+	291	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	291 -> 292;
+	290	 [label="gps: SecureBoot",
+		shape=box];
+	290 -> 291;
+	289	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	289 -> 292;
+	288	 [label="gps: RemoteAttestation",
+		shape=box];
+	288 -> 289;
+	287	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	287 -> 292;
+	286	 [label="gps: MemoryProtection",
+		shape=box];
+	286 -> 287;
+	285	 [label="gps: CAPEC-184",
+		shape=box];
+	285 -> 293;
+	284	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	284 -> 481;
+	283	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	283 -> 284;
+	282	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	282 -> 283;
+	281	 [label="gps: SecureBoot",
+		shape=box];
+	281 -> 282;
+	280	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	280 -> 283;
+	279	 [label="gps: RemoteAttestation",
+		shape=box];
+	279 -> 280;
+	278	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	278 -> 283;
+	277	 [label="gps: MemoryProtection",
+		shape=box];
+	277 -> 278;
+	276	 [label="gps: CAPEC-176",
+		shape=box];
+	276 -> 284;
+	275	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	275 -> 481;
+	274	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	274 -> 275;
+	273	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	273 -> 274;
+	272	 [label="fc: SecureBoot",
+		shape=box];
+	272 -> 273;
+	271	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	271 -> 274;
+	270	 [label="fc: RemoteAttestation",
+		shape=box];
+	270 -> 271;
+	269	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	269 -> 274;
+	268	 [label="fc: MemoryProtection",
+		shape=box];
+	268 -> 269;
+	267	 [label="fc: CAPEC-549",
+		shape=box];
+	267 -> 275;
+	266	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	266 -> 481;
+	265	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	265 -> 266;
+	264	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	264 -> 265;
+	263	 [label="fc: SecureBoot",
+		shape=box];
+	263 -> 264;
+	262	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	262 -> 265;
+	261	 [label="fc: RemoteAttestation",
+		shape=box];
+	261 -> 262;
+	260	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	260 -> 265;
+	259	 [label="fc: MemoryProtection",
+		shape=box];
+	259 -> 260;
+	258	 [label="fc: CAPEC-184",
+		shape=box];
+	258 -> 266;
+	257	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	257 -> 481;
+	256	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	256 -> 257;
+	255	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	255 -> 256;
+	254	 [label="fc: SecureBoot",
+		shape=box];
+	254 -> 255;
+	253	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	253 -> 256;
+	252	 [label="fc: RemoteAttestation",
+		shape=box];
+	252 -> 253;
+	251	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	251 -> 256;
+	250	 [label="fc: MemoryProtection",
+		shape=box];
+	250 -> 251;
+	249	 [label="fc: CAPEC-176",
+		shape=box];
+	249 -> 257;
+	248	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	248 -> 481;
+	247	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	247 -> 248;
+	246	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	246 -> 247;
+	245	 [label="deliveryPlanner: StaticCodeAnalysis",
+		shape=box];
+	245 -> 246;
+	244	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	244 -> 247;
+	243	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	243 -> 244;
+	242	 [label="deliveryPlanner: CAPEC-74",
+		shape=box];
+	242 -> 248;
+	241	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	241 -> 481;
+	240	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	240 -> 241;
+	239	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	239 -> 240;
+	238	 [label="deliveryPlanner: Logging",
+		shape=box];
+	238 -> 239;
+	237	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	237 -> 240;
+	236	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	236 -> 237;
+	235	 [label="deliveryPlanner: CAPEC-594",
+		shape=box];
+	235 -> 241;
+	234	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	234 -> 481;
+	233	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	233 -> 234;
+	232	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	232 -> 233;
+	231	 [label="deliveryPlanner: Logging",
+		shape=box];
+	231 -> 232;
+	230	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	230 -> 233;
+	229	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	229 -> 230;
+	228	 [label="deliveryPlanner: CAPEC-586",
+		shape=box];
+	228 -> 234;
+	227	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	227 -> 481;
+	226	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	226 -> 227;
+	225	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	225 -> 226;
+	224	 [label="deliveryPlanner: SecureBoot",
+		shape=box];
+	224 -> 225;
+	223	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	223 -> 226;
+	222	 [label="deliveryPlanner: RemoteAttestation",
+		shape=box];
+	222 -> 223;
+	221	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	221 -> 226;
+	220	 [label="deliveryPlanner: MemoryProtection",
+		shape=box];
+	220 -> 221;
+	219	 [label="deliveryPlanner: CAPEC-549",
+		shape=box];
+	219 -> 227;
+	218	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	218 -> 481;
+	217	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	217 -> 218;
+	216	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	216 -> 217;
+	215	 [label="deliveryPlanner: Logging",
+		shape=box];
+	215 -> 216;
+	214	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	214 -> 217;
+	213	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	213 -> 214;
+	212	 [label="deliveryPlanner: CAPEC-248",
+		shape=box];
+	212 -> 218;
+	211	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	211 -> 481;
+	210	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	210 -> 211;
+	209	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	209 -> 210;
+	208	 [label="deliveryPlanner: Logging",
+		shape=box];
+	208 -> 209;
+	207	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	207 -> 210;
+	206	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	206 -> 207;
+	205	 [label="deliveryPlanner: CAPEC-242",
+		shape=box];
+	205 -> 211;
+	204	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	204 -> 481;
+	203	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	203 -> 204;
+	202	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	202 -> 203;
+	201	 [label="deliveryPlanner: SecureBoot",
+		shape=box];
+	201 -> 202;
+	200	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	200 -> 203;
+	199	 [label="deliveryPlanner: RemoteAttestation",
+		shape=box];
+	199 -> 200;
+	198	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	198 -> 203;
+	197	 [label="deliveryPlanner: MemoryProtection",
+		shape=box];
+	197 -> 198;
+	196	 [label="deliveryPlanner: CAPEC-184",
+		shape=box];
+	196 -> 204;
+	195	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	195 -> 481;
+	194	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	194 -> 195;
+	193	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	193 -> 194;
+	192	 [label="deliveryPlanner: SecureBoot",
+		shape=box];
+	192 -> 193;
+	191	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	191 -> 194;
+	190	 [label="deliveryPlanner: RemoteAttestation",
+		shape=box];
+	190 -> 191;
+	189	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	189 -> 194;
+	188	 [label="deliveryPlanner: MemoryProtection",
+		shape=box];
+	188 -> 189;
+	187	 [label="deliveryPlanner: CAPEC-176",
+		shape=box];
+	187 -> 195;
+	186	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	186 -> 481;
+	185	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	185 -> 186;
+	184	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	184 -> 185;
+	183	 [label="deliveryPlanner: Logging",
+		shape=box];
+	183 -> 184;
+	182	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	182 -> 185;
+	181	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	181 -> 182;
+	180	 [label="deliveryPlanner: CAPEC-175",
+		shape=box];
+	180 -> 186;
+	179	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	179 -> 481;
+	178	 [height=0,
+		image="or_gray.png",
+		label="d-Or",
+		margin=0,
+		shape=none,
+		width=0];
+	178 -> 179;
+	177	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	177 -> 178;
+	176	 [label="deliveryPlanner: Logging",
+		shape=box];
+	176 -> 177;
+	175	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	175 -> 178;
+	174	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	174 -> 175;
+	173	 [label="deliveryPlanner: CAPEC-137",
+		shape=box];
+	173 -> 179;
+	172	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	172 -> 481;
+	171	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	171 -> 172;
+	170	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	170 -> 171;
+	169	 [label="deliveryItemMechanism: TamperProtection",
+		shape=box];
+	169 -> 170;
+	168	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	168 -> 171;
+	167	 [label="deliveryItemMechanism: PhysicalAccessControl",
+		shape=box];
+	167 -> 168;
+	166	 [label="deliveryItemMechanism: CAPEC-440",
+		shape=box];
+	166 -> 172;
+	165	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	165 -> 481;
+	164	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	164 -> 165;
+	163	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	163 -> 164;
+	162	 [label="camera: TamperProtection",
+		shape=box];
+	162 -> 163;
+	161	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	161 -> 164;
+	160	 [label="camera: PhysicalAccessControl",
+		shape=box];
+	160 -> 161;
+	159	 [label="camera: CAPEC-440",
+		shape=box];
+	159 -> 165;
+	158	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	158 -> 481;
+	157	 [height=0,
+		image="and_gray.png",
+		label="d-And",
+		margin=0,
+		shape=none,
+		width=0];
+	157 -> 158;
+	156	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	156 -> 157;
+	155	 [label="actuation: TamperProtection",
+		shape=box];
+	155 -> 156;
+	154	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	154 -> 157;
+	153	 [label="actuation: PhysicalAccessControl",
+		shape=box];
+	153 -> 154;
+	152	 [label="actuation: CAPEC-440",
+		shape=box];
+	152 -> 158;
+	151	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	151 -> 481;
+	150	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	150 -> 151;
+	149	 [label="radio: PhysicalAccessControl",
+		shape=box];
+	149 -> 150;
+	148	 [label="radio: CAPEC-624",
+		shape=box];
+	148 -> 151;
+	147	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	147 -> 481;
+	146	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	146 -> 147;
+	145	 [label="radio: PhysicalAccessControl",
+		shape=box];
+	145 -> 146;
+	144	 [label="radio: CAPEC-507",
+		shape=box];
+	144 -> 147;
+	143	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	143 -> 481;
+	142	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	142 -> 143;
+	141	 [label="radio: SystemAccessControl",
+		shape=box];
+	141 -> 142;
+	140	 [label="radio: CAPEC-390",
+		shape=box];
+	140 -> 143;
+	139	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	139 -> 481;
+	138	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	138 -> 139;
+	137	 [label="positionEstimator: PhysicalAccessControl",
+		shape=box];
+	137 -> 138;
+	136	 [label="positionEstimator: CAPEC-624",
+		shape=box];
+	136 -> 139;
+	135	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	135 -> 481;
+	134	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	134 -> 135;
+	133	 [label="positionEstimator: SupplyChainSecurity",
+		shape=box];
+	133 -> 134;
+	132	 [label="positionEstimator: CAPEC-439",
+		shape=box];
+	132 -> 135;
+	131	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	131 -> 481;
+	130	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	130 -> 131;
+	129	 [label="positionEstimator: SupplyChainSecurity",
+		shape=box];
+	129 -> 130;
+	128	 [label="positionEstimator: CAPEC-438",
+		shape=box];
+	128 -> 131;
+	127	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	127 -> 481;
+	126	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	126 -> 127;
+	125	 [label="positionEstimator: InputValidation",
+		shape=box];
+	125 -> 126;
+	124	 [label="positionEstimator: CAPEC-28",
+		shape=box];
+	124 -> 127;
+	123	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	123 -> 481;
+	122	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	122 -> 123;
+	121	 [label="positionEstimator: StaticCodeAnalysis",
+		shape=box];
+	121 -> 122;
+	120	 [label="positionEstimator: CAPEC-26",
+		shape=box];
+	120 -> 123;
+	119	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	119 -> 481;
+	118	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	118 -> 119;
+	117	 [label="positionEstimator: Heterogeneity",
+		shape=box];
+	117 -> 118;
+	116	 [label="positionEstimator: CAPEC-151",
+		shape=box];
+	116 -> 119;
+	115	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	115 -> 481;
+	114	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	114 -> 115;
+	113	 [label="positionEstimator: StaticCodeAnalysis",
+		shape=box];
+	113 -> 114;
+	112	 [label="positionEstimator: CAPEC-123",
+		shape=box];
+	112 -> 115;
+	111	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	111 -> 481;
+	110	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	110 -> 111;
+	109	 [label="navigation: PhysicalAccessControl",
+		shape=box];
+	109 -> 110;
+	108	 [label="navigation: CAPEC-624",
+		shape=box];
+	108 -> 111;
+	107	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	107 -> 481;
+	106	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	106 -> 107;
+	105	 [label="imu: PhysicalAccessControl",
+		shape=box];
+	105 -> 106;
+	104	 [label="imu: CAPEC-624",
+		shape=box];
+	104 -> 107;
+	103	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	103 -> 481;
+	102	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	102 -> 103;
+	101	 [label="imu: PhysicalAccessControl",
+		shape=box];
+	101 -> 102;
+	100	 [label="imu: CAPEC-507",
+		shape=box];
+	100 -> 103;
+	99	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	99 -> 481;
+	98	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	98 -> 99;
+	97	 [label="imu: SupplyChainSecurity",
+		shape=box];
+	97 -> 98;
+	96	 [label="imu: CAPEC-439",
+		shape=box];
+	96 -> 99;
+	95	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	95 -> 481;
+	94	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	94 -> 95;
+	93	 [label="imu: SupplyChainSecurity",
+		shape=box];
+	93 -> 94;
+	92	 [label="imu: CAPEC-438",
+		shape=box];
+	92 -> 95;
+	91	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	91 -> 481;
+	90	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	90 -> 91;
+	89	 [label="imu: SystemAccessControl",
+		shape=box];
+	89 -> 90;
+	88	 [label="imu: CAPEC-390",
+		shape=box];
+	88 -> 91;
+	87	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	87 -> 481;
+	86	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	86 -> 87;
+	85	 [label="gps: PhysicalAccessControl",
+		shape=box];
+	85 -> 86;
+	84	 [label="gps: CAPEC-624",
+		shape=box];
+	84 -> 87;
+	83	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	83 -> 481;
+	82	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	82 -> 83;
+	81	 [label="gps: PhysicalAccessControl",
+		shape=box];
+	81 -> 82;
+	80	 [label="gps: CAPEC-507",
+		shape=box];
+	80 -> 83;
+	79	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	79 -> 481;
+	78	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	78 -> 79;
+	77	 [label="gps: SupplyChainSecurity",
+		shape=box];
+	77 -> 78;
+	76	 [label="gps: CAPEC-439",
+		shape=box];
+	76 -> 79;
+	75	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	75 -> 481;
+	74	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	74 -> 75;
+	73	 [label="gps: SupplyChainSecurity",
+		shape=box];
+	73 -> 74;
+	72	 [label="gps: CAPEC-438",
+		shape=box];
+	72 -> 75;
+	71	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	71 -> 481;
+	70	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	70 -> 71;
+	69	 [label="gps: SystemAccessControl",
+		shape=box];
+	69 -> 70;
+	68	 [label="gps: CAPEC-390",
+		shape=box];
+	68 -> 71;
+	67	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	67 -> 481;
+	66	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	66 -> 67;
+	65	 [label="fc: PhysicalAccessControl",
+		shape=box];
+	65 -> 66;
+	64	 [label="fc: CAPEC-624",
+		shape=box];
+	64 -> 67;
+	63	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	63 -> 481;
+	62	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	62 -> 63;
+	61	 [label="deliveryPlanner: PhysicalAccessControl",
+		shape=box];
+	61 -> 62;
+	60	 [label="deliveryPlanner: CAPEC-624",
+		shape=box];
+	60 -> 63;
+	59	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	59 -> 481;
+	58	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	58 -> 59;
+	57	 [label="deliveryPlanner: SupplyChainSecurity",
+		shape=box];
+	57 -> 58;
+	56	 [label="deliveryPlanner: CAPEC-439",
+		shape=box];
+	56 -> 59;
+	55	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	55 -> 481;
+	54	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	54 -> 55;
+	53	 [label="deliveryPlanner: SupplyChainSecurity",
+		shape=box];
+	53 -> 54;
+	52	 [label="deliveryPlanner: CAPEC-438",
+		shape=box];
+	52 -> 55;
+	51	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	51 -> 481;
+	50	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	50 -> 51;
+	49	 [label="deliveryPlanner: InputValidation",
+		shape=box];
+	49 -> 50;
+	48	 [label="deliveryPlanner: CAPEC-28",
+		shape=box];
+	48 -> 51;
+	47	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	47 -> 481;
+	46	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	46 -> 47;
+	45	 [label="deliveryPlanner: StaticCodeAnalysis",
+		shape=box];
+	45 -> 46;
+	44	 [label="deliveryPlanner: CAPEC-26",
+		shape=box];
+	44 -> 47;
+	43	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	43 -> 481;
+	42	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	42 -> 43;
+	41	 [label="deliveryPlanner: Heterogeneity",
+		shape=box];
+	41 -> 42;
+	40	 [label="deliveryPlanner: CAPEC-151",
+		shape=box];
+	40 -> 43;
+	39	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	39 -> 481;
+	38	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	38 -> 39;
+	37	 [label="deliveryPlanner: StaticCodeAnalysis",
+		shape=box];
+	37 -> 38;
+	36	 [label="deliveryPlanner: CAPEC-123",
+		shape=box];
+	36 -> 39;
+	35	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	35 -> 481;
+	34	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	34 -> 35;
+	33	 [label="deliveryItemMechanism: PhysicalAccessControl",
+		shape=box];
+	33 -> 34;
+	32	 [label="deliveryItemMechanism: CAPEC-624",
+		shape=box];
+	32 -> 35;
+	31	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	31 -> 481;
+	30	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	30 -> 31;
+	29	 [label="deliveryItemMechanism: PhysicalAccessControl",
+		shape=box];
+	29 -> 30;
+	28	 [label="deliveryItemMechanism: CAPEC-507",
+		shape=box];
+	28 -> 31;
+	27	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	27 -> 481;
+	26	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	26 -> 27;
+	25	 [label="deliveryItemMechanism: SystemAccessControl",
+		shape=box];
+	25 -> 26;
+	24	 [label="deliveryItemMechanism: CAPEC-390",
+		shape=box];
+	24 -> 27;
+	23	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	23 -> 481;
+	22	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	22 -> 23;
+	21	 [label="camera: PhysicalAccessControl",
+		shape=box];
+	21 -> 22;
+	20	 [label="camera: CAPEC-624",
+		shape=box];
+	20 -> 23;
+	19	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	19 -> 481;
+	18	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	18 -> 19;
+	17	 [label="camera: PhysicalAccessControl",
+		shape=box];
+	17 -> 18;
+	16	 [label="camera: CAPEC-507",
+		shape=box];
+	16 -> 19;
+	15	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	15 -> 481;
+	14	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	14 -> 15;
+	13	 [label="camera: SystemAccessControl",
+		shape=box];
+	13 -> 14;
+	12	 [label="camera: CAPEC-390",
+		shape=box];
+	12 -> 15;
+	11	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	11 -> 481;
+	10	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	10 -> 11;
+	9	 [label="actuation: PhysicalAccessControl",
+		shape=box];
+	9 -> 10;
+	8	 [label="actuation: CAPEC-624",
+		shape=box];
+	8 -> 11;
+	7	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	7 -> 481;
+	6	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	6 -> 7;
+	5	 [label="actuation: PhysicalAccessControl",
+		shape=box];
+	5 -> 6;
+	4	 [label="actuation: CAPEC-507",
+		shape=box];
+	4 -> 7;
+	3	 [height=0,
+		image="and.png",
+		label=And,
+		margin=0,
+		shape=none,
+		width=0];
+	3 -> 481;
+	2	 [height=0,
+		image="not_gray.png",
+		label="
+Not",
+		margin=0,
+		shape=none,
+		width=0];
+	2 -> 3;
+	1	 [label="actuation: SystemAccessControl",
+		shape=box];
+	1 -> 2;
+	0	 [label="actuation: CAPEC-390",
+		shape=box];
+	0 -> 3;
+}

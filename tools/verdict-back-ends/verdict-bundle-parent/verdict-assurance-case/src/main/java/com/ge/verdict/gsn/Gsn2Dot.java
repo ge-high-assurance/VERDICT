@@ -24,6 +24,8 @@ public class Gsn2Dot {
 
         bw.write("digraph G{");
         bw.newLine();
+        bw.write("ratio = 0.5;");
+        bw.newLine();
         writeNodes(allNodes, bw);
         bw.newLine();
         writeRelationships(allNodes, bw);
@@ -77,6 +79,7 @@ public class Gsn2Dot {
             String nodeShape = "";
             String nodeColor = "";
             String nodeText = "";
+            boolean nodeStatus = true;
 
             if (node.getNodeType().equalsIgnoreCase("context")) {
                 nodeShape = "rectangle, style=\"rounded\" ";
@@ -84,22 +87,37 @@ public class Gsn2Dot {
             } else if (node.getNodeType().equalsIgnoreCase("solution")) {
                 nodeShape = "circle";
                 nodeText = node.getSolution().getDisplayText();
+                nodeStatus = node.getSolution().getStatus();
             } else if (node.getNodeType().equalsIgnoreCase("goal")) {
                 nodeShape = "box";
                 nodeText = node.getGoal().getDisplayText();
+                nodeStatus = node.getGoal().getStatus();
             } else if (node.getNodeType().equalsIgnoreCase("strategy")) {
                 nodeShape = "parallelogram";
                 nodeText = node.getStrategy().getDisplayText();
+                nodeStatus = node.getStrategy().getStatus();
+            }
+
+            if (nodeStatus) {
+                nodeColor = "green";
+            } else {
+                nodeColor = "red";
+            }
+
+            if (node.getNodeType().equalsIgnoreCase("context")) {
+                nodeColor = "black";
             }
 
             String nodeDeclareString =
                     node.getNodeId()
                             + " ["
-                            + "shape="
+                            + "margin=0.05, style=bold, color="
+                            + nodeColor
+                            + ", width=1, shape="
                             + nodeShape
                             + ", label=\""
                             + node.getNodeId()
-                            + "\\n"
+                            + "\\n\\n"
                             + nodeText
                             + "\"];";
             bw.write(nodeDeclareString);
@@ -113,13 +131,19 @@ public class Gsn2Dot {
         bw.newLine();
         for (GsnNode node : allNodes) {
             for (GsnNode support : node.getSupportedBy()) {
-                //				bw.write(node.getNodeId()+" -> "+ context.getNodeId()+" [constraint=false]");
-                bw.write(node.getNodeId() + " -> " + support.getNodeId());
+                bw.write(
+                        node.getNodeId()
+                                + " -> "
+                                + support.getNodeId()
+                                + " [splines=curved, arrowsize=2.0]");
                 bw.newLine();
             }
             for (GsnNode context : node.getInContextOf()) {
-                //				bw.write(node.getNodeId()+" -> "+ context.getNodeId()+" [constraint=false]");
-                bw.write(node.getNodeId() + " -> " + context.getNodeId());
+                bw.write(
+                        node.getNodeId()
+                                + " -> "
+                                + context.getNodeId()
+                                + " [splines=curved, arrowhead=empty, arrowsize=2.0]");
                 bw.newLine();
             }
         }

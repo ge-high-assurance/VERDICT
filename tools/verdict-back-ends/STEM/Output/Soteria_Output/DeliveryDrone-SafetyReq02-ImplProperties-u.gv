@@ -1,0 +1,40 @@
+digraph G {
+	graph [esep="+8, +8",
+		layout=dot,
+		outputorder=edgesfirst,
+		overlap=false,
+		rankdir=BT,
+		sep="+10, +10",
+		splines=true
+	];
+	8	 [height=0,
+		image="or.png",
+		label=Or,
+		margin=0,
+		shape=none,
+		width=0];
+	7	 [label="radio: ued_event",
+		shape=box];
+	7 -> 8;
+	6	 [label="positionEstimator: ued_event",
+		shape=box];
+	6 -> 8;
+	5	 [label="navigation: ued_event",
+		shape=box];
+	5 -> 8;
+	4	 [label="imu: ued_event",
+		shape=box];
+	4 -> 8;
+	3	 [label="gps: ued_event",
+		shape=box];
+	3 -> 8;
+	2	 [label="deliveryPlanner: ued_event",
+		shape=box];
+	2 -> 8;
+	1	 [label="deliveryItemMechanism: ued_event",
+		shape=box];
+	1 -> 8;
+	0	 [label="camera: ued_event",
+		shape=box];
+	0 -> 8;
+}

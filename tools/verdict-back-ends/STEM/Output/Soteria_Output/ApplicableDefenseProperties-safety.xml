@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<Results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Mission label="MReq01">
+    <Requirement label="SafetyReq01" defenseType="ApplicableDefenseProperties" computed_p="9.09999957347e-08" acceptable_p="1e-7">
+      <Cutset probability="9.99999993923e-09">
+        <Component name="actuation">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="camera">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="deliveryItemMechanism">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="deliveryPlanner">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="fc">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="imu">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="navigation">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="positionEstimator">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="radio">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="gps">
+          <Event name="loa_event"/>
+        </Component>
+      </Cutset>
+    </Requirement>
+  </Mission>
+  <Mission label="MReq02">
+    <Requirement label="SafetyReq02" defenseType="ApplicableDefenseProperties" computed_p="2.59999994738e-08" acceptable_p="1e-7">
+      <Cutset probability="9.99999993923e-09">
+        <Component name="gps">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999993923e-09">
+        <Component name="imu">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="camera">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="deliveryItemMechanism">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="deliveryPlanner">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="navigation">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="positionEstimator">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+      <Cutset probability="9.99999971718e-10">
+        <Component name="radio">
+          <Event name="ued_event"/>
+        </Component>
+      </Cutset>
+    </Requirement>
+  </Mission>
+</Results>

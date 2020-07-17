@@ -14,6 +14,9 @@ import verdict.vdm.vdm_model.*;
 
 /** @author Saswata Paul */
 public class CreateGSN {
+    protected static int strategyCounter = 1;
+    protected static int contextCounter = 1;
+    protected static int solutionCounter = 1;
 
     /**
      * Entry method for the CreateGSN class
@@ -106,7 +109,7 @@ public class CreateGSN {
 
         // Populate the rootnode with the mission goal
         missionNode.setNodeType("goal");
-        missionNode.setNodeId(mission.getId());
+        missionNode.setNodeId("GOAL_" + mission.getId());
         missionNode.setNodeLevel(0);
         System.out.println("Mission: " + mission.getId());
         // to set goal of missionNode
@@ -124,10 +127,12 @@ public class CreateGSN {
         GsnNode strategyNode = new GsnNode();
         strategyNode.setNodeType("strategy");
         strategyNode.setNodeLevel(1);
-        strategyNode.setNodeId("Strategy_" + mission.getId());
+        String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
+        strategyCounter++;
+        strategyNode.setNodeId(strategyId);
         System.out.println("----Strategy: " + strategyNode.getNodeId());
 
-        String strategyText = "Argument: By conjunction of subgoals: ";
+        String strategyText = "Argument: By conjunction of subgoals:\\n";
 
         // add requirements to supportedBy of StrategyNode
         for (String subReqId : mission.getCyberReqs()) {
@@ -174,6 +179,9 @@ public class CreateGSN {
         // add strategyNode to supportedBy of missionNode
         missionNode.getSupportedBy().add(strategyNode);
 
+        // setting reqNode status
+        missionNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
+
         return missionNode;
     }
 
@@ -193,7 +201,7 @@ public class CreateGSN {
         // Populate the rootnode with the requirement subgoal
         reqNode.setNodeType("goal");
         reqNode.setNodeLevel(2);
-        reqNode.setNodeId(cyberReq.getId());
+        reqNode.setNodeId("GOAL_" + cyberReq.getId());
         // to populate goal of node
         Goal reqNodeGoal = new Goal();
         reqNodeGoal.setDisplayText(cyberReq.getDescription());
@@ -208,12 +216,14 @@ public class CreateGSN {
         GsnNode strategyNode = new GsnNode();
         strategyNode.setNodeLevel(3);
         strategyNode.setNodeType("strategy");
-        strategyNode.setNodeId("Strategy_" + cyberReq.getId());
+        String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
+        strategyCounter++;
+        strategyNode.setNodeId(strategyId);
         System.out.println("------------Strategy: " + strategyNode.getNodeId());
 
         // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
-        strat.setDisplayText("Argument: By Soteria++ analysis of attack-defense trees");
+        strat.setDisplayText("Argument: By Soteria++ analysis\\nof attack-defense trees");
 
         // add a solution to the supportedBy of strategy
         GsnNode solutionNode = populateSolutionNode(cyberReq.getId(), cyberResults);
@@ -227,6 +237,9 @@ public class CreateGSN {
 
         // add strategyNode to supportedBy of reqNode
         reqNode.getSupportedBy().add(strategyNode);
+
+        // setting reqNode status
+        reqNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
 
         return reqNode;
     }
@@ -246,7 +259,7 @@ public class CreateGSN {
 
         // Populate the rootnode with the requirement subgoal
         reqNode.setNodeType("goal");
-        reqNode.setNodeId(safetyReq.getId());
+        reqNode.setNodeId("GOAL_" + safetyReq.getId());
         // to populate goal of node
         Goal reqNodeGoal = new Goal();
         reqNodeGoal.setDisplayText(safetyReq.getDescription());
@@ -261,12 +274,14 @@ public class CreateGSN {
         GsnNode strategyNode = new GsnNode();
         strategyNode.setNodeLevel(3);
         strategyNode.setNodeType("strategy");
-        strategyNode.setNodeId("Strategy_" + safetyReq.getId());
+        String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
+        strategyCounter++;
+        strategyNode.setNodeId(strategyId);
         System.out.println("------------Strategy: " + strategyNode.getNodeId());
 
         // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
-        strat.setDisplayText("Argument: By Soteria++ analysis of fault trees");
+        strat.setDisplayText("Argument: By Soteria++ analysis\\nof fault trees");
 
         // add a solution to the supportedBy of strategy
         GsnNode solutionNode = populateSolutionNode(safetyReq.getId(), safetyResults);
@@ -280,6 +295,9 @@ public class CreateGSN {
 
         // add strategyNode to supportedBy of reqNode
         reqNode.getSupportedBy().add(strategyNode);
+
+        // setting reqNode status
+        reqNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
 
         return reqNode;
     }
@@ -299,10 +317,12 @@ public class CreateGSN {
         // Populate the rootnode with solution details
         solutionNode.setNodeLevel(4);
         solutionNode.setNodeType("solution");
-        solutionNode.setNodeId("Soteria_Out_" + reqId);
+        String solutionId = "SOLUTION_" + Integer.toString(solutionCounter);
+        solutionCounter++;
+        solutionNode.setNodeId(solutionId);
         // to set solution of solutionNode
         Solution sol = new Solution();
-        sol.setDisplayText("Soteria++ minimal cutset for " + reqId);
+        sol.setDisplayText("Soteria++\\nminimal cutset\\nfor " + reqId);
 
         // Extract the probabilities from the soteria output xml
         String computed_p = "";
@@ -425,7 +445,9 @@ public class CreateGSN {
 
             // assigning values to the contextnode
             contextNode.setNodeType("context");
-            contextNode.setNodeId("Context_" + context);
+            String contextId = "CONTEXT_" + Integer.toString(contextCounter);
+            contextCounter++;
+            contextNode.setNodeId(contextId);
             contextNode.setNodeLevel(contextLevel);
 
             // pack the context
