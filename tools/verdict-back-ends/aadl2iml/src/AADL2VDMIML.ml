@@ -10,7 +10,7 @@
     @author William D. Smith
 *)
 
-exception DataTypeNotFound of string
+exception SemanticError of string
 
 module AD = AADLAst
 module AG = AGREEAst
@@ -77,7 +77,7 @@ let failwith_unsupported_data_type pos qcr =
     Format.asprintf "%a: error: data type '%a' not found"
       Position.pp_print_position pos C.pp_print_qcref qcr
   in
-  raise (DataTypeNotFound msg)
+  raise (SemanticError msg)
 
 let realization_full_name (r_pid, i_pid) =
   Format.asprintf "%a.%a" C.pp_print_id r_pid C.pp_print_id i_pid
@@ -748,11 +748,19 @@ let get_port_index {VI.ports; _} port =
   | None -> assert false
   | Some (_, idx) -> idx
 
+
+let failwith_could_resolve_reference pos id =
+  let msg =
+    Format.asprintf "%a: error: couldn't resolve reference to '%s'"
+      Position.pp_print_position pos id
+  in
+  raise (SemanticError msg)
+
 let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
   | None, (_, port) -> (
     VI.ComponentCE (ct_idx, get_port_index ct port)
   )
-  | Some (_, comp_inst), (_, port) -> (
+  | Some (pos, comp_inst), (_, port) -> (
     let ci, ci_idx =
       let ep =
         Utils.element_position
@@ -760,7 +768,7 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
         subcomps
       in
       match ep with
-      | None -> assert false
+      | None -> failwith_could_resolve_reference pos comp_inst
       | Some (ci, ci_idx) -> (ci, ci_idx)
     in
     let ci_ct, ci_ct_idx =
@@ -1154,7 +1162,7 @@ let aadl_ast_to_vdm_iml v_props = function
       in
       Some pkg
     )
-    with DataTypeNotFound msg -> (
+    with SemanticError msg -> (
       Format.eprintf "%s@." msg;
       None
     )
