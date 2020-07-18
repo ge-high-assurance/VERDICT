@@ -29,9 +29,9 @@
       | Some v -> v
       | None -> failwith msg
 
-    let force_opt_def def = function
+    (* let force_opt_def def = function
       | Some v -> v
-      | None -> def
+      | None -> def *)
 
     type mission_param =
       | Mission_ID of string
@@ -271,7 +271,7 @@
       | Threat_CIA of cia
       | Threat_REFERENCE of string
       | Threat_ASSUMPTIONS of string list
-      | Threat_DEFENSES of string list
+      (* | Threat_DEFENSES of string list *)
       | Threat_DESCRIPTION of string
       | Threat_COMMENT of string
 

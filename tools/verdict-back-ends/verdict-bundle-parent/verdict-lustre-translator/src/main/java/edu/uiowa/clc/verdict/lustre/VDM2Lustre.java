@@ -112,7 +112,7 @@ public class VDM2Lustre {
             // Event Ports to Data Ports;
             for (Port port : componentType.getPort()) {
                 // Update event_ports
-                visit(port);
+                visit(port, program);
             }
         }
 
@@ -238,7 +238,14 @@ public class VDM2Lustre {
 
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
-
+                
+                // Option Check)
+                
+                if(componentType == null && subcomponentImpl == null) {
+                	System.out.println(componentInstance.getName() + " subcomponent is missing both a specification and an implemention. Please provide some specification or an implementation to continue.");
+                	System.exit(-1);
+                }
+                
                 // Option 1) Implementation
                 if (subcomponentImpl != null) {
 
@@ -331,22 +338,22 @@ public class VDM2Lustre {
     }
 
     // Event Ports
-    public void visit(Port port) {
+    public void visit(Port port, LustreProgram lustreProgram) {
 
         // Print Event Ports.
         if (port.isEvent() != null && port.isEvent()) {
 
             DataType dataType = port.getType();
 
-            DataType eventType = getEventType(dataType);
+            DataType eventType = getEventType(dataType, lustreProgram);
 
             port.setType(eventType);
         }
     }
 
-    protected DataType getEventType(DataType dataType) {
+    protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
 
-        LustreProgram lustreProgram = vdm_model.getDataflowCode();
+        //        LustreProgram lustreProgram = vdm_model.getDataflowCode();
 
         DataType eventType = new DataType();
         TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);

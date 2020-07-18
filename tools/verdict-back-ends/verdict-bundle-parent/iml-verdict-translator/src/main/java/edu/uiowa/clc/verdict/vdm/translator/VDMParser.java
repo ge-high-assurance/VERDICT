@@ -1023,8 +1023,10 @@ public class VDMParser extends Parser {
                                     "Forward references in datatype declaration is not supported.");
 
                             if (faulty_declaration != null) {
-                                faulty_declaration = faulty_declaration.replace("_", ".");
+//                                faulty_declaration = faulty_declaration.replace("_", ".");
                                 System.out.println("Please fix " + faulty_declaration);
+//                                System.out.println("Error message: " + exp.getMessage());
+//                                System.out.println("Error stack: " + exp.getStackTrace());
                             }
 
                             System.exit(-1);

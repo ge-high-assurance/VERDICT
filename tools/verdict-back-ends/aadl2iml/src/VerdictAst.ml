@@ -212,7 +212,7 @@ let rec pp_print_slexpr ppf = function
      pp_print_wrap_parens ppf
        (fun p -> Format.fprintf p "not %a" pp_print_slexpr) expr
 
-let pp_print_safety_req_body ind ppf
+let pp_print_safety_req_body _ ppf
       (id, condition, description, comment) =
   Format.fprintf ppf
     "{id=%s; condition=%a%a%a}" id
@@ -220,7 +220,7 @@ let pp_print_safety_req_body ind ppf
     (pp_print_option "; comment=%s") comment
     (pp_print_option "; description=%s") description 
 
-let pp_print_safety_rel_body ind ppf
+let pp_print_safety_rel_body _ ppf
       (id, output, faultSrc, description, comment) =
   Format.fprintf ppf
     "{id=%s; output=%a%a%a%a}"
@@ -229,14 +229,14 @@ let pp_print_safety_rel_body ind ppf
     (pp_print_option "; comment=%s") comment
     (pp_print_option "; description=%s") description 
 
-let pp_print_safety_event_body ind ppf
+let pp_print_safety_event_body _ ppf
       (id, probability, description, comment) =
   Format.fprintf ppf
     "{id=%s; probability=%s%a%a}" id probability
     (pp_print_option "; comment=%s") comment
     (pp_print_option "; description=%s") description
 
-let pp_print_cyber_req_body ind ppf
+let pp_print_cyber_req_body _ ppf
       (id, cia, severity, condition, comment) =
   Format.fprintf ppf
     "{id=%s; severity=%a; condition=%a%a%a}" id
@@ -245,7 +245,7 @@ let pp_print_cyber_req_body ind ppf
     (pp_print_option "; comment=%s") comment
     (pp_print_option_a "; cia=%a" pp_print_cia) cia
 
-let pp_print_cyber_rel_body ind ppf
+let pp_print_cyber_rel_body _ ppf
       (id, output, inputs, comment) =
   Format.fprintf ppf
     "{id=%s; output=%a%a%a}"
@@ -288,15 +288,15 @@ let rec pp_print_texpr ppf = function
      pp_print_wrap_parens ppf
        (fun p -> Format.fprintf p "not %a" pp_print_texpr) expr
 
-let pp_print_threat_model ind ppf
+let pp_print_threat_model _ ppf
       (id, intro, expr) =
   Format.fprintf ppf "\"%s\" forall %a, %a" id
     pp_print_intro intro pp_print_texpr expr
 
 let pp_print_statement ind ppf = function
-  | Mission {id; description; reqs} ->
+  | Mission {id; _} ->
      Format.fprintf ppf "Mission \"%s\"" id (* TODO *)
-  | SafetyReq {id; condition; description; comment} ->
+  | SafetyReq {id; condition; description; comment; _} ->
      Format.fprintf ppf "SafetyReq %a"
        (pp_print_safety_req_body ind)
        (id, condition, description, comment)
@@ -308,19 +308,19 @@ let pp_print_statement ind ppf = function
      Format.fprintf ppf "SafetyEvent %a"
        (pp_print_safety_event_body ind)
        (id, probability, description, comment)
-  | CyberReq {id; cia; severity; condition; comment} ->
+  | CyberReq {id; cia; severity; condition; comment; _} ->
      Format.fprintf ppf "CyberReq %a"
        (pp_print_cyber_req_body ind)
        (id, cia, severity, condition, comment)
-  | CyberRel {id; output; inputs; comment} ->
+  | CyberRel {id; output; inputs; comment; _} ->
      Format.fprintf ppf "CyberRel %a"
        (pp_print_cyber_rel_body ind)
        (id, output, inputs, comment)
-  | ThreatModel {id; intro; expr} ->
+  | ThreatModel {id; intro; expr; _} ->
      Format.fprintf ppf "ThreatEffectModel %a"
        (pp_print_threat_model ind)
        (id, intro, expr)
-  | ThreatDefense {id; description; comment; threats} ->
+  | ThreatDefense {id; _} ->
      Format.fprintf ppf "ThreatDefense %s {}" id
   | ThreatDatabase id ->
      Format.fprintf ppf "ThreatDatabase \"%s\"" id

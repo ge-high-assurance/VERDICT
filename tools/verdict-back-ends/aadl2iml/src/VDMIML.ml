@@ -599,7 +599,7 @@ let pp_print_port_list ind ppf ports =
   )
 
 let pp_print_symbol_definition ind ppf
-  ({name; dtype; definition}: symbol_definition)
+  ({name; dtype; definition; _}: symbol_definition)
 =
   Format.fprintf ppf "sd.name = \"%s\" &&@," name;
   Format.fprintf ppf "@[<v %d>sd.dtype = %a &&@," ind
@@ -669,20 +669,20 @@ let pp_print_opt ppf s = function
   | Some a -> Format.fprintf ppf s a
   | None -> Format.fprintf ppf s ""
 
-let pp_print_cyber_cia ind ppf cia =
+let pp_print_cyber_cia _ ppf cia =
   Format.fprintf ppf "CIA.%s"
     (match cia with
            | CyberC -> "Confidentiality"
            | CyberI -> "Integrity"
            | CyberA -> "Availability")
 
-let pp_print_safety_ia ind ppf ia =
+let pp_print_safety_ia _ ppf ia =
   Format.fprintf ppf "IA.%s"
     (match ia with
            | SafetyI -> "Integrity"
            | SafetyA -> "Availability")
 
-let pp_print_cyber_severity ind ppf severity =
+let pp_print_cyber_severity _ ppf severity =
   Format.fprintf ppf "Severity.%s"
     (match severity with
                 | CyberCatastrophic -> "Catastrophic"
@@ -828,7 +828,7 @@ let pp_print_safety_rel_body ind ppf
   pp_print_opt ppf "rel.comment = \"%s\" &&@," comment;
   pp_print_opt ppf "rel.description = \"%s\"@," description
 
-let pp_print_safety_event_body ind ppf
+let pp_print_safety_event_body _ ppf
   {id; probability; comment; description} =
   Format.fprintf ppf "ev.id = \"%s\" &&@," id;
   Format.fprintf ppf "ev.probability = \"%s\" &&@," probability;
@@ -895,13 +895,13 @@ let pp_print_safety_events_list ind ppf safety_events =
     ppf
     (List.mapi (fun i ev -> (i, ev)) safety_events)
 
-let pp_print_bool_prop_value ppf = function
+(*let pp_print_bool_prop_value ppf = function
   | None -> Format.fprintf ppf "mk_none<Bool>"
   | Some v -> Format.fprintf ppf "mk_some<Bool>(%B)" v
 
 let pp_print_int_prop_value ppf = function
   | None -> Format.fprintf ppf "mk_none<Int>"
-  | Some i -> Format.fprintf ppf "mk_some<Int>(%s)" i
+  | Some i -> Format.fprintf ppf "mk_some<Int>(%s)" i *)
 
 let pp_print_string_prop_value ppf = function
   | None -> Format.fprintf ppf "mk_none<String>"
@@ -938,7 +938,7 @@ let pp_print_comp_types_list ind ppf comp_types =
   )
 
 
-let pp_print_generic_attribute ind ppf { name; atype; value } =
+let pp_print_generic_attribute _ ppf { name; atype; value } =
   Format.fprintf ppf "ga.name = \"%s\" &&@," name;
   Format.fprintf ppf "ga.atype = %s &&@,"
     (match atype with
@@ -1229,7 +1229,7 @@ let pp_print_node_declaration_list ind ppf node_decls =
       (List.mapi (fun i nd -> (i, nd)) node_decls)
 
 let pp_print_dataflow_model ind ppf
-  {constant_declarations; node_declarations}
+  {constant_declarations; node_declarations; _}
 =
   Format.fprintf ppf "dfm.type_declarations.length = 0 &&@,";
   Format.fprintf ppf "dfm.constant_declarations.length = %d &&@,"
@@ -1265,7 +1265,7 @@ let pp_print_list (f : Format.formatter -> 'a -> unit)
       Format.fprintf ppf "&& @[<v %d>%s.%s.element[%d] = %a@]@,"
         ind parent name i f elem) lst
 
-let pp_print_threat_intro ind ppf {var; var_type} =
+(*let pp_print_threat_intro _ ppf {var; var_type} =
   Format.fprintf ppf "some (ti: ThreatIntro) {@,";
   Format.fprintf ppf "ti.var_name = \"%s\" &&@," var;
   Format.fprintf ppf "ti.var_type = \"%s\"@," var_type;
@@ -1384,7 +1384,7 @@ let pp_print_threat_defenses_list ind ppf threat_defenses =
         (pp_print_threat_defense_body ind) defense
     )
     ppf
-    (List.mapi (fun i req -> (i, req)) threat_defenses)
+    (List.mapi (fun i req -> (i, req)) threat_defenses) *)
 
 let pp_print_mission_body ind ppf
       {id; description; comment; reqs} =
@@ -1410,8 +1410,7 @@ let pp_print_missions_list ind ppf missions =
 
 let pp_print_model_body ind ppf
       { name; type_declarations; component_types;
-        dataflow_code; comp_impl; cyber_reqs; safety_reqs; missions;
-        threat_models; threat_defenses }
+        dataflow_code; comp_impl; cyber_reqs; safety_reqs; missions; _ }
 =
   Format.fprintf ppf "m.name = \"%s\" &&@," name;
   Format.fprintf ppf "m.type_declarations.length = %d &&@,"

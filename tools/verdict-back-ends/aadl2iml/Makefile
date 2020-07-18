@@ -1,19 +1,17 @@
 
 BIN_NAME=aadl2iml
 BIN_PATH=bin
+EXE_PATH=_build/default/src/main.exe
 
-OCB_FLAGS   = -I src
-OCB = ocamlbuild $(OCB_FLAGS)
+.PHONY: all clean build
 
-.PHONY: all clean native
-
-all: native
+all: build
 
 clean:
-	$(OCB) -clean
+	@dune clean
 	@rm -rf $(BIN_PATH)
 
-native:
-	$(OCB) main.native
+build:
+	@dune build
 	@mkdir -p $(BIN_PATH)
-	@cp -L main.native $(BIN_PATH)/$(BIN_NAME)
+	@cp $(EXE_PATH) $(BIN_PATH)/$(BIN_NAME)

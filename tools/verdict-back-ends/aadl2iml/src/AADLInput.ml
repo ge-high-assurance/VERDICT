@@ -91,12 +91,12 @@ let sort_model_units input =
       | _ -> failwith("Duplicated AADL unit model detected!")
     in
     let f map = function
-      | AD.AADLPackage (_, { AD.name }) as um -> (
+      | AD.AADLPackage (_, { AD.name; _ }) as um -> (
         let imported_units = AD.get_imported_units um in
         List.fold_left (add_dependency name) map imported_units
         |> UnitMap.update name (add_unit_model um)
       )
-      | AD.PropertySet (_, { AD.name; AD.imported_units }) as um -> (
+      | AD.PropertySet (_, { AD.name; AD.imported_units; _ }) as um -> (
         let pname = [name] in
         List.fold_left (add_dependency pname) map imported_units
         |> UnitMap.update pname (add_unit_model um)
@@ -175,7 +175,7 @@ let merge_packages input =
 
   let package_names =
     let get_name set = function
-      | AD.AADLPackage (_, { AD.name } ) -> (
+      | AD.AADLPackage (_, { AD.name; _ } ) -> (
         PkgNameSet.add name set
       )
       | AD.PropertySet _ -> set
@@ -199,7 +199,7 @@ let merge_packages input =
     in
 
     let remove_renamed_packages renamed_packages =
-      let add_rp acc ({ AD.name; AD.renamed_package; AD.rename_all } as rp) =
+      let add_rp acc ({ AD.name; AD.renamed_package; _ } as rp) =
         match name with
         | None -> (
           match PkgNameSet.find_opt renamed_package package_names with
@@ -536,7 +536,7 @@ let merge_packages input =
 
   let merge_model_units mu1 mu2 =
     match mu1, mu2 with
-    | AD.AADLPackage (pos1, pkg1), AD.AADLPackage (pos2, pkg2) -> (
+    | AD.AADLPackage (pos1, pkg1), AD.AADLPackage (_, pkg2) -> (
       AD.AADLPackage (pos1, merge_package pkg1 pkg2)
     )
     | _ -> assert false
@@ -560,7 +560,7 @@ let get_verdict_properties prop_set_name input =
   let lc_prop_set_name = String.lowercase_ascii prop_set_name in
   let ast =
     input |> List.find_opt (function
-      | AD.PropertySet (_, { AD.name }) -> 
+      | AD.PropertySet (_, { AD.name; _ }) -> 
         String.lowercase_ascii (snd name) = lc_prop_set_name
       | _ -> false
     )
