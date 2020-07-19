@@ -40,22 +40,21 @@ public class Main {
                 new File(
                         "/Users/212807042/Desktop/DeliveryDroneFiles/soteria_outputs/ImplProperties-safety.xml");
 
-        CreateGSN.gsnCreator(testXml, cyberOutput, safetyOutput);
+        String rootGoalId = "SafetyReq01";
+        
+        GsnNode gsnFragment = CreateGSN.gsnCreator(testXml, cyberOutput, safetyOutput, rootGoalId);
 
-        // GraphViz parse dot file example
-        try (InputStream dot =
-                new FileInputStream(
-                        "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot"); ) {
-            MutableGraph g = new Parser().read(dot);
-            Graphviz.fromGraph(g)
-            		.width(1400)
-                    .render(Format.SVG)
-                    .toFile(
-                            new File(
-                                    "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg"));
-            // Graphviz.fromGraph(g).render(Format.PNG).toFile(new
-            // File("/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.png"));
-        }
+        String sourceDot="/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot";
+        String destinationGraph ="/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg";
+        
+        // Create a file and print the dot
+        File gsnDotFile =
+                new File(
+                        "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot");
+        Gsn2Dot.createDot(gsnFragment, gsnDotFile);
+
+        Dot2GraphViz.generateGraph(sourceDot, destinationGraph);
+    
     }
 
     /** FOR TESTING PURPOSES ONLY */

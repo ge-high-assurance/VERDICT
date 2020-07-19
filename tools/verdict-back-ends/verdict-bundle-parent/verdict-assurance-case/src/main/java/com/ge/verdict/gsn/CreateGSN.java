@@ -20,28 +20,21 @@ public class CreateGSN {
 
     /**
      * Entry method for the CreateGSN class
-     *
+     * 
      * @param testXml
      * @param cyberOutput
      * @param safetyOutput
+     * @param rootGoalId
+     * @return a GsnNode
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
      */
-    public static void gsnCreator(File testXml, File cyberOutput, File safetyOutput)
+    public static GsnNode gsnCreator(File testXml, File cyberOutput, File safetyOutput, String rootGoalId)
             throws ParserConfigurationException, SAXException, IOException {
 
-        // The files
-        //        File testXml = new
-        // File("/Users/212807042/Desktop/DeliveryDroneFiles/DeliveryDroneVdm.xml");
-        //        File cyberOutput =
-        //                new File(
-        //
-        // "/Users/212807042/Desktop/DeliveryDroneFiles/soteria_outputs/ImplProperties.xml");
-        //        File safetyOutput =
-        //                new File(
-        //
-        // "/Users/212807042/Desktop/DeliveryDroneFiles/soteria_outputs/ImplProperties-safety.xml");
+    	//The GsnNode to return
+    	GsnNode returnFragment = new GsnNode();
 
         // Fetch the DeliveryDrone model from the XML
         Model xmlModel = VdmTranslator.unmarshalFromXml(testXml);
@@ -60,25 +53,37 @@ public class CreateGSN {
         safetySoteria.getDocumentElement().normalize();
         NodeList nListSafety = safetySoteria.getElementsByTagName("Requirement");
 
-        // get a list of all GSN fragments from model
-        List<GsnNode> gsnFragments = getFragments(xmlModel, nListCyber, nListSafety);
+ 
+        //determine if rootGoalId is a mission, cyber, or safety requirement 
+        for (Mission aMission : xmlModel.getMission()) {
+        	if (aMission.getId().equalsIgnoreCase(rootGoalId)){
+        		returnFragment = populateMissionNode(aMission, xmlModel, nListCyber, nListSafety);  
+        	}
+        } 
+        for (CyberReq aCyberReq : xmlModel.getCyberReq()) {
+        	if (aCyberReq.getId().equalsIgnoreCase(rootGoalId)){
+        		returnFragment = populateCyberRequirementNode(aCyberReq, xmlModel, nListCyber);  
+        	}
+        } 
+        for (SafetyReq aSafetyReq : xmlModel.getSafetyReq()) {
+        	if (aSafetyReq.getId().equalsIgnoreCase(rootGoalId)){
+        		returnFragment = populateSafetyRequirementNode(aSafetyReq, xmlModel, nListSafety);  
+        	}
+        }        
 
-        Main.traverseGSN(gsnFragments.get(0));
-
-        // Create a file and print the dot
-        File gsnDotFile =
-                new File(
-                        "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot");
-        Gsn2Dot.createDot(gsnFragments.get(0), gsnDotFile);
+        
+        //return the GSN gragment
+        return returnFragment;
     }
 
     /**
-     * Produces a GSN fragment for each mission requirement a GSN Node and returns a list
+     * Produces a GSN fragment for each mission requirement 
+     * in a model 
      *
      * @param model
      * @param cyberResults
      * @param safetyResults
-     * @return
+     * @return a list of GsnNodes
      */
     public static List<GsnNode> getFragments(
             Model model, NodeList cyberResults, NodeList safetyResults) {
@@ -110,23 +115,23 @@ public class CreateGSN {
         // Populate the rootnode with the mission goal
         missionNode.setNodeType("goal");
         missionNode.setNodeId("GOAL_" + mission.getId());
-        missionNode.setNodeLevel(0);
+
         System.out.println("Mission: " + mission.getId());
         // to set goal of missionNode
         Goal missionGoal = new Goal();
         missionGoal.setDisplayText(mission.getDescription());
         missionNode.setGoal(missionGoal);
 
-        // INCOMPLETE: add contexts to missionNode
+        //add contexts to missionNode
         List<String> missionContext = new ArrayList<>();
         missionContext.add(model.getName());
         System.out.println("-------------------" + missionContext);
-        missionNode.getInContextOf().addAll(addContextPorts(missionContext, 0));
+        missionNode.getInContextOf().addAll(addContextPorts(missionContext, model));
 
         // create a strategy node to support the mission goal
         GsnNode strategyNode = new GsnNode();
         strategyNode.setNodeType("strategy");
-        strategyNode.setNodeLevel(1);
+
         String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
         strategyCounter++;
         strategyNode.setNodeId(strategyId);
@@ -200,21 +205,20 @@ public class CreateGSN {
 
         // Populate the rootnode with the requirement subgoal
         reqNode.setNodeType("goal");
-        reqNode.setNodeLevel(2);
+
         reqNode.setNodeId("GOAL_" + cyberReq.getId());
         // to populate goal of node
         Goal reqNodeGoal = new Goal();
         reqNodeGoal.setDisplayText(cyberReq.getDescription());
         reqNode.setGoal(reqNodeGoal);
 
-        // INCOMPLETE: add contexts to reqNode --> WILL NEED TO DEVELOP CyberExpr and SafetyExpr
-        // parsers
+        //Add context to reqNode
         List<String> reqContextPorts = getCyberExprPorts(cyberReq.getCondition());
-        reqNode.getInContextOf().addAll(addContextPorts(reqContextPorts, 2));
+        reqNode.getInContextOf().addAll(addContextPorts(reqContextPorts, model));
 
         // create a strategy node to support the requirement subgoal
         GsnNode strategyNode = new GsnNode();
-        strategyNode.setNodeLevel(3);
+
         strategyNode.setNodeType("strategy");
         String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
         strategyCounter++;
@@ -265,14 +269,13 @@ public class CreateGSN {
         reqNodeGoal.setDisplayText(safetyReq.getDescription());
         reqNode.setGoal(reqNodeGoal);
 
-        // INCOMPLETE: add contexts to reqNode --> WILL NEED TO DEVELOP CyberExpr and SafetyExpr
-        // parsers
+        //Add context to reqNode
         List<String> reqContextPorts = getSafetyReqExprPorts(safetyReq.getCondition());
-        reqNode.getInContextOf().addAll(addContextPorts(reqContextPorts, 2));
+        reqNode.getInContextOf().addAll(addContextPorts(reqContextPorts, model));
 
         // create a strategy node to support the requirement subgoal
         GsnNode strategyNode = new GsnNode();
-        strategyNode.setNodeLevel(3);
+
         strategyNode.setNodeType("strategy");
         String strategyId = "STRATEGY_" + Integer.toString(strategyCounter);
         strategyCounter++;
@@ -315,7 +318,7 @@ public class CreateGSN {
         GsnNode solutionNode = new GsnNode();
 
         // Populate the rootnode with solution details
-        solutionNode.setNodeLevel(4);
+
         solutionNode.setNodeType("solution");
         String solutionId = "SOLUTION_" + Integer.toString(solutionCounter);
         solutionCounter++;
@@ -347,6 +350,10 @@ public class CreateGSN {
             sol.setStatus(false);
             System.out.println("---------------- Found Solution -> " + false);
         }
+        
+        //setting hovering info for solution node
+        String extraInfo = "Computed Probability = "+computed_p+"&#10;Acceptable Probability = "+acceptable_p;
+        sol.setExtraInfo(extraInfo);
 
         // add sol to solutionNode
         solutionNode.setSolution(sol);
@@ -427,15 +434,12 @@ public class CreateGSN {
      * @param contextNames
      * @return
      */
-    public static List<GsnNode> addContextPorts(List<String> contextNames, int parentLavel) {
+    public static List<GsnNode> addContextPorts(List<String> contextNames, Model model) {
         // Removing duplicates from context_names
         List<String> duplicateFreeContextNames = new ArrayList<>(new HashSet<>(contextNames));
 
         // A list of GsnNodes to contain the "inContextOf"
         List<GsnNode> inContextOf = new ArrayList<>();
-
-        // Level of all the contexts
-        int contextLevel = parentLavel;
 
         for (String context : duplicateFreeContextNames) {
 
@@ -448,11 +452,27 @@ public class CreateGSN {
             String contextId = "CONTEXT_" + Integer.toString(contextCounter);
             contextCounter++;
             contextNode.setNodeId(contextId);
-            contextNode.setNodeLevel(contextLevel);
+            
+            //If context is a port, find the parent subsystem
+            List<String> parentNames = new ArrayList<>();;
+            for(ComponentType cType : model.getComponentType()) {
+            	for(Port port : cType.getPort()) {
+            		if (port.getName().equalsIgnoreCase(context)) {
+            			parentNames.add(cType.getName());
+            		}
+            	}
+            }
 
             // pack the context
             Context nodeContext = new Context();
             nodeContext.setDisplayText(context);
+            if(!(parentNames.isEmpty())) {
+            	String extraInfo = "Belongs to:";
+            	for(String parent : parentNames) {
+            		extraInfo= extraInfo+"&#10;"+parent;
+            	}
+            	nodeContext.setExtraInfo(extraInfo);
+            }
 
             contextNode.setContext(nodeContext);
 

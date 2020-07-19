@@ -10,6 +10,9 @@ public class Goal {
     /** Goal status true if passed false if failed */
     protected boolean status;
 
+    /** Additional information as string */
+    protected String moreInfo;
+
     /**
      * Gets the value of the id property.
      *
@@ -62,5 +65,24 @@ public class Goal {
      */
     public void setStatus(boolean value) {
         this.status = value;
+    }
+    
+    
+    /**
+     * Gets the value of the moreInfo property.
+     *
+     * @return possible object is {@link String }
+     */
+    public String getExtraInfo() {
+        return moreInfo;
+    }
+
+    /**
+     * Sets the value of the extraInfo property.
+     *
+     * @param value allowed object is {@link String }
+     */
+    public void setExtraInfo(String value) {
+        this.moreInfo = value;
     }
 }

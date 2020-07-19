@@ -11,13 +11,7 @@ public class Gsn2Dot {
 
     public static void createDot(GsnNode GSN, File fout) throws IOException {
 
-        System.out.println("Printing all node Ids:");
         getAllNodes(allNodes, GSN);
-        for (GsnNode node : allNodes) {
-            System.out.println(node.getNodeId());
-        }
-
-        System.out.println("Printing sample.dot:");
 
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
@@ -72,22 +66,30 @@ public class Gsn2Dot {
     }
 
     public static void writeNodes(List<GsnNode> allNodes, BufferedWriter bw) throws IOException {
-        bw.write("//Declaring all nodes below");
+        bw.write("//Node declarations:-");
         bw.newLine();
         for (GsnNode node : allNodes) {
             // String nodeDeclareString = "";
             String nodeShape = "";
             String nodeColor = "";
             String nodeText = "";
+            String hoverDisplay = "No additional information is available.";
             boolean nodeStatus = true;
 
+            //deciding node shape and hovertext
             if (node.getNodeType().equalsIgnoreCase("context")) {
                 nodeShape = "rectangle, style=\"rounded\" ";
                 nodeText = node.getContext().getDisplayText();
+            	if (!(node.getContext().getExtraInfo()==null)) {
+                	hoverDisplay = node.getContext().getExtraInfo();            		
+            	}
             } else if (node.getNodeType().equalsIgnoreCase("solution")) {
                 nodeShape = "circle";
                 nodeText = node.getSolution().getDisplayText();
                 nodeStatus = node.getSolution().getStatus();
+            	if (!(node.getSolution().getExtraInfo()==null)) {
+                	hoverDisplay = node.getSolution().getExtraInfo();            		
+            	}
             } else if (node.getNodeType().equalsIgnoreCase("goal")) {
                 nodeShape = "box";
                 nodeText = node.getGoal().getDisplayText();
@@ -98,20 +100,39 @@ public class Gsn2Dot {
                 nodeStatus = node.getStrategy().getStatus();
             }
 
+            //deciding node color
             if (nodeStatus) {
                 nodeColor = "green";
             } else {
                 nodeColor = "red";
             }
-
             if (node.getNodeType().equalsIgnoreCase("context")) {
                 nodeColor = "black";
             }
-
+            
+//            //deciding hover text
+//            if (node.getNodeType().equalsIgnoreCase("context")) {
+//            	if (!(node.getContext().getExtraInfo()==null)) {
+//                	hoverDisplay = node.getContext().getExtraInfo();            		
+//            	}
+//            } else if (node.getNodeType().equalsIgnoreCase("solution")) {
+//            	if (!(node.getSolution().getExtraInfo()==null)) {
+//                	hoverDisplay = node.getContext().getExtraInfo();            		
+//            	}
+//            } //else if (node.getNodeType().equalsIgnoreCase("goal")) {
+//               
+////            } else if (node.getNodeType().equalsIgnoreCase("strategy")) {
+////            
+////            }
+            
+            
+            //writing string to declare node in dot file
             String nodeDeclareString =
                     node.getNodeId()
                             + " ["
-                            + "margin=0.05, style=bold, color="
+                            + "tooltip=\""
+                            + hoverDisplay
+                            + "\", margin=0.05, style=bold, color="
                             + nodeColor
                             + ", width=1, shape="
                             + nodeShape
@@ -127,7 +148,7 @@ public class Gsn2Dot {
 
     public static void writeRelationships(List<GsnNode> allNodes, BufferedWriter bw)
             throws IOException {
-        bw.write("//Declaring all node relationships below");
+        bw.write("//Node relationships (edges):-");
         bw.newLine();
         for (GsnNode node : allNodes) {
             for (GsnNode support : node.getSupportedBy()) {
