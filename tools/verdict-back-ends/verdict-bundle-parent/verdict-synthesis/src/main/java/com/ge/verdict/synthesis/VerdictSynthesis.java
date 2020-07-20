@@ -8,9 +8,9 @@ import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
+import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -49,9 +49,6 @@ public class VerdictSynthesis {
 
         Collection<ComponentDefense> pairs = factory.allComponentDefensePairs();
 
-        // currently not using the LCD
-        normalizeCosts(pairs);
-
         optimizer.Assert(tree.toZ3Multi(context));
 
         if (meritAssignment) {
@@ -62,9 +59,9 @@ public class VerdictSynthesis {
                                             pair ->
                                                     context.mkLe(
                                                             pair.toZ3Multi(context),
-                                                            context.mkInt(
-                                                                    pair.dalToNormCost(
-                                                                            pair.implDal))))
+                                                            DLeaf.fractionToZ3(
+                                                                    pair.dalToRawCost(pair.implDal),
+                                                                    context)))
                                     .collect(Collectors.toList())
                                     .toArray(new BoolExpr[] {})));
         }
@@ -80,7 +77,8 @@ public class VerdictSynthesis {
                                         pair ->
                                                 context.mkGe(
                                                         pair.toZ3Multi(context),
-                                                        context.mkInt(pair.dalToNormCost(0))))
+                                                        DLeaf.fractionToZ3(
+                                                                pair.dalToRawCost(0), context)))
                                 .collect(Collectors.toList())
                                 .toArray(new BoolExpr[] {})));
 
@@ -107,9 +105,10 @@ public class VerdictSynthesis {
             double totalInputCost = 0, totalOutputCost = 0;
             Model model = optimizer.getModel();
             for (ComponentDefense pair : pairs) {
-                IntNum expr = (IntNum) model.eval(pair.toZ3Multi(context), true);
-                int normCost = expr.getInt();
-                int dal = pair.normCostToDal(normCost);
+                RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
+                Fraction rawCost =
+                        new Fraction(expr.getNumerator().getInt(), expr.getDenominator().getInt());
+                int dal = pair.rawCostToDal(rawCost);
 
                 double inputCost =
                         costModel.cost(pair.defenseProperty, pair.component, pair.implDal);

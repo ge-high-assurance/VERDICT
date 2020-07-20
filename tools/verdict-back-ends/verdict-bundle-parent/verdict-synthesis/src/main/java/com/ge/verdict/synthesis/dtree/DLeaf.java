@@ -5,7 +5,7 @@ import com.ge.verdict.synthesis.util.Pair;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import com.microsoft.z3.IntNum;
+import com.microsoft.z3.RatNum;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,6 +39,7 @@ public class DLeaf implements DTree {
         public final String attack;
 
         private final Fraction[] costs;
+        private Map<Fraction, Integer> rawCostToDal;
 
         private Map<Integer, Integer> dalToNormCost;
         private Map<Integer, Integer> normCostToDal;
@@ -60,8 +61,10 @@ public class DLeaf implements DTree {
                 throw new RuntimeException(
                         "invalid costs array, contains " + costs.length + " items instead of 10");
             }
+            rawCostToDal = new LinkedHashMap<>();
             for (int dal = 0; dal < this.costs.length; dal++) {
                 this.costs[dal] = costFraction(costs[dal]);
+                rawCostToDal.put(this.costs[dal], dal);
             }
         }
 
@@ -98,6 +101,14 @@ public class DLeaf implements DTree {
             return costs[dal];
         }
 
+        public int rawCostToDal(Fraction rawCost) {
+            Integer val = rawCostToDal.get(rawCost);
+            if (val == null) {
+                throw new RuntimeException("invalid raw cost: " + rawCost);
+            }
+            return val;
+        }
+
         public int dalToNormCost(int dal) {
             Integer val = dalToNormCost.get(dal);
             if (val == null) {
@@ -129,7 +140,7 @@ public class DLeaf implements DTree {
         }
 
         public ArithExpr toZ3Multi(Context context) {
-            return context.mkIntConst(smtName());
+            return context.mkRealConst(smtName());
         }
 
         public Variable toLogicNG(FormulaFactory factory) {
@@ -256,8 +267,7 @@ public class DLeaf implements DTree {
     @Override
     public BoolExpr toZ3Multi(Context context) {
         ArithExpr var = componentDefense.toZ3Multi(context);
-        IntNum target = context.mkInt(componentDefense.dalToNormCost(targetDal));
-        return context.mkGe(var, target);
+        return context.mkGe(var, fractionToZ3(componentDefense.dalToRawCost(targetDal), context));
     }
 
     @Override
@@ -273,5 +283,9 @@ public class DLeaf implements DTree {
     @Override
     public String toString() {
         return prettyPrint();
+    }
+
+    public static RatNum fractionToZ3(Fraction fraction, Context context) {
+        return context.mkReal(fraction.getNumerator(), fraction.getDenominator());
     }
 }
