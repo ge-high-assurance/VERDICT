@@ -332,6 +332,7 @@ let likelihoodCutCalc cs la =
     | DSum s         -> let l = (likelihoodCutSOP s la) in (gMax l)  (* max on d-OR gate b/c assoc list is in terms of likelihood *)
     | DPro p         -> gMin (likelihoodCutSOP p la)                 (* min on d-AND gate b/c assoc list is in terms of likelihood *)
     | AFALSE         -> 0.
+    | ATRUE          -> 1.
     | _ -> raise (Invalid_argument "In likelihoodCutCalc")
 ;;
 
@@ -360,6 +361,7 @@ let likelihoodCutCImp t cutset =
   let cs = match cutset with
              | AVar _ -> [cutset]
              | AFALSE -> [AFALSE]
+             | ATRUE  -> [ATRUE]
              | ASum s -> s
              | APro s -> s  (* for the case where the cutset contains C(a,d) *)
              | _ -> raise (Error "likelihoodCutCImp exception") 

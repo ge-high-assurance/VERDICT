@@ -8,6 +8,7 @@ Date: 2019-11-04
   
 Updates: 
     5/18/2020, Heber Herencia-Zapana, added inferring  cyber/safety parameters  ("-c","-s").
+    7/20/2020, Kit Siu, updated with command line parsing using the Command library.
 *)
 
 (**
@@ -170,7 +171,7 @@ let process_output_dir input_dir output_dir =
      append_dir_sep input_dir)    
 
 (** Execute the analysis *)
-let execute input_dir output_dir infeCyber infeSafe =
+let execute input_dir output_dir infeCyber infeSafe saveDotML =
   try (
     (* Collect all CSV files *)
     let input_files = expand_dir input_dir in
@@ -195,7 +196,7 @@ let execute input_dir output_dir infeCyber infeSafe =
       let defense2nist_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "Defenses2NIST.csv") in
       let attack_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "CAPEC.csv") in
       let events_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "Events.csv") in
-      let _ = do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch scn_arch_ch mission_ch defense_ch defense2nist_ch output_dir_path infeCyber infeSafe in
+      let _ = do_arch_analysis ~save_dot_ml:saveDotML comp_dep_ch comp_saf_ch attack_ch events_ch scn_arch_ch mission_ch defense_ch defense2nist_ch output_dir_path infeCyber infeSafe in
 
       Format.printf "Info: Done!@."
     )
@@ -205,38 +206,26 @@ let execute input_dir output_dir infeCyber infeSafe =
   | Sys_error msg ->
       Format.eprintf "%s@." msg 
 
-(** Parse the command line arguments *)
-let parse_command_line_args () =
-  let num_args = (Array.length Sys.argv) - 1 in
-  if num_args = 1 then
-    Some (Sys.argv.(1), Sys.argv.(1),false,false)
-  else if num_args = 2 && Sys.argv.(2)= "-c" then
-    Some (Sys.argv.(1), Sys.argv.(1),true,false)
-  else if num_args = 2 && Sys.argv.(2)= "-s" then
-    Some (Sys.argv.(1), Sys.argv.(1),false,true) 
-  else  if num_args = 3 && Sys.argv.(2) = "-c" && Sys.argv.(3) = "-s" then
-    Some (Sys.argv.(1), Sys.argv.(1),true,true)     
-  else if num_args = 3 &&  Sys.argv.(1) = "-o" then
-    Some (Sys.argv.(3), Sys.argv.(2),false,false)
-  else if num_args = 4 &&  Sys.argv.(4)= "-c" then 
-    Some (Sys.argv.(3), Sys.argv.(2),true,false)
-  else if num_args = 4 &&  Sys.argv.(4)= "-s" then 
-    Some (Sys.argv.(3), Sys.argv.(2),false,true)
-  else if num_args = 5 &&  Sys.argv.(4)= "-c" && Sys.argv.(5)="-s" then 
-    Some (Sys.argv.(3), Sys.argv.(2),true,true)     
-  else    
-    None
-    
-(** The entry point of the program *)
-let main () =
-  match parse_command_line_args () with
-  | Some (input_dir, output_dir,infeCyber,infeSafe) ->
-    execute input_dir output_dir infeCyber infeSafe
-  | None ->
-    Format.printf 
-      "SOTERIA++: a framework for analyzing and visualizing the safety and security of system architecture@.";
-    Format.printf
-      "Usage: %s [-o <output path>] <input path>@."
-      Sys.argv.(0)
+(* command line parsing *)
+let command =
+  Command.basic
+    ~summary: "SOTERIA++: a framework for analyzing and visualizing the safety and security of system architecture."
+    ~readme:(fun () -> "Given the expected .csv input files in the input directory, calculates cutsets and outputs in .svg and .txt file formats.")
+    Command.Let_syntax.(
+       let%map_open 
+          outputdir_param = flag "-o" (optional Filename.arg_type) ~doc:" output directory"
+          and inputdir_param = anon ("inputdir" %: Filename.arg_type)
+          and cyberInfer_flag = flag "-c" no_arg ~doc:" infer cyber relations if none are defined"
+          and safetyInfer_flag = flag "-s" no_arg ~doc:" infer safety relations if none are defined"
+          and saveDotML_flag = flag "-ml" no_arg ~doc:" save the .ml files with the SOTERIA++ library and model for debugging"
+         in
+         fun () -> 
+          match outputdir_param with
+          | Some o_param -> execute inputdir_param o_param cyberInfer_flag safetyInfer_flag saveDotML_flag
+          | None -> execute inputdir_param inputdir_param cyberInfer_flag safetyInfer_flag saveDotML_flag );; 
 
-let () = main ()
+(* run the command *)
+let () = Command.run 
+   ~version:"pre 1.0"  (* <-- TODO: check this default periodically *)
+   ~build_info:"corebuild -pkg printbox -pkg xml-light soteria_pp.native" 
+   command  ;;
