@@ -23,14 +23,22 @@
        </handler>
        <handler
              class="com.ge.research.osate.verdict.handlers.WzrdHandler"
-             commandId="com.ge.research.osate.verdict.commands.runWzrd"
-             enablesFor="1">
+             commandId="com.ge.research.osate.verdict.commands.runWzrd">
           <enabledWhen>
              <reference
                    definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">
              </reference>
           </enabledWhen>
-       </handler>              
+       </handler>
+       <handler
+             class="com.ge.research.osate.verdict.handlers.MBASSynthesisHandler"
+             commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
        <handler
              class="com.ge.research.osate.verdict.handlers.StopHandler"
              commandId="com.ge.research.osate.verdict.commands.stop">
@@ -58,13 +66,25 @@
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
 	            style="push"
 	            tooltip="Run MBAA">
-	      </command>    
+	      </command>
+	      <command
+	            commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+	            label="&amp;Run Model Based Architecture Synthesis (MBAS)"
+	            style="push"
+	            tooltip="Run MBAS">
+	      </command>
       	  <command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
-      	  </command>	      
+      	  </command>
+      	  <command
+      	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
+      	        label="&amp;MBAS Settings"
+      	        style="push"
+      	        tooltip="Click to change MBAS Settings">
+      	  </command>
 		</menu> 
 		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
           <command
@@ -113,11 +133,21 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
              name="Run MBAS">
-       </command>     
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+             name="Run MBAS Synthesis">
+       </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runCrv"
              name="Run CRV">
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.mbasSettings"
+             name="MBAS Settings">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"

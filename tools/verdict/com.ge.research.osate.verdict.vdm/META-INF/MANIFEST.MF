@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Automatic-Module-Name: com.ge.research.osate.verdict.vdm
+Bundle-SymbolicName: com.ge.research.osate.verdict.vdm;singleton:=true
+Bundle-Vendor: GE
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: javax.xml.bind
+Export-Package: com.ge.verdict.vdm,
+ verdict.vdm.vdm_data,
+ verdict.vdm.vdm_kind2,
+ verdict.vdm.vdm_lustre,
+ verdict.vdm.vdm_model

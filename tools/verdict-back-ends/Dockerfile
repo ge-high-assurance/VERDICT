@@ -1,6 +1,35 @@
 # Build aadl2iml, kind2, soteria_pp, and z3 using Docker
 
-FROM ocaml/opam2 AS builder
+FROM openjdk:11-jdk-slim-buster AS z3-builder
+
+# we need java in order to build the z3 java bindings
+# it's just easier to build it separately from the ocaml things
+
+USER 0
+RUN apt-get update -qq \
+ && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
+    make \
+    automake \
+    libtool \
+    pkg-config \
+    python3 \
+    python3-distutils \
+    wget \
+    curl \
+    g++
+
+# Download z3's sources and build z3
+
+RUN mkdir --mode=777 /src \
+ && cd /src \
+ && curl --fail --location --silent --show-error https://github.com/Z3Prover/z3/archive/z3-4.7.1.tar.gz | tar xzf - \
+ && cd z3-z3-4.7.1 \
+ && python3 scripts/mk_make.py --java --prefix=/usr/local \
+ && cd build \
+ && make \
+ && make install
+
+FROM ocaml/opam2 AS ocaml-builder
 
 # Switch to the root user and make sure we have all the Debian packages we need
 # These are already installed:
@@ -16,16 +45,7 @@ RUN apt-get update -qq \
     python3-distutils \
     wget
 
-# Download z3's sources and build z3
-
-RUN mkdir --mode=777 /src \
- && cd /src \
- && curl --fail --location --silent --show-error https://github.com/Z3Prover/z3/archive/z3-4.7.1.tar.gz | tar xzf - \
- && cd z3-z3-4.7.1 \
- && python3 scripts/mk_make.py --prefix=/usr/local \
- && cd build \
- && make \
- && make install
+RUN mkdir --mode=777 /src
 
 # Switch to the opam user and make sure we have all the ocaml packages we need
 
@@ -94,11 +114,13 @@ RUN apt-get update -qq \
 
 # Copy the binaries we need to call
 
-COPY --from=builder /src/aadl2iml/bin/aadl2iml /app/aadl2iml
-COPY --from=builder /src/kind2/bin/kind2 /app/kind2
-COPY --from=builder /src/soteria_pp/soteria_pp.native /app/soteria_pp
+COPY --from=ocaml-builder /src/aadl2iml/bin/aadl2iml /app/aadl2iml
+COPY --from=ocaml-builder /src/kind2/bin/kind2 /app/kind2
+COPY --from=ocaml-builder /src/soteria_pp/soteria_pp.native /app/soteria_pp
 COPY verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0-SNAPSHOT-capsule.jar /app/verdict.jar
-COPY --from=builder /usr/local /usr/local
+COPY --from=z3-builder /usr/local/bin /usr/local/bin
+COPY --from=z3-builder /usr/local/lib /usr/local/lib
+COPY --from=ocaml-builder /usr/local /usr/local
 
 # Run verdict.jar as the verdict user, not as root
 
@@ -107,3 +129,4 @@ WORKDIR /data
 # Java 11 LTS needs --add-open arguments
 ENTRYPOINT ["java", "-Xmx1536m", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
 ENV GraphVizPath=/usr/bin
+ENV LD_LIBRARY_PATH=/usr/local/lib

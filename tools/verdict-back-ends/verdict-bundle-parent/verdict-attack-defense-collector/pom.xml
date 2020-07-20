@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ge.verdict</groupId>
+        <artifactId>verdict-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>verdict-attack-defense-collector</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Verdict Attack-Defense Collector</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-data-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.logicng</groupId>
+            <artifactId>logicng</artifactId>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.chrisdchristo</groupId>
+                <artifactId>capsule-maven-plugin</artifactId>
+                <configuration>
+                    <appClass>com.ge.verdict.attackdefensecollector.App</appClass>
+                    <includeApp>true</includeApp>
+                    <includeAppDep>true</includeAppDep>
+                    <includePluginDep>false</includePluginDep>
+                    <includeTransitiveDep>true</includeTransitiveDep>
+                    <includeCompileDep>true</includeCompileDep>
+                    <includeRuntimeDep>true</includeRuntimeDep>
+                    <includeProvidedDep>false</includeProvidedDep>
+                    <includeSystemDep>false</includeSystemDep>
+                    <includeTestDep>true</includeTestDep>
+                    <includeOptionalDep>false</includeOptionalDep>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

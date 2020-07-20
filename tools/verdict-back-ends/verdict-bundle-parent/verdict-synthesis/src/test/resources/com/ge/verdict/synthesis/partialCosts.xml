@@ -1,0 +1,4 @@
+<cost-model>
+    <cost component="C1" defense="D1" dal="1">1</cost>
+    <cost component="C1" defense="D1" dal="2">2</cost>
+</cost-model>
