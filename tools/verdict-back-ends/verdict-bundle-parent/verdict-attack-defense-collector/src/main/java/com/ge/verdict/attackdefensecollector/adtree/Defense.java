@@ -103,7 +103,7 @@ public class Defense extends ADTree {
             }
             total = Prob.and(total, termTotal);
         }
-        // negagte because this is complementary
+        // negate because this is complementary
         return Prob.not(total);
     }
 
