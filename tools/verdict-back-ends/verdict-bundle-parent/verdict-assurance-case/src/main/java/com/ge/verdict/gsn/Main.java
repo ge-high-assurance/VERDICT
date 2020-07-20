@@ -1,19 +1,11 @@
 package com.ge.verdict.gsn;
 
-import static guru.nidi.graphviz.model.Factory.*;
-
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.parse.Parser;
 import java.io.*;
 import javax.xml.parsers.*;
-import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-import verdict.vdm.vdm_model.*;
 
 /**
- * FOR TESTING ONLY
+ * THIS CLASS EXISTS FOR TESTING ONLY
  *
  * @author 212807042
  */
@@ -39,22 +31,44 @@ public class Main {
         File safetyOutput =
                 new File(
                         "/Users/212807042/Desktop/DeliveryDroneFiles/soteria_outputs/ImplProperties-safety.xml");
+        String sourceDot =
+                "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot";
+        String destinationGraph =
+                "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg";
 
-        String rootGoalId = "SafetyReq01";
-        
-        GsnNode gsnFragment = CreateGSN.gsnCreator(testXml, cyberOutput, safetyOutput, rootGoalId);
+        String aadlModelAddress =
+                "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/DeliveryDrone.aadl";
 
-        String sourceDot="/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot";
-        String destinationGraph ="/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.svg";
-        
+        // Create the GSN Fragment
+        String rootGoalId = "MReq01";
+
+        GsnNode gsnFragment =
+                CreateGSN.gsnCreator(
+                        testXml, cyberOutput, safetyOutput, aadlModelAddress, rootGoalId);
+
+        System.out.println("Created Gsn Fragment");
+
+        // Create a file and print the GSN XML
+        File gsnXmlFile =
+                new File(
+                        "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.xml");
+
+        Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
+
+        System.out.println("Created Gsn Xml");
+
         // Create a file and print the dot
         File gsnDotFile =
                 new File(
                         "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/sample.dot");
         Gsn2Dot.createDot(gsnFragment, gsnDotFile);
 
+        System.out.println("Created Gsn dot");
+
+        // generate the graphViz svg file
         Dot2GraphViz.generateGraph(sourceDot, destinationGraph);
-    
+
+        System.out.println("Created Gsn svg");
     }
 
     /** FOR TESTING PURPOSES ONLY */

@@ -1,12 +1,19 @@
 package com.ge.verdict.gsn;
 
+import javax.xml.bind.annotation.XmlElement;
+
+/** @author Saswata Paul */
 public class Context {
+
+    @XmlElement
     /** An unique Id */
     protected String id;
 
+    @XmlElement
     /** Some text to display */
     protected String displayText;
 
+    @XmlElement
     /** Additional information as string */
     protected String moreInfo;
 
@@ -15,7 +22,7 @@ public class Context {
      *
      * @return possible object is {@link String }
      */
-    public String getId() {
+    protected String getId() {
         return id;
     }
 
@@ -24,7 +31,7 @@ public class Context {
      *
      * @param value allowed object is {@link String }
      */
-    public void setid(String value) {
+    protected void setid(String value) {
         this.id = value;
     }
 
@@ -33,7 +40,7 @@ public class Context {
      *
      * @return possible object is {@link String }
      */
-    public String getDisplayText() {
+    protected String getDisplayText() {
         return displayText;
     }
 
@@ -42,17 +49,16 @@ public class Context {
      *
      * @param value allowed object is {@link String }
      */
-    public void setDisplayText(String value) {
+    protected void setDisplayText(String value) {
         this.displayText = value;
     }
-    
-    
+
     /**
      * Gets the value of the moreInfo property.
      *
      * @return possible object is {@link String }
      */
-    public String getExtraInfo() {
+    protected String getExtraInfo() {
         return moreInfo;
     }
 
@@ -61,7 +67,7 @@ public class Context {
      *
      * @param value allowed object is {@link String }
      */
-    public void setExtraInfo(String value) {
+    protected void setExtraInfo(String value) {
         this.moreInfo = value;
     }
 }

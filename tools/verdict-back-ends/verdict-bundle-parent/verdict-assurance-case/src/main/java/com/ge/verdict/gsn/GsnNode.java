@@ -2,29 +2,38 @@ package com.ge.verdict.gsn;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/** @author Saswata paul */
+/** @author Saswata Paul */
+@XmlRootElement
 public class GsnNode {
 
+    @XmlElement
     /** An integer describing the level of a node */
     protected int nodeLevel;
 
+    @XmlElement
     /** A unique Id for each node */
     protected String nodeId;
 
+    @XmlElement
     /** Can be one of: ["goal", "strategy", "solution", "context"] */
     protected String nodeType;
 
+    @XmlElement
     /** To store relevant information based on nodeType */
     protected Goal goal;
 
-    protected Strategy strategy;
-    protected Solution solution;
-    protected Context context;
+    @XmlElement protected Strategy strategy;
+    @XmlElement protected Solution solution;
+    @XmlElement protected Context context;
 
+    @XmlElement
     /** List of nodes which support a node */
     protected List<GsnNode> supportedBy;
 
+    @XmlElement
     /** List of context nodes of a node */
     protected List<GsnNode> inContextOf;
 
@@ -33,7 +42,7 @@ public class GsnNode {
      *
      * @return possible object is {@link int }
      */
-    public int getNodeLevel() {
+    protected int getNodeLevel() {
         return nodeLevel;
     }
 
@@ -42,7 +51,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link int }
      */
-    public void setNodeLevel(int value) {
+    protected void setNodeLevel(int value) {
         this.nodeLevel = value;
     }
 
@@ -51,7 +60,7 @@ public class GsnNode {
      *
      * @return possible object is {@link String }
      */
-    public String getNodeId() {
+    protected String getNodeId() {
         return nodeId;
     }
 
@@ -60,7 +69,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link String }
      */
-    public void setNodeId(String value) {
+    protected void setNodeId(String value) {
         this.nodeId = value;
     }
 
@@ -69,7 +78,7 @@ public class GsnNode {
      *
      * @return possible object is {@link String }
      */
-    public String getNodeType() {
+    protected String getNodeType() {
         return nodeType;
     }
 
@@ -78,7 +87,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link String }
      */
-    public void setNodeType(String value) {
+    protected void setNodeType(String value) {
         this.nodeType = value;
     }
 
@@ -87,7 +96,7 @@ public class GsnNode {
      *
      * @return possible object is {@link Goal }
      */
-    public Goal getGoal() {
+    protected Goal getGoal() {
         return goal;
     }
 
@@ -96,7 +105,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link Goal }
      */
-    public void setGoal(Goal value) {
+    protected void setGoal(Goal value) {
         this.goal = value;
     }
 
@@ -105,7 +114,7 @@ public class GsnNode {
      *
      * @return possible object is {@link Strategy }
      */
-    public Strategy getStrategy() {
+    protected Strategy getStrategy() {
         return strategy;
     }
 
@@ -114,7 +123,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link Strategy }
      */
-    public void setStrategy(Strategy value) {
+    protected void setStrategy(Strategy value) {
         this.strategy = value;
     }
 
@@ -123,7 +132,7 @@ public class GsnNode {
      *
      * @return possible object is {@link Solution }
      */
-    public Solution getSolution() {
+    protected Solution getSolution() {
         return solution;
     }
 
@@ -132,7 +141,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link Solution }
      */
-    public void setSolution(Solution value) {
+    protected void setSolution(Solution value) {
         this.solution = value;
     }
 
@@ -141,7 +150,7 @@ public class GsnNode {
      *
      * @return possible object is {@link Context }
      */
-    public Context getContext() {
+    protected Context getContext() {
         return context;
     }
 
@@ -150,7 +159,7 @@ public class GsnNode {
      *
      * @param value allowed object is {@link Context }
      */
-    public void setContext(Context value) {
+    protected void setContext(Context value) {
         this.context = value;
     }
 
@@ -169,7 +178,7 @@ public class GsnNode {
      *
      * <p>Objects of the following type(s) are allowed in the list {@link GsnNode }
      */
-    public List<GsnNode> getSupportedBy() {
+    protected List<GsnNode> getSupportedBy() {
         if (supportedBy == null) {
             supportedBy = new ArrayList<GsnNode>();
         }
@@ -191,7 +200,7 @@ public class GsnNode {
      *
      * <p>Objects of the following type(s) are allowed in the list {@link GsnNode }
      */
-    public List<GsnNode> getInContextOf() {
+    protected List<GsnNode> getInContextOf() {
         if (inContextOf == null) {
             inContextOf = new ArrayList<GsnNode>();
         }

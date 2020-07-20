@@ -7,28 +7,50 @@ import java.util.List;
 /** @author Saswata Paul */
 public class Gsn2Dot {
 
+    // To store all the nodes in the GSN Fragment
     protected static List<GsnNode> allNodes = new ArrayList<>();
 
+    /**
+     * Takes a GsnNode and a file address and creates a dot file for the GSN fragment
+     *
+     * @param GSN
+     * @param fout
+     * @throws IOException
+     */
     public static void createDot(GsnNode GSN, File fout) throws IOException {
 
+        // get all nodes in the GSN fragment
         getAllNodes(allNodes, GSN);
 
+        // Create fileoutputstreams for writing to the file
         FileOutputStream fos = new FileOutputStream(fout);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
-        bw.write("digraph G{");
+        // Start the graph
+        bw.write("digraph ASSURANCE_CASE{");
         bw.newLine();
         bw.write("ratio = 0.5;");
         bw.newLine();
+        // declare all nodes
         writeNodes(allNodes, bw);
         bw.newLine();
+        // declare all edges
         writeRelationships(allNodes, bw);
+        // end the graph
         bw.write("}");
+        // close file
         bw.close();
     }
 
+    /**
+     * Populates the list of all nodes in a Gsn fragment
+     *
+     * @param allNodes
+     * @param node
+     */
     public static void getAllNodes(List<GsnNode> allNodes, GsnNode node) {
 
+        // traverse the GSN fragment and add each node to the list
         if (node.getNodeType().equalsIgnoreCase("context")) {
             allNodes.add(node);
         } else if (node.getNodeType().equalsIgnoreCase("solution")) {
@@ -65,31 +87,37 @@ public class Gsn2Dot {
         }
     }
 
+    /**
+     * Writes the node declarations to the dot file
+     *
+     * @param allNodes
+     * @param bw
+     * @throws IOException
+     */
     public static void writeNodes(List<GsnNode> allNodes, BufferedWriter bw) throws IOException {
         bw.write("//Node declarations:-");
         bw.newLine();
         for (GsnNode node : allNodes) {
-            // String nodeDeclareString = "";
             String nodeShape = "";
             String nodeColor = "";
             String nodeText = "";
-            String hoverDisplay = "No additional information is available.";
+            String hoverDisplay = "No additional information is available";
             boolean nodeStatus = true;
 
-            //deciding node shape and hovertext
+            // deciding node shape and hovertext
             if (node.getNodeType().equalsIgnoreCase("context")) {
                 nodeShape = "rectangle, style=\"rounded\" ";
                 nodeText = node.getContext().getDisplayText();
-            	if (!(node.getContext().getExtraInfo()==null)) {
-                	hoverDisplay = node.getContext().getExtraInfo();            		
-            	}
+                if (!(node.getContext().getExtraInfo() == null)) {
+                    hoverDisplay = node.getContext().getExtraInfo();
+                }
             } else if (node.getNodeType().equalsIgnoreCase("solution")) {
                 nodeShape = "circle";
                 nodeText = node.getSolution().getDisplayText();
                 nodeStatus = node.getSolution().getStatus();
-            	if (!(node.getSolution().getExtraInfo()==null)) {
-                	hoverDisplay = node.getSolution().getExtraInfo();            		
-            	}
+                if (!(node.getSolution().getExtraInfo() == null)) {
+                    hoverDisplay = node.getSolution().getExtraInfo();
+                }
             } else if (node.getNodeType().equalsIgnoreCase("goal")) {
                 nodeShape = "box";
                 nodeText = node.getGoal().getDisplayText();
@@ -100,7 +128,7 @@ public class Gsn2Dot {
                 nodeStatus = node.getStrategy().getStatus();
             }
 
-            //deciding node color
+            // deciding node color
             if (nodeStatus) {
                 nodeColor = "green";
             } else {
@@ -109,24 +137,8 @@ public class Gsn2Dot {
             if (node.getNodeType().equalsIgnoreCase("context")) {
                 nodeColor = "black";
             }
-            
-//            //deciding hover text
-//            if (node.getNodeType().equalsIgnoreCase("context")) {
-//            	if (!(node.getContext().getExtraInfo()==null)) {
-//                	hoverDisplay = node.getContext().getExtraInfo();            		
-//            	}
-//            } else if (node.getNodeType().equalsIgnoreCase("solution")) {
-//            	if (!(node.getSolution().getExtraInfo()==null)) {
-//                	hoverDisplay = node.getContext().getExtraInfo();            		
-//            	}
-//            } //else if (node.getNodeType().equalsIgnoreCase("goal")) {
-//               
-////            } else if (node.getNodeType().equalsIgnoreCase("strategy")) {
-////            
-////            }
-            
-            
-            //writing string to declare node in dot file
+
+            // writing string to declare node in dot file
             String nodeDeclareString =
                     node.getNodeId()
                             + " ["
@@ -134,7 +146,7 @@ public class Gsn2Dot {
                             + hoverDisplay
                             + "\", margin=0.05, style=bold, color="
                             + nodeColor
-                            + ", width=1, shape="
+                            + ", shape="
                             + nodeShape
                             + ", label=\""
                             + node.getNodeId()
@@ -146,19 +158,28 @@ public class Gsn2Dot {
         }
     }
 
+    /**
+     * Declares all edges in the dot file
+     *
+     * @param allNodes
+     * @param bw
+     * @throws IOException
+     */
     public static void writeRelationships(List<GsnNode> allNodes, BufferedWriter bw)
             throws IOException {
         bw.write("//Node relationships (edges):-");
         bw.newLine();
         for (GsnNode node : allNodes) {
+            // supportedBy edges
             for (GsnNode support : node.getSupportedBy()) {
                 bw.write(
                         node.getNodeId()
                                 + " -> "
                                 + support.getNodeId()
-                                + " [splines=curved, arrowsize=2.0]");
+                                + " [splines=curved, weight=2, arrowsize=2.0]");
                 bw.newLine();
             }
+            // inContextOf edges
             for (GsnNode context : node.getInContextOf()) {
                 bw.write(
                         node.getNodeId()

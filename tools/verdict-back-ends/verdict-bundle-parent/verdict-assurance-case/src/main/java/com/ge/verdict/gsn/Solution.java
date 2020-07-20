@@ -1,24 +1,32 @@
 package com.ge.verdict.gsn;
 
+import javax.xml.bind.annotation.XmlElement;
+
+/** @author Saswata Paul */
 public class Solution {
+
+    @XmlElement
     /** An unique Id */
     protected String id;
 
+    @XmlElement
     /** Some text to display */
     protected String displayText;
 
+    @XmlElement
     /** Solution status true if supports goal false if does not support goal */
     protected boolean status;
 
+    @XmlElement
     /** Additional information as string */
     protected String moreInfo;
-    
+
     /**
      * Gets the value of the id property.
      *
      * @return possible object is {@link String }
      */
-    public String getId() {
+    protected String getId() {
         return id;
     }
 
@@ -27,7 +35,7 @@ public class Solution {
      *
      * @param value allowed object is {@link String }
      */
-    public void setid(String value) {
+    protected void setid(String value) {
         this.id = value;
     }
 
@@ -36,7 +44,7 @@ public class Solution {
      *
      * @return possible object is {@link String }
      */
-    public String getDisplayText() {
+    protected String getDisplayText() {
         return displayText;
     }
 
@@ -45,7 +53,7 @@ public class Solution {
      *
      * @param value allowed object is {@link String }
      */
-    public void setDisplayText(String value) {
+    protected void setDisplayText(String value) {
         this.displayText = value;
     }
 
@@ -54,7 +62,7 @@ public class Solution {
      *
      * @return possible object is {@link boolean }
      */
-    public boolean getStatus() {
+    protected boolean getStatus() {
         return status;
     }
 
@@ -63,17 +71,16 @@ public class Solution {
      *
      * @param value allowed object is {@link boolean }
      */
-    public void setStatus(boolean value) {
+    protected void setStatus(boolean value) {
         this.status = value;
     }
-    
-    
+
     /**
      * Gets the value of the moreInfo property.
      *
      * @return possible object is {@link String }
      */
-    public String getExtraInfo() {
+    protected String getExtraInfo() {
         return moreInfo;
     }
 
@@ -82,7 +89,7 @@ public class Solution {
      *
      * @param value allowed object is {@link String }
      */
-    public void setExtraInfo(String value) {
+    protected void setExtraInfo(String value) {
         this.moreInfo = value;
     }
 }
