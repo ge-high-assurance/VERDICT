@@ -10,13 +10,20 @@
     @author William D. Smith
 *)
 
-exception SemanticError of string
-
 module AD = AADLAst
 module AG = AGREEAst
 module VE = VerdictAst
 module C  = CommonAstTypes
 module VI = VDMIML
+
+exception SemanticError of string
+
+let failwith_could_resolve_reference pos id =
+  let msg =
+    Format.asprintf "%a: error: couldn't resolve reference to '%s'"
+      Position.pp_print_position pos id
+  in
+  raise (SemanticError msg)
 
 let pp_print_pname_as_iml ppf pn =
   let pp_sep ppf () = Format.fprintf ppf "." in
@@ -738,29 +745,22 @@ let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
   VI.attributes = get_attributes prop_set_name name comp_props properties
  }
 
-let get_port_index {VI.ports; _} port =
+let get_port_index {VI.ports; _} (pos, port) =
   let ep =
     Utils.element_position
       (fun ({VI.name; _}: VI.port) -> equal_ids name port)
       ports
   in
   match ep with
-  | None -> assert false
+  | None -> failwith_could_resolve_reference pos port
   | Some (_, idx) -> idx
 
 
-let failwith_could_resolve_reference pos id =
-  let msg =
-    Format.asprintf "%a: error: couldn't resolve reference to '%s'"
-      Position.pp_print_position pos id
-  in
-  raise (SemanticError msg)
-
 let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
-  | None, (_, port) -> (
-    VI.ComponentCE (ct_idx, get_port_index ct port)
+  | None, pos_port -> (
+    VI.ComponentCE (ct_idx, get_port_index ct pos_port)
   )
-  | Some (pos, comp_inst), (_, port) -> (
+  | Some (pos, comp_inst), pos_port -> (
     let ci, ci_idx =
       let ep =
         Utils.element_position
@@ -779,7 +779,7 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
         get_comp_type_and_index iml_comp_types comp_id
       )  
     in
-    VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct port)
+    VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct pos_port)
   )
 
 let port_connection_to_iml_connection
