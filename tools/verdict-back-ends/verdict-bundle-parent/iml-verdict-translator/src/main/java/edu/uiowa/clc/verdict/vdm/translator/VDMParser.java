@@ -988,6 +988,7 @@ public class VDMParser extends Parser {
     public TypeDeclaration typeDeclaration() {
 
         TypeDeclaration typeDeclaration = new TypeDeclaration();
+        String type_id = null;
         // String ID = this.token.sd.getName();
 
         while (token.type == Type.TYPE_DECLARATION) {
@@ -995,10 +996,9 @@ public class VDMParser extends Parser {
 
             if (token.type == Type.IDENTIFIER) {
 
-                String identifier = Identifier();
+                type_id = Identifier();
                 // Renaming dot[.] in Type Declaration Identifier.
-                identifier = identifier.replace(".", "_");
-
+                String identifier = type_id.replace(".", "_");
                 typeDeclaration.setName(identifier);
 
             } else if (token.type == Type.OPTION) {
@@ -1017,16 +1017,13 @@ public class VDMParser extends Parser {
                             typeDeclaration.setDefinition(dataType);
                         } catch (IndexOutOfBoundsException exp) {
 
-                            String faulty_declaration = typeDeclaration.getName();
-
                             System.out.println(
                                     "Forward references in datatype declaration is not supported.");
 
-                            if (faulty_declaration != null) {
-//                                faulty_declaration = faulty_declaration.replace("_", ".");
-                                System.out.println("Please fix " + faulty_declaration);
-//                                System.out.println("Error message: " + exp.getMessage());
-//                                System.out.println("Error stack: " + exp.getStackTrace());
+                            if (type_id != null) {
+                                System.out.println("Please fix " + type_id);
+                                System.out.println("Error message: " + exp.getMessage());
+                                exp.printStackTrace();
                             }
 
                             System.exit(-1);
@@ -2675,9 +2672,9 @@ public class VDMParser extends Parser {
             consume(Type.COMPONENT_INSTANCE);
 
             if (token.type == Type.IDENTIFIER) {
-            	
+
                 String identifier = Identifier();
-                //Unique Block Implementation ID
+                // Unique Block Implementation ID
                 block_compImpl_Id = block_compImpl_Id.replace(".", "_");
                 componentInstance.setName(block_compImpl_Id + "_" + identifier);
                 componentInstance.setId(block_compImpl_Id + "_" + identifier);
@@ -2762,7 +2759,7 @@ public class VDMParser extends Parser {
      */
     public ComponentImpl componentImpl() {
 
-    	String identifier = null;	
+        String identifier = null;
         componentImpl = new ComponentImpl();
 
         // @TODO: Check ID.
