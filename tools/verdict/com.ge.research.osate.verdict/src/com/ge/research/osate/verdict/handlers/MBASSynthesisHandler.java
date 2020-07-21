@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -29,7 +28,6 @@ public class MBASSynthesisHandler extends AbstractHandler {
 			PlatformUI.getWorkbench().getIntroManager().closeIntro(introPart);
 			final IWorkbenchWindow iWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 			VerdictHandlersUtils.setPrintOnConsole("MBAS Output");
-			Display mainThreadDisplay = Display.getCurrent();
 
 			Thread mbasAnalysisThread = new Thread() {
 				@Override
@@ -99,7 +97,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
 								graphVizPath, costModel.getAbsolutePath(), outputXml.getAbsolutePath())) {
 							if (outputXml.exists()) {
-								MBASSynthesisReport.report(outputXml);
+								MBASSynthesisReport.report(outputXml, iWindow);
 							}
 						}
 					} catch (IOException e) {
@@ -126,7 +124,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage).arg("--csv").arg(projectName)
 				.arg("--mbas").argBind(stemProjectDir, "/app/STEM").arg2(soteriaPpBin, "/app/soteria_pp")
 				.arg("--synthesis").argBind(costModel, "/app/costs/costModel.xml").arg("-o")
-				.argBind(outputXml, "/app/output/synthesis_output.xml").arg("-m");
+				.argBind(outputXml, "/app/output/synthesis_output.xml");
 
 		if (MBASSettingsPanel.synthesisCyberInference) {
 			command.arg("-c");

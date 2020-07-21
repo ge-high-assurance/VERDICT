@@ -271,7 +271,7 @@
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"
 		icon="icons/atg.png"/>
 	<view id="com.ge.research.osate.verdict.gui.mbasResultsView"
-		name="MBAS Result"
+		name="MBAA Result"
 		class="com.ge.research.osate.verdict.gui.MBASResultsView"
 		icon="icons/search.png"/>
 	<view id="com.ge.research.osate.verdict.gui.capecDefenseView"
@@ -281,7 +281,11 @@
 	<view id="com.ge.research.osate.verdict.gui.safetyCutsetsView"
 		name="Safety Failure Paths"
 		class="com.ge.research.osate.verdict.gui.SafetyCutsetsView"
-		icon="icons/danger.png"/>	
+		icon="icons/danger.png"/>
+	<view id="com.ge.research.osate.verdict.gui.mbasSynthesisResultsView"
+		name="MBAS Result"
+		class="com.ge.research.osate.verdict.gui.MBASSynthesisResultsView"
+		icon="icons/search.png"/>
 	</extension>
 	
 	<extension point="org.eclipse.ui.preferencePages">

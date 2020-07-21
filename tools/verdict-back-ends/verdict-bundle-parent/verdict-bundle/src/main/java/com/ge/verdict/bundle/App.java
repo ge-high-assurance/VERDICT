@@ -164,7 +164,6 @@ public class App {
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
         options.addOption("o", "synthesis-output", true, "Synthesis output XML file");
         options.addOption("p", false, "Use partial solutions in synthesis");
-        options.addOption("m", false, "Perform merit assignment in synthesis");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -222,7 +221,6 @@ public class App {
         helpLine(
                 "      -o ................... synthesis output XML (required if synthesis enabled)");
         helpLine("      -p ................... synthesis partial solutions");
-        helpLine("      -m ................... synthesis merit assignment");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
@@ -287,8 +285,7 @@ public class App {
 
                     String costModelPath = opts.getOptionValue("y");
                     String output = opts.getOptionValue("o");
-                    boolean meritAssignment = opts.hasOption("m");
-                    boolean partialSolution = opts.hasOption("p") || meritAssignment;
+                    boolean partialSolution = opts.hasOption("p");
 
                     runMbasSynthesis(
                             csvProjectName,
@@ -298,7 +295,6 @@ public class App {
                             cyberInference,
                             safetyInference,
                             partialSolution,
-                            meritAssignment,
                             costModelPath,
                             output);
                 } else {
@@ -522,7 +518,6 @@ public class App {
             boolean cyberInference,
             boolean safetyInference,
             boolean partialSolution,
-            boolean meritAssignment,
             String costModelPath,
             String outputPath)
             throws VerdictRunException {
@@ -597,7 +592,7 @@ public class App {
                     results.stream()
                             .allMatch(
                                     result -> Prob.lte(result.prob, result.cyberReq.getSeverity()));
-            boolean performMeritAssignment = meritAssignment && sat;
+            boolean performMeritAssignment = partialSolution && sat;
 
             DLeaf.Factory factory = new DLeaf.Factory();
             DTree dtree =

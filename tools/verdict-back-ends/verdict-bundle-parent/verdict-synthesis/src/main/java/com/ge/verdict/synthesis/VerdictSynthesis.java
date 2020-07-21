@@ -48,6 +48,14 @@ public class VerdictSynthesis {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
+        System.out.println(
+                "performSynthesisMultiple, configuration: partialSolution="
+                        + partialSolution
+                        + ", inputSat="
+                        + inputSat
+                        + ", meritAssignment="
+                        + meritAssignment);
+
         Collection<ComponentDefense> pairs = factory.allComponentDefensePairs();
 
         optimizer.Assert(tree.toZ3Multi(context));

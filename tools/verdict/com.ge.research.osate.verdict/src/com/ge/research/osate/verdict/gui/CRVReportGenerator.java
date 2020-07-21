@@ -2,11 +2,8 @@ package com.ge.research.osate.verdict.gui;
 
 import java.util.List;
 
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 /**
 *
@@ -28,20 +25,7 @@ public class CRVReportGenerator implements Runnable {
 		this.fileName1 = fileName1;
 		this.fileName2 = fileName2;
 		CRVReportGenerator.window = window;
-		IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IViewPart myView1 = wp.findView(CRVResultsView.ID);
-		if (myView1 != null) {
-			wp.hideView(myView1);
-		}
-
-		IViewPart myView2 = wp.findView(CounterExampleView.ID_COUNTER_EXAMPLE);
-		if (myView2 != null) {
-			wp.hideView(myView2);
-		}
-		IViewPart myView3 = wp.findView(CounterExampleView.ID_TEST_CASE);
-		if (myView3 != null) {
-			wp.hideView(myView3);
-		}
+		ResultsPageUtil.closePages();
 		CRVResultSummary result = new CRVResultSummary(fileName1, fileName2);
 		tableContents = result.getTableContents();
 		showView(window);
