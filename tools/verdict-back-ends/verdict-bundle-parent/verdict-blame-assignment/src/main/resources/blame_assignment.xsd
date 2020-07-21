@@ -19,7 +19,7 @@
                 maxOccurs="1">
             </element>
             <element name="ApplicableThreat" type="tns:Attack"
-                minOccurs="1" maxOccurs="1">
+                minOccurs="1" maxOccurs="unbounded">
             </element>
         </sequence>
         <attribute name="PropertyID" type="string"></attribute>

@@ -42,7 +42,7 @@ public class CRVResultSummary {
 			newRow.addRow(attributes.get(i).getProperty());
 			newRow.addRow(attributes.get(i).getAnswer());
 			if (attributes.get(i).getBlameAssignment() != null) {
-				newRow.addRow(attributes.get(i).getBlameAssignment().getThreat());
+				newRow.addRow(attributes.get(i).getBlameAssignment().getThreats());
 				newRow.addRow(attributes.get(i).getBlameAssignment().getComponents());
 				newRow.addRow(attributes.get(i).getBlameAssignment().getLinks());
 				newRow.addRow(attributes.get(i).getBlameAssignment().getComponentsUncompromised());
@@ -124,7 +124,7 @@ public class CRVResultSummary {
 			newRow.addRow(prop);
 			newRow.addRow(pair.pos.getAnswer());
 			if (pair.pos.getBlameAssignment() != null) {
-				newRow.addRow(pair.pos.getBlameAssignment().getThreat());
+				newRow.addRow(pair.pos.getBlameAssignment().getThreats());
 				newRow.addRow(pair.pos.getBlameAssignment().getComponents());
 				newRow.addRow(pair.pos.getBlameAssignment().getLinks());
 				newRow.addRow(pair.pos.getBlameAssignment().getComponentsUncompromised());
