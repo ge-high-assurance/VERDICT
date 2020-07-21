@@ -19,6 +19,8 @@ let test_constant_prop_ad () =
   assert( constant_prop_ad (ANot (ANot (ANot (AVar "me")))) = ANot (AVar "me"));
   assert( constant_prop_ad (ANot (APro [ ASum [AVar "a"; AVar "b"]; ASum [AVar "c"; AVar "d"]])) 
           = ASum [ APro [ANot (AVar "a"); ANot (AVar "b")]; APro [ANot (AVar "c"); ANot (AVar "d")] ] );
+  assert( constant_prop_ad (ASum[]) = AFALSE );
+  assert( constant_prop_ad (APro[]) = ATRUE );
   true;;
 
 test_constant_prop_ad ();;

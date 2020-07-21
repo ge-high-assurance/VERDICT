@@ -178,7 +178,7 @@ let mk_full_qpref pkg id =
 
 let find_assoc qpr prop_assocs =
   List.find_opt
-    (fun ({name} : property_association) -> equal_qprefs qpr name)
+    (fun ({name; _} : property_association) -> equal_qprefs qpr name)
     prop_assocs
 
 let is_component_type = function
@@ -210,16 +210,16 @@ let is_data = function
   | _ -> false
 
 let get_imported_units = function
-  | AADLPackage (_, { public_sec; private_sec }) -> (
+  | AADLPackage (_, { public_sec; private_sec; _ }) -> (
     match public_sec, private_sec with
     | None, None -> []
-    | None, Some { imported_units } -> imported_units
-    | Some { imported_units }, None -> imported_units
+    | None, Some { imported_units; _ } -> imported_units
+    | Some { imported_units; _ }, None -> imported_units
     | Some pkg_sec1, Some pkg_sec2 -> (
       List.rev_append pkg_sec2.imported_units pkg_sec1.imported_units
     )
   )
-  | PropertySet (_, { imported_units }) -> imported_units
+  | PropertySet (_, { imported_units; _ }) -> imported_units
 
 
 let rec pp_print_imported_unit_list ppf = function
@@ -261,9 +261,11 @@ let pp_print_qcref_opt ppf = function
   | Some qcref ->
     Format.fprintf ppf " %a" pp_print_qcref qcref
 
-let pp_print_port ppf { name; dir; dtype } =
-  Format.fprintf ppf "%a: %a data port%a;"
+let pp_print_port ppf { name; dir; dtype; is_event; _ } =
+  (* TODO: Print properties *)
+  Format.fprintf ppf "%a: %a%s data port%a;"
     pp_print_id name pp_print_port_dir dir
+    (if is_event then " event" else "")
     pp_print_qcref_opt dtype
 
 let pp_print_qpref ppf = function
@@ -363,7 +365,8 @@ let pp_print_system_type ind ppf { name; ports; annexes } =
     (pp_print_annexes ind) annexes
     pp_print_id name
 
-let pp_print_data_type ind ppf ({ name; properties }: data_type) =
+let pp_print_data_type ind ppf ({ name; properties; _ }: data_type) =
+  (* TODO: Print type extension, features,... *)
   Format.fprintf ppf "@[<v %d>data %a%a@]@,end %a;" ind
     pp_print_id name
     (pp_print_properties ind) properties
@@ -377,7 +380,7 @@ let pp_print_full_iname ppf (realization, iname) =
   Format.fprintf ppf "%a.%a"
     pp_print_id realization pp_print_id iname
 
-let pp_print_subcomponent ind comp_type ppf { name; type_ref; properties } =
+let pp_print_subcomponent ind comp_type ppf { name; type_ref; properties; _ } =
   Format.fprintf ppf "%a: %s%a%a;"
     pp_print_id name comp_type pp_print_qcref_opt type_ref
     (pp_print_braced_properties ind) properties
@@ -418,7 +421,8 @@ let pp_print_connections ind ppf = function
        connections
   )
 
-let pp_print_system_impl ind ppf { name; subcomponents; connections } =
+let pp_print_system_impl ind ppf { name; subcomponents; connections; _ } =
+  (* TODO: Print annexes of system implementation *)
   Format.fprintf ppf "@[<v %d>system implementation %a@,%a%a@]@,end %a;" ind
     pp_print_full_iname name
     (pp_print_subcomponents ind "system") subcomponents
@@ -469,7 +473,7 @@ let pp_print_model_unit ind ppf = function
       (pp_print_pkg_sec_opt ind) ("private", private_sec)
       pp_print_pname name
   )
-  | PropertySet (_, {name}) -> (
+  | PropertySet (_, {name; _}) -> ( (* TODO: Print full property set *)
     Format.fprintf ppf "@[<v>property set %a is@,end %a;@]"
       pp_print_id name pp_print_id name
   )

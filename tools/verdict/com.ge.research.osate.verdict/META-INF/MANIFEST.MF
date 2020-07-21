@@ -10,12 +10,14 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.ge.research.osate.verdict.Activator
 Require-Bundle: com.ge.research.osate.verdict.dsl,
  com.ge.research.osate.verdict.dsl.ui,
+ com.ge.research.osate.verdict.vdm,
  org.apache.ant,
  org.eclipse.emf.ecore.editor,
  org.eclipse.jface,
  org.eclipse.swt,
  org.eclipse.ui.console,
  org.osate.aadl2,
+ org.osate.ge,
  org.osate.xtext.aadl2.ui
 Import-Package: org.apache.commons.logging
 Export-Package: com.ge.research.osate.verdict,

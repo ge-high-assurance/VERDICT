@@ -1,6 +1,6 @@
-# This workflow will build a Verdict project artifacts and Docker containers
+# This workflow will build Verdict project artifacts and Docker containers
 
-name: Verdict project build and test
+name: Build and test Verdict project
 
 on:
   push:
@@ -10,22 +10,33 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up GraphViz
       uses: kamiazya/setup-graphviz@v1
+
     - name: Set up JDK 1.8
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Executing Maven build
-      run: mvn -B package --file tools/pom.xml
+
+    - name: Cache Maven local repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Execute Maven build
+      run: mvn -B install -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
-    - name: Executing Docker build
+
+    - name: Execute Docker build
       uses: docker/build-push-action@v1
       with:
         path: tools/verdict-back-ends

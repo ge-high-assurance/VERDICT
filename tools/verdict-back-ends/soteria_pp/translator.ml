@@ -1138,7 +1138,7 @@ let rec removeMissionsWithNoReq l_librariesThreats =
 
        
 (* Analyze function - Calls model_to_adtree and model_to_ftree. Generates the artifacts *)
-let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
+let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
    let compDepen =  mainListtag comp_dep_ch  
    and compSafe = mainListtag comp_saf_ch
    and attack    = mainListtag attack_ch
@@ -1186,7 +1186,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
+              if save_dot_ml then saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
               (* -- cutset metric file, in printbox format -- *)    
               saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
               (* -- save .svg tree visualizations -- *)    
@@ -1214,7 +1214,7 @@ let do_arch_analysis comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission
               (* -- extract some text info -- *)
               and (modelVersion, safetyReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
               (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              (* saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;*)
+              if save_dot_ml then saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
               (* -- cutset metric file, in printbox format -- *)    
               saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
               (* -- save .svg tree visualizations -- *)    

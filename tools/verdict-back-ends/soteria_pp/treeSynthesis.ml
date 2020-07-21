@@ -238,12 +238,13 @@ let filter_v l bound connections inst acc =
       | _ -> true)
 ;;
 
+(* This function filters out Or[] and And[] from the formula list *)
 let filter_exp l = 
   List.filter l
     ~f:(fun z -> match z with
-      | Or[] -> false
-      | And[] -> false
-      | _ -> true)
+      | Or[] -> false           (* <-- false here means don't keep *)
+      | And[] -> false          (* <-- false here means don't keep *)
+      | _ -> true)              (* <-- true here means keep everything else *)
 ;;
 
 let add_to_acc_expand_form i acc =
@@ -286,7 +287,7 @@ let rec expand_form library instances connections f inst c acc =
       let nacc = add_to_acc_expand_form (inst.i_name, [i; flt]) acc in
       let (_, v) = List.hd_exn nacc in
       if v>1
-      then raise (Error "expand_form: cycle in fault formulas detected") 
+      then Or[ ] (* used to be: raise (Error "expand_form: cycle in fault formulas detected") *)
       else cons_form library instances connections (F nform) ni nacc
     | A[i;atck] -> 
       let input = List.find_exn connections ~f:(fun (d,_) -> d=(inst.i_name, i)) in
@@ -296,7 +297,7 @@ let rec expand_form library instances connections f inst c acc =
       let nacc = add_to_acc_expand_form (inst.i_name, [i; atck]) acc in
       let (_, v) = List.hd_exn nacc in
       if v>1
-      then raise (Error "expand_form: cycle in attack formulas detected") 
+      then Or[ ] (* used to be: then raise (Error "expand_form: cycle in attack formulas detected") *)
       else cons_form_ad library instances connections (A nform) ni nacc
     | F(_) -> raise (Error "expand_form: F")
     | A(_) -> raise (Error "expand_form: A")

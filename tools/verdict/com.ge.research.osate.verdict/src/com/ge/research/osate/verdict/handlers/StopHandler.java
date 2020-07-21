@@ -25,17 +25,21 @@ public class StopHandler extends AbstractHandler {
 	/** Enables the StopHandler when we need it. */
 	public static void enable(VerdictBundleCommand command) {
 		StopHandler.command = command;
-		instance.setBaseEnabled(true);
-		// Refresh the icon's color more quickly in case it was already enabled
-		instance.fireHandlerChanged(new HandlerEvent(instance, true, false));
+		if (instance != null) {
+			instance.setBaseEnabled(true);
+			// Refresh the icon's color more quickly in case it was already enabled
+			instance.fireHandlerChanged(new HandlerEvent(instance, true, false));
+		}
 	}
 
 	/** Disables the StopHandler when we don't need it anymore. */
 	public static void disable() {
 		StopHandler.command = null;
-		instance.setBaseEnabled(false);
-		// Refresh the icon's color more quickly in case it was already disabled
-		instance.fireHandlerChanged(new HandlerEvent(instance, true, false));
+		if (instance != null) {
+			instance.setBaseEnabled(false);
+			// Refresh the icon's color more quickly in case it was already disabled
+			instance.fireHandlerChanged(new HandlerEvent(instance, true, false));
+		}
 	}
 
 	@Override

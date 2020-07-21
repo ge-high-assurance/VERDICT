@@ -299,7 +299,7 @@ data_implementation:
   DATA IMPLEMENTATION
   rlz = realization "." pid = iname
   subcomps = data_subcomponents_section
-  connections = data_connections_section
+  (* connections = *) data_connections_section
   (* INCOMPLETE *)
   END full_iname ";"
   {
@@ -318,12 +318,12 @@ data_connection:
   (* INCOMPLETE *)
 
 access_connection:
-  pid = ident ":"
+  (* pid = *) ident ":"
   access_category
   ACCESS
-  src = access_connection_end
-  cdir = connection_direction
-  dst = access_connection_end
+  (* src = *) access_connection_end
+  (* cdir = *) connection_direction
+  (* dst = *) access_connection_end
   (* INCOMPLETE *)
   ";"
   {
@@ -351,7 +351,7 @@ system_subcomponents_section:
   | { [] }
   | SUBCOMPONENTS NONE ";" { [] }
   | SUBCOMPONENTS subcomps = nonempty_list(system_subcomponents_section_item)
-    { List.filter (fun { A.category } -> A.is_system category) subcomps }
+    { List.filter (fun { A.category; _ } -> A.is_system category) subcomps }
 
 system_subcomponents_section_item:
   | ss = system_subcomponent { ss }

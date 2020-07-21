@@ -36,7 +36,7 @@
                         <fileset>
                             <directory>${project.basedir}/xtend-gen</directory>
                             <excludes>
-                                <exclude>README.md</exclude>
+                                <exclude>README.rst</exclude>
                             </excludes>
                         </fileset>
                         <fileset>

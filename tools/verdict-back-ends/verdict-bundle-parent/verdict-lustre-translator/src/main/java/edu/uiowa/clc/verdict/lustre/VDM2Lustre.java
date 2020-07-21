@@ -239,6 +239,17 @@ public class VDM2Lustre {
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
+                // Option Check)
+
+                if (componentType == null && subcomponentImpl == null) {
+                    System.out.println(
+                            componentInstance.getName()
+                                    + " subcomponent is missing both a specification and an implemention.");
+                    System.out.println(
+                            "Please provide some specification or an implementation to continue.");
+                    System.exit(-1);
+                }
+
                 // Option 1) Implementation
                 if (subcomponentImpl != null) {
 

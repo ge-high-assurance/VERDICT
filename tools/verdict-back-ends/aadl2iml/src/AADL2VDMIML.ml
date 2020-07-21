@@ -10,13 +10,20 @@
     @author William D. Smith
 *)
 
-exception DataTypeNotFound of string
-
 module AD = AADLAst
 module AG = AGREEAst
 module VE = VerdictAst
 module C  = CommonAstTypes
 module VI = VDMIML
+
+exception SemanticError of string
+
+let failwith_could_resolve_reference pos id =
+  let msg =
+    Format.asprintf "%a: error: couldn't resolve reference to '%s'"
+      Position.pp_print_position pos id
+  in
+  raise (SemanticError msg)
 
 let pp_print_pname_as_iml ppf pn =
   let pp_sep ppf () = Format.fprintf ppf "." in
@@ -32,13 +39,13 @@ let enumerators_qpref = AD.mk_full_qpref "Data_Model" "Enumerators"
 let get_bool_prop_value qpr properties =
   match AD.find_assoc qpr properties with
   | None -> None
-  | Some {AD.value} -> (
+  | Some {AD.value; _} -> (
     match value with
     | AD.BooleanLit b -> Some b
     | _ -> assert false
   )
 
-let get_int_prop_value qpr properties =
+(* let get_int_prop_value qpr properties =
   match AD.find_assoc qpr properties with
   | None -> None
   | Some {AD.value} -> (
@@ -54,12 +61,12 @@ let get_string_prop_value qpr properties =
     match value with
     | AD.StringLit str -> Some str
     | _ -> assert false
-  )
+  ) *)
 
 let get_enumerators properties =
   match AD.find_assoc enumerators_qpref properties with
   | None -> failwith ("No Enumerators property association was found")
-  | Some {AD.value} -> (
+  | Some {AD.value; _} -> (
     let get_string = function
       | AD.StringLit str -> str
       | _ ->  failwith ("An enum value that is not string was found")
@@ -77,7 +84,7 @@ let failwith_unsupported_data_type pos qcr =
     Format.asprintf "%a: error: data type '%a' not found"
       Position.pp_print_position pos C.pp_print_qcref qcr
   in
-  raise (DataTypeNotFound msg)
+  raise (SemanticError msg)
 
 let realization_full_name (r_pid, i_pid) =
   Format.asprintf "%a.%a" C.pp_print_id r_pid C.pp_print_id i_pid
@@ -91,7 +98,7 @@ let get_data_type type_decls = function
     in
     let ep =
       Utils.element_position
-        (fun ({VI.name}: VI.type_declaration) -> equal_ids name id)
+        (fun ({VI.name; _}: VI.type_declaration) -> equal_ids name id)
         type_decls
     in
     match ep with
@@ -145,7 +152,7 @@ let get_data_type type_decls = function
 
 let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
-    let add_type ({AD.name; AD.type_extension; AD.properties}: AD.data_type) =
+    let add_type ({AD.name; AD.type_extension; AD.properties; _}: AD.data_type) =
       match type_extension with
       | Some _ ->
         ({VI.name = C.get_id name; VI.definition = None}, type_extension)
@@ -153,7 +160,7 @@ let data_to_type_decls data_types data_impls =
         let def =
           match AD.find_assoc data_repr_qpref properties with
           | None -> None
-          | Some {AD.value} -> (
+          | Some {AD.value; _} -> (
             match value with
             | AD.LiteralOrReference (None, (_, id)) -> (
               match String.lowercase_ascii id with
@@ -179,7 +186,7 @@ let data_to_type_decls data_types data_impls =
   in
   let type_decls_with_extension_id =
     let tdwei =
-      data_impls |> List.map (fun {AD.name; AD.subcomponents} ->
+      data_impls |> List.map (fun ({AD.name; _} : AD.data_impl) ->
         let name = realization_full_name name in
         ({name; VI.definition = None}, None)
       )
@@ -201,7 +208,7 @@ let data_to_type_decls data_types data_impls =
   in
   let process_data_impl type_decls {AD.name; AD.subcomponents} =
     let type_name = realization_full_name name in
-    let process_subcomponent {AD.name; AD.type_ref} =
+    let process_subcomponent {AD.name; AD.type_ref; _} =
       match type_ref with
       | None -> failwith ("Record field definition without a type is not supported")
       | Some qcr -> (C.get_id name, get_data_type type_decls qcr)
@@ -371,11 +378,11 @@ let var_decls_to_symbol_defs type_decls var_decls =
     }
   in
   var_decls
-  |> List.filter (fun ({AG.definition}: AG.eq_statement) -> definition != None)
+  |> List.filter (fun ({AG.definition; _}: AG.eq_statement) -> definition != None)
   |> List.map var_decl_to_symbol_def
 
 let agree_contract_item_to_iml_contract_item c_items =
-  let agree_contract_item_to_iml_contract_item { AG.id; AG.desc; AG.spec; } =
+  let agree_contract_item_to_iml_contract_item { AG.desc; AG.spec; _ } =
     ({VI.name = Some desc;
       VI.expression = agree_expr_to_iml_expr spec;
     } : VI.contract_item)
@@ -617,7 +624,7 @@ let system_types_to_iml_comp_types prop_set_name type_decls sys_types =
 let get_comp_type_and_index iml_comp_types id =
   let ep =
     Utils.element_position
-      (fun ({VI.name}: VI.component_type) -> equal_ids name id)
+      (fun ({VI.name; _}: VI.component_type) -> equal_ids name id)
       iml_comp_types
   in
   match ep with
@@ -627,7 +634,7 @@ let get_comp_type_and_index iml_comp_types id =
 let get_impl_index sys_impl comp_type comp_impl =
   let ep =
     Utils.element_position
-      (fun ({AD.name = ((_,id1), (_,id2))}: AD.system_impl) ->
+      (fun ({AD.name = ((_,id1), (_,id2)); _}: AD.system_impl) ->
         (equal_ids id1 comp_type) && (equal_ids id2 comp_impl))
       sys_impl
   in
@@ -669,8 +676,8 @@ let get_iml_prop_value = function
   | AD.ListTerm _ -> failwith "List-value properties are not supported yet"
 
 
-let get_attributes prop_set_name e_name default_props properties =
-  properties |> List.fold_left (fun acc { AD.name; AD.value } ->
+let get_attributes prop_set_name _e_name default_props properties =
+  properties |> List.fold_left (fun acc { AD.name; AD.value; _ } ->
     let name =
       match name with
       | Some (_, ps_name), (_, id) when equal_ids ps_name prop_set_name -> id
@@ -705,7 +712,7 @@ let get_attributes prop_set_name e_name default_props properties =
   )
 *)
 
-let split_property_set_and_get_map { AD.name; AD.declarations } =
+let split_property_set_and_get_map { AD.name; AD.declarations; _ } =
   let name = C.get_id name in
   declarations |> List.map (function
     | AD.UnsupportedDecl ->
@@ -713,7 +720,7 @@ let split_property_set_and_get_map { AD.name; AD.declarations } =
     | AD.PropertyDef def -> def
   )
   |> List.fold_left
-    (fun (comp, conn) { AD.name; AD.default_value; AD.applies_to } ->
+    (fun (comp, conn) { AD.name; AD.default_value; AD.applies_to; _ } ->
       let name = C.get_id name in
       let value =
         match default_value with
@@ -730,7 +737,7 @@ let split_property_set_and_get_map { AD.name; AD.declarations } =
 
 
 let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
-  {AD.name; AD.type_ref; AD.properties }
+  {AD.name; AD.type_ref; AD.properties; _ }
 =
  let name = C.get_id name in
  {VI.name = name;
@@ -738,40 +745,41 @@ let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
   VI.attributes = get_attributes prop_set_name name comp_props properties
  }
 
-let get_port_index {VI.ports} port =
+let get_port_index {VI.ports; _} (pos, port) =
   let ep =
     Utils.element_position
-      (fun ({VI.name}: VI.port) -> equal_ids name port)
+      (fun ({VI.name; _}: VI.port) -> equal_ids name port)
       ports
   in
   match ep with
-  | None -> assert false
+  | None -> failwith_could_resolve_reference pos port
   | Some (_, idx) -> idx
 
+
 let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
-  | None, (_, port) -> (
-    VI.ComponentCE (ct_idx, get_port_index ct port)
+  | None, pos_port -> (
+    VI.ComponentCE (ct_idx, get_port_index ct pos_port)
   )
-  | Some (_, comp_inst), (_, port) -> (
+  | Some (pos, comp_inst), pos_port -> (
     let ci, ci_idx =
       let ep =
         Utils.element_position
-        (fun ({VI.name}: VI.component_instance) -> equal_ids name comp_inst)
+        (fun ({VI.name; _}: VI.component_instance) -> equal_ids name comp_inst)
         subcomps
       in
       match ep with
-      | None -> assert false
+      | None -> failwith_could_resolve_reference pos comp_inst
       | Some (ci, ci_idx) -> (ci, ci_idx)
     in
     let ci_ct, ci_ct_idx =
       match ci.VI.itype with
       | Specification idx -> List.nth iml_comp_types idx, idx
       | Implementation idx -> (
-        let ({AD.name = ((_, comp_id), _)}: AD.system_impl) = List.nth sys_impl idx in
+        let ({AD.name = ((_, comp_id), _); _}: AD.system_impl) = List.nth sys_impl idx in
         get_comp_type_and_index iml_comp_types comp_id
       )  
     in
-    VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct port)
+    VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct pos_port)
   )
 
 let port_connection_to_iml_connection
@@ -976,7 +984,7 @@ let verdict_cyber_reqs_of_system_types sys_types =
   (* we assume that there is only one system type with cyber reqs *)
   List.fold_left
     begin
-      fun acc ({annexes} : AD.system_type) ->
+      fun acc ({annexes; _} : AD.system_type) ->
       List.fold_left
         begin
           fun acc' annex ->
@@ -991,7 +999,7 @@ let verdict_safety_reqs_of_system_types sys_types =
   (* we assume that there is only one system type with cyber reqs *)
   List.fold_left
     begin
-      fun acc ({annexes} : AD.system_type) ->
+      fun acc ({annexes; _} : AD.system_type) ->
       List.fold_left
         begin
           fun acc' annex ->
@@ -1076,7 +1084,7 @@ let missions_of_system_types sys_types =
      We assume that there are only actually missions in the
      top-level system type. *)
   sys_types
-  |> List.map (fun ({AD.annexes} : AD.system_type) -> annexes)
+  |> List.map (fun ({AD.annexes; _} : AD.system_type) -> annexes)
   |> List.flatten
   |> statements_of_annex_list
   |> List.map (function
@@ -1084,7 +1092,7 @@ let missions_of_system_types sys_types =
            -> Some (iml_of_mission id reqs description comment)
          | _ -> None) |> filter_opt
 
-let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs } =
+let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs; _ } =
   let comp_types, comp_impls =
     List.fold_left (fun (cts, cis) -> function
       | AD.ComponentType ct -> (ct :: cts, cis)
@@ -1142,7 +1150,7 @@ let pkg_sec_to_model v_props name { AD.classifiers; AD.annex_libs } =
   }
 
 let aadl_ast_to_vdm_iml v_props = function
-  | AD.AADLPackage (_, { AD.name ; AD.public_sec }) -> (
+  | AD.AADLPackage (_, { AD.name ; AD.public_sec; _ }) -> (
     match public_sec with
     | None -> None
     | Some sec -> try (
@@ -1154,7 +1162,7 @@ let aadl_ast_to_vdm_iml v_props = function
       in
       Some pkg
     )
-    with DataTypeNotFound msg -> (
+    with SemanticError msg -> (
       Format.eprintf "%s@." msg;
       None
     )

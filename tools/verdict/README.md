@@ -54,7 +54,7 @@ other OSATE releases besides the OSATE update site that happens to be
 in our file.
 
 If you still want to change our target
-[definition](com.ge.research.osate.verdict.target/com.ge.research.osate.verdict.target.target)
+[definition](com.ge.research.osate.verdict.targetplatform/com.ge.research.osate.verdict.targetplatform.target)
 file to use another stable OSATE release's update site, please go
 ahead and edit the file.  Our file also has some other Eclipse update
 sites that you may want to change in lockstep with the OSATE update
@@ -97,23 +97,24 @@ our OSATE plugin in an OSATE release as shown in the next section.  A
 successful build ends with the following output:
 
 ```text
-[INFO] --- tycho-p2-plugin:1.6.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
+[INFO] --- tycho-p2-plugin:1.7.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for verdict 1.0.0-SNAPSHOT:
 [INFO]
-[INFO] verdict ............................................ SUCCESS [  2.392 s]
-[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [02:13 min]
-[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  1.101 s]
-[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  3.292 s]
-[INFO] com.ge.research.osate.verdict ...................... SUCCESS [ 10.332 s]
-[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.807 s]
-[INFO] com.ge.research.osate.verdict.target ............... SUCCESS [  0.047 s]
-[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  7.839 s]
+[INFO] verdict ............................................ SUCCESS [  0.367 s]
+[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 38.026 s]
+[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.296 s]
+[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  1.160 s]
+[INFO] com.ge.research.osate.verdict.vdm .................. SUCCESS [  2.029 s]
+[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  2.278 s]
+[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.298 s]
+[INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.066 s]
+[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  2.307 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  03:33 min
-[INFO] Finished at: 2020-04-17T17:44:25-04:00
+[INFO] Total time:  02:14 min
+[INFO] Finished at: 2020-07-15T20:35:52-04:00
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -194,10 +195,10 @@ following:
 5. To make these build errors go away, you need to open our target
    definition file in Eclipse and set it as your Eclipse IDE's current
    target platform.  In the Package Explorer pane, expand the verdict
-   working set, expand the com.ge.research.osate.verdict.target
-   project, and double click the
-   com.ge.research.osate.verdict.target.target file to open it in the
-   Eclipse editor window.
+   working set, expand the
+   com.ge.research.osate.verdict.targetplatform project, and double
+   click the com.ge.research.osate.verdict.targetplatform.target file
+   to open it in the Eclipse editor window.
 
 6. Eclipse will need to spend some time resolving the target
    definition file and downloading the OSATE and other Eclipse APIs
