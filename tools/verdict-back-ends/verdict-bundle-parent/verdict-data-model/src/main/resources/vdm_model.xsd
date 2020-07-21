@@ -96,10 +96,15 @@
         <attribute name="event" type="boolean"></attribute>
     </complexType>
 
+
     <simpleType name="PortMode">
         <restriction base="string">
             <enumeration value="in"></enumeration>
             <enumeration value="out"></enumeration>
+            <enumeration value="inOut"></enumeration>
+            <enumeration value="requiresDataAccess"></enumeration>
+            <enumeration value="providesDataAccess"></enumeration>
+            <enumeration value="data"></enumeration>
         </restriction>
     </simpleType>
 

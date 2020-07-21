@@ -1,16 +1,13 @@
 package com.ge.research.osate.verdict.aadl2vdm;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Scanner;
 import javax.xml.namespace.QName;
 
 import org.eclipse.emf.common.util.EList;
@@ -27,7 +24,6 @@ import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
 import org.osate.aadl2.BusType;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.ContainmentPathElement;
@@ -101,18 +97,10 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
-import com.ge.research.osate.verdict.dsl.verdict.CyberRelInputLogic;
 import com.google.inject.Injector;
 
-import jnr.ffi.Struct.mode_t;
-import verdict.vdm.vdm_model.CyberExprList;
-import verdict.vdm.vdm_model.EventHappens;
-import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.Model;
 import com.ge.research.verdict.vdm.VdmTranslator;
-
-
-
 
 
 
@@ -156,17 +144,68 @@ public class Aadl2Vdm {
 
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
-		List<SystemImplementation> systemImpls = new ArrayList<>();		
+		List<BusType> busTypes = new ArrayList<>();
+		List<SubprogramType> subprogramTypes = new ArrayList<>();
+		List<ThreadType> threadTypes = new ArrayList<>();
+		List<MemoryType> memoryTypes = new ArrayList<>();
+		List<DeviceType> deviceTypes = new ArrayList<>();
+		List<AbstractType> abstractTypes = new ArrayList<>();
+		List<ProcessType> processTypes = new ArrayList<>();
+		List<ThreadGroupType> threadGroupTypes = new ArrayList<>();
+		List<VirtualProcessorType> virtualProcessorTypes = new ArrayList<>();
+		List<ProcessorType> processorTypes = new ArrayList<>();
+		List<ComponentImplementation> compImpls = new ArrayList<>();	
 		Map<Property, String> connPropertyToName = new LinkedHashMap<>();
-		Map<Property, String> componentPropertyToName = new LinkedHashMap<>();
+		Map<Property, String> componentPropertyToName = new LinkedHashMap<>();		
 
+		
 		// extracting data from the AADLObject 
 		for(EObject obj : objects) {
 			if (obj instanceof SystemType) {
 				systemTypes.add((SystemType) obj);
+			} else if (obj instanceof BusType) {
+				busTypes.add((BusType)obj);
+			} else if (obj instanceof SubprogramType) {
+				subprogramTypes.add((SubprogramType)obj);
+			} else if (obj instanceof ThreadType) {
+				threadTypes.add((ThreadType)obj);
+			} else if (obj instanceof MemoryType) {
+				memoryTypes.add((MemoryType)obj);
+			} else if (obj instanceof DeviceType) {
+				deviceTypes.add((DeviceType)obj);
+			} else if (obj instanceof AbstractType) {
+				abstractTypes.add((AbstractType)obj);
+			} else if (obj instanceof ProcessType) {
+				processTypes.add((ProcessType)obj);
+			} else if (obj instanceof ThreadGroupType) {
+				threadGroupTypes.add((ThreadGroupType)obj);
+			} else if (obj instanceof VirtualProcessorType) {
+				virtualProcessorTypes.add((VirtualProcessorType)obj);
+			} else if (obj instanceof ProcessorType) {
+				processorTypes.add((ProcessorType)obj);
 			} else if (obj instanceof SystemImplementation) {
-				systemImpls.add((SystemImplementation) obj);
-			} else if(obj instanceof PropertySetImpl) {
+				compImpls.add((SystemImplementation) obj);
+			} else if (obj instanceof SubprogramImplementation) {
+				compImpls.add((SubprogramImplementation) obj);
+			} else if (obj instanceof ThreadImplementation) {
+				compImpls.add((ThreadImplementation) obj);
+			} else if (obj instanceof MemoryImplementation) {
+				compImpls.add((MemoryImplementation) obj);
+			} else if (obj instanceof BusImplementation) {
+				compImpls.add((BusImplementation) obj);
+			} else if (obj instanceof AbstractImplementation) {
+				compImpls.add((AbstractImplementation) obj);
+			} else if (obj instanceof DeviceImplementation) {
+				compImpls.add((DeviceImplementation) obj);
+			} else if (obj instanceof ProcessImplementation) {
+				compImpls.add((ProcessImplementation) obj);
+			} else if (obj instanceof ThreadGroupImplementation) {
+				compImpls.add((ThreadGroupImplementation) obj);
+			} else if (obj instanceof VirtualProcessorImplementation) {
+				compImpls.add((VirtualProcessorImplementation) obj);
+			} else if (obj instanceof ProcessorImplementation) {
+				compImpls.add((ProcessorImplementation) obj);
+			}  else if(obj instanceof PropertySetImpl) {
 				Set<Property> compPropSet = new HashSet<Property>();
 				Set<Property> connPropSet = new HashSet<Property>();
 				
@@ -245,12 +284,52 @@ public class Aadl2Vdm {
 		
 
 		
-		/* Translating all System Types */
-		model = translateSystemTypeObjects(systemTypes, model);
-		
-		/* Translating all System Implementations */
-		model = translateSystemImplObjects(systemImpls, componentPropertyToName, connPropertyToName,model);
+		/* Translating all Component Types */
+		if(systemTypes.size()>0) {
+			model = translateSystemTypeObjects(systemTypes, model);			
+		}
+		if(busTypes.size()>0) {
+			model = translateBusTypeObjects(busTypes, model);			
+		}
+		if(subprogramTypes.size()>0) {
+			model = translateSubprogramTypeObjects(subprogramTypes, model);			
+		}
+		if(threadTypes.size()>0) {
+			model = translateThreadTypeObjects(threadTypes, model);			
+		}
+		if(memoryTypes.size()>0) {
+			model = translateMemoryTypeObjects(memoryTypes, model);			
+		}
+		if(deviceTypes.size()>0) {
+			model = translateDeviceTypeObjects(deviceTypes, model);			
+		}
+		if(abstractTypes.size()>0) {
+			model = translateAbstractTypeObjects(abstractTypes, model);			
+		}
+		if(processTypes.size()>0) {
+			model = translateProcessTypeObjects(processTypes, model);			
+		}
+		if(threadGroupTypes.size()>0) {
+			model = translateThreadGroupTypeObjects(threadGroupTypes, model);			
+		}
+		if(virtualProcessorTypes.size()>0) {
+			model = translateVirtualProcessorTypeObjects(virtualProcessorTypes, model);			
+		}
+		if(processorTypes.size()>0) {
+			model = translateProcessorTypeObjects(processorTypes, model);			
+		}
+	
 				
+		/* Translating all System Implementations */
+//		model = translateSystemImplObjects(systemImpls, componentPropertyToName, connPropertyToName,model);
+//		model = translateComponentImplObjects(compImpls, componentPropertyToName, connPropertyToName,model);
+				
+		
+		/** Translating all component implementations */
+		model = translateComponentImplObjects(compImpls, componentPropertyToName, connPropertyToName,model);
+		
+		
+		
 		//return the final model
 		return model; 
 	}//End of populateVDMFromAadlObjects
@@ -329,7 +408,7 @@ public class Aadl2Vdm {
 
 				
 				//populating "compCateg"
-				packComponent.setCompCateg("system");
+				packComponent.setCompCateg(sysType.getCategory().getName());
 			
 				//get all ports
 				List<DataPort> dataPorts = sysType.getOwnedDataPorts();
@@ -508,6 +587,10 @@ public class Aadl2Vdm {
                         packCyberReq.setCondition(condition);
                     }
 
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
                     
                     packCyberReq.setId(id);
                     packCyberReq.setComment(comment);
@@ -549,18 +632,2976 @@ public class Aadl2Vdm {
 		return m1;
 	}//End of translateSystemTypeObjects
 
+
+	/**
+	 * Analyzing each busType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param busTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateBusTypeObjects(List<BusType> busTypes, Model m1) {		
+		for(BusType bType : busTypes) {			
+			
+			// variables for unpacking bType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking bType 
+			for(AnnexSubclause annex : bType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking bType
+					
+			
+			/**  
+			 *  For every BusType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the bType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for busType 
+				packComponent.setId(bType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(bType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(bType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = bType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(bType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each busType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateBusTypeObjects
+		
 	
 	/**
-	 * Analyzing each system implementation
-	 * @param systemImpls
+	 * Analyzing each subprogramType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param subprogramTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateSubprogramTypeObjects(List<SubprogramType> subprogramTypes, Model m1) {		
+		for(SubprogramType subprogType : subprogramTypes) {			
+			
+			// variables for unpacking subprogType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking subprogType 
+			for(AnnexSubclause annex : subprogType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking subprogType
+					
+			
+			/**  
+			 *  For every SubprogramType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the subprogType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for subprogramType 
+				packComponent.setId(subprogType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(subprogType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(subprogType.getCategory().getName());
+			
+//ISSUE: No getOwneddataPOrts for SubProgramType
+//				//get all ports
+//				List<DataPort> dataPorts = subprogType.getOwnedDataPorts();
+
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(subprogType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each subprogramType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateSubprogramTypeObjects
+
+	
+	/**
+	 * Analyzing each threadType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param threadTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateThreadTypeObjects(List<ThreadType> threadTypes, Model m1) {		
+		for(ThreadType tType : threadTypes) {			
+			
+			// variables for unpacking tType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking tType 
+			for(AnnexSubclause annex : tType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking tType
+					
+			
+			/**  
+			 *  For every ThreadType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the tType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for threadType 
+				packComponent.setId(tType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(tType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(tType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = tType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(tType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each threadType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateThreadTypeObjects
+
+	
+	/**
+	 * Analyzing each memoryType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componenmemType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componenmemType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param memoryTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateMemoryTypeObjects(List<MemoryType> memoryTypes, Model m1) {		
+		for(MemoryType memType : memoryTypes) {			
+			
+			// variables for unpacking memType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking memType 
+			for(AnnexSubclause annex : memType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking memType
+					
+			
+			/**  
+			 *  For every MemoryType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componenmemType
+			 *  and add it to the list of componenmemType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the memType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for memoryType 
+				packComponent.setId(memType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(memType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(memType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = memType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componenmemTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(memType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each memoryType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateMemoryTypeObjects
+	
+		
+	/**
+	 * Analyzing each deviceType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param deviceTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateDeviceTypeObjects(List<DeviceType> deviceTypes, Model m1) {		
+		for(DeviceType devType : deviceTypes) {			
+			
+			// variables for unpacking devType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking devType 
+			for(AnnexSubclause annex : devType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking devType
+					
+			
+			/**  
+			 *  For every DeviceType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the devType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for deviceType 
+				packComponent.setId(devType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(devType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(devType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = devType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(devType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each deviceType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateDeviceTypeObjects
+
+		
+	/**
+	 * Analyzing each abstractType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param abstractTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateAbstractTypeObjects(List<AbstractType> abstractTypes, Model m1) {		
+		for(AbstractType absType : abstractTypes) {			
+			
+			// variables for unpacking absType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking absType 
+			for(AnnexSubclause annex : absType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking absType
+					
+			
+			/**  
+			 *  For every AbstractType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the absType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for abstractType 
+				packComponent.setId(absType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(absType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(absType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = absType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(absType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each abstractType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateAbstractTypeObjects
+
+	
+	/**
+	 * Analyzing each processType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param processTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateProcessTypeObjects(List<ProcessType> processTypes, Model m1) {		
+		for(ProcessType prcsType : processTypes) {			
+			
+			// variables for unpacking prcsType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking prcsType 
+			for(AnnexSubclause annex : prcsType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking prcsType
+					
+			
+			/**  
+			 *  For every ProcessType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the prcsType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for processType 
+				packComponent.setId(prcsType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(prcsType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(prcsType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = prcsType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(prcsType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each processType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateProcessTypeObjects
+
+	
+	/**
+	 * Analyzing each threadGroupType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param threadGroupTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateThreadGroupTypeObjects(List<ThreadGroupType> threadGroupTypes, Model m1) {		
+		for(ThreadGroupType tgType : threadGroupTypes) {			
+			
+			// variables for unpacking tgType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking tgType 
+			for(AnnexSubclause annex : tgType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking tgType
+					
+			
+			/**  
+			 *  For every ThreadGroupType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the tgType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for threadGroupType 
+				packComponent.setId(tgType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(tgType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(tgType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = tgType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(tgType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each threadGroupType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateThreadGroupTypeObjects
+
+		
+	/**
+	 * Analyzing each virtualProcessorType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param virtualProcessorTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateVirtualProcessorTypeObjects(List<VirtualProcessorType> virtualProcessorTypes, Model m1) {		
+		for(VirtualProcessorType vprocType : virtualProcessorTypes) {			
+			
+			// variables for unpacking vprocType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking vprocType 
+			for(AnnexSubclause annex : vprocType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking vprocType
+					
+			
+			/**  
+			 *  For every VirtualProcessorType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the vprocType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for virtualProcessorType 
+				packComponent.setId(vprocType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(vprocType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(vprocType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = vprocType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(vprocType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each virtualProcessorType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateVirtualProcessorTypeObjects
+
+	
+	/**
+	 * Analyzing each processorType: 
+	 * 1. Determine if it is a lower-level system or higher-level system
+	 * 2. If lower-level, add to componentType list attribute of Model
+	 * 	2.1 Populate the port, contract, cyberRel, safetyRel, event, id, compCategory
+	 *      fields of componentType of the Model object 
+	 * 3. If higher-level, assign to Model
+	 * 	3.1 Populate the safetyReq
+	 *      cyberReq, mission fields of Model object
+	 * @param processorTypes
+	 * @param m1
+	 * @return
+	 */
+	public Model translateProcessorTypeObjects(List<ProcessorType> processorTypes, Model m1) {		
+		for(ProcessorType proType : processorTypes) {			
+			
+			// variables for unpacking proType
+			List<Event> events = new ArrayList<>();
+			List<CyberMission> missionReqs = new ArrayList<>();
+			List<CyberRel> cyberRels = new ArrayList<>();
+			List<SafetyRel> safetyRels = new ArrayList<>();
+			List<CyberReq> cyberReqs = new ArrayList<>();
+			List<SafetyReq> safetyReqs = new ArrayList<>();
+			
+			//a flag to check if a higher -level component has already been found
+			boolean higher_flag = false;
+
+			// unpacking proType 
+			for(AnnexSubclause annex : proType.getOwnedAnnexSubclauses()) {
+				if(annex.getName().equalsIgnoreCase("verdict")) {
+					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
+
+					for (Statement statement : verdictAnnex.getElements()) {
+						if (statement instanceof Event) {
+							events.add((Event)statement);
+						} else if(statement instanceof CyberMission) {
+							missionReqs.add((CyberMission)statement);
+						} else if(statement instanceof CyberReq) {
+							cyberReqs.add((CyberReq)statement);
+						} else if(statement instanceof CyberRel) {
+							cyberRels.add((CyberRel)statement);
+						} else if(statement instanceof SafetyReq) {
+							safetyReqs.add((SafetyReq)statement);
+						} else if(statement instanceof SafetyRel) {
+							safetyRels.add((SafetyRel)statement);
+						}
+					}
+				}
+			} // End of unpacking proType
+					
+			
+			/**  
+			 *  For every ProcessorType,
+			 *  populate the id, name, compCateg, port, event, 
+			 *  cyberRel, and safetyRel fields of componentType
+			 *  and add it to the list of componentType 
+			 *  of the Model object
+			 * */  
+			if(true) { //No Filter-- do for all System Types
+							
+				//to pack the proType as a VDM component
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+
+				//Note: Not populating "contract" for now
+				
+//ISSUE: There is no getId() function for processorType 
+				packComponent.setId(proType.getQualifiedName());
+				
+				//populating "name"
+				packComponent.setName(proType.getName());
+
+				
+				//populating "compCateg"
+				packComponent.setCompCateg(proType.getCategory().getName());
+			
+				//get all ports
+				List<DataPort> dataPorts = proType.getOwnedDataPorts();
+
+				//checking each port's mode and name and adding it to the port list  
+				for(DataPort dataPort : dataPorts) {
+					
+					String portName = dataPort.getName();
+					String modeString = "in"; 
+					if(dataPort.isIn()) {
+						modeString = "in";						
+					}
+					else if(dataPort.isOut()) {
+						modeString = "out";
+					}
+
+					
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+			    	
+			    	//Note: Not populating "type" for now
+			    	
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);				
+				}//End of checking each port
+									
+				
+				//packing all events and adding to component
+				for(Event anEvent : events) {
+					//To pack the event as a VDM event
+					verdict.vdm.vdm_model.Event packEvent = new verdict.vdm.vdm_model.Event();
+									
+					String id = sanitizeValue(anEvent.getId());
+					String probability = sanitizeValue(anEvent.getProbability().getProp());
+					String comment = sanitizeValue(anEvent.getComment());
+					String description = sanitizeValue(anEvent.getDescription());
+										
+//ISSUE: "name" field missing in com.ge.research.osate.verdict.dsl.verdict.Event class and superclass					
+//					packEvent.setName("Not found");
+					
+					
+					packEvent.setId(id);
+					packEvent.setProbability(probability);
+					packEvent.setComment(comment);
+					packEvent.setDescription(description);
+					
+					//adding to the list of component's events
+					packComponent.getEvent().add(packEvent);									
+				}//End of packing all events
+				
+				
+				//packing all cyberRels and adding to component
+				for(CyberRel aCyberRel : cyberRels) {
+					//To pack the cyberRel as a VDM event
+					verdict.vdm.vdm_model.CyberRel packCyberRel = new verdict.vdm.vdm_model.CyberRel();
+				
+                    String id = sanitizeValue(aCyberRel.getId());
+                    String comment = sanitizeValue(aCyberRel.getComment());
+                    String description = sanitizeValue(aCyberRel.getDescription());
+                    String outPort = aCyberRel.getOutput().getValue().getPort();
+                    String outCia = aCyberRel.getOutput().getValue().getCia().getLiteral();
+                    verdict.vdm.vdm_model.CIAPort output = createVdmCIAPort(outPort, outCia);
+                    
+                    if(aCyberRel.getInputs() != null) {
+                        verdict.vdm.vdm_model.CyberExpr input = createVdmCyberExpr(aCyberRel.getInputs().getValue());
+                        packCyberRel.setInputs(input);
+                    }
+                    
+                                                            
+                    packCyberRel.setId(id);
+                    packCyberRel.setComment(comment);
+                    packCyberRel.setDescription(description);
+                    packCyberRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    
+					//adding to the list of component's Cyber relations
+					packComponent.getCyberRel().add(packCyberRel);									
+				}//End of packing all cyberRels				
+				
+				
+				//packing all safetyRels and adding to component
+				for(SafetyRel aSafetyRel : safetyRels) {
+					//To pack the safetyRel as a VDM event
+					verdict.vdm.vdm_model.SafetyRel packSafetyRel = new verdict.vdm.vdm_model.SafetyRel();
+				
+                    String id = sanitizeValue(aSafetyRel.getId());
+                    String comment = sanitizeValue(aSafetyRel.getComment());
+                    String description = sanitizeValue(aSafetyRel.getDescription());
+                    String outPort = aSafetyRel.getOutput().getValue().getPort();  
+                    String outIa = aSafetyRel.getOutput().getValue().getIa().getLiteral();
+                    verdict.vdm.vdm_model.IAPort output = createVdmIAPort(outPort, outIa);
+                     
+                    if(aSafetyRel.getFaultSrc() != null) {
+
+                        verdict.vdm.vdm_model.SafetyRelExpr faultSrc = createVdmSafetyRelExpr(aSafetyRel.getFaultSrc().getValue());
+                        packSafetyRel.setFaultSrc(faultSrc);
+                    }                    
+
+
+
+                    packSafetyRel.setId(id);
+                    packSafetyRel.setComment(comment);
+                    packSafetyRel.setDescription(description);
+                    packSafetyRel.setOutput(output);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+					//adding to the list of component's Safety relations
+					packComponent.getSafetyRel().add(packSafetyRel);									
+				}// End of packing all safetyRels	
+				
+
+				//adding to the list of componentTypes of the Model object
+				m1.getComponentType().add(packComponent);	
+			}//End of populate the id ...
+			
+			/** If a high-level system 
+			 *  populate the name, safetyReq, cyberReq, and mission
+			 *  for the model object
+			 * */
+			if(!cyberReqs.isEmpty() || !safetyReqs.isEmpty() || !missionReqs.isEmpty()) {
+				//checking if a high-level system has already been found
+				if (higher_flag == false) {
+					higher_flag = true;
+				}
+				else System.out.println("Warning: Multiple high-level systems detected!");
+				
+				//populating name
+				m1.setName(proType.getName());
+			
+				//packing all safetyReqs and adding to model
+				for(SafetyReq aSafetyReq : safetyReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.SafetyReq packSafetyReq = new verdict.vdm.vdm_model.SafetyReq();
+				
+                    String id = sanitizeValue(aSafetyReq.getId());
+                    String comment = sanitizeValue(aSafetyReq.getComment());
+                    String description = sanitizeValue(aSafetyReq.getDescription());
+                    String targetProbability = aSafetyReq.getSeverity().getTargetLikelihood().toString();  
+
+                    
+                    if(aSafetyReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.SafetyReqExpr condition = createVdmSafetyReqExpr(aSafetyReq.getCondition().getValue());
+                        packSafetyReq.setCondition(condition);
+                    }                    
+                    
+                    
+                    packSafetyReq.setId(id);
+                    packSafetyReq.setComment(comment);
+                    packSafetyReq.setDescription(description);
+                    packSafetyReq.setTargetProbability(targetProbability);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                
+					//adding to the list of model's Safety requirements
+					m1.getSafetyReq().add(packSafetyReq);									
+
+				}// End of packing all safetyReqs
+				
+
+				//packing all cyberReqs and adding to model
+				for(CyberReq aCyberReq : cyberReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.CyberReq packCyberReq = new verdict.vdm.vdm_model.CyberReq();
+				
+                    String id = sanitizeValue(aCyberReq.getId());
+                    String comment = sanitizeValue(aCyberReq.getComment());
+                    String description = sanitizeValue(aCyberReq.getDescription());
+                    verdict.vdm.vdm_model.Severity severity =  convertToVdmSeverity(aCyberReq.getSeverity().toString());
+                    
+                    if(aCyberReq.getCondition() != null) {
+
+                        verdict.vdm.vdm_model.CyberExpr condition = createVdmCyberExpr(aCyberReq.getCondition().getValue());
+                        packCyberReq.setCondition(condition);
+                    }
+
+                    if (aCyberReq.getCia().getLiteral() != null) {
+                    	verdict.vdm.vdm_model.CIA cia = convertToVdmCia(aCyberReq.getCia().getLiteral());
+                    	packCyberReq.setCia(cia);
+                    }
+                    
+                    packCyberReq.setId(id);
+                    packCyberReq.setComment(comment);
+                    packCyberReq.setDescription(description);
+                    packCyberReq.setSeverity(severity);
+                    //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+                    
+					//adding to the list of model's Cyber requirements
+					m1.getCyberReq().add(packCyberReq);									
+
+				}// End of packing all cyberReqs
+				
+				
+				//packing all missionReqs and adding to model
+				for(CyberMission aMission : missionReqs) {
+					//To pack the safettReq as a VDM event
+					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
+				
+                    String id = sanitizeValue(aMission.getId());
+                    String description = sanitizeValue(aMission.getDescription());
+                    EList<String> missionCyberReqs= aMission.getCyberReqs();
+                    packMission.setId(id);
+                    packMission.setDescription(description);
+                    
+                    for (String CyberReq : missionCyberReqs) {
+                    	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
+
+                    
+					//adding to the list of model's Mission
+					m1.getMission().add(packMission);									
+				}// End of packing all missionReqs							
+			}//End of if a higher-level system			
+		}  //End of Analyzing each processorType
+		
+		//returning the populated Model
+		return m1;
+	}//End of translateProcessorTypeObjects
+	
+	
+	/**
+	 * Analyzing each component implementation
+	 * @param comImpls
 	 * @param m2
 	 * @return
 	 */
-	public Model translateSystemImplObjects(List<SystemImplementation> systemImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) { 
+	public Model translateComponentImplObjects(List<ComponentImplementation> comImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) { 
 		
 		
 		//creating an object for each implementation first as we will need it later
-		for(SystemImplementation aSystemImpl : systemImpls) {
+		for(ComponentImplementation aSystemImpl : comImpls) {
 			//to pack the sysImpl as a VDM componentImpl
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();
 
@@ -578,16 +3619,15 @@ public class Aadl2Vdm {
 		}//End of creating an object
 		
 		//Getting the reference of the object previously created and populating
-		for(SystemImplementation aSystemImpl : systemImpls) {
+		for(ComponentImplementation aCompImpl : comImpls) {
 			
-
 			
 			//variable to refer to previously created object
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();;
 			
 			//finding previously created object
 			for (verdict.vdm.vdm_model.ComponentImpl anImplObj : m2.getComponentImpl()) {
-				if(anImplObj.getName().equals(aSystemImpl.getName())) {
+				if(anImplObj.getName().equals(aCompImpl.getName())) {
 					packCompImpl = anImplObj;
 
 				}
@@ -595,7 +3635,7 @@ public class Aadl2Vdm {
 									
 			//setting "type" field of packCompImpl
 			for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
-				if(aSystemImpl.getTypeName().equals(cType.getName())){
+				if(aCompImpl.getTypeName().equals(cType.getName())){
 					packCompImpl.setType(cType);				
 				}
 			}//End of setting "type"
@@ -604,7 +3644,7 @@ public class Aadl2Vdm {
 			verdict.vdm.vdm_model.BlockImpl packBlockImpl = new verdict.vdm.vdm_model.BlockImpl();
 			
 			//adding all subcomponents to "subcomponent" field of packBlockImpl
-			for (Subcomponent aSubComp : aSystemImpl.getOwnedSubcomponents()) {
+			for (Subcomponent aSubComp : aCompImpl.getOwnedSubcomponents()) {
 								
 				//to pack all information of a subcomponent
 				verdict.vdm.vdm_model.ComponentInstance packSubComp = new verdict.vdm.vdm_model.ComponentInstance();
@@ -677,20 +3717,20 @@ public class Aadl2Vdm {
 			
 			
 			//adding all connections to "connections" field of packBlockImpl
-			if(aSystemImpl.getOwnedConnections() != null && !aSystemImpl.getOwnedConnections().isEmpty()) {				
-				for (Connection aConn : aSystemImpl.getOwnedConnections()) {
+			if(aCompImpl.getOwnedConnections() != null && !aCompImpl.getOwnedConnections().isEmpty()) {				
+				for (Connection aConn : aCompImpl.getOwnedConnections()) {
 					//to pack all information of a connection
 					verdict.vdm.vdm_model.Connection packConn = new verdict.vdm.vdm_model.Connection();
 					
 					//variables to unpack information from AADL object
 					String srcCompInstName = "";
 					String destCompInstName = "";
-					String srcCompName = aSystemImpl.getTypeName();
-					String destCompName = aSystemImpl.getTypeName();
-					String srcCompImplName = aSystemImpl.getName();
-					String destCompImplName = aSystemImpl.getName();					
-					String srcCompCatName = aSystemImpl.getCategory().getName();
-					String destCompCatName = aSystemImpl.getCategory().getName();
+					String srcCompName = aCompImpl.getTypeName();
+					String destCompName = aCompImpl.getTypeName();
+					String srcCompImplName = aCompImpl.getName();
+					String destCompImplName = aCompImpl.getName();					
+					String srcCompCatName = aCompImpl.getCategory().getName();
+					String destCompCatName = aCompImpl.getCategory().getName();
 					Context srcConnContext = aConn.getAllSourceContext();
 					Context destConnContext = aConn.getAllDestinationContext();
 					ConnectionEnd srcConnectionEnd = aConn.getAllSource();
@@ -717,15 +3757,15 @@ public class Aadl2Vdm {
     				String destPortName = destConnectionEnd.getName();
     				
     				if(srcConnectionEnd instanceof DataPort) {
-    					srcPortTypeName = ((DataPort)srcConnectionEnd).isIn()?(((DataPort)srcConnectionEnd).isOut()? "in;out":"in"):"out";
+    					srcPortTypeName = ((DataPort)srcConnectionEnd).isIn()?(((DataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
     				} else if(srcConnectionEnd instanceof EventDataPort) {
-    					srcPortTypeName = ((EventDataPort)srcConnectionEnd).isIn()?(((EventDataPort)srcConnectionEnd).isOut()? "in;out":"in"):"out";
+    					srcPortTypeName = ((EventDataPort)srcConnectionEnd).isIn()?(((EventDataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
     				} else if(srcConnectionEnd instanceof DataAccess) {
     					AccessType type = ((DataAccess) srcConnectionEnd).getKind();
     					if(type == AccessType.PROVIDES) {
-    						srcPortTypeName = "provides data access";	
+    						srcPortTypeName = "providesDataAccess";	
     					} else if(type == AccessType.REQUIRES) {
-    						srcPortTypeName = "requires data access";
+    						srcPortTypeName = "requiresDataAccess";
     					} else {
     						throw new RuntimeException("Unexpected access type: " + type);
     					}
@@ -736,15 +3776,15 @@ public class Aadl2Vdm {
     				}
     				
     				if(destConnectionEnd instanceof DataPort) {
-    					destPortTypeName = ((DataPort)destConnectionEnd).isIn()?(((DataPort)destConnectionEnd).isOut()? "in;out":"in"):"out";
+    					destPortTypeName = ((DataPort)destConnectionEnd).isIn()?(((DataPort)destConnectionEnd).isOut()? "inOut":"in"):"out";
     				} else if(destConnectionEnd instanceof EventDataPort) {
-    					destPortTypeName = ((EventDataPort)destConnectionEnd).isIn()?(((EventDataPort)destConnectionEnd).isOut()? "in;out":"in"):"out";    					
+    					destPortTypeName = ((EventDataPort)destConnectionEnd).isIn()?(((EventDataPort)destConnectionEnd).isOut()? "inOut":"in"):"out";    					
     				} else if(destConnectionEnd instanceof DataAccess) {
     					AccessType type = ((DataAccess) destConnectionEnd).getKind();
     					if(type == AccessType.PROVIDES) {
-    						destPortTypeName = "provides data access";	
+    						destPortTypeName = "providesDataAccess";	
     					} else {
-    						destPortTypeName = "requires data access";
+    						destPortTypeName = "requiresDataAccess";
     					}
     				}  else if(destConnectionEnd instanceof DataSubcomponent){
     					destPortTypeName = "data";
@@ -754,6 +3794,7 @@ public class Aadl2Vdm {
     				
     				//setting name
     				packConn.setName(aConn.getFullName());
+    				
     				    				
     				
     				//--- Populate packConn below ---  
@@ -761,7 +3802,7 @@ public class Aadl2Vdm {
     				//to pack source
     				verdict.vdm.vdm_model.ConnectionEnd packSrcEnd = new verdict.vdm.vdm_model.ConnectionEnd();
     				
-					//to pack "componentPort"  of packSrcEnd
+					//to pack "componentPort"  of packSrcEnd    				
     				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName());
     				
     				
@@ -792,7 +3833,7 @@ public class Aadl2Vdm {
     				//to pack destination
     				verdict.vdm.vdm_model.ConnectionEnd packDestEnd = new verdict.vdm.vdm_model.ConnectionEnd();
     				
-					//to pack "componentPort"  of packSrcEnd
+					//to pack "componentPort"  of packDestEnd    				
     				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName());
     				
     				
@@ -882,7 +3923,7 @@ public class Aadl2Vdm {
 		return m2;
 	}//End of translateSystemImplObjects
 
-	
+
 /** Auxiliary functions: */	
 	
 	
@@ -2092,7 +5133,6 @@ public class Aadl2Vdm {
           	}
           	return full;
           }
-      	   	
-   
+      	   	  
     
 }
