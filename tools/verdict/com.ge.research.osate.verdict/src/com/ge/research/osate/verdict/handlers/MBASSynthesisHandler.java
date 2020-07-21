@@ -16,6 +16,7 @@ import org.eclipse.ui.intro.IIntroPart;
 import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
+import com.ge.research.osate.verdict.gui.MBASSynthesisReport;
 
 public class MBASSynthesisHandler extends AbstractHandler {
 	static final String SEP = File.separator;
@@ -93,9 +94,13 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							return;
 						}
 
+						File outputXml = new File(outputFolder, "synthesis_output.xml");
+
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
-								graphVizPath, costModel.getAbsolutePath())) {
-							// TODO display output
+								graphVizPath, costModel.getAbsolutePath(), outputXml.getAbsolutePath())) {
+							if (outputXml.exists()) {
+								MBASSynthesisReport.report(outputXml);
+							}
 						}
 					} catch (IOException e) {
 						VerdictLogger.severe(e.toString());
@@ -115,24 +120,19 @@ public class MBASSynthesisHandler extends AbstractHandler {
 	}
 
 	public static boolean runBundle(String bundleJar, String dockerImage, String projectName, String stemProjectDir,
-			String soteriaPpBin, String graphVizPath, String costModel) throws IOException {
+			String soteriaPpBin, String graphVizPath, String costModel, String outputXml) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage).arg("--csv").arg(projectName)
 				.arg("--mbas").argBind(stemProjectDir, "/app/STEM").arg2(soteriaPpBin, "/app/soteria_pp")
-				.arg("--synthesis").argBind(costModel, "/app/costs/costModel.xml");
+				.arg("--synthesis").argBind(costModel, "/app/costs/costModel.xml").arg("-o")
+				.argBind(outputXml, "/app/output/synthesis_output.xml").arg("-m");
 
-		if (MBASSettingsPanel.cyberInference) {
+		if (MBASSettingsPanel.synthesisCyberInference) {
 			command.arg("-c");
 		}
-		if (MBASSettingsPanel.safetyInference) {
-			command.arg("-s");
-		}
-		if (MBASSettingsPanel.usePartialSolution) {
+		if (MBASSettingsPanel.synthesisPartialSolution) {
 			command.arg("-p");
-		}
-		if (MBASSettingsPanel.performMeritAssignment) {
-			command.arg("-m");
 		}
 
 		int code = command.runJarOrImage();

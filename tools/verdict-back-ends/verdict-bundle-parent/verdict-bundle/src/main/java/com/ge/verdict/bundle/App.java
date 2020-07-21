@@ -9,12 +9,12 @@ import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
 import com.ge.verdict.synthesis.CostModel;
 import com.ge.verdict.synthesis.DTreeConstructor;
-import com.ge.verdict.synthesis.ResultsInstance;
 import com.ge.verdict.synthesis.VerdictSynthesis;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
+import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
@@ -162,6 +162,7 @@ public class App {
         options.addOption("s", false, "Safety Relations Inference");
         // TODO don't have a good short option because "s" is already taken
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
+        options.addOption("o", "synthesis-output", true, "Synthesis output XML file");
         options.addOption("p", false, "Use partial solutions in synthesis");
         options.addOption("m", false, "Perform merit assignment in synthesis");
 
@@ -218,6 +219,8 @@ public class App {
         helpLine(
                 "      --synthesis <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
+        helpLine(
+                "      -o ................... synthesis output XML (required if synthesis enabled)");
         helpLine("      -p ................... synthesis partial solutions");
         helpLine("      -m ................... synthesis merit assignment");
         helpLine();
@@ -278,7 +281,12 @@ public class App {
 
             if (csvProjectName != null) {
                 if (opts.hasOption("y")) {
+                    if (!opts.hasOption("o")) {
+                        throw new VerdictRunException("Must specify synthesis output XML");
+                    }
+
                     String costModelPath = opts.getOptionValue("y");
+                    String output = opts.getOptionValue("o");
                     boolean meritAssignment = opts.hasOption("m");
                     boolean partialSolution = opts.hasOption("p") || meritAssignment;
 
@@ -291,7 +299,8 @@ public class App {
                             safetyInference,
                             partialSolution,
                             meritAssignment,
-                            costModelPath);
+                            costModelPath,
+                            output);
                 } else {
                     runMbas(
                             csvProjectName,
@@ -514,7 +523,8 @@ public class App {
             boolean safetyInference,
             boolean partialSolution,
             boolean meritAssignment,
-            String costModelPath)
+            String costModelPath,
+            String outputPath)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -532,6 +542,8 @@ public class App {
         checkFile(soteriaPpOutputDir, true, true, true, false, null);
         checkFile(soteriaPpBin, true, false, false, true, null);
         checkFile(costModelPath, true, false, false, false, "xml");
+
+        checkFile(outputPath, false, false, true, false, "xml");
 
         deleteDirectoryContents(stemGraphsDir);
         deleteDirectoryContents(soteriaPpOutputDir);
@@ -602,8 +614,8 @@ public class App {
                             false);
 
             if (selected.isPresent()) {
-                log("Synthesis results:");
-                selected.get().prettyPrint(System.out);
+                selected.get().toFileXml(new File(outputPath));
+                log("Synthesis results output to " + outputPath);
             } else {
                 logError("Synthesis failed");
             }
