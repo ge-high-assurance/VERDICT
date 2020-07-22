@@ -86,40 +86,55 @@ public class MBASSynthesisResultsView extends ViewPart {
 		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Change");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original Cost");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
+		if (results.partialSolution) {
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original Cost");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
 
-		for (ResultsInstance.Item item : results.items) {
-			if (!results.partialSolution || item.inputDal != item.outputDal) {
-				double deltaCost = item.outputCost - item.inputCost;
-				String change;
-				if (item.outputDal > item.inputDal) {
-					if (item.inputDal == 0) {
-						change = "Implement";
+			for (ResultsInstance.Item item : results.items) {
+				if (!results.partialSolution || item.inputDal != item.outputDal) {
+					double deltaCost = item.outputCost - item.inputCost;
+					String change;
+					if (item.outputDal > item.inputDal) {
+						if (item.inputDal == 0) {
+							change = "Implement";
+						} else {
+							change = "Upgrade";
+						}
+					} else if (item.outputDal < item.inputDal) {
+						if (item.outputDal == 0) {
+							change = "Remove";
+						} else {
+							change = "Downgrade";
+						}
 					} else {
-						change = "Upgrade";
+						change = "N/A";
 					}
-				} else if (item.outputDal < item.inputDal) {
-					if (item.outputDal == 0) {
-						change = "Remove";
-					} else {
-						change = "Downgrade";
-					}
-				} else {
-					change = "N/A";
+
+					TableItem row = new TableItem(table, SWT.NONE);
+					row.setText(new String[] { change, item.component, item.defenseProperty,
+							Integer.toString(item.inputDal), Integer.toString(item.outputDal),
+							Double.toString(item.inputCost), Double.toString(item.outputCost),
+							Double.toString(deltaCost), });
 				}
+			}
+		} else {
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 
-				TableItem row = new TableItem(table, SWT.NONE);
-				row.setText(
-						new String[] { change, item.component, item.defenseProperty, Integer.toString(item.inputDal),
-								Integer.toString(item.outputDal), Double.toString(item.inputCost),
-								Double.toString(item.outputCost), Double.toString(deltaCost), });
+			for (ResultsInstance.Item item : results.items) {
+				if (item.outputDal != 0) {
+					TableItem row = new TableItem(table, SWT.NONE);
+					row.setText(new String[] { item.component, item.defenseProperty,
+							Integer.toString(item.outputDal), Double.toString(item.outputCost) });
+				}
 			}
 		}
 
