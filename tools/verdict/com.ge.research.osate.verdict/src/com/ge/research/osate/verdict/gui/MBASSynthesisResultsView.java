@@ -3,6 +3,7 @@ package com.ge.research.osate.verdict.gui;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -50,6 +51,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 			// All possible output states
 			if (results.partialSolution) {
 				if (results.inputSat) {
+					header.setForeground(new Color(Display.getCurrent(), 0, 102, 51));
 					if (results.meritAssignment) {
 						if (results.inputCost != results.outputCost) {
 							header.setText("Synthesis results: Partial solution SAT, merit assignment, cost: "
@@ -68,10 +70,11 @@ public class MBASSynthesisResultsView extends ViewPart {
 								+ results.outputCost);
 					}
 				} else {
+					header.setForeground(new Color(Display.getCurrent(), 204, 0, 0));
 					header.setText("Synthesis results: Partial solution UNSAT, cost: " + results.inputCost
 							+ " -> "
 							+ results.outputCost
-							+ "(increase of " + (results.outputCost - results.inputCost) + ")");
+							+ " (increase of " + (results.outputCost - results.inputCost) + ")");
 				}
 			} else {
 				header.setText("Synthesis results: No partial solution, total cost: " + results.outputCost);
@@ -86,10 +89,10 @@ public class MBASSynthesisResultsView extends ViewPart {
 		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Change");
 		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
 		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Input DAL");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Output DAL");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Input Cost");
-		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Output Cost");
+		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
+		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
+		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original Cost");
+		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 		new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
 
 		for (ResultsInstance.Item item : results.items) {
