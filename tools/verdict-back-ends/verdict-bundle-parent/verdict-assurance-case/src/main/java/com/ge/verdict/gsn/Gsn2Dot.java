@@ -3,6 +3,7 @@ package com.ge.verdict.gsn;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.davidmoten.text.utils.WordWrap;
 
 /** @author Saswata Paul */
 public class Gsn2Dot {
@@ -120,7 +121,7 @@ public class Gsn2Dot {
                 }
             } else if (node.getNodeType().equalsIgnoreCase("goal")) {
                 nodeShape = "box";
-                nodeText = node.getGoal().getDisplayText();
+                nodeText = stringWrapper(node.getGoal().getDisplayText());
                 nodeStatus = node.getGoal().getStatus();
             } else if (node.getNodeType().equalsIgnoreCase("strategy")) {
                 nodeShape = "parallelogram";
@@ -189,5 +190,23 @@ public class Gsn2Dot {
                 bw.newLine();
             }
         }
+    }
+
+    /**
+     * Takes a string and wraps it by adding a linebreak after every 50 characters Used to edit goal
+     * statements which are taken "as is" from verdict
+     *
+     * @param original
+     * @return
+     */
+    public static String stringWrapper(String original) {
+        // normalize spaces in the string
+        String normal = original.replaceAll("\\s{2,}", " ").trim();
+        String wrapped =
+                WordWrap.from(normal)
+                        .maxWidth(50)
+                        .insertHyphens(true) // true is the default
+                        .wrap();
+        return wrapped;
     }
 }
