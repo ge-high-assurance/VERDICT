@@ -51,8 +51,8 @@ public class CRVSettingsPanel extends ApplicationWindow {
 	public CRVSettingsPanel() {
 		super(null);
 
-		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
-		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
+		font = new Font(null, "Helvetica", 12, SWT.NORMAL);
+		boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
 	}
 
 	@Override

@@ -35,8 +35,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 	public MBASSettingsPanel() {
 		super(null);
 
-		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
-		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
+		font = new Font(null, "Helvetica", 12, SWT.NORMAL);
+		boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
 	}
 
 	@Override

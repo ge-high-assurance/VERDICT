@@ -64,7 +64,7 @@
              locationURI="menu:org.eclipse.ui.main.menu">             
 		<menu id="VerdictMenu" label="Verdict" >
 		<menu id="MbasMenu" 
-			label="&amp;Model Based Architecture Analysis/Synthesis (MBAA/MBAS)" >
+			label="&amp;Model Based Architecture Analysis/Synthesis" >
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runMbas"
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
@@ -96,10 +96,10 @@
       	        tooltip="Click to change MBAA/MBAS Settings">
       	  </command>   	  
 		</menu> 
-		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
+		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier" >
           <command
                 commandId="com.ge.research.osate.verdict.commands.runCrv"
-                label="&amp;Run Cyber Resilience Verifier"
+                label="&amp;Run Cyber Resilience Verifier (CRV)"
                 style="push"
                 tooltip="Run CRV">
           </command> 	
