@@ -1,5 +1,8 @@
 package com.ge.research.osate.verdict.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -25,6 +28,39 @@ public class MBASSynthesisResultsView extends ViewPart {
 	public void setFocus() {
 		if (composite != null) {
 			composite.setFocus();
+		}
+	}
+
+	private static enum Action {
+		// the order defines the ordering in the sort
+		IMPLEMENT("Implement"), UPGRADE("Upgrade"), REMOVE("Remove"), DOWNGRADE("Downgrade"), NONE("N/A");
+
+		public final String name;
+
+		private Action(String name) {
+			this.name = name;
+		}
+
+		public static Action fromItem(ResultsInstance.Item item) {
+			if (item.outputDal > item.inputDal) {
+				if (item.inputDal == 0) {
+					return IMPLEMENT;
+				} else {
+					return UPGRADE;
+				}
+			} else if (item.outputDal < item.inputDal) {
+				if (item.outputDal == 0) {
+					return REMOVE;
+				} else {
+					return DOWNGRADE;
+				}
+			} else {
+				return NONE;
+			}
+		}
+
+		public String checkDitto(Action prev) {
+			return this.equals(prev) ? "-do-" : name;
 		}
 	}
 
@@ -96,44 +132,43 @@ public class MBASSynthesisResultsView extends ViewPart {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
 
-			for (ResultsInstance.Item item : results.items) {
+			List<ResultsInstance.Item> sortedItems = new ArrayList<>(results.items);
+			sortedItems.sort((a, b) -> Action.fromItem(a).compareTo(Action.fromItem(b))); // enum implements Comparable
+
+			Action prev = null;
+			for (ResultsInstance.Item item : sortedItems) {
 				if (!results.partialSolution || item.inputDal != item.outputDal) {
 					double deltaCost = item.outputCost - item.inputCost;
-					String change;
-					if (item.outputDal > item.inputDal) {
-						if (item.inputDal == 0) {
-							change = "Implement";
-						} else {
-							change = "Upgrade";
-						}
-					} else if (item.outputDal < item.inputDal) {
-						if (item.outputDal == 0) {
-							change = "Remove";
-						} else {
-							change = "Downgrade";
-						}
-					} else {
-						change = "N/A";
-					}
+					Action action = Action.fromItem(item);
 
 					TableItem row = new TableItem(table, SWT.NONE);
-					row.setText(new String[] { change, item.component, item.defenseProperty,
+					row.setText(new String[] { action.checkDitto(prev), item.component,
+							item.defenseProperty,
 							Integer.toString(item.inputDal), Integer.toString(item.outputDal),
 							Double.toString(item.inputCost), Double.toString(item.outputCost),
 							Double.toString(deltaCost), });
+
+					prev = action;
 				}
 			}
 		} else {
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 
+			Action prev = null;
 			for (ResultsInstance.Item item : results.items) {
 				if (item.outputDal != 0) {
 					TableItem row = new TableItem(table, SWT.NONE);
-					row.setText(new String[] { item.component, item.defenseProperty,
+					Action action = Action.IMPLEMENT;
+
+					row.setText(new String[] { action.checkDitto(prev), item.component,
+							item.defenseProperty,
 							Integer.toString(item.outputDal), Double.toString(item.outputCost) });
+
+					prev = action;
 				}
 			}
 		}
