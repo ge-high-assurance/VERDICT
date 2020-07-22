@@ -64,7 +64,7 @@
              locationURI="menu:org.eclipse.ui.main.menu">             
 		<menu id="VerdictMenu" label="Verdict" >
 		<menu id="MbasMenu" 
-			label="&amp;Model Based Architecture Synthesis (MBAS)" >
+			label="&amp;Model Based Architecture Analysis/Synthesis (MBAA/MBAS)" >
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runMbas"
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
@@ -85,9 +85,9 @@
       	  </command>
       	  <command
       	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
-      	        label="&amp;MBAS Settings"
+      	        label="&amp;MBAA/MBAS Settings"
       	        style="push"
-      	        tooltip="Click to change MBAS Settings">
+      	        tooltip="Click to change MBAA/MBAS Settings">
       	  </command>
       	  <command
       	        commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
@@ -128,7 +128,7 @@
 	            commandId="com.ge.research.osate.verdict.commands.stop"
 				icon="icons/stop.gif"
                 style="push"
-                tooltip="Stop MBAS/CRV">
+                tooltip="Stop MBAA/MBAS/CRV">
 	      </command>
 	   </menuContribution>       
     </extension>
@@ -142,12 +142,12 @@
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
-             name="Run MBAS">
+             name="Run MBAA">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
-             name="Run MBAS Synthesis">
+             name="Run MBAS">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
@@ -157,7 +157,7 @@
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.mbasSettings"
-             name="MBAS Settings">
+             name="MBAA/MBAS Settings">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"

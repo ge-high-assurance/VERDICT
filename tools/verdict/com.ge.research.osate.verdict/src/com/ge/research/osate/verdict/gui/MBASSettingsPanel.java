@@ -51,7 +51,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		int y = bounds.y + (bounds.height - rect.height) / 2;
 
 		shell.setLocation(x, y);
-		shell.setText("MBAS Settings");
+		shell.setText("MBAA/MBAS Settings");
 		shell.setFont(font);
 	}
 
