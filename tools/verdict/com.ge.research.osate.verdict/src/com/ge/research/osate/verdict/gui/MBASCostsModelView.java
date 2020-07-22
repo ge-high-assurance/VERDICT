@@ -59,9 +59,8 @@ public class MBASCostsModelView extends ApplicationWindow{
 
 	public MBASCostsModelView(List<EObject> aadlObjs) {
 		super(null);
-		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
-		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
-
+		font = new Font(null, "Helvetica", 12, SWT.NORMAL);
+		boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
 		// This view is AADL project-based
 		// How can we ensure this?
 		// Read/write the data from/to the xml file
