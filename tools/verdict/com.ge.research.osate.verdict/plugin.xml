@@ -47,6 +47,10 @@
              class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
+        <handler
+             class="com.ge.research.osate.verdict.handlers.MBASCostsModelSettingHandler"
+             commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings">
+       </handler>       
        <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
@@ -85,6 +89,12 @@
       	        style="push"
       	        tooltip="Click to change MBAS Settings">
       	  </command>
+      	  <command
+      	        commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
+      	        label="&amp;MBAS Costs Model Settings"
+      	        style="push"
+      	        tooltip="Click to change MBAS Costs Model Settings">
+      	  </command>      	  
 		</menu> 
 		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
           <command
@@ -149,6 +159,11 @@
              id="com.ge.research.osate.verdict.commands.mbasSettings"
              name="MBAS Settings">
        </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
+             name="MBAS Costs Model Settings">
+       </command>       
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.stop"
