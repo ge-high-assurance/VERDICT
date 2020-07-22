@@ -77,24 +77,24 @@
 	            style="push"
 	            tooltip="Run MBAS">
 	      </command>
-      	  <command
+      	  <!--<command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
+      	  </command>-->
+      	  <command
+      	        commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
+      	        label="&amp;MBAS Costs Model Settings"
+      	        style="push"
+      	        tooltip="Click to change MBAS Costs Model Settings">
       	  </command>
       	  <command
       	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
       	        label="&amp;MBAA/MBAS Settings"
       	        style="push"
       	        tooltip="Click to change MBAA/MBAS Settings">
-      	  </command>
-      	  <command
-      	        commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
-      	        label="&amp;MBAS Costs Model Settings"
-      	        style="push"
-      	        tooltip="Click to change MBAS Costs Model Settings">
-      	  </command>      	  
+      	  </command>   	  
 		</menu> 
 		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
           <command
@@ -112,7 +112,7 @@
 		</menu>                                   	                         
          </menu>    
        </menuContribution>
-       <menuContribution
+       <!--<menuContribution
              allPopups="false"
              locationURI="popup:org.eclipse.ui.popup.any?after=additions">             			  
 	      <command
@@ -121,7 +121,7 @@
                 style="push"
                 tooltip="Select to launch wizard to edit cyber requirements/relations">                
 	      </command>
-	   </menuContribution>       
+	   </menuContribution> -->      
        <menuContribution
              locationURI="toolbar:org.eclipse.ui.console.ConsoleView">
 	      <command
@@ -174,11 +174,11 @@
              id="com.ge.research.osate.verdict.commands.crvSettings"
              name="CRV Settings">
        </command>
-       <command
+       <!--<command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runWzrd"
              name="Cyber Requirements/Relations Editor">
-       </command>                 
+       </command>-->
     </extension>
 
     <extension
