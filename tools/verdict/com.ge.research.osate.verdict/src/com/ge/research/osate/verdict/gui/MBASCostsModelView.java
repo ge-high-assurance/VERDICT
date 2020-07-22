@@ -23,64 +23,62 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.instance.ComponentInstance;
 
 
 public class MBASCostsModelView extends ApplicationWindow{
-	
+
 	// By default, all component-defense pairs are using the scaling factor cost 1
-	class ComponentDefenseCost {
+	private static class ComponentDefenseCost {
 		String componentName;
 		String defensePropName;
-		
+
 		int DAL;
 		double cost;
 		double scalingFactor;
-		
+
 		public ComponentDefenseCost(String name, String defense, int DAL, double cost) {
 			this.componentName = name;
 			this.defensePropName = defense;
 			this.DAL = DAL;
 			this.cost= cost;
 		}
-		
+
 		public ComponentDefenseCost(String name, String defense, double scalingFactor) {
 			this.componentName = name;
 			this.defensePropName = defense;
 			this.scalingFactor= scalingFactor;
-		}		
+		}
 	}
-	
-	public static boolean cyberInference = false;
-	public static boolean safetyInference = false;
 
-	public static boolean synthesisCyberInference = false;
-	public static boolean synthesisPartialSolution = false;
-	
 	public List<ComponentDefenseCost> linearCosts = new ArrayList<>();
 	public List<ComponentDefenseCost> individualCosts = new ArrayList<>();
-	
+
 	private Font font;
 	private Font boldFont;
-	
+
 	public MBASCostsModelView(List<EObject> aadlObjs) {
 		super(null);
 		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
 		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
-		
+
 		// This view is AADL project-based
-		// How can we ensure this? 
+		// How can we ensure this?
 		// Read/write the data from/to the xml file
 		// every time user opens/save the GUI.
-		
+
 		if(!aadlObjs.isEmpty()) {
 			for(EObject obj : aadlObjs) {
 				if(obj instanceof ComponentImplementation) {
-					System.out.println("Implementation: " + ((ComponentImplementation)obj).getName());
+					System.out.println("Implementation: " + ((ComponentImplementation) obj).getName());
+				}
+				if (obj instanceof ComponentInstance) {
+					System.out.println("Instance: " + ((ComponentInstance) obj).getName());
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -95,8 +93,8 @@ public class MBASCostsModelView extends ApplicationWindow{
 		shell.setLocation(x, y);
 		shell.setText("Costs Model");
 		shell.setFont(font);
-	}	
-	
+	}
+
 	public void run() {
 		setBlockOnOpen(true);
 		open();
@@ -104,9 +102,9 @@ public class MBASCostsModelView extends ApplicationWindow{
 
 	public void bringToFront(Shell shell) {
 		shell.setActive();
-	}	
-	
-	
+	}
+
+
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -115,78 +113,22 @@ public class MBASCostsModelView extends ApplicationWindow{
 		Label componentLabel = new Label(composite, SWT.NONE);
 		componentLabel.setText("Component: ");
 		componentLabel.setFont(boldFont);
-		
+
 		// List all components
-		
+
 		Label propLabel = new Label(composite, SWT.NONE);
 		propLabel.setText("Defense Property: ");
 		propLabel.setFont(boldFont);
-		
-		// List all defense properties		
-		
+
+		// List all defense properties
+
 		Label analysisLabel = new Label(composite, SWT.NONE);
 		analysisLabel.setText("Model Based Architecture Analysis");
 		analysisLabel.setFont(boldFont);
 
-		Group mbaaSelectionButtonGroup = new Group(composite, SWT.NONE);
-		mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
-
-		Button cyberButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		cyberButton.setText("Enable Cyber Relations Inference");
-		cyberButton.setFont(font);
-		cyberButton.setSelection(cyberInference);
-
-		Button safetyButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		safetyButton.setText("Enable Safety Relations Inference");
-		safetyButton.setFont(font);
-		safetyButton.setSelection(safetyInference);
-
-		Label synthesisLabel = new Label(composite, SWT.NONE);
-		synthesisLabel.setText("Model Based Architecture Synthesis");
-		synthesisLabel.setFont(boldFont);
-
-		Group mbasSelectionButtonGroup = new Group(composite, SWT.NONE);
-		mbasSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
-
-		Button synthesisEnableCyberInference = new Button(mbasSelectionButtonGroup, SWT.CHECK);
-		synthesisEnableCyberInference.setText("Enable Cyber Relations Inference");
-		synthesisEnableCyberInference.setFont(font);
-		synthesisEnableCyberInference.setSelection(synthesisCyberInference);
-
-		Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
-		partialSolution.setText("Enable Partial Solutions");
-		partialSolution.setFont(font);
-		partialSolution.setSelection(synthesisPartialSolution);
-
 		Group selDeAllButtons = new Group(composite, SWT.NONE);
 		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		selDeAllButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
-
-		Button selectAll = new Button(selDeAllButtons, SWT.PUSH);
-		selectAll.setText("Select All");
-		selectAll.setFont(font);
-		selectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cyberButton.setSelection(true);
-				safetyButton.setSelection(true);
-				synthesisEnableCyberInference.setSelection(true);
-				partialSolution.setSelection(true);
-			}
-		});
-
-		Button deselectAll = new Button(selDeAllButtons, SWT.PUSH);
-		deselectAll.setText("Deselect All");
-		deselectAll.setFont(font);
-		deselectAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cyberButton.setSelection(false);
-				safetyButton.setSelection(false);
-				synthesisEnableCyberInference.setSelection(false);
-				partialSolution.setSelection(false);
-			}
-		});
 
 		Composite closeButtons = new Composite(composite, SWT.NONE);
 		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -214,14 +156,11 @@ public class MBASCostsModelView extends ApplicationWindow{
 		save.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				cyberInference = cyberButton.getSelection();
-				safetyInference = safetyButton.getSelection();
-				synthesisPartialSolution = partialSolution.getSelection();
-				synthesisCyberInference = synthesisEnableCyberInference.getSelection();
+				// TODO save
 				composite.getShell().close();
 			}
 		});
 		return composite;
-	}	
+	}
 
 }

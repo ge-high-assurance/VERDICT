@@ -47,9 +47,14 @@
              class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
-        <handler
+       <handler
              class="com.ge.research.osate.verdict.handlers.MBASCostsModelSettingHandler"
              commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings">
+           <enabledWhen>
+               <reference
+                   definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+               </reference>
+           </enabledWhen>
        </handler>       
        <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
@@ -119,7 +124,7 @@
 	            commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
-                tooltip="Select to launch wizard to edit cyber requirements/relations">                
+                tooltip="Select to launch wizard to edit cyber requirements/relations">        
 	      </command>
 	   </menuContribution> -->      
        <menuContribution

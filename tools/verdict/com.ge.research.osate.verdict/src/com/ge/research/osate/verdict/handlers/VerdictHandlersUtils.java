@@ -174,22 +174,22 @@ public class VerdictHandlersUtils {
 
 		return paths;
 	}
-	
+
 	/**
 	 * Process an event corresponding to a selection of AADL project
-	 * Translate an AADL project into objects 
-	 * 
+	 * Translate an AADL project into objects
+	 *
 	 * */
 	public static List<EObject> preprocessAadlFiles(File dir) {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
-		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);										
+		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
 		List<String> aadlFileNames = new ArrayList<>();
-		
+
 		// Obtain all AADL files contents in the project
 		List<EObject> objects = new ArrayList<>();
-		
+
 		List<File> dirs = collectAllDirs(dir);
-		
+
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
@@ -202,7 +202,7 @@ public class VerdictHandlersUtils {
 		for (int i = 0; i < aadlFileNames.size(); i++) {
 			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
 		}
-		
+
 		// Load the resources
 		for (final Resource resource : resources) {
 			try {
@@ -211,14 +211,14 @@ public class VerdictHandlersUtils {
 				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
 			}
 		}
-		
+
 		// Load all objects from resources
 		for (final Resource resource : resources) {
 			resource.getAllContents().forEachRemaining(objects::add);
-		}	
+		}
 		return objects;
 	}
-	
+
 	public static List<File> collectAllDirs(File dir) {
 		List<File> allDirs = new ArrayList<File>();
 		allDirs.add(dir);
@@ -237,10 +237,5 @@ public class VerdictHandlersUtils {
 				collectDir(file, allDirs);
 			}
 		}
-	}	
-
-	public static void errAndExit(String err) {
-		System.out.println("Error: " + err);
-		System.exit(-1);
 	}
 }
