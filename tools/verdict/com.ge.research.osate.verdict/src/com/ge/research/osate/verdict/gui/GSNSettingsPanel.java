@@ -18,6 +18,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Mission;
+import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.SafetyReq;
+
 
 /**
 * Let user enable cyber or safety relations inference when running MBAA.
@@ -30,17 +35,18 @@ public class GSNSettingsPanel extends ApplicationWindow {
 	 * cyberFragments -  safety requirements
 	 * allFragments - all requirements   
 	 */
-	public static boolean missionFragments = false;
-	public static boolean cyberFragments = false;
-	public static boolean safetyFragments = false;
-	public static boolean allFragments = false;
+	public static String rootGoalId;
+	public static Model theVDMModel;
 
 	
 	private Font font;
 	private Font boldFont;
 
-	public GSNSettingsPanel() {
+	public GSNSettingsPanel(Model m) {
 		super(null);
+		
+		//set the Model object as theVDMModel 
+		theVDMModel = m;
 
 		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
 		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
@@ -77,66 +83,67 @@ public class GSNSettingsPanel extends ApplicationWindow {
 		composite.setLayout(new GridLayout(1, false));
 
 		Label analysisLabel = new Label(composite, SWT.NONE);
-		analysisLabel.setText("GSN Settings");
+		analysisLabel.setText("Select a requirement to generate GSN fragment:");
 		analysisLabel.setFont(boldFont);
 
 		Group selectionButtonGroup = new Group(composite, SWT.NONE);
-		selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
-
-		Button missionButton = new Button(selectionButtonGroup, SWT.CHECK);
-		missionButton.setText("Generate Fragments for All Mission Requirements");
-		missionButton.setFont(font);
-		missionButton.setSelection(missionFragments);
-		
-		Button cyberButton = new Button(selectionButtonGroup, SWT.CHECK);
-		cyberButton.setText("Generate Fragments for All Cyber Requirements");
-		cyberButton.setFont(font);
-		cyberButton.setSelection(cyberFragments);
-
-		Button safetyButton = new Button(selectionButtonGroup, SWT.CHECK);
-		safetyButton.setText("Generate Fragments for All Safety Requirements");
-		safetyButton.setFont(font);
-		safetyButton.setSelection(safetyFragments);
-
-		Button allButton = new Button(selectionButtonGroup, SWT.CHECK);
-		allButton.setText("Generate Fragments for All Requirements");
-		allButton.setFont(font);
-		allButton.setSelection(allFragments);
+		selectionButtonGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 
 		
-		Composite closeButtons = new Composite(composite, SWT.NONE);
-		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
-		closeButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
+		
+		for (Mission aMission: theVDMModel.getMission()) {
+			Button missionButton = new Button(selectionButtonGroup, SWT.CHECK);
+			missionButton.setText(aMission.getId());
+			missionButton.setFont(font);
+			missionButton.setSelection(false);
+			missionButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					if( missionButton.getSelection()) {
+						rootGoalId = aMission.getId();
+						System.out.println("Selected "+rootGoalId+ " to generate GSN fragment.");
+						composite.getShell().close();
+					}
+				}
+			});			
+		}
+		
 
-		Button cancel = new Button(closeButtons, SWT.PUSH);
-		cancel.setText("Cancel");
-		cancel.setFont(font);
+		for (CyberReq aCyberReq: theVDMModel.getCyberReq()) {
+			Button reqButton = new Button(selectionButtonGroup, SWT.CHECK);
+			reqButton.setText(aCyberReq.getId());
+			reqButton.setFont(font);
+			reqButton.setSelection(false);
+			reqButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					if( reqButton.getSelection()) {
+						rootGoalId = aCyberReq.getId();
+						System.out.println("Selected "+rootGoalId+ " to generate GSN fragment.");
+						composite.getShell().close();
+					}
+				}
+			});			
+		}
+		
 
-		Button save = new Button(closeButtons, SWT.PUSH);
-		save.setText("Save Settings");
-		save.setFont(font);
-
-		// Set the preferred size
-		Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		getShell().setSize(bestSize);
-
-		cancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				composite.getShell().close();
-			}
-		});
-
-		save.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				missionFragments = missionButton.getSelection();
-				cyberFragments = cyberButton.getSelection();
-				safetyFragments = safetyButton.getSelection();
-				allFragments = allButton.getSelection();
-				composite.getShell().close();
-			}
-		});
+		for (SafetyReq aSafetyReq: theVDMModel.getSafetyReq()) {
+			Button reqButton = new Button(selectionButtonGroup, SWT.CHECK);
+			reqButton.setText(aSafetyReq.getId());
+			reqButton.setFont(font);
+			reqButton.setSelection(false);
+			reqButton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent event) {
+					if( reqButton.getSelection()) {
+						rootGoalId = aSafetyReq.getId();
+						System.out.println("Selected "+rootGoalId+ " to generate GSN fragment.");
+						composite.getShell().close();
+					}
+				}
+			});			
+		}
+		
 		return composite;
 	}
 }

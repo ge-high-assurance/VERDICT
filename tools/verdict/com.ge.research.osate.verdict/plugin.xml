@@ -47,6 +47,11 @@
        <handler
              class="com.ge.research.osate.verdict.handlers.GSNSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.gsnSettings">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
        </handler>
        <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
