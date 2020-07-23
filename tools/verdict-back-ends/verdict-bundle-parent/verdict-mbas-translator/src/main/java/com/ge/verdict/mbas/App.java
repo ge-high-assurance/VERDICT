@@ -65,9 +65,8 @@ public class App {
                     File inputFile = new File(args[0]);
 
                     // Translate VDM to Mbas inputs
-                    VDM2CSV vdm2csv = new VDM2CSV();
-                    Model model = vdm2csv.unmarshalFromXml(inputFile);
-                    vdm2csv.marshalToMbasInputs(model, args[0], args[1], args[2]);
+                    Model model = VDM2CSV.unmarshalFromXml(inputFile);
+                    VDM2CSV.marshalToMbasInputs(model, args[0], args[1], args[2]);
                 }
             }
         }

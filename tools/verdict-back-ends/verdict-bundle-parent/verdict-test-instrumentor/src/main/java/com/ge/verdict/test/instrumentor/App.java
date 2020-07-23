@@ -22,14 +22,12 @@ public class App {
             File inputFile = new File(args[0]);
             File outputFile = new File(args[1]);
 
-            VdmTranslator translator = new VdmTranslator();
-
-            Model vdmModel = translator.unmarshalFromXml(inputFile);
+            Model vdmModel = VdmTranslator.unmarshalFromXml(inputFile);
 
             VerdictTestInstrumentor atg = new VerdictTestInstrumentor(vdmModel);
             atg.instrumentTests();
 
-            translator.marshalToXml(vdmModel, outputFile);
+            VdmTranslator.marshalToXml(vdmModel, outputFile);
         }
     }
 }

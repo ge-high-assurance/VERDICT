@@ -19,15 +19,13 @@ import verdict.vdm.vdm_model.Model;
 // Accepts VDMDataModel (preferably in memory) and Translates into Lustre code/file.
 public class VDMLustreTranslator {
 
-    private VerdictLustreTranslator translator = new VerdictLustreTranslator();
+    public static Model getVDM(File inputFile) {
 
-    public Model getVDM(File inputFile) {
-
-        return translator.unmarshalFromXml(inputFile);
+        return VerdictLustreTranslator.unmarshalFromXml(inputFile);
     }
 
     // Translate to DataFlow
-    public Model getDataFlow(Model verdictDataModel) {
+    public static Model getDataFlow(Model verdictDataModel) {
 
         VDM2Lustre vdm2Lustre = new VDM2Lustre(verdictDataModel);
         verdictDataModel = vdm2Lustre.translate();
@@ -35,7 +33,7 @@ public class VDMLustreTranslator {
         return verdictDataModel;
     }
 
-    public void dumpLustre(Model verdictDataModel, File outputFile) {
-        translator.marshalToLustre(verdictDataModel, outputFile);
+    public static void dumpLustre(Model verdictDataModel, File outputFile) {
+        VerdictLustreTranslator.marshalToLustre(verdictDataModel, outputFile);
     }
 }

@@ -38,23 +38,21 @@ public class App {
             }
 
             // Determine whether we should translate from Lustre to VDM or from VDM to Lustre
-            VerdictLustreTranslator translator = new VerdictLustreTranslator();
-
             if (inputFile.getName().endsWith(".lus")) {
-                Model verdictDataModel = translator.unmarshalFromLustre(inputFile);
-                translator.marshalToXml(verdictDataModel, lustre_outputFile);
+                Model verdictDataModel = VerdictLustreTranslator.unmarshalFromLustre(inputFile);
+                VerdictLustreTranslator.marshalToXml(verdictDataModel, lustre_outputFile);
             } else {
 
-                Model verdictDataModel = translator.unmarshalFromXml(inputFile);
+                Model verdictDataModel = VerdictLustreTranslator.unmarshalFromXml(inputFile);
 
                 VDM2Lustre vdm2Lustre = new VDM2Lustre(verdictDataModel);
                 verdictDataModel = vdm2Lustre.translate();
 
                 if (args.length == 3) {
-                    translator.marshalToXml(verdictDataModel, vdm_outputFile);
+                    VerdictLustreTranslator.marshalToXml(verdictDataModel, vdm_outputFile);
                 }
 
-                translator.marshalToLustre(verdictDataModel, lustre_outputFile);
+                VerdictLustreTranslator.marshalToLustre(verdictDataModel, lustre_outputFile);
 
                 //                PrettyPrinter pp = new PrettyPrinter();
                 //                pp.printProgram(verdictDataModel.getDataflowCode(),

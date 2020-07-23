@@ -1,17 +1,18 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>verdict-bundle-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
+    <!-- Verdict Bundle (single entry point to run all back-end tools) -->
     <artifactId>verdict-bundle</artifactId>
     <packaging>jar</packaging>
-
-    <name>Verdict Bundle</name>
 
     <dependencies>
         <dependency>
@@ -19,12 +20,12 @@
             <artifactId>commons-cli</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-attack-defense-collector</artifactId>
+            <groupId>com.ge.research.osate.verdict</groupId>
+            <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-data-model</artifactId>
+            <artifactId>verdict-attack-defense-collector</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
