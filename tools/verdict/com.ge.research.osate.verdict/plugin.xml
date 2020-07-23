@@ -45,6 +45,10 @@
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.GSNSettingsHandler"
+             commandId="com.ge.research.osate.verdict.commands.gsnSettings">
+       </handler>
+       <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
@@ -95,6 +99,14 @@
 	            style="push"
 	            tooltip="Click to change CRV Settings">
 	       </command>
+		</menu>
+		<menu id="GsnMenu" label="&amp;Assurance Cases (GSN)" >
+          <command
+                commandId="com.ge.research.osate.verdict.commands.gsnSettings"
+                label="&amp;GSN Settings"
+                style="push"
+                tooltip="Click to change GSN settings">
+          </command> 	
 		</menu>                                   	                         
          </menu>    
        </menuContribution>
@@ -140,6 +152,11 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.crvSettings"
              name="CRV Settings">
+       </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.gsnSettings"
+             name="GSN Settings">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"

@@ -32,6 +32,7 @@ public class Gsn2Dot {
         bw.newLine();
         bw.write("ratio = 0.5;");
         bw.newLine();
+        bw.newLine();
         // declare all nodes
         writeNodes(allNodes, bw);
         bw.newLine();
@@ -168,7 +169,7 @@ public class Gsn2Dot {
      */
     public static void writeRelationships(List<GsnNode> allNodes, BufferedWriter bw)
             throws IOException {
-        bw.write("//Node relationships (edges):-");
+        bw.write("//Edge declarations:-");
         bw.newLine();
         for (GsnNode node : allNodes) {
             // supportedBy edges
@@ -177,7 +178,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + support.getNodeId()
-                                + " [splines=curved, weight=2, arrowsize=2.0]");
+                                + " [splines=curved, weight=3, arrowsize=2.0]");
                 bw.newLine();
             }
             // inContextOf edges
@@ -186,7 +187,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + context.getNodeId()
-                                + " [splines=curved, arrowhead=empty, arrowsize=2.0]");
+                                + " [splines=curved, arrowhead=empty, arrowsize=1.0]");
                 bw.newLine();
             }
         }

@@ -23,6 +23,14 @@ public class Main {
             throws ParserConfigurationException, SAXException, IOException {
         System.out.println("Entered CreateGSn.Main()!");
 
+        // A user-specified requirement to create the GSN fragment for
+        // String rootGoalId = "MReq01";
+        // String rootGoalId = "MReq02";
+        String rootGoalId = "CyberReq01";
+        // String rootGoalId = "CyberReq02";
+        // String rootGoalId = "SafetyReq01";
+        // String rootGoalId = "SafetyReq02";
+
         // The files
         File testXml = new File("/Users/212807042/Desktop/DeliveryDroneFiles/DeliveryDroneVdm.xml");
         File cyberOutput =
@@ -38,9 +46,6 @@ public class Main {
 
         String aadlModelAddress =
                 "/Users/212807042/Desktop/DeliveryDroneFiles/graphviz_examples/DeliveryDrone.aadl";
-
-        // Create the GSN Fragment
-        String rootGoalId = "MReq01";
 
         GsnNode gsnFragment =
                 CreateGSN.gsnCreator(
