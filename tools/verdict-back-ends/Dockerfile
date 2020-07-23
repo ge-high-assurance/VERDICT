@@ -120,7 +120,7 @@ RUN apt-get update -qq \
 COPY --from=ocaml-builder /src/aadl2iml/bin/aadl2iml /app/aadl2iml
 COPY --from=ocaml-builder /src/kind2/bin/kind2 /app/kind2
 COPY --from=ocaml-builder /src/soteria_pp/soteria_pp.native /app/soteria_pp
-COPY verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0-SNAPSHOT-capsule.jar /app/verdict.jar
+COPY verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0.0-SNAPSHOT-capsule.jar /app/verdict.jar
 COPY --from=z3-builder /usr/local/bin /usr/local/bin
 COPY --from=z3-builder /usr/local/lib /usr/local/lib
 COPY --from=ocaml-builder /usr/local /usr/local
