@@ -1173,7 +1173,7 @@
 		<xsl:template name="WeaklyAssumes">
 		<xsl:for-each select="vdm_lustre:weaklyassume">
 			<span>
-				<xsl:text>&#160; weakly_assume </xsl:text>
+				<xsl:text>&#160; weakly assume </xsl:text>
 			</span>
 						<xsl:for-each select="vdm_lustre:name">
 			<xsl:value-of select="$quote"/>	

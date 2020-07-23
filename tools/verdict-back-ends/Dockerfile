@@ -38,9 +38,11 @@ FROM ocaml/opam2 AS ocaml-builder
 USER 0
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    automake \
-    libtool \
-    pkg-config \
+    gcc \
+    libzmq3-dev \
+    m4 \
+    make \
+    patch \
     python3 \
     python3-distutils \
     wget
@@ -59,13 +61,15 @@ RUN opam switch 4.07 \
     core \
     core_extended \
     dune \
+    dune-build-info \
+    menhir \
     num \
     ocamlbuild \
     ocamlfind \
     printbox \
     xml-light \
     yojson \
- && opam install "menhir<=20200211" \
+    zmq \
  && echo '#use "topfind" ;;' >> /home/opam/.ocamlinit \
  && echo '#thread ;;' >> /home/opam/.ocamlinit \
  && echo '#load "stdlib.cma" ;;' >> /home/opam/.ocamlinit \
@@ -77,11 +81,9 @@ RUN opam switch 4.07 \
 
 RUN eval $(opam env) \
  && cd /src \
- && git clone https://github.com/daniel-larraz/kind2.git \
+ && git clone https://github.com/kind2-mc/kind2.git \
  && cd kind2 \
- && git checkout verdict_blame_assign \
- && ./autogen.sh \
- && ./build.sh
+ && make
 
 # Copy aadl2iml's sources and build aadl2iml
 
@@ -109,6 +111,7 @@ RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     graphviz \
     libgomp1 \
+    libzmq5 \
  && rm -rf /var/lib/apt/lists/* \
  && adduser --disabled-password --gecos VERDICT verdict
 
