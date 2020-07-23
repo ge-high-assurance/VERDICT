@@ -8,5 +8,12 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java/"/>
 	<classpathentry kind="src" path="target/generated-sources/xjc/"/>
+	<classpathentry exported="true" kind="lib" path="lib/FastInfoset.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/istack-commons-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.activation-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.xml.bind-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxb-runtime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/stax-ex.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/txw2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

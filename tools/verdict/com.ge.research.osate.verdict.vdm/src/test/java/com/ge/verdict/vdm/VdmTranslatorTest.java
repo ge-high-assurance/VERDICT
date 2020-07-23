@@ -16,8 +16,7 @@ public class VdmTranslatorTest {
 
         File testFile = File.createTempFile("vdm-model", ".xml");
         testFile.deleteOnExit();
-        VdmTranslator translator = new VdmTranslator();
-        translator.marshalToXml(controlModel, testFile);
+        VdmTranslator.marshalToXml(controlModel, testFile);
         Assertions.assertThat(testFile).exists();
 
         File controlFile = new File("src/test/resources/vdm-model.xml");
@@ -27,8 +26,7 @@ public class VdmTranslatorTest {
     @Test
     public void testUnmarshalFromXml() throws IOException {
         File testFile = new File("src/test/resources/vdm-model.xml");
-        VdmTranslator translator = new VdmTranslator();
-        Model testModel = translator.unmarshalFromXml(testFile);
+        Model testModel = VdmTranslator.unmarshalFromXml(testFile);
 
         Model controlModel = VdmTest.createControlModel();
         Assertions.assertThat(testModel).usingRecursiveComparison().isEqualTo(controlModel);

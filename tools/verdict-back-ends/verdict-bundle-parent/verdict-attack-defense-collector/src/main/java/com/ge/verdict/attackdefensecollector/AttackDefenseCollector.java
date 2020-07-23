@@ -586,7 +586,7 @@ public class AttackDefenseCollector {
 
     public AttackDefenseCollector(File vdm, File inputDir, boolean inference)
             throws CSVFile.MalformedInputException, IOException {
-        Model model = (new VdmTranslator()).unmarshalFromXml(vdm);
+        Model model = VdmTranslator.unmarshalFromXml(vdm);
 
         systems = new LinkedHashMap<>();
         connections = new LinkedHashMap<>();

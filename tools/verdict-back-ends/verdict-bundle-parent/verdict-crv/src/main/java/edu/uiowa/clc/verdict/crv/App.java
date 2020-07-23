@@ -65,8 +65,7 @@ public class App {
 
         LOGGY.info("************************(VERDICT CRV)******************************");
 
-        // Loadl DataModel
-        VerdictLustreTranslator translator = new VerdictLustreTranslator();
+        // Load DataModel
 
         if (vdmFile.canRead()) {
             String InputFile = vdmFile.getAbsolutePath();
@@ -79,10 +78,10 @@ public class App {
                 // vdm_model = ResourceTest.setup(InputFile);
 
                 // Store VDM in a temporary file
-                translator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
+                VerdictLustreTranslator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
             } else if (fileExt.equals("xml")) {
                 // Use VDM model
-                vdm_model = translator.unmarshalFromXml(vdmFile);
+                vdm_model = VerdictLustreTranslator.unmarshalFromXml(vdmFile);
             } else {
 
                 LOGGY.warn("Invalid Model Input File: " + fileExt);
@@ -95,9 +94,8 @@ public class App {
             vdm_model = instrumentor.instrument(vdm_model, cmdLine);
 
             {
-                VdmTranslator tmp_translator = new VdmTranslator();
-                tmp_translator.marshalToXml(vdm_model, new File(vdmTmpDumpFile));
-                vdm_model = translator.unmarshalFromXml(new File(vdmTmpDumpFile));
+                VdmTranslator.marshalToXml(vdm_model, new File(vdmTmpDumpFile));
+                vdm_model = VerdictLustreTranslator.unmarshalFromXml(new File(vdmTmpDumpFile));
             }
 
             LOGGY.info("********Dataflow to Lustre code Printing*********");
@@ -136,13 +134,11 @@ public class App {
                 kind2_resultFile = new File(kind2TmpDumpFile);
             }
 
-            // VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
-            // lustreOutputer.marshalToLustre(lustreModel, lustreFile);
+            // VerdictLustreTranslator.marshalToLustre(lustreModel, lustreFile);
 
-            VDMLustreTranslator lustreOutputer = new VDMLustreTranslator();
-            lustreOutputer.dumpLustre(lustreModel, lustreFile);
+            VDMLustreTranslator.dumpLustre(lustreModel, lustreFile);
 
-            // translator.marshalToLustre(vdm_model, lustreFile);
+            // VerdictLustreTranslator.marshalToLustre(vdm_model, lustreFile);
 
             LOGGY.info("******************Executor***********************");
 

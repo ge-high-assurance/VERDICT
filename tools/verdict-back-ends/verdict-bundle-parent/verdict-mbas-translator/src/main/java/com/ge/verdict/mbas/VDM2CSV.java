@@ -29,7 +29,7 @@ public class VDM2CSV extends VdmTranslator {
      * @param stemOutputPath output path where the STEM related CSV files be written to
      * @param soteriaOutputPath output path where the Soteria++ related CSV files be written to
      */
-    public void marshalToMbasInputs(
+    public static void marshalToMbasInputs(
             Model model, String inputPath, String stemOutputPath, String soteriaOutputPath) {
 
         String scenario = (new File(inputPath)).getName().replace(".xml", "");

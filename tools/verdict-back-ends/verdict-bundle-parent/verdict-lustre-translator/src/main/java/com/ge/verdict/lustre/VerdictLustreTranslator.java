@@ -23,15 +23,11 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.ObjectFactory;
 
 /** Translate a Verdict data model to or from a Lustre file. */
 public class VerdictLustreTranslator extends VdmTranslator {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerdictLustreTranslator.class);
 
     /**
      * Marshal a Verdict data model to a Lustre file.
@@ -39,9 +35,9 @@ public class VerdictLustreTranslator extends VdmTranslator {
      * @param model Verdict data model to marshal
      * @param outputFile Lustre file to write to
      */
-    public void marshalToLustre(Model model, File outputFile) {
+    public static void marshalToLustre(Model model, File outputFile) {
         // Skip and warn if output file can't be created
-        if (canWrite(outputFile, LOGGER)) {
+        if (canWrite(outputFile)) {
             // Open output stream to be written to
             try (OutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile))) {
                 // Set up model as source to read from
@@ -83,7 +79,7 @@ public class VerdictLustreTranslator extends VdmTranslator {
      * @param inputFile Lustre file to unmarshal from
      * @return Verdict data model from Lustre file
      */
-    public Model unmarshalFromLustre(File inputFile) {
+    public static Model unmarshalFromLustre(File inputFile) {
         // Parse the Lustre file into a parse tree
         LustreParser.ProgramContext programContext =
                 VerdictLustreTranslator.parseFromLustre(inputFile);

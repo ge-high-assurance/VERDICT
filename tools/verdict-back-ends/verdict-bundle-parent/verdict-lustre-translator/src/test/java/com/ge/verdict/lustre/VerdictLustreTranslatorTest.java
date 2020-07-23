@@ -16,8 +16,7 @@ public class VerdictLustreTranslatorTest {
 
         File testFile = File.createTempFile("vdm-model", ".lus");
         testFile.deleteOnExit();
-        VerdictLustreTranslator translator = new VerdictLustreTranslator();
-        translator.marshalToLustre(controlModel, testFile);
+        VerdictLustreTranslator.marshalToLustre(controlModel, testFile);
         Assertions.assertThat(testFile).exists();
 
         File controlFile = new File("src/test/resources/vdm-model-output.lus");
@@ -27,8 +26,7 @@ public class VerdictLustreTranslatorTest {
     @Test
     public void testUnmarshalFromLustre() throws IOException {
         File testFile = new File("src/test/resources/vdm-model.lus");
-        VerdictLustreTranslator translator = new VerdictLustreTranslator();
-        Model testModel = translator.unmarshalFromLustre(testFile);
+        Model testModel = VerdictLustreTranslator.unmarshalFromLustre(testFile);
 
         Model controlModel = VdmTest.createControlModel();
 
@@ -38,8 +36,7 @@ public class VerdictLustreTranslatorTest {
     @Test
     public void testUnmarshalFromInclude() throws IOException {
         File testFile = new File("src/test/resources/include-vdm-model.lus");
-        VerdictLustreTranslator translator = new VerdictLustreTranslator();
-        Model testModel = translator.unmarshalFromLustre(testFile);
+        Model testModel = VerdictLustreTranslator.unmarshalFromLustre(testFile);
         testModel.setName("vdm-model.lus");
 
         Model controlModel = VdmTest.createControlModel();

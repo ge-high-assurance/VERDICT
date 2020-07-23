@@ -48,18 +48,17 @@ public class VerdictLustreTranslatorIT {
     public static void testLustreFile(Path path) {
         try {
             // Unmarshal a model from the original Lustre file
-            VerdictLustreTranslator translator = new VerdictLustreTranslator();
-            Model originalModel = translator.unmarshalFromLustre(path.toFile());
+            Model originalModel = VerdictLustreTranslator.unmarshalFromLustre(path.toFile());
 
             // Marshal the original model to a temporary Lustre file
             File tempFile = File.createTempFile(path.getFileName().toString(), ".lus");
-            translator.marshalToLustre(originalModel, tempFile);
+            VerdictLustreTranslator.marshalToLustre(originalModel, tempFile);
             Assertions.assertThat(tempFile).exists();
             tempFile.deleteOnExit();
 
             // Unmarshal another model from the temporary Lustre file and compare it to the original
             // model to check the fidelity of the marshalToLustre method
-            Model anotherModel = translator.unmarshalFromLustre(tempFile);
+            Model anotherModel = VerdictLustreTranslator.unmarshalFromLustre(tempFile);
             anotherModel.setName(originalModel.getName());
             try {
                 Assertions.assertThat(anotherModel)
@@ -69,9 +68,9 @@ public class VerdictLustreTranslatorIT {
                 System.err.println("Found non-fidelity of translation in " + path);
                 // Save both temporary Lustre and temporary XML files for easier debugging
                 tempFile = File.createTempFile(path.getFileName().toString(), ".lus");
-                translator.marshalToLustre(originalModel, tempFile);
+                VerdictLustreTranslator.marshalToLustre(originalModel, tempFile);
                 tempFile = File.createTempFile(path.getFileName().toString(), ".xml");
-                translator.marshalToXml(originalModel, tempFile);
+                VerdictLustreTranslator.marshalToXml(originalModel, tempFile);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

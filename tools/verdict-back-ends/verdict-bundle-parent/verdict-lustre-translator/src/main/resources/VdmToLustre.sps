@@ -9,7 +9,7 @@
 			<nspair prefix="vdm_model" uri="verdict::vdm::vdm_model"/>
 		</namespaces>
 		<schemasources>
-			<xsdschemasource name="XML" main="1" schemafile="..\..\..\..\verdict-data-model\src\main\resources\vdm_model.xsd" workingxmlfile="..\..\..\..\verdict-data-model\src\test\resources\vdm-model.xml"/>
+			<xsdschemasource name="XML" main="1" schemafile="..\..\..\..\..\..\verdict\com.ge.research.osate.verdict.vdm\src\main\resources\vdm_model.xsd" workingxmlfile="..\..\..\..\..\..\verdict\com.ge.research.osate.verdict.vdm\src\test\resources\vdm-model.xml"/>
 		</schemasources>
 	</schemasources>
 	<modules/>

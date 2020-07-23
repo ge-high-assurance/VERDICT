@@ -130,16 +130,15 @@ public class App {
 
         try {
             CommandLine cmdLine = parser.parse(options, args);
-            // Load VDM model
-            VdmTranslator translator = new VdmTranslator();
 
+            // Load VDM model
             if (cmdLine.hasOption("i")) {
                 String inputPath = cmdLine.getOptionValue("i");
                 LOGGER.info(inputPath);
 
                 inputFile = new File(inputPath);
 
-                verdictDataModel = translator.unmarshalFromXml(inputFile);
+                verdictDataModel = VdmTranslator.unmarshalFromXml(inputFile);
                 threat_instrumentor = new VDMInstrumentor(verdictDataModel);
             }
             if (cmdLine.hasOption("o")) {
@@ -153,7 +152,7 @@ public class App {
                 // LOGGER.info("Benign (Default)");
                 // }
 
-                translator.marshalToXml(verdictDataModel, outputFile);
+                VdmTranslator.marshalToXml(verdictDataModel, outputFile);
             }
 
         } catch (ParseException exp) {
