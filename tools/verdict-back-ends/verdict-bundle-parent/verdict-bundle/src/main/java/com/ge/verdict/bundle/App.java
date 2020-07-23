@@ -930,14 +930,20 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            Binary.invokeBin(
-                    kind2Bin,
-                    null,
-                    redirect,
-                    outputFormat,
-                    lustrePath,
-                    "--max_weak_assumptions",
-                    Boolean.toString(blameAssignment));
+            if (blameAssignment && instrumentor != null) {
+                Binary.invokeBin(
+                        kind2Bin,
+                        null,
+                        redirect,
+                        outputFormat,
+                        lustrePath,
+                        "--enable",
+                        "MCS",
+                        "--print_mcs_legacy",
+                        "true");
+            } else {
+                Binary.invokeBin(kind2Bin, null, redirect, outputFormat, lustrePath);
+            }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes
             if (e.getCode().isPresent()) {
