@@ -14,7 +14,7 @@
 	<xsl:param name="SV_GeneratedFileNamePrefix" select="if ( $SV_BaseOutputFileName ) then $SV_BaseOutputFileName else &apos;VdmToLustre&apos;" as="xs:string?"/>
 	<xsl:variable name="XML" select="/"/>
 	<xsl:variable name="altova:nPxPerIn" select="96"/>
-	<xsl:import-schema schema-location="../../../../verdict-data-model/src/main/resources/vdm_model.xsd" use-when="system-property('xsl:is-schema-aware')='yes'" namespace="verdict::vdm::vdm_model"/>
+	<xsl:import-schema schema-location="../../../../../../verdict/com.ge.research.osate.verdict.vdm/src/main/resources/vdm_model.xsd" use-when="system-property('xsl:is-schema-aware')='yes'" namespace="verdict::vdm::vdm_model"/>
 	<xsl:variable name="altova:CssImages" select="()"/>
 	<xsl:template match="/">
 		<xsl:call-template name="altova:Root"/>
@@ -1173,7 +1173,7 @@
 		<xsl:template name="WeaklyAssumes">
 		<xsl:for-each select="vdm_lustre:weaklyassume">
 			<span>
-				<xsl:text>&#160; weakly_assume </xsl:text>
+				<xsl:text>&#160; weakly assume </xsl:text>
 			</span>
 						<xsl:for-each select="vdm_lustre:name">
 			<xsl:value-of select="$quote"/>	

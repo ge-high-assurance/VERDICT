@@ -36,9 +36,7 @@ public class App {
             Model vdm_model = ResourceTest.setup(intputFile);
 
             // Save the VDM model
-            VdmTranslator translator = new VdmTranslator();
-
-            translator.marshalToXml(vdm_model, outputFile);
+            VdmTranslator.marshalToXml(vdm_model, outputFile);
         }
     }
 }

@@ -78,7 +78,7 @@ public class VdmTranslator {
         }
         if (canWrite && !outputDir.exists()) {
             if (!outputDir.mkdirs()) {
-                System.out.println("Could not create directory '{}'" + outputDir.getAbsolutePath());
+                System.out.println("Could not create directory " + outputDir.getAbsolutePath());
                 canWrite = false;
             }
         }
@@ -88,14 +88,15 @@ public class VdmTranslator {
             try {
                 outputFile.createNewFile();
             } catch (IOException e) {
-                System.out.println("Error creating file '{}': {}" + outputFile.getAbsolutePath() + e);
+                System.out.println(
+                        "Error creating file " + outputFile.getAbsolutePath() + ": " + e);
                 canWrite = false;
             }
         }
 
         // Check output file is writable
         if (canWrite && !outputFile.canWrite()) {
-            System.out.println("Cannot write file '{}'" +  outputFile.getAbsolutePath());
+            System.out.println("Cannot write file " + outputFile.getAbsolutePath());
             canWrite = false;
         }
 

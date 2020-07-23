@@ -718,11 +718,10 @@ public class App {
         log("Outputing Soteria++ files to directory: " + stemOutputDir);
 
         // Generate MBAS inputs
-        VDM2CSV vdm2csv = new VDM2CSV();
         Metrics.timer("Timer.mbas.vdm2csv", "model", modelName)
                 .record(
                         () ->
-                                vdm2csv.marshalToMbasInputs(
+                                VDM2CSV.marshalToMbasInputs(
                                         vdmModel, imlPath, stemCsvDir, stemOutputDir));
 
         logHeader("STEM");
@@ -878,9 +877,8 @@ public class App {
 
         {
             // For some reason we need to do this...?
-            VdmTranslator translator = new VdmTranslator();
-            translator.marshalToXml(vdmModel, new File(instrPath));
-            vdmModel = translator.unmarshalFromXml(new File(instrPath));
+            VdmTranslator.marshalToXml(vdmModel, new File(instrPath));
+            vdmModel = VdmTranslator.unmarshalFromXml(new File(instrPath));
         }
 
         debugOutVdm(debugDir, "VERDICT_output_debug_instr_reloaded.xml", vdmModel);
@@ -919,8 +917,7 @@ public class App {
 
         // Output Lustre model
         Timer.Sample verdictlustreSample = Timer.start(Metrics.globalRegistry);
-        VerdictLustreTranslator lustreOutputer = new VerdictLustreTranslator();
-        lustreOutputer.marshalToLustre(lustreModel, new File(lustrePath));
+        VerdictLustreTranslator.marshalToLustre(lustreModel, new File(lustrePath));
         verdictlustreSample.stop(Metrics.timer("Timer.crv.verdictlustre", "model", modelName));
 
         logHeader("Kind2");
@@ -940,14 +937,20 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            Binary.invokeBin(
-                    kind2Bin,
-                    null,
-                    redirect,
-                    outputFormat,
-                    lustrePath,
-                    "--max_weak_assumptions",
-                    Boolean.toString(blameAssignment));
+            if (blameAssignment && instrumentor != null) {
+                Binary.invokeBin(
+                        kind2Bin,
+                        null,
+                        redirect,
+                        outputFormat,
+                        lustrePath,
+                        "--enable",
+                        "MCS",
+                        "--print_mcs_legacy",
+                        "true");
+            } else {
+                Binary.invokeBin(kind2Bin, null, redirect, outputFormat, lustrePath);
+            }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes
             if (e.getCode().isPresent()) {
@@ -1014,8 +1017,7 @@ public class App {
         if (debugDir != null) {
             File out = new File(debugDir, name);
             log("Debug output: " + out.getAbsolutePath());
-            VdmTranslator translator = new VdmTranslator();
-            translator.marshalToXml(vdm, out);
+            VdmTranslator.marshalToXml(vdm, out);
         }
     }
 

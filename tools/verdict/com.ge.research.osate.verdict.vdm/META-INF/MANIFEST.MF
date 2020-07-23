@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Bundle-Name: com.ge.research.osate.verdict.vdm
 Automatic-Module-Name: com.ge.research.osate.verdict.vdm
 Bundle-SymbolicName: com.ge.research.osate.verdict.vdm;singleton:=true
 Bundle-Vendor: GE
@@ -11,3 +12,11 @@ Export-Package: com.ge.verdict.vdm,
  verdict.vdm.vdm_kind2,
  verdict.vdm.vdm_lustre,
  verdict.vdm.vdm_model
+Bundle-ClassPath: .,
+ lib/FastInfoset.jar,
+ lib/istack-commons-runtime.jar,
+ lib/jakarta.activation-api.jar,
+ lib/jakarta.xml.bind-api.jar,
+ lib/jaxb-runtime.jar,
+ lib/stax-ex.jar,
+ lib/txw2.jar
