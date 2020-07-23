@@ -1,7 +1,10 @@
 package com.ge.research.osate.verdict.gui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -23,7 +26,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.Subcomponent;
 
 
 public class MBASCostsModelView extends ApplicationWindow{
@@ -66,15 +69,25 @@ public class MBASCostsModelView extends ApplicationWindow{
 		// Read/write the data from/to the xml file
 		// every time user opens/save the GUI.
 
-		if(!aadlObjs.isEmpty()) {
-			for(EObject obj : aadlObjs) {
-				if(obj instanceof ComponentImplementation) {
-					System.out.println("Implementation: " + ((ComponentImplementation) obj).getName());
-				}
-				if (obj instanceof ComponentInstance) {
-					System.out.println("Instance: " + ((ComponentInstance) obj).getName());
+		List<ComponentImplementation> impls = new ArrayList<>();
+		List<Subcomponent> comps = new ArrayList<>();
+
+		for (EObject obj : aadlObjs) {
+			if (obj instanceof ComponentImplementation) {
+				ComponentImplementation impl = (ComponentImplementation) obj;
+				impls.add(impl);
+				for (Subcomponent comp : impl.getAllSubcomponents()) {
+					comps.add(comp);
 				}
 			}
+		}
+
+		Set<String> systemNames = new HashSet<>();
+		systemNames.addAll(impls.stream().map(ComponentImplementation::getName).collect(Collectors.toList()));
+		systemNames.addAll(comps.stream().map(Subcomponent::getName).collect(Collectors.toList()));
+
+		for (String system : systemNames) {
+			System.out.println("system: " + system);
 		}
 	}
 
