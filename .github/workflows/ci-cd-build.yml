@@ -86,4 +86,4 @@ jobs:
         image_tag: latest
         context: tools/verdict-back-ends
         pull_image_and_stages: true
-        push_image_and_stages: false
+        push_image_and_stages: true
