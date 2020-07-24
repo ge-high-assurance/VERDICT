@@ -257,7 +257,7 @@ public class XMLProcessor {
                                     Node node = nodeMap.item(i);
 
                                     String node_name = node.getNodeName();
-                                    if(node_name.contentEquals("class")) {
+                                    if(node_name.contentEquals("class") || node_name.contentEquals("source")) {
                                     	//skip
                                     } else {
                                     	System.out.println(node_name + " : " + node.getNodeValue());

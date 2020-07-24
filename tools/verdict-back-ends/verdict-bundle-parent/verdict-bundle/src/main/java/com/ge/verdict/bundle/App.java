@@ -965,9 +965,10 @@ public class App {
                         }
                         break;
                     case 2:
-                    	log("Kind2 fails to return results");
+                    	log("Kind2 fails to return correct results");
                         XMLProcessor.parseLog(new File(outputPath));
-                    	break;
+                    	//Terminate the process?
+                        break;
                     case 0:
                         log("Kind2 timed out");
                         break;
