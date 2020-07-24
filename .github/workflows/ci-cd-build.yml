@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         java-version: [ 1.8 ]
-        ocaml-version: [ 4.08.1 ]
+        ocaml-version: [ 4.07.1 ]
 
     runs-on: ${{ matrix.os }}
 
