@@ -174,15 +174,16 @@ public class VDM2Lustre {
         node.setName(identifier);
 
         // Port
+//        if(ignoreNode(componentType)) {
         for (Port port : componentType.getPort()) {
 
             if (port.isEvent() != null && port.isEvent()) {
                 this.eventDeclarations.put(port.getName(), port.getType());
             }
-
+            
             visit(port, node);
         }
-
+//       }
         // + Contract (Optional)
         ContractSpec contractSpec = componentType.getContract();
 
@@ -333,12 +334,17 @@ public class VDM2Lustre {
             }
         }
 
-        node.setCall(nodeCall);
-
-        node_eq.setRhs(node);
-        node_eq.setLhs(eq_lhs);
-
-        nodeBody.getEquation().add(node_eq);
+        //Ignore node call that do not have output
+        if(eq_lhs.getIdentifier() != null) {
+	     
+        	node.setCall(nodeCall);
+	
+	        node_eq.setRhs(node);
+	        node_eq.setLhs(eq_lhs);
+	
+	        nodeBody.getEquation().add(node_eq);
+        
+        }
     }
 
     // Event Ports
@@ -355,6 +361,26 @@ public class VDM2Lustre {
         }
     }
 
+    protected boolean ignoreNode(ComponentType componentType) {
+
+    	boolean ignore = true;
+    	
+        if (componentType != null) {
+
+            for (Port port : componentType.getPort()) {
+            	PortMode port_mode = port.getMode();
+            	
+            	if (port_mode == PortMode.OUT) {
+            		ignore = false;
+                }
+
+            }
+            
+        }
+
+        return ignore;
+    }
+    
     protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
 
         //        LustreProgram lustreProgram = vdm_model.getDataflowCode();
