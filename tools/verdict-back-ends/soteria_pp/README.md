@@ -4,13 +4,14 @@
 ** Prerequisites **
 -------------------
 
-OCaml version 4.07.0 is required, installed using opam version 2.0.0. The following OCaml 
-packages are required: async, core, core_extended, ocamlfind, and printbox. These can be 
-installed using the following command:
+OCaml version 4.07.0 is required, installed using opam version
+2.0.0. The following OCaml packages are required: async, core,
+core_extended, ocamlbuild, ocamlfind, printbox, and xml-light. These
+can be installed using the following command:
 
 
 ```
-$ opam install async core core_extended ocamlfind printbox
+$ opam install async core core_extended ocamlbuild ocamlfind printbox xml-light
 ```
 
 Edit your ~/.ocamlinit file by adding the following lines:
