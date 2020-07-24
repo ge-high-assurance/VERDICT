@@ -35,6 +35,12 @@ public class SummaryProcessor {
         return readResults(resultStream);
     }
 
+    public static void printLog(File resultFile) throws FileNotFoundException {
+
+        XMLProcessor.parseLog(resultFile);
+    }
+
+    
     public static Vector<VerdictProperty> readResults(InputStream inputStream)
             throws FileNotFoundException {
 

@@ -18,6 +18,7 @@ import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
+import edu.uiowa.clc.verdict.util.SummaryProcessor;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
 import io.micrometer.core.instrument.Clock;
@@ -26,6 +27,7 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -962,6 +964,10 @@ public class App {
                             log("Some properties are invalid");
                         }
                         break;
+                    case 2:
+                    	log("Kind2 fails to return results");
+                        XMLProcessor.parseLog(new File(outputPath));
+                    	break;
                     case 0:
                         log("Kind2 timed out");
                         break;
