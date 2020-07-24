@@ -13,7 +13,7 @@ sources (those that are not written in Java) are in other directories
 under our [parent](../) directory.
 
 Running Maven in this directory builds an executable jar called
-verdict-bundle-1.0-SNAPSHOT-capsule.jar which runs some back-end
+verdict-bundle-\<VERSION\>-capsule.jar which runs some back-end
 programs (those not written in Java) in subprocesses and directly
 calls some other back-end programs (those written in Java).  You can
 run our verdict-bundle jar and other back-end programs directly on
@@ -74,7 +74,7 @@ command like the following in this directory:
 `mvn clean install`
 
 If the build completes successfully, you will have an executable jar
-called verdict-bundle-1.0-SNAPSHOT-capsule.jar in the
+called verdict-bundle-\<VERSION\>-capsule.jar in the
 verdict-bundle/target directory.  The OSATE plugin can run this
 verdict-bundle jar directly on your system although you also would
 need to have the other back-end programs that the jar calls in

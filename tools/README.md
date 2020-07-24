@@ -7,7 +7,7 @@ Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
 tools consist of an OSATE plugin and a set of VERDICT back-end
 programs invoked by the plugin.  The plugin has two ways to call the
 back-end programs; it can run an executable jar called
-verdict-bundle-1.0-SNAPSHOT-capsule.jar in a subprocess or it can run
+verdict-bundle-\<VERSION\>-capsule.jar in a subprocess or it can run
 a Docker image called gehighassurance/verdict in a temporary
 container.
 
@@ -157,7 +157,7 @@ image or our back-end programs:
    empty and follow steps 6-11 instead.
 
 7. Click the Browse... button next to the "Bundle Jar:" field,
-   navigate to the "verdict-bundle-1.0-SNAPSHOT-capsule.jar" file
+   navigate to the "verdict-bundle-\<VERSION\>-capsule.jar" file
    inside the "extern" folder, and make it the field's setting.
 
 8. Click the Browse... button next to the "Aadl2iml Binary:" field,
