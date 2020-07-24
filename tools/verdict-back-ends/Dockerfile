@@ -21,7 +21,6 @@ RUN opam switch 4.07 \
     core \
     core_extended \
     dune \
-    dune-build-info \
     menhir \
     ocamlbuild \
     ocamlfind \
@@ -54,11 +53,13 @@ RUN eval $(opam env) \
 FROM ubuntu:20.04
 
 # Install packages we need to run verdict back-end tools
+# libzmq5 is required by Kind 2
 
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     default-jre \
     graphviz \
+    libzmq5 \
     z3 \
  && rm -rf /var/lib/apt/lists/* \
  && adduser --disabled-password --gecos VERDICT verdict
