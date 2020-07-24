@@ -85,6 +85,5 @@ jobs:
         image_name: gehighassurance/verdict-dev
         image_tag: latest
         context: tools/verdict-back-ends
-        dockerfile: tools/verdict-back-ends/Dockerfile
         pull_image_and_stages: true
         push_image_and_stages: false
