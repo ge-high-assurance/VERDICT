@@ -51,6 +51,24 @@
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
+       <handler
+             class="com.ge.research.osate.verdict.handlers.GSNSettingsHandler"
+             commandId="com.ge.research.osate.verdict.commands.gsnSettings">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
+              <handler
+             class="com.ge.research.osate.verdict.handlers.GSNHandler"
+             commandId="com.ge.research.osate.verdict.commands.runGsn">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
     </extension>
 
     <extension 
@@ -99,7 +117,21 @@
 	            style="push"
 	            tooltip="Click to change CRV Settings">
 	       </command>
-		</menu>                                   	                         
+		</menu>      
+		<menu id="GsnMenu" label="&amp;Assurance Cases (GSN)" >
+		   <command
+                commandId="com.ge.research.osate.verdict.commands.runGsn"
+                label="&amp;Create GSN"
+                style="push"
+                tooltip="Create GSN Fragment for selected requirement">
+          </command> 
+          <command
+                commandId="com.ge.research.osate.verdict.commands.gsnSettings"
+                label="&amp;GSN Settings"
+                style="push"
+                tooltip="Click to change GSN settings">
+          </command> 	
+		</menu>  		                     	                         
          </menu>    
        </menuContribution>
        <menuContribution
@@ -163,7 +195,18 @@
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runWzrd"
              name="Cyber Requirements/Relations Editor">
-       </command>                 
+       </command>   
+	   <command
+            categoryId="com.ge.research.osate.verdict.commands"
+            id="com.ge.research.osate.verdict.commands.runGsn"
+            name="Create GSN" >
+       </command> 
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.gsnSettings"
+             name="GSN Settings">
+       </command>
+                     
     </extension>
 
     <extension

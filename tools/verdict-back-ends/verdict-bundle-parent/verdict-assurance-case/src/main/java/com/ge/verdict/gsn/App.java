@@ -5,14 +5,12 @@ import javax.xml.parsers.*;
 import org.xml.sax.SAXException;
 
 /**
- * THIS CLASS EXISTS FOR TESTING ONLY
- *
- * @author 212807042
+ * 
+ * @author Saswata Paul
  */
-public class Main {
+public class App {
 
     /**
-     * THIS MAIN METHOD IS FOR TESTING PURPOSES ONLY
      *
      * @param args
      * @throws IOException
@@ -21,7 +19,6 @@ public class Main {
      */
     public static void main(String[] args)
             throws ParserConfigurationException, SAXException, IOException {
-        System.out.println("Entered CreateGSn.Main()!");
 
         // A user-specified requirement to create the GSN fragment for
         // String rootGoalId = "MReq01";
@@ -76,54 +73,46 @@ public class Main {
         System.out.println("Created Gsn svg");
     }
 
-    /** FOR TESTING PURPOSES ONLY */
-    public static void traverseGSN(GsnNode node) {
 
-        if (node.getNodeType().equalsIgnoreCase("context")) {
-            for (int i = 0; i <= node.getNodeLevel(); i++) {
-                System.out.print('*');
-            }
-            System.out.println("Context:- " + node.getNodeId());
-        } else if (node.getNodeType().equalsIgnoreCase("solution")) {
-            for (int i = 0; i <= node.getNodeLevel(); i++) {
-                System.out.print('*');
-            }
-            System.out.println("Solution:- " + node.getNodeId());
-            if (!(node.getInContextOf() == null)) {
-                for (GsnNode subNode : node.getInContextOf()) {
-                    traverseGSN(subNode);
-                }
-            }
-        } else if (node.getNodeType().equalsIgnoreCase("goal")) {
-            for (int i = 0; i <= node.getNodeLevel(); i++) {
-                System.out.print('*');
-            }
-            System.out.println("Goal:- " + node.getNodeId());
-            if (!(node.getInContextOf() == null)) {
-                for (GsnNode subNode : node.getInContextOf()) {
-                    traverseGSN(subNode);
-                }
-            }
-            if (!(node.getSupportedBy() == null)) {
-                for (GsnNode subNode : node.getSupportedBy()) {
-                    traverseGSN(subNode);
-                }
-            }
-        } else if (node.getNodeType().equalsIgnoreCase("strategy")) {
-            for (int i = 0; i <= node.getNodeLevel(); i++) {
-                System.out.print('*');
-            }
-            System.out.println("Strategy:- " + node.getNodeId());
-            if (!(node.getInContextOf() == null)) {
-                for (GsnNode subNode : node.getInContextOf()) {
-                    traverseGSN(subNode);
-                }
-            }
-            if (!(node.getSupportedBy() == null)) {
-                for (GsnNode subNode : node.getSupportedBy()) {
-                    traverseGSN(subNode);
-                }
-            }
-        }
+    /**
+     * The interface for creating GSN fragments
+     * @param args
+     * @throws IOException 
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     */
+    public void runGsnArtifactsGenerator(String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath) throws IOException, ParserConfigurationException, SAXException {
+
+        File modelXml = new File(gsnOutputDir, "modelXML.xml");
+        File cyberOutput = new File(soteriaOutputDir, "ImplProperties.xml");
+        File safetyOutput = new File(soteriaOutputDir, "ImplProperties-safety.xml");
+                
+        //create the GSN fragment
+        GsnNode gsnFragment = CreateGSN.gsnCreator(modelXml, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
+        System.out.println("Created Gsn Fragment");
+        
+        //Filenames
+        String xmlFilename = rootGoalId + "_GsnFragment.xml";
+        String dotFilename = rootGoalId + "_GsnFragment.dot";
+        String svgFilename = rootGoalId + "_GsnFragment.svg";
+
+        // Create a file and print the GSN XML
+        File gsnXmlFile =new File(gsnOutputDir, xmlFilename);
+        Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
+        System.out.println("Created Gsn Xml");
+
+        // Create a file and print the dot
+        File gsnDotFile = new File(gsnOutputDir, dotFilename);
+        Gsn2Dot.createDot(gsnFragment, gsnDotFile);
+        System.out.println("Created Gsn dot");
+
+        // generate the svg file using graphviz
+        String graphDestination = gsnOutputDir +"/" + svgFilename;
+        String dotFileSource = gsnDotFile.getAbsolutePath();
+        Dot2GraphViz.generateGraph(dotFileSource, graphDestination);
+        System.out.println("Created Gsn svg");
+    	
     }
+    
+    
 }
