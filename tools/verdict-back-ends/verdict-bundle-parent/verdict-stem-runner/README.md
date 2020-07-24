@@ -11,7 +11,7 @@ This directory builds a program called verdict-stem-runner which runs
 STEM queries on CSV data.  This program is usually called from another
 program called verdict-bundle, but you can run this program by itself
 using an executable capsule jar
-(target/verdict-stem-runner-1.0-SNAPSHOT-capsule.jar) if you want.
+(target/verdict-stem-runner-\<VERSION\>-capsule.jar) if you want.
 The only argument the capsule jar needs is the path to the
 [STEM](../../STEM) project on disk.  This program will load semantic
 modeling and reasoning rules from the STEM/OwlModels directory, read

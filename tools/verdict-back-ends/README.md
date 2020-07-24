@@ -28,7 +28,7 @@ to build a Docker image which contains all of our back-end programs.
 The majority of our back-end program sources are written in Java; they
 are all in the [verdict-bundle-parent](verdict-bundle-parent)
 directory and get bundled together into an executable jar called
-verdict-bundle-1.0-SNAPSHOT-capsule.jar.  The rest of our back-end
+verdict-bundle-\<VERSION\>-capsule.jar.  The rest of our back-end
 program sources (those that are not written in Java) are in the other
 directories mentioned above or in other source repositories.  Our
 verdict-bundle jar (the back-end programs' sole point of entry)
