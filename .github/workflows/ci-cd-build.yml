@@ -79,6 +79,8 @@ jobs:
 
     - name: Build Docker image
       uses: docker/build-push-action@v1
+      env:
+        DOCKER_BUILDKIT: 1
       with:
         repository: gehighassurance/verdict-dev
         username: ${{ secrets.DOCKER_USERNAME }}
