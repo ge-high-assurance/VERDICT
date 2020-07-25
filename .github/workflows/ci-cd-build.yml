@@ -78,12 +78,13 @@ jobs:
         opam exec make
 
     - name: Build Docker image
-      uses: whoan/docker-build-with-cache-action@v5
+      uses: docker/build-push-action@v1
       with:
+        repository: gehighassurance/verdict-dev
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        image_name: gehighassurance/verdict-dev
-        image_tag: latest
-        context: tools/verdict-back-ends
-        pull_image_and_stages: true
-        push_image_and_stages: true
+        tags: latest
+        path: tools/verdict-back-ends
+        build_args: BUILDKIT_INLINE_CACHE=1
+        cache_froms: gehighassurance/verdict-dev:latest
+        push: true
