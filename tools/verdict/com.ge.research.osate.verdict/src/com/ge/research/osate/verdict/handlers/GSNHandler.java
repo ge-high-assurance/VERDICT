@@ -1,7 +1,10 @@
 package com.ge.research.osate.verdict.handlers;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -96,12 +99,13 @@ public class GSNHandler extends AbstractHandler {
 							 * 	1. The rootId
 							 *  2. The Gsn output directory
 							 *  3. The Soteria++ Output directory
-							 *  4. The path of aadl file with CASE properties
+							 *  4. The path of the project directory 
+							 *     which contains the aadl files with CASE properties
 							 */
 							String rootId = GSNSettingsPanel.rootGoalId;
 							String soteriaOutputDir = stemProjPath + "/Output/Soteria_Output";
 							String gsnOutputDir = gsnOutputFolder.getAbsolutePath();
-							String caseAadlPath = ""; //Need to add the path for the aadl model here
+							String caseAadlDir = ""; //Need to add the path for the aadl model here
 							
 							/**
 							 * Create the xml model for the GSN creator 
@@ -109,6 +113,7 @@ public class GSNHandler extends AbstractHandler {
 							 */
 							List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 							File projectDir = new File(selection.get(0));
+							caseAadlDir = projectDir.getAbsolutePath();
 							Aadl2Vdm translatorObject = new Aadl2Vdm();
 							Model model = translatorObject.execute(projectDir);
 							File modelXml = new File(gsnOutputFolder, "modelXML.xml");
@@ -116,7 +121,7 @@ public class GSNHandler extends AbstractHandler {
 
 														
 			                //send the arguments to the backend 				
-							if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, caseAadlPath, graphVizPath)) {
+							if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, caseAadlDir, projectDir.getName(), graphVizPath)) {
 								
 								//Nothing for now.
 								
@@ -135,20 +140,38 @@ public class GSNHandler extends AbstractHandler {
 		return null;
 	}
 
-	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
-	}
 
+	/**
+	 * 
+	 * @param bundleJar
+	 * @param dockerImage
+	 * @param rootId
+	 * @param gsnOutputDir
+	 * @param soteriaOutputDir
+	 * @param caseAadlDir
+	 * @param projectName
+	 * @param graphVizPath
+	 * @return
+	 * @throws IOException
+	 */
 	public static boolean runBundle(String bundleJar, String dockerImage, String rootId, String gsnOutputDir, String soteriaOutputDir,
-			String caseAadlPath, String graphVizPath) throws IOException {
+			String caseAadlDir, String projectName, String graphVizPath) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		/**
-		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir>
+		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <caseAadlDir>
 		 */
 		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage)
-				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlPath);
+				.arg("--csv").arg(projectName)
+				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir);
+
+		//Since cannot test via plugin, just printing into a file for now.
+		String args = "--csv "+projectName+" --gsn "+rootId+" "+gsnOutputDir+" "+soteriaOutputDir+" "+caseAadlDir;
+		File printArguments = new File("/Users/212807042/Desktop/pluginArgs.txt");
+        FileOutputStream fos = new FileOutputStream(printArguments);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+        bw.write(args);
+        bw.close();
 
 		int code = command.runJarOrImage();
 		return code == 0;

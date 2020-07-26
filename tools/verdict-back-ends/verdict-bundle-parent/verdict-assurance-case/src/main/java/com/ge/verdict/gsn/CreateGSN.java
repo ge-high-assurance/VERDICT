@@ -18,6 +18,53 @@ public class CreateGSN {
     protected static int solutionCounter = 1;
 
     /**
+     * The interface for creating GSN artefacts
+     *
+     * @param rootGoalId
+     * @param gsnOutputDir
+     * @param soteriaOutputDir
+     * @param caseAadlPath
+     * @throws IOException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    public void runGsnArtifactsGenerator(
+            String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath)
+            throws IOException, ParserConfigurationException, SAXException {
+
+        File modelXml = new File(gsnOutputDir, "modelXML.xml");
+        File cyberOutput = new File(soteriaOutputDir, "ImplProperties.xml");
+        File safetyOutput = new File(soteriaOutputDir, "ImplProperties-safety.xml");
+
+        // create the GSN fragment
+        GsnNode gsnFragment =
+                CreateGSN.gsnCreator(modelXml, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
+        System.out.println("Created Gsn Fragment");
+
+        // Filenames
+        String xmlFilename = rootGoalId + "_GsnFragment.xml";
+        String dotFilename = rootGoalId + "_GsnFragment.dot";
+        String svgFilename = rootGoalId + "_GsnFragment.svg";
+
+        // Create a file and print the GSN XML
+        File gsnXmlFile = new File(gsnOutputDir, xmlFilename);
+        Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
+        System.out.println("Created Gsn Xml");
+
+        // Create a file and print the dot
+        File gsnDotFile = new File(gsnOutputDir, dotFilename);
+        Gsn2Dot.createDot(gsnFragment, gsnDotFile);
+        System.out.println("Created Gsn dot");
+
+        // generate the svg file using graphviz
+        String graphDestination = gsnOutputDir + "/" + svgFilename;
+        String dotFileSource = gsnDotFile.getAbsolutePath();
+
+        Dot2GraphViz.generateGraph(dotFileSource, graphDestination);
+        System.out.println("Created Gsn svg");
+    }
+
+    /**
      * creates a GsnNode and returns it
      *
      * @param testXml -- file object with the VDM xml

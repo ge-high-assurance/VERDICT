@@ -4,6 +4,7 @@ package com.ge.verdict.bundle;
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.gsn.CreateGSN;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
@@ -37,6 +38,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -46,6 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.Model;
 
 public class App {
@@ -140,9 +143,20 @@ public class App {
                         .argName("kind2 binary")
                         .build();
 
+        Option gsn =
+                Option.builder()
+                        .longOpt("gsn")
+                        .numberOfArgs(4)
+                        .argName("Root Goal Id")
+                        .argName("GSN Output Directory")
+                        .argName("Soteria++ Output Directory")
+                        .argName("Project Directory")
+                        .build();
+
         OptionGroup group = new OptionGroup();
         group.addOption(mbas);
         group.addOption(crv);
+        group.addOption(gsn);
         group.setRequired(true);
 
         Option debug =
@@ -354,6 +368,14 @@ public class App {
                     debugDir,
                     kind2Bin);
             sample.stop(Metrics.timer("Timer.crv", "model", modelName));
+        } else if (opts.hasOption("gsn")) {
+            String[] gsnOpts = opts.getOptionValues("gsn");
+            String rootGoalId = gsnOpts[0];
+            String gsnOutputDir = gsnOpts[1];
+            String soteriaOutputDir = gsnOpts[2];
+            String caseAadlPath = gsnOpts[3];
+
+            runGsn(rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath );
         }
     }
 
@@ -395,6 +417,27 @@ public class App {
         System.out.println();
     }
 
+    /**
+     * call the GSN creation interface from
+     * verdict-assurance-case
+     * @param rootGoalId
+     * @param gsnOutputDir
+     * @param soteriaOutputDir
+     * @param caseAadlPath
+     */
+    private static void runGsn(String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath) {
+        // calling the function to create GSN artefacts
+        CreateGSN createGsnObj = new CreateGSN();
+
+        try {
+            createGsnObj.runGsnArtifactsGenerator(
+                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Run MBAS with csv files input
      *
