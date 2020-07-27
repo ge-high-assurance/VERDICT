@@ -114,6 +114,9 @@ public class CRVHandler extends AbstractHandler {
 				command.arg("-G");
 			}			
 		}
+		if(CRVSettingsPanel.isMeritAssignment) {
+			command.arg("-MA");
+		}
 		if (CRVSettingsPanel.testCaseGeneration) {
 			command.arg("-ATG");
 		}
