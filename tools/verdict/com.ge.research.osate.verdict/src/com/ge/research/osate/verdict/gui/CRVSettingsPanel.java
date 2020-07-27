@@ -34,8 +34,14 @@ import org.eclipse.swt.widgets.Shell;
 public class CRVSettingsPanel extends ApplicationWindow {
 	public static Set<String> selectedThreats = new HashSet<String>();
 	public static boolean testCaseGeneration = false;
-	public static boolean blameAssignment = false;
+	public static boolean isBlameAssignment = false;
+	public static boolean isMeritAssignment = false;
 	public static boolean componentLevel = false;
+	public static boolean isGlobal = false;
+	public static boolean isLocal = true;
+	public static boolean blame = false;
+	public static boolean merit = false;
+	public static boolean isNone = true;
 
 	private static final String LS = "-LS";
 	private static final String NI = "-NI";
@@ -98,103 +104,134 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
 		// The "Enable Test Case Generation (ATG)" section
 		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
-		atgCheckBox.setText("Enable Test Case Generation (ATG)");
+		atgCheckBox.setText("Enable Test Case Generation");
 		atgCheckBox.setFont(font);
-		atgCheckBox.setImage(getIcon("atg.png"));
 		atgCheckBox.setSelection(testCaseGeneration);
 
-		// The "Blame Assignment" section: component-level and link-level
-		Label blameAssignmentLabel = new Label(composite, SWT.NONE);
-		blameAssignmentLabel.setText("Blame Assignment");
-		blameAssignmentLabel.setFont(boldFont);
-
+		// The Post-Analysis options
+		Label postAnalysisLabel = new Label(composite, SWT.NONE);
+		postAnalysisLabel.setText("Post-Analysis");
+		postAnalysisLabel.setFont(boldFont);		
+		
+		Group postAnalysisGroup = new Group(composite, SWT.NONE);
+		postAnalysisGroup.setLayout(new GridLayout(1, false));
+		
+		Composite meritBlameGroup = new Composite(postAnalysisGroup, SWT.NONE);
+		meritBlameGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		
+		Button meritButton = new Button(meritBlameGroup, SWT.RADIO);
+		meritButton.setText("Merit Assignment");
+		meritButton.setFont(font);
+		meritButton.setSelection(isMeritAssignment);
+		
+		Button blameButton = new Button(meritBlameGroup, SWT.RADIO);
+		blameButton.setText("Blame Assignment");
+		blameButton.setFont(font);
+		blameButton.setSelection(isBlameAssignment);
+		
+		Button noneButton = new Button(meritBlameGroup, SWT.RADIO);
+		noneButton.setText("None");
+		noneButton.setFont(font);
+		noneButton.setSelection(isNone);
+		
+		// The blame assignment options
+		Label baLable = new Label(composite, SWT.NONE);
+		baLable.setText("Blame Assignment Options");
+		baLable.setFont(boldFont);
+		
 		Group baGroup = new Group(composite, SWT.NONE);
-		baGroup.setLayout(new GridLayout(1, false));
+		baGroup.setLayout(new GridLayout(1, false));	
+		
+		Composite localGlobalGroup = new Composite(baGroup, SWT.NONE);
+		localGlobalGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+		localGlobalGroup.setEnabled(isBlameAssignment);		
+		
+		Button localButton = new Button(localGlobalGroup, SWT.RADIO);
+		localButton.setText("Local");
+		localButton.setFont(font);
+		localButton.setSelection(isLocal);
+		localButton.setEnabled(isBlameAssignment);
 
-		Button baCheckBox = new Button(baGroup, SWT.CHECK);
-		baCheckBox.setText("Enable Blame Assignment");
-		baCheckBox.setFont(font);
-		baCheckBox.setImage(getIcon("BA.ico"));
-		baCheckBox.setSelection(blameAssignment);
-
+		Button globalButton = new Button(localGlobalGroup, SWT.RADIO);
+		globalButton.setText("Gobal");
+		globalButton.setFont(font);
+		globalButton.setSelection(isGlobal);
+		globalButton.setEnabled(isBlameAssignment);	
+		
+		Label separator = new Label(baGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
+	    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+		
 		Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
 		compLinkGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		compLinkGroup.setEnabled(blameAssignment);
-
-		Button compLevel = new Button(compLinkGroup, SWT.RADIO);
-		compLevel.setText("Component-level");
-		compLevel.setFont(font);
-		compLevel.setSelection(componentLevel);
-		compLevel.setEnabled(blameAssignment);
-
+		compLinkGroup.setEnabled(isBlameAssignment);		
+		
 		Button linkLevel = new Button(compLinkGroup, SWT.RADIO);
 		linkLevel.setText("Link-level");
 		linkLevel.setFont(font);
 		linkLevel.setSelection(!componentLevel);
-		linkLevel.setEnabled(blameAssignment);
+		linkLevel.setEnabled(isBlameAssignment);	
+		
+		Button compLevel = new Button(compLinkGroup, SWT.RADIO);
+		compLevel.setText("Component-level");
+		compLevel.setFont(font);
+		compLevel.setSelection(componentLevel);
+		compLevel.setEnabled(isBlameAssignment);
+
 
 		// The "Enabled Threat Models" section: all the threats
 		Label threatModelsLabel = new Label(composite, SWT.NONE);
-		threatModelsLabel.setText("Enabled Threat Models");
+		threatModelsLabel.setText("Threat Model");
 		threatModelsLabel.setFont(boldFont);
 
 		Group selectionButtonGroup = new Group(composite, SWT.NONE);
 		selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
-		Button ls = new Button(selectionButtonGroup, SWT.CHECK);
-		ls.setImage(getIcon("LS.png"));
-		ls.setText("Location Spoofing");
-		if (selectedThreats.contains(LS)) {
-			ls.setSelection(true);
-		}
-
-		Button ni = new Button(selectionButtonGroup, SWT.CHECK);
-		ni.setImage(getIcon("NI.png"));
-		ni.setText("Network Injection");
-		if (selectedThreats.contains(NI)) {
-			ni.setSelection(true);
-		}
-
 		Button lb = new Button(selectionButtonGroup, SWT.CHECK);
-		lb.setImage(getIcon("LB.png"));
 		lb.setText("Logic Bomb");
 		if (selectedThreats.contains(LB)) {
 			lb.setSelection(true);
 		}
 
 		Button it = new Button(selectionButtonGroup, SWT.CHECK);
-		it.setImage(getIcon("IT.png"));
 		it.setText("Insider Threat");
 		if (selectedThreats.contains(IT)) {
 			it.setSelection(true);
 		}
 
+		Button ls = new Button(selectionButtonGroup, SWT.CHECK);
+		ls.setText("Location Spoofing");
+		if (selectedThreats.contains(LS)) {
+			ls.setSelection(true);
+		}
+
+		Button ni = new Button(selectionButtonGroup, SWT.CHECK);
+		ni.setText("Network Injection");
+		if (selectedThreats.contains(NI)) {
+			ni.setSelection(true);
+		}
+		
+		Button ht = new Button(selectionButtonGroup, SWT.CHECK);
+		ht.setText("Hardware Trojans");
+		if (selectedThreats.contains(HT)) {
+			ht.setSelection(true);
+		}		
+		
 		Button ot = new Button(selectionButtonGroup, SWT.CHECK);
-		ot.setImage(getIcon("OT.png"));
 		ot.setText("Outside User Threat");
 		if (selectedThreats.contains(OT)) {
 			ot.setSelection(true);
 		}
 
 		Button ri = new Button(selectionButtonGroup, SWT.CHECK);
-		ri.setImage(getIcon("RI.png"));
 		ri.setText("Remote Code Injection");
 		if (selectedThreats.contains(RI)) {
 			ri.setSelection(true);
 		}
 
 		Button sv = new Button(selectionButtonGroup, SWT.CHECK);
-		sv.setImage(getIcon("SV.png"));
 		sv.setText("Software Virus/Malware/Worm/Trojan");
 		if (selectedThreats.contains(SV)) {
 			sv.setSelection(true);
-		}
-
-		Button ht = new Button(selectionButtonGroup, SWT.CHECK);
-		ht.setImage(getIcon("HT.png"));
-		ht.setText("Hardware Trojans");
-		if (selectedThreats.contains(HT)) {
-			ht.setSelection(true);
 		}
 
 		Group selDeAllButtons = new Group(composite, SWT.NONE);
@@ -271,12 +308,16 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(bestSize);
 
-		baCheckBox.addSelectionListener(new SelectionAdapter() {
+		blameButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				compLinkGroup.setEnabled(baCheckBox.getSelection());
-				compLevel.setEnabled(baCheckBox.getSelection());
-				linkLevel.setEnabled(baCheckBox.getSelection());
+				baGroup.setEnabled(blameButton.getSelection());
+				localGlobalGroup.setEnabled(blameButton.getSelection());
+				compLinkGroup.setEnabled(blameButton.getSelection());
+				compLevel.setEnabled(blameButton.getSelection());
+				linkLevel.setEnabled(blameButton.getSelection());
+				localButton.setEnabled(blameButton.getSelection());
+				globalButton.setEnabled(blameButton.getSelection());
 			}
 		});
 
@@ -331,11 +372,14 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				} else if (selectedThreats.contains(HT)) {
 					selectedThreats.remove(HT);
 				}
-
+				
 				testCaseGeneration = atgCheckBox.getSelection();
-				blameAssignment = baCheckBox.getSelection();
+				isBlameAssignment = blameButton.getSelection();
+				isMeritAssignment = meritButton.getSelection();
+				isNone = noneButton.getSelection();
 				componentLevel = compLevel.getSelection();
-
+				isLocal = localButton.getSelection();
+				isGlobal = globalButton.getSelection();
 				composite.getShell().close();
 			}
 		});

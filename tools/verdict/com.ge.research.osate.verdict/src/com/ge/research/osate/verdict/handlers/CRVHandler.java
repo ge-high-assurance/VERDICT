@@ -105,14 +105,17 @@ public class CRVHandler extends AbstractHandler {
 		for (String threat : CRVSettingsPanel.selectedThreats) {
 			command.arg(threat);
 		}
-		if (CRVSettingsPanel.blameAssignment) {
+		if (CRVSettingsPanel.isBlameAssignment) {
 			command.arg("-BA");
+			if (CRVSettingsPanel.componentLevel) {
+				command.arg("-C");
+			}
+			if (CRVSettingsPanel.isGlobal) {
+				command.arg("-G");
+			}			
 		}
 		if (CRVSettingsPanel.testCaseGeneration) {
 			command.arg("-ATG");
-		}
-		if (CRVSettingsPanel.componentLevel) {
-			command.arg("-C");
 		}
 
 		int code = command.runJarOrImage();
