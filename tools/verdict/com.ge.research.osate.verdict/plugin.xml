@@ -118,7 +118,7 @@
 	            tooltip="Click to change CRV Settings">
 	       </command>
 		</menu>      
-		<menu id="GsnMenu" label="&amp;Assurance Cases (GSN)" >
+		<menu id="GsnMenu" label="&amp;Assurance Case Fragments Generation" >
 		   <command
                 commandId="com.ge.research.osate.verdict.commands.runGsn"
                 label="&amp;Create GSN"
@@ -127,9 +127,9 @@
           </command> 
           <command
                 commandId="com.ge.research.osate.verdict.commands.gsnSettings"
-                label="&amp;GSN Settings"
+                label="&amp;Assurance Case Settings"
                 style="push"
-                tooltip="Click to change GSN settings">
+                tooltip="Click to change Assurance Case settings">
           </command> 	
 		</menu>  		                     	                         
          </menu>    

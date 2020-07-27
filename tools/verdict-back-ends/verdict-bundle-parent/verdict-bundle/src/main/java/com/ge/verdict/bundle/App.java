@@ -435,7 +435,7 @@ public class App {
                     rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
         } catch (IOException | ParserConfigurationException | SAXException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

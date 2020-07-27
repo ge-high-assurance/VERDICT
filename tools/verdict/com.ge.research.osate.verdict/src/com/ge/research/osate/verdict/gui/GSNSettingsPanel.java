@@ -96,7 +96,7 @@ public class GSNSettingsPanel extends ApplicationWindow {
 				public void widgetSelected(SelectionEvent event) {
 					if( missionButton.getSelection()) {
 						rootGoalId = aGoalId;
-						System.out.println("Selected "+rootGoalId+ " to generate GSN fragment.");
+						System.out.println("Selected "+rootGoalId+ " for generating GSN fragment.");
 						composite.getShell().close();
 					}
 				}

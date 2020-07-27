@@ -28,7 +28,7 @@ public class Gsn2Xml {
             // Writes XML file to file-system
             jaxbMarshaller.marshal(fragment, outputFile);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

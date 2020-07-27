@@ -52,6 +52,16 @@
                         </goals>
                         <configuration>
                             <appClass>com.ge.verdict.gsn.App</appClass>
+                            <includeApp>true</includeApp>
+                            <includeAppDep>true</includeAppDep>
+                            <includePluginDep>false</includePluginDep>
+                            <includeTransitiveDep>true</includeTransitiveDep>
+                            <includeCompileDep>true</includeCompileDep>
+                            <includeRuntimeDep>true</includeRuntimeDep>
+                            <includeProvidedDep>false</includeProvidedDep>
+                            <includeSystemDep>false</includeSystemDep>
+                            <includeTestDep>true</includeTestDep>
+                            <includeOptionalDep>false</includeOptionalDep>
                         </configuration>
                     </execution>
                 </executions>

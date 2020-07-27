@@ -39,7 +39,7 @@ public class GSNHandler extends AbstractHandler {
 					@Override
 					public void run() {
 						try {
-							System.out.println("Please select a root goal ID for creating GSN fragment.");
+							System.out.println("Please select a root goal ID for creating the GSN fragment.");
 							} finally {
 							VerdictHandlersUtils.finishRun();
 						}						
