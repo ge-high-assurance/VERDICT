@@ -1,10 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -16,13 +13,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
-import com.ge.research.osate.verdict.gui.BundlePreferences;
-import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
-import com.ge.research.osate.verdict.gui.GSNSettingsPanel;
 import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
-import verdict.vdm.vdm_model.Model;
+import com.ge.research.osate.verdict.gui.BundlePreferences;
+import com.ge.research.osate.verdict.gui.GSNSettingsPanel;
 import com.ge.verdict.vdm.VdmTranslator;
+
+import verdict.vdm.vdm_model.Model;
 
 public class GSNHandler extends AbstractHandler {
 	static final String SEP = File.separator;
@@ -165,13 +161,6 @@ public class GSNHandler extends AbstractHandler {
 				.arg("--csv").arg(projectName)
 				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir);
 
-		//Since cannot test via plugin, just printing into a file for now.
-		String args = "--csv "+projectName+" --gsn "+rootId+" "+gsnOutputDir+" "+soteriaOutputDir+" "+caseAadlDir;
-		File printArguments = new File("/Users/212807042/Desktop/pluginArgs.txt");
-        FileOutputStream fos = new FileOutputStream(printArguments);
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-        bw.write(args);
-        bw.close();
 
 		int code = command.runJarOrImage();
 		return code == 0;

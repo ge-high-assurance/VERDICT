@@ -375,7 +375,7 @@ public class App {
             String soteriaOutputDir = gsnOpts[2];
             String caseAadlPath = gsnOpts[3];
 
-            runGsn(rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath );
+            runGsn(rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
         }
     }
 
@@ -418,14 +418,15 @@ public class App {
     }
 
     /**
-     * call the GSN creation interface from
-     * verdict-assurance-case
+     * call the GSN creation interface from verdict-assurance-case
+     *
      * @param rootGoalId
      * @param gsnOutputDir
      * @param soteriaOutputDir
      * @param caseAadlPath
      */
-    private static void runGsn(String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath) {
+    private static void runGsn(
+            String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath) {
         // calling the function to create GSN artefacts
         CreateGSN createGsnObj = new CreateGSN();
 
@@ -437,7 +438,7 @@ public class App {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Run MBAS with csv files input
      *
