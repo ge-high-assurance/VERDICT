@@ -17,7 +17,6 @@ import edu.uiowa.clc.verdict.util.Exec;
 import edu.uiowa.clc.verdict.util.LOGGY;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -145,7 +144,7 @@ public class App {
 
             int exitCode = Exec.run_kind2(lustreFile, kind2_resultFile);
 
-//            LOGGY.info("Kind2 Exit Code:" + exitCode);
+            //            LOGGY.info("Kind2 Exit Code:" + exitCode);
 
             if (exitCode == 20) {
                 LOGGY.info("No Invalid Property Found.");
@@ -197,5 +196,4 @@ public class App {
 
         return cmdLine;
     }
-    
 }

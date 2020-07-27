@@ -22,11 +22,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -212,10 +211,10 @@ public class XMLProcessor {
     }
 
     public static void parseLog(File kind2Output) {
-    	
-    	try {
-		
-        	FileInputStream logStream = new FileInputStream(kind2Output);
+
+        try {
+
+            FileInputStream logStream = new FileInputStream(kind2Output);
 
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
@@ -225,28 +224,29 @@ public class XMLProcessor {
             // doc.getDocumentElement().getNodeName());
 
             if (doc.hasChildNodes()) {
-               //Parse warning
-            	NodeList logNodeList = doc.getElementsByTagName("Log");
-            	
-            	for (int index = 0; index < logNodeList.getLength(); index++) {
-            		Node nNode = logNodeList.item(index);
+                // Parse warning
+                NodeList logNodeList = doc.getElementsByTagName("Log");
 
-                	if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                		Element eElement = (Element) nNode;
-                		
-                		
-//                		System.out.println("Warning: " + eElement.getAttribute("warn"));
-//                		System.out.println("Error: " + eElement.getAttribute("error"));
-//                		
-                		NodeList cNodes = eElement.getChildNodes();
-                		
-                		nNode = cNodes.item(0);
-                		String nodeName = eElement.getAttribute("class");
-                		if(nodeName.equalsIgnoreCase("warn")) {
-                			System.out.println("Warning: " + nNode.getTextContent());
-                		} else if(nodeName.equalsIgnoreCase("error")) {
-                			System.out.println("Failure: " + nNode.getTextContent());
-                			
+                for (int index = 0; index < logNodeList.getLength(); index++) {
+                    Node nNode = logNodeList.item(index);
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element eElement = (Element) nNode;
+
+                        //                		System.out.println("Warning: " +
+                        // eElement.getAttribute("warn"));
+                        //                		System.out.println("Error: " +
+                        // eElement.getAttribute("error"));
+                        //
+                        NodeList cNodes = eElement.getChildNodes();
+
+                        nNode = cNodes.item(0);
+                        String nodeName = eElement.getAttribute("class");
+                        if (nodeName.equalsIgnoreCase("warn")) {
+                            System.out.println("Warning: " + nNode.getTextContent());
+                        } else if (nodeName.equalsIgnoreCase("error")) {
+                            System.out.println("Failure: " + nNode.getTextContent());
+
                             if (eElement.hasAttributes()) {
 
                                 // get attributes names and values
@@ -257,39 +257,37 @@ public class XMLProcessor {
                                     Node node = nodeMap.item(i);
 
                                     String node_name = node.getNodeName();
-                                    if(node_name.contentEquals("class") || node_name.contentEquals("source")) {
-                                    	//skip
+                                    if (node_name.contentEquals("class")
+                                            || node_name.contentEquals("source")) {
+                                        // skip
                                     } else {
-                                    	System.out.println(node_name + " : " + node.getNodeValue());
+                                        System.out.println(node_name + " : " + node.getNodeValue());
                                     }
-                              }
+                                }
                             }
-                         }
-                	}
-            	}
-
+                        }
+                    }
+                }
             }
 
             // doc.getElementsByTagName("Property");
             logStream.close();
 
-    	} catch (FileNotFoundException exp) {
-			// TODO Auto-generated catch block
-			System.out.print("No error log file found.");
-//			System.exit(-1);
-    	} catch (IOException exp) {
-			// TODO Auto-generated catch block
-			System.out.print("Unable to read log file.");
-//			System.exit(-1);
-    	} catch(ParserConfigurationException exp) {
-    		System.out.print("Unable to parse error log file.");
-    	} catch(SAXException exp) {
-    		System.out.print("Log file is corrupted.");
-    	}
-
+        } catch (FileNotFoundException exp) {
+            // TODO Auto-generated catch block
+            System.out.print("No error log file found.");
+            //			System.exit(-1);
+        } catch (IOException exp) {
+            // TODO Auto-generated catch block
+            System.out.print("Unable to read log file.");
+            //			System.exit(-1);
+        } catch (ParserConfigurationException exp) {
+            System.out.print("Unable to parse error log file.");
+        } catch (SAXException exp) {
+            System.out.print("Log file is corrupted.");
+        }
     }
 
-    		
     // def parse_ct(example, ct):
     //
     // for node in example:

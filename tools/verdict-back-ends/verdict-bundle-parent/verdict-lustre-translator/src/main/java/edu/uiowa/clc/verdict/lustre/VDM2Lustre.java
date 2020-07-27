@@ -55,1445 +55,1512 @@ import verdict.vdm.vdm_model.PortMode;
 
 public class VDM2Lustre {
 
-    private Model vdm_model;
-    private HashMap<String, TypeDeclaration> typeDeclarations = null;
+	private Model vdm_model;
+	private HashMap<String, TypeDeclaration> typeDeclarations = null;
 
-    private HashMap<String, DataType> eventDeclarations = null;
+	private HashMap<String, DataType> eventDeclarations = null;
+	private Vector<Port> marked_ports = null;
+	private Vector<ComponentType> marked_types = null;
 
-    public VDM2Lustre(Model vdm_model) {
-        this.vdm_model = vdm_model;
-        this.typeDeclarations = new HashMap<String, TypeDeclaration>();
-        this.eventDeclarations = new HashMap<String, DataType>();
-    }
+	public VDM2Lustre(Model vdm_model) {
+		this.vdm_model = vdm_model;
+		this.typeDeclarations = new HashMap<String, TypeDeclaration>();
+		this.eventDeclarations = new HashMap<String, DataType>();
+		this.marked_ports = new Vector<Port>();
+		this.marked_types = new Vector<ComponentType>();
+	}
 
-    public Model translate() {
+	public Model translate() {
 
-        Model dataFlowModel = visit(vdm_model);
+		Model dataFlowModel = visit(vdm_model);
 
-        return dataFlowModel;
-    }
+		return dataFlowModel;
+	}
 
-    public Model visit(Model vdm_model) {
+	public Model visit(Model vdm_model) {
 
-        Model dataFlowModel = new Model();
-        // I) Naming Model *.lus
-        String program_name = vdm_model.getName() + ".lus";
-        dataFlowModel.setName(program_name);
+		Model dataFlowModel = new Model();
+		// I) Naming Model *.lus
+		String program_name = vdm_model.getName() + ".lus";
+		dataFlowModel.setName(program_name);
 
-        // II) Copying exiting DataFlow code
-        LustreProgram lustre_program = vdm_model.getDataflowCode();
+		// II) Copying exiting DataFlow code
+		LustreProgram lustre_program = vdm_model.getDataflowCode();
 
-        if (lustre_program == null) {
-            lustre_program = new LustreProgram();
-        }
+		if (lustre_program == null) {
+			lustre_program = new LustreProgram();
+		}
 
-        visit(vdm_model, lustre_program);
+		visit(vdm_model, lustre_program);
 
-        dataFlowModel.setDataflowCode(lustre_program);
+		dataFlowModel.setDataflowCode(lustre_program);
 
-        return dataFlowModel;
-    }
+		return dataFlowModel;
+	}
 
-    public void visit(Model vdm_model, LustreProgram program) {
+	public void visit(Model vdm_model, LustreProgram program) {
 
-        // A) Copying Type Declaration + amend name '_Impl
-        for (TypeDeclaration typeDec : vdm_model.getTypeDeclaration()) {
-            visit(typeDec, program);
-        }
+		// A) Copying Type Declaration + amend name '_Impl
+		for (TypeDeclaration typeDec : vdm_model.getTypeDeclaration()) {
+			visit(typeDec, program);
+		}
 
-        // Copying over Constant Declarations
-        for (ConstantDeclaration constDec : program.getConstantDeclaration()) {
-            visit(constDec);
-        }
+		// Copying over Constant Declarations
+		for (ConstantDeclaration constDec : program.getConstantDeclaration()) {
+			visit(constDec);
+		}
 
-        // Event Ports
-        for (ComponentType componentType : vdm_model.getComponentType()) {
+		// Event Ports
+		for (ComponentType componentType : vdm_model.getComponentType()) {
+			//Collect Node with no output
+			Port mPort = markPort(componentType);
+			
+			if(mPort == null) {
+				// Event Ports to Data Ports;
+				for (Port port : componentType.getPort()) {
+					// Update event_ports
+					visit(port, program);
+				}
+			} else {
+	        	System.out.println("++++++++Ignoring Node:" + componentType.getName());
+	        	System.out.println("++++++++Ignoring Port:" + mPort.getName());
+	        	this.marked_types.add(componentType);
+	        	this.marked_ports.add(mPort);
+	        	
+			}
+		}
+				
+		// B) Component Type
+		Node node = null;
 
-            // Event Ports to Data Ports;
-            for (Port port : componentType.getPort()) {
-                // Update event_ports
-                visit(port, program);
-            }
-        }
+		for (ComponentType componentType : vdm_model.getComponentType()) {
 
-        // B) Component Type
-        Node node = null;
+			if(!this.marked_types.contains(componentType)) {
+				
+				boolean is_implemented = false;
+					
+				for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+	
+					if (componentType == componentImpl.getType()) {
+						
+						node = visit(componentType, true);
+	
+						visit(componentImpl, node);
+						is_implemented = true;
+					}
+				}
+				
+				if (is_implemented == false) {
+					node = visit(componentType, false);
+				}
+	
+				program.getNodeDeclaration().add(node);
+			}
+		}
+		// Copying over Node Declarations.
+		for (Node node_dec : program.getNodeDeclaration()) {
+			visit(node_dec, program);
+		}
 
-        for (ComponentType componentType : vdm_model.getComponentType()) {
+		// Copy over Contract Spec.
+		for (Contract contract : program.getContractDeclaration()) {
+			visit(contract, program);
+		}
+	}
 
-            boolean is_implemented = false;
-
-            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
-
-                if (componentType == componentImpl.getType()) {
-                    node = visit(componentType, true);
-
-                    visit(componentImpl, node);
-                    is_implemented = true;
-                }
-            }
-            if (is_implemented == false) {
-                node = visit(componentType, false);
-            }
-
-            program.getNodeDeclaration().add(node);
-        }
-
-        // Copying over Node Declarations.
-        for (Node node_dec : program.getNodeDeclaration()) {
-            visit(node_dec, program);
-        }
-
-        // Copy over Contract Spec.
-        for (Contract contract : program.getContractDeclaration()) {
-            visit(contract, program);
-        }
-    }
-
-    // 1) Node signature +/- contract
-    // a) Imported Node (Contract, no Implementation)
-    // b) Node Impl
-    // c) Node Impl + contract
-    // d) @TODO: no Contract, no Implementation -- (*@contract gurantee true*)
-    public Node visit(ComponentType componentType, boolean is_implemented) {
+	// 1) Node signature +/- contract
+	// a) Imported Node (Contract, no Implementation)
+	// b) Node Impl
+	// c) Node Impl + contract
+	// d) @TODO: no Contract, no Implementation -- (*@contract gurantee true*)
+	public Node visit(ComponentType componentType, boolean is_implemented) {
 
         Node node = new Node();
+        	
+	        String identifier = componentType.getName();
+	
+	        if (is_implemented) {
+	            identifier += "_Impl";
+	
+	        } else {
+	            // Imported Node
+	            node.setIsImported(true);
+	            // System.out.println("Imported Nodes:" +identifier );
+	
+	        }
+	
+	        node.setName(identifier);
 
-        String identifier = componentType.getName();
+	        for (Port port : componentType.getPort()) {
+	
+	            if (port.isEvent() != null && port.isEvent()) {
+	                this.eventDeclarations.put(port.getName(), port.getType());
+	            }
+	
+	            visit(port, node);
+	        }
 
-        if (is_implemented) {
-            identifier += "_Impl";
+	        // + Contract (Optional)
+	        ContractSpec contractSpec = componentType.getContract();
+	
+	        if (is_implemented == false && contractSpec == null) {
+	            // Rename output renaming to avoid Duplicate.
+	            //            List<NodeParameter> node_parameters = node.getOutputParameter();
+	            //            for (NodeParameter instrumented_param : node_parameters) {
+	            //                String param_identifier = instrumented_param.getName();
+	            //                instrumented_param.setName(param_identifier + "_intrumented");
+	            //            }
+	
+	            ContractItem true_guarantee_item = new ContractItem();
+	
+	            Expression true_expr = new Expression();
+	            Boolean true_lit = new Boolean("true");
+	            true_expr.setBoolLiteral(true_lit);
+	
+	            true_guarantee_item.setExpression(true_expr);
+	
+	            contractSpec = new ContractSpec();
+	            contractSpec.getGuarantee().add(true_guarantee_item);
+	
+	            componentType.setContract(contractSpec);
+	        }
 
-        } else {
-            // Imported Node
-            node.setIsImported(true);
-            // System.out.println("Imported Nodes:" +identifier );
-
-        }
-
-        node.setName(identifier);
-
-        // Port
-//        if(ignoreNode(componentType)) {
-        for (Port port : componentType.getPort()) {
-
-            if (port.isEvent() != null && port.isEvent()) {
-                this.eventDeclarations.put(port.getName(), port.getType());
-            }
-            
-            visit(port, node);
-        }
-//       }
-        // + Contract (Optional)
-        ContractSpec contractSpec = componentType.getContract();
-
-        if (is_implemented == false && contractSpec == null) {
-            // Rename output renaming to avoid Duplicate.
-            //            List<NodeParameter> node_parameters = node.getOutputParameter();
-            //            for (NodeParameter instrumented_param : node_parameters) {
-            //                String param_identifier = instrumented_param.getName();
-            //                instrumented_param.setName(param_identifier + "_intrumented");
-            //            }
-
-            ContractItem true_guarantee_item = new ContractItem();
-
-            Expression true_expr = new Expression();
-            Boolean true_lit = new Boolean("true");
-            true_expr.setBoolLiteral(true_lit);
-
-            true_guarantee_item.setExpression(true_expr);
-
-            contractSpec = new ContractSpec();
-            contractSpec.getGuarantee().add(true_guarantee_item);
-
-            componentType.setContract(contractSpec);
-        }
-
-        if (contractSpec != null) {
-            visit(contractSpec);
-
-            if (contractSpec.getGuarantee().size() != 0) {
-                node.setContract(contractSpec);
-                this.eventDeclarations.clear();
-            }
-        }
-
+	        if (contractSpec != null) {
+	            visit(contractSpec);
+	
+	            if (contractSpec.getGuarantee().size() != 0) {
+	                node.setContract(contractSpec);
+	                this.eventDeclarations.clear();
+	            }
+	        }
+        
         return node;
     }
 
-    // B) Component Implementation Translated into Lustre Node
-    public void visit(ComponentImpl componentImpl, Node node) {
+	// B) Component Implementation Translated into Lustre Node
+	public void visit(ComponentImpl componentImpl, Node node) {
 
-        NodeBody nodeBody = new NodeBody();
+		NodeBody nodeBody = new NodeBody();
 
-        // Option 1) Block Implementation
-        //        retrieve_block(componentImpl);
-        BlockImpl blockImpl = componentImpl.getBlockImpl();
+		// Option 1) Block Implementation
+		// retrieve_block(componentImpl);
+		BlockImpl blockImpl = componentImpl.getBlockImpl();
 
-        // BlockImpl
-        if (blockImpl != null) {
+		// BlockImpl
+		if (blockImpl != null) {
 
-            ComponentType componentType = componentImpl.getType();
+			ComponentType componentType = componentImpl.getType();
 
-            for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+			for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
-                componentType = componentInstance.getSpecification();
-                ComponentImpl subcomponentImpl = componentInstance.getImplementation();
+				componentType = componentInstance.getSpecification();
+				ComponentImpl subcomponentImpl = componentInstance.getImplementation();
 
-                // Option Check)
+				// Option Check)
 
-                if (componentType == null && subcomponentImpl == null) {
-                    System.out.println(
-                            componentInstance.getName()
-                                    + " subcomponent is missing both a specification and an implemention.");
-                    System.out.println(
-                            "Please provide some specification or an implementation to continue.");
-                    System.exit(-1);
-                }
+				if (componentType == null && subcomponentImpl == null) {
+					System.out.println(componentInstance.getName()
+							+ " subcomponent is missing both a specification and an implemention.");
+					System.out.println("Please provide some specification or an implementation to continue.");
+					System.exit(-1);
+				}
 
-                // Option 1) Implementation
-                if (subcomponentImpl != null) {
+					
+				// Option 1) Implementation
+				if (subcomponentImpl != null) {
 
-                    componentType = subcomponentImpl.getType();
-                    visit(componentType, nodeBody, componentInstance.getId(), true);
-                }
+					componentType = subcomponentImpl.getType();
+					if(!this.marked_types.contains(componentType)) {
+						visit(componentType, nodeBody, componentInstance.getId(), true);
+					}
+				}
 
-                // Option 2) Specification
-                else if (componentType != null) {
-                    visit(componentType, nodeBody, componentInstance.getId(), false);
-                }
-            }
+				// Option 2) Specification
+				else if (componentType != null) {
+					if(!this.marked_types.contains(componentType)) {
+						visit(componentType, nodeBody, componentInstance.getId(), false);
+					}
+				}
+			}
 
-            for (Connection connection : blockImpl.getConnection()) {
-                visit(connection, nodeBody);
-            }
+			for (Connection connection : blockImpl.getConnection()) {
+				if(!ignoreConnection(connection)) {
+					visit(connection, nodeBody);
+				} 
+			}
 
-        } else {
-            // Option 2) DataFlow Implementation / NodeBody
-            nodeBody = componentImpl.getDataflowImpl();
-            // node.setBody(nodeBody);
-        }
+		} else {
+			// Option 2) DataFlow Implementation / NodeBody
+			nodeBody = componentImpl.getDataflowImpl();
+			// node.setBody(nodeBody);
+		}
 
-        node.setBody(nodeBody);
-    }
-
-    public void visit(
-            ComponentType componentType,
-            NodeBody nodeBody,
-            String componentInstanceID,
-            boolean impl_type) {
-
-        // Node Equation
-        NodeEquation node_eq = new NodeEquation();
-
-        // Return variables
-        NodeEquationLHS eq_lhs = new NodeEquationLHS();
-
-        // Node Call
-        Expression node = new Expression();
-        NodeCall nodeCall = new NodeCall();
-
-        if (impl_type) {
-            nodeCall.setNodeId(componentType.getName() + "_Impl");
-        } else {
-            nodeCall.setNodeId(componentType.getName());
-        }
-
-        // Port
-        for (Port port : componentType.getPort()) {
-
-            //            //Event Port Definition
-            //            for (Port port : componentType.getPort()) {
-            //            visit(port);
-            //            }
-
-            // MODE
-            PortMode port_mode = port.getMode();
-
-            if (port_mode == PortMode.IN) {
-                Expression arg = new Expression();
-                arg.setIdentifier(port.getName());
-
-                nodeCall.getArgument().add(arg);
-            }
-
-            if (port_mode == PortMode.OUT) {
-                VariableDeclaration var = new VariableDeclaration();
-
-                // Node Name
-                String output_name = port.getName();
-                String var_name = componentInstanceID + "_port_" + output_name;
-                var.setName(var_name);
-                // Node DataType
-                DataType dataType = port.getType();
-
-                var.setDataType(dataType);
-                nodeBody.getVariableDeclaration().add(var);
-
-                eq_lhs.getIdentifier().add(var_name);
-            }
-        }
-
-        //Ignore node call that do not have output
-        if(eq_lhs.getIdentifier() != null) {
-	     
-        	node.setCall(nodeCall);
+		node.setBody(nodeBody);
+	}
 	
-	        node_eq.setRhs(node);
-	        node_eq.setLhs(eq_lhs);
+	//Ignore Connection or Marked Ports.
+	private boolean ignoreConnection(Connection con) {
+		
+		ConnectionEnd srcConnection = con.getSource();
+		ComponentType srcType = null;
+		
+		ConnectionEnd destConnection = con.getDestination();
+		ComponentType destType = null;
+		
+		Port srcPort = srcConnection.getComponentPort();
+		
+		if(srcPort == null) {
+			CompInstancePort compPort = srcConnection.getSubcomponentPort();
+			srcPort = compPort.getPort();
+			
+			ComponentInstance srcCompInstance = compPort.getSubcomponent();
+			srcType = srcCompInstance.getSpecification();
+			if(srcType == null) {
+				ComponentImpl compImpl = srcCompInstance.getImplementation();
+				srcType = compImpl.getType();
+			}
+		}
+
+		Port destPort = destConnection.getComponentPort();
+		
+		if(destPort == null) {
+			CompInstancePort compPort = destConnection.getSubcomponentPort();
+			destPort = compPort.getPort();
+
+			ComponentInstance destCompInstance = compPort.getSubcomponent();
+			destType = destCompInstance.getSpecification();
+			if(destType == null) {
+				ComponentImpl compImpl = destCompInstance.getImplementation();
+				destType = compImpl.getType();
+			}
+
+		}
+		
+
+		if(this.marked_ports.contains(srcPort) || this.marked_ports.contains(destPort)) {
+			System.out.println("Ignore Port Connection:" + con.getName());
+			return true;
+		}
+		
+		if(this.marked_types.contains(srcType) || this.marked_types.contains(destType)) {
+			System.out.println("Ignore Instance Connection:" + con.getName());
+			return true;
+		}
+		
+		
+		return false;
+		
+	}
 	
-	        nodeBody.getEquation().add(node_eq);
-        
-        }
-    }
+	public void visit(ComponentType componentType, NodeBody nodeBody, String componentInstanceID, boolean impl_type) {
 
-    // Event Ports
-    public void visit(Port port, LustreProgram lustreProgram) {
+		// Node Equation
+		NodeEquation node_eq = new NodeEquation();
 
-        // Print Event Ports.
-        if (port.isEvent() != null && port.isEvent()) {
+		// Return variables
+		NodeEquationLHS eq_lhs = new NodeEquationLHS();
 
-            DataType dataType = port.getType();
+		// Node Call
+		Expression node = new Expression();
+		NodeCall nodeCall = new NodeCall();
 
-            DataType eventType = getEventType(dataType, lustreProgram);
+		if (impl_type) {
+			nodeCall.setNodeId(componentType.getName() + "_Impl");
+		} else {
+			nodeCall.setNodeId(componentType.getName());
+		}
 
-            port.setType(eventType);
-        }
-    }
+		// Port
+		for (Port port : componentType.getPort()) {
 
-    protected boolean ignoreNode(ComponentType componentType) {
+			// //Event Port Definition
+			// for (Port port : componentType.getPort()) {
+			// visit(port);
+			// }
 
-    	boolean ignore = true;
-    	
-        if (componentType != null) {
+			// MODE
+			PortMode port_mode = port.getMode();
 
-            for (Port port : componentType.getPort()) {
-            	PortMode port_mode = port.getMode();
-            	
-            	if (port_mode == PortMode.OUT) {
-            		ignore = false;
-                }
+			if (port_mode == PortMode.IN) {
+				Expression arg = new Expression();
+				arg.setIdentifier(port.getName());
 
-            }
-            
-        }
+				nodeCall.getArgument().add(arg);
+			}
 
-        return ignore;
-    }
-    
-    protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
+			if (port_mode == PortMode.OUT) {
+				VariableDeclaration var = new VariableDeclaration();
 
-        //        LustreProgram lustreProgram = vdm_model.getDataflowCode();
+				// Node Name
+				String output_name = port.getName();
+				String var_name = componentInstanceID + "_port_" + output_name;
+				var.setName(var_name);
+				// Node DataType
+				DataType dataType = port.getType();
 
-        DataType eventType = new DataType();
-        TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);
+				var.setDataType(dataType);
+				nodeBody.getVariableDeclaration().add(var);
 
-        String eventTypeName = eventTypeDeclaration.getName();
-        eventType.setUserDefinedType(eventTypeName);
+				eq_lhs.getIdentifier().add(var_name);
+			}
+		}
 
-        if (!typeDeclarations.containsKey(eventTypeName)) {
-            typeDeclarations.put(eventTypeName, eventTypeDeclaration);
-            lustreProgram.getTypeDeclaration().add(eventTypeDeclaration);
-        }
+		// Ignore node call that do not have output
+		if (eq_lhs.getIdentifier() != null) {
 
-        return eventType;
-    }
+			node.setCall(nodeCall);
 
-    protected TypeDeclaration defineEventDeclaration(DataType dataType) {
+			node_eq.setRhs(node);
+			node_eq.setLhs(eq_lhs);
 
-        TypeDeclaration eventTypeDeclaration = new TypeDeclaration();
+			nodeBody.getEquation().add(node_eq);
+		}
+	}
 
-        if (dataType != null) {
+	// Event Ports
+	public void visit(Port port, LustreProgram lustreProgram) {
 
-            String user_defined_type = dataType.getUserDefinedType();
+		// Print Event Ports.
+		if (port.isEvent() != null && port.isEvent()) {
 
-            boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+			DataType dataType = port.getType();
 
-            if (implemented_type) {
+			DataType eventType = getEventType(dataType, lustreProgram);
 
-                TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
+			port.setType(eventType);
+		}
+	}
 
-                user_defined_type = baseType.getName();
-                String definedType = user_defined_type.replace("_", "Event_");
+	//Mark Ports with no output
+	protected Port markPort(ComponentType componentType) {
+		
+		Port markedPort = null;
+		
+		for (Port port : componentType.getPort()) {
+			
+			PortMode port_mode = port.getMode();
 
-                eventTypeDeclaration.setName(definedType);
+			if (port_mode == PortMode.OUT) {
+				return null;
+			} else {
+				markedPort = port;
+			}
+		}
 
-                DataType eventDefinition = new DataType();
-                RecordType eventRecord = getEventrecord(user_defined_type);
-                eventDefinition.setRecordType(eventRecord);
+		return markedPort;
+	}
 
-                eventTypeDeclaration.setDefinition(eventDefinition);
-                eventTypeDeclaration.setName(definedType);
-            }
+	protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
 
-        } else {
-            // None DataType
-            String definedType = "EventDataType";
+		// LustreProgram lustreProgram = vdm_model.getDataflowCode();
 
-            eventTypeDeclaration.setName(definedType);
+		DataType eventType = new DataType();
+		TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);
 
-            DataType eventDefinition = new DataType();
-            RecordType eventRecord = getEventrecord(null);
-            eventDefinition.setRecordType(eventRecord);
+		String eventTypeName = eventTypeDeclaration.getName();
+		eventType.setUserDefinedType(eventTypeName);
 
-            eventTypeDeclaration.setDefinition(eventDefinition);
-            eventTypeDeclaration.setName(definedType);
-        }
+		if (!typeDeclarations.containsKey(eventTypeName)) {
+			typeDeclarations.put(eventTypeName, eventTypeDeclaration);
+			lustreProgram.getTypeDeclaration().add(eventTypeDeclaration);
+		}
 
-        return eventTypeDeclaration;
-    }
+		return eventType;
+	}
 
-    protected RecordType getEventrecord(String userDefineType) {
+	protected TypeDeclaration defineEventDeclaration(DataType dataType) {
 
-        // Define a Record
-        RecordType eventRecord = new RecordType();
+		TypeDeclaration eventTypeDeclaration = new TypeDeclaration();
 
-        // is_present: bool
-        RecordField eventField = new RecordField();
+		if (dataType != null) {
 
-        DataType boolType = new DataType();
-        boolType.setPlainType(PlainType.BOOL);
-        eventField.setName("is_present");
-        eventField.setType(boolType);
+			String user_defined_type = dataType.getUserDefinedType();
 
-        eventRecord.getRecordField().add(eventField);
+			boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
-        // value: UserDefined
-        if (userDefineType != null) {
-            RecordField eventValue = new RecordField();
+			if (implemented_type) {
 
-            DataType valueType = new DataType();
-            valueType.setUserDefinedType(userDefineType);
+				TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
-            eventValue.setName("value");
-            eventValue.setType(valueType);
-            eventRecord.getRecordField().add(eventValue);
-        }
+				user_defined_type = baseType.getName();
+				String definedType = user_defined_type.replace("_", "Event_");
 
-        return eventRecord;
-    }
+				eventTypeDeclaration.setName(definedType);
 
-    public void visit(Port port, Node node) {
+				DataType eventDefinition = new DataType();
+				RecordType eventRecord = getEventrecord(user_defined_type);
+				eventDefinition.setRecordType(eventRecord);
 
-        PortMode port_mode = port.getMode();
+				eventTypeDeclaration.setDefinition(eventDefinition);
+				eventTypeDeclaration.setName(definedType);
+			}
 
-        NodeParameter node_parameter = new NodeParameter();
+		} else {
+			// None DataType
+			String definedType = "EventDataType";
 
-        // Node Name
-        String port_name = port.getName();
-        node_parameter.setName(port_name);
+			eventTypeDeclaration.setName(definedType);
 
-        // Node DataType
-        DataType dataType = port.getType();
-        node_parameter.setDataType(dataType);
+			DataType eventDefinition = new DataType();
+			RecordType eventRecord = getEventrecord(null);
+			eventDefinition.setRecordType(eventRecord);
 
-        // Node Input Parameter
-        if (port_mode == PortMode.IN) {
-            node.getInputParameter().add(node_parameter);
-        }
-        // Node OutputParameter
-        else if (port_mode == PortMode.OUT) {
-            node.getOutputParameter().add(node_parameter);
+			eventTypeDeclaration.setDefinition(eventDefinition);
+			eventTypeDeclaration.setName(definedType);
+		}
 
-            //            if(node.isIsImported() != null) {
-            String inst_cmp = "(.+)_Inst_.*";
-            Pattern inst_pattern = Pattern.compile(inst_cmp);
-            Matcher m = inst_pattern.matcher(node.getName());
+		return eventTypeDeclaration;
+	}
 
-            if (m.matches()) {
-                node_parameter.setName(node_parameter.getName() + "_instrumented");
-            }
-        }
-    }
+	protected RecordType getEventrecord(String userDefineType) {
 
-    public void visit(Contract contract, LustreProgram program) {
+		// Define a Record
+		RecordType eventRecord = new RecordType();
 
-        for (ContractSpec contractSpec : contract.getSpecification()) {
-            visit(contractSpec);
-        }
-        // program.getContractDeclaration().add(contract);
-    }
+		// is_present: bool
+		RecordField eventField = new RecordField();
 
-    public void visit(ContractSpec contractSpec) {
+		DataType boolType = new DataType();
+		boolType.setPlainType(PlainType.BOOL);
+		eventField.setName("is_present");
+		eventField.setType(boolType);
 
-        for (SymbolDefinition symbol : contractSpec.getSymbol()) {
-            DataType data_type = symbol.getDataType();
+		eventRecord.getRecordField().add(eventField);
 
-            String user_defined_type = data_type.getUserDefinedType();
+		// value: UserDefined
+		if (userDefineType != null) {
+			RecordField eventValue = new RecordField();
 
-            if (user_defined_type != null) {
-                //                user_defined_type = user_defined_type + "_Impl";
+			DataType valueType = new DataType();
+			valueType.setUserDefinedType(userDefineType);
 
-                boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+			eventValue.setName("value");
+			eventValue.setType(valueType);
+			eventRecord.getRecordField().add(eventValue);
+		}
 
-                if (implemented_type) {
-                    data_type.setUserDefinedType(user_defined_type);
-                }
-            }
+		return eventRecord;
+	}
 
-            Expression expr = symbol.getDefinition();
+	public void visit(Port port, Node node) {
 
-            expr = visitExpression(expr);
-            symbol.setDefinition(expr);
+		PortMode port_mode = port.getMode();
 
-            recordLiteral(expr);
-        }
+		NodeParameter node_parameter = new NodeParameter();
 
-        String mbas_fml = "((.+):(.+):(.+))|((.+):Formula$)";
-        Pattern fml_pattern = Pattern.compile(mbas_fml);
+		// Node Name
+		String port_name = port.getName();
+		node_parameter.setName(port_name);
 
-        List<ContractItem> mbas_guarantee = new ArrayList<ContractItem>();
-        // guarantee
-        for (ContractItem contractItem : contractSpec.getGuarantee()) {
-            if (contractItem.getName() != null) {
-                Matcher m = fml_pattern.matcher(contractItem.getName());
+		// Node DataType
+		DataType dataType = port.getType();
+		node_parameter.setDataType(dataType);
 
-                if (m.find()) {
-                    mbas_guarantee.add(contractItem);
-                } else {
-                    // Normal Formula
-                    visit(contractItem);
-                }
-            } else {
-                visit(contractItem);
-            }
-        }
+		// Node Input Parameter
+		if (port_mode == PortMode.IN) {
+			node.getInputParameter().add(node_parameter);
+		}
+		// Node OutputParameter
+		else if (port_mode == PortMode.OUT) {
+			node.getOutputParameter().add(node_parameter);
 
-        // remove MBAS guarantee
-        contractSpec.getGuarantee().removeAll(mbas_guarantee);
-    }
+			// if(node.isIsImported() != null) {
+			String inst_cmp = "(.+)_Inst_.*";
+			Pattern inst_pattern = Pattern.compile(inst_cmp);
+			Matcher m = inst_pattern.matcher(node.getName());
 
-    public void visit(ContractItem contractItem) {
+			if (m.matches()) {
+				node_parameter.setName(node_parameter.getName() + "_instrumented");
+			}
+		}
+	}
 
-        Expression expr = contractItem.getExpression();
+	public void visit(Contract contract, LustreProgram program) {
 
-        expr = visitExpression(expr);
-        contractItem.setExpression(expr);
+		for (ContractSpec contractSpec : contract.getSpecification()) {
+			visit(contractSpec);
+		}
+		// program.getContractDeclaration().add(contract);
+	}
 
-        recordLiteral(expr);
-    }
+	public void visit(ContractSpec contractSpec) {
 
-    public void recordLiteral(Expression expr) {
+		for (SymbolDefinition symbol : contractSpec.getSymbol()) {
+			DataType data_type = symbol.getDataType();
 
-        if (expr != null) {
+			String user_defined_type = data_type.getUserDefinedType();
 
-            RecordLiteral recordLiteral = expr.getRecordLiteral();
+			if (user_defined_type != null) {
+				// user_defined_type = user_defined_type + "_Impl";
 
-            if (recordLiteral != null) {
+				boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
-                String identifier = recordLiteral.getRecordType();
-                identifier = identifier.replace(".", "_");
-                recordLiteral.setRecordType(identifier);
+				if (implemented_type) {
+					data_type.setUserDefinedType(user_defined_type);
+				}
+			}
 
-                for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
-                    expr = fieldDef.getFieldValue();
-                    recordLiteral(expr);
-                }
+			Expression expr = symbol.getDefinition();
 
-            } else {
+			expr = visitExpression(expr);
+			symbol.setDefinition(expr);
 
-                BinaryOperation op = expr.getEqual();
+			recordLiteral(expr);
+		}
 
-                if (op == null) {
+		String mbas_fml = "((.+):(.+):(.+))|((.+):Formula$)";
+		Pattern fml_pattern = Pattern.compile(mbas_fml);
 
-                    op = expr.getNotEqual();
+		List<ContractItem> mbas_guarantee = new ArrayList<ContractItem>();
+		// guarantee
+		for (ContractItem contractItem : contractSpec.getGuarantee()) {
+			if (contractItem.getName() != null) {
+				Matcher m = fml_pattern.matcher(contractItem.getName());
 
-                    if (op == null) {
-                        op = expr.getAnd();
+				if (m.find()) {
+					mbas_guarantee.add(contractItem);
+				} else {
+					// Normal Formula
+					visit(contractItem);
+				}
+			} else {
+				visit(contractItem);
+			}
+		}
 
-                        if (op == null) {
-                            op = expr.getImplies();
-                        }
-                    }
-                }
+		// remove MBAS guarantee
+		contractSpec.getGuarantee().removeAll(mbas_guarantee);
+	}
 
-                if (op != null) {
+	public void visit(ContractItem contractItem) {
 
-                    Expression lhs_expr = op.getLhsOperand();
+		Expression expr = contractItem.getExpression();
 
-                    recordLiteral(lhs_expr);
+		expr = visitExpression(expr);
+		contractItem.setExpression(expr);
 
-                    Expression rhs_expr = op.getRhsOperand();
-                    recordLiteral(rhs_expr);
-                }
+		recordLiteral(expr);
+	}
 
-                Expression not_expr = expr.getNot();
+	public void recordLiteral(Expression expr) {
 
-                if (not_expr != null) {
-                    recordLiteral(not_expr);
-                } else {
+		if (expr != null) {
 
-                    Expression pre_expr = expr.getPre();
-                    recordLiteral(pre_expr);
-                }
+			RecordLiteral recordLiteral = expr.getRecordLiteral();
 
-                NodeCall nodeCall = expr.getCall();
+			if (recordLiteral != null) {
 
-                if (nodeCall != null) {
+				String identifier = recordLiteral.getRecordType();
+				identifier = identifier.replace(".", "_");
+				recordLiteral.setRecordType(identifier);
 
-                    for (Expression arg : nodeCall.getArgument()) {
-                        recordLiteral(arg);
-                    }
-                }
-            }
-        }
-    }
+				for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
+					expr = fieldDef.getFieldValue();
+					recordLiteral(expr);
+				}
 
-    protected BinaryOperation binaryOP(BinaryOperation op) {
+			} else {
 
-        BinaryOperation op_exp = new BinaryOperation();
+				BinaryOperation op = expr.getEqual();
 
-        Expression lhs = op.getLhsOperand();
-        lhs = visitExpression(lhs);
+				if (op == null) {
 
-        Expression rhs = op.getRhsOperand();
-        rhs = visitExpression(rhs);
+					op = expr.getNotEqual();
 
-        op_exp.setLhsOperand(lhs);
-        op_exp.setRhsOperand(rhs);
+					if (op == null) {
+						op = expr.getAnd();
 
-        return op_exp;
-    }
+						if (op == null) {
+							op = expr.getImplies();
+						}
+					}
+				}
 
-    protected Expression visitExpression(Expression expr) {
+				if (op != null) {
 
-        Expression u_Expr = new Expression();
+					Expression lhs_expr = op.getLhsOperand();
 
-        // Binary Operators
-        if (expr != null) {
+					recordLiteral(lhs_expr);
 
-            BinaryOperation op = expr.getEqual();
+					Expression rhs_expr = op.getRhsOperand();
+					recordLiteral(rhs_expr);
+				}
 
-            if (op != null) {
+				Expression not_expr = expr.getNot();
 
-                u_Expr.setEqual(binaryOP(op));
-            }
+				if (not_expr != null) {
+					recordLiteral(not_expr);
+				} else {
 
-            op = expr.getNotEqual();
+					Expression pre_expr = expr.getPre();
+					recordLiteral(pre_expr);
+				}
 
-            if (op != null) {
+				NodeCall nodeCall = expr.getCall();
 
-                u_Expr.setNotEqual(binaryOP(op));
-            }
+				if (nodeCall != null) {
 
-            op = expr.getImplies();
+					for (Expression arg : nodeCall.getArgument()) {
+						recordLiteral(arg);
+					}
+				}
+			}
+		}
+	}
 
-            if (op != null) {
+	protected BinaryOperation binaryOP(BinaryOperation op) {
 
-                u_Expr.setImplies(binaryOP(op));
-            }
+		BinaryOperation op_exp = new BinaryOperation();
 
-            op = expr.getAnd();
+		Expression lhs = op.getLhsOperand();
+		lhs = visitExpression(lhs);
 
-            if (op != null) {
+		Expression rhs = op.getRhsOperand();
+		rhs = visitExpression(rhs);
 
-                u_Expr.setAnd(binaryOP(op));
-            }
+		op_exp.setLhsOperand(lhs);
+		op_exp.setRhsOperand(rhs);
 
-            op = expr.getOr();
+		return op_exp;
+	}
 
-            if (op != null) {
+	protected Expression visitExpression(Expression expr) {
 
-                u_Expr.setOr(binaryOP(op));
-            }
+		Expression u_Expr = new Expression();
 
-            op = expr.getXor();
+		// Binary Operators
+		if (expr != null) {
 
-            if (op != null) {
+			BinaryOperation op = expr.getEqual();
 
-                u_Expr.setXor(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getArrow();
+				u_Expr.setEqual(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getNotEqual();
 
-                u_Expr.setArrow(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getLessThanOrEqualTo();
+				u_Expr.setNotEqual(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getImplies();
 
-                u_Expr.setLessThanOrEqualTo(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getLessThan();
+				u_Expr.setImplies(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getAnd();
 
-                u_Expr.setLessThan(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getGreaterThan();
+				u_Expr.setAnd(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getOr();
 
-                u_Expr.setGreaterThan(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getGreaterThanOrEqualTo();
+				u_Expr.setOr(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getXor();
 
-                u_Expr.setGreaterThanOrEqualTo(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getMinus();
+				u_Expr.setXor(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getArrow();
 
-                u_Expr.setMinus(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getPlus();
+				u_Expr.setArrow(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getLessThanOrEqualTo();
 
-                u_Expr.setPlus(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getDiv();
+				u_Expr.setLessThanOrEqualTo(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getLessThan();
 
-                u_Expr.setDiv(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getTimes();
+				u_Expr.setLessThan(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getGreaterThan();
 
-                u_Expr.setTimes(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getMod();
+				u_Expr.setGreaterThan(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getGreaterThanOrEqualTo();
 
-                u_Expr.setMod(binaryOP(op));
-            }
+			if (op != null) {
 
-            op = expr.getCartesianExpression();
+				u_Expr.setGreaterThanOrEqualTo(binaryOP(op));
+			}
 
-            if (op != null) {
+			op = expr.getMinus();
 
-                u_Expr.setCartesianExpression(binaryOP(op));
-            }
+			if (op != null) {
 
-            IfThenElse cond_op = expr.getConditionalExpression();
+				u_Expr.setMinus(binaryOP(op));
+			}
 
-            if (cond_op != null) {
+			op = expr.getPlus();
 
-                Expression cond_expr = cond_op.getCondition();
-                cond_expr = visitExpression(cond_expr);
+			if (op != null) {
 
-                Expression then_expr = cond_op.getThenBranch();
-                then_expr = visitExpression(then_expr);
+				u_Expr.setPlus(binaryOP(op));
+			}
 
-                Expression else_expr = cond_op.getElseBranch();
-                else_expr = visitExpression(else_expr);
+			op = expr.getDiv();
 
-                cond_op.setCondition(cond_expr);
-                cond_op.setThenBranch(then_expr);
-                cond_op.setElseBranch(else_expr);
+			if (op != null) {
 
-                u_Expr.setConditionalExpression(cond_op);
-            }
+				u_Expr.setDiv(binaryOP(op));
+			}
 
-            // Record Literal
-            RecordLiteral recordLiteral = expr.getRecordLiteral();
+			op = expr.getTimes();
 
-            if (recordLiteral != null) {
+			if (op != null) {
 
-                Expression fieldExpr;
+				u_Expr.setTimes(binaryOP(op));
+			}
 
-                for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
-                    fieldExpr = fieldDef.getFieldValue();
-                    visitExpression(fieldExpr);
-                }
+			op = expr.getMod();
 
-                u_Expr.setRecordLiteral(recordLiteral);
-            }
+			if (op != null) {
 
-            // Record Project
-            RecordProjection recordProj = expr.getRecordProjection();
+				u_Expr.setMod(binaryOP(op));
+			}
 
-            if (recordProj != null) {
-                Expression recordRef = recordProj.getRecordReference();
+			op = expr.getCartesianExpression();
 
-                recordRef = visitExpression(recordRef);
-                recordProj.setRecordReference(recordRef);
+			if (op != null) {
 
-                u_Expr.setRecordProjection(recordProj);
-            }
+				u_Expr.setCartesianExpression(binaryOP(op));
+			}
 
-            // Unary Operators
-            Expression notExpr = expr.getNot();
+			IfThenElse cond_op = expr.getConditionalExpression();
 
-            if (notExpr != null) {
-                notExpr = visitExpression(notExpr);
-                u_Expr.setNot(notExpr);
-            }
+			if (cond_op != null) {
 
-            Expression negExpr = expr.getNegative();
+				Expression cond_expr = cond_op.getCondition();
+				cond_expr = visitExpression(cond_expr);
 
-            if (negExpr != null) {
-                negExpr = visitExpression(negExpr);
-                u_Expr.setNegative(negExpr);
-                ;
-            }
+				Expression then_expr = cond_op.getThenBranch();
+				then_expr = visitExpression(then_expr);
 
-            Expression preExpr = expr.getPre();
+				Expression else_expr = cond_op.getElseBranch();
+				else_expr = visitExpression(else_expr);
 
-            if (preExpr != null) {
+				cond_op.setCondition(cond_expr);
+				cond_op.setThenBranch(then_expr);
+				cond_op.setElseBranch(else_expr);
 
-                preExpr = visitExpression(preExpr);
-                u_Expr.setPre(preExpr);
-            }
+				u_Expr.setConditionalExpression(cond_op);
+			}
 
-            Expression toIntExpr = expr.getToInt();
+			// Record Literal
+			RecordLiteral recordLiteral = expr.getRecordLiteral();
 
-            if (toIntExpr != null) {
+			if (recordLiteral != null) {
 
-                toIntExpr = visitExpression(toIntExpr);
-                u_Expr.setToInt(toIntExpr);
-            }
+				Expression fieldExpr;
 
-            Expression toRealExpr = expr.getToReal();
+				for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
+					fieldExpr = fieldDef.getFieldValue();
+					visitExpression(fieldExpr);
+				}
 
-            if (toRealExpr != null) {
+				u_Expr.setRecordLiteral(recordLiteral);
+			}
 
-                toRealExpr = visitExpression(toRealExpr);
-                u_Expr.setToReal(toRealExpr);
-            }
+			// Record Project
+			RecordProjection recordProj = expr.getRecordProjection();
 
-            Boolean b = expr.isBoolLiteral();
+			if (recordProj != null) {
+				Expression recordRef = recordProj.getRecordReference();
 
-            if (b != null) {
-                u_Expr.setBoolLiteral(b);
-            }
+				recordRef = visitExpression(recordRef);
+				recordProj.setRecordReference(recordRef);
 
-            BigInteger int_value = expr.getIntLiteral();
+				u_Expr.setRecordProjection(recordProj);
+			}
 
-            if (int_value != null) {
-                u_Expr.setIntLiteral(int_value);
-            }
+			// Unary Operators
+			Expression notExpr = expr.getNot();
 
-            BigDecimal real_value = expr.getRealLiteral();
+			if (notExpr != null) {
+				notExpr = visitExpression(notExpr);
+				u_Expr.setNot(notExpr);
+			}
 
-            if (real_value != null) {
-                u_Expr.setRealLiteral(real_value);
-            }
+			Expression negExpr = expr.getNegative();
 
-            // Identifier
-            String identifier = expr.getIdentifier();
+			if (negExpr != null) {
+				negExpr = visitExpression(negExpr);
+				u_Expr.setNegative(negExpr);
+				;
+			}
 
-            if (identifier != null) {
-                // Check respective EventType and add value Projection.
+			Expression preExpr = expr.getPre();
 
-                if (eventDeclarations.containsKey(identifier)) {
+			if (preExpr != null) {
 
-                    u_Expr = eventExpression(expr, false);
+				preExpr = visitExpression(preExpr);
+				u_Expr.setPre(preExpr);
+			}
 
-                } else {
-                    u_Expr.setIdentifier(identifier);
-                }
-            }
+			Expression toIntExpr = expr.getToInt();
 
-            // NodeCall
-            NodeCall nodeCall = expr.getCall();
+			if (toIntExpr != null) {
 
-            if (nodeCall != null) {
-                u_Expr.setCall(nodeCall);
+				toIntExpr = visitExpression(toIntExpr);
+				u_Expr.setToInt(toIntExpr);
+			}
 
-                List<Expression> arguments = new Vector<Expression>();
+			Expression toRealExpr = expr.getToReal();
 
-                for (Expression argExpr : nodeCall.getArgument()) {
-                    argExpr = visitExpression(argExpr);
-                    arguments.add(argExpr);
-                }
+			if (toRealExpr != null) {
 
-                nodeCall.getArgument().clear();
-                nodeCall.getArgument().addAll(arguments);
+				toRealExpr = visitExpression(toRealExpr);
+				u_Expr.setToReal(toRealExpr);
+			}
 
-                u_Expr.setCall(nodeCall);
-            }
+			Boolean b = expr.isBoolLiteral();
 
-            // Event Expression
-            Expression event = expr.getEvent();
+			if (b != null) {
+				u_Expr.setBoolLiteral(b);
+			}
 
-            if (event != null) {
-                u_Expr = eventExpression(event, true);
-                //	    		System.out.println(expr + "^^^ Updated to Event ^^^ " + event);
-            }
+			BigInteger int_value = expr.getIntLiteral();
 
-            ExpressionList expList = expr.getExpressionList();
+			if (int_value != null) {
+				u_Expr.setIntLiteral(int_value);
+			}
 
-            if (expList != null) {
-                ExpressionList uList = new ExpressionList();
-                for (Expression aexpr : expList.getExpression()) {
-                    expr = visitExpression(aexpr);
-                    uList.getExpression().add(expr);
-                }
-                expList.getExpression().clear();
-                u_Expr.setExpressionList(uList);
-            }
+			BigDecimal real_value = expr.getRealLiteral();
 
-            //            ExpressionList arrayExpList = expr.getArrayExpression();
-            //
-            //	    	if(expList != null) {
-            //	    		List<Expression> uList = new ArrayList<Expression>();
-            //	    		for(Expression aexpr: arrayExpList.getExpression()) {
-            //	    			expr = visitExpression(aexpr);
-            //	    			uList.add(expr);
-            //	    		}
-            //	    		arrayExpList.getExpression().clear();
-            //	    		arrayExpList.getExpression().addAll(uList);
-            //	    		u_Expr.setArrayExpression(arrayExpList);
-            //	    	}
+			if (real_value != null) {
+				u_Expr.setRealLiteral(real_value);
+			}
 
-        }
+			// Identifier
+			String identifier = expr.getIdentifier();
 
-        return u_Expr;
-    }
+			if (identifier != null) {
+				// Check respective EventType and add value Projection.
 
-    protected Expression eventExpression(Expression expr, boolean event_type) {
+				if (eventDeclarations.containsKey(identifier)) {
 
-        Expression eventExpression = new Expression();
+					u_Expr = eventExpression(expr, false);
 
-        if (expr != null) {
+				} else {
+					u_Expr.setIdentifier(identifier);
+				}
+			}
 
-            RecordProjection recordProject = new RecordProjection();
+			// NodeCall
+			NodeCall nodeCall = expr.getCall();
 
-            if (event_type) {
-                recordProject.setFieldId("is_present");
-            } else {
-                recordProject.setFieldId("value");
-            }
-            recordProject.setRecordReference(expr);
+			if (nodeCall != null) {
+				u_Expr.setCall(nodeCall);
 
-            eventExpression.setRecordProjection(recordProject);
-        }
+				List<Expression> arguments = new Vector<Expression>();
 
-        return eventExpression;
-    }
+				for (Expression argExpr : nodeCall.getArgument()) {
+					argExpr = visitExpression(argExpr);
+					arguments.add(argExpr);
+				}
 
-    public void visit(Node node, LustreProgram program) {
+				nodeCall.getArgument().clear();
+				nodeCall.getArgument().addAll(arguments);
 
-        // Collect Input Event DataTypes
-        for (NodeParameter node_param : node.getInputParameter()) {
-            visit(node_param);
-        }
+				u_Expr.setCall(nodeCall);
+			}
 
-        // Collect Output Event DataTypes
-        for (NodeParameter node_param : node.getOutputParameter()) {
-            visit(node_param);
-        }
+			// Event Expression
+			Expression event = expr.getEvent();
 
-        NodeBody nodeBody = node.getBody();
+			if (event != null) {
+				u_Expr = eventExpression(event, true);
+				// System.out.println(expr + "^^^ Updated to Event ^^^ " + event);
+			}
 
-        if (nodeBody != null) {
-            visit(nodeBody, program);
-        }
-    }
+			ExpressionList expList = expr.getExpressionList();
 
-    public void visit(NodeBody nodeBody, LustreProgram program) {
+			if (expList != null) {
+				ExpressionList uList = new ExpressionList();
+				for (Expression aexpr : expList.getExpression()) {
+					expr = visitExpression(aexpr);
+					uList.getExpression().add(expr);
+				}
+				expList.getExpression().clear();
+				u_Expr.setExpressionList(uList);
+			}
 
-        for (VariableDeclaration var : nodeBody.getVariableDeclaration()) {
-            DataType data_type = var.getDataType();
+			// ExpressionList arrayExpList = expr.getArrayExpression();
+			//
+			// if(expList != null) {
+			// List<Expression> uList = new ArrayList<Expression>();
+			// for(Expression aexpr: arrayExpList.getExpression()) {
+			// expr = visitExpression(aexpr);
+			// uList.add(expr);
+			// }
+			// arrayExpList.getExpression().clear();
+			// arrayExpList.getExpression().addAll(uList);
+			// u_Expr.setArrayExpression(arrayExpList);
+			// }
 
-            String user_defined_type = null;
-            if (data_type != null) {
-                user_defined_type = data_type.getUserDefinedType();
-            }
+		}
 
-            //            String user_defined_type = data_type.getUserDefinedType();
+		return u_Expr;
+	}
 
-            if (user_defined_type != null) {
-                //                user_defined_type = user_defined_type + "_Impl";
+	protected Expression eventExpression(Expression expr, boolean event_type) {
 
-                boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+		Expression eventExpression = new Expression();
 
-                if (implemented_type) {
-                    data_type.setUserDefinedType(user_defined_type);
-                }
-            }
-        }
+		if (expr != null) {
 
-        for (NodeEquation node_equation : nodeBody.getEquation()) {
-            visit(node_equation);
-        }
+			RecordProjection recordProject = new RecordProjection();
 
-        // Update Expression related to Events
-        //        for (NodeEquation node_equation : nodeBody.getEquation()) {
-        //        	visitNodeEq(node_equation);
-        //        }
-    }
+			if (event_type) {
+				recordProject.setFieldId("is_present");
+			} else {
+				recordProject.setFieldId("value");
+			}
+			recordProject.setRecordReference(expr);
 
-    //    protected void visitNodeEq(NodeEquation node_eq) {
-    //
-    //    	Expression rhs_expr = node_eq.getRhs();
-    //    	visitExpression(rhs_expr);
-    //    }
+			eventExpression.setRecordProjection(recordProject);
+		}
 
-    public void visit(NodeEquation node_equation) {
+		return eventExpression;
+	}
 
-        Expression expr = node_equation.getRhs();
-        recordLiteral(expr);
+	public void visit(Node node, LustreProgram program) {
 
-        //        expr = visitExpression(expr);
-        //        node_equation.setRhs(expr);
+		// Collect Input Event DataTypes
+		for (NodeParameter node_param : node.getInputParameter()) {
+			visit(node_param);
+		}
 
-    }
+		// Collect Output Event DataTypes
+		for (NodeParameter node_param : node.getOutputParameter()) {
+			visit(node_param);
+		}
 
-    public void visit(NodeParameter node_param) {
+		NodeBody nodeBody = node.getBody();
 
-        DataType data_type = node_param.getDataType();
+		if (nodeBody != null) {
+			visit(nodeBody, program);
+		}
+	}
 
-        String user_defined_type = null;
-        if (data_type != null) {
-            user_defined_type = data_type.getUserDefinedType();
-        }
+	public void visit(NodeBody nodeBody, LustreProgram program) {
 
-        if (user_defined_type != null) {
-            //            user_defined_type = user_defined_type + "_Impl";
+		for (VariableDeclaration var : nodeBody.getVariableDeclaration()) {
+			DataType data_type = var.getDataType();
 
-            boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+			String user_defined_type = null;
+			if (data_type != null) {
+				user_defined_type = data_type.getUserDefinedType();
+			}
 
-            if (implemented_type) {
-                data_type.setUserDefinedType(user_defined_type);
-            }
-        }
-    }
+			// String user_defined_type = data_type.getUserDefinedType();
 
-    public void visit(NodeBody nodeBody, Node node) {
-        node.setBody(nodeBody);
-    }
+			if (user_defined_type != null) {
+				// user_defined_type = user_defined_type + "_Impl";
 
-    // Connect -> NodeCall
-    public void visit(Connection connection, NodeBody nodeBody) {
+				boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
-        // R.H.S
-        ConnectionEnd src = connection.getSource();
+				if (implemented_type) {
+					data_type.setUserDefinedType(user_defined_type);
+				}
+			}
+		}
 
-        // Source Connection
-        Port src_component_port = src.getComponentPort();
+		for (NodeEquation node_equation : nodeBody.getEquation()) {
+			visit(node_equation);
+		}
 
-        // L.H.S.
-        ConnectionEnd dest = connection.getDestination();
-        // Destination Connection
-        Port dest_component_port = dest.getComponentPort();
+		// Update Expression related to Events
+		// for (NodeEquation node_equation : nodeBody.getEquation()) {
+		// visitNodeEq(node_equation);
+		// }
+	}
 
-        if (dest_component_port != null) {
-            // Destination = Component (z3)
-            // Source = SubComponent (my_b:B _z2)
-            NodeEquation neq = new NodeEquation();
+	// protected void visitNodeEq(NodeEquation node_eq) {
+	//
+	// Expression rhs_expr = node_eq.getRhs();
+	// visitExpression(rhs_expr);
+	// }
 
-            NodeEquationLHS eq_lhs = new NodeEquationLHS();
-            eq_lhs.getIdentifier().add(dest_component_port.getName());
-            neq.setLhs(eq_lhs);
+	public void visit(NodeEquation node_equation) {
 
-            CompInstancePort compInstancePort = src.getSubcomponentPort();
-            ComponentInstance componentInstance = compInstancePort.getSubcomponent();
+		Expression expr = node_equation.getRhs();
+		recordLiteral(expr);
 
-            src_component_port = compInstancePort.getPort();
+		// expr = visitExpression(expr);
+		// node_equation.setRhs(expr);
 
-            String src_portID = src_component_port.getName();
+	}
 
-            Expression expr = new Expression();
+	public void visit(NodeParameter node_param) {
 
-            List<VariableDeclaration> vars = nodeBody.getVariableDeclaration();
+		DataType data_type = node_param.getDataType();
 
-            boolean match = false;
+		String user_defined_type = null;
+		if (data_type != null) {
+			user_defined_type = data_type.getUserDefinedType();
+		}
 
-            String id_expr = componentInstance.getId() + "_port_" + src_portID;
+		if (user_defined_type != null) {
+			// user_defined_type = user_defined_type + "_Impl";
 
-            for (VariableDeclaration var : vars) {
-                if (var.getName().equals(id_expr)) {
-                    match = true;
-                    break;
-                }
-            }
+			boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
-            if (match) {
-                expr.setIdentifier(id_expr);
-                //                System.out.println(">>>>>>>>>>>>>Identifiers: " +
-                // expr.getIdentifier());
+			if (implemented_type) {
+				data_type.setUserDefinedType(user_defined_type);
+			}
+		}
+	}
 
-            } else {
+	public void visit(NodeBody nodeBody, Node node) {
+		node.setBody(nodeBody);
+	}
 
-                String inst_cmp = "(.+)_instrumented";
-                Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.println(src_portID);
-                Matcher m = inst_pattern.matcher(src_portID);
-                if (m.matches()) {
-                    src_portID = m.group(1);
-                }
+	// Connect -> NodeCall
+	public void visit(Connection connection, NodeBody nodeBody) {
 
-                id_expr = componentInstance.getId() + "_port_" + src_portID;
-                expr.setIdentifier(id_expr);
-                //                System.out.println(id_expr);
+		// R.H.S
+		ConnectionEnd src = connection.getSource();
 
-                //                System.out.println(">>>>>>>>>>>>>Identifiers: " +
-                // expr.getIdentifier());
-            }
+		// Source Connection
+		Port src_component_port = src.getComponentPort();
 
-            neq.setRhs(expr);
+		// L.H.S.
+		ConnectionEnd dest = connection.getDestination();
+		// Destination Connection
+		Port dest_component_port = dest.getComponentPort();
 
-            nodeBody.getEquation().add(neq);
+		if (dest_component_port != null) {
+			// Destination = Component (z3)
+			// Source = SubComponent (my_b:B _z2)
+			NodeEquation neq = new NodeEquation();
 
-        } else if (src_component_port != null) {
+			NodeEquationLHS eq_lhs = new NodeEquationLHS();
+			eq_lhs.getIdentifier().add(dest_component_port.getName());
+			neq.setLhs(eq_lhs);
 
-            CompInstancePort compInstancePort = dest.getSubcomponentPort();
-            // X1
-            dest_component_port = compInstancePort.getPort();
-            // my_a1 : A
-            ComponentInstance componentInstance = compInstancePort.getSubcomponent();
+			CompInstancePort compInstancePort = src.getSubcomponentPort();
+			ComponentInstance componentInstance = compInstancePort.getSubcomponent();
 
-            String arg_value = src_component_port.getName();
-            // called node Identifier.
-            String called_node_ID = null;
-            ComponentType componentType = componentInstance.getSpecification();
-            ComponentImpl componentImpl = componentInstance.getImplementation();
+			src_component_port = compInstancePort.getPort();
 
-            if (componentType == null) {
-                componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
-            }
-            if (componentType != null && componentImpl != null) {
-                componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
+			String src_portID = src_component_port.getName();
 
-                String inst_cmp = "(.+)_instrumented";
+			Expression expr = new Expression();
 
-                Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.println(arg_value);
-                Matcher m = inst_pattern.matcher(arg_value);
-                if (m.matches()) {
-                    arg_value = m.group(1);
-                }
+			List<VariableDeclaration> vars = nodeBody.getVariableDeclaration();
 
-            } else {
-                called_node_ID = componentType.getName();
-                arg_value = src_component_port.getName();
-                //                System.out.println(arg_value);
-            }
+			boolean match = false;
 
-            for (Port port : componentType.getPort()) {
-                // MODE
-                PortMode port_mode = port.getMode();
+			String id_expr = componentInstance.getId() + "_port_" + src_portID;
 
-                if (port_mode == PortMode.OUT) {
-                    // EQ L.H.S Variables *called Node return values
-                    String expr_id = componentInstance.getName() + "_port_" + port.getName();
-                    //                    System.out.print(">>>" + expr_id);
-                    NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
+			for (VariableDeclaration var : vars) {
+				if (var.getName().equals(id_expr)) {
+					match = true;
+					break;
+				}
+			}
 
-                    if (n_eq != null) {
-                        Expression eq_rhs = n_eq.getRhs();
+			if (match) {
+				expr.setIdentifier(id_expr);
+				// System.out.println(">>>>>>>>>>>>>Identifiers: " +
+				// expr.getIdentifier());
 
-                        NodeCall node_called = eq_rhs.getCall();
+			} else {
 
-                        String inst_cmp = "(.+)_Inst_.*";
-                        Pattern inst_pattern = Pattern.compile(inst_cmp);
+				String inst_cmp = "(.+)_instrumented";
+				Pattern inst_pattern = Pattern.compile(inst_cmp);
+				// System.out.println(src_portID);
+				Matcher m = inst_pattern.matcher(src_portID);
+				if (m.matches()) {
+					src_portID = m.group(1);
+				}
 
-                        //                        String node_id = "";
-                        //                        if (node_called != null) {
-                        //                            node_id = node_called.getNodeId();
-                        //                        }
+				id_expr = componentInstance.getId() + "_port_" + src_portID;
+				expr.setIdentifier(id_expr);
+				// System.out.println(id_expr);
 
-                        //                    System.out.println(" = " + node_id + " (" + arg_value
-                        // +
-                        // ")");
-                        Matcher m = inst_pattern.matcher(node_called.getNodeId());
+				// System.out.println(">>>>>>>>>>>>>Identifiers: " +
+				// expr.getIdentifier());
+			}
 
-                        IfThenElse ifelse = new IfThenElse();
-                        Expression called_expr = new Expression();
-                        // Condition
-                        Expression gps_expr = new Expression();
+			neq.setRhs(expr);
 
-                        if (m.matches()) {
-                            // Instrumented component Instance ID
-                            String component_id = m.group(1);
-                            gps_expr.setIdentifier(component_id);
-                        }
-                        ifelse.setCondition(gps_expr);
-                        // Then
-                        ifelse.setThenBranch(called_expr);
-                        // Else
-                        Expression arg = new Expression();
-                        arg.setIdentifier(src_component_port.getName());
-                        ifelse.setElseBranch(arg);
+			nodeBody.getEquation().add(neq);
 
-                        // NodeCalled Expr
-                        called_expr.setCall(node_called);
+		} else if (src_component_port != null) {
 
-                        Expression instrumented_expr = new Expression();
-                        instrumented_expr.setConditionalExpression(ifelse);
+			CompInstancePort compInstancePort = dest.getSubcomponentPort();
+			// X1
+			dest_component_port = compInstancePort.getPort();
+			// my_a1 : A
+			ComponentInstance componentInstance = compInstancePort.getSubcomponent();
 
-                        if (node_called != null) {
-                            if (node_called.getNodeId().equals(called_node_ID)) {
-                                for (Expression arg_expr : node_called.getArgument()) {
-                                    if (arg_expr.getIdentifier()
-                                            .equals(dest_component_port.getName())) {
-                                        arg_expr.setIdentifier(arg_value);
-                                    } else if (node_called.getArgument().size() == 1) {
-                                        arg_expr.setIdentifier(arg_value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+			String arg_value = src_component_port.getName();
+			// called node Identifier.
+			String called_node_ID = null;
+			ComponentType componentType = componentInstance.getSpecification();
+			ComponentImpl componentImpl = componentInstance.getImplementation();
 
-        } else {
+			if (componentType == null) {
+				componentType = componentImpl.getType();
+				called_node_ID = componentType.getName() + "_Impl";
+			}
+			if (componentType != null && componentImpl != null) {
+				componentType = componentImpl.getType();
+				called_node_ID = componentType.getName() + "_Impl";
 
-            CompInstancePort compInstancePort = src.getSubcomponentPort();
+				String inst_cmp = "(.+)_instrumented";
 
-            ComponentInstance componentInstance = compInstancePort.getSubcomponent();
+				Pattern inst_pattern = Pattern.compile(inst_cmp);
+				// System.out.println(arg_value);
+				Matcher m = inst_pattern.matcher(arg_value);
+				if (m.matches()) {
+					arg_value = m.group(1);
+				}
 
-            src_component_port = compInstancePort.getPort();
+			} else {
+				called_node_ID = componentType.getName();
+				arg_value = src_component_port.getName();
+				// System.out.println(arg_value);
+			}
 
-            Expression arg_expr = new Expression();
-            // my_a1_y1
+			for (Port port : componentType.getPort()) {
+				// MODE
+				PortMode port_mode = port.getMode();
 
-            String src_portID = src_component_port.getName();
+				if (port_mode == PortMode.OUT) {
+					// EQ L.H.S Variables *called Node return values
+					String expr_id = componentInstance.getName() + "_port_" + port.getName();
+					// System.out.print(">>>" + expr_id);
+					NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
 
-            String componentInstanceID = componentInstance.getId();
-            arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
+					if (n_eq != null) {
+						Expression eq_rhs = n_eq.getRhs();
 
-            // called node Identifier.
-            String called_node_ID = null;
+						NodeCall node_called = eq_rhs.getCall();
 
-            compInstancePort = dest.getSubcomponentPort();
-            componentInstance = compInstancePort.getSubcomponent();
+						String inst_cmp = "(.+)_Inst_.*";
+						Pattern inst_pattern = Pattern.compile(inst_cmp);
 
-            dest_component_port = compInstancePort.getPort();
+						// String node_id = "";
+						// if (node_called != null) {
+						// node_id = node_called.getNodeId();
+						// }
 
-            ComponentType componentType = componentInstance.getSpecification();
-            ComponentImpl componentImpl = componentInstance.getImplementation();
+						// System.out.println(" = " + node_id + " (" + arg_value
+						// +
+						// ")");
+						Matcher m = inst_pattern.matcher(node_called.getNodeId());
 
-            String old_portID = null;
+						IfThenElse ifelse = new IfThenElse();
+						Expression called_expr = new Expression();
+						// Condition
+						Expression gps_expr = new Expression();
 
-            if (componentType == null) {
-                componentType = componentImpl.getType();
-                called_node_ID = componentType.getName();
-            }
-            if (componentType != null && componentImpl != null) {
+						if (m.matches()) {
+							// Instrumented component Instance ID
+							String component_id = m.group(1);
+							gps_expr.setIdentifier(component_id);
+						}
+						ifelse.setCondition(gps_expr);
+						// Then
+						ifelse.setThenBranch(called_expr);
+						// Else
+						Expression arg = new Expression();
+						arg.setIdentifier(src_component_port.getName());
+						ifelse.setElseBranch(arg);
 
-                componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
+						// NodeCalled Expr
+						called_expr.setCall(node_called);
 
-                String inst_cmp = "(.+)_instrumented";
-                Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.print(src_portID + " ==> ");
-                Matcher m = inst_pattern.matcher(src_portID);
-                if (m.matches()) {
-                    old_portID = src_portID;
+						Expression instrumented_expr = new Expression();
+						instrumented_expr.setConditionalExpression(ifelse);
 
-                    src_portID = m.group(1);
-                    arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
-                    //                    System.out.println(old_portID + " -- " + src_portID);
-                }
-                //                System.out.println(arg_expr.getIdentifier() + " <== " +
-                // src_portID);
+						if (node_called != null) {
+							if (node_called.getNodeId().equals(called_node_ID)) {
+								for (Expression arg_expr : node_called.getArgument()) {
+									if (arg_expr.getIdentifier().equals(dest_component_port.getName())) {
+										arg_expr.setIdentifier(arg_value);
+									} else if (node_called.getArgument().size() == 1) {
+										arg_expr.setIdentifier(arg_value);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 
-            } else {
-                called_node_ID = componentType.getName();
-            }
+		} else {
 
-            String node_arg = "(.+)_Inst_.*";
-            Pattern arg_pattern = Pattern.compile(node_arg);
+			CompInstancePort compInstancePort = src.getSubcomponentPort();
 
-            Matcher m_arg = arg_pattern.matcher(called_node_ID);
+			ComponentInstance componentInstance = compInstancePort.getSubcomponent();
 
-            if (!m_arg.matches() && old_portID != null) {
-                arg_expr.setIdentifier(componentInstanceID + "_port_" + old_portID);
-                //                System.out.println("Node ID =>" + called_node_ID + "(" +
-                // arg_expr.getIdentifier() + ")");
-            }
+			src_component_port = compInstancePort.getPort();
 
-            //            System.out.println(called_node_ID);
-            for (Port port : componentType.getPort()) {
-                // MODE
-                PortMode port_mode = port.getMode();
+			Expression arg_expr = new Expression();
+			// my_a1_y1
 
-                if (port_mode == PortMode.OUT) {
-                    // EQ L.H.S Variables *called Node return values
-                    String expr_id = componentInstance.getName() + "_port_" + port.getName();
-                    NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
+			String src_portID = src_component_port.getName();
 
-                    if (n_eq != null) {
-                        Expression eq_rhs = n_eq.getRhs();
+			String componentInstanceID = componentInstance.getId();
+			arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
 
-                        NodeCall node_called = eq_rhs.getCall();
+			// called node Identifier.
+			String called_node_ID = null;
 
-                        String inst_cmp = "(.+)_Inst_.*";
-                        Pattern inst_pattern = Pattern.compile(inst_cmp);
-                        String node_id = "";
+			compInstancePort = dest.getSubcomponentPort();
+			componentInstance = compInstancePort.getSubcomponent();
 
-                        if (node_called != null) {
-                            node_id = node_called.getNodeId();
-                        }
+			dest_component_port = compInstancePort.getPort();
 
-                        Matcher m = inst_pattern.matcher(node_id);
+			ComponentType componentType = componentInstance.getSpecification();
+			ComponentImpl componentImpl = componentInstance.getImplementation();
 
-                        IfThenElse ifelse = new IfThenElse();
-                        Expression called_expr = new Expression();
-                        // Condition
-                        Expression g_expr = new Expression();
+			String old_portID = null;
 
-                        if (m.matches()) {
-                            // Instrumented component Instance ID
-                            String component_id = m.group(1);
-                            g_expr.setIdentifier(component_id);
-                        }
+			if (componentType == null) {
+				componentType = componentImpl.getType();
+				called_node_ID = componentType.getName();
+			}
+			if (componentType != null && componentImpl != null) {
 
-                        ifelse.setCondition(g_expr);
-                        // Then
-                        ifelse.setThenBranch(called_expr);
-                        // Else
-                        //                        Expression arg = new Expression();
-                        ifelse.setElseBranch(arg_expr);
+				componentType = componentImpl.getType();
+				called_node_ID = componentType.getName() + "_Impl";
 
-                        // NodeCalled Expr
-                        called_expr.setCall(node_called);
+				String inst_cmp = "(.+)_instrumented";
+				Pattern inst_pattern = Pattern.compile(inst_cmp);
+				// System.out.print(src_portID + " ==> ");
+				Matcher m = inst_pattern.matcher(src_portID);
+				if (m.matches()) {
+					old_portID = src_portID;
 
-                        Expression instrumented_expr = new Expression();
+					src_portID = m.group(1);
+					arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
+					// System.out.println(old_portID + " -- " + src_portID);
+				}
+				// System.out.println(arg_expr.getIdentifier() + " <== " +
+				// src_portID);
 
-                        instrumented_expr.setConditionalExpression(ifelse);
+			} else {
+				called_node_ID = componentType.getName();
+			}
 
-                        if (node_called != null) {
-                            if (node_called.getNodeId().equals(called_node_ID)) {
-                                for (Expression a_expr : node_called.getArgument()) {
+			String node_arg = "(.+)_Inst_.*";
+			Pattern arg_pattern = Pattern.compile(node_arg);
 
-                                    if (a_expr.getIdentifier()
-                                            .equals(dest_component_port.getName())) {
-                                        a_expr.setIdentifier(arg_expr.getIdentifier());
-                                    } else if (node_called.getArgument().size() == 1) {
-                                        a_expr.setIdentifier(arg_expr.getIdentifier());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+			Matcher m_arg = arg_pattern.matcher(called_node_ID);
 
-    private NodeEquation getNodeEq(String eq_id, NodeBody nodeBody) {
+			if (!m_arg.matches() && old_portID != null) {
+				arg_expr.setIdentifier(componentInstanceID + "_port_" + old_portID);
+				// System.out.println("Node ID =>" + called_node_ID + "(" +
+				// arg_expr.getIdentifier() + ")");
+			}
 
-        NodeEquation eq = null;
+			// System.out.println(called_node_ID);
+			for (Port port : componentType.getPort()) {
+				// MODE
+				PortMode port_mode = port.getMode();
 
-        for (NodeEquation n_eq : nodeBody.getEquation()) {
+				if (port_mode == PortMode.OUT) {
+					// EQ L.H.S Variables *called Node return values
+					String expr_id = componentInstance.getName() + "_port_" + port.getName();
+					NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
 
-            NodeEquationLHS eq_lhs = n_eq.getLhs();
+					if (n_eq != null) {
+						Expression eq_rhs = n_eq.getRhs();
 
-            if (eq_lhs.getIdentifier().contains(eq_id)) {
-                eq = n_eq;
-                break;
-            }
-        }
+						NodeCall node_called = eq_rhs.getCall();
 
-        return eq;
-    }
+						String inst_cmp = "(.+)_Inst_.*";
+						Pattern inst_pattern = Pattern.compile(inst_cmp);
+						String node_id = "";
 
-    public void visit(ConstantDeclaration constantDeclaration) {
+						if (node_called != null) {
+							node_id = node_called.getNodeId();
+						}
 
-        //        String identifier = constantDeclaration.getName();
-        DataType data_type = constantDeclaration.getDataType();
+						Matcher m = inst_pattern.matcher(node_id);
 
-        String user_defined_type = data_type.getUserDefinedType();
-        //        Expression expr = constantDeclaration.getDefinition();
+						IfThenElse ifelse = new IfThenElse();
+						Expression called_expr = new Expression();
+						// Condition
+						Expression g_expr = new Expression();
 
-        if (user_defined_type != null) {
-            //            user_defined_type = user_defined_type + "_Impl";
+						if (m.matches()) {
+							// Instrumented component Instance ID
+							String component_id = m.group(1);
+							g_expr.setIdentifier(component_id);
+						}
 
-            boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+						ifelse.setCondition(g_expr);
+						// Then
+						ifelse.setThenBranch(called_expr);
+						// Else
+						// Expression arg = new Expression();
+						ifelse.setElseBranch(arg_expr);
 
-            if (implemented_type) {
-                data_type.setUserDefinedType(user_defined_type);
-            }
+						// NodeCalled Expr
+						called_expr.setCall(node_called);
 
-            Expression expr = constantDeclaration.getDefinition();
+						Expression instrumented_expr = new Expression();
 
-            recordLiteral(expr);
-        }
-    }
+						instrumented_expr.setConditionalExpression(ifelse);
 
-    // Copying Type Declaration.
-    public void visit(TypeDeclaration typeDeclaration, LustreProgram program) {
+						if (node_called != null) {
+							if (node_called.getNodeId().equals(called_node_ID)) {
+								for (Expression a_expr : node_called.getArgument()) {
 
-        String identifier = typeDeclaration.getName();
-        // Renaming dot[.] in Type Declaration Identifier.
-        //        identifier = identifier.replace(".", "_id_");
-        //        typeDeclaration.setName(identifier);
+									if (a_expr.getIdentifier().equals(dest_component_port.getName())) {
+										a_expr.setIdentifier(arg_expr.getIdentifier());
+									} else if (node_called.getArgument().size() == 1) {
+										a_expr.setIdentifier(arg_expr.getIdentifier());
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-        DataType data_type = typeDeclaration.getDefinition();
+	private NodeEquation getNodeEq(String eq_id, NodeBody nodeBody) {
 
-        if (data_type != null) {
-            RecordType record_type = data_type.getRecordType();
+		NodeEquation eq = null;
 
-            if (record_type != null) {
-                //                identifier = identifier + "_Impl";
+		for (NodeEquation n_eq : nodeBody.getEquation()) {
 
-                List<RecordField> record_fields = record_type.getRecordField();
+			NodeEquationLHS eq_lhs = n_eq.getLhs();
 
-                for (RecordField record_field : record_fields) {
-                    //            String identifier = record_field.getName();
+			if (eq_lhs.getIdentifier().contains(eq_id)) {
+				eq = n_eq;
+				break;
+			}
+		}
 
-                    data_type = record_field.getType();
-                    String user_defined_type = data_type.getUserDefinedType();
+		return eq;
+	}
 
-                    if (user_defined_type != null) {
-                        //                        user_defined_type = user_defined_type + "_Impl";
+	public void visit(ConstantDeclaration constantDeclaration) {
 
-                        for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
-                            if (user_defined_type.equals(type_declaration.getName())) {
-                                data_type.setUserDefinedType(user_defined_type);
-                            }
-                        }
-                    }
-                }
+		// String identifier = constantDeclaration.getName();
+		DataType data_type = constantDeclaration.getDataType();
 
-                // Updating TypeName_Impl
-                typeDeclaration.setName(identifier);
-            }
-        }
+		String user_defined_type = data_type.getUserDefinedType();
+		// Expression expr = constantDeclaration.getDefinition();
 
-        typeDeclarations.put(identifier, typeDeclaration);
-        program.getTypeDeclaration().add(typeDeclaration);
-    }
+		if (user_defined_type != null) {
+			// user_defined_type = user_defined_type + "_Impl";
 
-    protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+			boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
-        BlockImpl blockImpl = null;
+			if (implemented_type) {
+				data_type.setUserDefinedType(user_defined_type);
+			}
 
-        String cmpID = compImpl.getType().getId();
+			Expression expr = constantDeclaration.getDefinition();
 
-        for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
-            if (cmpImpl.getBlockImpl() != null) {
-                blockImpl = cmpImpl.getBlockImpl();
-                for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
-                    ComponentImpl impl = cmpInstance.getImplementation();
-                    ComponentType enumType = null;
+			recordLiteral(expr);
+		}
+	}
 
-                    if (impl != null) {
-                        enumType = impl.getType();
-                    } else {
-                        enumType = cmpInstance.getSpecification();
-                    }
+	// Copying Type Declaration.
+	public void visit(TypeDeclaration typeDeclaration, LustreProgram program) {
 
-                    if (cmpID.equals(enumType.getId())) {
-                        return blockImpl;
-                    }
-                }
-            }
-        }
+		String identifier = typeDeclaration.getName();
+		// Renaming dot[.] in Type Declaration Identifier.
+		// identifier = identifier.replace(".", "_id_");
+		// typeDeclaration.setName(identifier);
 
-        return blockImpl;
-    }
+		DataType data_type = typeDeclaration.getDefinition();
+
+		if (data_type != null) {
+			RecordType record_type = data_type.getRecordType();
+
+			if (record_type != null) {
+				// identifier = identifier + "_Impl";
+
+				List<RecordField> record_fields = record_type.getRecordField();
+
+				for (RecordField record_field : record_fields) {
+					// String identifier = record_field.getName();
+
+					data_type = record_field.getType();
+					String user_defined_type = data_type.getUserDefinedType();
+
+					if (user_defined_type != null) {
+						// user_defined_type = user_defined_type + "_Impl";
+
+						for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
+							if (user_defined_type.equals(type_declaration.getName())) {
+								data_type.setUserDefinedType(user_defined_type);
+							}
+						}
+					}
+				}
+
+				// Updating TypeName_Impl
+				typeDeclaration.setName(identifier);
+			}
+		}
+
+		typeDeclarations.put(identifier, typeDeclaration);
+		program.getTypeDeclaration().add(typeDeclaration);
+	}
+
+	protected BlockImpl retrieve_block(ComponentImpl compImpl) {
+
+		BlockImpl blockImpl = null;
+
+		String cmpID = compImpl.getType().getId();
+
+		for (ComponentImpl cmpImpl : vdm_model.getComponentImpl()) {
+			if (cmpImpl.getBlockImpl() != null) {
+				blockImpl = cmpImpl.getBlockImpl();
+				for (ComponentInstance cmpInstance : blockImpl.getSubcomponent()) {
+					ComponentImpl impl = cmpInstance.getImplementation();
+					ComponentType enumType = null;
+
+					if (impl != null) {
+						enumType = impl.getType();
+					} else {
+						enumType = cmpInstance.getSpecification();
+					}
+
+					if (cmpID.equals(enumType.getId())) {
+						return blockImpl;
+					}
+				}
+			}
+		}
+
+		return blockImpl;
+	}
 }

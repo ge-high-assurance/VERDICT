@@ -40,7 +40,6 @@ public class SummaryProcessor {
         XMLProcessor.parseLog(resultFile);
     }
 
-    
     public static Vector<VerdictProperty> readResults(InputStream inputStream)
             throws FileNotFoundException {
 
