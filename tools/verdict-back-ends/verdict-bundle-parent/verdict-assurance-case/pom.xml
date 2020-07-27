@@ -25,11 +25,6 @@
             <version>0.17.0</version>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.davidmoten</groupId>
             <artifactId>word-wrap</artifactId>
             <version>0.1.1</version>
@@ -37,6 +32,11 @@
         <!-- JAXB dependencies needed only under Java 9 or later -->
 
         <!-- Dependencies needed only by tests -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
