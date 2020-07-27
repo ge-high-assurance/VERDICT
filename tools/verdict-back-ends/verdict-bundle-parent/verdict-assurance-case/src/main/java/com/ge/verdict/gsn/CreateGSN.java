@@ -20,10 +20,10 @@ public class CreateGSN {
     /**
      * The interface for creating GSN artefacts
      *
-     * @param rootGoalId
-     * @param gsnOutputDir
-     * @param soteriaOutputDir
-     * @param caseAadlPath
+     * @param rootGoalId -- the root goal of the GSN fragment
+     * @param gsnOutputDir -- the directory where outputs will be stored
+     * @param soteriaOutputDir -- the directory containing Soteria outputs
+     * @param caseAadlPath -- the directory containing the AADL files
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
