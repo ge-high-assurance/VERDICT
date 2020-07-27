@@ -91,12 +91,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>"-Djava.library.path=${project.build.directory}/native-libs${path.separator}${java.library.path}"</argLine>
                     <environmentVariables>
                         <DYLD_LIBRARY_PATH>${project.build.directory}/native-libs</DYLD_LIBRARY_PATH>
                         <LD_LIBRARY_PATH>${project.build.directory}/native-libs</LD_LIBRARY_PATH>
-                        <PATH>${project.build.directory}/native-libs${path.separator}${env.PATH}</PATH>
                     </environmentVariables>
+                    <workingDirectory>${project.build.directory}/native-libs</workingDirectory>
                 </configuration>
             </plugin>
             <!-- Add native libs to capsule -->
