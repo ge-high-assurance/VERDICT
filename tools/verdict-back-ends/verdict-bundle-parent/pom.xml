@@ -26,5 +26,6 @@
         <module>verdict-synthesis</module>
         <module>verdict-test-instrumentor</module>
         <module>z3-native-libs</module>
+        <module>verdict-merit-assignment</module>
     </modules>
 </project>

@@ -18,6 +18,7 @@ import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
+import edu.uiowa.clc.verdict.merit.MeritAssignment;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
 import io.micrometer.core.instrument.Clock;
@@ -961,7 +962,9 @@ public class App {
                         outputFormat,
                         lustrePath,
                         "--ivc",
-                        Boolean.toString(meritAssignment));
+                        Boolean.toString(meritAssignment),
+                        "--ivc_category",
+                        "contracts");
             }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes
@@ -998,7 +1001,9 @@ public class App {
 
         if (meritAssignment) {
             logHeader("Merit Assignment");
-            // TODO print merit assignment info
+
+            MeritAssignment ma = new MeritAssignment(new File(outputPath));
+            ma.readAndPrintInfo();
         }
 
         if (blameAssignment && instrumentor != null) {
