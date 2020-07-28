@@ -119,19 +119,20 @@ public class VDM2Lustre {
             // Collect Node with no output
             Port mPort = markPort(componentType);
 
-            //            if (mPort == null) {
-            // Event Ports to Data Ports;
-            for (Port port : componentType.getPort()) {
-                // Update event_ports
-                visit(port, program);
+            if (mPort == null) {
+                // Event Ports to Data Ports;
+                for (Port port : componentType.getPort()) {
+                    // Update event_ports
+                    visit(port, program);
+                }
+            } else {
+
+                System.out.println("Ignoring Node:" + componentType.getName());
+                System.out.println("Ignoring Port:" + mPort.getName());
+
+                this.marked_types.add(componentType);
+                this.marked_ports.add(mPort);
             }
-            //            } else {
-            //                System.out.println("++++++++Ignoring Node:" +
-            // componentType.getName());
-            //                System.out.println("++++++++Ignoring Port:" + mPort.getName());
-            //                this.marked_types.add(componentType);
-            //                this.marked_ports.add(mPort);
-            //            }
         }
 
         // B) Component Type
@@ -141,31 +142,30 @@ public class VDM2Lustre {
         for (ComponentType componentType : vdm_model.getComponentType()) {
 
             boolean is_declared = false;
-            //            if (!this.marked_types.contains(componentType)) {
 
-            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            if (!this.marked_types.contains(componentType)) {
 
-                if (componentType == componentImpl.getType()) {
+                for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-                    impl_node = visit(componentType, true);
+                    if (componentType == componentImpl.getType()) {
 
-                    visit(componentImpl, impl_node);
-                    is_declared = true;
-                    break;
+                        impl_node = visit(componentType, true);
+
+                        visit(componentImpl, impl_node);
+                        is_declared = true;
+                        break;
+                    }
+                }
+
+                if (is_declared) {
+                    cmp_node = visit(componentType, false);
+                    program.getNodeDeclaration().add(cmp_node);
+                    program.getNodeDeclaration().add(impl_node);
+                } else {
+                    cmp_node = visit(componentType, false);
+                    program.getNodeDeclaration().add(cmp_node);
                 }
             }
-
-            if (is_declared) {
-                cmp_node = visit(componentType, false);
-                program.getNodeDeclaration().add(cmp_node);
-                program.getNodeDeclaration().add(impl_node);
-            } else {
-                cmp_node = visit(componentType, false);
-                program.getNodeDeclaration().add(cmp_node);
-            }
-            //
-
-            //            }
         }
         // Copying over Node Declarations.
         for (Node node_dec : program.getNodeDeclaration()) {
@@ -295,9 +295,9 @@ public class VDM2Lustre {
             }
 
             for (Connection connection : blockImpl.getConnection()) {
-                //                if (!ignoreConnection(connection)) {
-                visit(connection, nodeBody);
-                //                }
+                if (!ignoreConnection(connection)) {
+                    visit(connection, nodeBody);
+                }
             }
 
         } else {
