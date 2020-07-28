@@ -25,10 +25,10 @@ public class App {
             String caseAadlPath = args[3];
 
             // calling the function to create GSN artefacts
-            CreateGSN createGsnObj = new CreateGSN();
+            GSNInterface createGsnObj = new GSNInterface();
 
             createGsnObj.runGsnArtifactsGenerator(
-                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
+                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, true);
         }
     }
 }

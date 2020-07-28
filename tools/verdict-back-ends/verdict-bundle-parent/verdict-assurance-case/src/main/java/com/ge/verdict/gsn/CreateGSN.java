@@ -1,6 +1,5 @@
 package com.ge.verdict.gsn;
 
-import com.ge.verdict.vdm.VdmTranslator;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,56 +16,8 @@ public class CreateGSN {
     protected static int strategyCounter = 1;
     protected static int contextCounter = 1;
     protected static int solutionCounter = 1;
-
-    /**
-     * The interface for creating GSN artefacts
-     *
-     * @param rootGoalId -- the root goal of the GSN fragment
-     * @param gsnOutputDir -- the directory where outputs will be stored
-     * @param soteriaOutputDir -- the directory containing Soteria outputs
-     * @param caseAadlPath -- the directory containing the AADL files
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     */
-    public void runGsnArtifactsGenerator(
-            String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath)
-            throws IOException, ParserConfigurationException, SAXException {
-
-        File modelXml = new File(gsnOutputDir, "modelXML.xml");
-        File cyberOutput = new File(soteriaOutputDir, "ImplProperties.xml");
-        File safetyOutput = new File(soteriaOutputDir, "ImplProperties-safety.xml");
-
-        // Fetch the DeliveryDrone model from the XML
-        Model xmlModel = VdmTranslator.unmarshalFromXml(modelXml);
-
-        // create the GSN fragment
-        GsnNode gsnFragment =
-                CreateGSN.gsnCreator(xmlModel, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
-        System.out.println("Info: Created Gsn Fragment");
-
-        // Filenames
-        String xmlFilename = rootGoalId + "_GsnFragment.xml";
-        String dotFilename = rootGoalId + "_GsnFragment.dot";
-        String svgFilename = rootGoalId + "_GsnFragment.svg";
-
-        // Create a file and print the GSN XML
-        File gsnXmlFile = new File(gsnOutputDir, xmlFilename);
-        Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
-        System.out.println("Info: Created Gsn Xml: " + gsnXmlFile.getAbsolutePath());
-
-        // Create a file and print the dot
-        File gsnDotFile = new File(gsnOutputDir, dotFilename);
-        Gsn2Dot.createDot(gsnFragment, gsnDotFile);
-        System.out.println("Info: Created Gsn dot: " + gsnDotFile.getAbsolutePath());
-
-        // generate the svg file using graphviz
-        String graphDestination = gsnOutputDir + SEP + svgFilename;
-        String dotFileSource = gsnDotFile.getAbsolutePath();
-
-        Dot2GraphViz.generateGraph(dotFileSource, graphDestination);
-        System.out.println("Info: Created Gsn svg: " + graphDestination);
-    }
+    protected static String soteriaCyberOutputAddr;
+    protected static String soteriaSafetyOutputAddr;
 
     /**
      * creates a GsnNode and returns it
@@ -88,6 +39,10 @@ public class CreateGSN {
             String addressForCASE,
             String rootGoalId)
             throws ParserConfigurationException, SAXException, IOException {
+
+        // setting class variables
+        soteriaCyberOutputAddr = cyberOutput.getAbsolutePath();
+        soteriaSafetyOutputAddr = safetyOutput.getAbsolutePath();
 
         // The GsnNode to return
         GsnNode returnFragment = new GsnNode();
@@ -284,7 +239,7 @@ public class CreateGSN {
         strat.setDisplayText("Argument: By Soteria++ analysis &#10;of attack-defense trees");
 
         // add a solution to the supportedBy of strategy
-        GsnNode solutionNode = populateSolutionNode(cyberReq.getId(), cyberResults);
+        GsnNode solutionNode = populateSolutionNode(cyberReq.getId(), cyberResults, true);
         strategyNode.getSupportedBy().add(solutionNode);
 
         // setting strategy status
@@ -323,6 +278,7 @@ public class CreateGSN {
         strategyContextNode2.setNodeId(strategyContextId2);
         strategyContext2.setDisplayText("CASE CONSOLIDATED PROPERTIES");
         strategyContext2.setExtraInfo("Address:&#10;" + addressForCASE);
+        strategyContext2.setUrl(addressForCASE);
         strategyContextNode2.setContext(strategyContext2);
 
         // add the context node to strategyNode
@@ -375,7 +331,7 @@ public class CreateGSN {
         strat.setDisplayText("Argument: By Soteria++ analysis &#10;of fault trees");
 
         // add a solution to the supportedBy of strategy
-        GsnNode solutionNode = populateSolutionNode(safetyReq.getId(), safetyResults);
+        GsnNode solutionNode = populateSolutionNode(safetyReq.getId(), safetyResults, false);
         strategyNode.getSupportedBy().add(solutionNode);
 
         // setting strategy status
@@ -414,6 +370,7 @@ public class CreateGSN {
         strategyContextNode2.setNodeId(strategyContextId2);
         strategyContext2.setDisplayText("CASE CONSOLIDATED PROPERTIES");
         strategyContext2.setExtraInfo("Address:&#10;" + addressForCASE);
+        strategyContext2.setUrl(addressForCASE);
         strategyContextNode2.setContext(strategyContext2);
 
         // add the context node to strategyNode
@@ -436,7 +393,7 @@ public class CreateGSN {
      * @param safetyResults
      * @return
      */
-    public static GsnNode populateSolutionNode(String reqId, NodeList results) {
+    public static GsnNode populateSolutionNode(String reqId, NodeList results, boolean cyberFlag) {
         // GsnNode to pack solution
         GsnNode solutionNode = new GsnNode();
 
@@ -473,12 +430,23 @@ public class CreateGSN {
         }
 
         // setting hovering info for solution node
-        String extraInfo =
-                "Computed Probability = "
-                        + computed_p
-                        + "&#10;Acceptable Probability = "
-                        + acceptable_p;
-        sol.setExtraInfo(extraInfo);
+        if (cyberFlag) {
+            String extraInfo =
+                    "Computed Likelihood = "
+                            + computed_p
+                            + "&#10;Acceptable Likelihood = "
+                            + acceptable_p;
+            sol.setExtraInfo(extraInfo);
+            sol.setUrl(soteriaCyberOutputAddr);
+        } else {
+            String extraInfo =
+                    "Computed Probability = "
+                            + computed_p
+                            + "&#10;Acceptable Probability = "
+                            + acceptable_p;
+            sol.setExtraInfo(extraInfo);
+            sol.setUrl(soteriaSafetyOutputAddr);
+        }
 
         // add sol to solutionNode
         solutionNode.setSolution(sol);

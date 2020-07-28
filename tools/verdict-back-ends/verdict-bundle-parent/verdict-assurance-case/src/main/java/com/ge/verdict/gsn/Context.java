@@ -17,6 +17,28 @@ public class Context {
     /** Additional information as string */
     protected String moreInfo;
 
+    @XmlElement
+    /** A clickable URL */
+    protected String url;
+
+    /**
+     * Gets the value of the URL property.
+     *
+     * @return possible object is {@link String }
+     */
+    protected String getUrl() {
+        return url;
+    }
+
+    /**
+     * Sets the value of the Url property.
+     *
+     * @param value allowed object is {@link String }
+     */
+    protected void setUrl(String value) {
+        this.url = value;
+    }
+
     /**
      * Gets the value of the id property.
      *
@@ -31,7 +53,7 @@ public class Context {
      *
      * @param value allowed object is {@link String }
      */
-    protected void setid(String value) {
+    protected void setId(String value) {
         this.id = value;
     }
 

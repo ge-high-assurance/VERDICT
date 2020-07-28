@@ -27,18 +27,19 @@ import org.eclipse.swt.widgets.Text;
 /**
 * Let user enable cyber or safety relations inference when running MBAA.
 */
-public class GSNSettingsPanel extends ApplicationWindow {
+public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 	// variable to control granularity of GSN
 	public static String rootGoalId;
-	//variable to decide if GSN should be shown in a new Tab
+	//variable to decide if svgs should be shown in a new Tab
 	public static boolean showInTab;
-
+	//variable to decide if xml should be generated
+	public static boolean generateXml;
 
 	
 	private Font font;
 	private Font boldFont;
 
-	public GSNSettingsPanel() {
+	public AssuranceCaseSettingsPanel() {
 		super(null);
 		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
 		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
@@ -94,10 +95,15 @@ public class GSNSettingsPanel extends ApplicationWindow {
             idField.setText(rootGoalId);        	
         }
 	    
+        //Button to save settings for xml
+        Button xmlButton = new Button(acsGroup, SWT.CHECK);	
+        xmlButton.setText("Generate XML artifacts");	
+        xmlButton.setFont(font);	
+        xmlButton.setSelection(generateXml);
 
         //Button to save settings for showing in tab
         Button showFragButton = new Button(acsGroup, SWT.CHECK);	
-		showFragButton.setText("Show Artifacts in New Tab");	
+		showFragButton.setText("Auto-Open GSN Fragments");	
 		showFragButton.setFont(font);	
 		showFragButton.setSelection(showInTab);
         
@@ -129,8 +135,8 @@ public class GSNSettingsPanel extends ApplicationWindow {
 				if (idField.getText()!=null) {
 					rootGoalId=idField.getText();
 				} 
-				
 				showInTab = showFragButton.getSelection();
+				generateXml = xmlButton.getSelection();
 				
 				composite.getShell().close();
 			}

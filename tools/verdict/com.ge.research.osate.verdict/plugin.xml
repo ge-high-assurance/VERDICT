@@ -52,8 +52,8 @@
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
        </handler>
        <handler
-             class="com.ge.research.osate.verdict.handlers.GSNSettingsHandler"
-             commandId="com.ge.research.osate.verdict.commands.gsnSettings">
+             class="com.ge.research.osate.verdict.handlers.AssuranceCaseSettingsHandler"
+             commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings">
 	         <enabledWhen>
 	            <reference
 	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
@@ -121,12 +121,18 @@
 		<menu id="GsnMenu" label="&amp;Assurance Case Fragments Generation" >
 		   <command
                 commandId="com.ge.research.osate.verdict.commands.runGsn"
-                label="&amp;Create GSN"
+                label="&amp;Create GSN Assurance Case Fragments"
                 style="push"
                 tooltip="Create GSN Fragment for selected requirement">
-          </command> 
+          </command>
           <command
-                commandId="com.ge.research.osate.verdict.commands.gsnSettings"
+                commandId="com.ge.research.osate.verdict.commands.runSacm"
+                label="&amp;Create SACM Assurance Case Fragments"
+                style="push"
+                tooltip="Click to create SACM for selected requirement">
+          </command>  
+          <command
+                commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
                 label="&amp;Assurance Case Settings"
                 style="push"
                 tooltip="Click to change Assurance Case settings">
@@ -203,8 +209,8 @@
        </command> 
        <command
              categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.gsnSettings"
-             name="GSN Settings">
+             id="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
+             name="Assurance Case Settings">
        </command>
                      
     </extension>

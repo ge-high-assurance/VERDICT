@@ -4,7 +4,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import com.ge.research.osate.verdict.gui.GSNSettingsPanel;
+import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 
 
 
@@ -12,8 +12,8 @@ import com.ge.research.osate.verdict.gui.GSNSettingsPanel;
  * If the settings panel is not created yet, we create a new one;
  * otherwise, we bring the old panel to the front.
  */
-public class GSNSettingsHandler extends AbstractHandler {
-	private static GSNSettingsPanel gsnSettingsWindow;
+public class AssuranceCaseSettingsHandler extends AbstractHandler {
+	private static AssuranceCaseSettingsPanel assuranceCaseSettingsWindow;
 
 	@Override
 	/**
@@ -22,12 +22,12 @@ public class GSNSettingsHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
 		//Creating the GSN settings window
-		if (gsnSettingsWindow == null) {
-			gsnSettingsWindow = new GSNSettingsPanel();
-			gsnSettingsWindow.run();
-			gsnSettingsWindow = null;
+		if (assuranceCaseSettingsWindow == null) {
+			assuranceCaseSettingsWindow = new AssuranceCaseSettingsPanel();
+			assuranceCaseSettingsWindow.run();
+			assuranceCaseSettingsWindow = null;
 		} else {
-			gsnSettingsWindow.bringToFront(gsnSettingsWindow.getShell());
+			assuranceCaseSettingsWindow.bringToFront(assuranceCaseSettingsWindow.getShell());
 		}	
 		return null;
 	}

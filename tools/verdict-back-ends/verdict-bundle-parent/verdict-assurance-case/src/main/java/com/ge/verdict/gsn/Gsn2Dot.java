@@ -104,6 +104,7 @@ public class Gsn2Dot {
             String nodeColor = "";
             String nodeText = "";
             String hoverDisplay = "No additional information is available";
+            String url = "";
             boolean nodeStatus = true;
 
             // deciding node shape and hovertext
@@ -113,12 +114,18 @@ public class Gsn2Dot {
                 if (!(node.getContext().getExtraInfo() == null)) {
                     hoverDisplay = node.getContext().getExtraInfo();
                 }
+                if (!(node.getContext().getUrl() == null)) {
+                    url = node.getContext().getUrl();
+                }
             } else if (node.getNodeType().equalsIgnoreCase("solution")) {
                 nodeShape = "circle";
                 nodeText = node.getSolution().getDisplayText();
                 nodeStatus = node.getSolution().getStatus();
                 if (!(node.getSolution().getExtraInfo() == null)) {
                     hoverDisplay = node.getSolution().getExtraInfo();
+                }
+                if (!(node.getSolution().getUrl() == null)) {
+                    url = node.getSolution().getUrl();
                 }
             } else if (node.getNodeType().equalsIgnoreCase("goal")) {
                 nodeShape = "box";
@@ -144,7 +151,9 @@ public class Gsn2Dot {
             String nodeDeclareString =
                     node.getNodeId()
                             + " ["
-                            + "tooltip=\""
+                            + "href=\""
+                            + url
+                            + "\", tooltip=\""
                             + hoverDisplay
                             + "\", margin=0.05, style=bold, color="
                             + nodeColor

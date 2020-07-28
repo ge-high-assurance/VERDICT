@@ -40,11 +40,10 @@ import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
+import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
-import com.ge.research.osate.verdict.gui.GSNSettingsPanel;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.verdict.vdm.VdmTranslator;
-import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
 
 import verdict.vdm.vdm_model.Model;
 
@@ -62,153 +61,146 @@ public class GSNHandler extends AbstractHandler {
 			VerdictHandlersUtils.printGreeting();
 			Display mainThreadDisplay = Display.getCurrent();
 			
-			//If no root goal Id has been selected
-			if(GSNSettingsPanel.rootGoalId== null ){
-				Thread noIdSelectedThread = new Thread() {
-					@Override
-					public void run() {
-						try {
-							System.out.println("Input Error: Please provide a root goal ID for creating the GSN fragment.");
-							} finally {
-							VerdictHandlersUtils.finishRun();
-						}						
-					}
-				};
-				noIdSelectedThread.start();
-			}
-			else {//If a root goal Id has been selected
-				Thread createGsnThread = new Thread() {
-					@Override
-					public void run() {
-						try {
-							//getting input
-							String userInput = GSNSettingsPanel.rootGoalId.trim();
-							
-							//Getting project directory
-							List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
-							File projectDir = new File(selection.get(0));
-							
-							//Check if input Id is correct, finish otherwise
-							Aadl2Vdm objectVdmTran = new Aadl2Vdm();
-							List<String> allReqIds = getRequirementIds(objectVdmTran.preprocessAadlFiles(projectDir)); 
-							if (!allReqIds.contains(userInput) || userInput.length()==0){
-								System.out.println("Input Error: Please provide a correct root goal ID from your project.");
-							} else {
-																
-								VerdictHandlersUtils.setPrintOnConsole("Generating GSN for : "+ GSNSettingsPanel.rootGoalId);
-								
-								//Checking if all necessary settings exist
-								String stemProjPath = BundlePreferences.getStemDir();
-								if (stemProjPath.isEmpty()) {
-									System.out.println("Please set STEM directory path in Preferences");
-									return;
-								}
-								String dockerImage = BundlePreferences.getDockerImage();
-								String bundleJar = BundlePreferences.getBundleJar();
-								if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
-									System.out.println("Please set VERDICT Bundle Jar path in Preferences");
-									return;
-								}
-								String soteriaPpBin = BundlePreferences.getSoteriaPpBin();
-								if (dockerImage.isEmpty() && soteriaPpBin.isEmpty()) {
-									System.out.println("Please set soteria++ binary path in Preferences");
-									return;
-								}
-								String graphVizPath = BundlePreferences.getGraphVizPath();
-								if (dockerImage.isEmpty() && graphVizPath.isEmpty()) {
-									System.out.println("Please set GraphViz path in Preferences");
-									return;
-								}
 
-								// Create CSVData, Output, Graphs, GSN folders if they don't exist
-								// If they exist, delete all unnecessary files
-								File dataFolder = new File(stemProjPath, "CSVData");
-								File outputFolder = new File(stemProjPath, "Output");
-								File graphsFolder = new File(stemProjPath, "Graphs");
-								File gsnOutputFolder = new File(stemProjPath, "GSN");
-								
-								
-								if (dataFolder.exists() && dataFolder.isDirectory()) {
-									deleteFilesInDir("csv", dataFolder);
-								} else {
-									dataFolder.mkdir();
-								}
-								if (outputFolder.exists() && outputFolder.isDirectory()) {
-									deleteFilesInDir("csv", outputFolder);
-								} else {
-									outputFolder.mkdir();
-								}
-								if (graphsFolder.exists() && graphsFolder.isDirectory()) {
-									deleteFilesInDir("svg", graphsFolder);
-								} else {
-									graphsFolder.mkdir();
-								}
-								if (gsnOutputFolder.exists() && gsnOutputFolder.isDirectory()) {
-									deleteFilesInDir("svg", gsnOutputFolder);
-									deleteFilesInDir("dot", gsnOutputFolder);
-									deleteFilesInDir("xml", gsnOutputFolder);
-								} else {
-									gsnOutputFolder.mkdir();
-								}
-								
-
-								//Running MBAS First to create the soteria++ outputs
-								Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-
-								aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
-								
-								//running MBAS 
-								boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
-
-//								/** TEMPORARY! CHANGE BEFORE FINAL */
-//								boolean outputsGenerated = true;
-								
-	                            // if MBAS succeeded, proceed to GSN
-								if (outputsGenerated){
-									
-									/**
-									 * The GSN creator backend needs:
-									 * 	1. The rootId
-									 *  2. The Gsn output directory
-									 *  3. The Soteria++ Output directory
-									 *  4. The path of the project directory 
-									 *     which contains the aadl files with CASE properties
-									 */
-									String rootId = userInput;
-									String soteriaOutputDir = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
-									String gsnOutputDir = gsnOutputFolder.getAbsolutePath();
-									String caseAadlDir = projectDir.getAbsolutePath();
-									
-									/**
-									 * Create the xml model for the GSN creator 
-									 * in the GSN output directory as modelXML.xml
-									 */
-									Aadl2Vdm translatorObject = new Aadl2Vdm();
-									Model model = translatorObject.execute(projectDir);
-									File modelXml = new File(gsnOutputFolder, "modelXML.xml");
-									VdmTranslator.marshalToXml(model, modelXml);
-
-																
-					                //send the arguments to the backend 				
-									if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, caseAadlDir, projectDir.getName(), graphVizPath)) {
-										//Show graphs in tab if option selected
-										if(GSNSettingsPanel.showInTab) {
-											// Open SVG GSN files
-											VerdictHandlersUtils.openSvgGraphsInDir(new File(stemProjPath, "GSN").getAbsolutePath());
-											
-										}
-									}
-								}								
-							}	
-							} catch (IOException e) {
-								VerdictLogger.severe(e.toString());
-							} finally {
-							VerdictHandlersUtils.finishRun();
+			Thread createGsnThread = new Thread() {
+				@Override
+				public void run() {
+					try {
+						//Getting project directory
+						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
+						File projectDir = new File(selection.get(0));
+						
+						//Check if input Id is correct, finish otherwise
+						Aadl2Vdm objectVdmTran = new Aadl2Vdm();
+						List<String> allReqIds = getRequirementIds(objectVdmTran.preprocessAadlFiles(projectDir)); 
+						
+						//getting input
+						String userInput;
+						
+						//checking if input is valid
+						if (AssuranceCaseSettingsPanel.rootGoalId==null) {
+							System.out.println("Warning: Invalid input. Generating for all mission requirements.");
+							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+						} else if (!allReqIds.contains(AssuranceCaseSettingsPanel.rootGoalId.trim())){
+							System.out.println("Warning: Invalid input. Generating for all mission requirements.");
+							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+						} else {
+							userInput = AssuranceCaseSettingsPanel.rootGoalId.trim();
 						}
+						
+						VerdictHandlersUtils.setPrintOnConsole("Generating GSN for : "+ AssuranceCaseSettingsPanel.rootGoalId);
+						
+						//Checking if all necessary settings exist
+						String stemProjPath = BundlePreferences.getStemDir();
+						if (stemProjPath.isEmpty()) {
+							System.out.println("Please set STEM directory path in Preferences");
+							return;
+						}
+						String dockerImage = BundlePreferences.getDockerImage();
+						String bundleJar = BundlePreferences.getBundleJar();
+						if (dockerImage.isEmpty() && bundleJar.isEmpty()) {
+							System.out.println("Please set VERDICT Bundle Jar path in Preferences");
+							return;
+						}
+						String soteriaPpBin = BundlePreferences.getSoteriaPpBin();
+						if (dockerImage.isEmpty() && soteriaPpBin.isEmpty()) {
+							System.out.println("Please set soteria++ binary path in Preferences");
+							return;
+						}
+						String graphVizPath = BundlePreferences.getGraphVizPath();
+						if (dockerImage.isEmpty() && graphVizPath.isEmpty()) {
+							System.out.println("Please set GraphViz path in Preferences");
+							return;
+						}
+
+						// Create CSVData, Output, Graphs, GSN folders if they don't exist
+						// If they exist, delete all unnecessary files
+						File dataFolder = new File(stemProjPath, "CSVData");
+						File outputFolder = new File(stemProjPath, "Output");
+						File graphsFolder = new File(stemProjPath, "Graphs");
+						File gsnOutputFolder = new File(stemProjPath, "GSN");
+						
+						
+						if (dataFolder.exists() && dataFolder.isDirectory()) {
+							deleteFilesInDir("csv", dataFolder);
+						} else {
+							dataFolder.mkdir();
+						}
+						if (outputFolder.exists() && outputFolder.isDirectory()) {
+							deleteFilesInDir("csv", outputFolder);
+						} else {
+							outputFolder.mkdir();
+						}
+						if (graphsFolder.exists() && graphsFolder.isDirectory()) {
+							deleteFilesInDir("svg", graphsFolder);
+						} else {
+							graphsFolder.mkdir();
+						}
+						if (gsnOutputFolder.exists() && gsnOutputFolder.isDirectory()) {
+							deleteFilesInDir("svg", gsnOutputFolder);
+							deleteFilesInDir("dot", gsnOutputFolder);
+							deleteFilesInDir("xml", gsnOutputFolder);
+						} else {
+							gsnOutputFolder.mkdir();
+						}
+						
+
+						//Running MBAS First to create the soteria++ outputs
+						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+
+						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+						
+						//running MBAS 
+						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
+
+						/** TEMPORARY! CHANGE BEFORE FINAL */
+						//boolean outputsGenerated = true;
+						
+                        // if MBAS succeeded, proceed to GSN
+						if (outputsGenerated){
+							
+							/**
+							 * The GSN creator backend needs:
+							 * 	1. The rootId
+							 *  2. The Gsn output directory
+							 *  3. The Soteria++ Output directory
+							 *  4. The path of the project directory 
+							 *     which contains the aadl files with CASE properties
+							 */
+							String rootId = userInput;
+							String soteriaOutputDir = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
+							String gsnOutputDir = gsnOutputFolder.getAbsolutePath();
+							String caseAadlDir = projectDir.getAbsolutePath();
+							
+							/**
+							 * Create the xml model for the GSN creator 
+							 * in the GSN output directory as modelXML.xml
+							 */
+							Aadl2Vdm translatorObject = new Aadl2Vdm();
+							Model model = translatorObject.execute(projectDir);
+							File modelXml = new File(gsnOutputFolder, "modelXML.xml");
+							VdmTranslator.marshalToXml(model, modelXml);
+
+														
+			                //send the arguments to the backend 				
+							if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, caseAadlDir, projectDir.getName(), graphVizPath)) {
+								//Show graphs in tab if option selected
+								if(AssuranceCaseSettingsPanel.showInTab) {
+									// Open SVG GSN files
+									VerdictHandlersUtils.openSvgGraphsInDir(new File(stemProjPath, "GSN").getAbsolutePath());
+									
+								}
+							}
+						}
+						
+						} catch (IOException e) {
+							VerdictLogger.severe(e.toString());
+						} finally {
+						VerdictHandlersUtils.finishRun();
 					}
-				};
-				createGsnThread.start();
-			}
+				}
+			};
+			createGsnThread.start();
 
 		}
 		return null;
@@ -231,17 +223,26 @@ public class GSNHandler extends AbstractHandler {
 	public static boolean runBundle(String bundleJar, String dockerImage, String rootId, String gsnOutputDir, String soteriaOutputDir,
 			String caseAadlDir, String projectName, String graphVizPath) throws IOException {
 
+		//if xml has been asked by user
+		String xmlKey = "";
+		if (AssuranceCaseSettingsPanel.generateXml) {
+			xmlKey = "-x";
+		}
+		
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		/**
-		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <caseAadlDir>
+		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <caseAadlDir> 
+		 *              xmlKey
 		 */
 		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage)
 				.arg("--csv").arg(projectName)
-				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir);
+				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir)
+		        .arg(xmlKey); 
 		
+
 		
 //		//Since cannot test via plugin, just printing into a file for now.
-//		String args = "--csv "+projectName+" --gsn "+rootId+" "+gsnOutputDir+" "+soteriaOutputDir+" "+caseAadlDir;
+//		String args = "--csv "+projectName+" --gsn "+rootId+" "+gsnOutputDir+" "+soteriaOutputDir+" "+caseAadlDir+" "+xmlKey;
 //		File printArguments = new File("/Users/212807042/Desktop/pluginArgs.txt");
 //        FileOutputStream fos = new FileOutputStream(printArguments);
 //        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
