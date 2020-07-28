@@ -1161,6 +1161,14 @@
 			<span>
 				<xsl:text>&#160; assume </xsl:text>
 			</span>
+			<xsl:for-each select="vdm_lustre:name">
+			<xsl:value-of select="$quote"/>	
+				<xsl:apply-templates/>
+				<xsl:value-of select="$quote"/>				
+				<span>
+					<xsl:text>&#160;</xsl:text>
+				</span>
+			</xsl:for-each>			
 			<xsl:for-each select="vdm_lustre:expression">
 				<xsl:call-template name="Expression"/>
 			</xsl:for-each>
