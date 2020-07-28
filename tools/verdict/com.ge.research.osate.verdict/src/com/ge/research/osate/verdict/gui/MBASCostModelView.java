@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
@@ -23,13 +23,10 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -46,7 +43,6 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Subcomponent;
 
@@ -164,16 +160,8 @@ public class MBASCostModelView extends ApplicationWindow{
 
 	@Override
 	protected Control createContents(Composite parent) {
-		ScrolledComposite scroller = new ScrolledComposite(parent, SWT.H_SCROLL);
-
-		composite = new Composite(scroller, SWT.NONE);
+		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
-
-		// TODO this scroll area doesn't seem to be working
-		scroller.setContent(composite);
-		scroller.setExpandHorizontal(true);
-		scroller.setExpandVertical(true);
-		scroller.setMinSize(500, 400);
 
 		Label componentLabel = new Label(composite, SWT.NONE);
 		componentLabel.setText("Component: ");
@@ -187,8 +175,18 @@ public class MBASCostModelView extends ApplicationWindow{
 
 		// List all defense properties
 
-		table = new Table(composite, SWT.BORDER);
-		table.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite topButtons = new Composite(composite, SWT.NONE);
+		topButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
+		topButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
+
+		Button newRule = new Button(topButtons, SWT.PUSH);
+		newRule.setText("Add row");
+		newRule.setFont(font);
+
+		table = new Table(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.heightHint = 500;
+		table.setLayoutData(gridData);
 		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
@@ -228,6 +226,13 @@ public class MBASCostModelView extends ApplicationWindow{
 		// Set the preferred size
 		Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(bestSize);
+
+		newRule.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				costModel.rules.add(costModel.createRule(Optional.empty(), Optional.empty(), Optional.empty(), 0));
+			}
+		});
 
 		cancel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -280,23 +285,43 @@ public class MBASCostModelView extends ApplicationWindow{
 		});
 		createTableViewerColumn("", 50, 4).setLabelProvider(new ColumnLabelProvider() {
 			private Map<Object, Button> buttons = new HashMap<>();
+			private Map<Object, SelectionListener> listeners = new HashMap<>();
 
 			@Override
 			public void update(ViewerCell cell) {
 				TableItem item = (TableItem) cell.getItem();
-				Button button = buttons.get(cell.getElement());
-				if (button == null) {
+				final Button button;
+				if (buttons.containsKey(cell.getElement())) {
+					button = buttons.get(cell.getElement());
+				} else {
 					button = new Button((Composite) cell.getViewerRow().getControl(), SWT.NONE);
 					button.setImage(deleteImage);
 					buttons.put(cell.getElement(), button);
-
-					// TODO detect press and delete...
-					// need to associate with the correct row, which is tricky
 				}
 				TableEditor editor = new TableEditor(item.getParent());
 				editor.grabHorizontal = true;
 				editor.grabVertical = true;
 				editor.setEditor(button, item, cell.getColumnIndex());
+
+				if (listeners.containsKey(cell.getElement())) {
+					button.removeSelectionListener(listeners.get(cell.getElement()));
+				}
+				final SynthesisCostModel.Rule rule = (SynthesisCostModel.Rule) cell.getElement();
+				SelectionListener listener = new SelectionListener() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						costModel.rules.remove(rule);
+						button.dispose();
+						tableViewer.refresh();
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e) {
+					}
+				};
+				listeners.put(cell.getElement(), listener);
+				button.addSelectionListener(listener);
+
 				editor.layout();
 			}
 		});
@@ -374,143 +399,5 @@ public class MBASCostModelView extends ApplicationWindow{
 		column.getColumn().setResizable(true);
 		column.getColumn().setMoveable(false);
 		return column;
-	}
-
-	private void loadTable() {
-		table.removeAll();
-
-		for (int i = 0; i < costModel.rules.size(); i++) {
-			addTableRow(costModel.rules.get(i), i);
-		}
-
-		table.pack();
-		composite.pack();
-	}
-
-	private void addTableRow(SynthesisCostModel.Rule rule, int index) {
-//		TableItem row = new TableItem(table, SWT.NONE);
-//		Color background = index % 2 == 0 ? new Color(Display.getCurrent(), 255, 255, 255)
-//				: new Color(Display.getCurrent(), 204, 204, 204);
-//
-//		String component = rule.component.orElse(COMPONENT_ALL);
-//		String defenseProp = rule.defenseProperty.orElse(DEFENSE_PROP_ALL);
-//		String dal = rule.dal.map(i -> i.toString()).orElse(DAL_LINEAR);
-//		String cost = Double.toString(rule.value);
-//
-//		row.setBackground(background);
-//
-//		addTextEditor(row, suggComponents, component, 0, background, str -> {
-//			if (suggComponentsIndexMap.containsKey(str)) {
-//				rule.component = str.equals(COMPONENT_ALL) ? Optional.empty() : Optional.of(str);
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		});
-//
-//		addTextEditor(row, suggDefenseProps, defenseProp, 1, background, str -> {
-//			if (suggDefensePropsIndexMap.containsKey(str)) {
-//				rule.defenseProperty = str.equals(DEFENSE_PROP_ALL) ? Optional.empty() : Optional.of(str);
-//				return true;
-//			} else {
-//				return false;
-//			}
-//		});
-//		addTextEditor(row, suggDals, dal, 2, background, str -> {
-//			if (suggDalsIndexMap.containsKey(str)) {
-//				try {
-//					rule.dal = str.equals(DAL_LINEAR) ? Optional.empty() : Optional.of(Integer.parseInt(str));
-//					return true;
-//				} catch (NumberFormatException e) {
-//					return false;
-//				}
-//			} else {
-//				return false;
-//			}
-//		});
-//		addTextEditor(row, null, cost, 3, background, str -> {
-//			try {
-//				rule.value = Double.parseDouble(str);
-//				return true;
-//			} catch (NumberFormatException e) {
-//				return false;
-//			}
-//		});
-//		addCloseButton(row, 4, background, () -> {
-//			int pos = costModel.rules.indexOf(rule);
-//			costModel.rules.remove(pos);
-//			table.remove(pos);
-//			row.dispose();
-//		});
-	}
-
-	private void addTextEditor(TableItem row,
-			List<String> options,
-			String currentSelection,
-			int column,
-			Color background,
-			Function<String, Boolean> listener) {
-		TableEditor editor = new TableEditor(table);
-		editor.grabHorizontal = true;
-		editor.grabVertical = true;
-
-		Color invalidColor = new Color(Display.getCurrent(), 255, 127, 127);
-
-		if (options != null) {
-			CCombo combo = new CCombo(table, SWT.NONE);
-			combo.setEditable(true);
-			for (String option : options) {
-				combo.add(option);
-			}
-			combo.setText(currentSelection);
-			combo.setBackground(background);
-
-			combo.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					combo.setBackground(listener.apply(combo.getText()) ? background : invalidColor);
-				}
-
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					combo.setBackground(listener.apply(combo.getText()) ? background : invalidColor);
-				}
-			});
-
-			combo.addModifyListener(
-					e -> combo.setBackground(listener.apply(combo.getText()) ? background : invalidColor));
-
-			editor.setEditor(combo, row, column);
-		} else {
-			Text text = new Text(table, SWT.NONE);
-			text.setEditable(true);
-			text.setText(currentSelection);
-			text.setBackground(background);
-
-			text.addModifyListener(e -> text.setBackground(listener.apply(text.getText()) ? background : invalidColor));
-
-			editor.setEditor(text, row, column);
-		}
-	}
-
-	private void addCloseButton(TableItem row, int column, Color background, Runnable listener) {
-		TableEditor editor = new TableEditor(table);
-		editor.grabHorizontal = true;
-		editor.grabVertical = true;
-
-		Button button = new Button(table, SWT.PUSH);
-		button.setImage(deleteImage);
-		button.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				listener.run();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
-		editor.setEditor(button, row, column);
 	}
 }
