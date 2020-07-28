@@ -4,6 +4,7 @@ package com.ge.verdict.bundle;
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.attackdefensecollector.Prob;
+import com.ge.verdict.gsn.GSNInterface;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
@@ -37,6 +38,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -46,6 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.Model;
 
 public class App {
@@ -140,9 +143,20 @@ public class App {
                         .argName("kind2 binary")
                         .build();
 
+        Option gsn =
+                Option.builder()
+                        .longOpt("gsn")
+                        .numberOfArgs(4)
+                        .argName("Root Goal Id")
+                        .argName("GSN Output Directory")
+                        .argName("Soteria++ Output Directory")
+                        .argName("Project Directory")
+                        .build();
+
         OptionGroup group = new OptionGroup();
         group.addOption(mbas);
         group.addOption(crv);
+        group.addOption(gsn);
         group.setRequired(true);
 
         Option debug =
@@ -164,6 +178,8 @@ public class App {
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
         options.addOption("p", false, "Use partial solutions in synthesis");
         options.addOption("m", false, "Perform merit assignment in synthesis");
+
+        options.addOption("x", false, "Generate XML files for GSN");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -228,9 +244,18 @@ public class App {
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
         helpLine("      -BA .................. blame assignment");
         helpLine(
-                "      -C ................... component-level blame assignment (default link-level)");
+                "      -C .................... component-level blame assignment (default link-level)");
         helpLine(
                 "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
+        helpLine();
+        helpLine("Toolchain: Assurance Case Fragment Generator");
+        helpLine("  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> [-x]");
+        helpLine("   <root id> ............... the root goal id for the assurance case fragment");
+        helpLine(
+                "   <gsn out dir> ........... the directory where the gsn fragments should be created");
+        helpLine("   <soteria out dir> ....... the directory where Soteria outputs are created");
+        helpLine("   <aadl project dir> ...... the directory where the aadl files are present");
+        helpLine("        -x ................. key to determine if xml should be created");
         helpLine();
         helpLine("-d, --debug <dir> .......... Produce debug output");
         helpLine("      <dir> ................ Intermediary XML output directory");
@@ -354,6 +379,24 @@ public class App {
                     debugDir,
                     kind2Bin);
             sample.stop(Metrics.timer("Timer.crv", "model", modelName));
+        } else if (opts.hasOption("gsn")) {
+            String[] gsnOpts = opts.getOptionValues("gsn");
+            String rootGoalId = gsnOpts[0];
+            String gsnOutputDir = gsnOpts[1];
+            String soteriaOutputDir = gsnOpts[2];
+            String caseAadlPath = gsnOpts[3];
+            boolean generateXml = false;
+            if (opts.hasOption("x")) {
+                generateXml = true;
+            }
+
+            runGsn(
+                    rootGoalId,
+                    gsnOutputDir,
+                    soteriaOutputDir,
+                    caseAadlPath,
+                    generateXml,
+                    modelName);
         }
     }
 
@@ -393,6 +436,37 @@ public class App {
         System.out.println("      " + header);
         logLine();
         System.out.println();
+    }
+
+    /**
+     * call the GSN creation interface from verdict-assurance-case
+     *
+     * @param rootGoalId
+     * @param gsnOutputDir
+     * @param soteriaOutputDir
+     * @param caseAadlPath
+     */
+    private static void runGsn(
+            String rootGoalId,
+            String gsnOutputDir,
+            String soteriaOutputDir,
+            String caseAadlPath,
+            boolean generateXml,
+            String modelName)
+            throws VerdictRunException {
+        logHeader("GSN");
+        // calling the function to create GSN artefacts
+        GSNInterface createGsnObj = new GSNInterface();
+
+        try {
+            createGsnObj.runGsnArtifactsGenerator(
+                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            // TODO Auto-generated catch block
+            throw new VerdictRunException("Failed to create GSN fragments", e);
+        }
+
+        logHeader("Finished");
     }
 
     /**
