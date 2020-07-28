@@ -12,6 +12,7 @@ import verdict.vdm.vdm_model.*;
 
 /** @author Saswata Paul */
 public class CreateGSN {
+    static final String SEP = File.separator;
     // For naming the nodes uniformly
     protected static int strategyCounter = 1;
     protected static int contextCounter = 1;
@@ -36,10 +37,13 @@ public class CreateGSN {
         File cyberOutput = new File(soteriaOutputDir, "ImplProperties.xml");
         File safetyOutput = new File(soteriaOutputDir, "ImplProperties-safety.xml");
 
+        // Fetch the DeliveryDrone model from the XML
+        Model xmlModel = VdmTranslator.unmarshalFromXml(modelXml);
+
         // create the GSN fragment
         GsnNode gsnFragment =
-                CreateGSN.gsnCreator(modelXml, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
-        System.out.println("Created Gsn Fragment");
+                CreateGSN.gsnCreator(xmlModel, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
+        System.out.println("Info: Created Gsn Fragment");
 
         // Filenames
         String xmlFilename = rootGoalId + "_GsnFragment.xml";
@@ -49,25 +53,25 @@ public class CreateGSN {
         // Create a file and print the GSN XML
         File gsnXmlFile = new File(gsnOutputDir, xmlFilename);
         Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
-        System.out.println("Created Gsn Xml");
+        System.out.println("Info: Created Gsn Xml: " + gsnXmlFile.getAbsolutePath());
 
         // Create a file and print the dot
         File gsnDotFile = new File(gsnOutputDir, dotFilename);
         Gsn2Dot.createDot(gsnFragment, gsnDotFile);
-        System.out.println("Created Gsn dot");
+        System.out.println("Info: Created Gsn dot: " + gsnDotFile.getAbsolutePath());
 
         // generate the svg file using graphviz
-        String graphDestination = gsnOutputDir + "/" + svgFilename;
+        String graphDestination = gsnOutputDir + SEP + svgFilename;
         String dotFileSource = gsnDotFile.getAbsolutePath();
 
         Dot2GraphViz.generateGraph(dotFileSource, graphDestination);
-        System.out.println("Created Gsn svg");
+        System.out.println("Info: Created Gsn svg: " + graphDestination);
     }
 
     /**
      * creates a GsnNode and returns it
      *
-     * @param testXml -- file object with the VDM xml
+     * @param xmlModel -- a VDM model
      * @param cyberOutput -- file object with soteria++ output for cyber properties
      * @param safetyOutput -- file object with soteria++ output for safety properties
      * @param addressForCASE -- string address to the CASE consolidated properties
@@ -78,7 +82,7 @@ public class CreateGSN {
      * @throws IOException
      */
     public static GsnNode gsnCreator(
-            File testXml,
+            Model xmlModel,
             File cyberOutput,
             File safetyOutput,
             String addressForCASE,
@@ -87,9 +91,6 @@ public class CreateGSN {
 
         // The GsnNode to return
         GsnNode returnFragment = new GsnNode();
-
-        // Fetch the DeliveryDrone model from the XML
-        Model xmlModel = VdmTranslator.unmarshalFromXml(testXml);
 
         // Get Document Builder for DOM parser
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

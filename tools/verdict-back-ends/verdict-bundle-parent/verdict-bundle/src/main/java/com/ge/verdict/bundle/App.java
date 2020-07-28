@@ -375,7 +375,7 @@ public class App {
             String soteriaOutputDir = gsnOpts[2];
             String caseAadlPath = gsnOpts[3];
 
-            runGsn(rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
+            runGsn(rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, modelName);
         }
     }
 
@@ -426,17 +426,23 @@ public class App {
      * @param caseAadlPath
      */
     private static void runGsn(
-            String rootGoalId, String gsnOutputDir, String soteriaOutputDir, String caseAadlPath) {
+            String rootGoalId,
+            String gsnOutputDir,
+            String soteriaOutputDir,
+            String caseAadlPath,
+            String modelName)
+            throws VerdictRunException {
+        logHeader("GSN");
         // calling the function to create GSN artefacts
         CreateGSN createGsnObj = new CreateGSN();
-
         try {
             createGsnObj.runGsnArtifactsGenerator(
                     rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath);
         } catch (IOException | ParserConfigurationException | SAXException e) {
             // TODO Auto-generated catch block
-            throw new RuntimeException(e);
+            throw new VerdictRunException("Failed to create GSN fragments", e);
         }
+        logHeader("Finished");
     }
 
     /**

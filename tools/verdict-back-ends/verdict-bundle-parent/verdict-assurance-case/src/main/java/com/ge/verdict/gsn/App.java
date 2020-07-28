@@ -17,7 +17,7 @@ public class App {
             throws IOException, ParserConfigurationException, SAXException {
 
         if (args.length != 4) {
-            System.out.println("Invalid number of arguments provided.");
+            System.out.println("Argument Error: Invalid number of arguments provided.");
         } else {
             String rootGoalId = args[0];
             String gsnOutputDir = args[1];

@@ -119,17 +119,40 @@ public class Aadl2Vdm {
 	 * */	
 	public Model execute(File inputDir)
 	   {				
-			System.err.println("Successfully entered Aadl2Vdm Translator! \n\n\n");
+      		logHeader("AADL2VDM");
+//			System.err.println("Successfully entered Aadl2Vdm Translator! \n\n\n");
 		    Model m = new Model();
 			m = populateVDMFromAadlObjects(preprocessAadlFiles(inputDir), m);			
-			System.err.println("Working Directory = " + System.getProperty("user.dir"));
+//			System.err.println("Working Directory = " + System.getProperty("user.dir"));
 			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
-			System.err.println("Created File object to store Xml");
+//			System.err.println("Created File object to store Xml");
 			VdmTranslator.marshalToXml(m, testXml);
-			System.err.println("Marshalled Model to XML");
+//			System.err.println("Marshalled Model to XML");
+			System.out.println("Info: Created VDM object");
 			return m;
 	   }	
-	   
+	
+	
+	/**
+	 * for pretty printing header
+	 */
+    private static void logLine() {
+        System.out.println(
+                "******************************************************************"
+                        + "******************************************************");
+    }
+    
+    
+	/**
+	 * for pretty printing header
+	 */   
+    private static void logHeader(String header) {
+        System.out.println();
+        logLine();
+        System.out.println("      " + header);
+        logLine();
+        System.out.println();
+    } 	
 	
 	/**
 	 * Assume the input is correct without any syntax errors
