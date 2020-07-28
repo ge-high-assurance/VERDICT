@@ -12,6 +12,7 @@ import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.SafetyReq;
 
+/** @author Saswata Paul */
 public class GSNInterface {
     static final String SEP = File.separator;
 

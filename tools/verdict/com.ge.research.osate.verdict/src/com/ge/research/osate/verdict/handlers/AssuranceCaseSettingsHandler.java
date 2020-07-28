@@ -9,6 +9,7 @@ import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 
 
 /**
+ * @author Saswata Paul
  * If the settings panel is not created yet, we create a new one;
  * otherwise, we bring the old panel to the front.
  */

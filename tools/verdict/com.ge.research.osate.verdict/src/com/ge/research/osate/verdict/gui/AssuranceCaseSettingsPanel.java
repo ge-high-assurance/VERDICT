@@ -25,15 +25,15 @@ import org.eclipse.swt.widgets.Text;
 
 
 /**
-* Let user enable cyber or safety relations inference when running MBAA.
+* @author Saswata Paul
 */
 public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 	// variable to control granularity of GSN
 	public static String rootGoalId;
 	//variable to decide if svgs should be shown in a new Tab
-	public static boolean showInTab;
+	public static boolean showInTab = true;
 	//variable to decide if xml should be generated
-	public static boolean generateXml;
+	public static boolean generateXml = true ;
 
 	
 	private Font font;
@@ -78,32 +78,36 @@ public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 		Label acsLabel = new Label(composite, SWT.NONE);
 		acsLabel.setText("Assurance Case Settings");
 		acsLabel.setFont(boldFont);
-
+        GridData gd1 = new GridData ();
+        gd1.horizontalAlignment = SWT.CENTER;		
+        acsLabel.setLayoutData(gd1);
+		
 		Group acsGroup = new Group(composite, SWT.NONE);
 		acsGroup.setLayout(new GridLayout(1, false));
 		
 
 		//Field to accept requirement ID
 	    Label idLabel = new Label(acsGroup, SWT.NULL);
-	    idLabel.setText("Enter requirement Id below: ");
+	    idLabel.setText("Enter Requirement Id Below");
 		idLabel.setFont(font);
+        idLabel.setLayoutData(gd1);
         Text idField = new Text(acsGroup, SWT.BORDER | SWT.LEFT);
-        GridData gd = new GridData ();
-        gd.widthHint = 205;
-        idField.setLayoutData(gd);
+        GridData gd2 = new GridData ();
+        gd2.widthHint = 205;
+        idField.setLayoutData(gd2);
         if(rootGoalId!=null) {
             idField.setText(rootGoalId);        	
         }
 	    
         //Button to save settings for xml
         Button xmlButton = new Button(acsGroup, SWT.CHECK);	
-        xmlButton.setText("Generate XML artifacts");	
+        xmlButton.setText("Generate XML Artifacts");	
         xmlButton.setFont(font);	
         xmlButton.setSelection(generateXml);
 
         //Button to save settings for showing in tab
         Button showFragButton = new Button(acsGroup, SWT.CHECK);	
-		showFragButton.setText("Auto-Open GSN Fragments");	
+		showFragButton.setText("Auto-Open GSN Graphs");	
 		showFragButton.setFont(font);	
 		showFragButton.setSelection(showInTab);
         

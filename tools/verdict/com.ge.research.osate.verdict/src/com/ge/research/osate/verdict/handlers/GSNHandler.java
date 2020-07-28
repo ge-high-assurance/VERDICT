@@ -1,10 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,10 +10,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AnnexSubclause;
@@ -42,11 +36,15 @@ import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
-import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_model.Model;
 
+/**
+ * 
+ * @author Saswata Paul
+ *
+ */
 public class GSNHandler extends AbstractHandler {
 	static final String SEP = File.separator;
 
@@ -56,11 +54,7 @@ public class GSNHandler extends AbstractHandler {
 			// Print on console
 			IIntroPart introPart = PlatformUI.getWorkbench().getIntroManager().getIntro();
 			PlatformUI.getWorkbench().getIntroManager().closeIntro(introPart);
-			final IWorkbenchWindow iWindow = HandlerUtil.getActiveWorkbenchWindow(event);
-//			VerdictHandlersUtils.setPrintOnConsole("MBAS Output");
 			VerdictHandlersUtils.printGreeting();
-			Display mainThreadDisplay = Display.getCurrent();
-			
 
 			Thread createGsnThread = new Thread() {
 				@Override
@@ -240,28 +234,34 @@ public class GSNHandler extends AbstractHandler {
 		        .arg(xmlKey); 
 		
 
-		
-//		//Since cannot test via plugin, just printing into a file for now.
-//		String args = "--csv "+projectName+" --gsn "+rootId+" "+gsnOutputDir+" "+soteriaOutputDir+" "+caseAadlDir+" "+xmlKey;
-//		File printArguments = new File("/Users/212807042/Desktop/pluginArgs.txt");
-//        FileOutputStream fos = new FileOutputStream(printArguments);
-//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-//        bw.write(args);
-//        bw.close();
-
 
 		int code = command.runJarOrImage();
 		return code == 0;
-//        return true;
 	}
 
 	
-	
+	/**
+	 * Calls Aadl2Csv translator
+	 * @param dir
+	 * @param stemOutputDir
+	 * @param soteriaOutputDir
+	 */
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
 		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
 		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
 	}
 
+	/**
+	 * runs MBAA for both cyber and safety requirements
+	 * @param bundleJar
+	 * @param dockerImage
+	 * @param projectName
+	 * @param stemProjectDir
+	 * @param soteriaPpBin
+	 * @param graphVizPath
+	 * @return
+	 * @throws IOException
+	 */
 	public static boolean runBundleMBAS(String bundleJar, String dockerImage, String projectName,
 			String stemProjectDir, String soteriaPpBin, String graphVizPath) throws IOException {
 
