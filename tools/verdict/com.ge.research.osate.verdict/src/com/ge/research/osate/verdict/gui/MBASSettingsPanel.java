@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 * Let user enable cyber or safety relations inference when running MBAA.
 */
 public class MBASSettingsPanel extends ApplicationWindow {
+	public static boolean openGraphs = true;
 	public static boolean cyberInference = false;
 	public static boolean safetyInference = false;
 
@@ -76,6 +77,11 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		Group mbaaSelectionButtonGroup = new Group(composite, SWT.NONE);
 		mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
+		Button openGraphButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
+		openGraphButton.setText("Auto-Open Generated Graphs");
+		openGraphButton.setFont(font);
+		openGraphButton.setSelection(openGraphs);		
+		
 		Button cyberButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
 		cyberButton.setText("Enable Cyber Relations Inference");
 		cyberButton.setFont(font);
@@ -99,7 +105,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		synthesisEnableCyberInference.setSelection(synthesisCyberInference);
 
 		Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
-		partialSolution.setText("Enable Partial Solutions");
+		partialSolution.setText("Enable Partial Models");
 		partialSolution.setFont(font);
 		partialSolution.setSelection(synthesisPartialSolution);
 
@@ -159,6 +165,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		save.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
+				openGraphs = openGraphButton.getSelection();
 				cyberInference = cyberButton.getSelection();
 				safetyInference = safetyButton.getSelection();
 				synthesisPartialSolution = partialSolution.getSelection();
