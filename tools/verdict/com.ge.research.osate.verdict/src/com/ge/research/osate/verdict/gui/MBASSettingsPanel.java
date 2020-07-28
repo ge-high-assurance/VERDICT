@@ -78,7 +78,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
 		Button openGraphButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		openGraphButton.setText("Auto-Open Generated Graphs");
+		openGraphButton.setText("Show Graphs in New Tabs");
 		openGraphButton.setFont(font);
 		openGraphButton.setSelection(openGraphs);		
 		
