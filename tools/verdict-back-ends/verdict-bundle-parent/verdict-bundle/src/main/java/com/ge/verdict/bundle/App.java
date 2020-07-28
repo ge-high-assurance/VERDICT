@@ -19,6 +19,7 @@ import com.ge.verdict.vdm.VdmTranslator;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
+import edu.uiowa.clc.verdict.merit.MeritAssignment;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
 import io.micrometer.core.instrument.Clock;
@@ -185,8 +186,10 @@ public class App {
             options.addOption(opt, false, "");
         }
 
+        options.addOption("MA", false, "Merit Assignment");
         options.addOption("BA", false, "Blame Assignment");
         options.addOption("C", false, "Component-level Blame Assignment");
+        options.addOption("G", false, "Global Blame Assignment");
         options.addOption("ATG", false, "Automatic Test-case Generation");
 
         return options;
@@ -238,13 +241,15 @@ public class App {
         helpLine("      -m ................... synthesis merit assignment");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
-        helpLine("  --crv <out> <kind2 bin> [-ATG] [-BA [-C]] <threats>");
+        helpLine("  --crv <out> <kind2 bin> [-ATG] [-MA] [-BA [-C] [-G]] <threats>");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
+        helpLine("      -MA .................. merit assignment");
         helpLine("      -BA .................. blame assignment");
         helpLine(
-                "      -C .................... component-level blame assignment (default link-level)");
+                "      -C ................... component-level blame assignment (default link-level)");
+        helpLine("      -G ................... global blame assignment (default local)");
         helpLine(
                 "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
         helpLine();
@@ -354,8 +359,10 @@ public class App {
                             .filter(threat -> opts.hasOption(threat))
                             .collect(Collectors.toList());
 
+            boolean meritAssignment = opts.hasOption("MA");
             boolean blameAssignment = opts.hasOption("BA");
             boolean componentLevel = opts.hasOption("C");
+            boolean globalOptimization = opts.hasOption("G");
             boolean atg = opts.hasOption("ATG");
 
             String[] crvOpts = opts.getOptionValues("crv");
@@ -373,7 +380,9 @@ public class App {
                     threats,
                     blameAssignment,
                     componentLevel,
+                    globalOptimization,
                     atg,
+                    meritAssignment,
                     outputPath,
                     outputBaPath,
                     debugDir,
@@ -862,7 +871,9 @@ public class App {
             List<String> threats,
             boolean blameAssignment,
             boolean componentLevel,
+            boolean globalOptimization,
             boolean atg,
+            boolean meritAssignment,
             String outputPath,
             String outputBaPath,
             String debugDir,
@@ -1014,9 +1025,20 @@ public class App {
                         "--enable",
                         "MCS",
                         "--print_mcs_legacy",
-                        "true");
+                        "true",
+                        "--mcs_approximate",
+                        Boolean.toString(!globalOptimization));
             } else {
-                Binary.invokeBin(kind2Bin, null, redirect, outputFormat, lustrePath);
+                Binary.invokeBin(
+                        kind2Bin,
+                        null,
+                        redirect,
+                        outputFormat,
+                        lustrePath,
+                        "--ivc",
+                        Boolean.toString(meritAssignment),
+                        "--ivc_category",
+                        "contracts");
             }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes
@@ -1049,6 +1071,13 @@ public class App {
             throw new VerdictRunException("Failed to execute kind2", e);
         } finally {
             kind2Sample.stop(Metrics.timer("Timer.crv.kind2", "model", modelName));
+        }
+
+        if (meritAssignment) {
+            logHeader("Merit Assignment");
+
+            MeritAssignment ma = new MeritAssignment(new File(outputPath));
+            ma.readAndPrintInfo();
         }
 
         if (blameAssignment && instrumentor != null) {

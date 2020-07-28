@@ -52,6 +52,10 @@
             <artifactId>verdict-test-instrumentor</artifactId>
         </dependency>
         <dependency>
+            <groupId>edu.uiowa.clc.verdict</groupId>
+            <artifactId>verdict-merit-assignment</artifactId>
+        </dependency>
+        <dependency>
             <groupId>edu.uiowa.clc.verdict.blm</groupId>
             <artifactId>verdict-blame-assignment</artifactId>
         </dependency>
