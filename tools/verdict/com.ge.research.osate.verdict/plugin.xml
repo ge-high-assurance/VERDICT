@@ -48,8 +48,8 @@
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
        <handler
-             class="com.ge.research.osate.verdict.handlers.MBASCostsModelSettingHandler"
-             commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings">
+             class="com.ge.research.osate.verdict.handlers.MBASCostModelSettingHandler"
+             commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings">
            <enabledWhen>
                <reference
                    definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
@@ -89,10 +89,10 @@
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
       	  </command>-->
       	  <command
-      	        commandId="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
-      	        label="&amp;MBAS Costs Model Settings"
+      	        commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+      	        label="&amp;Configure MBAS Cost Model"
       	        style="push"
-      	        tooltip="Click to change MBAS Costs Model Settings">
+      	        tooltip="Click to change MBAS Cost Model">
       	  </command>
       	  <command
       	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
@@ -166,8 +166,8 @@
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.mbasCostsModelSettings"
-             name="MBAS Costs Model Settings">
+             id="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+             name="Configure MBAS Cost Model">
        </command>       
        <command
              categoryId="com.ge.research.osate.verdict.commands"

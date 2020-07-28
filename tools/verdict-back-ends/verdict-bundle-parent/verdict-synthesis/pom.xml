@@ -24,8 +24,8 @@
             <artifactId>verdict-attack-defense-collector</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>verdict-data-model</artifactId>
+            <groupId>com.ge.research.osate.verdict</groupId>
+            <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
