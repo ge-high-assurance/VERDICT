@@ -43,7 +43,10 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.DataImplementation;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.Subcomponent;
 
 public class MBASCostModelView extends ApplicationWindow{
@@ -92,12 +95,26 @@ public class MBASCostModelView extends ApplicationWindow{
 		List<ComponentImplementation> impls = new ArrayList<>();
 		List<Subcomponent> comps = new ArrayList<>();
 
+		Set<String> defensePropNames = new HashSet<>();
+
 		for (EObject obj : aadlObjs) {
-			if (obj instanceof ComponentImplementation) {
+			// be careful not to pick up data implementations
+			if (obj instanceof ComponentImplementation && !(obj instanceof DataImplementation)) {
 				ComponentImplementation impl = (ComponentImplementation) obj;
 				impls.add(impl);
 				for (Subcomponent comp : impl.getAllSubcomponents()) {
 					comps.add(comp);
+				}
+			} else if (obj instanceof Property) {
+				Property prop = (Property) obj;
+				boolean rightMetaclass = prop.getAppliesToMetaclasses().stream().anyMatch(metaclass -> {
+					String name = metaclass.getMetaclass().getName().toLowerCase();
+					return "system".equals(name) || "connection".contentEquals(name);
+				});
+				boolean isInteger = prop.getPropertyType() instanceof AadlInteger;
+				// we could further check if the range is 0..9
+				if (rightMetaclass && isInteger) {
+					defensePropNames.add(prop.getName());
 				}
 			}
 		}
@@ -106,17 +123,23 @@ public class MBASCostModelView extends ApplicationWindow{
 		systemNames.addAll(impls.stream().map(ComponentImplementation::getName).collect(Collectors.toList()));
 		systemNames.addAll(comps.stream().map(Subcomponent::getName).collect(Collectors.toList()));
 
-		suggComponents.add(SynthesisCostModel.COMPONENT_ALL);
 		for (String system : systemNames) {
 			suggComponents.add(system);
 		}
+		suggComponents.sort(null);
+		suggComponents.add(0, SynthesisCostModel.COMPONENT_ALL);
 
-		suggDefenseProps.add(SynthesisCostModel.DEFENSE_PROP_ALL);
+		for (String defenseProp : defensePropNames) {
+			suggDefenseProps.add(defenseProp);
+		}
+		suggDefenseProps.sort(null);
+		suggDefenseProps.add(0, SynthesisCostModel.DEFENSE_PROP_ALL);
 
-		suggDals.add(SynthesisCostModel.DAL_LINEAR);
 		for (int dal = 0; dal < 10; dal++) {
 			suggDals.add(Integer.toString(dal));
 		}
+		suggDals.sort(null);
+		suggDals.add(0, SynthesisCostModel.DAL_LINEAR);
 
 		// We want to be able to check contains in constant time
 		suggComponentsIndexMap = new HashMap<>();
