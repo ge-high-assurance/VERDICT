@@ -52,6 +52,7 @@ public class GSNHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (VerdictHandlersUtils.startRun()) {
 			// Print on console
+			VerdictHandlersUtils.setPrintOnConsole("");
 			IIntroPart introPart = PlatformUI.getWorkbench().getIntroManager().getIntro();
 			PlatformUI.getWorkbench().getIntroManager().closeIntro(introPart);
 			VerdictHandlersUtils.printGreeting();
@@ -73,16 +74,15 @@ public class GSNHandler extends AbstractHandler {
 						
 						//checking if input is valid
 						if (AssuranceCaseSettingsPanel.rootGoalId==null) {
-							System.out.println("Warning: Invalid input. Generating for all mission requirements.");
+							System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
 							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
 						} else if (!allReqIds.contains(AssuranceCaseSettingsPanel.rootGoalId.trim())){
-							System.out.println("Warning: Invalid input. Generating for all mission requirements.");
+							System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
 							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
 						} else {
 							userInput = AssuranceCaseSettingsPanel.rootGoalId.trim();
-						}
-						
-						VerdictHandlersUtils.setPrintOnConsole("Generating GSN for : "+ AssuranceCaseSettingsPanel.rootGoalId);
+							System.out.println("Info: Generating GSN Assurance Case Fragments for : "+ userInput);
+						}						
 						
 						//Checking if all necessary settings exist
 						String stemProjPath = BundlePreferences.getStemDir();
