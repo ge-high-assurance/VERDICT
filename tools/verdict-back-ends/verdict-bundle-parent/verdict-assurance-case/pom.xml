@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ge.verdict</groupId>
+        <artifactId>verdict-bundle-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Verdict Assurance Case -->
+    <artifactId>verdict-assurance-case</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ge.research.osate.verdict</groupId>
+            <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>guru.nidi</groupId>
+            <artifactId>graphviz-java</artifactId>
+            <version>0.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>word-wrap</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+        <!-- JAXB dependencies needed only under Java 9 or later -->
+
+        <!-- Dependencies needed only by tests -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.chrisdchristo</groupId>
+                <artifactId>capsule-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <appClass>com.ge.verdict.gsn.App</appClass>
+                            <includeApp>true</includeApp>
+                            <includeAppDep>true</includeAppDep>
+                            <includePluginDep>false</includePluginDep>
+                            <includeTransitiveDep>true</includeTransitiveDep>
+                            <includeCompileDep>true</includeCompileDep>
+                            <includeRuntimeDep>true</includeRuntimeDep>
+                            <includeProvidedDep>false</includeProvidedDep>
+                            <includeSystemDep>false</includeSystemDep>
+                            <includeTestDep>true</includeTestDep>
+                            <includeOptionalDep>false</includeOptionalDep>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

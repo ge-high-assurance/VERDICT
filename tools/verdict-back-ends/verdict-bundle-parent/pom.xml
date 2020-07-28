@@ -15,6 +15,7 @@
 
     <modules>
         <module>iml-verdict-translator</module>
+        <module>verdict-assurance-case</module>
         <module>verdict-attack-defense-collector</module>
         <module>verdict-blame-assignment</module>
         <module>verdict-bundle</module>

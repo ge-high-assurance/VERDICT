@@ -85,6 +85,11 @@
             </dependency>
             <dependency>
                 <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-assurance-case</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-attack-defense-collector</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -25,6 +25,10 @@
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-assurance-case</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-attack-defense-collector</artifactId>
         </dependency>
         <dependency>
