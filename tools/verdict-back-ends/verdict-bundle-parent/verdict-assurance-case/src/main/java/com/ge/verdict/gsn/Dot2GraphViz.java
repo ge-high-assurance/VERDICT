@@ -25,8 +25,7 @@ public class Dot2GraphViz {
      * @throws IOException
      * @throws IOException
      */
-    public static void generateGraph(String sourceAddress, String outputAddress)
-            throws IOException {
+    public void generateGraph(String sourceAddress, String outputAddress) throws IOException {
 
         // Parse dot file and create the svg
         try (InputStream dot = new FileInputStream(sourceAddress); ) {

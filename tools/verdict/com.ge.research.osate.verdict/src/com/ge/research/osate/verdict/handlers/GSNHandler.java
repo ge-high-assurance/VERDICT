@@ -1,7 +1,10 @@
 package com.ge.research.osate.verdict.handlers;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -72,17 +75,39 @@ public class GSNHandler extends AbstractHandler {
 						//getting input
 						String userInput;
 						
-						//checking if input is valid
+						//checking user input
 						if (AssuranceCaseSettingsPanel.rootGoalId==null) {
 							System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
 							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
-						} else if (!allReqIds.contains(AssuranceCaseSettingsPanel.rootGoalId.trim())){
-							System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
-							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
 						} else {
-							userInput = AssuranceCaseSettingsPanel.rootGoalId.trim();
-							System.out.println("Info: Generating GSN Assurance Case Fragments for : "+ userInput);
-						}						
+							if (AssuranceCaseSettingsPanel.rootGoalId.trim().length()==0) {
+								System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
+								userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+							} else {
+								boolean correctInputs = true;
+								
+								//splitting the input by ; here
+								String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
+								String[] inputs = inputLine.split(";");
+																
+								//checking if input is valid
+								for(String in : inputs) {
+									if (!allReqIds.contains(in)) {
+										correctInputs = false;
+									}
+								}
+								
+								if (correctInputs) {
+									userInput = inputLine;
+								} else {
+									System.out.println("Warning: Ill Formed Input. Generating for all mission requirements.");
+									userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+								}															
+							}
+
+						}
+																			
+						
 						
 						//Checking if all necessary settings exist
 						String stemProjPath = BundlePreferences.getStemDir();
@@ -146,9 +171,6 @@ public class GSNHandler extends AbstractHandler {
 						
 						//running MBAS 
 						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
-
-						/** TEMPORARY! CHANGE BEFORE FINAL */
-						//boolean outputsGenerated = true;
 						
                         // if MBAS succeeded, proceed to GSN
 						if (outputsGenerated){
@@ -233,7 +255,6 @@ public class GSNHandler extends AbstractHandler {
 				.arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir)
 		        .arg(xmlKey); 
 		
-
 
 		int code = command.runJarOrImage();
 		return code == 0;

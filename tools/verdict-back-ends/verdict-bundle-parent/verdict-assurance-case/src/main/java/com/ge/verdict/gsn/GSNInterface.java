@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
-import verdict.vdm.vdm_model.CyberReq;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.SafetyReq;
 
 /** @author Saswata Paul */
 public class GSNInterface {
@@ -19,7 +17,7 @@ public class GSNInterface {
     /**
      * The interface for creating GSN artefacts
      *
-     * @param rootGoalIdInput -- the GUI input root goal of the GSN fragment
+     * @param userInput -- the GUI user input with Ids
      * @param gsnOutputDir -- the directory where outputs will be stored
      * @param soteriaOutputDir -- the directory containing Soteria outputs
      * @param caseAadlPath -- the directory containing the AADL files
@@ -29,7 +27,7 @@ public class GSNInterface {
      * @throws SAXException
      */
     public void runGsnArtifactsGenerator(
-            String rootGoalIdInput,
+            String userInput,
             String gsnOutputDir,
             String soteriaOutputDir,
             String caseAadlPath,
@@ -49,34 +47,28 @@ public class GSNInterface {
             missionIds.add(aMission.getId());
         }
 
-        // List of all cyber req ids
-        List<String> cyberIds = new ArrayList<>();
-        for (CyberReq aCReq : xmlModel.getCyberReq()) {
-            cyberIds.add(aCReq.getId());
-        }
-
-        // List of all safety req ids
-        List<String> safetyIds = new ArrayList<>();
-        for (SafetyReq aSReq : xmlModel.getSafetyReq()) {
-            safetyIds.add(aSReq.getId());
-        }
-
         // List of ids to create fragments for
         List<String> forIds = new ArrayList<>();
 
-        if (rootGoalIdInput.equals("ALLMREQKEY")) {
+        if (userInput.equals("ALLMREQKEY")) {
             forIds.addAll(missionIds);
-            forIds.addAll(cyberIds);
-            forIds.addAll(safetyIds);
         } else {
-            forIds.add(rootGoalIdInput);
+
+            // get individual IDs from the user input
+            String[] inputs = userInput.split(";");
+
+            // adding each Id to the list
+            for (String id : inputs) {
+                forIds.add(id);
+            }
         }
 
         // creating fragments
         for (String rootGoalId : forIds) {
             // create the GSN fragment
+            CreateGSN objCreateGSN = new CreateGSN();
             GsnNode gsnFragment =
-                    CreateGSN.gsnCreator(
+                    objCreateGSN.gsnCreator(
                             xmlModel, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
             System.out.println("Info: Created Gsn fragment for " + rootGoalId);
 
@@ -88,7 +80,8 @@ public class GSNInterface {
             if (xmlFlag) {
                 // Create a file and print the GSN XML
                 File gsnXmlFile = new File(gsnOutputDir, xmlFilename);
-                Gsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
+                Gsn2Xml objGsn2Xml = new Gsn2Xml();
+                objGsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
                 System.out.println(
                         "Info: Written Gsn to xml for "
                                 + rootGoalId
@@ -98,7 +91,8 @@ public class GSNInterface {
 
             // Create a file and print the dot
             File gsnDotFile = new File(gsnOutputDir, dotFilename);
-            Gsn2Dot.createDot(gsnFragment, gsnDotFile);
+            Gsn2Dot objGsn2Dot = new Gsn2Dot();
+            objGsn2Dot.createDot(gsnFragment, gsnDotFile);
             System.out.println(
                     "Info: Written Gsn to dot for "
                             + rootGoalId
@@ -109,7 +103,8 @@ public class GSNInterface {
             String graphDestination = gsnOutputDir + SEP + svgFilename;
             String dotFileSource = gsnDotFile.getAbsolutePath();
 
-            Dot2GraphViz.generateGraph(dotFileSource, graphDestination);
+            Dot2GraphViz objDot2GraphViz = new Dot2GraphViz();
+            objDot2GraphViz.generateGraph(dotFileSource, graphDestination);
             System.out.println(
                     "Info: Written Gsn to svg for " + rootGoalId + ": " + graphDestination);
         }
