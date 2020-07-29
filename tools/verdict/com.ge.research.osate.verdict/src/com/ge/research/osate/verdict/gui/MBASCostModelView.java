@@ -184,38 +184,46 @@ public class MBASCostModelView extends ApplicationWindow{
 	@Override
 	protected Control createContents(Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
+		composite.setLayout(new GridLayout(2, false));
+
+		int leftColumnWidth = 400;
+
+		Composite leftColumn = new Composite(composite, SWT.NONE);
+		leftColumn.setLayout(new GridLayout(1, false));
+
+		Composite rightColumn = new Composite(composite, SWT.NONE);
+		rightColumn.setLayout(new GridLayout(1, false));
 
 		String allComps = suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
 				.collect(Collectors.joining(", "));
 		String allDefenseProps = suggDefenseProps.stream()
 				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.joining(", "));
 
-		Label componentLabel = new Label(composite, SWT.NONE);
+		Label componentLabel = new Label(leftColumn, SWT.NONE);
 		componentLabel.setText("Component:");
 		componentLabel.setFont(boldFont);
 
-		Label compsLabel = new Label(composite, SWT.WRAP);
+		Label compsLabel = new Label(leftColumn, SWT.WRAP);
 		GridData compsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
-		compsLabelGridData.widthHint = 600; // this is hardcoded, don't know how to make it adapt to window size
+		compsLabelGridData.widthHint = leftColumnWidth;
 		compsLabel.setLayoutData(compsLabelGridData);
 		compsLabel.setText(allComps);
 
 		// List all components
 
-		Label propLabel = new Label(composite, SWT.NONE);
+		Label propLabel = new Label(leftColumn, SWT.NONE);
 		propLabel.setText("Defense Property:");
 		propLabel.setFont(boldFont);
 
-		Label defPropsLabel = new Label(composite, SWT.WRAP);
+		Label defPropsLabel = new Label(leftColumn, SWT.WRAP);
 		GridData defPropsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
-		defPropsLabelGridData.widthHint = 600; // this is hardcoded, don't know how to make it adapt to window size
+		defPropsLabelGridData.widthHint = leftColumnWidth;
 		defPropsLabel.setLayoutData(defPropsLabelGridData);
 		defPropsLabel.setText(allDefenseProps);
 
 		// List all defense properties
 
-		Composite topButtons = new Composite(composite, SWT.NONE);
+		Composite topButtons = new Composite(rightColumn, SWT.NONE);
 		topButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		topButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
@@ -223,35 +231,18 @@ public class MBASCostModelView extends ApplicationWindow{
 		newRule.setText("Add row");
 		newRule.setFont(font);
 
-		table = new Table(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		table = new Table(rightColumn, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gridData.heightHint = 500;
 		table.setLayoutData(gridData);
 		table.setHeaderBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
-//		TableColumn componentCol = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-//		componentCol.setText("Component");
-//		componentCol.setWidth(240);
-//		TableColumn defenseCol = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-//		defenseCol.setText("Defense Property");
-//		defenseCol.setWidth(240);
-//		TableColumn dalCol = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-//		dalCol.setText("DAL");
-//		dalCol.setWidth(100);
-//		TableColumn costCol = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-//		costCol.setText("Cost");
-//		costCol.setWidth(160);
-//		TableColumn deleteCol = new TableColumn(table, SWT.CENTER | SWT.WRAP);
-//		deleteCol.setWidth(table.getItemHeight());
-
 		createTableViewer();
-
-//		loadTable();
 
 		table.setHeaderVisible(true);
 
-		Composite closeButtons = new Composite(composite, SWT.NONE);
+		Composite closeButtons = new Composite(rightColumn, SWT.NONE);
 		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		closeButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
