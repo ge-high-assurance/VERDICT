@@ -80,6 +80,7 @@ import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
+
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -201,7 +202,7 @@ public class Agree2Vdm {
 		//return the final model
 		return model;
 	}
-	
+
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
