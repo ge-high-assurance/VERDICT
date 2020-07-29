@@ -88,7 +88,6 @@ import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
-
 import com.rockwellcollins.atc.agree.agree.NodeBodyExpr;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.NodeEq;
