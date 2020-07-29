@@ -186,15 +186,32 @@ public class MBASCostModelView extends ApplicationWindow{
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
 
+		String allComps = suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
+				.collect(Collectors.joining(", "));
+		String allDefenseProps = suggDefenseProps.stream()
+				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.joining(", "));
+
 		Label componentLabel = new Label(composite, SWT.NONE);
-		componentLabel.setText("Component: ");
+		componentLabel.setText("Component:");
 		componentLabel.setFont(boldFont);
+
+		Label compsLabel = new Label(composite, SWT.WRAP);
+		GridData compsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
+		compsLabelGridData.widthHint = 600; // this is hardcoded, don't know how to make it adapt to window size
+		compsLabel.setLayoutData(compsLabelGridData);
+		compsLabel.setText(allComps);
 
 		// List all components
 
 		Label propLabel = new Label(composite, SWT.NONE);
-		propLabel.setText("Defense Property: ");
+		propLabel.setText("Defense Property:");
 		propLabel.setFont(boldFont);
+
+		Label defPropsLabel = new Label(composite, SWT.WRAP);
+		GridData defPropsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
+		defPropsLabelGridData.widthHint = 600; // this is hardcoded, don't know how to make it adapt to window size
+		defPropsLabel.setLayoutData(defPropsLabelGridData);
+		defPropsLabel.setText(allDefenseProps);
 
 		// List all defense properties
 
