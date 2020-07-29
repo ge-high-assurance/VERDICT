@@ -1,6 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,6 +12,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -23,6 +27,10 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.xtext.resource.XtextResourceSet;
+import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
+
+import com.google.inject.Injector;
 
 /**
 *
@@ -167,8 +175,67 @@ public class VerdictHandlersUtils {
 		return paths;
 	}
 
-	public static void errAndExit(String err) {
-		System.out.println("Error: " + err);
-		System.exit(-1);
+	/**
+	 * Process an event corresponding to a selection of AADL project
+	 * Translate an AADL project into objects
+	 *
+	 * */
+	public static List<EObject> preprocessAadlFiles(File dir) {
+		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
+		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
+		List<String> aadlFileNames = new ArrayList<>();
+
+		// Obtain all AADL files contents in the project
+		List<EObject> objects = new ArrayList<>();
+
+		List<File> dirs = collectAllDirs(dir);
+
+		for(File subdir: dirs) {
+			for (File file : subdir.listFiles()) {
+				if (file.getAbsolutePath().endsWith(".aadl")) {
+					aadlFileNames.add(file.getAbsolutePath());
+				}
+			}
+		}
+
+		final Resource[] resources = new Resource[aadlFileNames.size()];
+		for (int i = 0; i < aadlFileNames.size(); i++) {
+			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
+		}
+
+		// Load the resources
+		for (final Resource resource : resources) {
+			try {
+				resource.load(null);
+			} catch (final IOException e) {
+				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
+			}
+		}
+
+		// Load all objects from resources
+		for (final Resource resource : resources) {
+			resource.getAllContents().forEachRemaining(objects::add);
+		}
+		return objects;
+	}
+
+	public static List<File> collectAllDirs(File dir) {
+		List<File> allDirs = new ArrayList<File>();
+		allDirs.add(dir);
+		for(File file : dir.listFiles()) {
+			if(file.isDirectory()) {
+				allDirs.add(file);
+				collectDir(file, allDirs);
+			}
+		}
+		return allDirs;
+	}
+	public static void collectDir(File dir, List<File> allDirs) {
+		for(File file : dir.listFiles()) {
+			if(file.isDirectory()) {
+				allDirs.add(file);
+				collectDir(file, allDirs);
+			}
+		}
 	}
 }

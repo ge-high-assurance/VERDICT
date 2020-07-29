@@ -23,10 +23,12 @@ import org.eclipse.swt.widgets.Shell;
 * Let user enable cyber or safety relations inference when running MBAA.
 */
 public class MBASSettingsPanel extends ApplicationWindow {
+	public static boolean openGraphs = true;
 	public static boolean cyberInference = false;
 	public static boolean safetyInference = false;
-	public static boolean usePartialSolution = false;
-	public static boolean performMeritAssignment = false;
+
+	public static boolean synthesisCyberInference = false;
+	public static boolean synthesisPartialSolution = false;
 
 	private Font font;
 	private Font boldFont;
@@ -34,8 +36,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 	public MBASSettingsPanel() {
 		super(null);
 
-		font = new Font(null, "Helvetica", 11, SWT.NORMAL);
-		boldFont = new Font(null, "Helvetica", 11, SWT.BOLD);
+		font = new Font(null, "Helvetica", 12, SWT.NORMAL);
+		boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		int y = bounds.y + (bounds.height - rect.height) / 2;
 
 		shell.setLocation(x, y);
-		shell.setText("MBAS Settings");
+		shell.setText("MBAA/MBAS Settings");
 		shell.setFont(font);
 	}
 
@@ -72,28 +74,40 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		analysisLabel.setText("Model Based Architecture Analysis");
 		analysisLabel.setFont(boldFont);
 
-		Group selectionButtonGroup = new Group(composite, SWT.NONE);
-		selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
+		Group mbaaSelectionButtonGroup = new Group(composite, SWT.NONE);
+		mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
-		Button cyberButton = new Button(selectionButtonGroup, SWT.CHECK);
+		Button openGraphButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
+		openGraphButton.setText("Show Graphs in New Tabs");
+		openGraphButton.setFont(font);
+		openGraphButton.setSelection(openGraphs);		
+		
+		Button cyberButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
 		cyberButton.setText("Enable Cyber Relations Inference");
 		cyberButton.setFont(font);
 		cyberButton.setSelection(cyberInference);
 
-		Button safetyButton = new Button(selectionButtonGroup, SWT.CHECK);
+		Button safetyButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
 		safetyButton.setText("Enable Safety Relations Inference");
 		safetyButton.setFont(font);
 		safetyButton.setSelection(safetyInference);
 
-		Button partialSolution = new Button(selectionButtonGroup, SWT.CHECK);
-		partialSolution.setText("Use Partial Solutions in Synthesis");
-		partialSolution.setFont(font);
-		partialSolution.setSelection(usePartialSolution);
+		Label synthesisLabel = new Label(composite, SWT.NONE);
+		synthesisLabel.setText("Model Based Architecture Synthesis");
+		synthesisLabel.setFont(boldFont);
 
-		Button meritAssignment = new Button(selectionButtonGroup, SWT.CHECK);
-		meritAssignment.setText("Merit Assignment for Synthesis");
-		meritAssignment.setFont(font);
-		meritAssignment.setSelection(performMeritAssignment);
+		Group mbasSelectionButtonGroup = new Group(composite, SWT.NONE);
+		mbasSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
+
+		Button synthesisEnableCyberInference = new Button(mbasSelectionButtonGroup, SWT.CHECK);
+		synthesisEnableCyberInference.setText("Enable Cyber Relations Inference");
+		synthesisEnableCyberInference.setFont(font);
+		synthesisEnableCyberInference.setSelection(synthesisCyberInference);
+
+		Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
+		partialSolution.setText("Enable Partial Models");
+		partialSolution.setFont(font);
+		partialSolution.setSelection(synthesisPartialSolution);
 
 		Group selDeAllButtons = new Group(composite, SWT.NONE);
 		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -107,8 +121,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {
 				cyberButton.setSelection(true);
 				safetyButton.setSelection(true);
+				synthesisEnableCyberInference.setSelection(true);
 				partialSolution.setSelection(true);
-				meritAssignment.setSelection(true);
 			}
 		});
 
@@ -120,8 +134,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {
 				cyberButton.setSelection(false);
 				safetyButton.setSelection(false);
+				synthesisEnableCyberInference.setSelection(false);
 				partialSolution.setSelection(false);
-				meritAssignment.setSelection(false);
 			}
 		});
 
@@ -151,10 +165,11 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		save.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
+				openGraphs = openGraphButton.getSelection();
 				cyberInference = cyberButton.getSelection();
 				safetyInference = safetyButton.getSelection();
-				usePartialSolution = partialSolution.getSelection();
-				performMeritAssignment = meritAssignment.getSelection();
+				synthesisPartialSolution = partialSolution.getSelection();
+				synthesisCyberInference = synthesisEnableCyberInference.getSelection();
 				composite.getShell().close();
 			}
 		});

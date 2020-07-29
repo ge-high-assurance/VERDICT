@@ -20,6 +20,7 @@ import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
+import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
