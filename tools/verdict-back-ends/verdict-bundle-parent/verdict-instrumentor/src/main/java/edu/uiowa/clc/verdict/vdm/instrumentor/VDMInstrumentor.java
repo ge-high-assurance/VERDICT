@@ -361,14 +361,16 @@ public class VDMInstrumentor {
                         // Check if Port is Probe Port
                         if (!isProbePort(link_con)) {
                             vdm_links.add(link_con);
-                        } else {
-                            System.out.println(
-                                    "Ignore Probe ports connection:" + link_con.getName());
-                        }
-                    } else {
-                        System.out.println(
-                                "Ignore Empty output component connection:" + link_con.getName());
-                    }
+                        } 
+//                        else {
+//                            System.out.println(
+//                                    "Probe ports connection:" + link_con.getName());
+//                        }
+                    } 
+//                    else {
+//                        System.out.println(
+//                                "Empty output component connection:" + link_con.getName());
+//                    }
                 }
 
                 components_map.put(component.getId(), vdm_cmp_links);
@@ -384,20 +386,14 @@ public class VDMInstrumentor {
                 Connection con = it.next();
                 if (isProbePort(con)) {
                     it.remove();
-                    System.out.println("Probe ports connection ignored:" + con.getName());
+//                    System.out.println("Probe ports connection:" + con.getName());
                 } else if (ignoreMarkedLink(con)) {
                     it.remove();
-                    System.out.println(
-                            "Empty output components connection ignored:" + con.getName());
+//                    System.out.println(
+//                            "Empty output component connection:" + con.getName());
                 }
             }
         }
-
-        //        else {
-        //           System.out.println("No Component found!");
-        //        }
-
-        //        int connection_index = 1;
 
         HashSet<String> global_constants = new HashSet<String>();
 
