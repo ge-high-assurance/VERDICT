@@ -58,17 +58,12 @@ If you still want to change our target
 file to use another stable OSATE release's update site, please go
 ahead and edit the file.  Our file also has some other Eclipse update
 sites that you may want to change in lockstep with the OSATE update
-site.  You can use the latest version of the OSATE source repository's
-own target
-[definition](https://github.com/osate/osate2/blob/2.6.1/core/org.osate.build.target/osate2-platform.target)
-file as a reference; simply copy the same update site urls OSATE
+site.  You can use the OSATE source repository's own corresponding
+target
+[definition](https://github.com/osate/osate2/blob/2.7.0/core/org.osate.build.target/osate2-platform.target)
+file as a reference; make sure to copy the same update site urls OSATE
 itself uses for similar Eclipse features to our own target definition
-file.  However, note that our GenerateVerdict.mwe2 workflow file is
-not compatible with newer Eclipse releases than 2019-09 because it
-uses deprecated org.eclipse.emf.mwe2.launcher.feature.group APIs.  We
-use that workflow file only to generate some plugin source files and
-use "0.0.0" for API version numbers, so you still can install our
-OSATE plugin in newer OSATE & Eclipse releases.
+file.
 
 ## Build our OSATE plugin sources
 

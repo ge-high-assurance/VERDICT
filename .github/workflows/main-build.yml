@@ -1,12 +1,12 @@
 # This workflow will build Verdict project artifacts and Docker images
 
-name: Verdict ci-cd build
+name: Verdict main build
 
 on:
   push:
-    branches: [ ci-cd ]
+    branches: [ master ]
   pull_request:
-    branches: [ ci-cd ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -82,11 +82,12 @@ jobs:
       env:
         DOCKER_BUILDKIT: 1
       with:
-        repository: gehighassurance/verdict-dev
+        repository: gehighassurance/verdict
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tags: latest
+        tag_with_ref: true
         path: tools/verdict-back-ends
         build_args: BUILDKIT_INLINE_CACHE=1
         cache_froms: gehighassurance/verdict-dev:latest
-        push: true
+        push: ${{ startsWith(github.ref, 'refs/tags/') }}
