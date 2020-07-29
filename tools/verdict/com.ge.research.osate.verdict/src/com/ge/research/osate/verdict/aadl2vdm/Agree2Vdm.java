@@ -80,6 +80,7 @@ import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
+
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -101,7 +102,6 @@ import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.impl.ArgImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
-
 public class Agree2Vdm {
 	/**
 	 * The execute() method performs a set of tasks for translating AADL to VDM
