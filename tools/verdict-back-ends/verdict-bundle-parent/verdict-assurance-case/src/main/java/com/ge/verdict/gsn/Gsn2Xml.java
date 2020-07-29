@@ -14,7 +14,7 @@ public class Gsn2Xml {
      * @param fragment
      * @param outputFile
      */
-    public static void convertGsnToXML(GsnNode fragment, File outputFile) {
+    public void convertGsnToXML(GsnNode fragment, File outputFile) {
         try {
             // Create JAXB Context
             JAXBContext jaxbContext = JAXBContext.newInstance(GsnNode.class);

@@ -124,13 +124,7 @@
                 label="&amp;Create GSN Assurance Case Fragments"
                 style="push"
                 tooltip="Create GSN Fragment for selected requirement">
-          </command>
-          <command
-                commandId="com.ge.research.osate.verdict.commands.runSacm"
-                label="&amp;Create SACM Assurance Case Fragments"
-                style="push"
-                tooltip="Click to create SACM for selected requirement">
-          </command>  
+          </command> 
           <command
                 commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
                 label="&amp;Assurance Case Settings"

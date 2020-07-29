@@ -13,11 +13,11 @@ import verdict.vdm.vdm_model.*;
 public class CreateGSN {
     static final String SEP = File.separator;
     // For naming the nodes uniformly
-    protected static int strategyCounter = 1;
-    protected static int contextCounter = 1;
-    protected static int solutionCounter = 1;
-    protected static String soteriaCyberOutputAddr;
-    protected static String soteriaSafetyOutputAddr;
+    private int strategyCounter = 1;
+    private int contextCounter = 1;
+    private int solutionCounter = 1;
+    private String soteriaCyberOutputAddr;
+    private String soteriaSafetyOutputAddr;
 
     /**
      * creates a GsnNode and returns it
@@ -32,7 +32,7 @@ public class CreateGSN {
      * @throws SAXException
      * @throws IOException
      */
-    public static GsnNode gsnCreator(
+    public GsnNode gsnCreator(
             Model xmlModel,
             File cyberOutput,
             File safetyOutput,
@@ -97,7 +97,7 @@ public class CreateGSN {
      * @param safetyResults
      * @return
      */
-    public static GsnNode populateMissionNode(
+    public GsnNode populateMissionNode(
             Mission mission,
             Model model,
             NodeList cyberResults,
@@ -208,7 +208,7 @@ public class CreateGSN {
      * @param cyberResults
      * @return
      */
-    public static GsnNode populateCyberRequirementNode(
+    public GsnNode populateCyberRequirementNode(
             CyberReq cyberReq, Model model, NodeList cyberResults, String addressForCASE) {
         // GsnNode to pack requirement rootnode
         GsnNode reqNode = new GsnNode();
@@ -301,7 +301,7 @@ public class CreateGSN {
      * @param safetyResults
      * @return
      */
-    public static GsnNode populateSafetyRequirementNode(
+    public GsnNode populateSafetyRequirementNode(
             SafetyReq safetyReq, Model model, NodeList safetyResults, String addressForCASE) {
         // GsnNode to pack requirement rootnode
         GsnNode reqNode = new GsnNode();
@@ -393,7 +393,7 @@ public class CreateGSN {
      * @param safetyResults
      * @return
      */
-    public static GsnNode populateSolutionNode(String reqId, NodeList results, boolean cyberFlag) {
+    public GsnNode populateSolutionNode(String reqId, NodeList results, boolean cyberFlag) {
         // GsnNode to pack solution
         GsnNode solutionNode = new GsnNode();
 
@@ -460,7 +460,7 @@ public class CreateGSN {
      * @param cyberExpr
      * @return
      */
-    public static List<String> getCyberExprPorts(CyberExpr cyberExpr) {
+    public List<String> getCyberExprPorts(CyberExpr cyberExpr) {
         // to pack return list
         List<String> returnList = new ArrayList<>();
 
@@ -491,7 +491,7 @@ public class CreateGSN {
      * @param safetyExpr
      * @return
      */
-    public static List<String> getSafetyReqExprPorts(SafetyReqExpr safetyExpr) {
+    public List<String> getSafetyReqExprPorts(SafetyReqExpr safetyExpr) {
         // to pack return list
         List<String> returnList = new ArrayList<>();
 
@@ -527,7 +527,7 @@ public class CreateGSN {
      * @param model
      * @return
      */
-    public static List<GsnNode> addGoalContexts(List<String> contextNames, Model model) {
+    public List<GsnNode> addGoalContexts(List<String> contextNames, Model model) {
 
         // A list of GsnNodes to contain the "inContextOf"
         List<GsnNode> inContextOf = new ArrayList<>();
@@ -622,7 +622,7 @@ public class CreateGSN {
      * @param cyberExpr
      * @return
      */
-    public static String getCyberExprCondition(CyberExpr cyberExpr) {
+    public String getCyberExprCondition(CyberExpr cyberExpr) {
         // to pack return list
         String returnString = "";
 
@@ -664,7 +664,7 @@ public class CreateGSN {
      * @param safetyExpr
      * @return
      */
-    public static String getSafetyReqExprCondition(SafetyReqExpr safetyExpr) {
+    public String getSafetyReqExprCondition(SafetyReqExpr safetyExpr) {
         // to pack return list
         String returnString = "";
 

@@ -9,7 +9,7 @@ import org.davidmoten.text.utils.WordWrap;
 public class Gsn2Dot {
 
     // To store all the nodes in the GSN Fragment
-    protected static List<GsnNode> allNodes = new ArrayList<>();
+    private List<GsnNode> allNodes = new ArrayList<>();
 
     /**
      * Takes a GsnNode and a file address and creates a dot file for the GSN fragment
@@ -18,7 +18,7 @@ public class Gsn2Dot {
      * @param fout
      * @throws IOException
      */
-    public static void createDot(GsnNode GSN, File fout) throws IOException {
+    public void createDot(GsnNode GSN, File fout) throws IOException {
 
         // get all nodes in the GSN fragment
         getAllNodes(allNodes, GSN);
@@ -42,6 +42,7 @@ public class Gsn2Dot {
         bw.write("}");
         // close file
         bw.close();
+        fos.close();
     }
 
     /**
@@ -50,7 +51,7 @@ public class Gsn2Dot {
      * @param allNodes
      * @param node
      */
-    public static void getAllNodes(List<GsnNode> allNodes, GsnNode node) {
+    public void getAllNodes(List<GsnNode> allNodes, GsnNode node) {
 
         // traverse the GSN fragment and add each node to the list
         if (node.getNodeType().equalsIgnoreCase("context")) {
@@ -96,7 +97,7 @@ public class Gsn2Dot {
      * @param bw
      * @throws IOException
      */
-    public static void writeNodes(List<GsnNode> allNodes, BufferedWriter bw) throws IOException {
+    public void writeNodes(List<GsnNode> allNodes, BufferedWriter bw) throws IOException {
         bw.write("//Node declarations:-");
         bw.newLine();
         for (GsnNode node : allNodes) {
@@ -176,8 +177,7 @@ public class Gsn2Dot {
      * @param bw
      * @throws IOException
      */
-    public static void writeRelationships(List<GsnNode> allNodes, BufferedWriter bw)
-            throws IOException {
+    public void writeRelationships(List<GsnNode> allNodes, BufferedWriter bw) throws IOException {
         bw.write("//Edge declarations:-");
         bw.newLine();
         for (GsnNode node : allNodes) {
@@ -209,7 +209,7 @@ public class Gsn2Dot {
      * @param original
      * @return
      */
-    public static String stringWrapper(String original) {
+    public String stringWrapper(String original) {
         // normalize spaces in the string
         String normal = original.replaceAll("\\s{2,}", " ").trim();
         String wrapped =

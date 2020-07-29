@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 import org.eclipse.emf.common.util.EList;
@@ -46,16 +47,16 @@ import org.osate.aadl2.ProcessType;
 import org.osate.aadl2.ProcessorImplementation;
 import org.osate.aadl2.ProcessorType;
 import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyOwner;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PropertyOwner;
+import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponent;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemSubcomponent;
 import org.osate.aadl2.SystemType;
-import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.ThreadGroupImplementation;
 import org.osate.aadl2.ThreadGroupSubcomponent;
 import org.osate.aadl2.ThreadGroupType;
@@ -82,17 +83,17 @@ import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
 import com.ge.research.osate.verdict.dsl.verdict.CyberRel;
 import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
 import com.ge.research.osate.verdict.dsl.verdict.Event;
+import com.ge.research.osate.verdict.dsl.verdict.FExpr;
 import com.ge.research.osate.verdict.dsl.verdict.LAnd;
 import com.ge.research.osate.verdict.dsl.verdict.LExpr;
+import com.ge.research.osate.verdict.dsl.verdict.LNot;
 import com.ge.research.osate.verdict.dsl.verdict.LOr;
 import com.ge.research.osate.verdict.dsl.verdict.LPort;
-import com.ge.research.osate.verdict.dsl.verdict.LNot;
 import com.ge.research.osate.verdict.dsl.verdict.SLAnd;
 import com.ge.research.osate.verdict.dsl.verdict.SLExpr;
+import com.ge.research.osate.verdict.dsl.verdict.SLNot;
 import com.ge.research.osate.verdict.dsl.verdict.SLOr;
 import com.ge.research.osate.verdict.dsl.verdict.SLPort;
-import com.ge.research.osate.verdict.dsl.verdict.SLNot;
-import com.ge.research.osate.verdict.dsl.verdict.FExpr;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
@@ -100,7 +101,6 @@ import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
 
 import verdict.vdm.vdm_model.Model;
-import com.ge.verdict.vdm.VdmTranslator;
 
 
 
@@ -112,7 +112,9 @@ import com.ge.verdict.vdm.VdmTranslator;
 public class Aadl2Vdm {
 
 	/**
-	 * The execute() method performs a set of tasks for translating AADL to VDM
+	 * The execute() method 
+	 * creates a new Model object and 
+	 * returns it
 	 * 
 	 * @param inputDir a reference to a directory
 	 *
@@ -120,14 +122,8 @@ public class Aadl2Vdm {
 	public Model execute(File inputDir)
 	   {				
       		logHeader("AADL2VDM");
-//			System.err.println("Successfully entered Aadl2Vdm Translator! \n\n\n");
 		    Model m = new Model();
 			m = populateVDMFromAadlObjects(preprocessAadlFiles(inputDir), m);			
-//			System.err.println("Working Directory = " + System.getProperty("user.dir"));
-			File testXml = new File("/Users/212807042/Desktop/testXML.xml");
-//			System.err.println("Created File object to store Xml");
-			VdmTranslator.marshalToXml(m, testXml);
-//			System.err.println("Marshalled Model to XML");
 			System.out.println("Info: Created VDM object");
 			return m;
 	   }	
