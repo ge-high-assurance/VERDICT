@@ -105,7 +105,7 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		synthesisEnableCyberInference.setSelection(synthesisCyberInference);
 
 		Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
-		partialSolution.setText("Enable Partial Models");
+		partialSolution.setText("Use Implemented Defenses");
 		partialSolution.setFont(font);
 		partialSolution.setSelection(synthesisPartialSolution);
 
