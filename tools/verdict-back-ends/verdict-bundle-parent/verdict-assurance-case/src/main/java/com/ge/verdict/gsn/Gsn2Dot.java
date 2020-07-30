@@ -165,7 +165,8 @@ public class Gsn2Dot {
                 nodeColor = "red";
             }
             if (node.getNodeType().equalsIgnoreCase("context")
-                    || node.getNodeType().equalsIgnoreCase("justification")) {
+                    || node.getNodeType().equalsIgnoreCase("justification") 
+                    || node.getNodeType().equalsIgnoreCase("assumption")) {
                 nodeColor = "black";
             }
 
