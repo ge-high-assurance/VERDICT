@@ -7,8 +7,10 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.adtree.DefenseCondition;
 import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
+import com.ge.verdict.synthesis.dtree.DCondition;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
@@ -87,6 +89,7 @@ public class DTreeConstructor {
 
     private final Set<Defense> defenses;
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
+    private final Set<DCondition> dconditions;
 
     private DTreeConstructor(
             CostModel costModel,
@@ -102,6 +105,7 @@ public class DTreeConstructor {
 
         defenses = new LinkedHashSet<>();
         attackALeafMap = new LinkedHashMap<>();
+        dconditions = new LinkedHashSet<>();
     }
 
     private DTree perform(ADTree adtree) {
@@ -136,6 +140,20 @@ public class DTreeConstructor {
 
             for (ALeaf aleaf : unmitigated) {
                 System.out.println("Warning: Unmitigated attack: " + aleaf.getAttack().toString());
+            }
+
+            for (DCondition dcond : dconditions) {
+                Optional<DLeaf.ComponentDefense> compDef =
+                        factory.lookup(
+                                dcond.defenseCond.getAttackable().getParentName(),
+                                dcond.defenseCond.getDefenseProperty());
+                if (compDef.isPresent()) {
+                    dcond.setCompDef(compDef.get());
+                } else {
+                    throw new RuntimeException(
+                            "Defense condition references undefined component-defense pair: "
+                                    + dcond.prettyPrint());
+                }
             }
 
             Optional<DTree> prepared = result.prepare();
@@ -186,6 +204,10 @@ public class DTreeConstructor {
         } else if (adtree instanceof ADNot) {
             ADNot adnot = (ADNot) adtree;
             return constructInternal(adnot.child()).map(DNot::new);
+        } else if (adtree instanceof DefenseCondition) {
+            DCondition dcond = new DCondition((DefenseCondition) adtree);
+            dconditions.add(dcond);
+            return Optional.of(dcond);
         } else {
             throw new RuntimeException(
                     "got invalid adtree type: " + adtree.getClass().getCanonicalName());

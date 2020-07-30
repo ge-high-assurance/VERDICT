@@ -177,6 +177,10 @@ public class DLeaf implements DTree {
             return componentDefenseMap.get(key);
         }
 
+        public Optional<ComponentDefense> lookup(String component, String defense) {
+            return Optional.ofNullable(componentDefenseMap.get(new Pair<>(component, defense)));
+        }
+
         public ComponentDefense fromId(int id) {
             ComponentDefense leaf = idMap.get(id);
             if (leaf != null) {
