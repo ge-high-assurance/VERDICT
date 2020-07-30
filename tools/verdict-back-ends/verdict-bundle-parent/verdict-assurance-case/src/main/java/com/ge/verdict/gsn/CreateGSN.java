@@ -16,6 +16,8 @@ public class CreateGSN {
     private int strategyCounter = 1;
     private int contextCounter = 1;
     private int solutionCounter = 1;
+    private int justificationCounter = 1;
+    private int assumptionCounter = 1;
     private String soteriaCyberOutputAddr;
     private String soteriaSafetyOutputAddr;
 
@@ -191,8 +193,18 @@ public class CreateGSN {
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode);
 
+        // Add a justification to justifiedBy of strategyNode
+        if (mission.getJustification() != null) {
+            strategyNode.getJustifiedBy().add(getJustificationNode(mission.getJustification()));
+        }
+
         // add strategyNode to supportedBy of missionNode
         missionNode.getSupportedBy().add(strategyNode);
+
+        // add any available assumption to missionNode
+        if (mission.getAssumption() != null) {
+            missionNode.getHasAssumptions().add(getAssumptionNode(mission.getAssumption()));
+        }
 
         // setting reqNode status
         missionNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
@@ -256,36 +268,38 @@ public class CreateGSN {
         String strategyContextId = "CONTEXT_" + Integer.toString(contextCounter);
         contextCounter++;
         strategyContextNode.setNodeId(strategyContextId);
-        String strategyContextDisplayText =
+        String strategyContextDisplayText = "A Condition and a Severity";
+        String strategyContextHoverText =
                 "Condition:= " + getCyberExprCondition(cyberReq.getCondition()) + "&#10;";
         // strategyContextDisplayText =strategyContextDisplayText+"CIA:= " +
         // cyberReq.getCia().toString().charAt(0);
-        strategyContextDisplayText =
-                strategyContextDisplayText + "Severity:= " + cyberReq.getSeverity();
+        strategyContextHoverText =
+                strategyContextHoverText + "Severity:= " + cyberReq.getSeverity();
         strategyContext.setDisplayText(strategyContextDisplayText);
+        strategyContext.setExtraInfo(strategyContextHoverText);
         strategyContextNode.setContext(strategyContext);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode);
 
         // Add the CASE consolidated properties as a context to strategyNode
-        Context strategyContext2 = new Context();
-        // A node to pack strategyContext
-        GsnNode strategyContextNode2 = new GsnNode();
-        strategyContextNode2.setNodeType("context");
-        String strategyContextId2 = "CONTEXT_" + Integer.toString(contextCounter);
-        contextCounter++;
-        strategyContextNode2.setNodeId(strategyContextId2);
-        strategyContext2.setDisplayText("CASE CONSOLIDATED PROPERTIES");
-        strategyContext2.setExtraInfo("Address:&#10;" + addressForCASE);
-        strategyContext2.setUrl(addressForCASE);
-        strategyContextNode2.setContext(strategyContext2);
+        GsnNode strategyContextNode2 = getCASEContext(addressForCASE);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode2);
 
+        // Add a justification to justifiedBy of strategyNode
+        if (cyberReq.getJustification() != null) {
+            strategyNode.getJustifiedBy().add(getJustificationNode(cyberReq.getJustification()));
+        }
+
         // add strategyNode to supportedBy of reqNode
         reqNode.getSupportedBy().add(strategyNode);
+
+        // add any available assumption to reqNode
+        if (cyberReq.getAssumption() != null) {
+            reqNode.getHasAssumptions().add(getAssumptionNode(cyberReq.getAssumption()));
+        }
 
         // setting reqNode status
         reqNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
@@ -348,36 +362,38 @@ public class CreateGSN {
         String strategyContextId = "CONTEXT_" + Integer.toString(contextCounter);
         contextCounter++;
         strategyContextNode.setNodeId(strategyContextId);
-        String strategyContextDisplayText =
+        String strategyContextDisplayText = "A Condition and a Target Probability";
+        String strategyContextHoverText =
                 "Condition:= " + getSafetyReqExprCondition(safetyReq.getCondition()) + "&#10;";
-        strategyContextDisplayText =
-                strategyContextDisplayText
+        strategyContextHoverText =
+                strategyContextHoverText
                         + "Target Probability:= "
                         + safetyReq.getTargetProbability();
         strategyContext.setDisplayText(strategyContextDisplayText);
+        strategyContext.setExtraInfo(strategyContextHoverText);
         strategyContextNode.setContext(strategyContext);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode);
 
         // Add the CASE consolidated properties as a context to strategyNode
-        Context strategyContext2 = new Context();
-        // A node to pack strategyContext
-        GsnNode strategyContextNode2 = new GsnNode();
-        strategyContextNode2.setNodeType("context");
-        String strategyContextId2 = "CONTEXT_" + Integer.toString(contextCounter);
-        contextCounter++;
-        strategyContextNode2.setNodeId(strategyContextId2);
-        strategyContext2.setDisplayText("CASE CONSOLIDATED PROPERTIES");
-        strategyContext2.setExtraInfo("Address:&#10;" + addressForCASE);
-        strategyContext2.setUrl(addressForCASE);
-        strategyContextNode2.setContext(strategyContext2);
+        GsnNode strategyContextNode2 = getCASEContext(addressForCASE);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode2);
 
+        // Add a justification to justifiedBy of strategyNode
+        if (safetyReq.getJustification() != null) {
+            strategyNode.getJustifiedBy().add(getJustificationNode(safetyReq.getJustification()));
+        }
+
         // add strategyNode to supportedBy of reqNode
         reqNode.getSupportedBy().add(strategyNode);
+
+        // add any available assumption to reqNode
+        if (safetyReq.getAssumption() != null) {
+            reqNode.getHasAssumptions().add(getAssumptionNode(safetyReq.getAssumption()));
+        }
 
         // setting reqNode status
         reqNode.getGoal().setStatus(strategyNode.getStrategy().getStatus());
@@ -701,5 +717,73 @@ public class CreateGSN {
         }
 
         return returnString;
+    }
+
+    /**
+     * Creates a context node referring to CASE Properties
+     *
+     * @param addressForCASE
+     * @return
+     */
+    public GsnNode getCASEContext(String addressForCASE) {
+        GsnNode caseContextNode = new GsnNode();
+
+        // a new Context to pack the context
+        Context context = new Context();
+
+        caseContextNode.setNodeType("context");
+        String strategyContextId = "CONTEXT_" + Integer.toString(contextCounter);
+        contextCounter++;
+        caseContextNode.setNodeId(strategyContextId);
+        context.setDisplayText("CASE Consolidated Properties");
+        context.setExtraInfo("Address:&#10;" + addressForCASE);
+        context.setUrl(addressForCASE);
+        caseContextNode.setContext(context);
+
+        return caseContextNode;
+    }
+
+    /**
+     * Creates a justification Node
+     *
+     * @param justification
+     * @return
+     */
+    public GsnNode getJustificationNode(String justificationText) {
+        GsnNode justificationNode = new GsnNode();
+
+        // a new Justification to pack the justification
+        Justification justification = new Justification();
+
+        justificationNode.setNodeType("justification");
+        String justificationId = "JUSTIFICATION_" + Integer.toString(justificationCounter);
+        justificationCounter++;
+        justificationNode.setNodeId(justificationId);
+        justification.setExtraInfo(justificationText);
+        justificationNode.setJustification(justification);
+
+        return justificationNode;
+    }
+
+    /**
+     * Creates an assumption node
+     *
+     * @param assumptionText
+     * @return
+     */
+    public GsnNode getAssumptionNode(String assumptionText) {
+        GsnNode assumptionNode = new GsnNode();
+
+        // a new Justification to pack the justification
+        Assumption assumption = new Assumption();
+
+        assumptionNode.setNodeType("assumption");
+        String assumptionId = "ASSUMPTION_" + Integer.toString(assumptionCounter);
+        assumptionCounter++;
+        assumptionNode.setNodeId(assumptionId);
+        assumption.setExtraInfo(assumptionText);
+        assumptionNode.setAssumption(assumption);
+
+        return assumptionNode;
     }
 }

@@ -62,7 +62,9 @@ CyberMissionBlock returns CyberMission:
 	('description' '=' description=STRING DELIMETER_OPT)? &
 	// Why note instead of comment? Because Xtext is stupid.
 	// Try changing it and see that it generates two fields with the same name in VerdictPackage...
-	('comment' '=' note=STRING DELIMETER_OPT)?
+	('comment' '=' note=STRING DELIMETER_OPT)? &
+	('justification' '=' justification=STRING DELIMETER_OPT)? &
+	('assumption' '=' assumption=STRING DELIMETER_OPT)?	 		
 	) '}'
 ;
 
@@ -77,7 +79,9 @@ CyberReqBlock returns CyberReq:
 	('condition' '=' condition=CyberReqConditionLogic DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)? &
-	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)?
+	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)? &
+	('justification' '=' justification=STRING DELIMETER_OPT)? &
+	('assumption' '=' assumption=STRING DELIMETER_OPT)?	
 	) '}'
 ;
 
@@ -170,7 +174,9 @@ SafetyReqBlock returns SafetyReq:
 	('condition' '=' condition=SafetyReqConditionLogic DELIMETER_OPT) &
 	('targetProbability' '=' severity=Prob DELIMETER_OPT) &
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
-	('description' '=' description=STRING DELIMETER_OPT)?
+	('description' '=' description=STRING DELIMETER_OPT)? &
+	('justification' '=' justification=STRING DELIMETER_OPT)? &
+	('assumption' '=' assumption=STRING DELIMETER_OPT)?	
 	) '}'
 ;
 

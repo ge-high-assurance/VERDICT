@@ -172,6 +172,12 @@ public class GSNHandler extends AbstractHandler {
 						//running MBAS 
 						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
 						
+						
+//						/**
+//						 * For testing only
+//						 */
+//						boolean outputsGenerated = true;
+						
                         // if MBAS succeeded, proceed to GSN
 						if (outputsGenerated){
 							
@@ -419,7 +425,6 @@ public class GSNHandler extends AbstractHandler {
 				for(SafetyReq aSafetyReq : safetyReqs) {
 					allReqIds.add(aSafetyReq.getId());
 				}
-			
 			}
 		}
 			
