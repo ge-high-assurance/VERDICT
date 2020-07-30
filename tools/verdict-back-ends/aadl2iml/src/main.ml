@@ -60,10 +60,14 @@ let expand_dirs input_files =
 let process_aadl_project input output_file verdict_props =
   let input = AADLInput.merge_packages (List.rev input) in
   match List.find_opt AADLAst.is_aadl_package input with
-  | None -> ()
+  | None -> (
+    Format.eprintf "aadl2iml: no IML model generated!@."; exit 6
+  )
   | Some ast -> (
     match AADL2VDMIML.aadl_ast_to_vdm_iml verdict_props ast with
-    | None -> ()
+    | None -> (
+      Format.eprintf "aadl2iml: no IML model generated!@."; exit 6
+    )
     | Some vdm_iml -> (
       if output_file = "" then
         Format.printf "%a@." VDMIML.pp_print_vdm_iml vdm_iml
@@ -103,20 +107,22 @@ let process_input_files input_files output_file prop_set_name =
         process_aadl_project_warning_version input output_file prop_set_name
       )
       | Error _ ->
-        Format.eprintf "Cycle found!@."
+        Format.eprintf "aadl2iml: cycle found in AADL model!@."; exit 5
     )
     | Error (AADLInput.UnexpectedChar (pos, c)) ->
         Format.eprintf "%a: error: unexpected character ‘%c’@."
-          Position.pp_print_position pos c
+          Position.pp_print_position pos c;
+        exit 4
 
     | Error (AADLInput.SyntaxError pos) ->
-        Format.eprintf "%a: syntax error@." Position.pp_print_position pos
+        Format.eprintf "%a: syntax error@." Position.pp_print_position pos;
+        exit 4
   )
   with
   | Sys_error msg ->
-      Format.eprintf "%s@." msg
+      Format.eprintf "%s@." msg; exit 3
   | e ->
-      Format.eprintf "%s@." (Printexc.to_string e)
+      Format.eprintf "%s@." (Printexc.to_string e); exit 3
 
 
 let parse_command_line_args () =
@@ -143,9 +149,10 @@ let main () =
   | Some (input_files, output_file, prop_set_name) ->
     process_input_files input_files output_file prop_set_name
   | None ->
-    Format.printf
+    Format.eprintf
       "Usage: %s -ps <prop_set_name> [-o <output.iml>] <file_1.aadl|dir1> ... <file_N.aadl|dir_N>@."
-      Sys.argv.(0)
+      Sys.argv.(0);
+    exit 1
 
 let () = main ()
 

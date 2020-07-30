@@ -16,14 +16,13 @@ module VE = VerdictAst
 module C  = CommonAstTypes
 module VI = VDMIML
 
-exception SemanticError of string
+exception SemanticError of (Position.t * string)
 
 let failwith_could_resolve_reference pos id =
   let msg =
-    Format.asprintf "%a: error: couldn't resolve reference to '%s'"
-      Position.pp_print_position pos id
+    Format.asprintf "couldn't resolve reference to '%s'" id
   in
-  raise (SemanticError msg)
+  raise (SemanticError (pos, msg))
 
 let pp_print_pname_as_iml ppf pn =
   let pp_sep ppf () = Format.fprintf ppf "." in
@@ -81,10 +80,9 @@ let equal_ids id1 id2 =
 
 let failwith_unsupported_data_type pos qcr =
   let msg =
-    Format.asprintf "%a: error: data type '%a' not found"
-      Position.pp_print_position pos C.pp_print_qcref qcr
+    Format.asprintf "data type '%a' not found" C.pp_print_qcref qcr
   in
-  raise (SemanticError msg)
+  raise (SemanticError (pos, msg))
 
 let realization_full_name (r_pid, i_pid) =
   Format.asprintf "%a.%a" C.pp_print_id r_pid C.pp_print_id i_pid
@@ -155,7 +153,7 @@ let data_to_type_decls data_types data_impls =
     let add_type ({AD.name; AD.type_extension; AD.properties; _}: AD.data_type) =
       match type_extension with
       | Some _ ->
-        ({VI.name = C.get_id name; VI.definition = None}, type_extension)
+        ({VI.name = C.get_id name; VI.definition = None; VI.parent = None}, type_extension)
       | None -> (
         let def =
           match AD.find_assoc data_repr_qpref properties with
@@ -179,7 +177,7 @@ let data_to_type_decls data_types data_impls =
             | _ -> failwith ("Found unexpected data representation value")
           )
         in
-        ({VI.name = C.get_id name; VI.definition = def}, None)
+        ({VI.name = C.get_id name; VI.definition = def; VI.parent = None}, None)
       )
     in
     List.map add_type data_types
@@ -187,8 +185,17 @@ let data_to_type_decls data_types data_impls =
   let type_decls_with_extension_id =
     let tdwei =
       data_impls |> List.map (fun ({AD.name; _} : AD.data_impl) ->
+        let parent_id = fst name |> C.get_id in
         let name = realization_full_name name in
-        ({name; VI.definition = None}, None)
+        let parent =
+          Utils.element_position
+            (fun (({VI.name; _}, _): (VI.type_declaration * C.qcref option)) ->
+              equal_ids name parent_id
+            )
+            type_decls_with_extension_id
+          |> (function None -> None | Some (_, p) -> Some p)
+        in
+        ({name; VI.definition = None; parent}, None)
       )
     in
     List.rev_append (List.rev type_decls_with_extension_id) tdwei
@@ -199,10 +206,16 @@ let data_to_type_decls data_types data_impls =
       : (VI.type_declaration * C.qcref option)) =
       match ext_id with
       | None -> type_decl
-      | Some qcr ->
+      | Some qcr -> (
+        let dtype = get_data_type type_decls qcr in
         { VI.name = type_decl.VI.name;
-          VI.definition = Some (get_data_type type_decls qcr)
+          VI.definition = Some dtype;
+          VI.parent =
+            match dtype with
+            | VI.UserDefinedType idx -> (List.nth type_decls idx).VI.parent
+            | _ -> None
         }
+      )
     in
     List.map set_type_aliases type_decls_with_extension_id
   in
@@ -219,14 +232,14 @@ let data_to_type_decls data_types data_impls =
     let rec update_type l: VI.type_declaration list -> VI.type_declaration list =
     function
       | [] -> failwith ("Data implementation found without data type declaration")
-      | { VI.name; VI.definition } :: tl when (equal_ids name type_name) -> (
+      | { VI.name; VI.definition; VI.parent } :: tl when (equal_ids name type_name) -> (
         let td: VI.type_declaration =
           let def =
             match definition with
             | None -> Some (VI.RecordType record_fields)
             | _ -> definition
           in
-          { name; VI.definition = def }
+          { name; VI.definition = def; parent }
         in
         List.rev_append (td :: l) tl
       )
@@ -745,7 +758,7 @@ let subcomponent_to_comp_inst prop_set_name comp_props sys_impl iml_comp_types
   VI.attributes = get_attributes prop_set_name name comp_props properties
  }
 
-let get_port_index {VI.ports; _} (pos, port) =
+let get_port_and_index {VI.ports; _} (pos, port) =
   let ep =
     Utils.element_position
       (fun ({VI.name; _}: VI.port) -> equal_ids name port)
@@ -753,12 +766,13 @@ let get_port_index {VI.ports; _} (pos, port) =
   in
   match ep with
   | None -> failwith_could_resolve_reference pos port
-  | Some (_, idx) -> idx
+  | Some pi -> pi
 
 
-let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
+let port_and_iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
   | None, pos_port -> (
-    VI.ComponentCE (ct_idx, get_port_index ct pos_port)
+    let (port, idx) = get_port_and_index ct pos_port in
+    port, VI.ComponentCE (ct_idx, idx)
   )
   | Some (pos, comp_inst), pos_port -> (
     let ci, ci_idx =
@@ -779,19 +793,60 @@ let iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps = function
         get_comp_type_and_index iml_comp_types comp_id
       )  
     in
-    VI.SubcomponentCE (ci_idx, ci_ct_idx, get_port_index ci_ct pos_port)
+    let (port, idx) = get_port_and_index ci_ct pos_port in
+    port, VI.SubcomponentCE (ci_idx, ci_ct_idx, idx)
   )
 
+let failwith_incompatible_types pos id1 id2 =
+  let msg =
+    Format.asprintf "'%s' and '%s' have incompatible data types" id1 id2
+  in
+  raise (SemanticError (pos, msg))
+
 let port_connection_to_iml_connection
-  prop_set_name conn_props ct ct_idx sys_impl iml_comp_types subcomps
+  prop_set_name conn_props ct ct_idx sys_impl iml_comp_types subcomps type_decls
   { AD.name; AD.dir; AD.src; AD.dst; AD.properties }
 =
   assert (dir = AD.Unidirectional);
+  let src_port, source =
+    port_and_iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src
+  in
+  let dst_port, destination =
+    port_and_iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst
+  in
+  (match src_port.VI.ptype, dst_port.VI.ptype with
+   | Some src_ptype, Some dst_ptype -> (
+     if src_ptype<>dst_ptype then (
+       let src_subtype_of_dst =
+         VI.is_subtype type_decls src_ptype dst_ptype
+       in
+       let dst_subtype_of_src =
+         VI.is_subtype type_decls dst_ptype src_ptype
+       in
+       match src_subtype_of_dst, dst_subtype_of_src with
+       | true, false ->
+         let pos = C.get_pos (snd dst) in
+         raise (SemanticError (pos, "subtyping is not supported"))
+       | false, true
+       | false, false ->
+         failwith_incompatible_types
+           (C.get_pos (snd src)) (C.get_id (snd src)) (C.get_id (snd dst))
+       | true, true -> ()
+     )
+   )
+   | Some _, None ->
+     raise (SemanticError
+       (C.get_pos (snd dst), "source port has a type but destination port does not"))
+   | None, Some _ ->
+     raise (SemanticError
+       (C.get_pos (snd src), "destination port has a type but source port does not"))
+   | _ -> ()
+  );
   let name = C.get_id name in
   {VI.name = name;
    VI.attributes = get_attributes prop_set_name name conn_props properties;
-   VI.source = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps src;
-   VI.destination = iml_connection_end ct ct_idx sys_impl iml_comp_types subcomps dst;
+   source;
+   destination;
   }
 
 let agree_const_decl_to_iml_const_decl type_decls { AG.name; AG.dtype; AG.definition } =
@@ -947,7 +1002,7 @@ let system_impl_to_iml_comp_impl v_props type_decls iml_comp_types sys_impl =
           let connections =
             connections |> List.map
               (port_connection_to_iml_connection prop_set_name conn_props
-                ct ct_idx sys_impl iml_comp_types subcomponents)
+                ct ct_idx sys_impl iml_comp_types subcomponents type_decls)
           in
           ({ subcomponents; connections } : VI.block_impl)
         in
@@ -1162,8 +1217,8 @@ let aadl_ast_to_vdm_iml v_props = function
       in
       Some pkg
     )
-    with SemanticError msg -> (
-      Format.eprintf "%s@." msg;
+    with SemanticError (pos, msg) -> (
+      Format.eprintf "%a: error: %s@." Position.pp_print_position pos msg;
       None
     )
   )
