@@ -465,7 +465,15 @@ public class AttackDefenseCollector {
                             row.getCell("Integrity"),
                             row.getCell("Availability"));
             List<String> defenseNames =
-                    Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";"));
+                    Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";")).stream()
+                            .map(
+                                    name ->
+                                            name.length() > 0
+                                                    ? Character.toString(name.charAt(0))
+                                                                    .toLowerCase()
+                                                            + name.substring(1)
+                                                    : "")
+                            .collect(Collectors.toList());
             List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
             List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
             // Prob likelihood = Prob.not(Prob.fromDal(row.getCell("DAL"), Prob.certain()));
