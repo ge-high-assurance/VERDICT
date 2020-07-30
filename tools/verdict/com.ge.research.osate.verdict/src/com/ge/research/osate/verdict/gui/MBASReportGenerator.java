@@ -9,11 +9,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,24 +38,12 @@ public class MBASReportGenerator implements Runnable {
 		this.applicableDefense = applicableDefense;
 		this.implProperty = implProperty;
 		MBASReportGenerator.window = window;
-		IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		IViewPart myView1 = wp.findView(MBASResultsView.ID);
-		if (myView1 != null) {
-			wp.hideView(myView1);
-		}
-		IViewPart myView2 = wp.findView(CapecDefenseView.ID);
-		if (myView2 != null) {
-			wp.hideView(myView2);
-		}
-		IViewPart myView3 = wp.findView(SafetyCutsetsView.ID);
-		if (myView3 != null) {
-			wp.hideView(myView3);
-		}
+		ResultsPageUtil.closePages();
 		MBASResultSummary result = new MBASResultSummary(applicableDefense, implProperty);
 		missions = result.getMissions();
 		safetyResults = loadSafetyResults(safetyApplicableDefense, safetyImplProperty);
 		result.updateMissionsWithSafety(safetyResults);
-		
+
 		// Load maps from CAPECs and NISTS to descriptions (for tooltips)
 		attackDesc = CsvMapReader.readCsvMap(new File(capecFile), "\"CAPEC\"", "\"CAPECDescription\"");
 		defenseDesc = CsvMapReader.readCsvMap(new File(nistFile), "\"NISTProfile\"", "\"DefenseDescription\"");

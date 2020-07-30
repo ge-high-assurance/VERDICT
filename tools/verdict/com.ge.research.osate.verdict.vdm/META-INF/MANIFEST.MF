@@ -7,6 +7,7 @@ Bundle-Vendor: GE
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: com.ge.verdict.vdm,
+ com.ge.verdict.vdm.synthesis,
  verdict.vdm.vdm_data,
  verdict.vdm.vdm_kind2,
  verdict.vdm.vdm_lustre,

@@ -1,4 +1,4 @@
-package com.ge.verdict.synthesis;
+package com.ge.verdict.vdm.synthesis;
 
 import java.io.File;
 import java.io.IOException;

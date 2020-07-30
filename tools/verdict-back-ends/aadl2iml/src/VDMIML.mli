@@ -28,6 +28,7 @@ type data_type =
 type type_declaration = {
   name: identifier;
   definition: data_type option;
+  parent: type_decl_ref option;
 }
 
 type port_mode = In | Out
@@ -360,6 +361,8 @@ type package = {
 }
 
 type t = package
+
+val is_subtype: type_declaration list -> data_type -> data_type -> bool
 
 val pp_print_vdm_iml: Format.formatter -> t -> unit
 

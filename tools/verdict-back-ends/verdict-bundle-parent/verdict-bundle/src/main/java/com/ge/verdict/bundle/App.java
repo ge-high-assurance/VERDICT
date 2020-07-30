@@ -10,12 +10,12 @@ import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
 import com.ge.verdict.synthesis.CostModel;
 import com.ge.verdict.synthesis.DTreeConstructor;
-import com.ge.verdict.synthesis.ResultsInstance;
 import com.ge.verdict.synthesis.VerdictSynthesis;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
+import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
@@ -177,8 +177,8 @@ public class App {
         options.addOption("s", false, "Safety Relations Inference");
         // TODO don't have a good short option because "s" is already taken
         options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
+        options.addOption("o", "synthesis-output", true, "Synthesis output XML file");
         options.addOption("p", false, "Use partial solutions in synthesis");
-        options.addOption("m", false, "Perform merit assignment in synthesis");
 
         options.addOption("x", false, "Generate XML files for GSN");
 
@@ -237,8 +237,9 @@ public class App {
         helpLine(
                 "      --synthesis <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
+        helpLine(
+                "      -o ................... synthesis output XML (required if synthesis enabled)");
         helpLine("      -p ................... synthesis partial solutions");
-        helpLine("      -m ................... synthesis merit assignment");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-MA] [-BA [-C] [-G]] <threats>");
@@ -308,9 +309,13 @@ public class App {
 
             if (csvProjectName != null) {
                 if (opts.hasOption("y")) {
+                    if (!opts.hasOption("o")) {
+                        throw new VerdictRunException("Must specify synthesis output XML");
+                    }
+
                     String costModelPath = opts.getOptionValue("y");
-                    boolean meritAssignment = opts.hasOption("m");
-                    boolean partialSolution = opts.hasOption("p") || meritAssignment;
+                    String output = opts.getOptionValue("o");
+                    boolean partialSolution = opts.hasOption("p");
 
                     runMbasSynthesis(
                             csvProjectName,
@@ -320,8 +325,8 @@ public class App {
                             cyberInference,
                             safetyInference,
                             partialSolution,
-                            meritAssignment,
-                            costModelPath);
+                            costModelPath,
+                            output);
                 } else {
                     runMbas(
                             csvProjectName,
@@ -596,8 +601,8 @@ public class App {
             boolean cyberInference,
             boolean safetyInference,
             boolean partialSolution,
-            boolean meritAssignment,
-            String costModelPath)
+            String costModelPath,
+            String outputPath)
             throws VerdictRunException {
 
         String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
@@ -615,6 +620,8 @@ public class App {
         checkFile(soteriaPpOutputDir, true, true, true, false, null);
         checkFile(soteriaPpBin, true, false, false, true, null);
         checkFile(costModelPath, true, false, false, false, "xml");
+
+        checkFile(outputPath, false, false, true, false, "xml");
 
         deleteDirectoryContents(stemGraphsDir);
         deleteDirectoryContents(soteriaPpOutputDir);
@@ -668,7 +675,7 @@ public class App {
                     results.stream()
                             .allMatch(
                                     result -> Prob.lte(result.prob, result.cyberReq.getSeverity()));
-            boolean performMeritAssignment = meritAssignment && sat;
+            boolean performMeritAssignment = partialSolution && sat;
 
             DLeaf.Factory factory = new DLeaf.Factory();
             DTree dtree =
@@ -685,8 +692,8 @@ public class App {
                             false);
 
             if (selected.isPresent()) {
-                log("Synthesis results:");
-                selected.get().prettyPrint(System.out);
+                selected.get().toFileXml(new File(outputPath));
+                log("Synthesis results output to " + outputPath);
             } else {
                 logError("Synthesis failed");
             }
@@ -1126,17 +1133,22 @@ public class App {
         log("Input AADL project: " + aadlPath);
         log("Output IML file: " + imlPath);
         log("VERDICT Properties Name: " + propertySet);
+        System.out.println(); // Make any message provided by aadl2iml more visible
 
         try {
             Binary.invokeBin(aadl2imlBin, "-ps", propertySet, "-o", imlPath, aadlPath);
         } catch (Binary.ExecutionException e) {
-            throw new VerdictRunException("Failed to execute aadl2iml", e);
+            if (e.getCode().isPresent()) {
+                // If an exit code is present, aadl2iml should have printed a message
+                System.exit(2);
+            } else {
+                throw new VerdictRunException("Failed to execute aadl2iml", e);
+            }
         }
 
-        // For some reason, aadl2iml doesn't give a non-zero exit code when it fails
-        // But we can detect failure like this:
         if (!(new File(imlPath)).exists()) {
-            throw new VerdictRunException("Failed to execute aadl2iml, no output generated");
+            logError("Failed to execute aadl2iml, no output generated");
+            System.exit(2);
         }
     }
 

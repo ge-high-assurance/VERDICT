@@ -4,6 +4,7 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.util.Pair;
+import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -46,6 +47,14 @@ public class VerdictSynthesis {
             boolean dumpSmtLib) {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
+
+        System.out.println(
+                "performSynthesisMultiple, configuration: partialSolution="
+                        + partialSolution
+                        + ", inputSat="
+                        + inputSat
+                        + ", meritAssignment="
+                        + meritAssignment);
 
         Collection<ComponentDefense> pairs = factory.allComponentDefensePairs();
 
