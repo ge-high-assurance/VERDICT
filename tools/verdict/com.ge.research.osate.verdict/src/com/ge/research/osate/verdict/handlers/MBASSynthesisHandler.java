@@ -13,9 +13,13 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
 import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
+import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.research.osate.verdict.gui.MBASSynthesisReport;
+import com.ge.verdict.vdm.VdmTranslator;
+
+import verdict.vdm.vdm_model.Model;
 
 public class MBASSynthesisHandler extends AbstractHandler {
 	static final String SEP = File.separator;
@@ -63,6 +67,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 						File dataFolder = new File(stemProjPath, "CSVData");
 						File outputFolder = new File(stemProjPath, "Output");
 						File graphsFolder = new File(stemProjPath, "Graphs");
+						File vdmFile = new File(outputFolder, "verdict-model.xml");
 
 						if (dataFolder.exists() && dataFolder.isDirectory()) {
 							deleteFilesInDir("csv", dataFolder);
@@ -81,9 +86,6 @@ public class MBASSynthesisHandler extends AbstractHandler {
 						}
 
 						File projectDir = new File(selection.get(0));
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-
-						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 
 						File costModel = new File(projectDir, "costModel.xml");
 						if (!costModel.exists()) {
@@ -92,9 +94,18 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							return;
 						}
 
+						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+
+						Aadl2Vdm aadl2vdm = new Aadl2Vdm();
+						Model vdmModel = aadl2vdm.execute(projectDir);
+						VdmTranslator.marshalToXml(vdmModel, vdmFile);
+
 						File outputXml = new File(outputFolder, "synthesis_output.xml");
 
-						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
+						if (runBundle(bundleJar, dockerImage, projectDir.getName(), vdmFile.getAbsolutePath(),
+								stemProjPath,
+								soteriaPpBin,
 								graphVizPath, costModel.getAbsolutePath(), outputXml.getAbsolutePath())) {
 							if (outputXml.exists()) {
 								MBASSynthesisReport.report(outputXml, iWindow);
@@ -117,13 +128,16 @@ public class MBASSynthesisHandler extends AbstractHandler {
 		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
 	}
 
-	public static boolean runBundle(String bundleJar, String dockerImage, String projectName, String stemProjectDir,
+	public static boolean runBundle(String bundleJar, String dockerImage, String projectName, String vdmFile,
+			String stemProjectDir,
 			String soteriaPpBin, String graphVizPath, String costModel, String outputXml) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage).arg("--csv").arg(projectName)
 				.arg("--mbas").argBind(stemProjectDir, "/app/STEM").arg2(soteriaPpBin, "/app/soteria_pp")
-				.arg("--synthesis").argBind(costModel, "/app/costs/costModel.xml").arg("-o")
+				.arg("--synthesis").argBind(vdmFile, "/app/vdm/verdict-model.xml")
+				.argBind(costModel, "/app/costs/costModel.xml")
+				.arg("-o")
 				.argBind(outputXml, "/app/output/synthesis_output.xml");
 
 		if (MBASSettingsPanel.synthesisCyberInference) {

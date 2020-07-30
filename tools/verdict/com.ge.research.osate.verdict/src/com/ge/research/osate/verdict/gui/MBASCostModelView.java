@@ -49,6 +49,8 @@ import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.Subcomponent;
 
+import com.ge.verdict.vdm.DefenseProperties;
+
 public class MBASCostModelView extends ApplicationWindow{
 	private Font font;
 	private Font boldFont;
@@ -130,7 +132,9 @@ public class MBASCostModelView extends ApplicationWindow{
 		suggComponents.add(0, SynthesisCostModel.COMPONENT_ALL);
 
 		for (String defenseProp : defensePropNames) {
-			suggDefenseProps.add(defenseProp);
+			if (DefenseProperties.MBAA_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
+				suggDefenseProps.add(defenseProp);
+			}
 		}
 		suggDefenseProps.sort(null);
 		suggDefenseProps.add(0, SynthesisCostModel.DEFENSE_PROP_ALL);

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
@@ -376,14 +377,17 @@ public class AttackDefenseCollector {
             }
         }
 
-        loadAttacksDefenses(inputDir, connectionAttackNames);
+        loadAttacksDefenses(inputDir, connectionAttackNames, null);
 
         if (inference) {
             performInference();
         }
     }
 
-    private void loadAttacksDefenses(String inputDir, Map<String, String> connectionNameMap)
+    private void loadAttacksDefenses(
+            String inputDir,
+            Map<String, String> connectionNameMap,
+            Map<Pair<String, String>, Integer> implDal)
             throws CSVFile.MalformedInputException, IOException {
         // Load all the files as CSV
         CSVFile capecCsv =
@@ -524,13 +528,33 @@ public class AttackDefenseCollector {
 
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
-                    Optional<Pair<String, Integer>> impl =
-                            "null".equals(implProps.get(i))
-                                    ? Optional.empty()
-                                    : Optional.of(
-                                            new Pair<>(
-                                                    implProps.get(i),
-                                                    Integer.parseInt(likelihoodStrings.get(i))));
+                    int dal = -1;
+                    // load DAL from VDM if available
+                    if (implDal != null) {
+                        Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
+                        if (implDal.containsKey(pair)) {
+                            dal = implDal.get(pair);
+                        }
+                    }
+
+                    // this code treats applicable defense and impl defense as separate things
+                    // but we have changed the capitalization so that they should be the same
+                    Optional<Pair<String, Integer>> impl;
+                    if (dal == -1) {
+                        impl =
+                                "null".equals(implProps.get(i))
+                                        ? Optional.empty()
+                                        : Optional.of(
+                                                new Pair<>(
+                                                        implProps.get(i),
+                                                        Integer.parseInt(
+                                                                likelihoodStrings.get(i))));
+                    } else {
+                        impl =
+                                dal == 0
+                                        ? Optional.empty()
+                                        : Optional.of(new Pair<>(defenseNames.get(i), dal));
+                    }
                     clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
                 }
             }
@@ -605,6 +629,8 @@ public class AttackDefenseCollector {
 
         Map<String, String> connectionAttackNames = new HashMap<>();
 
+        Map<Pair<String, String>, Integer> implDal = new HashMap<>();
+
         // Load all instances as systems
         for (ComponentImpl impl : model.getComponentImpl()) {
             for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
@@ -649,18 +675,6 @@ public class AttackDefenseCollector {
             for (Connection conn : impl.getBlockImpl().getConnection()) {
                 boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
                 boolean internalOutgoing = conn.getDestination().getSubcomponentPort() == null;
-
-                //                String sourcePort =
-                //                        internalIncoming
-                //                                ? conn.getSource().getComponentPort().getName()
-                //                                :
-                // conn.getSource().getSubcomponentPort().getPort().getName();
-                //                String destPort =
-                //                        internalOutgoing
-                //                                ?
-                // conn.getDestination().getComponentPort().getName()
-                //                                :
-                // conn.getDestination().getSubcomponentPort().getPort().getName();
 
                 String sourcePort, destPort;
                 if (internalIncoming) {
@@ -792,7 +806,42 @@ public class AttackDefenseCollector {
             }
         }
 
-        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames);
+        // load implemented defense DALs from VDM
+        for (ComponentImpl impl : model.getComponentImpl()) {
+            for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
+                for (GenericAttribute attrib : inst.getAttribute()) {
+                    if (attrib.getValue() instanceof String) {
+                        try {
+                            Integer dal = Integer.parseInt((String) attrib.getValue());
+
+                            // chop qualifier (normally "CASE_Consolidated_Properties::")
+                            int lastColon = attrib.getName().lastIndexOf(':');
+                            String name =
+                                    lastColon != -1
+                                            ? attrib.getName().substring(lastColon + 1)
+                                            : attrib.getName();
+
+                            implDal.put(new Pair<>(inst.getName(), name), dal);
+                        } catch (NumberFormatException e) {
+                            // most likely this is a non-integer property
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println("IMPl DAL COUNT: " + implDal.size());
+        for (HashMap.Entry<Pair<String, String>, Integer> entry : implDal.entrySet()) {
+            System.out.println(
+                    "IMPL DAL: <"
+                            + entry.getKey().left
+                            + ", "
+                            + entry.getKey().right
+                            + "> = "
+                            + entry.getValue());
+        }
+
+        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames, implDal);
 
         if (inference) {
             performInference();

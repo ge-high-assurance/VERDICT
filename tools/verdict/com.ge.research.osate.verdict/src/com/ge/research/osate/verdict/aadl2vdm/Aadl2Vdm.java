@@ -554,8 +554,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(sysType.getName());
@@ -852,8 +853,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(bType.getName());
@@ -1128,8 +1130,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(subprogType.getName());
@@ -1426,8 +1429,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(tType.getName());
@@ -1724,8 +1728,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(memType.getName());
@@ -2022,8 +2027,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(devType.getName());
@@ -2320,8 +2326,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(absType.getName());
@@ -2618,8 +2625,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(prcsType.getName());
@@ -2916,8 +2924,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(tgType.getName());
@@ -3214,8 +3223,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(vprocType.getName());
@@ -3512,8 +3522,9 @@ public class Aadl2Vdm {
 				//checking if a high-level system has already been found
 				if (higher_flag == false) {
 					higher_flag = true;
+				} else {
+					System.out.println("Warning: Multiple high-level systems detected!");
 				}
-				else System.out.println("Warning: Multiple high-level systems detected!");
 				
 				//populating name
 				m1.setName(proType.getName());
@@ -3838,7 +3849,9 @@ public class Aadl2Vdm {
 
         						packSrcEndCompInstPort.setSubcomponent(checkCompInst);
         						break;
-        					} else continue;
+        					} else {
+								continue;
+							}
         				}    				        				
         				packSrcEndCompInstPort.setPort(packSrcEndPort);
         				
@@ -3869,7 +3882,9 @@ public class Aadl2Vdm {
 
         						packDestEndCompInstPort.setSubcomponent(checkCompInst);
         						break;
-        					} else continue;
+        					} else {
+								continue;
+							}
         				}    				        				
         				packDestEndCompInstPort.setPort(packDestEndPort);
         				
@@ -4051,7 +4066,7 @@ public class Aadl2Vdm {
             //to pack all conjunct subexpressions in a single list
             verdict.vdm.vdm_model.CyberExprList packOrList= new verdict.vdm.vdm_model.CyberExprList();
                         
-    		for(LExpr expr : ((LAnd)andExpr).getExprs()) { //for each conjunct (each disjunct is a LExpr)
+    		for(LExpr expr : andExpr.getExprs()) { //for each conjunct (each disjunct is a LExpr)
     			//to pack the CyberExpr for this conjunct
     			verdict.vdm.vdm_model.CyberExpr packConjunctCyberExpr= handleOrCyberExpr(expr, allPortNames, allPortCIAs); 			
 
@@ -4147,7 +4162,7 @@ public class Aadl2Vdm {
 		if(notExpr.getExpr() instanceof LPort){
 
 			
-			verdict.vdm.vdm_model.CIAPort port = handleCIAPort((LPort)notExpr.getExpr(), allPortNames, allPortCIAs);
+			verdict.vdm.vdm_model.CIAPort port = handleCIAPort(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 			//setting "port" field of packCyberExp
 			packCyberExpr.setPort(port);
@@ -4155,7 +4170,7 @@ public class Aadl2Vdm {
 		} else if(notExpr.getExpr() instanceof LOr){
 
 			
-			packCyberExpr = handleOrCyberExpr((LOr)notExpr.getExpr(), allPortNames, allPortCIAs);
+			packCyberExpr = handleOrCyberExpr(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof LAnd){
 
@@ -4294,7 +4309,7 @@ public class Aadl2Vdm {
             //to pack all conjunct subexpressions in a single list
             verdict.vdm.vdm_model.SafetyReqExprList packOrList= new verdict.vdm.vdm_model.SafetyReqExprList();
                         
-    		for(SLExpr expr : ((SLAnd)andExpr).getExprs()) { //for each conjunct (each disjunct is a LExpr)
+    		for(SLExpr expr : andExpr.getExprs()) { //for each conjunct (each disjunct is a LExpr)
     			//to pack the SafetyReqExpr for this conjunct
     			verdict.vdm.vdm_model.SafetyReqExpr packConjunctSafetyReqExpr= handleOrSafetyReqExpr(expr, allPortNames, allPortCIAs); 			
 
@@ -4392,7 +4407,7 @@ public class Aadl2Vdm {
 		if(notExpr.getExpr() instanceof SLPort){
 
 			
-			verdict.vdm.vdm_model.IAPort port = handleIAPort((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
+			verdict.vdm.vdm_model.IAPort port = handleIAPort(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 			//setting "port" field of packSafetyReqExp
 			packSafetyReqExpr.setPort(port);
@@ -4400,7 +4415,7 @@ public class Aadl2Vdm {
 		} else if(notExpr.getExpr() instanceof SLOr){
 
 			
-			packSafetyReqExpr = handleOrSafetyReqExpr((SLOr)notExpr.getExpr(), allPortNames, allPortCIAs);
+			packSafetyReqExpr = handleOrSafetyReqExpr(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof SLAnd){
 
@@ -4550,7 +4565,7 @@ public class Aadl2Vdm {
             //to pack all conjunct subexpressions in a single list
             verdict.vdm.vdm_model.SafetyRelExprList packOrList= new verdict.vdm.vdm_model.SafetyRelExprList();
                         
-    		for(SLExpr expr : ((SLAnd)andExpr).getExprs()) { //for each conjunct (each disjunct is a LExpr)
+    		for(SLExpr expr : andExpr.getExprs()) { //for each conjunct (each disjunct is a LExpr)
     			//to pack the SafetyRelExpr for this conjunct
     			verdict.vdm.vdm_model.SafetyRelExpr packConjunctSafetyRelExpr= handleOrSafetyRelExpr(expr, allPortNames, allPortCIAs); 			
 
@@ -4657,7 +4672,7 @@ public class Aadl2Vdm {
 		if(notExpr.getExpr() instanceof SLPort){
 
 			
-			verdict.vdm.vdm_model.IAPort port = handleIAPort((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
+			verdict.vdm.vdm_model.IAPort port = handleIAPort(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 			//setting "port" field of packSafetyRelExpr
 			packSafetyRelExpr.setPort(port);
@@ -4665,7 +4680,7 @@ public class Aadl2Vdm {
 		} else if(notExpr.getExpr() instanceof FExpr){
 
 			
-			verdict.vdm.vdm_model.EventHappens fault = handleEventHappens((SLPort)notExpr.getExpr(), allPortNames, allPortCIAs);
+			verdict.vdm.vdm_model.EventHappens fault = handleEventHappens(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 			//setting "port" field of packSafetyRelExpr
 			packSafetyRelExpr.setFault(fault);
@@ -4673,7 +4688,7 @@ public class Aadl2Vdm {
 		} else if(notExpr.getExpr() instanceof SLOr){
 
 			
-			packSafetyRelExpr = handleOrSafetyRelExpr((SLOr)notExpr.getExpr(), allPortNames, allPortCIAs);
+			packSafetyRelExpr = handleOrSafetyRelExpr(notExpr.getExpr(), allPortNames, allPortCIAs);
 			
 		} else if(notExpr.getExpr() instanceof SLAnd){
 
@@ -4895,7 +4910,7 @@ public class Aadl2Vdm {
 			
 			if(refValue.getContainmentPathElements().size() == 1) {
 				ContainmentPathElement element = refValue.getContainmentPathElements().get(0);
-				NamedElement namedElement = (NamedElement) element.getNamedElement();
+				NamedElement namedElement = element.getNamedElement();
 				
 				if(namedElement instanceof BusSubcomponent) {
 					ComponentImplementation impl = ((BusSubcomponent)namedElement).getContainingComponentImpl();

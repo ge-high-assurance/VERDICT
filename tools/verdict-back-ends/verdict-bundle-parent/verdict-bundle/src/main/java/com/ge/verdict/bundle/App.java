@@ -175,8 +175,17 @@ public class App {
 
         options.addOption("c", false, "Cyber Relations Inference");
         options.addOption("s", false, "Safety Relations Inference");
+
         // TODO don't have a good short option because "s" is already taken
-        options.addOption("y", "synthesis", true, "Perform synthesis instead of Soteria++");
+        Option synthesis =
+                Option.builder("y")
+                        .desc("Perform synthesis instead of Soteria++")
+                        .longOpt("synthesis")
+                        .numberOfArgs(2)
+                        .argName("vdm")
+                        .argName("costModel")
+                        .build();
+        options.addOption(synthesis);
         options.addOption("o", "synthesis-output", true, "Synthesis output XML file");
         options.addOption("p", false, "Use partial solutions in synthesis");
 
@@ -235,7 +244,7 @@ public class App {
         helpLine("      -c ................... cyber relations inference");
         helpLine("      -s ................... safety relations inference");
         helpLine(
-                "      --synthesis <cost model xml>"
+                "      --synthesis <vdm file> <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
         helpLine(
                 "      -o ................... synthesis output XML (required if synthesis enabled)");
@@ -313,11 +322,18 @@ public class App {
                         throw new VerdictRunException("Must specify synthesis output XML");
                     }
 
-                    String costModelPath = opts.getOptionValue("y");
+                    String[] synthesisOpts = opts.getOptionValues("y");
+                    if (synthesisOpts.length != 2) {
+                        throw new VerdictRunException("Missing --synthesis args");
+                    }
+
+                    String vdmFile = synthesisOpts[0];
+                    String costModelPath = synthesisOpts[1];
                     String output = opts.getOptionValue("o");
                     boolean partialSolution = opts.hasOption("p");
 
                     runMbasSynthesis(
+                            vdmFile,
                             csvProjectName,
                             stemProjectDir,
                             debugDir,
@@ -594,6 +610,7 @@ public class App {
      * @throws VerdictRunException
      */
     public static void runMbasSynthesis(
+            String vdmFile,
             String modelName,
             String stemProjectDir,
             String debugDir,
@@ -613,6 +630,7 @@ public class App {
         soteriaOutputDir.mkdirs();
         String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
 
+        checkFile(vdmFile, true, false, false, false, "xml");
         checkFile(stemCsvDir, true, true, true, false, null);
         checkFile(stemOutputDir, true, true, true, false, null);
         checkFile(stemGraphsDir, true, true, true, false, null);
@@ -668,7 +686,8 @@ public class App {
             CostModel costModel = new CostModel(new File(costModelPath));
 
             AttackDefenseCollector collector =
-                    new AttackDefenseCollector(stemOutputDir, cyberInference);
+                    new AttackDefenseCollector(
+                            new File(vdmFile), new File(stemOutputDir), cyberInference);
             List<AttackDefenseCollector.Result> results = collector.perform();
 
             boolean sat =
