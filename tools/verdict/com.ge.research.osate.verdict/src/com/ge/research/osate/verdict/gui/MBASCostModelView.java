@@ -185,28 +185,30 @@ public class MBASCostModelView extends ApplicationWindow{
 	public void bringToFront(Shell shell) {
 		shell.setActive();
 	}
-	
+
 	public void createThreeColumnsTable(Composite leftColumn, List<String> content, int width) {
-	    final Table table = new Table(leftColumn, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-	    table.setLinesVisible(true);
-	    for (int i = 0; i < 3; i++) {
-	      TableColumn column = new TableColumn(table, SWT.NONE);
-	      column.setWidth(width);
-	    }
-	    for(int i = 0; i < content.size(); ) {
-	    	TableItem item = new TableItem(table, SWT.NONE);
-	    	  if(i+2 < content.size()) {	    		  
-	    		  item.setText(new String[] { content.get(i), content.get(i+1), content.get(i+2)});
-	    	  } else {
-	    		  int k = 0;
-	    		  String[] text = new String [content.size()-i+1];
-	    		  for(int j = i; j < content.size(); j++) {
-	    			  text[k] = content.get(j); ++k;
-	    		  }
-	    		  item.setText(text);
-	    	  }
-		      i+=3;
-	    }				
+		final Table table = new Table(leftColumn, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE);
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
+		for (int i = 0; i < 3; i++) {
+			TableColumn column = new TableColumn(table, SWT.NONE);
+			column.setWidth(width);
+		}
+		for (int i = 0; i < content.size();) {
+			TableItem item = new TableItem(table, SWT.NONE);
+			if (i + 2 < content.size()) {
+				item.setText(new String[] { content.get(i), content.get(i + 1), content.get(i + 2) });
+			} else {
+				int k = 0;
+				String[] text = new String[content.size() - i + 1];
+				for (int j = i; j < content.size(); j++) {
+					text[k] = content.get(j);
+					++k;
+				}
+				item.setText(text);
+			}
+			i += 3;
+		}
 	}
 
 	@Override
@@ -224,7 +226,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		componentLabel.setText("Component Table");
 		componentLabel.setFont(boldFont);
 		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
-		
+
 		// Create a table for displaying components
 		createThreeColumnsTable(leftColumn, suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
 				.collect(Collectors.toList()), 175);
@@ -235,10 +237,10 @@ public class MBASCostModelView extends ApplicationWindow{
 		propLabel.setText("Defense Property Table");
 		propLabel.setFont(boldFont);
 		propLabel.setAlignment(SWT.CENTER);
-		
+
 		// Create a table for displaying defense properties
 		createThreeColumnsTable(leftColumn, suggDefenseProps.stream()
-				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);		
+				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);
 
 		// List all defense properties
 
