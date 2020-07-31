@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.ComponentImplementation;
@@ -184,13 +185,34 @@ public class MBASCostModelView extends ApplicationWindow{
 	public void bringToFront(Shell shell) {
 		shell.setActive();
 	}
+	
+	public void createThreeColumnsTable(Composite leftColumn, List<String> content, int width) {
+	    final Table table = new Table(leftColumn, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+	    table.setLinesVisible(true);
+	    for (int i = 0; i < 3; i++) {
+	      TableColumn column = new TableColumn(table, SWT.NONE);
+	      column.setWidth(width);
+	    }
+	    for(int i = 0; i < content.size(); ) {
+	    	TableItem item = new TableItem(table, SWT.NONE);
+	    	  if(i+2 < content.size()) {	    		  
+	    		  item.setText(new String[] { content.get(i), content.get(i+1), content.get(i+2)});
+	    	  } else {
+	    		  int k = 0;
+	    		  String[] text = new String [content.size()-i+1];
+	    		  for(int j = i; j < content.size(); j++) {
+	    			  text[k] = content.get(j); ++k;
+	    		  }
+	    		  item.setText(text);
+	    	  }
+		      i+=3;
+	    }				
+	}
 
 	@Override
 	protected Control createContents(Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(2, false));
-
-		int leftColumnWidth = 400;
 
 		Composite leftColumn = new Composite(composite, SWT.NONE);
 		leftColumn.setLayout(new GridLayout(1, false));
@@ -198,32 +220,25 @@ public class MBASCostModelView extends ApplicationWindow{
 		Composite rightColumn = new Composite(composite, SWT.NONE);
 		rightColumn.setLayout(new GridLayout(1, false));
 
-		String allComps = suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
-				.collect(Collectors.joining(", "));
-		String allDefenseProps = suggDefenseProps.stream()
-				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.joining(", "));
-
 		Label componentLabel = new Label(leftColumn, SWT.NONE);
-		componentLabel.setText("Component:");
+		componentLabel.setText("Component Table");
 		componentLabel.setFont(boldFont);
-
-		Label compsLabel = new Label(leftColumn, SWT.WRAP);
-		GridData compsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
-		compsLabelGridData.widthHint = leftColumnWidth;
-		compsLabel.setLayoutData(compsLabelGridData);
-		compsLabel.setText(allComps);
+		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
+		
+		// Create a table for displaying components
+		createThreeColumnsTable(leftColumn, suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
+				.collect(Collectors.toList()), 175);
 
 		// List all components
 
 		Label propLabel = new Label(leftColumn, SWT.NONE);
-		propLabel.setText("Defense Property:");
+		propLabel.setText("Defense Property Table");
 		propLabel.setFont(boldFont);
-
-		Label defPropsLabel = new Label(leftColumn, SWT.WRAP);
-		GridData defPropsLabelGridData = new GridData(SWT.LEFT, SWT.TOP, true, false);
-		defPropsLabelGridData.widthHint = leftColumnWidth;
-		defPropsLabel.setLayoutData(defPropsLabelGridData);
-		defPropsLabel.setText(allDefenseProps);
+		propLabel.setAlignment(SWT.CENTER);
+		
+		// Create a table for displaying defense properties
+		createThreeColumnsTable(leftColumn, suggDefenseProps.stream()
+				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);		
 
 		// List all defense properties
 
@@ -232,7 +247,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		topButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
 		Button newRule = new Button(topButtons, SWT.PUSH);
-		newRule.setText("Add row");
+		newRule.setText("Add Row");
 		newRule.setFont(font);
 
 		table = new Table(rightColumn, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
