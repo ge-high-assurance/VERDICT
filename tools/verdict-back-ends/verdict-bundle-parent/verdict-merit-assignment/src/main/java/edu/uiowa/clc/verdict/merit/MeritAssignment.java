@@ -34,7 +34,7 @@ public class MeritAssignment {
                 Element MESElement = (Element) MESNode;
                 NodeList nList = MESElement.getElementsByTagName("Node");
 
-                for (int j = 0; j < nList.getLength(); ++j) {
+                for (int j = nList.getLength() - 1; j >= 0; --j) {
                     Node nNode = nList.item(j);
 
                     if (nNode.getNodeType() != Node.ELEMENT_NODE) continue;
