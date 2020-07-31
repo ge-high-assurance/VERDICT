@@ -11,6 +11,9 @@ package edu.uiowa.clc.verdict.util;
 
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
@@ -18,10 +21,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class XMLProcessor {
 
@@ -201,6 +207,84 @@ public class XMLProcessor {
             jaxbMarshaller.marshal(bml, outputFile);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void parseLog(File kind2Output) {
+
+        try {
+
+            FileInputStream logStream = new FileInputStream(kind2Output);
+
+            DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+            Document doc = dBuilder.parse(logStream);
+
+            //            System.out.println("Root element :" +
+            // doc.getDocumentElement().getNodeName());
+
+            if (doc.hasChildNodes()) {
+                // Parse warning
+                NodeList logNodeList = doc.getElementsByTagName("Log");
+
+                for (int index = 0; index < logNodeList.getLength(); index++) {
+                    Node nNode = logNodeList.item(index);
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element eElement = (Element) nNode;
+
+                        //                		System.out.println("Warning: " +
+                        // eElement.getAttribute("warn"));
+                        //                		System.out.println("Error: " +
+                        // eElement.getAttribute("error"));
+                        //
+                        NodeList cNodes = eElement.getChildNodes();
+
+                        nNode = cNodes.item(0);
+                        String nodeName = eElement.getAttribute("class");
+                        if (nodeName.equalsIgnoreCase("warn")) {
+                            System.out.println("Warning: " + nNode.getTextContent());
+                        } else if (nodeName.equalsIgnoreCase("error")) {
+                            System.out.println("Failure: " + nNode.getTextContent());
+
+                            if (eElement.hasAttributes()) {
+
+                                // get attributes names and values
+                                NamedNodeMap nodeMap = eElement.getAttributes();
+
+                                for (int i = 0; i < nodeMap.getLength(); i++) {
+
+                                    Node node = nodeMap.item(i);
+
+                                    String node_name = node.getNodeName();
+                                    if (node_name.contentEquals("class")
+                                            || node_name.contentEquals("source")) {
+                                        // skip
+                                    } else {
+                                        System.out.println(node_name + " : " + node.getNodeValue());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // doc.getElementsByTagName("Property");
+            logStream.close();
+
+        } catch (FileNotFoundException exp) {
+            // TODO Auto-generated catch block
+            System.out.print("No error log file found.");
+            //			System.exit(-1);
+        } catch (IOException exp) {
+            // TODO Auto-generated catch block
+            System.out.print("Unable to read log file.");
+            //			System.exit(-1);
+        } catch (ParserConfigurationException exp) {
+            System.out.print("Unable to parse error log file.");
+        } catch (SAXException exp) {
+            System.out.print("Log file is corrupted.");
         }
     }
 

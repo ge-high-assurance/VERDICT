@@ -129,26 +129,6 @@ public class Aadl2Vdm {
 	   }	
 	
 	
-	/**
-	 * for pretty printing header
-	 */
-    private static void logLine() {
-        System.out.println(
-                "******************************************************************"
-                        + "******************************************************");
-    }
-    
-    
-	/**
-	 * for pretty printing header
-	 */   
-    private static void logHeader(String header) {
-        System.out.println();
-        logLine();
-        System.out.println("      " + header);
-        logLine();
-        System.out.println();
-    } 	
 	
 	/**
 	 * Assume the input is correct without any syntax errors
@@ -584,6 +564,15 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+                    
+                    
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -616,7 +605,15 @@ public class Aadl2Vdm {
                     packCyberReq.setDescription(description);
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
+
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
                     
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -625,6 +622,7 @@ public class Aadl2Vdm {
 				
 				//packing all missionReqs and adding to model
 				for(CyberMission aMission : missionReqs) {
+					
 					//To pack the safettReq as a VDM event
 					verdict.vdm.vdm_model.Mission packMission = new verdict.vdm.vdm_model.Mission();
 				
@@ -633,6 +631,14 @@ public class Aadl2Vdm {
                     EList<String> missionCyberReqs= aMission.getCyberReqs();
                     packMission.setId(id);
                     packMission.setDescription(description);
+
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
                     
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
@@ -882,6 +888,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+                    
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -915,6 +929,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -932,6 +954,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -1158,6 +1188,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -1191,6 +1229,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -1208,6 +1254,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -1456,6 +1510,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -1489,6 +1551,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -1506,6 +1576,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -1754,6 +1832,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -1787,6 +1873,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -1804,8 +1898,16 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
                     }
                     
                     //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
@@ -2052,6 +2154,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -2085,6 +2195,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -2102,6 +2220,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -2350,6 +2476,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -2383,6 +2517,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -2400,6 +2542,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -2648,6 +2798,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -2681,6 +2839,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -2698,6 +2864,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -2946,6 +3120,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -2979,6 +3161,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -2996,6 +3186,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -3244,6 +3442,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -3277,6 +3483,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -3294,8 +3508,16 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
                     }
                     
                     //ISSUE: "comment" and "name" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberMission class and superclass
@@ -3542,6 +3764,14 @@ public class Aadl2Vdm {
                     packSafetyReq.setTargetProbability(targetProbability);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                 
+                    if(aSafetyReq.getJustification() != null) {
+                        packSafetyReq.setJustification(aSafetyReq.getJustification());
+                    }
+                    
+                    if(aSafetyReq.getAssumption() != null) {
+                        packSafetyReq.setAssumption(aSafetyReq.getAssumption());
+                    }
+
 					//adding to the list of model's Safety requirements
 					m1.getSafetyReq().add(packSafetyReq);									
 
@@ -3575,6 +3805,14 @@ public class Aadl2Vdm {
                     packCyberReq.setSeverity(severity);
                     //ISSUE: "name", "phases" and "extern" fields missing in com.ge.research.osate.verdict.dsl.verdict.CyberRel class and superclass
                     
+                    if(aCyberReq.getJustification() != null) {
+                        packCyberReq.setJustification(aCyberReq.getJustification());
+                    }
+                    
+                    if(aCyberReq.getAssumption() != null) {
+                        packCyberReq.setAssumption(aCyberReq.getAssumption());
+                    }
+
 					//adding to the list of model's Cyber requirements
 					m1.getCyberReq().add(packCyberReq);									
 
@@ -3592,6 +3830,14 @@ public class Aadl2Vdm {
                     packMission.setId(id);
                     packMission.setDescription(description);
                     
+                    if(aMission.getJustification() != null) {
+                        packMission.setJustification(aMission.getJustification());
+                    }
+                    
+                    if(aMission.getAssumption() != null) {
+                        packMission.setAssumption(aMission.getAssumption());
+                    }
+
                     for (String CyberReq : missionCyberReqs) {
                     	packMission.getCyberReqs().add(CyberReq);
                     }
@@ -5152,6 +5398,27 @@ public class Aadl2Vdm {
           	}
           	return full;
           }
-      	   	  
+  
+          
+      	/**
+      	 * for pretty printing header
+      	 */
+          private static void logLine() {
+              System.out.println(
+                      "******************************************************************"
+                              + "******************************************************");
+          }
+          
+          
+      	/**
+      	 * for pretty printing header
+      	 */   
+          private static void logHeader(String header) {
+              System.out.println();
+              logLine();
+              System.out.println("      " + header);
+              logLine();
+              System.out.println();
+          }
     
 }

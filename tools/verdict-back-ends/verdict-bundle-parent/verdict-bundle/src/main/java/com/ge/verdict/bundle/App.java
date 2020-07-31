@@ -1065,6 +1065,11 @@ public class App {
                             log("Some properties are invalid");
                         }
                         break;
+                    case 2:
+                        log("Kind2 fails to return correct results");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
                     case 0:
                         log("Kind2 timed out");
                         break;

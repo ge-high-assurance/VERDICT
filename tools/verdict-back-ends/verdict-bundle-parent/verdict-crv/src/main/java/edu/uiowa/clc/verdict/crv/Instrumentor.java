@@ -443,18 +443,6 @@ public class Instrumentor extends VDMInstrumentor {
 
         HashSet<String> ports = new HashSet<String>();
 
-        //        for (Connection con : vdm_links) {
-
-        //        ConnectionEnd con_end = link.getSource();
-        //        Port src_port = con_end.getComponentPort();
-        //
-        //        if (src_port == null) {
-        //            CompInstancePort instance_port = con_end.getSubcomponentPort();
-        //            src_port = instance_port.getPort();
-        //        }
-        //
-        //        ports.add(src_port.getName());
-
         ConnectionEnd con_end = link.getSource();
         Port dest_port = con_end.getComponentPort();
 
@@ -474,8 +462,6 @@ public class Instrumentor extends VDMInstrumentor {
         }
 
         ports.add(dest_port.getName());
-
-        //        }
 
         return ports;
     }

@@ -18,16 +18,17 @@ public class GsnNode {
     protected String nodeId;
 
     @XmlElement
-    /** Can be one of: ["goal", "strategy", "solution", "context"] */
+    /** Can be one of: ["goal", "strategy", "solution", "context", "justification", "assumption"] */
     protected String nodeType;
 
-    @XmlElement
     /** To store relevant information based on nodeType */
-    protected Goal goal;
+    @XmlElement protected Goal goal;
 
     @XmlElement protected Strategy strategy;
     @XmlElement protected Solution solution;
     @XmlElement protected Context context;
+    @XmlElement protected Justification justification;
+    @XmlElement protected Assumption assumption;
 
     @XmlElement
     /** List of nodes which support a node */
@@ -36,6 +37,14 @@ public class GsnNode {
     @XmlElement
     /** List of context nodes of a node */
     protected List<GsnNode> inContextOf;
+
+    @XmlElement
+    /** List of justifications of a node */
+    protected List<GsnNode> justifiedBy;
+
+    @XmlElement
+    /** List of justifications of a node */
+    protected List<GsnNode> hasAssumptions;
 
     /**
      * Gets the value of the nodeLevel property.
@@ -155,12 +164,48 @@ public class GsnNode {
     }
 
     /**
-     * Sets the value of the property.
+     * Sets the value of the context property.
      *
      * @param value allowed object is {@link Context }
      */
     protected void setContext(Context value) {
         this.context = value;
+    }
+
+    /**
+     * Gets the value of the justification property.
+     *
+     * @return possible object is {@link Context }
+     */
+    protected Justification getJustification() {
+        return justification;
+    }
+
+    /**
+     * Sets the value of the justification property.
+     *
+     * @param value allowed object is {@link Context }
+     */
+    protected void setJustification(Justification value) {
+        this.justification = value;
+    }
+
+    /**
+     * Gets the value of the assumption property.
+     *
+     * @return possible object is {@link Context }
+     */
+    protected Assumption getAssumption() {
+        return assumption;
+    }
+
+    /**
+     * Sets the value of the assumption property.
+     *
+     * @param value allowed object is {@link Context }
+     */
+    protected void setAssumption(Assumption value) {
+        this.assumption = value;
     }
 
     /**
@@ -205,5 +250,49 @@ public class GsnNode {
             inContextOf = new ArrayList<GsnNode>();
         }
         return this.inContextOf;
+    }
+
+    /**
+     * Gets the value of the justifiedBy field.
+     *
+     * <p>This accessor method returns a reference to the live list, not a snapshot. Therefore any
+     * modification you make to the returned list will be present inside the JAXB object. This is
+     * why there is not a <CODE>set</CODE> method for the justifiedBy property.
+     *
+     * <p>For example, to add a new item, do as follows:
+     *
+     * <pre>
+     *    getjustifiedBy().add(newItem);
+     * </pre>
+     *
+     * <p>Objects of the following type(s) are allowed in the list {@link GsnNode }
+     */
+    protected List<GsnNode> getJustifiedBy() {
+        if (justifiedBy == null) {
+            justifiedBy = new ArrayList<GsnNode>();
+        }
+        return this.justifiedBy;
+    }
+
+    /**
+     * Gets the value of the hasAssumptions field.
+     *
+     * <p>This accessor method returns a reference to the live list, not a snapshot. Therefore any
+     * modification you make to the returned list will be present inside the JAXB object. This is
+     * why there is not a <CODE>set</CODE> method for the hasAssumptions property.
+     *
+     * <p>For example, to add a new item, do as follows:
+     *
+     * <pre>
+     *    getHasAssumptions().add(newItem);
+     * </pre>
+     *
+     * <p>Objects of the following type(s) are allowed in the list {@link GsnNode }
+     */
+    protected List<GsnNode> getHasAssumptions() {
+        if (hasAssumptions == null) {
+            hasAssumptions = new ArrayList<GsnNode>();
+        }
+        return this.hasAssumptions;
     }
 }
