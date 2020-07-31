@@ -117,8 +117,8 @@ public class ResultsInstance {
                                 elem.getAttribute(ITEM_DEFENSE_PROPERTY),
                                 Integer.parseInt(elem.getAttribute(ITEM_INPUT_DAL)),
                                 Integer.parseInt(elem.getAttribute(ITEM_OUTPUT_DAL)),
-                                Double.parseDouble(elem.getAttribute(ITEM_INPUT_COST)),
-                                Double.parseDouble(elem.getAttribute(ITEM_OUTPUT_COST))));
+                                parseCost(elem.getAttribute(ITEM_INPUT_COST)),
+                                parseCost(elem.getAttribute(ITEM_OUTPUT_COST))));
             }
         }
 
@@ -126,8 +126,8 @@ public class ResultsInstance {
                 Boolean.parseBoolean(root.getAttribute(ROOT_PARTIAL_SOLUTION)),
                 Boolean.parseBoolean(root.getAttribute(ROOT_MERIT_ASSIGNMENT)),
                 Boolean.parseBoolean(root.getAttribute(ROOT_INPUT_SAT)),
-                Double.parseDouble(root.getAttribute(ROOT_INPUT_COST)),
-                Double.parseDouble(root.getAttribute(ROOT_OUTPUT_COST)),
+                parseCost(root.getAttribute(ROOT_INPUT_COST)),
+                parseCost(root.getAttribute(ROOT_OUTPUT_COST)),
                 items);
     }
 
@@ -233,5 +233,9 @@ public class ResultsInstance {
                     && items.equals(otherRes.items);
         }
         return false;
+    }
+
+    public static double parseCost(String costStr) {
+        return Double.parseDouble(costStr);
     }
 }

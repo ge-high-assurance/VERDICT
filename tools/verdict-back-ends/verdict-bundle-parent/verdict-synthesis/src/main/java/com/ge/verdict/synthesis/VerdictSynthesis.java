@@ -111,7 +111,7 @@ public class VerdictSynthesis {
 
         if (optimizer.Check().equals(Status.SATISFIABLE)) {
             List<ResultsInstance.Item> items = new ArrayList<>();
-            double totalInputCost = 0, totalOutputCost = 0;
+            Fraction totalInputCost = new Fraction(0), totalOutputCost = new Fraction(0);
             Model model = optimizer.getModel();
             for (ComponentDefense pair : pairs) {
                 RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
@@ -119,12 +119,12 @@ public class VerdictSynthesis {
                         new Fraction(expr.getNumerator().getInt(), expr.getDenominator().getInt());
                 int dal = pair.rawCostToDal(rawCost);
 
-                double inputCost =
+                Fraction inputCost =
                         costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
-                double outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
+                Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
 
-                totalInputCost += inputCost;
-                totalOutputCost += outputCost;
+                totalInputCost = totalInputCost.add(inputCost);
+                totalOutputCost = totalOutputCost.add(outputCost);
 
                 items.add(
                         new ResultsInstance.Item(
@@ -132,16 +132,16 @@ public class VerdictSynthesis {
                                 pair.defenseProperty,
                                 pair.implDal,
                                 dal,
-                                inputCost,
-                                outputCost));
+                                inputCost.doubleValue(),
+                                outputCost.doubleValue()));
             }
             return Optional.of(
                     new ResultsInstance(
                             partialSolution,
                             meritAssignment,
                             inputSat,
-                            totalInputCost,
-                            totalOutputCost,
+                            totalInputCost.doubleValue(),
+                            totalOutputCost.doubleValue(),
                             items));
         } else {
             System.err.println(
