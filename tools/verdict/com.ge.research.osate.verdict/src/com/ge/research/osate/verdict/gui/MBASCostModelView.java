@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.Subcomponent;
@@ -97,6 +98,7 @@ public class MBASCostModelView extends ApplicationWindow{
 
 		List<ComponentImplementation> impls = new ArrayList<>();
 		List<Subcomponent> comps = new ArrayList<>();
+		List<Connection> conns = new ArrayList<>();
 
 		Set<String> defensePropNames = new HashSet<>();
 
@@ -107,6 +109,9 @@ public class MBASCostModelView extends ApplicationWindow{
 				impls.add(impl);
 				for (Subcomponent comp : impl.getAllSubcomponents()) {
 					comps.add(comp);
+				}
+				for (Connection conn : impl.getAllConnections()) {
+					conns.add(conn);
 				}
 			} else if (obj instanceof Property) {
 				Property prop = (Property) obj;
@@ -125,6 +130,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		Set<String> systemNames = new HashSet<>();
 		systemNames.addAll(impls.stream().map(ComponentImplementation::getName).collect(Collectors.toList()));
 		systemNames.addAll(comps.stream().map(Subcomponent::getName).collect(Collectors.toList()));
+		systemNames.addAll(conns.stream().map(Connection::getName).collect(Collectors.toList()));
 
 		for (String system : systemNames) {
 			suggComponents.add(system);
@@ -187,7 +193,11 @@ public class MBASCostModelView extends ApplicationWindow{
 	}
 
 	public void createThreeColumnsTable(Composite leftColumn, List<String> content, int width) {
-		final Table table = new Table(leftColumn, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE);
+		final Table table = new Table(leftColumn,
+				SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE | SWT.V_SCROLL);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.heightHint = 200;
+		table.setLayoutData(gridData);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		for (int i = 0; i < 3; i++) {
