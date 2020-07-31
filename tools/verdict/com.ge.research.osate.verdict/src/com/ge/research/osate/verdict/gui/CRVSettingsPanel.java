@@ -95,57 +95,57 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
 
-		Label atgLabel = new Label(composite, SWT.NONE);
-		atgLabel.setText("Test Case Generation");
-		atgLabel.setFont(boldFont);
-
-		Group atgGroup = new Group(composite, SWT.NONE);
-		atgGroup.setLayout(new GridLayout(1, false));
-
-		// The "Enable Test Case Generation (ATG)" section
-		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
-		atgCheckBox.setText("Enable Test Case Generation");
-		atgCheckBox.setFont(font);
-		atgCheckBox.setSelection(testCaseGeneration);
+//		Label atgLabel = new Label(composite, SWT.NONE);
+//		atgLabel.setText("Test Case Generation");
+//		atgLabel.setFont(boldFont);
+//
+//		Group atgGroup = new Group(composite, SWT.NONE);
+//		atgGroup.setLayout(new GridLayout(1, false));
+//
+//		// The "Enable Test Case Generation (ATG)" section
+//		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
+//		atgCheckBox.setText("Enable Test Case Generation");
+//		atgCheckBox.setFont(font);
+//		atgCheckBox.setSelection(testCaseGeneration);
 
 		// The Post-Analysis options
 		Label postAnalysisLabel = new Label(composite, SWT.NONE);
 		postAnalysisLabel.setText("Post-Analysis");
-		postAnalysisLabel.setFont(boldFont);		
-		
+		postAnalysisLabel.setFont(boldFont);
+
 		Group postAnalysisGroup = new Group(composite, SWT.NONE);
 		postAnalysisGroup.setLayout(new GridLayout(1, false));
-		
+
 		Composite meritBlameGroup = new Composite(postAnalysisGroup, SWT.NONE);
 		meritBlameGroup.setLayout(new RowLayout(SWT.VERTICAL));
-		
+
 		Button meritButton = new Button(meritBlameGroup, SWT.RADIO);
 		meritButton.setText("Merit Assignment");
 		meritButton.setFont(font);
 		meritButton.setSelection(isMeritAssignment);
-		
+
 		Button blameButton = new Button(meritBlameGroup, SWT.RADIO);
 		blameButton.setText("Blame Assignment");
 		blameButton.setFont(font);
 		blameButton.setSelection(isBlameAssignment);
-		
+
 		Button noneButton = new Button(meritBlameGroup, SWT.RADIO);
 		noneButton.setText("None");
 		noneButton.setFont(font);
 		noneButton.setSelection(isNone);
-		
+
 		// The blame assignment options
 		Label baLable = new Label(composite, SWT.NONE);
 		baLable.setText("Blame Assignment Options");
 		baLable.setFont(boldFont);
-		
+
 		Group baGroup = new Group(composite, SWT.NONE);
-		baGroup.setLayout(new GridLayout(1, false));	
-		
+		baGroup.setLayout(new GridLayout(1, false));
+
 		Composite localGlobalGroup = new Composite(baGroup, SWT.NONE);
 		localGlobalGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		localGlobalGroup.setEnabled(isBlameAssignment);		
-		
+		localGlobalGroup.setEnabled(isBlameAssignment);
+
 		Button localButton = new Button(localGlobalGroup, SWT.RADIO);
 		localButton.setText("Local");
 		localButton.setFont(font);
@@ -156,21 +156,21 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		globalButton.setText("Gobal");
 		globalButton.setFont(font);
 		globalButton.setSelection(isGlobal);
-		globalButton.setEnabled(isBlameAssignment);	
-		
+		globalButton.setEnabled(isBlameAssignment);
+
 		Label separator = new Label(baGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
-	    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		
+	    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
 		compLinkGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		compLinkGroup.setEnabled(isBlameAssignment);		
-		
+		compLinkGroup.setEnabled(isBlameAssignment);
+
 		Button linkLevel = new Button(compLinkGroup, SWT.RADIO);
 		linkLevel.setText("Link-level");
 		linkLevel.setFont(font);
 		linkLevel.setSelection(!componentLevel);
-		linkLevel.setEnabled(isBlameAssignment);	
-		
+		linkLevel.setEnabled(isBlameAssignment);
+
 		Button compLevel = new Button(compLinkGroup, SWT.RADIO);
 		compLevel.setText("Component-level");
 		compLevel.setFont(font);
@@ -209,13 +209,13 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		if (selectedThreats.contains(NI)) {
 			ni.setSelection(true);
 		}
-		
+
 		Button ht = new Button(selectionButtonGroup, SWT.CHECK);
 		ht.setText("Hardware Trojans");
 		if (selectedThreats.contains(HT)) {
 			ht.setSelection(true);
-		}		
-		
+		}
+
 		Button ot = new Button(selectionButtonGroup, SWT.CHECK);
 		ot.setText("Outside User Threat");
 		if (selectedThreats.contains(OT)) {
@@ -372,8 +372,8 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				} else if (selectedThreats.contains(HT)) {
 					selectedThreats.remove(HT);
 				}
-				
-				testCaseGeneration = atgCheckBox.getSelection();
+
+//				testCaseGeneration = atgCheckBox.getSelection();
 				isBlameAssignment = blameButton.getSelection();
 				isMeritAssignment = meritButton.getSelection();
 				isNone = noneButton.getSelection();

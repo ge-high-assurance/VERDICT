@@ -189,11 +189,11 @@ public class CRVResultsView extends ViewPart {
 					Menu menu = new Menu(table.getShell(), SWT.POP_UP);
 					MenuItem counterExample = new MenuItem(menu, SWT.PUSH);
 					counterExample.setText("View Counter-example");
-					MenuItem testCase = new MenuItem(menu, SWT.PUSH);
-					testCase.setText("View Test Case");
+//					MenuItem testCase = new MenuItem(menu, SWT.PUSH);
+//					testCase.setText("View Test Case");
 
 					counterExample.setEnabled(!tableContents.get(table.getSelectionIndex()).getCounterExample().isEmpty());
-					testCase.setEnabled(!tableContents.get(table.getSelectionIndex()).getTestCase().isEmpty());
+//					testCase.setEnabled(!tableContents.get(table.getSelectionIndex()).getTestCase().isEmpty());
 
 					counterExample.addSelectionListener(new SelectionListener() {
 						@Override
@@ -222,32 +222,32 @@ public class CRVResultsView extends ViewPart {
 						}
 					});
 
-					testCase.addSelectionListener(new SelectionListener() {
-						@Override
-						public void widgetDefaultSelected(SelectionEvent e) {
-							// Nothing here
-						}
-
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							if (!(table.getSelectionIndex() < 0)) {
-								CETable ce = new CETable(Display.getCurrent(), parent.getShell(),
-										tableContents.get(table.getSelectionIndex()).getTestCase());
-								IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-										.getActivePage();
-								IViewPart myView1 = wp.findView(CounterExampleView.ID_COUNTER_EXAMPLE);
-								if (myView1 != null) {
-									wp.hideView(myView1);
-								}
-								IViewPart myView2 = wp.findView(CounterExampleView.ID_TEST_CASE);
-								if (myView2 != null) {
-									wp.hideView(myView2);
-								}
-								String name = tableContents.get(table.getSelectionIndex()).getPropertyName();
-								showView(CRVReportGenerator.window, ce.getTableContents(), true, name);
-							}
-						}
-					});
+//					testCase.addSelectionListener(new SelectionListener() {
+//						@Override
+//						public void widgetDefaultSelected(SelectionEvent e) {
+//							// Nothing here
+//						}
+//
+//						@Override
+//						public void widgetSelected(SelectionEvent e) {
+//							if (!(table.getSelectionIndex() < 0)) {
+//								CETable ce = new CETable(Display.getCurrent(), parent.getShell(),
+//										tableContents.get(table.getSelectionIndex()).getTestCase());
+//								IWorkbenchPage wp = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+//										.getActivePage();
+//								IViewPart myView1 = wp.findView(CounterExampleView.ID_COUNTER_EXAMPLE);
+//								if (myView1 != null) {
+//									wp.hideView(myView1);
+//								}
+//								IViewPart myView2 = wp.findView(CounterExampleView.ID_TEST_CASE);
+//								if (myView2 != null) {
+//									wp.hideView(myView2);
+//								}
+//								String name = tableContents.get(table.getSelectionIndex()).getPropertyName();
+//								showView(CRVReportGenerator.window, ce.getTableContents(), true, name);
+//							}
+//						}
+//					});
 
 					// draws pop up menu:
 					Point pt = new Point(e.x, e.y);
