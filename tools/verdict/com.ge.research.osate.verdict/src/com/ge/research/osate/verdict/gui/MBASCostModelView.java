@@ -194,7 +194,7 @@ public class MBASCostModelView extends ApplicationWindow{
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setWidth(width);
 		}
-		for (int i = 0; i < content.size();) {
+		for (int i = 0; i < content.size(); i += 3) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			if (i + 2 < content.size()) {
 				item.setText(new String[] { content.get(i), content.get(i + 1), content.get(i + 2) });
@@ -207,7 +207,6 @@ public class MBASCostModelView extends ApplicationWindow{
 				}
 				item.setText(text);
 			}
-			i += 3;
 		}
 	}
 
