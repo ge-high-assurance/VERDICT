@@ -165,7 +165,7 @@ public class Gsn2Dot {
                 nodeColor = "red";
             }
             if (node.getNodeType().equalsIgnoreCase("context")
-                    || node.getNodeType().equalsIgnoreCase("justification") 
+                    || node.getNodeType().equalsIgnoreCase("justification")
                     || node.getNodeType().equalsIgnoreCase("assumption")) {
                 nodeColor = "black";
             }
@@ -182,6 +182,7 @@ public class Gsn2Dot {
                             + nodeColor
                             + ", shape="
                             + nodeShape
+                            + ", penwidth = 3.0"
                             + ", label=\""
                             + node.getNodeId()
                             + "\\n\\n"
@@ -209,7 +210,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + support.getNodeId()
-                                + " [splines=curved, weight=3, arrowsize=2.0]");
+                                + " [splines=curved, penwidth = 2.0, weight=3, arrowsize=2.0]");
                 bw.newLine();
             }
             // inContextOf edges
@@ -218,7 +219,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + context.getNodeId()
-                                + " [splines=curved, arrowhead=empty, arrowsize=1.0]");
+                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
             // justifiedBy edges
@@ -227,7 +228,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + justification.getNodeId()
-                                + " [splines=curved, arrowhead=empty, arrowsize=1.0]");
+                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
             // hasAssumption edges
@@ -236,7 +237,7 @@ public class Gsn2Dot {
                         node.getNodeId()
                                 + " -> "
                                 + assumption.getNodeId()
-                                + " [splines=curved, arrowhead=empty, arrowsize=1.0]");
+                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
         }
