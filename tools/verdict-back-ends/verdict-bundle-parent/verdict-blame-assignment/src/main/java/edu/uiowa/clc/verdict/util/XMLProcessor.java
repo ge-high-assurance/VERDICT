@@ -118,7 +118,7 @@ public class XMLProcessor {
                                 verdict_property.setStatus(true);
                             } else {
 
-                                if (t_source.equals("wamax")) {
+                                if (t_source.equals("mcs")) {
                                     // parse weak assumptions
                                     //                                    System.out.println("Parse
                                     // Weak Assumption");

@@ -52,9 +52,7 @@ public class SummaryProcessor {
 
             LOGGY.info("Property: " + p.getId() + "  " + p.isSAT());
 
-            if (!p.isSAT()
-                    && p.getSource().equals("wamax")
-                    && p.getAllWeakAssumptions().size() > 0) {
+            if (!p.isSAT() && p.getSource().equals("mcs") && p.getAllWeakAssumptions().size() > 0) {
 
                 LOGGY.info("Weak Assumptions: ");
                 LOGGY.info("-----------------");

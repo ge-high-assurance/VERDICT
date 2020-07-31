@@ -48,8 +48,35 @@
              commandId="com.ge.research.osate.verdict.commands.mbasSettings">
        </handler>
        <handler
+             class="com.ge.research.osate.verdict.handlers.MBASCostModelSettingHandler"
+             commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings">
+           <enabledWhen>
+               <reference
+                   definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+               </reference>
+           </enabledWhen>
+       </handler>       
+       <handler
              class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
              commandId="com.ge.research.osate.verdict.commands.crvSettings">
+       </handler>
+       <handler
+             class="com.ge.research.osate.verdict.handlers.AssuranceCaseSettingsHandler"
+             commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
+       </handler>
+              <handler
+             class="com.ge.research.osate.verdict.handlers.GSNHandler"
+             commandId="com.ge.research.osate.verdict.commands.runGsn">
+	         <enabledWhen>
+	            <reference
+	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+	            </reference>
+	         </enabledWhen>               
        </handler>
     </extension>
 
@@ -60,7 +87,7 @@
              locationURI="menu:org.eclipse.ui.main.menu">             
 		<menu id="VerdictMenu" label="Verdict" >
 		<menu id="MbasMenu" 
-			label="&amp;Model Based Architecture Synthesis (MBAS)" >
+			label="&amp;Model Based Architecture Analysis/Synthesis" >
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runMbas"
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
@@ -73,23 +100,29 @@
 	            style="push"
 	            tooltip="Run MBAS">
 	      </command>
-      	  <command
+      	  <!--<command
                 commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
                 tooltip="Select to lauch wizard for editing cyber formula/requirements">
+      	  </command>-->
+      	  <command
+      	        commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+      	        label="&amp;Configure MBAS Cost Model"
+      	        style="push"
+      	        tooltip="Click to change MBAS Cost Model">
       	  </command>
       	  <command
       	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
-      	        label="&amp;MBAS Settings"
+      	        label="&amp;MBAA/MBAS Settings"
       	        style="push"
-      	        tooltip="Click to change MBAS Settings">
-      	  </command>
+      	        tooltip="Click to change MBAA/MBAS Settings">
+      	  </command>   	  
 		</menu> 
-		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier (CRV)" >
+		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier" >
           <command
                 commandId="com.ge.research.osate.verdict.commands.runCrv"
-                label="&amp;Run Cyber Resilience Verifier"
+                label="&amp;Run Cyber Resilience Verifier (CRV)"
                 style="push"
                 tooltip="Run CRV">
           </command> 	
@@ -99,26 +132,40 @@
 	            style="push"
 	            tooltip="Click to change CRV Settings">
 	       </command>
-		</menu>                                   	                         
+		</menu>      
+		<menu id="GsnMenu" label="&amp;Assurance Case Fragments Generation" >
+		   <command
+                commandId="com.ge.research.osate.verdict.commands.runGsn"
+                label="&amp;Create GSN Assurance Case Fragments"
+                style="push"
+                tooltip="Create GSN Fragment for selected requirement">
+          </command> 
+          <command
+                commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
+                label="&amp;Assurance Case Settings"
+                style="push"
+                tooltip="Click to change Assurance Case settings">
+          </command> 	
+		</menu>  		                     	                         
          </menu>    
        </menuContribution>
-       <menuContribution
+       <!--<menuContribution
              allPopups="false"
              locationURI="popup:org.eclipse.ui.popup.any?after=additions">             			  
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runWzrd"
                 label="&amp;Cyber Requirements/Relations Editor"
                 style="push"
-                tooltip="Select to launch wizard to edit cyber requirements/relations">                
+                tooltip="Select to launch wizard to edit cyber requirements/relations">        
 	      </command>
-	   </menuContribution>       
+	   </menuContribution> -->      
        <menuContribution
              locationURI="toolbar:org.eclipse.ui.console.ConsoleView">
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.stop"
 				icon="icons/stop.gif"
                 style="push"
-                tooltip="Stop MBAS/CRV">
+                tooltip="Stop MBAA/MBAS/CRV">
 	      </command>
 	   </menuContribution>       
     </extension>
@@ -132,12 +179,12 @@
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbas"
-             name="Run MBAS">
+             name="Run MBAA">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
-             name="Run MBAS Synthesis">
+             name="Run MBAS">
        </command>
        <command
              categoryId="com.ge.research.osate.verdict.commands"
@@ -147,8 +194,13 @@
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.mbasSettings"
-             name="MBAS Settings">
+             name="MBAA/MBAS Settings">
        </command>
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+             name="Configure MBAS Cost Model">
+       </command>       
        <command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.stop"
@@ -159,11 +211,21 @@
              id="com.ge.research.osate.verdict.commands.crvSettings"
              name="CRV Settings">
        </command>
-       <command
+       <!--<command
              categoryId="com.ge.research.osate.verdict.commands"
              id="com.ge.research.osate.verdict.commands.runWzrd"
              name="Cyber Requirements/Relations Editor">
-       </command>                 
+       </command>-->
+       <command
+            categoryId="com.ge.research.osate.verdict.commands"
+            id="com.ge.research.osate.verdict.commands.runGsn"
+            name="Create GSN" >
+       </command> 
+       <command
+             categoryId="com.ge.research.osate.verdict.commands"
+             id="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
+             name="Assurance Case Settings">
+       </command>
     </extension>
 
     <extension
@@ -271,7 +333,7 @@
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"
 		icon="icons/atg.png"/>
 	<view id="com.ge.research.osate.verdict.gui.mbasResultsView"
-		name="MBAS Result"
+		name="MBAA Result"
 		class="com.ge.research.osate.verdict.gui.MBASResultsView"
 		icon="icons/search.png"/>
 	<view id="com.ge.research.osate.verdict.gui.capecDefenseView"
@@ -281,7 +343,11 @@
 	<view id="com.ge.research.osate.verdict.gui.safetyCutsetsView"
 		name="Safety Failure Paths"
 		class="com.ge.research.osate.verdict.gui.SafetyCutsetsView"
-		icon="icons/danger.png"/>	
+		icon="icons/danger.png"/>
+	<view id="com.ge.research.osate.verdict.gui.mbasSynthesisResultsView"
+		name="MBAS Result"
+		class="com.ge.research.osate.verdict.gui.MBASSynthesisResultsView"
+		icon="icons/search.png"/>
 	</extension>
 	
 	<extension point="org.eclipse.ui.preferencePages">

@@ -28,6 +28,7 @@ type data_type =
 type type_declaration = {
   name: identifier;
   definition: data_type option;
+  parent: type_decl_ref option;
 }
 
 type port_mode = In | Out
@@ -361,6 +362,14 @@ type package = {
 
 type t = package
 
+let is_subtype type_decls t1 t2 =
+  match t1, t2 with
+  | UserDefinedType idx1, UserDefinedType idx2 -> (
+    match (List.nth type_decls idx1).parent with
+    | None -> false
+    | Some parent_idx -> parent_idx=idx2
+  )
+  | _, _ -> t1=t2
 
 let pp_print_imports ppf =
   Format.fprintf ppf "@,import iml.utils.*;@,import iml.verdict.*;@,"
@@ -426,7 +435,7 @@ and pp_print_record_field ind ppf (id, dt) =
   Format.fprintf ppf "@[<v %d>rf.dtype = %a" ind
     (pp_print_data_type ind) dt
 
-let pp_print_type_declaration ind ppf ({name; definition}: type_declaration) =
+let pp_print_type_declaration ind ppf ({name; definition; _}: type_declaration) =
   Format.fprintf ppf "td.name = \"%s\" &&@," name;
   match definition with
   | None -> Format.fprintf ppf "td.definition = mk_none<DataType>"

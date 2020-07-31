@@ -100,6 +100,10 @@
         <restriction base="string">
             <enumeration value="in"></enumeration>
             <enumeration value="out"></enumeration>
+            <enumeration value="inOut"></enumeration>
+            <enumeration value="requiresDataAccess"></enumeration>
+            <enumeration value="providesDataAccess"></enumeration>
+            <enumeration value="data"></enumeration>
         </restriction>
     </simpleType>
 
@@ -258,6 +262,10 @@
                 maxOccurs="1"></element>
             <element name="description" type="string" minOccurs="0"
                 maxOccurs="1"></element>
+            <element name="justification" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="assumption" type="string" minOccurs="0"
+                maxOccurs="1"></element>
             <element name="phases" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
@@ -411,6 +419,10 @@
                 maxOccurs="1"></element>
             <element name="description" type="string" minOccurs="0"
                 maxOccurs="1"></element>
+            <element name="justification" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="assumption" type="string" minOccurs="0"
+                maxOccurs="1"></element>
             <element name="phases" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
@@ -444,6 +456,10 @@
             <element name="cyberReqs" type="string" minOccurs="0"
                 maxOccurs="unbounded"></element>
             <element name="description" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="justification" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="assumption" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="comment" type="string" minOccurs="0"
                 maxOccurs="1"></element>

@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.ge.research.osate.verdict.handlers.VerdictHandlersUtils;
-
 /**
 *
 * Author: Soumya Talukder
@@ -130,7 +128,7 @@ public class MBASResultSummary {
 
 	private void checkSameSizeOfTwoLists(List<?> tableContents1, List<?> tableContents2) {
 		if (tableContents1.size() != tableContents2.size()) {
-			VerdictHandlersUtils.errAndExit("unexpected the size of two lists from Soteria++ is not the same!");
+			throw new RuntimeException("unexpected the size of two lists from Soteria++ is not the same!");
 		}
 	}
 
