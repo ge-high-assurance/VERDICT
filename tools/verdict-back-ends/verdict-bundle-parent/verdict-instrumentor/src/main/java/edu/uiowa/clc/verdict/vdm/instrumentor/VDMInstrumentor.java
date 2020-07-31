@@ -31,6 +31,7 @@ import verdict.vdm.vdm_lustre.ContractItem;
 import verdict.vdm.vdm_lustre.ContractSpec;
 import verdict.vdm.vdm_lustre.Expression;
 import verdict.vdm.vdm_lustre.IfThenElse;
+import verdict.vdm.vdm_lustre.LustreProgram;
 import verdict.vdm.vdm_lustre.NodeBody;
 import verdict.vdm.vdm_lustre.NodeCall;
 import verdict.vdm.vdm_lustre.NodeEquation;
@@ -281,8 +282,16 @@ public class VDMInstrumentor {
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
 
-        // Initialize Components with Empty Ports and Ignore
+        //Initialize Components with Empty Ports and Ignore
         identifyEmptyOutputComponents();
+        
+        //Initialize DataFlow for empty Implementations.
+        LustreProgram lt = vdm_model.getDataflowCode();
+		
+        if(lt == null) {
+        	lt = new LustreProgram();
+        	vdm_model.setDataflowCode(lt);
+        }
 
         if (threats.contains("LS")) {
             System.out.println("Location Spoofing Instrumentation");
