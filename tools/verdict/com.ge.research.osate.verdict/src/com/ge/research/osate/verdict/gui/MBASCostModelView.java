@@ -155,9 +155,12 @@ public class MBASCostModelView extends ApplicationWindow{
 		suggComponents.add(0, SynthesisCostModel.COMPONENT_ALL);
 
 		for (String defenseProp : defensePropNames) {
-			if (DefenseProperties.MBAA_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
+			if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
 				suggDefenseProps.add(defenseProp);
 			}
+			if (DefenseProperties.MBAA_CNN_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
+				suggDefenseProps.add(defenseProp);
+			}			
 		}
 		suggDefenseProps.sort(null);
 		suggDefenseProps.add(0, SynthesisCostModel.DEFENSE_PROP_ALL);
@@ -214,11 +217,11 @@ public class MBASCostModelView extends ApplicationWindow{
 	 * component implementation and category being the header
 	 * 
 	 * */
-	public void createThreeColumnTableByCat(Composite leftColumn, int width) {
+	public void createThreeColumnTableCatByCompAndConn(Composite leftColumn, boolean isProp, int height, int width) {
 		final Table table = new Table(leftColumn,
 				SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE | SWT.V_SCROLL);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gridData.heightHint = 275;
+		gridData.heightHint = height;
 		table.setLayoutData(gridData);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -226,8 +229,13 @@ public class MBASCostModelView extends ApplicationWindow{
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setWidth(width);
 		}
-		implToSubcompNameMapping.forEach((key, value) -> createTableContent(table, key, "Subcomponents", value));
-		implToConnNameMapping.forEach((key, value) -> createTableContent(table, key, "Connections", value));
+		if(!isProp) {
+			implToSubcompNameMapping.forEach((key, value) -> createTableContent(table, key, "Subcomponents", value));
+			implToConnNameMapping.forEach((key, value) -> createTableContent(table, key, "Connections", value));
+		} else {
+			createTableContent(table, "Component Properties", "", DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_LIST);
+			createTableContent(table, "Connection Properties", "", DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_LIST);
+		}
 	}	
 	
 	public void createTableContent(Table table, String key, String category, List<String> content) {
@@ -304,7 +312,7 @@ public class MBASCostModelView extends ApplicationWindow{
 //		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
 
 		// Create a table for displaying components and connections
-		createThreeColumnTableByCat(leftColumn, 175);
+		createThreeColumnTableCatByCompAndConn(leftColumn, false, 250, 175);
 
 		// List all components
 
@@ -314,8 +322,9 @@ public class MBASCostModelView extends ApplicationWindow{
 		propLabel.setAlignment(SWT.CENTER);
 
 		// Create a table for displaying defense properties
-		createThreeColumnTable(leftColumn, suggDefenseProps.stream()
-				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);
+		createThreeColumnTableCatByCompAndConn(leftColumn, true, 225, 175);
+//		createThreeColumnTable(leftColumn, suggDefenseProps.stream()
+//				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);
 
 		// List all defense properties
 
