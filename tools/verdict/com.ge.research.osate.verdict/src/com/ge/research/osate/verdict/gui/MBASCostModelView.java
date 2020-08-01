@@ -1,5 +1,6 @@
 package com.ge.research.osate.verdict.gui;
 
+import java.awt.font.TextLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +24,12 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -72,6 +75,9 @@ public class MBASCostModelView extends ApplicationWindow{
 	private final Map<String, Integer> suggDefensePropsIndexMap;
 	private final List<String> suggDals;
 	private final Map<String, Integer> suggDalsIndexMap;
+	
+	Map<String, List<String>> implToSubcompNameMapping;
+	Map<String, List<String>> implToConnNameMapping;	
 
 	public MBASCostModelView(List<EObject> aadlObjs, File costModelFile) {
 		super(null);
@@ -95,6 +101,9 @@ public class MBASCostModelView extends ApplicationWindow{
 		suggComponents = new ArrayList<>();
 		suggDefenseProps = new ArrayList<>();
 		suggDals = new ArrayList<>();
+		
+		implToSubcompNameMapping = new HashMap<>();
+		implToConnNameMapping = new HashMap<>();		
 
 		List<ComponentImplementation> impls = new ArrayList<>();
 		List<Subcomponent> comps = new ArrayList<>();
@@ -107,12 +116,19 @@ public class MBASCostModelView extends ApplicationWindow{
 			if (obj instanceof ComponentImplementation && !(obj instanceof DataImplementation)) {
 				ComponentImplementation impl = (ComponentImplementation) obj;
 				impls.add(impl);
+				List<String> subcompNames = new ArrayList<>();
+				List<String> connNames = new ArrayList<>();
+				
 				for (Subcomponent comp : impl.getAllSubcomponents()) {
 					comps.add(comp);
+					subcompNames.add(comp.getFullName());
 				}
 				for (Connection conn : impl.getAllConnections()) {
 					conns.add(conn);
+					connNames.add(conn.getFullName());
 				}
+				implToSubcompNameMapping.put(impl.getFullName(), subcompNames);
+				implToConnNameMapping.put(impl.getFullName(), connNames);
 			} else if (obj instanceof Property) {
 				Property prop = (Property) obj;
 				boolean rightMetaclass = prop.getAppliesToMetaclasses().stream().anyMatch(metaclass -> {
@@ -128,9 +144,9 @@ public class MBASCostModelView extends ApplicationWindow{
 		}
 
 		Set<String> systemNames = new HashSet<>();
-		systemNames.addAll(impls.stream().map(ComponentImplementation::getName).collect(Collectors.toList()));
-		systemNames.addAll(comps.stream().map(Subcomponent::getName).collect(Collectors.toList()));
-		systemNames.addAll(conns.stream().map(Connection::getName).collect(Collectors.toList()));
+		systemNames.addAll(impls.stream().map(ComponentImplementation::getFullName).collect(Collectors.toList()));
+		systemNames.addAll(comps.stream().map(Subcomponent::getFullName).collect(Collectors.toList()));
+		systemNames.addAll(conns.stream().map(Connection::getFullName).collect(Collectors.toList()));
 
 		for (String system : systemNames) {
 			suggComponents.add(system);
@@ -192,11 +208,62 @@ public class MBASCostModelView extends ApplicationWindow{
 		shell.setActive();
 	}
 
-	public void createThreeColumnsTable(Composite leftColumn, List<String> content, int width) {
+	/**
+	 * 
+	 * Create a three-column table always starting with the 
+	 * component implementation and category being the header
+	 * 
+	 * */
+	public void createThreeColumnTableByCat(Composite leftColumn, int width) {
 		final Table table = new Table(leftColumn,
 				SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE | SWT.V_SCROLL);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		gridData.heightHint = 200;
+		gridData.heightHint = 275;
+		table.setLayoutData(gridData);
+		table.setLinesVisible(true);
+		table.setHeaderVisible(true);
+		for (int i = 0; i < 3; i++) {
+			TableColumn column = new TableColumn(table, SWT.NONE);
+			column.setWidth(width);
+		}
+		implToSubcompNameMapping.forEach((key, value) -> createTableContent(table, key, "Subcomponents", value));
+		implToConnNameMapping.forEach((key, value) -> createTableContent(table, key, "Connections", value));
+	}	
+	
+	public void createTableContent(Table table, String key, String category, List<String> content) {
+		TableItem keyItem = new TableItem(table, SWT.NONE);
+		keyItem.setText(new String[] {key, category, ""});
+		Color blue = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+
+		keyItem.setFont(boldFont);
+		keyItem.setForeground(blue);
+		
+		for (int i = 0; i < content.size(); i += 3) {
+			TableItem item = new TableItem(table, SWT.NONE);
+			if (i + 2 < content.size()) {
+				item.setText(new String[] { content.get(i), content.get(i + 1), content.get(i + 2) });
+			} else {
+				int k = 0;
+				String[] text = new String[content.size() - i + 1];
+				for (int j = i; j < content.size(); j++) {
+					text[k] = content.get(j);
+					++k;
+				}
+				item.setText(text);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * Create a three-column table
+	 * 
+	 * */
+	public void createThreeColumnTable(Composite leftColumn, List<String> content, int width) {
+		final Table table = new Table(leftColumn,
+				SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.RESIZE | SWT.V_SCROLL);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.heightHint = 215;
 		table.setLayoutData(gridData);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -232,13 +299,12 @@ public class MBASCostModelView extends ApplicationWindow{
 		rightColumn.setLayout(new GridLayout(1, false));
 
 		Label componentLabel = new Label(leftColumn, SWT.NONE);
-		componentLabel.setText("Component Table");
+		componentLabel.setText("Component and Connection Table");
 		componentLabel.setFont(boldFont);
-		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
+//		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
 
-		// Create a table for displaying components
-		createThreeColumnsTable(leftColumn, suggComponents.stream().filter(name -> !SynthesisCostModel.COMPONENT_ALL.equals(name))
-				.collect(Collectors.toList()), 175);
+		// Create a table for displaying components and connections
+		createThreeColumnTableByCat(leftColumn, 175);
 
 		// List all components
 
@@ -248,7 +314,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		propLabel.setAlignment(SWT.CENTER);
 
 		// Create a table for displaying defense properties
-		createThreeColumnsTable(leftColumn, suggDefenseProps.stream()
+		createThreeColumnTable(leftColumn, suggDefenseProps.stream()
 				.filter(name -> !SynthesisCostModel.DEFENSE_PROP_ALL.equals(name)).collect(Collectors.toList()), 175);
 
 		// List all defense properties
