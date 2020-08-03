@@ -170,7 +170,12 @@ public class CreateGSN {
         }
 
         // add strategy text to display
-        strat.setDisplayText(strategyText);
+        if (mission.getStrategy() != null) {
+            // if user has specified a strategy
+            strat.setDisplayText(mission.getStrategy());
+        } else {
+            strat.setDisplayText(strategyText);
+        }
 
         // add strategy to strategyNode
         strategyNode.setStrategy(strat);
@@ -246,9 +251,17 @@ public class CreateGSN {
         strategyCounter++;
         strategyNode.setNodeId(strategyId);
 
+        String strategyText;
+
+        if (cyberReq.getStrategy() != null) {
+            strategyText = cyberReq.getStrategy();
+        } else {
+            strategyText = "Argument: By Soteria++ analysis &#10;of attack-defense trees";
+        }
+
         // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
-        strat.setDisplayText("Argument: By Soteria++ analysis &#10;of attack-defense trees");
+        strat.setDisplayText(strategyText);
 
         // add a solution to the supportedBy of strategy
         GsnNode solutionNode = populateSolutionNode(cyberReq.getId(), cyberResults, true);
@@ -340,9 +353,17 @@ public class CreateGSN {
         strategyCounter++;
         strategyNode.setNodeId(strategyId);
 
+        String strategyText;
+
+        if (safetyReq.getStrategy() != null) {
+            strategyText = safetyReq.getStrategy();
+        } else {
+            strategyText = "Argument: By Soteria++ analysis &#10;of fault trees";
+        }
+
         // to populate Strategy of strategyNode
         Strategy strat = new Strategy();
-        strat.setDisplayText("Argument: By Soteria++ analysis &#10;of fault trees");
+        strat.setDisplayText(strategyText);
 
         // add a solution to the supportedBy of strategy
         GsnNode solutionNode = populateSolutionNode(safetyReq.getId(), safetyResults, false);

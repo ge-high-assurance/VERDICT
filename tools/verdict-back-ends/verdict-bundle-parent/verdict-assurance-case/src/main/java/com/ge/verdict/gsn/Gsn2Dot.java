@@ -120,6 +120,10 @@ public class Gsn2Dot {
             String nodeText = "";
             String hoverDisplay = "No additional information is available";
             String url = "";
+            String margin = "0.05";
+            String style = "bold";
+            String penwidth = "3.0";
+
             boolean nodeStatus = true;
 
             // deciding node shape and hovertext
@@ -171,6 +175,23 @@ public class Gsn2Dot {
             }
 
             // writing string to declare node in dot file
+            //            String nodeDeclareString =
+            //                    node.getNodeId()
+            //                            + " ["
+            //                            + "href=\""
+            //                            + url
+            //                            + "\", tooltip=\""
+            //                            + hoverDisplay
+            //                            + "\", margin=0.05, style=bold, color="
+            //                            + nodeColor
+            //                            + ", shape="
+            //                            + nodeShape
+            //                            + ", penwidth = 3.0"
+            //                            + ", label=\""
+            //                            + node.getNodeId()
+            //                            + "\\n\\n"
+            //                            + nodeText
+            //                            + "\"];";
             String nodeDeclareString =
                     node.getNodeId()
                             + " ["
@@ -178,11 +199,16 @@ public class Gsn2Dot {
                             + url
                             + "\", tooltip=\""
                             + hoverDisplay
-                            + "\", margin=0.05, style=bold, color="
+                            + "\", margin=\""
+                            + margin
+                            + "\", style=\""
+                            + style
+                            + "\", color="
                             + nodeColor
                             + ", shape="
                             + nodeShape
-                            + ", penwidth = 3.0"
+                            + ", penwidth ="
+                            + penwidth
                             + ", label=\""
                             + node.getNodeId()
                             + "\\n\\n"

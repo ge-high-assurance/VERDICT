@@ -64,7 +64,8 @@ CyberMissionBlock returns CyberMission:
 	// Try changing it and see that it generates two fields with the same name in VerdictPackage...
 	('comment' '=' note=STRING DELIMETER_OPT)? &
 	('justification' '=' justification=STRING DELIMETER_OPT)? &
-	('assumption' '=' assumption=STRING DELIMETER_OPT)?	 		
+	('assumption' '=' assumption=STRING DELIMETER_OPT)? &
+	('strategy' '=' strategy=STRING DELIMETER_OPT)?	 		 		
 	) '}'
 ;
 
@@ -81,7 +82,8 @@ CyberReqBlock returns CyberReq:
 	('description' '=' description=STRING DELIMETER_OPT)? &
 	(hasTargetLikelihood?='targetLikelihood' '=' targetLikelihood=TargetLikelihood DELIMETER_OPT)? &
 	('justification' '=' justification=STRING DELIMETER_OPT)? &
-	('assumption' '=' assumption=STRING DELIMETER_OPT)?	
+	('assumption' '=' assumption=STRING DELIMETER_OPT)? &
+	('strategy' '=' strategy=STRING DELIMETER_OPT)?	 		
 	) '}'
 ;
 
@@ -176,7 +178,8 @@ SafetyReqBlock returns SafetyReq:
 	('comment' '=' comment=STRING DELIMETER_OPT)? &
 	('description' '=' description=STRING DELIMETER_OPT)? &
 	('justification' '=' justification=STRING DELIMETER_OPT)? &
-	('assumption' '=' assumption=STRING DELIMETER_OPT)?	
+	('assumption' '=' assumption=STRING DELIMETER_OPT)? &
+	('strategy' '=' strategy=STRING DELIMETER_OPT)?	 		
 	) '}'
 ;
 

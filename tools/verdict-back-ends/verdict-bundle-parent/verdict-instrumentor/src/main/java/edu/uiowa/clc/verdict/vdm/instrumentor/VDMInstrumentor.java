@@ -282,15 +282,15 @@ public class VDMInstrumentor {
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
 
-        //Initialize Components with Empty Ports and Ignore
+        // Initialize Components with Empty Ports and Ignore
         identifyEmptyOutputComponents();
-        
-        //Initialize DataFlow for empty Implementations.
+
+        // Initialize DataFlow for empty Implementations.
         LustreProgram lt = vdm_model.getDataflowCode();
-		
-        if(lt == null) {
-        	lt = new LustreProgram();
-        	vdm_model.setDataflowCode(lt);
+
+        if (lt == null) {
+            lt = new LustreProgram();
+            vdm_model.setDataflowCode(lt);
         }
 
         if (threats.contains("LS")) {
@@ -370,16 +370,18 @@ public class VDMInstrumentor {
                         // Check if Port is Probe Port
                         if (!isProbePort(link_con)) {
                             vdm_links.add(link_con);
-                        } 
-//                        else {
-//                            System.out.println(
-//                                    "Probe ports connection:" + link_con.getName());
-//                        }
-                    } 
-//                    else {
-//                        System.out.println(
-//                                "Empty output component connection:" + link_con.getName());
-//                    }
+                        }
+                        //                        else {
+                        //                            System.out.println(
+                        //                                    "Probe ports connection:" +
+                        // link_con.getName());
+                        //                        }
+                    }
+                    //                    else {
+                    //                        System.out.println(
+                    //                                "Empty output component connection:" +
+                    // link_con.getName());
+                    //                    }
                 }
 
                 components_map.put(component.getId(), vdm_cmp_links);
@@ -395,11 +397,13 @@ public class VDMInstrumentor {
                 Connection con = it.next();
                 if (isProbePort(con)) {
                     it.remove();
-//                    System.out.println("Probe ports connection:" + con.getName());
+                    //                    System.out.println("Probe ports connection:" +
+                    // con.getName());
                 } else if (ignoreMarkedLink(con)) {
                     it.remove();
-//                    System.out.println(
-//                            "Empty output component connection:" + con.getName());
+                    //                    System.out.println(
+                    //                            "Empty output component connection:" +
+                    // con.getName());
                 }
             }
         }

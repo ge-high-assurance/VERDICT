@@ -76,6 +76,7 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		stylesSubclause.put("kw_targetProbability", KEYWORD_ID);
 		stylesSubclause.put("kw_justification", KEYWORD_ID);
 		stylesSubclause.put("kw_assumption", KEYWORD_ID);
+		stylesSubclause.put("kw_strategy", KEYWORD_ID);		
 		stylesSubclause.put("kw_reqs", KEYWORD_ID);
 
 		stylesSubclause.put("enum_None", KEYWORD_ID);
@@ -129,6 +130,7 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		stylesLibrary.put("kw_comment", KEYWORD_ID);
 		stylesLibrary.put("kw_justification", KEYWORD_ID);
 		stylesLibrary.put("kw_assumption", KEYWORD_ID);
+		stylesLibrary.put("kw_strategy", KEYWORD_ID);				
 
 		stylesLibrary.put("enum_mutuallyExclusive", KEYWORD_ID);
 

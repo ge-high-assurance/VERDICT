@@ -142,7 +142,6 @@ public class VDM2Lustre {
         String inst_cmp = "(.+)_Inst_.*";
         Pattern inst_pattern = Pattern.compile(inst_cmp);
 
-
         for (ComponentType componentType : vdm_model.getComponentType()) {
 
             boolean is_declared = false;
@@ -162,17 +161,17 @@ public class VDM2Lustre {
                 }
 
                 if (is_declared) {
-                	
+
                     cmp_node = visit(componentType, false);
 
                     Matcher m = inst_pattern.matcher(cmp_node.getName());
- 
+
                     if (m.matches() == false) {
-                    	program.getNodeDeclaration().add(cmp_node);
+                        program.getNodeDeclaration().add(cmp_node);
                     }
-                    
+
                     program.getNodeDeclaration().add(impl_node);
-                
+
                 } else {
                     cmp_node = visit(componentType, false);
                     program.getNodeDeclaration().add(cmp_node);
@@ -267,7 +266,6 @@ public class VDM2Lustre {
         // Option 1) Block Implementation
         // retrieve_block(componentImpl);
         BlockImpl blockImpl = componentImpl.getBlockImpl();
-
 
         // BlockImpl
         if (blockImpl != null) {
