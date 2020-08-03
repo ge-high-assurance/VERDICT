@@ -127,8 +127,8 @@ public class MBASCostModelView extends ApplicationWindow{
 					conns.add(conn);
 					connNames.add(conn.getFullName());
 				}
-				implToSubcompNameMapping.put(impl.getFullName(), subcompNames);
-				implToConnNameMapping.put(impl.getFullName(), connNames);
+				implToSubcompNameMapping.put(impl.getQualifiedName(), subcompNames);
+				implToConnNameMapping.put(impl.getQualifiedName(), connNames);
 			} else if (obj instanceof Property) {
 				Property prop = (Property) obj;
 				boolean rightMetaclass = prop.getAppliesToMetaclasses().stream().anyMatch(metaclass -> {
