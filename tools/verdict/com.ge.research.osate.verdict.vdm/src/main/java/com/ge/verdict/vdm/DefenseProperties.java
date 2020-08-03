@@ -82,6 +82,6 @@ public final class DefenseProperties {
     public static final Set<String> MBAA_COMP_DEFENSE_PROPERTIES_SET =
             Collections.unmodifiableSet(new HashSet<>(MBAA_COMP_DEFENSE_PROPERTIES_LIST));
 
-    public static final Set<String> MBAA_CNN_DEFENSE_PROPERTIES_SET =
+    public static final Set<String> MBAA_CONN_DEFENSE_PROPERTIES_SET =
             Collections.unmodifiableSet(new HashSet<>(MBAA_CONN_DEFENSE_PROPERTIES_LIST));
 }

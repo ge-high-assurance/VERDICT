@@ -1,5 +1,19 @@
 package com.ge.verdict.attackdefensecollector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -14,20 +28,9 @@ import com.ge.verdict.attackdefensecollector.model.CyberRel;
 import com.ge.verdict.attackdefensecollector.model.CyberReq;
 import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
+import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -49,6 +52,8 @@ public class AttackDefenseCollector {
     private Map<String, SystemModel> systems;
     /** Resolution table for connection models. */
     private Map<String, Set<ConnectionModel>> connections;
+
+    private Map<Pair<String, String>, Integer> implDal;
 
     /**
      * Get the system model with the specified name, creating it and adding it to the resolution
@@ -131,6 +136,8 @@ public class AttackDefenseCollector {
 
         systems = new LinkedHashMap<>();
         connections = new LinkedHashMap<>();
+
+        implDal = new LinkedHashMap<>();
 
         // Load all the files as CSV
         CSVFile compDepCsv =
@@ -377,17 +384,14 @@ public class AttackDefenseCollector {
             }
         }
 
-        loadAttacksDefenses(inputDir, connectionAttackNames, null);
+        loadAttacksDefenses(inputDir, connectionAttackNames);
 
         if (inference) {
             performInference();
         }
     }
 
-    private void loadAttacksDefenses(
-            String inputDir,
-            Map<String, String> connectionNameMap,
-            Map<Pair<String, String>, Integer> implDal)
+    private void loadAttacksDefenses(String inputDir, Map<String, String> connectionNameMap)
             throws CSVFile.MalformedInputException, IOException {
         // Load all the files as CSV
         CSVFile capecCsv =
@@ -530,11 +534,9 @@ public class AttackDefenseCollector {
                 if (!"null".equals(defenseNames.get(i))) {
                     int dal = -1;
                     // load DAL from VDM if available
-                    if (implDal != null) {
-                        Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
-                        if (implDal.containsKey(pair)) {
-                            dal = implDal.get(pair);
-                        }
+                    Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
+                    if (implDal.containsKey(pair)) {
+                        dal = implDal.get(pair);
                     }
 
                     // this code treats applicable defense and impl defense as separate things
@@ -629,7 +631,7 @@ public class AttackDefenseCollector {
 
         Map<String, String> connectionAttackNames = new HashMap<>();
 
-        Map<Pair<String, String>, Integer> implDal = new HashMap<>();
+        implDal = new LinkedHashMap<>();
 
         // Load all instances as systems
         for (ComponentImpl impl : model.getComponentImpl()) {
@@ -811,37 +813,69 @@ public class AttackDefenseCollector {
             for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
                 for (GenericAttribute attrib : inst.getAttribute()) {
                     if (attrib.getValue() instanceof String) {
-                        try {
-                            Integer dal = Integer.parseInt((String) attrib.getValue());
+                        // chop qualifier (normally "CASE_Consolidated_Properties::")
+                        int lastColon = attrib.getName().lastIndexOf(':');
+                        String name =
+                                lastColon != -1
+                                        ? attrib.getName().substring(lastColon + 1)
+                                        : attrib.getName();
 
-                            // chop qualifier (normally "CASE_Consolidated_Properties::")
-                            int lastColon = attrib.getName().lastIndexOf(':');
-                            String name =
-                                    lastColon != -1
-                                            ? attrib.getName().substring(lastColon + 1)
-                                            : attrib.getName();
+                        if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(name)) {
+                            try {
+                                Integer dal = Integer.parseInt((String) attrib.getValue());
+                                if (dal > 0) {
+                                    implDal.put(new Pair<>(inst.getName(), name), dal);
+                                }
 
-                            implDal.put(new Pair<>(inst.getName(), name), dal);
-                        } catch (NumberFormatException e) {
-                            // most likely this is a non-integer property
+                            } catch (NumberFormatException e) {
+                                throw new RuntimeException(
+                                        "Invalid DAL for "
+                                                + impl.getName()
+                                                + " - "
+                                                + inst.getName()
+                                                + ":"
+                                                + name
+                                                + ", "
+                                                + attrib.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+            for (Connection conn : impl.getBlockImpl().getConnection()) {
+                for (GenericAttribute attrib : conn.getAttribute()) {
+                    if (attrib.getValue() instanceof String) {
+                        // chop qualifier (normally "CASE_Consolidated_Properties::")
+                        int lastColon = attrib.getName().lastIndexOf(':');
+                        String name =
+                                lastColon != -1
+                                        ? attrib.getName().substring(lastColon + 1)
+                                        : attrib.getName();
+
+                        if (DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(name)) {
+                            try {
+                                Integer dal = Integer.parseInt((String) attrib.getValue());
+                                if (dal > 0) {
+                                    implDal.put(new Pair<>(conn.getName(), name), dal);
+                                }
+                            } catch (NumberFormatException e) {
+                                throw new RuntimeException(
+                                        "Invalid DAL for "
+                                                + impl.getName()
+                                                + " - "
+                                                + conn.getName()
+                                                + ":"
+                                                + name
+                                                + ", "
+                                                + attrib.getValue());
+                            }
                         }
                     }
                 }
             }
         }
 
-        System.out.println("IMPl DAL COUNT: " + implDal.size());
-        for (HashMap.Entry<Pair<String, String>, Integer> entry : implDal.entrySet()) {
-            System.out.println(
-                    "IMPL DAL: <"
-                            + entry.getKey().left
-                            + ", "
-                            + entry.getKey().right
-                            + "> = "
-                            + entry.getValue());
-        }
-
-        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames, implDal);
+        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames);
 
         if (inference) {
             performInference();
@@ -934,6 +968,18 @@ public class AttackDefenseCollector {
         }
 
         return output;
+    }
+
+    /**
+     * Get the full set of implemented component-defense pairs, not just those that appear in the
+     * attack-defense tree.
+     *
+     * <p>Note: this only works if loading from VDM (the second constructor).
+     *
+     * @return a map from pairs (component, defense) to implemented DAL.
+     */
+    public Map<Pair<String, String>, Integer> getImplDal() {
+        return Collections.unmodifiableMap(implDal);
     }
 
     public static final class Result {

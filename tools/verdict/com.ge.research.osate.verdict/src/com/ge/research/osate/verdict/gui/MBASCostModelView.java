@@ -158,7 +158,7 @@ public class MBASCostModelView extends ApplicationWindow{
 			if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
 				suggDefenseProps.add(defenseProp);
 			}
-			if (DefenseProperties.MBAA_CNN_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
+			if (DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
 				suggDefenseProps.add(defenseProp);
 			}			
 		}

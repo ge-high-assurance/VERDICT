@@ -711,7 +711,14 @@ public class App {
                             false);
 
             if (selected.isPresent()) {
-                selected.get().toFileXml(new File(outputPath));
+                if (partialSolution) {
+                    ResultsInstance withExtraDefProps =
+                            VerdictSynthesis.addExtraImplDefenses(
+                                    selected.get(), collector.getImplDal(), costModel);
+                    withExtraDefProps.toFileXml(new File(outputPath));
+                } else {
+                    selected.get().toFileXml(new File(outputPath));
+                }
                 log("Synthesis results output to " + outputPath);
             } else {
                 logError("Synthesis failed");
