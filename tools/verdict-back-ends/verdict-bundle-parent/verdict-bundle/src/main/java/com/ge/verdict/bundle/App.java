@@ -1084,6 +1084,11 @@ public class App {
                             log("Some properties are invalid");
                         }
                         break;
+                    case 2:
+                        log("Kind2 fails to return correct results");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
                     case 0:
                         log("Kind2 timed out");
                         break;
@@ -1152,17 +1157,22 @@ public class App {
         log("Input AADL project: " + aadlPath);
         log("Output IML file: " + imlPath);
         log("VERDICT Properties Name: " + propertySet);
+        System.out.println(); // Make any message provided by aadl2iml more visible
 
         try {
             Binary.invokeBin(aadl2imlBin, "-ps", propertySet, "-o", imlPath, aadlPath);
         } catch (Binary.ExecutionException e) {
-            throw new VerdictRunException("Failed to execute aadl2iml", e);
+            if (e.getCode().isPresent()) {
+                // If an exit code is present, aadl2iml should have printed a message
+                System.exit(2);
+            } else {
+                throw new VerdictRunException("Failed to execute aadl2iml", e);
+            }
         }
 
-        // For some reason, aadl2iml doesn't give a non-zero exit code when it fails
-        // But we can detect failure like this:
         if (!(new File(imlPath)).exists()) {
-            throw new VerdictRunException("Failed to execute aadl2iml, no output generated");
+            logError("Failed to execute aadl2iml, no output generated");
+            System.exit(2);
         }
     }
 

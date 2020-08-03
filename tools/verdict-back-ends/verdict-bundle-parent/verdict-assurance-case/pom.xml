@@ -20,17 +20,13 @@
             <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
         </dependency>
         <dependency>
-            <groupId>guru.nidi</groupId>
-            <artifactId>graphviz-java</artifactId>
-            <version>0.17.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.davidmoten</groupId>
             <artifactId>word-wrap</artifactId>
-            <version>0.1.1</version>
         </dependency>
-        <!-- JAXB dependencies needed only under Java 9 or later -->
-
+        <dependency>
+            <groupId>guru.nidi</groupId>
+            <artifactId>graphviz-java</artifactId>
+        </dependency>
         <!-- Dependencies needed only by tests -->
         <dependency>
             <groupId>org.slf4j</groupId>

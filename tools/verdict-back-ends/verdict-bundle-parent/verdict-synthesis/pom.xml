@@ -16,16 +16,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.ge.research.osate.verdict</groupId>
+            <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>com.microsoft.z3</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-attack-defense-collector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ge.research.osate.verdict</groupId>
-            <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

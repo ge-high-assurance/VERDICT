@@ -90,9 +90,8 @@ public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 	    Label idLabel = new Label(acsGroup, SWT.NULL);
 	    idLabel.setText("Enter Requirement Ids Below:");
 		idLabel.setFont(font);
-//        idLabel.setLayoutData(gd1);
 	    Label idLabel2 = new Label(acsGroup, SWT.NULL);
-	    idLabel2.setText("Eg:- Id1;Id2;Id3;");
+	    idLabel2.setText("Usage: Id1;Id2;Id3;...IdN;");
         Text idField = new Text(acsGroup, SWT.BORDER | SWT.LEFT);
         GridData gd2 = new GridData ();
         gd2.widthHint = 300;

@@ -144,7 +144,7 @@ public class App {
 
             int exitCode = Exec.run_kind2(lustreFile, kind2_resultFile);
 
-            LOGGY.info("Kind2 Exit Code:" + exitCode);
+            //            LOGGY.info("Kind2 Exit Code:" + exitCode);
 
             if (exitCode == 20) {
                 LOGGY.info("No Invalid Property Found.");
@@ -152,6 +152,9 @@ public class App {
                 LOGGY.info("Found Invalid Properties.");
             } else if (exitCode == 0) {
                 LOGGY.warn("Kind2 TIMED OUT!!!");
+            } else if (exitCode == 2) {
+                LOGGY.warn("Kind2 Failure, Log messages:");
+                XMLProcessor.parseLog(kind2_resultFile);
             }
 
             LOGGY.info("*************Blame Assignment***********");

@@ -60,10 +60,18 @@ public class VDM2Lustre {
 
     private HashMap<String, DataType> eventDeclarations = null;
 
+    private Vector<Port> marked_ports = null;
+    private Vector<ComponentType> marked_types = null;
+
     public VDM2Lustre(Model vdm_model) {
+
         this.vdm_model = vdm_model;
         this.typeDeclarations = new HashMap<String, TypeDeclaration>();
+
         this.eventDeclarations = new HashMap<String, DataType>();
+
+        this.marked_ports = new Vector<Port>();
+        this.marked_types = new Vector<ComponentType>();
     }
 
     public Model translate() {
@@ -108,37 +116,68 @@ public class VDM2Lustre {
 
         // Event Ports
         for (ComponentType componentType : vdm_model.getComponentType()) {
+            // Collect Node with no output
+            Port mPort = markPort(componentType);
 
-            // Event Ports to Data Ports;
-            for (Port port : componentType.getPort()) {
-                // Update event_ports
-                visit(port, program);
+            if (mPort == null) {
+                // Event Ports to Data Ports;
+                for (Port port : componentType.getPort()) {
+                    // Update event_ports
+                    visit(port, program);
+                }
+            } else {
+
+                System.out.println("Ignoring Node:" + componentType.getName());
+                System.out.println("Ignoring Port:" + mPort.getName());
+
+                this.marked_types.add(componentType);
+                this.marked_ports.add(mPort);
             }
         }
 
         // B) Component Type
-        Node node = null;
+        Node cmp_node = null;
+        Node impl_node = null;
+
+        String inst_cmp = "(.+)_Inst_.*";
+        Pattern inst_pattern = Pattern.compile(inst_cmp);
 
         for (ComponentType componentType : vdm_model.getComponentType()) {
 
-            boolean is_implemented = false;
+            boolean is_declared = false;
 
-            for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
+            if (!this.marked_types.contains(componentType)) {
 
-                if (componentType == componentImpl.getType()) {
-                    node = visit(componentType, true);
+                for (ComponentImpl componentImpl : vdm_model.getComponentImpl()) {
 
-                    visit(componentImpl, node);
-                    is_implemented = true;
+                    if (componentType == componentImpl.getType()) {
+
+                        impl_node = visit(componentType, true);
+
+                        visit(componentImpl, impl_node);
+                        is_declared = true;
+                        break;
+                    }
+                }
+
+                if (is_declared) {
+
+                    cmp_node = visit(componentType, false);
+
+                    Matcher m = inst_pattern.matcher(cmp_node.getName());
+
+                    if (m.matches() == false) {
+                        program.getNodeDeclaration().add(cmp_node);
+                    }
+
+                    program.getNodeDeclaration().add(impl_node);
+
+                } else {
+                    cmp_node = visit(componentType, false);
+                    program.getNodeDeclaration().add(cmp_node);
                 }
             }
-            if (is_implemented == false) {
-                node = visit(componentType, false);
-            }
-
-            program.getNodeDeclaration().add(node);
         }
-
         // Copying over Node Declarations.
         for (Node node_dec : program.getNodeDeclaration()) {
             visit(node_dec, program);
@@ -173,7 +212,6 @@ public class VDM2Lustre {
 
         node.setName(identifier);
 
-        // Port
         for (Port port : componentType.getPort()) {
 
             if (port.isEvent() != null && port.isEvent()) {
@@ -226,7 +264,7 @@ public class VDM2Lustre {
         NodeBody nodeBody = new NodeBody();
 
         // Option 1) Block Implementation
-        //        retrieve_block(componentImpl);
+        // retrieve_block(componentImpl);
         BlockImpl blockImpl = componentImpl.getBlockImpl();
 
         // BlockImpl
@@ -254,17 +292,23 @@ public class VDM2Lustre {
                 if (subcomponentImpl != null) {
 
                     componentType = subcomponentImpl.getType();
-                    visit(componentType, nodeBody, componentInstance.getId(), true);
+                    if (!this.marked_types.contains(componentType)) {
+                        visit(componentType, nodeBody, componentInstance.getId(), true);
+                    }
                 }
 
                 // Option 2) Specification
                 else if (componentType != null) {
-                    visit(componentType, nodeBody, componentInstance.getId(), false);
+                    if (!this.marked_types.contains(componentType)) {
+                        visit(componentType, nodeBody, componentInstance.getId(), false);
+                    }
                 }
             }
 
             for (Connection connection : blockImpl.getConnection()) {
-                visit(connection, nodeBody);
+                if (!ignoreConnection(connection)) {
+                    visit(connection, nodeBody);
+                }
             }
 
         } else {
@@ -274,6 +318,56 @@ public class VDM2Lustre {
         }
 
         node.setBody(nodeBody);
+    }
+
+    // Ignore Connection or Marked Ports.
+    private boolean ignoreConnection(Connection con) {
+
+        ConnectionEnd srcConnection = con.getSource();
+        ComponentType srcType = null;
+
+        ConnectionEnd destConnection = con.getDestination();
+        ComponentType destType = null;
+
+        Port srcPort = srcConnection.getComponentPort();
+
+        if (srcPort == null) {
+            CompInstancePort compPort = srcConnection.getSubcomponentPort();
+            srcPort = compPort.getPort();
+
+            ComponentInstance srcCompInstance = compPort.getSubcomponent();
+            srcType = srcCompInstance.getSpecification();
+            if (srcType == null) {
+                ComponentImpl compImpl = srcCompInstance.getImplementation();
+                srcType = compImpl.getType();
+            }
+        }
+
+        Port destPort = destConnection.getComponentPort();
+
+        if (destPort == null) {
+            CompInstancePort compPort = destConnection.getSubcomponentPort();
+            destPort = compPort.getPort();
+
+            ComponentInstance destCompInstance = compPort.getSubcomponent();
+            destType = destCompInstance.getSpecification();
+            if (destType == null) {
+                ComponentImpl compImpl = destCompInstance.getImplementation();
+                destType = compImpl.getType();
+            }
+        }
+
+        if (this.marked_ports.contains(srcPort) || this.marked_ports.contains(destPort)) {
+            System.out.println("Ignore Port Connection:" + con.getName());
+            return true;
+        }
+
+        if (this.marked_types.contains(srcType) || this.marked_types.contains(destType)) {
+            System.out.println("Ignore Instance Connection:" + con.getName());
+            return true;
+        }
+
+        return false;
     }
 
     public void visit(
@@ -301,10 +395,10 @@ public class VDM2Lustre {
         // Port
         for (Port port : componentType.getPort()) {
 
-            //            //Event Port Definition
-            //            for (Port port : componentType.getPort()) {
-            //            visit(port);
-            //            }
+            // //Event Port Definition
+            // for (Port port : componentType.getPort()) {
+            // visit(port);
+            // }
 
             // MODE
             PortMode port_mode = port.getMode();
@@ -333,12 +427,16 @@ public class VDM2Lustre {
             }
         }
 
-        node.setCall(nodeCall);
+        // Ignore node call that do not have output
+        if (eq_lhs.getIdentifier() != null) {
 
-        node_eq.setRhs(node);
-        node_eq.setLhs(eq_lhs);
+            node.setCall(nodeCall);
 
-        nodeBody.getEquation().add(node_eq);
+            node_eq.setRhs(node);
+            node_eq.setLhs(eq_lhs);
+
+            nodeBody.getEquation().add(node_eq);
+        }
     }
 
     // Event Ports
@@ -355,9 +453,28 @@ public class VDM2Lustre {
         }
     }
 
+    // Mark Ports with no output
+    protected Port markPort(ComponentType componentType) {
+
+        Port markedPort = null;
+
+        for (Port port : componentType.getPort()) {
+
+            PortMode port_mode = port.getMode();
+
+            if (port_mode == PortMode.OUT) {
+                return null;
+            } else {
+                markedPort = port;
+            }
+        }
+
+        return markedPort;
+    }
+
     protected DataType getEventType(DataType dataType, LustreProgram lustreProgram) {
 
-        //        LustreProgram lustreProgram = vdm_model.getDataflowCode();
+        // LustreProgram lustreProgram = vdm_model.getDataflowCode();
 
         DataType eventType = new DataType();
         TypeDeclaration eventTypeDeclaration = defineEventDeclaration(dataType);
@@ -459,6 +576,15 @@ public class VDM2Lustre {
 
         // Node DataType
         DataType dataType = port.getType();
+
+        // Change Null DataType to Integer Default Type
+        if (dataType == null) {
+
+            dataType = new DataType();
+            dataType.setPlainType(PlainType.INT);
+            port.setType(dataType);
+        }
+
         node_parameter.setDataType(dataType);
 
         // Node Input Parameter
@@ -469,7 +595,7 @@ public class VDM2Lustre {
         else if (port_mode == PortMode.OUT) {
             node.getOutputParameter().add(node_parameter);
 
-            //            if(node.isIsImported() != null) {
+            // if(node.isIsImported() != null) {
             String inst_cmp = "(.+)_Inst_.*";
             Pattern inst_pattern = Pattern.compile(inst_cmp);
             Matcher m = inst_pattern.matcher(node.getName());
@@ -496,7 +622,7 @@ public class VDM2Lustre {
             String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                //                user_defined_type = user_defined_type + "_Impl";
+                // user_defined_type = user_defined_type + "_Impl";
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -899,7 +1025,7 @@ public class VDM2Lustre {
 
             if (event != null) {
                 u_Expr = eventExpression(event, true);
-                //	    		System.out.println(expr + "^^^ Updated to Event ^^^ " + event);
+                // System.out.println(expr + "^^^ Updated to Event ^^^ " + event);
             }
 
             ExpressionList expList = expr.getExpressionList();
@@ -914,18 +1040,18 @@ public class VDM2Lustre {
                 u_Expr.setExpressionList(uList);
             }
 
-            //            ExpressionList arrayExpList = expr.getArrayExpression();
+            // ExpressionList arrayExpList = expr.getArrayExpression();
             //
-            //	    	if(expList != null) {
-            //	    		List<Expression> uList = new ArrayList<Expression>();
-            //	    		for(Expression aexpr: arrayExpList.getExpression()) {
-            //	    			expr = visitExpression(aexpr);
-            //	    			uList.add(expr);
-            //	    		}
-            //	    		arrayExpList.getExpression().clear();
-            //	    		arrayExpList.getExpression().addAll(uList);
-            //	    		u_Expr.setArrayExpression(arrayExpList);
-            //	    	}
+            // if(expList != null) {
+            // List<Expression> uList = new ArrayList<Expression>();
+            // for(Expression aexpr: arrayExpList.getExpression()) {
+            // expr = visitExpression(aexpr);
+            // uList.add(expr);
+            // }
+            // arrayExpList.getExpression().clear();
+            // arrayExpList.getExpression().addAll(uList);
+            // u_Expr.setArrayExpression(arrayExpList);
+            // }
 
         }
 
@@ -982,10 +1108,10 @@ public class VDM2Lustre {
                 user_defined_type = data_type.getUserDefinedType();
             }
 
-            //            String user_defined_type = data_type.getUserDefinedType();
+            // String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                //                user_defined_type = user_defined_type + "_Impl";
+                // user_defined_type = user_defined_type + "_Impl";
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1000,24 +1126,24 @@ public class VDM2Lustre {
         }
 
         // Update Expression related to Events
-        //        for (NodeEquation node_equation : nodeBody.getEquation()) {
-        //        	visitNodeEq(node_equation);
-        //        }
+        // for (NodeEquation node_equation : nodeBody.getEquation()) {
+        // visitNodeEq(node_equation);
+        // }
     }
 
-    //    protected void visitNodeEq(NodeEquation node_eq) {
+    // protected void visitNodeEq(NodeEquation node_eq) {
     //
-    //    	Expression rhs_expr = node_eq.getRhs();
-    //    	visitExpression(rhs_expr);
-    //    }
+    // Expression rhs_expr = node_eq.getRhs();
+    // visitExpression(rhs_expr);
+    // }
 
     public void visit(NodeEquation node_equation) {
 
         Expression expr = node_equation.getRhs();
         recordLiteral(expr);
 
-        //        expr = visitExpression(expr);
-        //        node_equation.setRhs(expr);
+        // expr = visitExpression(expr);
+        // node_equation.setRhs(expr);
 
     }
 
@@ -1031,7 +1157,7 @@ public class VDM2Lustre {
         }
 
         if (user_defined_type != null) {
-            //            user_defined_type = user_defined_type + "_Impl";
+            // user_defined_type = user_defined_type + "_Impl";
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1092,14 +1218,14 @@ public class VDM2Lustre {
 
             if (match) {
                 expr.setIdentifier(id_expr);
-                //                System.out.println(">>>>>>>>>>>>>Identifiers: " +
+                // System.out.println(">>>>>>>>>>>>>Identifiers: " +
                 // expr.getIdentifier());
 
             } else {
 
                 String inst_cmp = "(.+)_instrumented";
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.println(src_portID);
+                // System.out.println(src_portID);
                 Matcher m = inst_pattern.matcher(src_portID);
                 if (m.matches()) {
                     src_portID = m.group(1);
@@ -1107,9 +1233,9 @@ public class VDM2Lustre {
 
                 id_expr = componentInstance.getId() + "_port_" + src_portID;
                 expr.setIdentifier(id_expr);
-                //                System.out.println(id_expr);
+                // System.out.println(id_expr);
 
-                //                System.out.println(">>>>>>>>>>>>>Identifiers: " +
+                // System.out.println(">>>>>>>>>>>>>Identifiers: " +
                 // expr.getIdentifier());
             }
 
@@ -1142,7 +1268,7 @@ public class VDM2Lustre {
                 String inst_cmp = "(.+)_instrumented";
 
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.println(arg_value);
+                // System.out.println(arg_value);
                 Matcher m = inst_pattern.matcher(arg_value);
                 if (m.matches()) {
                     arg_value = m.group(1);
@@ -1151,7 +1277,7 @@ public class VDM2Lustre {
             } else {
                 called_node_ID = componentType.getName();
                 arg_value = src_component_port.getName();
-                //                System.out.println(arg_value);
+                // System.out.println(arg_value);
             }
 
             for (Port port : componentType.getPort()) {
@@ -1161,7 +1287,7 @@ public class VDM2Lustre {
                 if (port_mode == PortMode.OUT) {
                     // EQ L.H.S Variables *called Node return values
                     String expr_id = componentInstance.getName() + "_port_" + port.getName();
-                    //                    System.out.print(">>>" + expr_id);
+                    // System.out.print(">>>" + expr_id);
                     NodeEquation n_eq = getNodeEq(expr_id, nodeBody);
 
                     if (n_eq != null) {
@@ -1172,12 +1298,12 @@ public class VDM2Lustre {
                         String inst_cmp = "(.+)_Inst_.*";
                         Pattern inst_pattern = Pattern.compile(inst_cmp);
 
-                        //                        String node_id = "";
-                        //                        if (node_called != null) {
-                        //                            node_id = node_called.getNodeId();
-                        //                        }
+                        // String node_id = "";
+                        // if (node_called != null) {
+                        // node_id = node_called.getNodeId();
+                        // }
 
-                        //                    System.out.println(" = " + node_id + " (" + arg_value
+                        // System.out.println(" = " + node_id + " (" + arg_value
                         // +
                         // ")");
                         Matcher m = inst_pattern.matcher(node_called.getNodeId());
@@ -1262,16 +1388,16 @@ public class VDM2Lustre {
 
                 String inst_cmp = "(.+)_instrumented";
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
-                //                System.out.print(src_portID + " ==> ");
+                // System.out.print(src_portID + " ==> ");
                 Matcher m = inst_pattern.matcher(src_portID);
                 if (m.matches()) {
                     old_portID = src_portID;
 
                     src_portID = m.group(1);
                     arg_expr.setIdentifier(componentInstanceID + "_port_" + src_portID);
-                    //                    System.out.println(old_portID + " -- " + src_portID);
+                    // System.out.println(old_portID + " -- " + src_portID);
                 }
-                //                System.out.println(arg_expr.getIdentifier() + " <== " +
+                // System.out.println(arg_expr.getIdentifier() + " <== " +
                 // src_portID);
 
             } else {
@@ -1285,11 +1411,11 @@ public class VDM2Lustre {
 
             if (!m_arg.matches() && old_portID != null) {
                 arg_expr.setIdentifier(componentInstanceID + "_port_" + old_portID);
-                //                System.out.println("Node ID =>" + called_node_ID + "(" +
+                // System.out.println("Node ID =>" + called_node_ID + "(" +
                 // arg_expr.getIdentifier() + ")");
             }
 
-            //            System.out.println(called_node_ID);
+            // System.out.println(called_node_ID);
             for (Port port : componentType.getPort()) {
                 // MODE
                 PortMode port_mode = port.getMode();
@@ -1329,7 +1455,7 @@ public class VDM2Lustre {
                         // Then
                         ifelse.setThenBranch(called_expr);
                         // Else
-                        //                        Expression arg = new Expression();
+                        // Expression arg = new Expression();
                         ifelse.setElseBranch(arg_expr);
 
                         // NodeCalled Expr
@@ -1377,14 +1503,14 @@ public class VDM2Lustre {
 
     public void visit(ConstantDeclaration constantDeclaration) {
 
-        //        String identifier = constantDeclaration.getName();
+        // String identifier = constantDeclaration.getName();
         DataType data_type = constantDeclaration.getDataType();
 
         String user_defined_type = data_type.getUserDefinedType();
-        //        Expression expr = constantDeclaration.getDefinition();
+        // Expression expr = constantDeclaration.getDefinition();
 
         if (user_defined_type != null) {
-            //            user_defined_type = user_defined_type + "_Impl";
+            // user_defined_type = user_defined_type + "_Impl";
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1403,8 +1529,8 @@ public class VDM2Lustre {
 
         String identifier = typeDeclaration.getName();
         // Renaming dot[.] in Type Declaration Identifier.
-        //        identifier = identifier.replace(".", "_id_");
-        //        typeDeclaration.setName(identifier);
+        // identifier = identifier.replace(".", "_id_");
+        // typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
 
@@ -1412,18 +1538,18 @@ public class VDM2Lustre {
             RecordType record_type = data_type.getRecordType();
 
             if (record_type != null) {
-                //                identifier = identifier + "_Impl";
+                // identifier = identifier + "_Impl";
 
                 List<RecordField> record_fields = record_type.getRecordField();
 
                 for (RecordField record_field : record_fields) {
-                    //            String identifier = record_field.getName();
+                    // String identifier = record_field.getName();
 
                     data_type = record_field.getType();
                     String user_defined_type = data_type.getUserDefinedType();
 
                     if (user_defined_type != null) {
-                        //                        user_defined_type = user_defined_type + "_Impl";
+                        // user_defined_type = user_defined_type + "_Impl";
 
                         for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
                             if (user_defined_type.equals(type_declaration.getName())) {
