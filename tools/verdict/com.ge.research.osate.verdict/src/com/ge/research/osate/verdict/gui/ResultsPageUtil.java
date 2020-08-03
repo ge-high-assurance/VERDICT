@@ -23,5 +23,17 @@ public class ResultsPageUtil {
 		if (myView4 != null) {
 			wp.hideView(myView4);
 		}
+		IViewPart myView5 = wp.findView(CRVResultsView.ID);
+		if (myView5 != null) {
+			wp.hideView(myView5);
+		}
+		IViewPart myView6 = wp.findView(CounterExampleView.ID_COUNTER_EXAMPLE);
+		if (myView6 != null) {
+			wp.hideView(myView6);
+		}
+		IViewPart myView7 = wp.findView(CounterExampleView.ID_TEST_CASE);
+		if (myView7 != null) {
+			wp.hideView(myView7);
+		}
 	}
 }
