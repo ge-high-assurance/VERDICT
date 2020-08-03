@@ -25,6 +25,11 @@
             <repository location="http://download.eclipse.org/releases/2019-12"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
+            <unit id="org.apache.commons.math3" version="0.0.0"/>
+            <unit id="org.apache.commons.math3.source" version="0.0.0"/>
+            <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository"/>
+        </location>
+        <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
             <unit id="de.itemis.xtext.antlr.sdk.feature.group" version="0.0.0"/>
             <repository location="http://download.itemis.com/updates/releases/2.1.1"/>
         </location>

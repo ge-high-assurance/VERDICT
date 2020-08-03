@@ -36,7 +36,7 @@ public class VerdictLustreTranslatorIT {
         // Path path = Paths.get("/VERDICT/agacek/jkind/testing");
 
         // Has no errors
-        Path path = Paths.get("../../../../VerdictDemo/tmp/translated_models/model_d");
+        Path path = Paths.get("../../../../../materials/VerdictDemo/tmp/translated_models/model_d");
 
         // Test all Lustre files stored under the given path.
         Files.walk(path)
