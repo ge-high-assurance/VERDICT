@@ -1066,7 +1066,7 @@ public class App {
                         }
                         break;
                     case 2:
-                        log("Kind2 fails to return correct results");
+                        log("Kind2 terminated with an error");
                         XMLProcessor.parseLog(new File(outputPath));
                         // Terminate the process?
                         break;

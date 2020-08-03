@@ -244,7 +244,8 @@ public class XMLProcessor {
                         String nodeName = eElement.getAttribute("class");
                         if (nodeName.equalsIgnoreCase("warn")) {
                             System.out.println("Warning: " + nNode.getTextContent());
-                        } else if (nodeName.equalsIgnoreCase("error")) {
+                        } else if (nodeName.equalsIgnoreCase("error")
+                                || nodeName.equalsIgnoreCase("fatal")) {
                             System.out.println("Failure: " + nNode.getTextContent());
 
                             if (eElement.hasAttributes()) {
