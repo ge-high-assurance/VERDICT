@@ -132,16 +132,16 @@ public class VerdictSynthesis {
                                 pair.defenseProperty,
                                 pair.implDal,
                                 dal,
-                                inputCost.doubleValue(),
-                                outputCost.doubleValue()));
+                                inputCost,
+                                outputCost));
             }
             return Optional.of(
                     new ResultsInstance(
                             partialSolution,
                             meritAssignment,
                             inputSat,
-                            totalInputCost.doubleValue(),
-                            totalOutputCost.doubleValue(),
+                            totalInputCost,
+                            totalOutputCost,
                             items));
         } else {
             System.err.println(

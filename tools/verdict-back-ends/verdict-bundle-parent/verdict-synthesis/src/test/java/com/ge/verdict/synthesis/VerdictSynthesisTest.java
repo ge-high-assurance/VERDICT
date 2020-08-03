@@ -257,8 +257,10 @@ public class VerdictSynthesisTest {
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items).hasSize(1);
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D1", 0, 4, 2, 16));
-        Assertions.assertThat(result.get().outputCost).isEqualTo(16);
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D1", 0, 4, new Fraction(2), new Fraction(16)));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(16));
     }
 
     @Test
@@ -279,10 +281,14 @@ public class VerdictSynthesisTest {
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items).hasSize(2);
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D1", 3, 3, 3, 3));
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D1", 3, 3, new Fraction(3), new Fraction(3)));
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D2", 3, 0, 5, 1));
-        Assertions.assertThat(result.get().outputCost).isEqualTo(4);
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D2", 3, 0, new Fraction(5), new Fraction(1)));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(4));
     }
 
     @Test
@@ -340,7 +346,7 @@ public class VerdictSynthesisTest {
 
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items.size()).isEqualTo(2);
-        Assertions.assertThat(result.get().outputCost).isEqualTo(1);
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(1));
     }
 
     @Test
