@@ -826,7 +826,6 @@ public class AttackDefenseCollector {
                                 if (dal > 0) {
                                     implDal.put(new Pair<>(inst.getName(), name), dal);
                                 }
-
                             } catch (NumberFormatException e) {
                                 throw new RuntimeException(
                                         "Invalid DAL for "

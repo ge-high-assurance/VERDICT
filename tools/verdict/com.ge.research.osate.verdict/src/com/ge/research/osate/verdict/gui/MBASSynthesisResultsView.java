@@ -90,7 +90,8 @@ public class MBASSynthesisResultsView extends ViewPart {
 					header.setForeground(new Color(Display.getCurrent(), 0, 102, 51));
 					if (results.meritAssignment) {
 						if (!results.inputCost.equals(results.outputCost)) {
-							header.setText("Synthesis results: Partial solution SAT, merit assignment, cost: "
+							header.setText(
+									"Synthesis results: Existing solution SAT, merit assignment, cost: "
 									+ results.inputCost
 											.doubleValue()
 									+ " -> "
@@ -100,17 +101,19 @@ public class MBASSynthesisResultsView extends ViewPart {
 									+ ")");
 						} else {
 							header.setText(
-									"Synthesis results: Partial solution SAT, merit assignment already minimal, total cost: "
+									"Synthesis results: Existing solution SAT, merit assignment already minimal, total cost: "
 											+ results.outputCost.doubleValue());
 						}
 					} else {
 						// This one doesn't actually happen because there is no option to disable merit assignment
-						header.setText("Synthesis results: Partial solution SAT, no merit assignment, total cost: "
+						header.setText(
+								"Synthesis results: Existing solution SAT, no merit assignment, total cost: "
 								+ results.outputCost.doubleValue());
 					}
 				} else {
 					header.setForeground(new Color(Display.getCurrent(), 204, 0, 0));
-					header.setText("Synthesis results: Partial solution UNSAT, cost: " + results.inputCost
+					header.setText("Synthesis results: Existing solution UNSAT, cost: "
+							+ results.inputCost
 							.doubleValue()
 							+ " -> "
 							+ results.outputCost
@@ -119,7 +122,8 @@ public class MBASSynthesisResultsView extends ViewPart {
 				}
 			} else {
 				header.setText(
-						"Synthesis results: No partial solution, total cost: " + results.outputCost.doubleValue());
+						"Synthesis results (not using existing solution): total cost: "
+								+ results.outputCost.doubleValue());
 			}
 		}
 
