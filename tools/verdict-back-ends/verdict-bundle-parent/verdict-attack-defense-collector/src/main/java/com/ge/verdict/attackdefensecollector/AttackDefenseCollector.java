@@ -1,19 +1,5 @@
 package com.ge.verdict.attackdefensecollector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -30,7 +16,19 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -137,7 +135,7 @@ public class AttackDefenseCollector {
         systems = new LinkedHashMap<>();
         connections = new LinkedHashMap<>();
 
-        implDal = new LinkedHashMap<>();
+        implDal = null;
 
         // Load all the files as CSV
         CSVFile compDepCsv =
@@ -533,10 +531,16 @@ public class AttackDefenseCollector {
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
                     int dal = -1;
-                    // load DAL from VDM if available
-                    Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
-                    if (implDal.containsKey(pair)) {
-                        dal = implDal.get(pair);
+                    // it will be null if we are not loading from VDM
+                    if (implDal != null) {
+                        // load DAL from VDM if available
+                        Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
+                        if (implDal.containsKey(pair)) {
+                            dal = implDal.get(pair);
+                        } else {
+                            // if there is no binding present, then it is not implemented
+                            dal = 0;
+                        }
                     }
 
                     // this code treats applicable defense and impl defense as separate things
@@ -978,7 +982,7 @@ public class AttackDefenseCollector {
      * @return a map from pairs (component, defense) to implemented DAL.
      */
     public Map<Pair<String, String>, Integer> getImplDal() {
-        return Collections.unmodifiableMap(implDal);
+        return Collections.unmodifiableMap(implDal != null ? implDal : new HashMap<>());
     }
 
     public static final class Result {

@@ -94,7 +94,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							return;
 						}
 
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
+						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator(true);
 						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 
 						Aadl2Vdm aadl2vdm = new Aadl2Vdm();

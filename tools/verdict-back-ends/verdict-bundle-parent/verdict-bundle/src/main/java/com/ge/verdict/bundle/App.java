@@ -711,7 +711,7 @@ public class App {
                             false);
 
             if (selected.isPresent()) {
-                if (partialSolution) {
+                if (performMeritAssignment) {
                     ResultsInstance withExtraDefProps =
                             VerdictSynthesis.addExtraImplDefenses(
                                     selected.get(), collector.getImplDal(), costModel);
