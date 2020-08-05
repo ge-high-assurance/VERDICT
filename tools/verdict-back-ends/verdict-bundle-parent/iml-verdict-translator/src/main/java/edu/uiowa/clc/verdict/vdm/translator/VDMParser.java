@@ -1192,7 +1192,7 @@ public class VDMParser extends Parser {
                 String identifier = Identifier();
                 port.setName(identifier);
                 port.setId(identifier);
-//                port.setId(componentID + "." + identifier);
+                //                port.setId(componentID + "." + identifier);
 
             } else if (token.type == Type.PORT_MODE) {
                 PortMode portMode = portMode();
@@ -2677,10 +2677,10 @@ public class VDMParser extends Parser {
                 String identifier = Identifier();
                 // Unique Block Implementation ID
                 block_compImpl_Id = block_compImpl_Id.replace(".", "_dot_");
-            
-//                componentInstance.setName(block_compImpl_Id + "_" + identifier);
-//                componentInstance.setId(block_compImpl_Id + "_" + identifier);
-          
+
+                componentInstance.setName(block_compImpl_Id + "_" + identifier);
+                componentInstance.setId(block_compImpl_Id + "_" + identifier);
+
             } else if (token.type == Type.COMPONENT_INSTANCE_KIND) {
                 // Specification or Implementation
                 componentInstanceKind();

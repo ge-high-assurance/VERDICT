@@ -505,7 +505,7 @@ public class VDM2Lustre {
                 TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
                 user_defined_type = baseType.getName();
-                String definedType = user_defined_type.replace("_", "Event_");
+                String definedType = user_defined_type.replace("_dot_", "Event_");
 
                 eventTypeDeclaration.setName(definedType);
 
@@ -1529,8 +1529,8 @@ public class VDM2Lustre {
 
         String identifier = typeDeclaration.getName();
         // Renaming dot[.] in Type Declaration Identifier.
-        // identifier = identifier.replace(".", "_id_");
-        // typeDeclaration.setName(identifier);
+        identifier = identifier.replace(".", "_id_");
+        typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
 

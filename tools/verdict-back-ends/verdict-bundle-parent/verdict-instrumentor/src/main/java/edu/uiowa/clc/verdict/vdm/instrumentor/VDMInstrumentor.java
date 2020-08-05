@@ -1787,8 +1787,8 @@ public class VDMInstrumentor {
 
         ComponentImpl instrument_compImpl = new ComponentImpl();
 
-        instrument_compImpl.setId(instrumented_cmp.getId() + ".impl");
-        instrument_compImpl.setName(instrumented_cmp.getName() + "_Impl");
+        instrument_compImpl.setId(instrumented_cmp.getId() + "_dot_impl");
+        instrument_compImpl.setName(instrumented_cmp.getName() + "_dot_Impl");
         instrument_compImpl.setType(instrumented_cmp);
 
         IfThenElse ifelse = new IfThenElse();

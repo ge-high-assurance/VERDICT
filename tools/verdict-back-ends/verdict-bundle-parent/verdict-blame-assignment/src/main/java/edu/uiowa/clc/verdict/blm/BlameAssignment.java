@@ -271,10 +271,12 @@ public class BlameAssignment {
     }
 
     private void rename_link(Link selected_link) {
+
         String link_name = selected_link.getLinkID();
-        System.out.println("Before:" + link_name);
+
         link_name = link_name.replaceAll("_port_", ".");
-        System.out.println("After:" + link_name);
+
+        link_name = link_name.replace("_dot_", ".");
 
         selected_link.setLinkID(link_name);
     }
