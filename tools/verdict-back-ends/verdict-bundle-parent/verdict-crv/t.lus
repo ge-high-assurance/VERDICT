@@ -1,0 +1,209 @@
+type Position;
+type SatelliteConstellation = enum { GPS, Galileo };
+type SatelliteSignals;
+type Status = enum { Confirmed, Unconfirmed };
+type MAC;
+type Position_dot_impl = struct { latitude : real; longitude : real };
+type SatelliteSignals_dot_impl = struct { gps_sig : Position_dot_impl; galileo_sig : Position_dot_impl };
+type MAC_dot_impl = struct { x : real; y : real };
+type PositionEvent_impl = struct { is_present : bool; value : Position_dot_impl };
+
+
+
+node HasHappened
+  (x : bool)
+returns
+  (y : bool);
+let
+  y = ((x) or (((false) -> ((pre (y))))));
+tel
+
+node IsBadLocation
+  (p : Position_dot_impl)
+returns
+  (f : bool);
+let
+  f = ((((((25.0) <= (p.latitude))) and (((p.latitude) <= (50.0))))) and ((((((-(130.0))) <= (p.longitude))) and (((p.longitude) <= ((-(60.0))))))));
+tel
+
+node ComputeMAC
+  (p : Position_dot_impl)
+returns
+  (mac : MAC_dot_impl);
+let
+  mac = MAC_dot_impl { x = ((p.latitude) / (2.0)); y = ((p.longitude) / (2.0)) };
+tel
+
+node FirstTimeHolds
+  (x : bool)
+returns
+  (r : bool);
+let
+  r = ((x) -> ((((not ((pre (HasHappened(x)))))) and (x))));
+tel
+
+node imported DeliveryManager
+  (constellation : SatelliteConstellation;
+  satellite_sig : SatelliteSignals;
+  imu_ref : Position_dot_impl;
+  delivery_location_in : Position_dot_impl;
+  init : bool;
+  mac : MAC_dot_impl)
+returns
+  (imu_out : PositionEvent_impl;
+  gps_out : PositionEvent_impl;
+  delivery_location_out : PositionEvent_impl);
+(*@contract
+  guarantee true;
+*)
+
+node DeliveryManager_Impl
+  (constellation : SatelliteConstellation;
+  satellite_sig : SatelliteSignals;
+  imu_ref : Position_dot_impl;
+  delivery_location_in : Position_dot_impl;
+  init : bool;
+  mac : MAC_dot_impl)
+returns
+  (imu_out : PositionEvent_impl;
+  gps_out : PositionEvent_impl;
+  delivery_location_out : PositionEvent_impl);
+var
+  DeliveryManager_dot_Impl_dd_port_delivery_location_out : PositionEvent_impl;
+  DeliveryManager_dot_Impl_imu_port_imu_out : PositionEvent_impl;
+  DeliveryManager_dot_Impl_gps_port_gps_out : PositionEvent_impl;
+let
+  DeliveryManager_dot_Impl_dd_port_delivery_location_out = DeliveryDriver(delivery_location_in, init, mac);
+  DeliveryManager_dot_Impl_imu_port_imu_out = IMU(imu_ref, init);
+  DeliveryManager_dot_Impl_gps_port_gps_out = GPS(constellation, satellite_sig, init);
+  delivery_location_out = DeliveryManager_dot_Impl_dd_port_delivery_location_out;
+  imu_out = DeliveryManager_dot_Impl_imu_port_imu_out;
+  gps_out = DeliveryManager_dot_Impl_gps_port_gps_out;
+tel
+
+node imported DeliveryDriver
+  (delivery_location_in : Position_dot_impl;
+  init : bool;
+  mac : MAC_dot_impl)
+returns
+  (delivery_location_out : PositionEvent_impl);
+(*@contract
+  guarantee "delivery_location_out value" ((FirstTimeHolds(((init) and (((mac) = (ComputeMAC(delivery_location_in))))))) = (delivery_location_out.is_present));
+  guarantee "delivery_location_out presence" ((delivery_location_out.is_present) => (((delivery_location_out.value) = (delivery_location_in))));
+*)
+
+node imported IMU
+  (imu_ref : Position_dot_impl;
+  init : bool)
+returns
+  (imu_out : PositionEvent_impl);
+(*@contract
+  guarantee true;
+*)
+
+node imported GPS
+  (constellation : SatelliteConstellation;
+  satellite_sig : SatelliteSignals;
+  init : bool)
+returns
+  (gps_out : PositionEvent_impl);
+(*@contract
+  guarantee true;
+*)
+
+node imported SystemBus
+  (imu_in : PositionEvent_impl;
+  gps_in : PositionEvent_impl;
+  delivery_location_in : PositionEvent_impl)
+returns
+  (imu_out : PositionEvent_impl;
+  gps_out : PositionEvent_impl;
+  delivery_location_out : PositionEvent_impl);
+(*@contract
+  guarantee "imu_out presence" ((imu_out.is_present) = (imu_in.is_present));
+  guarantee "imu_out value" ((imu_out.is_present) => (((imu_out.value) = (imu_in.value))));
+  guarantee "gps_out presence" ((gps_out.is_present) = (gps_in.is_present));
+  guarantee "gps_out value" ((gps_out.is_present) => (((gps_out.value) = (gps_in.value))));
+  guarantee "delivery_location_out presence" ((delivery_location_out.is_present) = (delivery_location_in.is_present));
+  guarantee "delivery_location_out value" ((delivery_location_out.is_present) => (((delivery_location_out.value) = (delivery_location_in.value))));
+*)
+
+node imported Controller
+  (imu_in : PositionEvent_impl;
+  gps_in : PositionEvent_impl;
+  delivery_location_in : PositionEvent_impl;
+  warning_flag : bool)
+returns
+  (status : Status;
+  delivery_location_out : Position_dot_impl);
+(*@contract
+  var valid_delivery_location_event : bool = ((delivery_location_in.is_present) and ((not (warning_flag))));
+  guarantee "status value" ((((status) = (Confirmed))) = (HasHappened(valid_delivery_location_event)));
+  guarantee "delivery_location_out value (update)" ((FirstTimeHolds(valid_delivery_location_event)) => (((delivery_location_out) = (delivery_location_in.value))));
+  guarantee "delivery_location_out value (fixed point)" ((true) -> (((HasHappened(((false) -> ((pre (valid_delivery_location_event)))))) => (((delivery_location_out) = ((pre (delivery_location_out))))))));
+*)
+
+node imported PositionRuntimeMonitor
+  (loc : PositionEvent_impl)
+returns
+  (warning_flag : bool);
+(*@contract
+  guarantee "warning_flag value" ((warning_flag) = (((loc.is_present) and (IsBadLocation(loc.value)))));
+*)
+
+node imported UAVToySystem
+  (constellation : SatelliteConstellation;
+  satellite_sig : SatelliteSignals;
+  imu_ref : Position_dot_impl;
+  delivery_location_in : Position_dot_impl;
+  init : bool;
+  mac : MAC_dot_impl)
+returns
+  (status : Status;
+  delivery_location_out : Position_dot_impl);
+(*@contract
+  var init_delivery_location : Position_dot_impl = (if (FirstTimeHolds(init)) then (delivery_location_in) else (((delivery_location_in) -> ((pre (init_delivery_location))))));
+  assume "delivery location is not a bad location" ((init) => ((not (IsBadLocation(delivery_location_in)))));
+  assume "initialization only happens once" ((true) -> ((((pre (HasHappened(init)))) => ((not (init))))));
+  assume "mac value" ((mac) = (ComputeMAC(delivery_location_in)));
+  guarantee "P1: UAV system delivers only if delivery location is the one provided in the initialization" ((((status) = (Confirmed))) => (((delivery_location_out) = (init_delivery_location))));
+  guarantee "P2: UAV system does not deliver in a bad location" (not (((((status) = (Confirmed))) and (IsBadLocation(delivery_location_out)))));
+*)
+
+node UAVToySystem_Impl
+  (constellation : SatelliteConstellation;
+  satellite_sig : SatelliteSignals;
+  imu_ref : Position_dot_impl;
+  delivery_location_in : Position_dot_impl;
+  init : bool;
+  mac : MAC_dot_impl)
+returns
+  (status : Status;
+  delivery_location_out : Position_dot_impl);
+(*@contract
+  var init_delivery_location : Position_dot_impl = (if (FirstTimeHolds(init)) then (delivery_location_in) else (((delivery_location_in) -> ((pre (init_delivery_location))))));
+  assume "delivery location is not a bad location" ((init) => ((not (IsBadLocation(delivery_location_in)))));
+  assume "initialization only happens once" ((true) -> ((((pre (HasHappened(init)))) => ((not (init))))));
+  assume "mac value" ((mac) = (ComputeMAC(delivery_location_in)));
+  guarantee "P1: UAV system delivers only if delivery location is the one provided in the initialization" ((((status) = (Confirmed))) => (((delivery_location_out) = (init_delivery_location))));
+  guarantee "P2: UAV system does not deliver in a bad location" (not (((((status) = (Confirmed))) and (IsBadLocation(delivery_location_out)))));
+*)
+var
+  UAVToySystem_dot_Impl_dm_port_imu_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_dm_port_gps_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_dm_port_delivery_location_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_sbus_port_imu_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_sbus_port_gps_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_sbus_port_delivery_location_out : PositionEvent_impl;
+  UAVToySystem_dot_Impl_contr_port_status : Status;
+  UAVToySystem_dot_Impl_contr_port_delivery_location_out : Position_dot_impl;
+  UAVToySystem_dot_Impl_rm_port_warning_flag : bool;
+let
+  UAVToySystem_dot_Impl_dm_port_imu_out, UAVToySystem_dot_Impl_dm_port_gps_out, UAVToySystem_dot_Impl_dm_port_delivery_location_out = DeliveryManager_Impl(constellation, satellite_sig, imu_ref, delivery_location_in, init, mac);
+  UAVToySystem_dot_Impl_sbus_port_imu_out, UAVToySystem_dot_Impl_sbus_port_gps_out, UAVToySystem_dot_Impl_sbus_port_delivery_location_out = SystemBus(UAVToySystem_dot_Impl_dm_port_imu_out, UAVToySystem_dot_Impl_dm_port_gps_out, UAVToySystem_dot_Impl_dm_port_delivery_location_out);
+  UAVToySystem_dot_Impl_contr_port_status, UAVToySystem_dot_Impl_contr_port_delivery_location_out = Controller(UAVToySystem_dot_Impl_sbus_port_imu_out, UAVToySystem_dot_Impl_sbus_port_gps_out, UAVToySystem_dot_Impl_sbus_port_delivery_location_out, UAVToySystem_dot_Impl_rm_port_warning_flag);
+  UAVToySystem_dot_Impl_rm_port_warning_flag = PositionRuntimeMonitor(UAVToySystem_dot_Impl_sbus_port_delivery_location_out);
+  status = UAVToySystem_dot_Impl_contr_port_status;
+  delivery_location_out = UAVToySystem_dot_Impl_contr_port_delivery_location_out;
+tel
+

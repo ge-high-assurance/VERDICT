@@ -1,0 +1,2014 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<vdm_model:model xmlns:vdm_lustre="verdict::vdm::vdm_lustre" xmlns:vdm_model="verdict::vdm::vdm_model" xmlns:vdm_data="verdict::vdm::vdm_data">
+    <name>Thermostat</name>
+    <typeDeclaration>
+        <vdm_data:name>SwitchPosition</vdm_data:name>
+        <vdm_data:definition>
+            <vdm_data:enumType>
+                <vdm_data:enumValue>Cool</vdm_data:enumValue>
+                <vdm_data:enumValue>Off</vdm_data:enumValue>
+                <vdm_data:enumValue>Heat</vdm_data:enumValue>
+            </vdm_data:enumType>
+        </vdm_data:definition>
+    </typeDeclaration>
+    <componentType id="SetDesiredTemperature" name="SetDesiredTemperature" compCateg="system">
+        <port id="up_button" probe="false" event="false">
+            <name>up_button</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="down_button" probe="false" event="false">
+            <name>down_button</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="setpoint" probe="false" event="false">
+            <name>setpoint</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </type>
+        </port>
+        <contract>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>prev_setpoint</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>real</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:arrow>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:pre>
+<vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                            </vdm_lustre:pre>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:arrow>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>increment_condition</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>up_button</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>prev_setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:minus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>MAX_TEMPERATURE</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DIFF</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:minus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>decrement_condition</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>down_button</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:greaterThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>prev_setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:plus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>MIN_TEMPERATURE</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DIFF</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:plus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:greaterThanOrEqualTo>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:assume>
+                <vdm_lustre:name>Up/Down button signals are mutually exclusive</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:not>
+                        <vdm_lustre:and>
+                            <vdm_lustre:lhsOperand>
+<vdm_lustre:identifier>up_button</vdm_lustre:identifier>
+                            </vdm_lustre:lhsOperand>
+                            <vdm_lustre:rhsOperand>
+<vdm_lustre:identifier>down_button</vdm_lustre:identifier>
+                            </vdm_lustre:rhsOperand>
+                        </vdm_lustre:and>
+                    </vdm_lustre:not>
+                </vdm_lustre:expression>
+            </vdm_lustre:assume>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint increment</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>increment_condition</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:plus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>prev_setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DIFF</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:plus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint decrement</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>decrement_condition</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:minus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>prev_setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DIFF</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:minus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint invariance</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:or>
+    <vdm_lustre:lhsOperand>
+        <vdm_lustre:identifier>increment_condition</vdm_lustre:identifier>
+    </vdm_lustre:lhsOperand>
+    <vdm_lustre:rhsOperand>
+        <vdm_lustre:identifier>decrement_condition</vdm_lustre:identifier>
+    </vdm_lustre:rhsOperand>
+</vdm_lustre:or>
+                            </vdm_lustre:not>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>prev_setpoint</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+        </contract>
+        <cyberRel>
+            <id>heat_signal_out_I</id>
+            <output>
+                <name>setpoint</name>
+                <cia>Integrity</cia>
+            </output>
+            <inputs>
+                <or>
+                    <expr>
+                        <port>
+                            <name>down_button</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                    <expr>
+                        <port>
+                            <name>up_button</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                </or>
+            </inputs>
+            <comment></comment>
+            <description></description>
+            <phases></phases>
+            <extern></extern>
+        </cyberRel>
+    </componentType>
+    <componentType id="ControlTemperature" name="ControlTemperature" compCateg="system">
+        <port id="switch" probe="false" event="false">
+            <name>switch</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:userDefinedType>SwitchPosition</vdm_data:userDefinedType>
+            </type>
+        </port>
+        <port id="current_temperature" probe="false" event="false">
+            <name>current_temperature</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="setpoint" probe="false" event="false">
+            <name>setpoint</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="cool_act_signal" probe="false" event="false">
+            <name>cool_act_signal</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="heat_act_signal" probe="false" event="false">
+            <name>heat_act_signal</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <contract>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>cooling_start_condition</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>Cool</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:greaterThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:plus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:plus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:greaterThan>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>cool_mode</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:arrow>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>cooling_start_condition</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:or>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>cooling_start_condition</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:and>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:and>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:pre>
+                        <vdm_lustre:identifier>cool_mode</vdm_lustre:identifier>
+                    </vdm_lustre:pre>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:equal>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>Cool</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:equal>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:and>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:greaterThan>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:greaterThan>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:and>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:or>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:arrow>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>heating_start_condition</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>Heat</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:minus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:minus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThan>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>heat_mode</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:arrow>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>heating_start_condition</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:or>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>heating_start_condition</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:and>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:and>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:pre>
+                        <vdm_lustre:identifier>heat_mode</vdm_lustre:identifier>
+                    </vdm_lustre:pre>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:equal>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>Heat</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:equal>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:and>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:lessThan>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:lessThan>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:and>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:or>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:arrow>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>off_mode</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:identifier>cool_mode</vdm_lustre:identifier>
+                            </vdm_lustre:not>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:identifier>heat_mode</vdm_lustre:identifier>
+                            </vdm_lustre:not>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Cooling activation</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:equal>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>cool_mode</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:equal>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Heating activation</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:equal>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>heat_mode</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:equal>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+        </contract>
+        <cyberRel>
+            <id>cool_signal_out_I</id>
+            <output>
+                <name>cool_act_signal</name>
+                <cia>Integrity</cia>
+            </output>
+            <inputs>
+                <or>
+                    <expr>
+                        <port>
+                            <name>switch</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                    <expr>
+                        <port>
+                            <name>current_temperature</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                    <expr>
+                        <port>
+                            <name>setpoint</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                </or>
+            </inputs>
+            <comment></comment>
+            <description></description>
+            <phases></phases>
+            <extern></extern>
+        </cyberRel>
+        <cyberRel>
+            <id>heat_signal_out_I</id>
+            <output>
+                <name>heat_act_signal</name>
+                <cia>Integrity</cia>
+            </output>
+            <inputs>
+                <or>
+                    <expr>
+                        <port>
+                            <name>switch</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                    <expr>
+                        <port>
+                            <name>current_temperature</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                    <expr>
+                        <port>
+                            <name>setpoint</name>
+                            <cia>Integrity</cia>
+                        </port>
+                    </expr>
+                </or>
+            </inputs>
+            <comment></comment>
+            <description></description>
+            <phases></phases>
+            <extern></extern>
+        </cyberRel>
+    </componentType>
+    <componentType id="ThermostatController" name="ThermostatController" compCateg="system">
+        <port id="switch" probe="false" event="false">
+            <name>switch</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:userDefinedType>SwitchPosition</vdm_data:userDefinedType>
+            </type>
+        </port>
+        <port id="up_button" probe="false" event="false">
+            <name>up_button</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="down_button" probe="false" event="false">
+            <name>down_button</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="current_temperature" probe="false" event="false">
+            <name>current_temperature</name>
+            <mode>in</mode>
+            <type>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="cool_act_signal" probe="false" event="false">
+            <name>cool_act_signal</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="heat_act_signal" probe="false" event="false">
+            <name>heat_act_signal</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>bool</vdm_data:plainType>
+            </type>
+        </port>
+        <port id="setpoint" probe="false" event="false">
+            <name>setpoint</name>
+            <mode>out</mode>
+            <type>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </type>
+        </port>
+        <contract>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>current_temperature_in_deadzone</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:minus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:minus>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:plus>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:plus>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:symbol>
+                <vdm_lustre:name>system_is_off</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+                <vdm_lustre:definition>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                            </vdm_lustre:not>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                            </vdm_lustre:not>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:definition>
+            </vdm_lustre:symbol>
+            <vdm_lustre:assume>
+                <vdm_lustre:name>Up/Down button signals are mutually exclusive</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:not>
+                        <vdm_lustre:and>
+                            <vdm_lustre:lhsOperand>
+<vdm_lustre:identifier>up_button</vdm_lustre:identifier>
+                            </vdm_lustre:lhsOperand>
+                            <vdm_lustre:rhsOperand>
+<vdm_lustre:identifier>down_button</vdm_lustre:identifier>
+                            </vdm_lustre:rhsOperand>
+                        </vdm_lustre:and>
+                    </vdm_lustre:not>
+                </vdm_lustre:expression>
+            </vdm_lustre:assume>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Initial temperature is in range</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>MIN_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>MAX_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Deadband and Diff are positive values</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:greaterThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:realLiteral>0.000000</vdm_lustre:realLiteral>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:greaterThan>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:greaterThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>DIFF</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:realLiteral>0.000000</vdm_lustre:realLiteral>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:greaterThan>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>No activation signal is enabled if switch is in Off</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>Off</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:and>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:not>
+        <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+    </vdm_lustre:not>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:not>
+        <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+    </vdm_lustre:not>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:and>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Cooling system is turned On only if switch is in Cool</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>Cool</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Heating system is turned On only if switch is in Heat</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>Heat</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Activation signals are never enabled at the same time</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:not>
+                        <vdm_lustre:and>
+                            <vdm_lustre:lhsOperand>
+<vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                            </vdm_lustre:lhsOperand>
+                            <vdm_lustre:rhsOperand>
+<vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                            </vdm_lustre:rhsOperand>
+                        </vdm_lustre:and>
+                    </vdm_lustre:not>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint is always in range</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:and>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>MIN_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThanOrEqualTo>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>MAX_TEMPERATURE</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThanOrEqualTo>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:and>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint doesn't change if no button is pressed</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:and>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:not>
+        <vdm_lustre:identifier>up_button</vdm_lustre:identifier>
+    </vdm_lustre:not>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:not>
+        <vdm_lustre:identifier>down_button</vdm_lustre:identifier>
+    </vdm_lustre:not>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:and>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:equal>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:arrow>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:pre>
+                <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+            </vdm_lustre:pre>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:arrow>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:equal>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint doesn't decrease if the up button is pressed</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>up_button</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:lessThan>
+    <vdm_lustre:lhsOperand>
+        <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+    </vdm_lustre:lhsOperand>
+    <vdm_lustre:rhsOperand>
+        <vdm_lustre:arrow>
+            <vdm_lustre:lhsOperand>
+                <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+            </vdm_lustre:lhsOperand>
+            <vdm_lustre:rhsOperand>
+                <vdm_lustre:pre>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:pre>
+            </vdm_lustre:rhsOperand>
+        </vdm_lustre:arrow>
+    </vdm_lustre:rhsOperand>
+</vdm_lustre:lessThan>
+                            </vdm_lustre:not>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Setpoint doesn't increase if the down button is pressed</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>down_button</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:not>
+<vdm_lustre:greaterThan>
+    <vdm_lustre:lhsOperand>
+        <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+    </vdm_lustre:lhsOperand>
+    <vdm_lustre:rhsOperand>
+        <vdm_lustre:arrow>
+            <vdm_lustre:lhsOperand>
+                <vdm_lustre:identifier>INITIAL_TEMPERATURE</vdm_lustre:identifier>
+            </vdm_lustre:lhsOperand>
+            <vdm_lustre:rhsOperand>
+                <vdm_lustre:pre>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:pre>
+            </vdm_lustre:rhsOperand>
+        </vdm_lustre:arrow>
+    </vdm_lustre:rhsOperand>
+</vdm_lustre:greaterThan>
+                            </vdm_lustre:not>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>System is Off if current temperature is in the dead zone and system was Off in the previous step</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:arrow>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:boolLiteral>true</vdm_lustre:boolLiteral>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:implies>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:and>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>current_temperature_in_deadzone</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:pre>
+                <vdm_lustre:identifier>system_is_off</vdm_lustre:identifier>
+            </vdm_lustre:pre>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:and>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>system_is_off</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:implies>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:arrow>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Cooling system is On only if current temperature is higher than setpoint</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:greaterThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:greaterThan>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Heating system is On only if current temperature is lower than setpoint</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:lessThan>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:lessThan>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Cooling system is On if switch is in Cool and temperature is higher than setpoint plus deadband</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:and>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:equal>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>Cool</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:equal>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:greaterThan>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:plus>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:plus>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:greaterThan>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:and>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Heating system is On if switch is in Heat and temperature is lower than setpoint minus deadband</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:and>
+<vdm_lustre:lhsOperand>
+    <vdm_lustre:equal>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:identifier>Heat</vdm_lustre:identifier>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:equal>
+</vdm_lustre:lhsOperand>
+<vdm_lustre:rhsOperand>
+    <vdm_lustre:lessThan>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:minus>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>DEADBAND</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:minus>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:lessThan>
+</vdm_lustre:rhsOperand>
+                            </vdm_lustre:and>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Once cooling system is On, it remains On as long as setpoint hasn't reached and switch is in Cool</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:call vdm_lustre:nodeId="Since">
+<vdm_lustre:argument>
+    <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+</vdm_lustre:argument>
+<vdm_lustre:argument>
+    <vdm_lustre:and>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:equal>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>Cool</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:equal>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:greaterThan>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:greaterThan>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:and>
+</vdm_lustre:argument>
+                            </vdm_lustre:call>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>cool_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+            <vdm_lustre:guarantee>
+                <vdm_lustre:name>Once heating system is On, it remains On as long as setpoint hasn't reached and switch is in Heat</vdm_lustre:name>
+                <vdm_lustre:expression>
+                    <vdm_lustre:implies>
+                        <vdm_lustre:lhsOperand>
+                            <vdm_lustre:call vdm_lustre:nodeId="Since">
+<vdm_lustre:argument>
+    <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+</vdm_lustre:argument>
+<vdm_lustre:argument>
+    <vdm_lustre:and>
+        <vdm_lustre:lhsOperand>
+            <vdm_lustre:equal>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>switch</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>Heat</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:equal>
+        </vdm_lustre:lhsOperand>
+        <vdm_lustre:rhsOperand>
+            <vdm_lustre:lessThan>
+                <vdm_lustre:lhsOperand>
+                    <vdm_lustre:identifier>current_temperature</vdm_lustre:identifier>
+                </vdm_lustre:lhsOperand>
+                <vdm_lustre:rhsOperand>
+                    <vdm_lustre:identifier>setpoint</vdm_lustre:identifier>
+                </vdm_lustre:rhsOperand>
+            </vdm_lustre:lessThan>
+        </vdm_lustre:rhsOperand>
+    </vdm_lustre:and>
+</vdm_lustre:argument>
+                            </vdm_lustre:call>
+                        </vdm_lustre:lhsOperand>
+                        <vdm_lustre:rhsOperand>
+                            <vdm_lustre:identifier>heat_act_signal</vdm_lustre:identifier>
+                        </vdm_lustre:rhsOperand>
+                    </vdm_lustre:implies>
+                </vdm_lustre:expression>
+            </vdm_lustre:guarantee>
+        </contract>
+    </componentType>
+    <componentImpl id="ThermostatController.Impl" type="ThermostatController" name="ThermostatController.Impl">
+        <blockImpl>
+            <subcomponent id="ThermostatController_dot_Impl_set_desired_temperature" name="ThermostatController_dot_Impl_set_desired_temperature">
+                <specification>SetDesiredTemperature</specification>
+                <attribute>
+                    <vdm_data:name>zeroize</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>userAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>tamperProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>systemAccessControl</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>supplyChainSecurity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Supply_Chain_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>strongCryptoAlgorithms</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>staticCodeAnalysis</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Sniffing_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>secureBoot</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>resourceIsolation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>resourceAvailability</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>removeIdentifyingInformation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>remoteAttestation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>physicalAccessControl</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Physical_Theft_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>pedigree</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">COTS</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>memoryProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>logging</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Interception_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>insideTrustedBoundary</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>inputValidation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Identity_Spoofing_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>heterogeneity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>hasSensitiveInfo</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Hardware_Integrity_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Flooding_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Fault_Injection_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>failSafe</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Excessive_Allocation_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedStorage</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>dosProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Configuration_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>componentType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Hybrid</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>category</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Unknown</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>canReceiveSWUpdate</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>canReceiveConfigUpdate</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Buffer_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Brute_Force_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>auditMessageResponses</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>antiJamming</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>adversariallyTestedForTrojanOrLogicBomb</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+            </subcomponent>
+            <subcomponent id="ThermostatController_dot_Impl_control_temperature" name="ThermostatController_dot_Impl_control_temperature">
+                <specification>ControlTemperature</specification>
+                <attribute>
+                    <vdm_data:name>zeroize</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>userAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>tamperProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>systemAccessControl</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">3</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>supplyChainSecurity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">3</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Supply_Chain_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>strongCryptoAlgorithms</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>staticCodeAnalysis</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Sniffing_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>secureBoot</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">3</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>resourceIsolation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>resourceAvailability</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>removeIdentifyingInformation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>remoteAttestation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>physicalAccessControl</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">3</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Physical_Theft_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>pedigree</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">COTS</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>memoryProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">3</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>logging</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Interception_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>insideTrustedBoundary</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>inputValidation</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Identity_Spoofing_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>heterogeneity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>hasSensitiveInfo</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Hardware_Integrity_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Flooding_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Fault_Injection_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>failSafe</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Excessive_Allocation_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedStorage</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>dosProtection</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Configuration_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>componentType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Hybrid</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>category</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Unknown</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>canReceiveSWUpdate</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>canReceiveConfigUpdate</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">true</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Buffer_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>Brute_Force_Attack</vdm_data:name>
+                    <vdm_data:type>Bool</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">false</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>auditMessageResponses</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>antiJamming</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>adversariallyTestedForTrojanOrLogicBomb</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+            </subcomponent>
+            <connection name="switch_conn">
+                <source>
+                    <componentPort>switch</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_control_temperature</subcomponent>
+                        <port>switch</port>
+                    </subcomponentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="up_bth_conn">
+                <source>
+                    <componentPort>up_button</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_set_desired_temperature</subcomponent>
+                        <port>up_button</port>
+                    </subcomponentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="down_btn_conn">
+                <source>
+                    <componentPort>down_button</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_set_desired_temperature</subcomponent>
+                        <port>down_button</port>
+                    </subcomponentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="cur_temp_conn">
+                <source>
+                    <componentPort>current_temperature</componentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_control_temperature</subcomponent>
+                        <port>current_temperature</port>
+                    </subcomponentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="cool_sig_conn">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_control_temperature</subcomponent>
+                        <port>cool_act_signal</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <componentPort>cool_act_signal</componentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="heat_sig_conn">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_control_temperature</subcomponent>
+                        <port>heat_act_signal</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <componentPort>heat_act_signal</componentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="setpoint1_conn">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_set_desired_temperature</subcomponent>
+                        <port>setpoint</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_control_temperature</subcomponent>
+                        <port>setpoint</port>
+                    </subcomponentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+            <connection name="setpoint2_conn">
+                <source>
+                    <subcomponentPort>
+                        <subcomponent>ThermostatController_dot_Impl_set_desired_temperature</subcomponent>
+                        <port>setpoint</port>
+                    </subcomponentPort>
+                </source>
+                <destination>
+                    <componentPort>setpoint</componentPort>
+                </destination>
+                <attribute>
+                    <vdm_data:name>sessionAuthenticity</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>encryptedTransmission</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>deviceAuthentication</vdm_data:name>
+                    <vdm_data:type>Int</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">0</vdm_data:value>
+                </attribute>
+                <attribute>
+                    <vdm_data:name>connectionType</vdm_data:name>
+                    <vdm_data:type>String</vdm_data:type>
+                    <vdm_data:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Untrusted</vdm_data:value>
+                </attribute>
+            </connection>
+        </blockImpl>
+    </componentImpl>
+    <dataflowCode>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>MIN_TEMPERATURE</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:realLiteral>40.000000</vdm_lustre:realLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>MAX_TEMPERATURE</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:realLiteral>100.000000</vdm_lustre:realLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>INITIAL_TEMPERATURE</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:realLiteral>70.000000</vdm_lustre:realLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>DEADBAND</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:realLiteral>3.000000</vdm_lustre:realLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+        <vdm_lustre:constantDeclaration>
+            <vdm_lustre:name>DIFF</vdm_lustre:name>
+            <vdm_lustre:dataType>
+                <vdm_data:plainType>real</vdm_data:plainType>
+            </vdm_lustre:dataType>
+            <vdm_lustre:definition>
+                <vdm_lustre:realLiteral>1.000000</vdm_lustre:realLiteral>
+            </vdm_lustre:definition>
+        </vdm_lustre:constantDeclaration>
+        <vdm_lustre:nodeDeclaration vdm_lustre:isFunction="false">
+            <vdm_lustre:name>Since</vdm_lustre:name>
+            <vdm_lustre:inputParameter vdm_lustre:isConstant="false">
+                <vdm_lustre:name>X</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+            </vdm_lustre:inputParameter>
+            <vdm_lustre:inputParameter vdm_lustre:isConstant="false">
+                <vdm_lustre:name>Y</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+            </vdm_lustre:inputParameter>
+            <vdm_lustre:outputParameter>
+                <vdm_lustre:name>Z</vdm_lustre:name>
+                <vdm_lustre:dataType>
+                    <vdm_data:plainType>bool</vdm_data:plainType>
+                </vdm_lustre:dataType>
+            </vdm_lustre:outputParameter>
+            <vdm_lustre:body>
+                <vdm_lustre:equation>
+                    <vdm_lustre:lhs>
+                        <vdm_lustre:identifier>Z</vdm_lustre:identifier>
+                    </vdm_lustre:lhs>
+                    <vdm_lustre:rhs>
+                        <vdm_lustre:or>
+                            <vdm_lustre:lhsOperand>
+<vdm_lustre:identifier>X</vdm_lustre:identifier>
+                            </vdm_lustre:lhsOperand>
+                            <vdm_lustre:rhsOperand>
+<vdm_lustre:and>
+    <vdm_lustre:lhsOperand>
+        <vdm_lustre:identifier>Y</vdm_lustre:identifier>
+    </vdm_lustre:lhsOperand>
+    <vdm_lustre:rhsOperand>
+        <vdm_lustre:arrow>
+            <vdm_lustre:lhsOperand>
+                <vdm_lustre:boolLiteral>false</vdm_lustre:boolLiteral>
+            </vdm_lustre:lhsOperand>
+            <vdm_lustre:rhsOperand>
+                <vdm_lustre:pre>
+                    <vdm_lustre:identifier>Z</vdm_lustre:identifier>
+                </vdm_lustre:pre>
+            </vdm_lustre:rhsOperand>
+        </vdm_lustre:arrow>
+    </vdm_lustre:rhsOperand>
+</vdm_lustre:and>
+                            </vdm_lustre:rhsOperand>
+                        </vdm_lustre:or>
+                    </vdm_lustre:rhs>
+                </vdm_lustre:equation>
+            </vdm_lustre:body>
+        </vdm_lustre:nodeDeclaration>
+    </dataflowCode>
+    <cyberReq>
+        <id>CyberReq01</id>
+        <cia>Integrity</cia>
+        <severity>Minor</severity>
+        <condition>
+            <or>
+                <expr>
+                    <port>
+                        <name>heat_act_signal</name>
+                        <cia>Integrity</cia>
+                    </port>
+                </expr>
+                <expr>
+                    <port>
+                        <name>cool_act_signal</name>
+                        <cia>Integrity</cia>
+                    </port>
+                </expr>
+            </or>
+        </condition>
+        <comment></comment>
+        <description>The thermostat shall be resilient to Control Temperature algorithm integrity</description>
+        <phases></phases>
+        <extern></extern>
+    </cyberReq>
+</vdm_model:model>

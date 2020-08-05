@@ -1,0 +1,4837 @@
+package CruiseController;
+
+import iml.utils.*;
+import iml.verdict.*;
+
+model: Model := some (m: Model) {
+  m.name = "CruiseController" &&
+  m.type_declarations.length = 0 &&
+  m.component_types.length = 5 &&
+  m.component_types.element[0] = some (ct: ComponentType) {
+    ct.name = "SetSpeed" &&
+    ct.ports.length = 9 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "on_off" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "resume_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "set_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "inc" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "dec" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "brake_cancel" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[6] = some(p: Port) {
+      p.name = "speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[7] = some(p: Port) {
+      p.name = "desired_speed" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = true &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[8] = some(p: Port) {
+      p.name = "enabled" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 9 &&
+      csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+        sd.name = "off_mode" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Or &&
+              e.or = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Or &&
+                  e.or = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Or &&
+                      e.or = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.And &&
+                          e.and = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "off_mode"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Not &&
+                              e.not = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "on_off"
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.And &&
+                          e.and = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "ready_mode"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "on_off"
+                            }
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "on_mode"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "on_off"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "paused_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "on_off"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+        sd.name = "set_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "set_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_SPEED"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "speed"
+                    }
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.LessThanOrEqualTo &&
+              e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "MAX_SPEED"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[2] = some (sd: SymbolDefinition) {
+        sd.name = "ready_mode" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Or &&
+              e.or = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "ready_mode"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Not &&
+                          e.not = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "on_off"
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Not &&
+                      e.not = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "set_condition"
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "off_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "on_off"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[3] = some (sd: SymbolDefinition) {
+        sd.name = "on_mode" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Or &&
+              e.or = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Or &&
+                  e.or = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.And &&
+                          e.and = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "on_mode"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Not &&
+                              e.not = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "on_off"
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Not &&
+                          e.not = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "brake_cancel"
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "ready_mode"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "set_condition"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "paused_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "resume_speed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[4] = some (sd: SymbolDefinition) {
+        sd.name = "paused_mode" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Or &&
+              e.or = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "paused_mode"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Not &&
+                          e.not = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "on_off"
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Not &&
+                      e.not = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "resume_speed"
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "on_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "brake_cancel"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[5] = some (sd: SymbolDefinition) {
+        sd.name = "setting_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Pre &&
+                  e.pre = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "ready_mode"
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "set_condition"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[6] = some (sd: SymbolDefinition) {
+        sd.name = "increment_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "on_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "inc"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "desired_speed"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Minus &&
+                      e.minus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MAX_SPEED"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[7] = some (sd: SymbolDefinition) {
+        sd.name = "decrement_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = false
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "on_mode"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "dec"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                  e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "desired_speed"
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MIN_SPEED"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[8] = some (sd: SymbolDefinition) {
+        sd.name = "invariance_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Not &&
+                  e.not = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "setting_condition"
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Not &&
+                  e.not = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "increment_condition"
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "decrement_condition"
+              }
+            }
+          }
+        }
+      } &&
+      csp.assumes.length = 2 &&
+      csp.assumes.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Speed is always a non-negative value") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+          e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "speed"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.RealLiteral &&
+              e.real_literal = 0.0
+            }
+          }
+        }
+      } &&
+      csp.assumes.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Buttons are mutually exclusive") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Plus &&
+              e.plus = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Plus &&
+                  e.plus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Plus &&
+                          e.plus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Plus &&
+                              e.plus = some (bo: BinaryOperation) {
+                                bo.lhs_operand = some (e: Expression) {
+                                  e.kind = ExpressionKind.Call &&
+                                  e.call = some (cll: NodeCall) {
+                                    cll.node = "ToInt" &&
+                                    cll.arguments.length = 1 &&
+                                    cll.arguments.element[0] = some (e: Expression) {
+                                      e.kind = ExpressionKind.Id &&
+                                      e.identifier = "on_off"
+                                    }
+                                  }
+                                } &&
+                                bo.rhs_operand = some (e: Expression) {
+                                  e.kind = ExpressionKind.Call &&
+                                  e.call = some (cll: NodeCall) {
+                                    cll.node = "ToInt" &&
+                                    cll.arguments.length = 1 &&
+                                    cll.arguments.element[0] = some (e: Expression) {
+                                      e.kind = ExpressionKind.Id &&
+                                      e.identifier = "resume_speed"
+                                    }
+                                  }
+                                }
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Call &&
+                              e.call = some (cll: NodeCall) {
+                                cll.node = "ToInt" &&
+                                cll.arguments.length = 1 &&
+                                cll.arguments.element[0] = some (e: Expression) {
+                                  e.kind = ExpressionKind.Id &&
+                                  e.identifier = "set_speed"
+                                }
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Call &&
+                          e.call = some (cll: NodeCall) {
+                            cll.node = "ToInt" &&
+                            cll.arguments.length = 1 &&
+                            cll.arguments.element[0] = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "inc"
+                            }
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Call &&
+                      e.call = some (cll: NodeCall) {
+                        cll.node = "ToInt" &&
+                        cll.arguments.length = 1 &&
+                        cll.arguments.element[0] = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "dec"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Call &&
+                  e.call = some (cll: NodeCall) {
+                    cll.node = "ToInt" &&
+                    cll.arguments.length = 1 &&
+                    cll.arguments.element[0] = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "brake_cancel"
+                    }
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.IntLiteral &&
+              e.int_literal = 1
+            }
+          }
+        }
+      } &&
+      csp.guarantees.length = 5 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Cruise control is enabled if and only if it is On") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Equal &&
+          e.equal = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "on_mode"
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Desired speed setting") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setting_condition"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "speed"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[2] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Desired speed increment") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "increment_condition"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[3] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Desired speed decrement") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "decrement_condition"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Minus &&
+                      e.minus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[4] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Desired speed invariance") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "invariance_condition"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "desired_speed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 0 
+     &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.component_types.element[1] = some (ct: ComponentType) {
+    ct.name = "ControlSpeed" &&
+    ct.ports.length = 3 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "desired_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "force" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 0 &&
+      csp.assumes.length = 1 &&
+      csp.assumes.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Speed is always a non-negative value") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+          e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "speed"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.RealLiteral &&
+              e.real_literal = 0.0
+            }
+          }
+        }
+      } &&
+      csp.guarantees.length = 2 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Force is zero when desired speed is not greater than the current speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.LessThanOrEqualTo &&
+              e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "speed"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "force"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.RealLiteral &&
+                  e.real_literal = 0.0
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Force is bounded by a proportional factor of the speed difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+          e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "force"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Call &&
+              e.call = some (cll: NodeCall) {
+                cll.node = "Max" &&
+                cll.arguments.length = 2 &&
+                cll.arguments.element[0] = some (e: Expression) {
+                  e.kind = ExpressionKind.RealLiteral &&
+                  e.real_literal = 0.0
+                } &&
+                cll.arguments.element[1] = some (e: Expression) {
+                  e.kind = ExpressionKind.Times &&
+                  e.times = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "FORCE_COEFFICIENT"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Minus &&
+                      e.minus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "desired_speed"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "speed"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 0 
+     &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.component_types.element[2] = some (ct: ComponentType) {
+    ct.name = "MeasureSpeed" &&
+    ct.ports.length = 3 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "rotate" &&
+      p.mode = PortMode.In &&
+      p.is_event = true &&
+      p.probe = false &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "second" &&
+      p.mode = PortMode.In &&
+      p.is_event = true &&
+      p.probe = false &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "speed" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 2 &&
+      csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+        sd.name = "nc" &&
+        sd.dtype = IntegerType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.IntLiteral &&
+              e.int_literal = 0
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Plus &&
+              e.plus = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Pre &&
+                  e.pre = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "count"
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.ConditionalExpr &&
+                  e.conditional_expr = some (ite: IfThenElse) {
+                    ite.condition = some (e: Expression) {
+                      e.kind = ExpressionKind.Event &&
+                      e.event = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "rotate"
+                      }
+                    } &&
+                    ite.thenBranch = some (e: Expression) {
+                      e.kind = ExpressionKind.IntLiteral &&
+                      e.int_literal = 1
+                    } &&
+                    ite.elseBranch = some (e: Expression) {
+                      e.kind = ExpressionKind.IntLiteral &&
+                      e.int_literal = 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+        sd.name = "count" &&
+        sd.dtype = IntegerType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.ConditionalExpr &&
+          e.conditional_expr = some (ite: IfThenElse) {
+            ite.condition = some (e: Expression) {
+              e.kind = ExpressionKind.Event &&
+              e.event = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "second"
+              }
+            } &&
+            ite.thenBranch = some (e: Expression) {
+              e.kind = ExpressionKind.IntLiteral &&
+              e.int_literal = 0
+            } &&
+            ite.elseBranch = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "nc"
+            }
+          }
+        }
+      } &&
+      csp.assumes.length = 0 &&
+      csp.guarantees.length = 3 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Speed is initially zero") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Call &&
+          e.call = some (cll: NodeCall) {
+            cll.node = "InitiallyHolds" &&
+            cll.arguments.length = 1 &&
+            cll.arguments.element[0] = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.RealLiteral &&
+                  e.real_literal = 0.0
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Speed is updated every second") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Event &&
+                  e.event = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "second"
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Times &&
+                      e.times = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "K"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.ToReal &&
+                          e.to_real = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "nc"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[2] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Speed stays unchanged when it is not updated") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Not &&
+                  e.not = some (e: Expression) {
+                    e.kind = ExpressionKind.Event &&
+                    e.event = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "second"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "speed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 0 
+     &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.component_types.element[3] = some (ct: ComponentType) {
+    ct.name = "Filter" &&
+    ct.ports.length = 3 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "is_enabled" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "desired_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "filtered_desired_speed" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 1 &&
+      csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+        sd.name = "desired_speed_is_valid" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+              e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "MIN_FILTERED_SPEED"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.LessThanOrEqualTo &&
+              e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "MAX_FILTERED_SPEED"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.assumes.length = 0 &&
+      csp.guarantees.length = 8 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is not enabled, just relay the desired speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "is_enabled"
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "filtered_desired_speed"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled and incomming desired speed is within the expected range, then just relay it to outgoing filtered desired speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "is_enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed_is_valid"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[2] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "is_enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThan &&
+                  e.less_than = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_FILTERED_SPEED"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_FILTERED_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[3] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "is_enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThan &&
+                  e.greater_than = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_FILTERED_SPEED"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_FILTERED_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[4] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "is_enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.BoolLiteral &&
+                  e.bool_literal = true
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "desired_speed"
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.LessThanOrEqualTo &&
+                      e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Plus &&
+                          e.plus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MAX_FILTERED_SPEED"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "filtered_desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[5] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "is_enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.BoolLiteral &&
+                  e.bool_literal = true
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "desired_speed"
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Plus &&
+                          e.plus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MAX_FILTERED_SPEED"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_FILTERED_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[6] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "is_enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.BoolLiteral &&
+                  e.bool_literal = true
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "desired_speed"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                      e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MIN_FILTERED_SPEED"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Minus &&
+                      e.minus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "filtered_desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[7] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "is_enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.BoolLiteral &&
+                  e.bool_literal = true
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "desired_speed"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.LessThan &&
+                      e.less_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "filtered_desired_speed"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "MIN_FILTERED_SPEED"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "filtered_desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_FILTERED_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 0 
+     &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.component_types.element[4] = some (ct: ComponentType) {
+    ct.name = "CruiseControllerSystem" &&
+    ct.ports.length = 13 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "on_off" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "resume_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "set_speed" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[3] = some(p: Port) {
+      p.name = "inc" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[4] = some(p: Port) {
+      p.name = "dec" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[5] = some(p: Port) {
+      p.name = "brake_cancel" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[6] = some(p: Port) {
+      p.name = "rotate" &&
+      p.mode = PortMode.In &&
+      p.is_event = true &&
+      p.probe = false &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[7] = some(p: Port) {
+      p.name = "second" &&
+      p.mode = PortMode.In &&
+      p.is_event = true &&
+      p.probe = false &&
+      p.ptype = mk_none<DataType>
+    } &&
+    ct.ports.element[8] = some(p: Port) {
+      p.name = "filter_is_enabled" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[9] = some(p: Port) {
+      p.name = "force" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[10] = some(p: Port) {
+      p.name = "enabled" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[11] = some(p: Port) {
+      p.name = "speed" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.ports.element[12] = some(p: Port) {
+      p.name = "desired_speed" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 2 &&
+      csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+        sd.name = "disabled" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "enabled"
+          }
+        }
+      } &&
+      csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+        sd.name = "no_button_pressed" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.And &&
+                          e.and = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Not &&
+                              e.not = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "on_off"
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Not &&
+                              e.not = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "resume_speed"
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Not &&
+                          e.not = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "set_speed"
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Not &&
+                      e.not = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "inc"
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Not &&
+                  e.not = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "dec"
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "brake_cancel"
+              }
+            }
+          }
+        }
+      } &&
+      csp.assumes.length = 2 &&
+      csp.assumes.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Buttons are mutually exclusive") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Plus &&
+              e.plus = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Plus &&
+                  e.plus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Plus &&
+                          e.plus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Plus &&
+                              e.plus = some (bo: BinaryOperation) {
+                                bo.lhs_operand = some (e: Expression) {
+                                  e.kind = ExpressionKind.Call &&
+                                  e.call = some (cll: NodeCall) {
+                                    cll.node = "ToInt" &&
+                                    cll.arguments.length = 1 &&
+                                    cll.arguments.element[0] = some (e: Expression) {
+                                      e.kind = ExpressionKind.Id &&
+                                      e.identifier = "on_off"
+                                    }
+                                  }
+                                } &&
+                                bo.rhs_operand = some (e: Expression) {
+                                  e.kind = ExpressionKind.Call &&
+                                  e.call = some (cll: NodeCall) {
+                                    cll.node = "ToInt" &&
+                                    cll.arguments.length = 1 &&
+                                    cll.arguments.element[0] = some (e: Expression) {
+                                      e.kind = ExpressionKind.Id &&
+                                      e.identifier = "resume_speed"
+                                    }
+                                  }
+                                }
+                              }
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Call &&
+                              e.call = some (cll: NodeCall) {
+                                cll.node = "ToInt" &&
+                                cll.arguments.length = 1 &&
+                                cll.arguments.element[0] = some (e: Expression) {
+                                  e.kind = ExpressionKind.Id &&
+                                  e.identifier = "set_speed"
+                                }
+                              }
+                            }
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Call &&
+                          e.call = some (cll: NodeCall) {
+                            cll.node = "ToInt" &&
+                            cll.arguments.length = 1 &&
+                            cll.arguments.element[0] = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "inc"
+                            }
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Call &&
+                      e.call = some (cll: NodeCall) {
+                        cll.node = "ToInt" &&
+                        cll.arguments.length = 1 &&
+                        cll.arguments.element[0] = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "dec"
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Call &&
+                  e.call = some (cll: NodeCall) {
+                    cll.node = "ToInt" &&
+                    cll.arguments.length = 1 &&
+                    cll.arguments.element[0] = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "brake_cancel"
+                    }
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.IntLiteral &&
+              e.int_literal = 1
+            }
+          }
+        }
+      } &&
+      csp.assumes.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Filter status") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "filter_is_enabled"
+          }
+        }
+      } &&
+      csp.guarantees.length = 10 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                  e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_SPEED"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("2. Cruise Controller System with its filter is enabled only if desired speed is within Cruise Controller filtered minimum and maximun speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "enabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                  e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_FILTERED_SPEED"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_FILTERED_SPEED"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[2] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("3. Cruise Controller System with its filter is enabled only if difference between two consecutive desired speeds are not greater than the filter expected difference") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Or &&
+          e.or = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "disabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Call &&
+              e.call = some (cll: NodeCall) {
+                cll.node = "Since" &&
+                cll.arguments.length = 2 &&
+                cll.arguments.element[0] = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "enabled"
+                } &&
+                cll.arguments.element[1] = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Call &&
+                      e.call = some (cll: NodeCall) {
+                        cll.node = "Abs" &&
+                        cll.arguments.length = 1 &&
+                        cll.arguments.element[0] = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "desired_speed"
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Pre &&
+                              e.pre = some (e: Expression) {
+                                e.kind = ExpressionKind.Id &&
+                                e.identifier = "desired_speed"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "FILTER_EXPECTED_DIFFERENCE"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[3] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("4. Cruise Controller System is disabled initially") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Call &&
+          e.call = some (cll: NodeCall) {
+            cll.node = "InitiallyHolds" &&
+            cll.arguments.length = 1 &&
+            cll.arguments.element[0] = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "disabled"
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[4] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("5. When Cruise Controller System is disabled, the desired speed does not get changed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "disabled"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Call &&
+              e.call = some (cll: NodeCall) {
+                cll.node = "UnchangedReal" &&
+                cll.arguments.length = 1 &&
+                cll.arguments.element[0] = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[5] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("6. When Cruise Controller System is enabled and speed increase request does not exceed the maximum cruise controller speed, the desired speed is then increased accordingly") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "enabled"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "inc"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.LessThanOrEqualTo &&
+                      e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Minus &&
+                          e.minus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "MAX_SPEED"
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "SPEED_CHANGE_STEP"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Plus &&
+                      e.plus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[6] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("7. When Cruise Controller System is enabled and speed decrease request does not make desired speed become less than the minimum cruise controller speed, the desired speed is then decreased accordingly") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.BoolLiteral &&
+              e.bool_literal = true
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Implies &&
+              e.implies = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.And &&
+                  e.and = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.And &&
+                      e.and = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "enabled"
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "dec"
+                        }
+                      }
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.GreaterThan &&
+                      e.greater_than = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Plus &&
+                          e.plus = some (bo: BinaryOperation) {
+                            bo.lhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "MIN_SPEED"
+                            } &&
+                            bo.rhs_operand = some (e: Expression) {
+                              e.kind = ExpressionKind.Id &&
+                              e.identifier = "SPEED_CHANGE_STEP"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Minus &&
+                      e.minus = some (bo: BinaryOperation) {
+                        bo.lhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Pre &&
+                          e.pre = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "desired_speed"
+                          }
+                        } &&
+                        bo.rhs_operand = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "SPEED_CHANGE_STEP"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[7] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("8. When Cruise Controller System is enabled and no button is pressed, the desired speed does not get changed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "no_button_pressed"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Call &&
+              e.call = some (cll: NodeCall) {
+                cll.node = "UnchangedReal" &&
+                cll.arguments.length = 1 &&
+                cll.arguments.element[0] = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "desired_speed"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[8] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("9. Force is zero if Cruise Controller System is enabled and the desired speed is not greater than the current speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThanOrEqualTo &&
+                  e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "speed"
+                    }
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "force"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.RealLiteral &&
+                  e.real_literal = 0.0
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[9] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("10. Force is positive if Cruise Controller System is enabled and the desired speed is greater than the current speed") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "enabled"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThan &&
+                  e.greater_than = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "desired_speed"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "speed"
+                    }
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.GreaterThan &&
+              e.greater_than = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "force"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.RealLiteral &&
+                  e.real_literal = 0.0
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 0 
+     &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.dataflow_code = mk_some<LustreProgram>(some (dfm: LustreProgram) {
+    dfm.type_declarations.length = 0 &&
+    dfm.constant_declarations.length = 11 &&
+    dfm.constant_declarations.element[0] = some (ctd: ConstantDeclaration) {
+      ctd.name = "PI" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 3.1416
+      })
+    } &&
+    dfm.constant_declarations.element[1] = some (ctd: ConstantDeclaration) {
+      ctd.name = "ONE_MILE" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 1609.34
+      })
+    } &&
+    dfm.constant_declarations.element[2] = some (ctd: ConstantDeclaration) {
+      ctd.name = "WHEEL_DIAMETER" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 0.52
+      })
+    } &&
+    dfm.constant_declarations.element[3] = some (ctd: ConstantDeclaration) {
+      ctd.name = "K" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.Times &&
+        e.times = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Div &&
+            e.div = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.RealLiteral &&
+                e.real_literal = 3600.0
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "ONE_MILE"
+              }
+            }
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Times &&
+            e.times = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "PI"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "WHEEL_DIAMETER"
+              }
+            }
+          }
+        }
+      })
+    } &&
+    dfm.constant_declarations.element[4] = some (ctd: ConstantDeclaration) {
+      ctd.name = "MIN_SPEED" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 25.0
+      })
+    } &&
+    dfm.constant_declarations.element[5] = some (ctd: ConstantDeclaration) {
+      ctd.name = "MAX_SPEED" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 130.0
+      })
+    } &&
+    dfm.constant_declarations.element[6] = some (ctd: ConstantDeclaration) {
+      ctd.name = "MIN_FILTERED_SPEED" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 20.0
+      })
+    } &&
+    dfm.constant_declarations.element[7] = some (ctd: ConstantDeclaration) {
+      ctd.name = "MAX_FILTERED_SPEED" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 140.0
+      })
+    } &&
+    dfm.constant_declarations.element[8] = some (ctd: ConstantDeclaration) {
+      ctd.name = "FILTER_EXPECTED_DIFFERENCE" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 10.0
+      })
+    } &&
+    dfm.constant_declarations.element[9] = some (ctd: ConstantDeclaration) {
+      ctd.name = "SPEED_CHANGE_STEP" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 1.0
+      })
+    } &&
+    dfm.constant_declarations.element[10] = some (ctd: ConstantDeclaration) {
+      ctd.name = "FORCE_COEFFICIENT" &&
+      ctd.dtype = RealType &&
+      ctd.definition = mk_some<Expression>(some (e: Expression) {
+        e.kind = ExpressionKind.RealLiteral &&
+        e.real_literal = 0.1
+      })
+    } &&
+    dfm.contract_declarations.length = 0 &&
+    dfm.node_declarations.length = 6 &&
+    dfm.node_declarations.element[0] = some (nd: Node) {
+      nd.name = "ToInt" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 1 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "b" &&
+        ip.dtype = BoolType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "i" &&
+        op.dtype = IntegerType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "i" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.ConditionalExpr &&
+            e.conditional_expr = some (ite: IfThenElse) {
+              ite.condition = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "b"
+              } &&
+              ite.thenBranch = some (e: Expression) {
+                e.kind = ExpressionKind.IntLiteral &&
+                e.int_literal = 1
+              } &&
+              ite.elseBranch = some (e: Expression) {
+                e.kind = ExpressionKind.IntLiteral &&
+                e.int_literal = 0
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    } &&
+    dfm.node_declarations.element[1] = some (nd: Node) {
+      nd.name = "Max" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 2 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "a" &&
+        ip.dtype = RealType &&
+        ip.is_constant = false
+      } &&
+      nd.input_parameters.element[1] = some (ip: InputParameter) {
+        ip.name = "b" &&
+        ip.dtype = RealType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "z" &&
+        op.dtype = RealType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "z" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.ConditionalExpr &&
+            e.conditional_expr = some (ite: IfThenElse) {
+              ite.condition = some (e: Expression) {
+                e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "a"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "b"
+                  }
+                }
+              } &&
+              ite.thenBranch = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "a"
+              } &&
+              ite.elseBranch = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "b"
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    } &&
+    dfm.node_declarations.element[2] = some (nd: Node) {
+      nd.name = "UnchangedReal" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 1 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "n" &&
+        ip.dtype = RealType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "b" &&
+        op.dtype = BoolType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "b" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.Arrow &&
+            e.arrow = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.BoolLiteral &&
+                e.bool_literal = true
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Equal &&
+                e.equal = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "n"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Pre &&
+                    e.pre = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "n"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    } &&
+    dfm.node_declarations.element[3] = some (nd: Node) {
+      nd.name = "InitiallyHolds" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 1 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "X" &&
+        ip.dtype = BoolType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "Y" &&
+        op.dtype = BoolType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "Y" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.Arrow &&
+            e.arrow = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "X"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.BoolLiteral &&
+                e.bool_literal = true
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    } &&
+    dfm.node_declarations.element[4] = some (nd: Node) {
+      nd.name = "Abs" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 1 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "x" &&
+        ip.dtype = RealType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "y" &&
+        op.dtype = RealType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "y" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.ConditionalExpr &&
+            e.conditional_expr = some (ite: IfThenElse) {
+              ite.condition = some (e: Expression) {
+                e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+                e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "x"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.RealLiteral &&
+                    e.real_literal = 0.0
+                  }
+                }
+              } &&
+              ite.thenBranch = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "x"
+              } &&
+              ite.elseBranch = some (e: Expression) {
+                e.kind = ExpressionKind.Negative &&
+                e.negative = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "x"
+                }
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    } &&
+    dfm.node_declarations.element[5] = some (nd: Node) {
+      nd.name = "Since" &&
+      nd.is_function = false &&
+      nd.is_main = false &&
+      nd.input_parameters.length = 2 &&
+      nd.input_parameters.element[0] = some (ip: InputParameter) {
+        ip.name = "X" &&
+        ip.dtype = BoolType &&
+        ip.is_constant = false
+      } &&
+      nd.input_parameters.element[1] = some (ip: InputParameter) {
+        ip.name = "Y" &&
+        ip.dtype = BoolType &&
+        ip.is_constant = false
+      } &&
+      nd.output_parameters.length = 1 &&
+      nd.output_parameters.element[0] = some (op: OutputParameter) {
+        op.name = "Z" &&
+        op.dtype = BoolType
+      } &&
+      nd.contract = mk_none<ContractSpec> &&
+      nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+        nb.constant_declarations.length = 0 &&
+        nb.variable_declarations.length = 0 &&
+        nb.assertions.length = 0 &&
+        nb.equations.length = 1 &&
+        nb.equations.element[0] = some (eq: NodeEquation) {
+          eq.lhs.length = 1 &&
+          eq.lhs.element[0] = "Z" &&
+          eq.rhs = some (e: Expression) {
+            e.kind = ExpressionKind.Or &&
+            e.or = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "X"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.And &&
+                e.and = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "Y"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Arrow &&
+                    e.arrow = some (bo: BinaryOperation) {
+                      bo.lhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.BoolLiteral &&
+                        e.bool_literal = false
+                      } &&
+                      bo.rhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Pre &&
+                        e.pre = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        nb.properties.length = 0
+      })
+    }
+  }) &&
+  m.component_impl.length = 1 &&
+  m.component_impl.element[0] = some (ci: ComponentImpl) {
+    ci.name = "CruiseControllerSystem.Impl" &&
+    ci.ctype = m.component_types.element[4] &&
+    ci.kind = ComponentImplKind.Block_Impl &&
+    ci.block_impl = some (imp: BlockImpl) {
+      imp.subcomponents.length = 4 &&
+      imp.subcomponents.element[0] = some (ci: ComponentInstance) {
+        ci.name = "measureSpeed" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[2] &&
+        ci.attributes.length = 42 &&
+         ci.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "zeroize" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "userAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "tamperProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "systemAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[4] = some (ga: GenericAttribute) {
+           ga.name = "supplyChainSecurity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[5] = some (ga: GenericAttribute) {
+           ga.name = "Supply_Chain_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[6] = some (ga: GenericAttribute) {
+           ga.name = "strongCryptoAlgorithms" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[7] = some (ga: GenericAttribute) {
+           ga.name = "staticCodeAnalysis" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[8] = some (ga: GenericAttribute) {
+           ga.name = "Sniffing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[9] = some (ga: GenericAttribute) {
+           ga.name = "secureBoot" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[10] = some (ga: GenericAttribute) {
+           ga.name = "resourceIsolation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[11] = some (ga: GenericAttribute) {
+           ga.name = "resourceAvailability" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[12] = some (ga: GenericAttribute) {
+           ga.name = "removeIdentifyingInformation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[13] = some (ga: GenericAttribute) {
+           ga.name = "remoteAttestation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[14] = some (ga: GenericAttribute) {
+           ga.name = "physicalAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[15] = some (ga: GenericAttribute) {
+           ga.name = "Physical_Theft_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[16] = some (ga: GenericAttribute) {
+           ga.name = "pedigree" &&
+           ga.atype = String &&
+           ga.value = "InternallyDeveloped"
+           
+        } &&
+         ci.attributes.element[17] = some (ga: GenericAttribute) {
+           ga.name = "memoryProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[18] = some (ga: GenericAttribute) {
+           ga.name = "logging" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[19] = some (ga: GenericAttribute) {
+           ga.name = "Interception_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[20] = some (ga: GenericAttribute) {
+           ga.name = "insideTrustedBoundary" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[21] = some (ga: GenericAttribute) {
+           ga.name = "inputValidation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[22] = some (ga: GenericAttribute) {
+           ga.name = "Identity_Spoofing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[23] = some (ga: GenericAttribute) {
+           ga.name = "heterogeneity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[24] = some (ga: GenericAttribute) {
+           ga.name = "hasSensitiveInfo" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[25] = some (ga: GenericAttribute) {
+           ga.name = "Hardware_Integrity_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[26] = some (ga: GenericAttribute) {
+           ga.name = "Flooding_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[27] = some (ga: GenericAttribute) {
+           ga.name = "Fault_Injection_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[28] = some (ga: GenericAttribute) {
+           ga.name = "failSafe" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[29] = some (ga: GenericAttribute) {
+           ga.name = "Excessive_Allocation_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[30] = some (ga: GenericAttribute) {
+           ga.name = "encryptedStorage" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[31] = some (ga: GenericAttribute) {
+           ga.name = "dosProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[32] = some (ga: GenericAttribute) {
+           ga.name = "Configuration_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[33] = some (ga: GenericAttribute) {
+           ga.name = "componentType" &&
+           ga.atype = String &&
+           ga.value = "Hybrid"
+           
+        } &&
+         ci.attributes.element[34] = some (ga: GenericAttribute) {
+           ga.name = "category" &&
+           ga.atype = String &&
+           ga.value = "Unknown"
+           
+        } &&
+         ci.attributes.element[35] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveSWUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[36] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveConfigUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[37] = some (ga: GenericAttribute) {
+           ga.name = "Buffer_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[38] = some (ga: GenericAttribute) {
+           ga.name = "Brute_Force_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[39] = some (ga: GenericAttribute) {
+           ga.name = "auditMessageResponses" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[40] = some (ga: GenericAttribute) {
+           ga.name = "antiJamming" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[41] = some (ga: GenericAttribute) {
+           ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+           ga.atype = Int &&
+           ga.value = "7"
+           
+        }
+      } &&
+      imp.subcomponents.element[1] = some (ci: ComponentInstance) {
+        ci.name = "setSpeed" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[0] &&
+        ci.attributes.length = 42 &&
+         ci.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "zeroize" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "userAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "tamperProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "systemAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[4] = some (ga: GenericAttribute) {
+           ga.name = "supplyChainSecurity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[5] = some (ga: GenericAttribute) {
+           ga.name = "Supply_Chain_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[6] = some (ga: GenericAttribute) {
+           ga.name = "strongCryptoAlgorithms" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[7] = some (ga: GenericAttribute) {
+           ga.name = "staticCodeAnalysis" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[8] = some (ga: GenericAttribute) {
+           ga.name = "Sniffing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[9] = some (ga: GenericAttribute) {
+           ga.name = "secureBoot" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[10] = some (ga: GenericAttribute) {
+           ga.name = "resourceIsolation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[11] = some (ga: GenericAttribute) {
+           ga.name = "resourceAvailability" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[12] = some (ga: GenericAttribute) {
+           ga.name = "removeIdentifyingInformation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[13] = some (ga: GenericAttribute) {
+           ga.name = "remoteAttestation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[14] = some (ga: GenericAttribute) {
+           ga.name = "physicalAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[15] = some (ga: GenericAttribute) {
+           ga.name = "Physical_Theft_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[16] = some (ga: GenericAttribute) {
+           ga.name = "pedigree" &&
+           ga.atype = String &&
+           ga.value = "InternallyDeveloped"
+           
+        } &&
+         ci.attributes.element[17] = some (ga: GenericAttribute) {
+           ga.name = "memoryProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[18] = some (ga: GenericAttribute) {
+           ga.name = "logging" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[19] = some (ga: GenericAttribute) {
+           ga.name = "Interception_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[20] = some (ga: GenericAttribute) {
+           ga.name = "insideTrustedBoundary" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[21] = some (ga: GenericAttribute) {
+           ga.name = "inputValidation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[22] = some (ga: GenericAttribute) {
+           ga.name = "Identity_Spoofing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[23] = some (ga: GenericAttribute) {
+           ga.name = "heterogeneity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[24] = some (ga: GenericAttribute) {
+           ga.name = "hasSensitiveInfo" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[25] = some (ga: GenericAttribute) {
+           ga.name = "Hardware_Integrity_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[26] = some (ga: GenericAttribute) {
+           ga.name = "Flooding_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[27] = some (ga: GenericAttribute) {
+           ga.name = "Fault_Injection_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[28] = some (ga: GenericAttribute) {
+           ga.name = "failSafe" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[29] = some (ga: GenericAttribute) {
+           ga.name = "Excessive_Allocation_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[30] = some (ga: GenericAttribute) {
+           ga.name = "encryptedStorage" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[31] = some (ga: GenericAttribute) {
+           ga.name = "dosProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[32] = some (ga: GenericAttribute) {
+           ga.name = "Configuration_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[33] = some (ga: GenericAttribute) {
+           ga.name = "componentType" &&
+           ga.atype = String &&
+           ga.value = "Hybrid"
+           
+        } &&
+         ci.attributes.element[34] = some (ga: GenericAttribute) {
+           ga.name = "category" &&
+           ga.atype = String &&
+           ga.value = "Unknown"
+           
+        } &&
+         ci.attributes.element[35] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveSWUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[36] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveConfigUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[37] = some (ga: GenericAttribute) {
+           ga.name = "Buffer_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[38] = some (ga: GenericAttribute) {
+           ga.name = "Brute_Force_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[39] = some (ga: GenericAttribute) {
+           ga.name = "auditMessageResponses" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[40] = some (ga: GenericAttribute) {
+           ga.name = "antiJamming" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[41] = some (ga: GenericAttribute) {
+           ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        }
+      } &&
+      imp.subcomponents.element[2] = some (ci: ComponentInstance) {
+        ci.name = "controlSpeed" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[1] &&
+        ci.attributes.length = 42 &&
+         ci.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "zeroize" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "userAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "tamperProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "systemAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[4] = some (ga: GenericAttribute) {
+           ga.name = "supplyChainSecurity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[5] = some (ga: GenericAttribute) {
+           ga.name = "Supply_Chain_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[6] = some (ga: GenericAttribute) {
+           ga.name = "strongCryptoAlgorithms" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[7] = some (ga: GenericAttribute) {
+           ga.name = "staticCodeAnalysis" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[8] = some (ga: GenericAttribute) {
+           ga.name = "Sniffing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[9] = some (ga: GenericAttribute) {
+           ga.name = "secureBoot" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[10] = some (ga: GenericAttribute) {
+           ga.name = "resourceIsolation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[11] = some (ga: GenericAttribute) {
+           ga.name = "resourceAvailability" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[12] = some (ga: GenericAttribute) {
+           ga.name = "removeIdentifyingInformation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[13] = some (ga: GenericAttribute) {
+           ga.name = "remoteAttestation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[14] = some (ga: GenericAttribute) {
+           ga.name = "physicalAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[15] = some (ga: GenericAttribute) {
+           ga.name = "Physical_Theft_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[16] = some (ga: GenericAttribute) {
+           ga.name = "pedigree" &&
+           ga.atype = String &&
+           ga.value = "InternallyDeveloped"
+           
+        } &&
+         ci.attributes.element[17] = some (ga: GenericAttribute) {
+           ga.name = "memoryProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[18] = some (ga: GenericAttribute) {
+           ga.name = "logging" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[19] = some (ga: GenericAttribute) {
+           ga.name = "Interception_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[20] = some (ga: GenericAttribute) {
+           ga.name = "insideTrustedBoundary" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[21] = some (ga: GenericAttribute) {
+           ga.name = "inputValidation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[22] = some (ga: GenericAttribute) {
+           ga.name = "Identity_Spoofing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[23] = some (ga: GenericAttribute) {
+           ga.name = "heterogeneity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[24] = some (ga: GenericAttribute) {
+           ga.name = "hasSensitiveInfo" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[25] = some (ga: GenericAttribute) {
+           ga.name = "Hardware_Integrity_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[26] = some (ga: GenericAttribute) {
+           ga.name = "Flooding_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[27] = some (ga: GenericAttribute) {
+           ga.name = "Fault_Injection_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[28] = some (ga: GenericAttribute) {
+           ga.name = "failSafe" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[29] = some (ga: GenericAttribute) {
+           ga.name = "Excessive_Allocation_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[30] = some (ga: GenericAttribute) {
+           ga.name = "encryptedStorage" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[31] = some (ga: GenericAttribute) {
+           ga.name = "dosProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[32] = some (ga: GenericAttribute) {
+           ga.name = "Configuration_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[33] = some (ga: GenericAttribute) {
+           ga.name = "componentType" &&
+           ga.atype = String &&
+           ga.value = "Hybrid"
+           
+        } &&
+         ci.attributes.element[34] = some (ga: GenericAttribute) {
+           ga.name = "category" &&
+           ga.atype = String &&
+           ga.value = "Unknown"
+           
+        } &&
+         ci.attributes.element[35] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveSWUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[36] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveConfigUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[37] = some (ga: GenericAttribute) {
+           ga.name = "Buffer_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[38] = some (ga: GenericAttribute) {
+           ga.name = "Brute_Force_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[39] = some (ga: GenericAttribute) {
+           ga.name = "auditMessageResponses" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[40] = some (ga: GenericAttribute) {
+           ga.name = "antiJamming" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[41] = some (ga: GenericAttribute) {
+           ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+           ga.atype = Int &&
+           ga.value = "7"
+           
+        }
+      } &&
+      imp.subcomponents.element[3] = some (ci: ComponentInstance) {
+        ci.name = "filter" &&
+        ci.kind = ComponentInstanceKind.Specification &&
+        ci.specification = m.component_types.element[3] &&
+        ci.attributes.length = 42 &&
+         ci.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "zeroize" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "userAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "tamperProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "systemAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[4] = some (ga: GenericAttribute) {
+           ga.name = "supplyChainSecurity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[5] = some (ga: GenericAttribute) {
+           ga.name = "Supply_Chain_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[6] = some (ga: GenericAttribute) {
+           ga.name = "strongCryptoAlgorithms" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[7] = some (ga: GenericAttribute) {
+           ga.name = "staticCodeAnalysis" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[8] = some (ga: GenericAttribute) {
+           ga.name = "Sniffing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[9] = some (ga: GenericAttribute) {
+           ga.name = "secureBoot" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[10] = some (ga: GenericAttribute) {
+           ga.name = "resourceIsolation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[11] = some (ga: GenericAttribute) {
+           ga.name = "resourceAvailability" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[12] = some (ga: GenericAttribute) {
+           ga.name = "removeIdentifyingInformation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[13] = some (ga: GenericAttribute) {
+           ga.name = "remoteAttestation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[14] = some (ga: GenericAttribute) {
+           ga.name = "physicalAccessControl" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[15] = some (ga: GenericAttribute) {
+           ga.name = "Physical_Theft_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[16] = some (ga: GenericAttribute) {
+           ga.name = "pedigree" &&
+           ga.atype = String &&
+           ga.value = "InternallyDeveloped"
+           
+        } &&
+         ci.attributes.element[17] = some (ga: GenericAttribute) {
+           ga.name = "memoryProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[18] = some (ga: GenericAttribute) {
+           ga.name = "logging" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[19] = some (ga: GenericAttribute) {
+           ga.name = "Interception_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[20] = some (ga: GenericAttribute) {
+           ga.name = "insideTrustedBoundary" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[21] = some (ga: GenericAttribute) {
+           ga.name = "inputValidation" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[22] = some (ga: GenericAttribute) {
+           ga.name = "Identity_Spoofing_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[23] = some (ga: GenericAttribute) {
+           ga.name = "heterogeneity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[24] = some (ga: GenericAttribute) {
+           ga.name = "hasSensitiveInfo" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[25] = some (ga: GenericAttribute) {
+           ga.name = "Hardware_Integrity_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[26] = some (ga: GenericAttribute) {
+           ga.name = "Flooding_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[27] = some (ga: GenericAttribute) {
+           ga.name = "Fault_Injection_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[28] = some (ga: GenericAttribute) {
+           ga.name = "failSafe" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[29] = some (ga: GenericAttribute) {
+           ga.name = "Excessive_Allocation_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[30] = some (ga: GenericAttribute) {
+           ga.name = "encryptedStorage" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[31] = some (ga: GenericAttribute) {
+           ga.name = "dosProtection" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[32] = some (ga: GenericAttribute) {
+           ga.name = "Configuration_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[33] = some (ga: GenericAttribute) {
+           ga.name = "componentType" &&
+           ga.atype = String &&
+           ga.value = "Hybrid"
+           
+        } &&
+         ci.attributes.element[34] = some (ga: GenericAttribute) {
+           ga.name = "category" &&
+           ga.atype = String &&
+           ga.value = "Unknown"
+           
+        } &&
+         ci.attributes.element[35] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveSWUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[36] = some (ga: GenericAttribute) {
+           ga.name = "canReceiveConfigUpdate" &&
+           ga.atype = Bool &&
+           ga.value = "true"
+           
+        } &&
+         ci.attributes.element[37] = some (ga: GenericAttribute) {
+           ga.name = "Buffer_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[38] = some (ga: GenericAttribute) {
+           ga.name = "Brute_Force_Attack" &&
+           ga.atype = Bool &&
+           ga.value = "false"
+           
+        } &&
+         ci.attributes.element[39] = some (ga: GenericAttribute) {
+           ga.name = "auditMessageResponses" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[40] = some (ga: GenericAttribute) {
+           ga.name = "antiJamming" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         ci.attributes.element[41] = some (ga: GenericAttribute) {
+           ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+           ga.atype = Int &&
+           ga.value = "7"
+           
+        }
+      } &&
+      imp.connections.length = 17 &&
+      imp.connections.element[0] = some (c: Connection) {
+        c.name = "c01" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[0]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[1] = some (c: Connection) {
+        c.name = "c02" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[1]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[2] = some (c: Connection) {
+        c.name = "c03" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[2]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[2]
+          }
+        }
+      } &&
+      imp.connections.element[3] = some (c: Connection) {
+        c.name = "c04" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[3]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[3]
+          }
+        }
+      } &&
+      imp.connections.element[4] = some (c: Connection) {
+        c.name = "c05" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[4]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[4]
+          }
+        }
+      } &&
+      imp.connections.element[5] = some (c: Connection) {
+        c.name = "c06" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[5]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[5]
+          }
+        }
+      } &&
+      imp.connections.element[6] = some (c: Connection) {
+        c.name = "c07" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[2].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[6]
+          }
+        }
+      } &&
+      imp.connections.element[7] = some (c: Connection) {
+        c.name = "c08" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[2].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[1].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[8] = some (c: Connection) {
+        c.name = "c09" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[8]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[4].ports.element[10]
+        }
+      } &&
+      imp.connections.element[9] = some (c: Connection) {
+        c.name = "c10" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Untrusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[1] &&
+            sp.port = m.component_types.element[0].ports.element[7]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[3].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[10] = some (c: Connection) {
+        c.name = "c11" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[1].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[4].ports.element[9]
+        }
+      } &&
+      imp.connections.element[11] = some (c: Connection) {
+        c.name = "c12" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[6]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[2].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[12] = some (c: Connection) {
+        c.name = "c13" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[7]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[2].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[13] = some (c: Connection) {
+        c.name = "c14" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[3].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[2] &&
+            sp.port = m.component_types.element[1].ports.element[1]
+          }
+        }
+      } &&
+      imp.connections.element[14] = some (c: Connection) {
+        c.name = "c15" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.ComponentCE &&
+          src.component_port = m.component_types.element[4].ports.element[8]
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.SubcomponentCE &&
+          dst.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[3].ports.element[0]
+          }
+        }
+      } &&
+      imp.connections.element[15] = some (c: Connection) {
+        c.name = "v01" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[3] &&
+            sp.port = m.component_types.element[3].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[4].ports.element[12]
+        }
+      } &&
+      imp.connections.element[16] = some (c: Connection) {
+        c.name = "v02" &&
+        c.attributes.length = 4 &&
+         c.attributes.element[0] = some (ga: GenericAttribute) {
+           ga.name = "sessionAuthenticity" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[1] = some (ga: GenericAttribute) {
+           ga.name = "encryptedTransmission" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[2] = some (ga: GenericAttribute) {
+           ga.name = "deviceAuthentication" &&
+           ga.atype = Int &&
+           ga.value = "0"
+           
+        } &&
+         c.attributes.element[3] = some (ga: GenericAttribute) {
+           ga.name = "connectionType" &&
+           ga.atype = String &&
+           ga.value = "Trusted"
+           
+        } &&
+        c.source = some (src: ConnectionEnd) {
+          src.kind = ConnectionEndKind.SubcomponentCE &&
+          src.subcomponent_port = some (sp: CompInstPort) {
+            sp.subcomponent = imp.subcomponents.element[0] &&
+            sp.port = m.component_types.element[2].ports.element[2]
+          }
+        } &&
+        c.destination = some (dst: ConnectionEnd) {
+          dst.kind = ConnectionEndKind.ComponentCE &&
+          dst.component_port = m.component_types.element[4].ports.element[11]
+        }
+      }
+    }
+  } && 
+  m.cyber_requirements.length = 0 
+   && 
+  m.safety_requirements.length = 0 
+   && 
+  m.missions.length = 0 
+  
+};

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<Results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" enabled="mcs,bmc,ind,ind2,ic3,invgents,invgenos,invgenintos,invgenintos" timeout="0.000000" bmc_max="0" compositional="false" modular="false" mcs_category="annotations" mcs_all="false" mcs_only_main_node="false">
+
+
+<Log class="info" source="parse">kind2 v1.2.0-383-g4ff316c1</Log>
+
+
+<AnalysisStart top="UAVToySystem_Impl" concrete="IsBadLocation,HasHappened,FirstTimeHolds,DeliveryManager_Impl,ComputeMAC" abstract="SystemBus,PositionRuntimeMonitor,IMU,GPS,DeliveryDriver,Controller" assumptions=""/>
+
+<AnalysisStop/>
+
+
+
+</Results>

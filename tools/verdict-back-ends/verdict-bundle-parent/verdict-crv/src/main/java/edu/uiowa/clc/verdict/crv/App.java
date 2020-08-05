@@ -18,6 +18,7 @@ import edu.uiowa.clc.verdict.util.LOGGY;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -78,7 +79,8 @@ public class App {
                 // vdm_model = ResourceTest.setup(InputFile);
 
                 // Store VDM in a temporary file
-                VerdictLustreTranslator.marshalToXml(vdm_model, new File(InputFile + ".xml"));
+                //                VerdictLustreTranslator.marshalToXml(vdm_model, new File(InputFile
+                // + ".xml"));
             } else if (fileExt.equals("xml")) {
                 // Use VDM model
                 vdm_model = VerdictLustreTranslator.unmarshalFromXml(vdmFile);
@@ -184,7 +186,27 @@ public class App {
 
         try {
             cmdLine = parser.parse(options, args);
+            if (cmdLine.hasOption("AT")) {
+                ArrayList<String> cmd_args = new ArrayList<String>();
 
+                for (int i = 0; i < args.length; i++) {
+                    cmd_args.add(args[i]);
+                    //                    System.out.println("User Provided Arguments: " + args[i]);
+                }
+
+                String[] cmd_attacks = {
+                    "-LS", "-LB", "-NI", "-SV", "-RI", "-OT", "-IT", "-HT", "-BG"
+                };
+
+                for (int i = 0; i < cmd_attacks.length; i++) {
+                    String atk = cmd_attacks[i];
+                    if (cmd_args.contains(atk) == false) {
+                        cmd_args.add(atk);
+                        //                        System.out.println("Added additional Arguments: "
+                        // + atk);
+                    }
+                }
+            }
         } catch (ParseException exp) {
 
             LOGGY.info("Error:");

@@ -1,0 +1,2501 @@
+package Thermostat;
+
+import iml.utils.*;
+import iml.verdict.*;
+
+model: Model := some (m: Model) {
+  m.name = "Thermostat" &&
+  m.type_declarations.length = 1 &&
+  m.type_declarations.element[0] = some (td: TypeDeclaration) {
+    td.name = "SwitchPosition" &&
+    td.definition = mk_some<DataType>(some (dt: DataType) {
+      dt.kind = DataTypeKind.Enum &&
+      dt.enum_type.length = 3 &&
+      dt.enum_type.element[0] = "Cool" &&
+      dt.enum_type.element[1] = "Off" &&
+      dt.enum_type.element[2] = "Heat"
+    })
+  } &&
+  m.component_types.length = 3 &&
+  m.component_types.element[0] = some (ct: ComponentType) {
+    ct.name = "SetDesiredTemperature" &&
+    ct.ports.length = 3 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "up_button" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[1] = some(p: Port) {
+      p.name = "down_button" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(BoolType)
+    } &&
+    ct.ports.element[2] = some(p: Port) {
+      p.name = "setpoint" &&
+      p.mode = PortMode.Out &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(RealType)
+    } &&
+    ct.compCateg = mk_some<String>("system") &&
+    ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+      csp.constant_declarations.length = 0 &&
+      csp.variable_declarations.length = 3 &&
+      csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+        sd.name = "prev_setpoint" &&
+        sd.dtype = RealType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.Arrow &&
+          e.arrow = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "INITIAL_TEMPERATURE"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Pre &&
+              e.pre = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "setpoint"
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+        sd.name = "increment_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "up_button"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.LessThanOrEqualTo &&
+              e.less_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "prev_setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Minus &&
+                  e.minus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MAX_TEMPERATURE"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DIFF"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.variable_declarations.element[2] = some (sd: SymbolDefinition) {
+        sd.name = "decrement_condition" &&
+        sd.dtype = BoolType &&
+        sd.definition = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "down_button"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.GreaterThanOrEqualTo &&
+              e.greater_than_or_equal_to = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "prev_setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Plus &&
+                  e.plus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "MIN_TEMPERATURE"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DIFF"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.assumes.length = 1 &&
+      csp.assumes.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Up/Down button signals are mutually exclusive") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.And &&
+            e.and = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "up_button"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "down_button"
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.length = 3 &&
+      csp.guarantees.element[0] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Setpoint increment") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "increment_condition"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Plus &&
+                  e.plus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "prev_setpoint"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DIFF"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[1] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Setpoint decrement") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "decrement_condition"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Minus &&
+                  e.minus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "prev_setpoint"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DIFF"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.guarantees.element[2] = some (ci: ContractItem) {
+        ci.name = mk_some<Identifier>("Setpoint invariance") &&
+        ci.expression = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Or &&
+                e.or = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "increment_condition"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "decrement_condition"
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "prev_setpoint"
+                }
+              }
+            }
+          }
+        }
+      } &&
+      csp.modes.length = 0 &&
+      csp.imports.length = 0
+    }) &&
+    ct.cyber_relations.length = 1 &&
+    ct.cyber_relations.element[0] = some (rel: CyberRel) {
+      rel.id = "heat_signal_out_I" &&
+      rel.output = some (port: CIAPort) {
+        port.name = "setpoint" &&
+        port.cia = CIA.Integrity
+        } &&
+      rel.inputs = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Or &&
+        expr.or.length = 2 &&
+        expr.or.element[0] = some (expr: CyberExpr) {
+          expr.kind = CyberExprKind.Port &&
+          expr.port = some (port: CIAPort) {
+            port.name = "down_button" &&
+            port.cia = CIA.Integrity
+            }
+          }
+           &&
+        expr.or.element[1] = some (expr: CyberExpr) {
+          expr.kind = CyberExprKind.Port &&
+          expr.port = some (port: CIAPort) {
+            port.name = "up_button" &&
+            port.cia = CIA.Integrity
+            }
+          }
+          }
+         &&
+      rel.comment = "" &&
+      rel.description = "" &&
+      rel.phases = "" &&
+      rel.extern = ""
+      
+    } &&
+    ct.safety_relations.length = 0 
+     &&
+    ct.safety_events.length = 0 
+    
+  } &&
+  m.component_types.element[1] = some (ct: ComponentType) {
+    ct.name = "ControlTemperature" &&
+    ct.ports.length = 5 &&
+    ct.ports.element[0] = some(p: Port) {
+      p.name = "switch" &&
+      p.mode = PortMode.In &&
+      p.is_event = false &&
+      p.probe = false &&
+      p.ptype = mk_some<DataType>(some (dt: DataType) {
+        dt.kind = DataTypeKind.UserDefined &&
+        dt.user_defined_type = m.type_declarations.element[0]
+    })
+  } &&
+  ct.ports.element[1] = some(p: Port) {
+    p.name = "current_temperature" &&
+    p.mode = PortMode.In &&
+    p.is_event = false &&
+    p.probe = false &&
+    p.ptype = mk_some<DataType>(RealType)
+  } &&
+  ct.ports.element[2] = some(p: Port) {
+    p.name = "setpoint" &&
+    p.mode = PortMode.In &&
+    p.is_event = false &&
+    p.probe = false &&
+    p.ptype = mk_some<DataType>(RealType)
+  } &&
+  ct.ports.element[3] = some(p: Port) {
+    p.name = "cool_act_signal" &&
+    p.mode = PortMode.Out &&
+    p.is_event = false &&
+    p.probe = false &&
+    p.ptype = mk_some<DataType>(BoolType)
+  } &&
+  ct.ports.element[4] = some(p: Port) {
+    p.name = "heat_act_signal" &&
+    p.mode = PortMode.Out &&
+    p.is_event = false &&
+    p.probe = false &&
+    p.ptype = mk_some<DataType>(BoolType)
+  } &&
+  ct.compCateg = mk_some<String>("system") &&
+  ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+    csp.constant_declarations.length = 0 &&
+    csp.variable_declarations.length = 5 &&
+    csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+      sd.name = "cooling_start_condition" &&
+      sd.dtype = BoolType &&
+      sd.definition = some (e: Expression) {
+        e.kind = ExpressionKind.And &&
+        e.and = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Equal &&
+            e.equal = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "switch"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "Cool"
+              }
+            }
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.GreaterThan &&
+            e.greater_than = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "current_temperature"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Plus &&
+                e.plus = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "setpoint"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "DEADBAND"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } &&
+    csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+      sd.name = "cool_mode" &&
+      sd.dtype = BoolType &&
+      sd.definition = some (e: Expression) {
+        e.kind = ExpressionKind.Arrow &&
+        e.arrow = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "cooling_start_condition"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Or &&
+            e.or = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "cooling_start_condition"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.And &&
+                e.and = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.And &&
+                    e.and = some (bo: BinaryOperation) {
+                      bo.lhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Pre &&
+                        e.pre = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "cool_mode"
+                        }
+                      } &&
+                      bo.rhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Equal &&
+                        e.equal = some (bo: BinaryOperation) {
+                          bo.lhs_operand = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "switch"
+                          } &&
+                          bo.rhs_operand = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "Cool"
+                          }
+                        }
+                      }
+                    }
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.GreaterThan &&
+                    e.greater_than = some (bo: BinaryOperation) {
+                      bo.lhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "current_temperature"
+                      } &&
+                      bo.rhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "setpoint"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } &&
+    csp.variable_declarations.element[2] = some (sd: SymbolDefinition) {
+      sd.name = "heating_start_condition" &&
+      sd.dtype = BoolType &&
+      sd.definition = some (e: Expression) {
+        e.kind = ExpressionKind.And &&
+        e.and = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Equal &&
+            e.equal = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "switch"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "Heat"
+              }
+            }
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.LessThan &&
+            e.less_than = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "current_temperature"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Minus &&
+                e.minus = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "setpoint"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "DEADBAND"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } &&
+    csp.variable_declarations.element[3] = some (sd: SymbolDefinition) {
+      sd.name = "heat_mode" &&
+      sd.dtype = BoolType &&
+      sd.definition = some (e: Expression) {
+        e.kind = ExpressionKind.Arrow &&
+        e.arrow = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "heating_start_condition"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Or &&
+            e.or = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "heating_start_condition"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.And &&
+                e.and = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.And &&
+                    e.and = some (bo: BinaryOperation) {
+                      bo.lhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Pre &&
+                        e.pre = some (e: Expression) {
+                          e.kind = ExpressionKind.Id &&
+                          e.identifier = "heat_mode"
+                        }
+                      } &&
+                      bo.rhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Equal &&
+                        e.equal = some (bo: BinaryOperation) {
+                          bo.lhs_operand = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "switch"
+                          } &&
+                          bo.rhs_operand = some (e: Expression) {
+                            e.kind = ExpressionKind.Id &&
+                            e.identifier = "Heat"
+                          }
+                        }
+                      }
+                    }
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.LessThan &&
+                    e.less_than = some (bo: BinaryOperation) {
+                      bo.lhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "current_temperature"
+                      } &&
+                      bo.rhs_operand = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "setpoint"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } &&
+    csp.variable_declarations.element[4] = some (sd: SymbolDefinition) {
+      sd.name = "off_mode" &&
+      sd.dtype = BoolType &&
+      sd.definition = some (e: Expression) {
+        e.kind = ExpressionKind.And &&
+        e.and = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Not &&
+            e.not = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "cool_mode"
+            }
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Not &&
+            e.not = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "heat_mode"
+            }
+          }
+        }
+      }
+    } &&
+    csp.assumes.length = 0 &&
+    csp.guarantees.length = 2 &&
+    csp.guarantees.element[0] = some (ci: ContractItem) {
+      ci.name = mk_some<Identifier>("Cooling activation") &&
+      ci.expression = some (e: Expression) {
+        e.kind = ExpressionKind.Equal &&
+        e.equal = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "cool_act_signal"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "cool_mode"
+          }
+        }
+      }
+    } &&
+    csp.guarantees.element[1] = some (ci: ContractItem) {
+      ci.name = mk_some<Identifier>("Heating activation") &&
+      ci.expression = some (e: Expression) {
+        e.kind = ExpressionKind.Equal &&
+        e.equal = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "heat_act_signal"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "heat_mode"
+          }
+        }
+      }
+    } &&
+    csp.modes.length = 0 &&
+    csp.imports.length = 0
+  }) &&
+  ct.cyber_relations.length = 2 &&
+  ct.cyber_relations.element[0] = some (rel: CyberRel) {
+    rel.id = "cool_signal_out_I" &&
+    rel.output = some (port: CIAPort) {
+      port.name = "cool_act_signal" &&
+      port.cia = CIA.Integrity
+      } &&
+    rel.inputs = some (expr: CyberExpr) {
+      expr.kind = CyberExprKind.Or &&
+      expr.or.length = 3 &&
+      expr.or.element[0] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "switch" &&
+          port.cia = CIA.Integrity
+          }
+        }
+         &&
+      expr.or.element[1] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "current_temperature" &&
+          port.cia = CIA.Integrity
+          }
+        }
+         &&
+      expr.or.element[2] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "setpoint" &&
+          port.cia = CIA.Integrity
+          }
+        }
+        }
+       &&
+    rel.comment = "" &&
+    rel.description = "" &&
+    rel.phases = "" &&
+    rel.extern = ""
+    
+  } &&
+  ct.cyber_relations.element[1] = some (rel: CyberRel) {
+    rel.id = "heat_signal_out_I" &&
+    rel.output = some (port: CIAPort) {
+      port.name = "heat_act_signal" &&
+      port.cia = CIA.Integrity
+      } &&
+    rel.inputs = some (expr: CyberExpr) {
+      expr.kind = CyberExprKind.Or &&
+      expr.or.length = 3 &&
+      expr.or.element[0] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "switch" &&
+          port.cia = CIA.Integrity
+          }
+        }
+         &&
+      expr.or.element[1] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "current_temperature" &&
+          port.cia = CIA.Integrity
+          }
+        }
+         &&
+      expr.or.element[2] = some (expr: CyberExpr) {
+        expr.kind = CyberExprKind.Port &&
+        expr.port = some (port: CIAPort) {
+          port.name = "setpoint" &&
+          port.cia = CIA.Integrity
+          }
+        }
+        }
+       &&
+    rel.comment = "" &&
+    rel.description = "" &&
+    rel.phases = "" &&
+    rel.extern = ""
+    
+  } &&
+  ct.safety_relations.length = 0 
+   &&
+  ct.safety_events.length = 0 
+  
+} &&
+m.component_types.element[2] = some (ct: ComponentType) {
+  ct.name = "ThermostatController" &&
+  ct.ports.length = 7 &&
+  ct.ports.element[0] = some(p: Port) {
+    p.name = "switch" &&
+    p.mode = PortMode.In &&
+    p.is_event = false &&
+    p.probe = false &&
+    p.ptype = mk_some<DataType>(some (dt: DataType) {
+      dt.kind = DataTypeKind.UserDefined &&
+      dt.user_defined_type = m.type_declarations.element[0]
+  })
+} &&
+ct.ports.element[1] = some(p: Port) {
+  p.name = "up_button" &&
+  p.mode = PortMode.In &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(BoolType)
+} &&
+ct.ports.element[2] = some(p: Port) {
+  p.name = "down_button" &&
+  p.mode = PortMode.In &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(BoolType)
+} &&
+ct.ports.element[3] = some(p: Port) {
+  p.name = "current_temperature" &&
+  p.mode = PortMode.In &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(RealType)
+} &&
+ct.ports.element[4] = some(p: Port) {
+  p.name = "cool_act_signal" &&
+  p.mode = PortMode.Out &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(BoolType)
+} &&
+ct.ports.element[5] = some(p: Port) {
+  p.name = "heat_act_signal" &&
+  p.mode = PortMode.Out &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(BoolType)
+} &&
+ct.ports.element[6] = some(p: Port) {
+  p.name = "setpoint" &&
+  p.mode = PortMode.Out &&
+  p.is_event = false &&
+  p.probe = false &&
+  p.ptype = mk_some<DataType>(RealType)
+} &&
+ct.compCateg = mk_some<String>("system") &&
+ct.contract = mk_some<ContractSpec>(some (csp: ContractSpec) {
+  csp.constant_declarations.length = 0 &&
+  csp.variable_declarations.length = 2 &&
+  csp.variable_declarations.element[0] = some (sd: SymbolDefinition) {
+    sd.name = "current_temperature_in_deadzone" &&
+    sd.dtype = BoolType &&
+    sd.definition = some (e: Expression) {
+      e.kind = ExpressionKind.And &&
+      e.and = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Minus &&
+              e.minus = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "DEADBAND"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "current_temperature"
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "current_temperature"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Plus &&
+              e.plus = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "setpoint"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "DEADBAND"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.variable_declarations.element[1] = some (sd: SymbolDefinition) {
+    sd.name = "system_is_off" &&
+    sd.dtype = BoolType &&
+    sd.definition = some (e: Expression) {
+      e.kind = ExpressionKind.And &&
+      e.and = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "cool_act_signal"
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "heat_act_signal"
+          }
+        }
+      }
+    }
+  } &&
+  csp.assumes.length = 1 &&
+  csp.assumes.element[0] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Up/Down button signals are mutually exclusive") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Not &&
+      e.not = some (e: Expression) {
+        e.kind = ExpressionKind.And &&
+        e.and = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "up_button"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "down_button"
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.length = 17 &&
+  csp.guarantees.element[0] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Initial temperature is in range") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.And &&
+      e.and = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "MIN_TEMPERATURE"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "INITIAL_TEMPERATURE"
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "INITIAL_TEMPERATURE"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "MAX_TEMPERATURE"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[1] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Deadband and Diff are positive values") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.And &&
+      e.and = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThan &&
+          e.greater_than = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "DEADBAND"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.RealLiteral &&
+              e.real_literal = 0.0
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThan &&
+          e.greater_than = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "DIFF"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.RealLiteral &&
+              e.real_literal = 0.0
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[2] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("No activation signal is enabled if switch is in Off") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Equal &&
+          e.equal = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "switch"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "Off"
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "cool_act_signal"
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "heat_act_signal"
+              }
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[3] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Cooling system is turned On only if switch is in Cool") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "cool_act_signal"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Equal &&
+          e.equal = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "switch"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "Cool"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[4] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Heating system is turned On only if switch is in Heat") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "heat_act_signal"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Equal &&
+          e.equal = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "switch"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "Heat"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[5] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Activation signals are never enabled at the same time") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Not &&
+      e.not = some (e: Expression) {
+        e.kind = ExpressionKind.And &&
+        e.and = some (bo: BinaryOperation) {
+          bo.lhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "cool_act_signal"
+          } &&
+          bo.rhs_operand = some (e: Expression) {
+            e.kind = ExpressionKind.Id &&
+            e.identifier = "heat_act_signal"
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[6] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Setpoint is always in range") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.And &&
+      e.and = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "MIN_TEMPERATURE"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setpoint"
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThanOrEqualTo &&
+          e.less_than_or_equal_to = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setpoint"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "MAX_TEMPERATURE"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[7] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Setpoint doesn't change if no button is pressed") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "up_button"
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Not &&
+              e.not = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "down_button"
+              }
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Equal &&
+          e.equal = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setpoint"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Arrow &&
+              e.arrow = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "INITIAL_TEMPERATURE"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Pre &&
+                  e.pre = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "setpoint"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[8] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Setpoint doesn't decrease if the up button is pressed") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "up_button"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.LessThan &&
+            e.less_than = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "setpoint"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Arrow &&
+                e.arrow = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "INITIAL_TEMPERATURE"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Pre &&
+                    e.pre = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[9] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Setpoint doesn't increase if the down button is pressed") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "down_button"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Not &&
+          e.not = some (e: Expression) {
+            e.kind = ExpressionKind.GreaterThan &&
+            e.greater_than = some (bo: BinaryOperation) {
+              bo.lhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Id &&
+                e.identifier = "setpoint"
+              } &&
+              bo.rhs_operand = some (e: Expression) {
+                e.kind = ExpressionKind.Arrow &&
+                e.arrow = some (bo: BinaryOperation) {
+                  bo.lhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "INITIAL_TEMPERATURE"
+                  } &&
+                  bo.rhs_operand = some (e: Expression) {
+                    e.kind = ExpressionKind.Pre &&
+                    e.pre = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[10] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("System is Off if current temperature is in the dead zone and system was Off in the previous step") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Arrow &&
+      e.arrow = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.BoolLiteral &&
+          e.bool_literal = true
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Implies &&
+          e.implies = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "current_temperature_in_deadzone"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Pre &&
+                  e.pre = some (e: Expression) {
+                    e.kind = ExpressionKind.Id &&
+                    e.identifier = "system_is_off"
+                  }
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "system_is_off"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[11] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Cooling system is On only if current temperature is higher than setpoint") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "cool_act_signal"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.GreaterThan &&
+          e.greater_than = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "current_temperature"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setpoint"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[12] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Heating system is On only if current temperature is lower than setpoint") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "heat_act_signal"
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.LessThan &&
+          e.less_than = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "current_temperature"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "setpoint"
+            }
+          }
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[13] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Cooling system is On if switch is in Cool and temperature is higher than setpoint plus deadband") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "switch"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "Cool"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.GreaterThan &&
+              e.greater_than = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "current_temperature"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Plus &&
+                  e.plus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DEADBAND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "cool_act_signal"
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[14] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Heating system is On if switch is in Heat and temperature is lower than setpoint minus deadband") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.And &&
+          e.and = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Equal &&
+              e.equal = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "switch"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "Heat"
+                }
+              }
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.LessThan &&
+              e.less_than = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "current_temperature"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Minus &&
+                  e.minus = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "DEADBAND"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "heat_act_signal"
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[15] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Once cooling system is On, it remains On as long as setpoint hasn't reached and switch is in Cool") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Call &&
+          e.call = some (cll: NodeCall) {
+            cll.node = "Since" &&
+            cll.arguments.length = 2 &&
+            cll.arguments.element[0] = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "cool_act_signal"
+            } &&
+            cll.arguments.element[1] = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "switch"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "Cool"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.GreaterThan &&
+                  e.greater_than = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "current_temperature"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "cool_act_signal"
+        }
+      }
+    }
+  } &&
+  csp.guarantees.element[16] = some (ci: ContractItem) {
+    ci.name = mk_some<Identifier>("Once heating system is On, it remains On as long as setpoint hasn't reached and switch is in Heat") &&
+    ci.expression = some (e: Expression) {
+      e.kind = ExpressionKind.Implies &&
+      e.implies = some (bo: BinaryOperation) {
+        bo.lhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Call &&
+          e.call = some (cll: NodeCall) {
+            cll.node = "Since" &&
+            cll.arguments.length = 2 &&
+            cll.arguments.element[0] = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "heat_act_signal"
+            } &&
+            cll.arguments.element[1] = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Equal &&
+                  e.equal = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "switch"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "Heat"
+                    }
+                  }
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.LessThan &&
+                  e.less_than = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "current_temperature"
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Id &&
+                      e.identifier = "setpoint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } &&
+        bo.rhs_operand = some (e: Expression) {
+          e.kind = ExpressionKind.Id &&
+          e.identifier = "heat_act_signal"
+        }
+      }
+    }
+  } &&
+  csp.modes.length = 0 &&
+  csp.imports.length = 0
+}) &&
+ct.cyber_relations.length = 0 
+ &&
+ct.safety_relations.length = 0 
+ &&
+ct.safety_events.length = 0 
+} &&
+m.dataflow_code = mk_some<LustreProgram>(some (dfm: LustreProgram) {
+  dfm.type_declarations.length = 0 &&
+  dfm.constant_declarations.length = 5 &&
+  dfm.constant_declarations.element[0] = some (ctd: ConstantDeclaration) {
+    ctd.name = "MIN_TEMPERATURE" &&
+    ctd.dtype = RealType &&
+    ctd.definition = mk_some<Expression>(some (e: Expression) {
+      e.kind = ExpressionKind.RealLiteral &&
+      e.real_literal = 40.0
+    })
+  } &&
+  dfm.constant_declarations.element[1] = some (ctd: ConstantDeclaration) {
+    ctd.name = "MAX_TEMPERATURE" &&
+    ctd.dtype = RealType &&
+    ctd.definition = mk_some<Expression>(some (e: Expression) {
+      e.kind = ExpressionKind.RealLiteral &&
+      e.real_literal = 100.0
+    })
+  } &&
+  dfm.constant_declarations.element[2] = some (ctd: ConstantDeclaration) {
+    ctd.name = "INITIAL_TEMPERATURE" &&
+    ctd.dtype = RealType &&
+    ctd.definition = mk_some<Expression>(some (e: Expression) {
+      e.kind = ExpressionKind.RealLiteral &&
+      e.real_literal = 70.0
+    })
+  } &&
+  dfm.constant_declarations.element[3] = some (ctd: ConstantDeclaration) {
+    ctd.name = "DEADBAND" &&
+    ctd.dtype = RealType &&
+    ctd.definition = mk_some<Expression>(some (e: Expression) {
+      e.kind = ExpressionKind.RealLiteral &&
+      e.real_literal = 3.0
+    })
+  } &&
+  dfm.constant_declarations.element[4] = some (ctd: ConstantDeclaration) {
+    ctd.name = "DIFF" &&
+    ctd.dtype = RealType &&
+    ctd.definition = mk_some<Expression>(some (e: Expression) {
+      e.kind = ExpressionKind.RealLiteral &&
+      e.real_literal = 1.0
+    })
+  } &&
+  dfm.contract_declarations.length = 0 &&
+  dfm.node_declarations.length = 1 &&
+  dfm.node_declarations.element[0] = some (nd: Node) {
+    nd.name = "Since" &&
+    nd.is_function = false &&
+    nd.is_main = false &&
+    nd.input_parameters.length = 2 &&
+    nd.input_parameters.element[0] = some (ip: InputParameter) {
+      ip.name = "X" &&
+      ip.dtype = BoolType &&
+      ip.is_constant = false
+    } &&
+    nd.input_parameters.element[1] = some (ip: InputParameter) {
+      ip.name = "Y" &&
+      ip.dtype = BoolType &&
+      ip.is_constant = false
+    } &&
+    nd.output_parameters.length = 1 &&
+    nd.output_parameters.element[0] = some (op: OutputParameter) {
+      op.name = "Z" &&
+      op.dtype = BoolType
+    } &&
+    nd.contract = mk_none<ContractSpec> &&
+    nd.body = mk_some<NodeBody>(some (nb: NodeBody) {
+      nb.constant_declarations.length = 0 &&
+      nb.variable_declarations.length = 0 &&
+      nb.assertions.length = 0 &&
+      nb.equations.length = 1 &&
+      nb.equations.element[0] = some (eq: NodeEquation) {
+        eq.lhs.length = 1 &&
+        eq.lhs.element[0] = "Z" &&
+        eq.rhs = some (e: Expression) {
+          e.kind = ExpressionKind.Or &&
+          e.or = some (bo: BinaryOperation) {
+            bo.lhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.Id &&
+              e.identifier = "X"
+            } &&
+            bo.rhs_operand = some (e: Expression) {
+              e.kind = ExpressionKind.And &&
+              e.and = some (bo: BinaryOperation) {
+                bo.lhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Id &&
+                  e.identifier = "Y"
+                } &&
+                bo.rhs_operand = some (e: Expression) {
+                  e.kind = ExpressionKind.Arrow &&
+                  e.arrow = some (bo: BinaryOperation) {
+                    bo.lhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.BoolLiteral &&
+                      e.bool_literal = false
+                    } &&
+                    bo.rhs_operand = some (e: Expression) {
+                      e.kind = ExpressionKind.Pre &&
+                      e.pre = some (e: Expression) {
+                        e.kind = ExpressionKind.Id &&
+                        e.identifier = "Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } &&
+      nb.properties.length = 0
+    })
+  }}) &&m.component_impl.length = 1 &&
+m.component_impl.element[0] = some (ci: ComponentImpl) {
+  ci.name = "ThermostatController.Impl" &&
+  ci.ctype = m.component_types.element[2] &&
+  ci.kind = ComponentImplKind.Block_Impl &&
+  ci.block_impl = some (imp: BlockImpl) {
+    imp.subcomponents.length = 2 &&
+    imp.subcomponents.element[0] = some (ci: ComponentInstance) {
+      ci.name = "set_desired_temperature" &&
+      ci.kind = ComponentInstanceKind.Specification &&
+      ci.specification = m.component_types.element[0] &&
+      ci.attributes.length = 42 &&
+       ci.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "zeroize" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "userAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "tamperProtection" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "systemAccessControl" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[4] = some (ga: GenericAttribute) {
+         ga.name = "supplyChainSecurity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[5] = some (ga: GenericAttribute) {
+         ga.name = "Supply_Chain_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[6] = some (ga: GenericAttribute) {
+         ga.name = "strongCryptoAlgorithms" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[7] = some (ga: GenericAttribute) {
+         ga.name = "staticCodeAnalysis" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[8] = some (ga: GenericAttribute) {
+         ga.name = "Sniffing_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[9] = some (ga: GenericAttribute) {
+         ga.name = "secureBoot" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[10] = some (ga: GenericAttribute) {
+         ga.name = "resourceIsolation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[11] = some (ga: GenericAttribute) {
+         ga.name = "resourceAvailability" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[12] = some (ga: GenericAttribute) {
+         ga.name = "removeIdentifyingInformation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[13] = some (ga: GenericAttribute) {
+         ga.name = "remoteAttestation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[14] = some (ga: GenericAttribute) {
+         ga.name = "physicalAccessControl" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[15] = some (ga: GenericAttribute) {
+         ga.name = "Physical_Theft_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[16] = some (ga: GenericAttribute) {
+         ga.name = "pedigree" &&
+         ga.atype = String &&
+         ga.value = "COTS"
+         
+      } &&
+       ci.attributes.element[17] = some (ga: GenericAttribute) {
+         ga.name = "memoryProtection" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[18] = some (ga: GenericAttribute) {
+         ga.name = "logging" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[19] = some (ga: GenericAttribute) {
+         ga.name = "Interception_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[20] = some (ga: GenericAttribute) {
+         ga.name = "insideTrustedBoundary" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[21] = some (ga: GenericAttribute) {
+         ga.name = "inputValidation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[22] = some (ga: GenericAttribute) {
+         ga.name = "Identity_Spoofing_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[23] = some (ga: GenericAttribute) {
+         ga.name = "heterogeneity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[24] = some (ga: GenericAttribute) {
+         ga.name = "hasSensitiveInfo" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[25] = some (ga: GenericAttribute) {
+         ga.name = "Hardware_Integrity_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[26] = some (ga: GenericAttribute) {
+         ga.name = "Flooding_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[27] = some (ga: GenericAttribute) {
+         ga.name = "Fault_Injection_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[28] = some (ga: GenericAttribute) {
+         ga.name = "failSafe" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[29] = some (ga: GenericAttribute) {
+         ga.name = "Excessive_Allocation_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[30] = some (ga: GenericAttribute) {
+         ga.name = "encryptedStorage" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[31] = some (ga: GenericAttribute) {
+         ga.name = "dosProtection" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[32] = some (ga: GenericAttribute) {
+         ga.name = "Configuration_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[33] = some (ga: GenericAttribute) {
+         ga.name = "componentType" &&
+         ga.atype = String &&
+         ga.value = "Hybrid"
+         
+      } &&
+       ci.attributes.element[34] = some (ga: GenericAttribute) {
+         ga.name = "category" &&
+         ga.atype = String &&
+         ga.value = "Unknown"
+         
+      } &&
+       ci.attributes.element[35] = some (ga: GenericAttribute) {
+         ga.name = "canReceiveSWUpdate" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[36] = some (ga: GenericAttribute) {
+         ga.name = "canReceiveConfigUpdate" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[37] = some (ga: GenericAttribute) {
+         ga.name = "Buffer_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[38] = some (ga: GenericAttribute) {
+         ga.name = "Brute_Force_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[39] = some (ga: GenericAttribute) {
+         ga.name = "auditMessageResponses" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[40] = some (ga: GenericAttribute) {
+         ga.name = "antiJamming" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[41] = some (ga: GenericAttribute) {
+         ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      }
+    } &&
+    imp.subcomponents.element[1] = some (ci: ComponentInstance) {
+      ci.name = "control_temperature" &&
+      ci.kind = ComponentInstanceKind.Specification &&
+      ci.specification = m.component_types.element[1] &&
+      ci.attributes.length = 42 &&
+       ci.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "zeroize" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "userAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "tamperProtection" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "systemAccessControl" &&
+         ga.atype = Int &&
+         ga.value = "3"
+         
+      } &&
+       ci.attributes.element[4] = some (ga: GenericAttribute) {
+         ga.name = "supplyChainSecurity" &&
+         ga.atype = Int &&
+         ga.value = "3"
+         
+      } &&
+       ci.attributes.element[5] = some (ga: GenericAttribute) {
+         ga.name = "Supply_Chain_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[6] = some (ga: GenericAttribute) {
+         ga.name = "strongCryptoAlgorithms" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[7] = some (ga: GenericAttribute) {
+         ga.name = "staticCodeAnalysis" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[8] = some (ga: GenericAttribute) {
+         ga.name = "Sniffing_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[9] = some (ga: GenericAttribute) {
+         ga.name = "secureBoot" &&
+         ga.atype = Int &&
+         ga.value = "3"
+         
+      } &&
+       ci.attributes.element[10] = some (ga: GenericAttribute) {
+         ga.name = "resourceIsolation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[11] = some (ga: GenericAttribute) {
+         ga.name = "resourceAvailability" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[12] = some (ga: GenericAttribute) {
+         ga.name = "removeIdentifyingInformation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[13] = some (ga: GenericAttribute) {
+         ga.name = "remoteAttestation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[14] = some (ga: GenericAttribute) {
+         ga.name = "physicalAccessControl" &&
+         ga.atype = Int &&
+         ga.value = "3"
+         
+      } &&
+       ci.attributes.element[15] = some (ga: GenericAttribute) {
+         ga.name = "Physical_Theft_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[16] = some (ga: GenericAttribute) {
+         ga.name = "pedigree" &&
+         ga.atype = String &&
+         ga.value = "COTS"
+         
+      } &&
+       ci.attributes.element[17] = some (ga: GenericAttribute) {
+         ga.name = "memoryProtection" &&
+         ga.atype = Int &&
+         ga.value = "3"
+         
+      } &&
+       ci.attributes.element[18] = some (ga: GenericAttribute) {
+         ga.name = "logging" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[19] = some (ga: GenericAttribute) {
+         ga.name = "Interception_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[20] = some (ga: GenericAttribute) {
+         ga.name = "insideTrustedBoundary" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[21] = some (ga: GenericAttribute) {
+         ga.name = "inputValidation" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[22] = some (ga: GenericAttribute) {
+         ga.name = "Identity_Spoofing_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[23] = some (ga: GenericAttribute) {
+         ga.name = "heterogeneity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[24] = some (ga: GenericAttribute) {
+         ga.name = "hasSensitiveInfo" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[25] = some (ga: GenericAttribute) {
+         ga.name = "Hardware_Integrity_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[26] = some (ga: GenericAttribute) {
+         ga.name = "Flooding_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[27] = some (ga: GenericAttribute) {
+         ga.name = "Fault_Injection_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[28] = some (ga: GenericAttribute) {
+         ga.name = "failSafe" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[29] = some (ga: GenericAttribute) {
+         ga.name = "Excessive_Allocation_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[30] = some (ga: GenericAttribute) {
+         ga.name = "encryptedStorage" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[31] = some (ga: GenericAttribute) {
+         ga.name = "dosProtection" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[32] = some (ga: GenericAttribute) {
+         ga.name = "Configuration_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[33] = some (ga: GenericAttribute) {
+         ga.name = "componentType" &&
+         ga.atype = String &&
+         ga.value = "Hybrid"
+         
+      } &&
+       ci.attributes.element[34] = some (ga: GenericAttribute) {
+         ga.name = "category" &&
+         ga.atype = String &&
+         ga.value = "Unknown"
+         
+      } &&
+       ci.attributes.element[35] = some (ga: GenericAttribute) {
+         ga.name = "canReceiveSWUpdate" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[36] = some (ga: GenericAttribute) {
+         ga.name = "canReceiveConfigUpdate" &&
+         ga.atype = Bool &&
+         ga.value = "true"
+         
+      } &&
+       ci.attributes.element[37] = some (ga: GenericAttribute) {
+         ga.name = "Buffer_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[38] = some (ga: GenericAttribute) {
+         ga.name = "Brute_Force_Attack" &&
+         ga.atype = Bool &&
+         ga.value = "false"
+         
+      } &&
+       ci.attributes.element[39] = some (ga: GenericAttribute) {
+         ga.name = "auditMessageResponses" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[40] = some (ga: GenericAttribute) {
+         ga.name = "antiJamming" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       ci.attributes.element[41] = some (ga: GenericAttribute) {
+         ga.name = "adversariallyTestedForTrojanOrLogicBomb" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      }
+    } &&
+    imp.connections.length = 8 &&
+    imp.connections.element[0] = some (c: Connection) {
+      c.name = "switch_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.ComponentCE &&
+        src.component_port = m.component_types.element[2].ports.element[0]
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.SubcomponentCE &&
+        dst.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[1] &&
+          sp.port = m.component_types.element[1].ports.element[0]
+        }
+      }
+    } &&
+    imp.connections.element[1] = some (c: Connection) {
+      c.name = "up_bth_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.ComponentCE &&
+        src.component_port = m.component_types.element[2].ports.element[1]
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.SubcomponentCE &&
+        dst.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[0] &&
+          sp.port = m.component_types.element[0].ports.element[0]
+        }
+      }
+    } &&
+    imp.connections.element[2] = some (c: Connection) {
+      c.name = "down_btn_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.ComponentCE &&
+        src.component_port = m.component_types.element[2].ports.element[2]
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.SubcomponentCE &&
+        dst.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[0] &&
+          sp.port = m.component_types.element[0].ports.element[1]
+        }
+      }
+    } &&
+    imp.connections.element[3] = some (c: Connection) {
+      c.name = "cur_temp_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.ComponentCE &&
+        src.component_port = m.component_types.element[2].ports.element[3]
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.SubcomponentCE &&
+        dst.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[1] &&
+          sp.port = m.component_types.element[1].ports.element[1]
+        }
+      }
+    } &&
+    imp.connections.element[4] = some (c: Connection) {
+      c.name = "cool_sig_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.SubcomponentCE &&
+        src.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[1] &&
+          sp.port = m.component_types.element[1].ports.element[3]
+        }
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.ComponentCE &&
+        dst.component_port = m.component_types.element[2].ports.element[4]
+      }
+    } &&
+    imp.connections.element[5] = some (c: Connection) {
+      c.name = "heat_sig_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.SubcomponentCE &&
+        src.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[1] &&
+          sp.port = m.component_types.element[1].ports.element[4]
+        }
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.ComponentCE &&
+        dst.component_port = m.component_types.element[2].ports.element[5]
+      }
+    } &&
+    imp.connections.element[6] = some (c: Connection) {
+      c.name = "setpoint1_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.SubcomponentCE &&
+        src.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[0] &&
+          sp.port = m.component_types.element[0].ports.element[2]
+        }
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.SubcomponentCE &&
+        dst.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[1] &&
+          sp.port = m.component_types.element[1].ports.element[2]
+        }
+      }
+    } &&
+    imp.connections.element[7] = some (c: Connection) {
+      c.name = "setpoint2_conn" &&
+      c.attributes.length = 4 &&
+       c.attributes.element[0] = some (ga: GenericAttribute) {
+         ga.name = "sessionAuthenticity" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[1] = some (ga: GenericAttribute) {
+         ga.name = "encryptedTransmission" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[2] = some (ga: GenericAttribute) {
+         ga.name = "deviceAuthentication" &&
+         ga.atype = Int &&
+         ga.value = "0"
+         
+      } &&
+       c.attributes.element[3] = some (ga: GenericAttribute) {
+         ga.name = "connectionType" &&
+         ga.atype = String &&
+         ga.value = "Untrusted"
+         
+      } &&
+      c.source = some (src: ConnectionEnd) {
+        src.kind = ConnectionEndKind.SubcomponentCE &&
+        src.subcomponent_port = some (sp: CompInstPort) {
+          sp.subcomponent = imp.subcomponents.element[0] &&
+          sp.port = m.component_types.element[0].ports.element[2]
+        }
+      } &&
+      c.destination = some (dst: ConnectionEnd) {
+        dst.kind = ConnectionEndKind.ComponentCE &&
+        dst.component_port = m.component_types.element[2].ports.element[6]
+      }
+    }
+  }} && m.cyber_requirements.length = 1 &&
+m.cyber_requirements.element[0] = some (req: CyberReq) {
+  req.id = "CyberReq01" &&
+  req.severity = Severity.Minor &&
+  req.condition = some (expr: CyberExpr) {
+    expr.kind = CyberExprKind.Or &&
+    expr.or.length = 2 &&
+    expr.or.element[0] = some (expr: CyberExpr) {
+      expr.kind = CyberExprKind.Port &&
+      expr.port = some (port: CIAPort) {
+        port.name = "heat_act_signal" &&
+        port.cia = CIA.Integrity
+        }
+      }
+       &&
+    expr.or.element[1] = some (expr: CyberExpr) {
+      expr.kind = CyberExprKind.Port &&
+      expr.port = some (port: CIAPort) {
+        port.name = "cool_act_signal" &&
+        port.cia = CIA.Integrity
+        }
+      }
+      }
+     &&
+  req.comment = "" &&
+  req.description = "The thermostat shall be resilient to Control Temperature algorithm integrity" &&
+  req.phases = "" &&
+  req.extern = ""
+  && req.cia = CIA.Integrity
+  } && m.safety_requirements.length = 0  && m.missions.length = 0 
+};
