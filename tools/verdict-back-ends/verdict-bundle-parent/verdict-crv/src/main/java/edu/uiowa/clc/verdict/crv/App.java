@@ -186,6 +186,7 @@ public class App {
 
         try {
             cmdLine = parser.parse(options, args);
+            
             if (cmdLine.hasOption("AT")) {
                 ArrayList<String> cmd_args = new ArrayList<String>();
 
@@ -195,7 +196,7 @@ public class App {
                 }
 
                 String[] cmd_attacks = {
-                    "-LS", "-LB", "-NI", "-SV", "-RI", "-OT", "-IT", "-HT", "-BG"
+                    "-LS", "-LB", "-NI", "-SV", "-RI", "-OT", "-IT", "-HT"
                 };
 
                 for (int i = 0; i < cmd_attacks.length; i++) {
@@ -206,11 +207,15 @@ public class App {
                         // + atk);
                     }
                 }
+                
+                int size = args.length + cmd_attacks.length;
+                
+                args = cmd_args.toArray(new String[size]);
+                cmdLine = parser.parse(options, args);   
             }
         } catch (ParseException exp) {
 
-            LOGGY.info("Error:");
-            LOGGY.info(exp.getMessage());
+            LOGGY.info("Invalid cmd arguments: " + exp.getMessage());
 
             formatter.printHelp("VERDICT-Instrumentor", options);
             System.exit(-1);
