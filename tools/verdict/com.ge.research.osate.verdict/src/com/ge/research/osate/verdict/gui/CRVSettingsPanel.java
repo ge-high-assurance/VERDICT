@@ -238,49 +238,6 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		noneButton.setFont(font);
 		noneButton.setSelection(isNone);
 		
-		// The blame assignment options
-		Label baLable = new Label(composite, SWT.NONE);
-		baLable.setText("Blame Assignment Options");
-		baLable.setFont(boldFont);
-		
-		Group baGroup = new Group(composite, SWT.NONE);
-		baGroup.setLayout(new GridLayout(1, false));	
-		
-		Composite localGlobalGroup = new Composite(baGroup, SWT.NONE);
-		localGlobalGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		localGlobalGroup.setEnabled(isBlameAssignment);		
-		
-		Button localButton = new Button(localGlobalGroup, SWT.RADIO);
-		localButton.setText("Local");
-		localButton.setFont(font);
-		localButton.setSelection(isLocal);
-		localButton.setEnabled(isBlameAssignment);
-
-		Button globalButton = new Button(localGlobalGroup, SWT.RADIO);
-		globalButton.setText("Gobal");
-		globalButton.setFont(font);
-		globalButton.setSelection(isGlobal);
-		globalButton.setEnabled(isBlameAssignment);	
-		
-		Label separator = new Label(baGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
-	    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
-		
-		Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
-		compLinkGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
-		compLinkGroup.setEnabled(isBlameAssignment);		
-		
-		Button linkLevel = new Button(compLinkGroup, SWT.RADIO);
-		linkLevel.setText("Link-level");
-		linkLevel.setFont(font);
-		linkLevel.setSelection(!componentLevel);
-		linkLevel.setEnabled(isBlameAssignment);	
-		
-		Button compLevel = new Button(compLinkGroup, SWT.RADIO);
-		compLevel.setText("Component-level");
-		compLevel.setFont(font);
-		compLevel.setSelection(componentLevel);
-		compLevel.setEnabled(isBlameAssignment);
-		
 		// save and close buttons
 		Composite closeButtons = new Composite(composite, SWT.NONE);
 		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -308,17 +265,78 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		// Set the preferred size
 		Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(bestSize);
-
+		
 		blameButton.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				baGroup.setEnabled(blameButton.getSelection());
-				localGlobalGroup.setEnabled(blameButton.getSelection());
-				compLinkGroup.setEnabled(blameButton.getSelection());
-				compLevel.setEnabled(blameButton.getSelection());
-				linkLevel.setEnabled(blameButton.getSelection());
-				localButton.setEnabled(blameButton.getSelection());
-				globalButton.setEnabled(blameButton.getSelection());
+			public void widgetSelected(SelectionEvent e) {				
+				if (blameButton.getSelection()) {
+					//create the group below only if the blame assignment button is selected
+					Group baGroup = new Group(composite, SWT.NONE);
+					baGroup.setText("Blame Assignment Options");
+					baGroup.setLayout(new GridLayout(1, false));
+					
+					Composite localGlobalGroup = new Composite(baGroup, SWT.NONE);
+					localGlobalGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+					localGlobalGroup.setEnabled(isBlameAssignment);		
+					
+					Button localButton = new Button(localGlobalGroup, SWT.RADIO);
+					localButton.setText("Local");
+					localButton.setFont(font);
+					localButton.setSelection(isLocal);
+					localButton.setEnabled(isBlameAssignment);
+
+					Button globalButton = new Button(localGlobalGroup, SWT.RADIO);
+					globalButton.setText("Global");
+					globalButton.setFont(font);
+					globalButton.setSelection(isGlobal);
+					globalButton.setEnabled(isBlameAssignment);	
+					
+					Label separator = new Label(baGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
+				    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+					
+				    Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
+					compLinkGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+					compLinkGroup.setEnabled(isBlameAssignment);		
+					
+					Button linkLevel = new Button(compLinkGroup, SWT.RADIO);
+					linkLevel.setText("Link-level");
+					linkLevel.setFont(font);
+					linkLevel.setSelection(!componentLevel);
+					linkLevel.setEnabled(isBlameAssignment);	
+					
+					Button compLevel = new Button(compLinkGroup, SWT.RADIO);
+					compLevel.setText("Component-level");
+					compLevel.setFont(font);
+					compLevel.setSelection(componentLevel);
+					compLevel.setEnabled(isBlameAssignment);
+					
+					baGroup.setEnabled(blameButton.getSelection());
+					localGlobalGroup.setEnabled(blameButton.getSelection());
+					compLinkGroup.setEnabled(blameButton.getSelection());
+					compLevel.setEnabled(blameButton.getSelection());
+					linkLevel.setEnabled(blameButton.getSelection());
+					localButton.setEnabled(blameButton.getSelection());
+					globalButton.setEnabled(blameButton.getSelection());
+					
+					componentLevel = compLevel.getSelection();
+					isLocal = localButton.getSelection();
+					isGlobal = globalButton.getSelection();
+					closeButtons.moveBelow(baGroup);//move save and cancel buttons to the bottom
+				} else {
+					//remove the blame-assignments-options-group by iterating 
+					//through the parent's children i.e.the "composite" control's children
+					for(Control control: composite.getChildren()) {
+						if (control instanceof Group) {
+							Group group= (Group)control;
+							if(group.getText()== "Blame Assignment Options") {
+								group.dispose();
+							}
+						}
+					}
+				}
+				// Set the preferred size
+				Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				getShell().setSize(bestSize);
 			}
 		});
 
@@ -378,9 +396,6 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				isBlameAssignment = blameButton.getSelection();
 				isMeritAssignment = meritButton.getSelection();
 				isNone = noneButton.getSelection();
-				componentLevel = compLevel.getSelection();
-				isLocal = localButton.getSelection();
-				isGlobal = globalButton.getSelection();
 				composite.getShell().close();
 			}
 		});
