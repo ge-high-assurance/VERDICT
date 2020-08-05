@@ -70,8 +70,11 @@ public class Exec {
         File kind2 = new File(user_dir, KIND2);
 
         cmd_arg.add(kind2.getAbsolutePath());
-        cmd_arg.add("--max_weak_assumptions");
+        cmd_arg.add("--enable");
+        cmd_arg.add("MCS");
+        cmd_arg.add("--print_mcs_legacy");
         cmd_arg.add("true");
+        
         cmd_arg.add(lustureFile.getAbsolutePath());
         cmd_arg.add("-xml");
 
