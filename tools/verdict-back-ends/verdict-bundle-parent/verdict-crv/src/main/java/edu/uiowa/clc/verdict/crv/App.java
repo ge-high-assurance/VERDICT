@@ -186,7 +186,7 @@ public class App {
 
         try {
             cmdLine = parser.parse(options, args);
-            
+
             if (cmdLine.hasOption("AT")) {
                 ArrayList<String> cmd_args = new ArrayList<String>();
 
@@ -195,9 +195,7 @@ public class App {
                     //                    System.out.println("User Provided Arguments: " + args[i]);
                 }
 
-                String[] cmd_attacks = {
-                    "-LS", "-LB", "-NI", "-SV", "-RI", "-OT", "-IT", "-HT"
-                };
+                String[] cmd_attacks = {"-LS", "-LB", "-NI", "-SV", "-RI", "-OT", "-IT", "-HT"};
 
                 for (int i = 0; i < cmd_attacks.length; i++) {
                     String atk = cmd_attacks[i];
@@ -207,11 +205,11 @@ public class App {
                         // + atk);
                     }
                 }
-                
+
                 int size = args.length + cmd_attacks.length;
-                
+
                 args = cmd_args.toArray(new String[size]);
-                cmdLine = parser.parse(options, args);   
+                cmdLine = parser.parse(options, args);
             }
         } catch (ParseException exp) {
 
