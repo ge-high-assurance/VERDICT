@@ -56,6 +56,10 @@ public class Instrumentor extends VDMInstrumentor {
         return this.attack_cmp_link_map;
     }
 
+    public boolean emptyIntrumentation() {
+        return emptySelection;
+    }
+
     public static Options createOptions() {
 
         final Options options = new Options();

@@ -54,6 +54,7 @@ public class VDMInstrumentor {
 
     protected Vector<Port> marked_ports = null;
     protected Vector<ComponentType> marked_types = null;
+    protected boolean emptySelection = false;
 
     public VDMInstrumentor(Model vdm_model) {
 
@@ -156,8 +157,6 @@ public class VDMInstrumentor {
 
         return blockImpl;
     }
-
-    //    protected String getComponentImpl(String componentID, Connection con) {}
 
     protected boolean isSourceComponent(Connection con) {
         if (con != null) {
@@ -355,12 +354,8 @@ public class VDMInstrumentor {
             //            System.out.println("Selected Components:");
 
             for (ComponentType component : vdm_components) {
-                //                System.out.println("(" + component_index++ + ") " +
-                // component.getId());
 
-                //                if (blockImpl == null) {
                 blockImpl = retrieve_block(component);
-                //                }
 
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
 
@@ -371,21 +366,9 @@ public class VDMInstrumentor {
                         if (!isProbePort(link_con)) {
                             vdm_links.add(link_con);
                         }
-                        //                        else {
-                        //                            System.out.println(
-                        //                                    "Probe ports connection:" +
-                        // link_con.getName());
-                        //                        }
                     }
-                    //                    else {
-                    //                        System.out.println(
-                    //                                "Empty output component connection:" +
-                    // link_con.getName());
-                    //                    }
                 }
-
                 components_map.put(component.getId(), vdm_cmp_links);
-                // if (component.getName().equals("GPS")) {}
             }
         }
 
@@ -397,13 +380,8 @@ public class VDMInstrumentor {
                 Connection con = it.next();
                 if (isProbePort(con)) {
                     it.remove();
-                    //                    System.out.println("Probe ports connection:" +
-                    // con.getName());
                 } else if (ignoreMarkedLink(con)) {
                     it.remove();
-                    //                    System.out.println(
-                    //                            "Empty output component connection:" +
-                    // con.getName());
                 }
             }
         }
@@ -459,6 +437,8 @@ public class VDMInstrumentor {
                     connections_map.put(connection, constant);
                 }
             }
+        } else {
+            emptySelection = true;
         }
 
         // Declare Global Constants
