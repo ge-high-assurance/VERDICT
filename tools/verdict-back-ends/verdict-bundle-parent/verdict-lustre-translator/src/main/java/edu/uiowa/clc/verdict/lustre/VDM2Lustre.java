@@ -682,7 +682,7 @@ public class VDM2Lustre {
             if (recordLiteral != null) {
 
                 String identifier = recordLiteral.getRecordType();
-                identifier = identifier.replace(".", "_");
+                identifier = identifier.replace(".", "_dot_");
                 recordLiteral.setRecordType(identifier);
 
                 for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {

@@ -1525,7 +1525,7 @@ public class VDMInstrumentor {
         if (src_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1643,7 +1643,7 @@ public class VDMInstrumentor {
         if (src_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1670,7 +1670,7 @@ public class VDMInstrumentor {
         if (dest_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             dest_componentInstance.setId(identifier);
             dest_componentInstance.setName(identifier);
