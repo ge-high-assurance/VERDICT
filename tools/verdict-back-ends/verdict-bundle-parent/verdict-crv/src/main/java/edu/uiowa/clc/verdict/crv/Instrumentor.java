@@ -129,6 +129,8 @@ public class Instrumentor extends VDMInstrumentor {
         Option bm_opt =
                 new Option("B", "Blame Assignment", false, "Blame Assignment (Link Level) Default");
 
+        Option mt_opt = new Option("M", "Merit Assignment", false, "Merit Assignment");
+
         Option bl_opt =
                 new Option(
                         "C",
@@ -148,6 +150,7 @@ public class Instrumentor extends VDMInstrumentor {
 
         options.addOption(bn_opt);
         options.addOption(bm_opt);
+        options.addOption(mt_opt);
         options.addOption(bl_opt);
 
         return options;

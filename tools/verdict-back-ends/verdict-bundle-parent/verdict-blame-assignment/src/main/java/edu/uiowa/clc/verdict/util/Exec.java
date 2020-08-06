@@ -29,7 +29,9 @@ import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 public class Exec {
 
-    public static int run_kind2(File lustureFile, File kind2ResultFile, boolean emptySelection) throws IOException {
+    public static int run_kind2(
+            File lustureFile, File kind2ResultFile, boolean emptySelection, boolean meritAssignment)
+            throws IOException {
 
         //        InputStream resultStream = null;
         final String KIND2 = "kind2";
@@ -69,18 +71,22 @@ public class Exec {
 
         File kind2 = new File(user_dir, KIND2);
 
-        if(emptySelection) {
-        	cmd_arg.add("--ivc");
-        	cmd_arg.add("--ivc_category");
-        	cmd_arg.add("contracts");        	
+        if (emptySelection || meritAssignment) {
+            cmd_arg.add(kind2.getAbsolutePath());        	
+            cmd_arg.add("--ivc");
+            cmd_arg.add(Boolean.toString(meritAssignment));
+            cmd_arg.add("--ivc_category");
+            cmd_arg.add("contracts");
         } else {
-	        cmd_arg.add(kind2.getAbsolutePath());
-	        cmd_arg.add("--enable");
-	        cmd_arg.add("MCS");
-	        cmd_arg.add("--print_mcs_legacy");
-	        cmd_arg.add("true");
+            cmd_arg.add(kind2.getAbsolutePath());
+            cmd_arg.add("--enable");
+            cmd_arg.add("MCS");
+            cmd_arg.add("--print_mcs_legacy");
+            cmd_arg.add("true");
         }
+
         cmd_arg.add(lustureFile.getAbsolutePath());
+        
         cmd_arg.add("-xml");
 
         String cmd = cmd_arg.toString();

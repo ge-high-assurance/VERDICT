@@ -41,7 +41,9 @@ public class App {
     }
 
     public static void runCRV(String[] args) throws IOException {
+
         final String vdmTmpDumpFile = "tmp.xml";
+
         final String kind2TmpDumpFile = "tmp-kind2-result-dump.xml";
 
         CommandLine cmdLine = cmdLineOptions(args);
@@ -58,6 +60,11 @@ public class App {
         // Setting Blame assingment Level (Component Level & Link Level)
         if (cmdLine.hasOption("C")) {
             component_level = true;
+        }
+
+        boolean meritAssignment = false;
+        if (cmdLine.hasOption("M")) {
+            meritAssignment = true;
         }
 
         File lustreFile = null;
@@ -144,7 +151,12 @@ public class App {
 
             LOGGY.info("******************Executor***********************");
 
-            int exitCode = Exec.run_kind2(lustreFile, kind2_resultFile, instrumentor.emptyIntrumentation());
+            int exitCode =
+                    Exec.run_kind2(
+                            lustreFile,
+                            kind2_resultFile,
+                            instrumentor.emptyIntrumentation(),
+                            meritAssignment);
 
             //            LOGGY.info("Kind2 Exit Code:" + exitCode);
 
@@ -159,15 +171,22 @@ public class App {
                 XMLProcessor.parseLog(kind2_resultFile);
             }
 
-            LOGGY.info("*************Blame Assignment***********");
 
-            BlameAssignment bm = new BlameAssignment();
-            bm =
-                    bm.compute_blame_assignment(
-                            kind2_resultFile, instrumentor.getAttackMap(), component_level);
+            if (meritAssignment) {
+                LOGGY.info("*************Merit Assignment***********");
+            	
+            	MeritAssignmentResult.readAndPrintInfo(kind2_resultFile); 
+            	
+            } else {
+                LOGGY.info("*************Blame Assignment***********");
+            	
+                BlameAssignment bm = new BlameAssignment();
+                bm =
+                        bm.compute_blame_assignment(
+                                kind2_resultFile, instrumentor.getAttackMap(), component_level);
 
-            XMLProcessor.dumpXML(bm, bm_outputFile);
-
+                XMLProcessor.dumpXML(bm, bm_outputFile);
+            }
         } else {
             LOGGY.warn("ERROR Unable to read VDM Model File");
         }
