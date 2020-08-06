@@ -41,7 +41,12 @@ public class MeritAssignment {
 
                     Element nodeElement = (Element) nNode;
 
-                    System.out.println("Node " + nodeElement.getAttribute("name") + ":");
+                    String element_name = nodeElement.getAttribute("name");
+
+                    //                    element_name = element_name.replaceAll("_port_", ".");
+                    element_name = element_name.replace("_dot_", ".");
+
+                    System.out.println("Node " + element_name + ":");
 
                     NodeList eList = nodeElement.getElementsByTagName("Element");
 
