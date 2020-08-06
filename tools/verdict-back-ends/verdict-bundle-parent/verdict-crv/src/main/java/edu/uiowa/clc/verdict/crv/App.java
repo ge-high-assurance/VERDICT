@@ -142,7 +142,9 @@ public class App {
 
             LOGGY.info("******************Executor***********************");
 
-            int exitCode = Exec.run_kind2(lustreFile, kind2_resultFile);
+            int exitCode =
+                    Exec.run_kind2(
+                            lustreFile, kind2_resultFile, instrumentor.emptyIntrumentation());
 
             //            LOGGY.info("Kind2 Exit Code:" + exitCode);
 

@@ -1022,7 +1022,9 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            if (blameAssignment && instrumentor != null) {
+            if (blameAssignment
+                    && instrumentor != null
+                    && instrumentor.emptyIntrumentation() == false) {
                 Binary.invokeBin(
                         kind2Bin,
                         null,
