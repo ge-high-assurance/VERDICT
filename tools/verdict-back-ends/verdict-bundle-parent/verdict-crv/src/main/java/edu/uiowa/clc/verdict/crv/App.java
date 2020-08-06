@@ -171,15 +171,14 @@ public class App {
                 XMLProcessor.parseLog(kind2_resultFile);
             }
 
-
             if (meritAssignment) {
                 LOGGY.info("*************Merit Assignment***********");
-            	
-            	MeritAssignmentResult.readAndPrintInfo(kind2_resultFile); 
-            	
+
+                MeritAssignmentResult.readAndPrintInfo(kind2_resultFile);
+
             } else {
                 LOGGY.info("*************Blame Assignment***********");
-            	
+
                 BlameAssignment bm = new BlameAssignment();
                 bm =
                         bm.compute_blame_assignment(

@@ -71,14 +71,14 @@ public class Exec {
 
         File kind2 = new File(user_dir, KIND2);
 
+        cmd_arg.add(kind2.getAbsolutePath());
+
         if (emptySelection || meritAssignment) {
-            cmd_arg.add(kind2.getAbsolutePath());        	
             cmd_arg.add("--ivc");
             cmd_arg.add(Boolean.toString(meritAssignment));
             cmd_arg.add("--ivc_category");
             cmd_arg.add("contracts");
         } else {
-            cmd_arg.add(kind2.getAbsolutePath());
             cmd_arg.add("--enable");
             cmd_arg.add("MCS");
             cmd_arg.add("--print_mcs_legacy");
@@ -86,7 +86,7 @@ public class Exec {
         }
 
         cmd_arg.add(lustureFile.getAbsolutePath());
-        
+
         cmd_arg.add("-xml");
 
         String cmd = cmd_arg.toString();
@@ -129,7 +129,7 @@ public class Exec {
 
         try {
 
-            String input, err;
+            String input;
 
             InputStream resultStream = process.getInputStream();
 

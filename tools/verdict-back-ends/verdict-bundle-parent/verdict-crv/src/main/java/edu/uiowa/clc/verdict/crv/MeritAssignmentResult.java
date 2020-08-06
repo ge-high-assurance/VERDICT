@@ -33,10 +33,10 @@ public class MeritAssignmentResult {
                     if (nNode.getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element nodeElement = (Element) nNode;
-                    
+
                     String nodeName = nodeElement.getAttribute("name");
-//                    nodeName = nodeName.replaceAll("_port_", ".");
-//                    nodeName = nodeName.replace("_dot_", ".");
+                    //                    nodeName = nodeName.replaceAll("_port_", ".");
+                    //                    nodeName = nodeName.replace("_dot_", ".");
 
                     System.out.println("Node " + nodeName + ":");
 
