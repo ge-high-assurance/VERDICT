@@ -158,8 +158,6 @@ public class VDMInstrumentor {
         return blockImpl;
     }
 
-    //    protected String getComponentImpl(String componentID, Connection con) {}
-
     protected boolean isSourceComponent(Connection con) {
         if (con != null) {
             ConnectionEnd src = con.getSource();
@@ -356,12 +354,8 @@ public class VDMInstrumentor {
             //            System.out.println("Selected Components:");
 
             for (ComponentType component : vdm_components) {
-                //                System.out.println("(" + component_index++ + ") " +
-                // component.getId());
 
-                //                if (blockImpl == null) {
                 blockImpl = retrieve_block(component);
-                //                }
 
                 HashSet<Connection> vdm_cmp_links = instrument_component(component, blockImpl);
 
@@ -372,21 +366,9 @@ public class VDMInstrumentor {
                         if (!isProbePort(link_con)) {
                             vdm_links.add(link_con);
                         }
-                        //                        else {
-                        //                            System.out.println(
-                        //                                    "Probe ports connection:" +
-                        // link_con.getName());
-                        //                        }
                     }
-                    //                    else {
-                    //                        System.out.println(
-                    //                                "Empty output component connection:" +
-                    // link_con.getName());
-                    //                    }
                 }
-
                 components_map.put(component.getId(), vdm_cmp_links);
-                // if (component.getName().equals("GPS")) {}
             }
         }
 
@@ -398,13 +380,8 @@ public class VDMInstrumentor {
                 Connection con = it.next();
                 if (isProbePort(con)) {
                     it.remove();
-                    //                    System.out.println("Probe ports connection:" +
-                    // con.getName());
                 } else if (ignoreMarkedLink(con)) {
                     it.remove();
-                    //                    System.out.println(
-                    //                            "Empty output component connection:" +
-                    // con.getName());
                 }
             }
         }
@@ -1528,7 +1505,7 @@ public class VDMInstrumentor {
         if (src_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1646,7 +1623,7 @@ public class VDMInstrumentor {
         if (src_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1673,7 +1650,7 @@ public class VDMInstrumentor {
         if (dest_port != null) {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
-            identifier = identifier.replace(".", "_");
+            identifier = identifier.replace(".", "_dot_");
 
             dest_componentInstance.setId(identifier);
             dest_componentInstance.setName(identifier);
@@ -1790,8 +1767,8 @@ public class VDMInstrumentor {
 
         ComponentImpl instrument_compImpl = new ComponentImpl();
 
-        instrument_compImpl.setId(instrumented_cmp.getId() + ".impl");
-        instrument_compImpl.setName(instrumented_cmp.getName() + "_Impl");
+        instrument_compImpl.setId(instrumented_cmp.getId() + "_dot_impl");
+        instrument_compImpl.setName(instrumented_cmp.getName() + "_dot_Impl");
         instrument_compImpl.setType(instrumented_cmp);
 
         IfThenElse ifelse = new IfThenElse();
