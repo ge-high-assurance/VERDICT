@@ -108,7 +108,6 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		atgCheckBox.setFont(font);
 		atgCheckBox.setSelection(testCaseGeneration);
 		
-		
 		// The "Enabled Threat Models" section: all the threats
 		Label threatModelsLabel = new Label(composite, SWT.NONE);
 		threatModelsLabel.setText("Threat Models");
@@ -232,6 +231,60 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		blameButton.setText("Blame Assignment");
 		blameButton.setFont(font);
 		blameButton.setSelection(isBlameAssignment);
+		
+		//if blame assignment is selected load previously selected blame assignment options if any
+		if(isBlameAssignment) {
+			Group baGroup = new Group(composite, SWT.NONE);
+			baGroup.setText("Blame Assignment Options");
+			baGroup.setLayout(new GridLayout(1, false));
+			
+			Composite localGlobalGroup = new Composite(baGroup, SWT.NONE);
+			localGlobalGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+			localGlobalGroup.setEnabled(isBlameAssignment);		
+			
+			Button localButton = new Button(localGlobalGroup, SWT.RADIO);
+			localButton.setText("Local");
+			localButton.setFont(font);
+			localButton.setSelection(isLocal);
+			localButton.setEnabled(isBlameAssignment);
+
+			Button globalButton = new Button(localGlobalGroup, SWT.RADIO);
+			globalButton.setText("Global");
+			globalButton.setFont(font);
+			globalButton.setSelection(isGlobal);
+			globalButton.setEnabled(isBlameAssignment);	
+			
+			Label separator = new Label(baGroup, SWT.HORIZONTAL | SWT.SEPARATOR);
+		    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+			
+		    Composite compLinkGroup = new Composite(baGroup, SWT.NONE);
+			compLinkGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+			compLinkGroup.setEnabled(isBlameAssignment);		
+			
+			Button linkLevel = new Button(compLinkGroup, SWT.RADIO);
+			linkLevel.setText("Link-level");
+			linkLevel.setFont(font);
+			linkLevel.setSelection(!componentLevel);
+			linkLevel.setEnabled(isBlameAssignment);	
+			
+			Button compLevel = new Button(compLinkGroup, SWT.RADIO);
+			compLevel.setText("Component-level");
+			compLevel.setFont(font);
+			compLevel.setSelection(componentLevel);
+			compLevel.setEnabled(isBlameAssignment);
+			
+			baGroup.setEnabled(blameButton.getSelection());
+			localGlobalGroup.setEnabled(blameButton.getSelection());
+			compLinkGroup.setEnabled(blameButton.getSelection());
+			compLevel.setEnabled(blameButton.getSelection());
+			linkLevel.setEnabled(blameButton.getSelection());
+			localButton.setEnabled(blameButton.getSelection());
+			globalButton.setEnabled(blameButton.getSelection());
+			
+			componentLevel = compLevel.getSelection();
+			isLocal = localButton.getSelection();
+			isGlobal = globalButton.getSelection();
+		}
 		
 		Button noneButton = new Button(meritBlameGroup, SWT.RADIO);
 		noneButton.setText("None");
@@ -396,6 +449,39 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				isBlameAssignment = blameButton.getSelection();
 				isMeritAssignment = meritButton.getSelection();
 				isNone = noneButton.getSelection();
+				//if blame assignment radio is selected then iterate
+				//through the parent's children i.e.the "composite" control's children
+				//and get (remember) values of blame assignment options buttons
+				for(Control control: composite.getChildren()) {
+					if (control instanceof Group) {
+						Group group= (Group)control;
+						if(group.getText()== "Blame Assignment Options") {
+							for(Control groupChild: group.getChildren()) {
+								if (groupChild instanceof Composite) {
+									Composite subComposite= (Composite)groupChild;
+									for(Control subCompositeControl: subComposite.getChildren()) {
+										if (subCompositeControl instanceof Button) {
+											Button button= (Button)subCompositeControl;
+											switch (button.getText()) {
+												case "Local":
+													isLocal = button.getSelection();
+											    break;
+											    case "Global":
+											    	isGlobal = button.getSelection();
+											    break;
+											    case "Component-level":
+											    	componentLevel = button.getSelection();
+											    break;
+											    default:
+											    	System.out.println("Not local or global or component");
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 				composite.getShell().close();
 			}
 		});
