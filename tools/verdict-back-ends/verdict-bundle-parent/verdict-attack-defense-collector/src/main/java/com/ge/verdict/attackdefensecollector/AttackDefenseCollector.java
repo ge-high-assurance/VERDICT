@@ -641,6 +641,11 @@ public class AttackDefenseCollector {
         for (ComponentImpl impl : model.getComponentImpl()) {
             for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
                 SystemModel system = getSystem(inst.getName());
+                for (GenericAttribute attrib : inst.getAttribute()) {
+                    if (attrib.getValue() instanceof String) {
+                        system.addAttribute(attrib.getName(), (String) attrib.getValue());
+                    }
+                }
                 Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
                 if (inst.getImplementation() != null) {
                     Util.putSetMap(compImplToSystem, inst.getImplementation().getName(), system);
@@ -732,6 +737,13 @@ public class AttackDefenseCollector {
                                         resolver(dest),
                                         sourcePort,
                                         destPort);
+
+                        for (GenericAttribute attrib : conn.getAttribute()) {
+                            if (attrib.getValue() instanceof String) {
+                                connection.addAttribute(
+                                        attrib.getName(), (String) attrib.getValue());
+                            }
+                        }
 
                         //						System.out.println("ADDING CONNECTION " + conn.getName() + " from "
                         // + source.getName() + ":"

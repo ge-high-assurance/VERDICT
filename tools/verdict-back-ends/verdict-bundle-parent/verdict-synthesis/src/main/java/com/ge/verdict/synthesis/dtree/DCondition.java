@@ -45,12 +45,15 @@ public class DCondition implements DTree {
 
     @Override
     public BoolExpr toZ3Multi(Context context) {
-        if (compDef == null) {
-            throw new RuntimeException("compDef has not been set");
+        if (compDef != null) {
+            // Note that we use < instead of >= because the defense tree is inverted compared to the
+            // attack-defense tree
+            return context.mkLt(
+                    compDef.toZ3Multi(context),
+                    DLeaf.fractionToZ3(compDef.dalToRawCost(defenseCond.getMinImplDal()), context));
+        } else {
+            throw new RuntimeException("DCondition missing comp def: " + prettyPrint());
         }
-        return context.mkGe(
-                compDef.toZ3Multi(context),
-                DLeaf.fractionToZ3(compDef.dalToRawCost(defenseCond.getMinImplDal()), context));
     }
 
     @Override

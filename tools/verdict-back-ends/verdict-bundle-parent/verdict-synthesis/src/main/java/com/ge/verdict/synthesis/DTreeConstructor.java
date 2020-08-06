@@ -1,5 +1,15 @@
 package com.ge.verdict.synthesis;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
@@ -15,15 +25,6 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DTreeConstructor {
     /**
@@ -150,9 +151,23 @@ public class DTreeConstructor {
                 if (compDef.isPresent()) {
                     dcond.setCompDef(compDef.get());
                 } else {
-                    throw new RuntimeException(
-                            "Defense condition references undefined component-defense pair: "
-                                    + dcond.prettyPrint());
+                    // This means that the defense isn't part of the attack-defense tree,
+                    // so we need to create a dleaf (which implicitly creates an SMT variable)
+                    // for it so that the DAL can get forced down to zero if necessary
+
+					// This doesn't actually work. This is the screwy case that we need to fix.
+                    DLeaf dleaf =
+                            new DLeaf(
+                                    dcond.defenseCond.getAttackable().getParentName(),
+                                    dcond.defenseCond.getDefenseProperty(),
+                                    "",
+                                    dcond.defenseCond.getImplDal(),
+                                    0,
+                                    costModel,
+                                    factory,
+                                    usePartialSolution,
+                                    meritAssignment);
+                    dcond.setCompDef(dleaf.componentDefense);
                 }
             }
 

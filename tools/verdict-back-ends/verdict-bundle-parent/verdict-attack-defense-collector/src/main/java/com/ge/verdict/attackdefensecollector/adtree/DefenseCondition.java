@@ -31,10 +31,29 @@ public class DefenseCondition extends ADTree {
         return minImplDal;
     }
 
+    public int getImplDal() {
+        String dalStr = attackable.getParentAttributes().get(defenseProperty);
+        if (dalStr != null) {
+            try {
+                return Integer.parseInt(dalStr);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(
+                        "invalid DAL: "
+                                + dalStr
+                                + " for defense property "
+                                + defenseProperty
+                                + " on component/connection "
+                                + attackable.getParentName());
+            }
+        } else {
+            // if it's not in the attributes list, then it must be unimplemented
+            return 0;
+        }
+    }
+
     @Override
     public Prob compute() {
-        // TODO Auto-generated method stub
-        return null;
+        return getImplDal() >= minImplDal ? Prob.certain() : Prob.impossible();
     }
 
     @Override
