@@ -76,7 +76,7 @@ public class CRVReadXMLFile {
 			CounterExampleAttributes newNode = new CounterExampleAttributes();
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				newNode.setNodeName(eElement.getAttribute("name"));
+				newNode.setNodeName(eElement.getAttribute("name").replace("_dot_", "."));
 				newNode.setNodeAttr(extractCENode(eElement.getElementsByTagName("Stream")));
 				list.add(newNode);
 			}
@@ -172,7 +172,7 @@ public class CRVReadXMLFile {
 			CENode newString = new CENode();
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				newString.setVarName(eElement.getAttribute("name"));
+				newString.setVarName(eElement.getAttribute("name").replace("_dot_", "."));
 				if (eElement.getAttribute("type").equals("enum")) {
 					newString.setVarType(eElement.getAttribute("enumName"));
 				} else {
