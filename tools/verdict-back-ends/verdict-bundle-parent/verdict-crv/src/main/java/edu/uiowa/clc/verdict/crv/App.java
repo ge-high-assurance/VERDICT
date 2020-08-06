@@ -199,8 +199,9 @@ public class App {
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
-
         CommandLine cmdLine = null;
+
+        int args_attacks_count = 0;
 
         try {
             cmdLine = parser.parse(options, args);
@@ -221,10 +222,12 @@ public class App {
                         cmd_args.add(atk);
                         //                        System.out.println("Added additional Arguments: "
                         // + atk);
+                    } else {
+                        args_attacks_count++;
                     }
                 }
 
-                int size = args.length + cmd_attacks.length;
+                int size = args.length + (cmd_attacks.length - args_attacks_count);
 
                 args = cmd_args.toArray(new String[size]);
                 cmdLine = parser.parse(options, args);
