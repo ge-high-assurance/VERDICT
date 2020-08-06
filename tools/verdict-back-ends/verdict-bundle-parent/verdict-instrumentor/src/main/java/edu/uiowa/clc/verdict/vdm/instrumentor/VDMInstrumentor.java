@@ -54,6 +54,7 @@ public class VDMInstrumentor {
 
     protected Vector<Port> marked_ports = null;
     protected Vector<ComponentType> marked_types = null;
+    protected boolean emptySelection = false;
 
     public VDMInstrumentor(Model vdm_model) {
 
@@ -459,6 +460,8 @@ public class VDMInstrumentor {
                     connections_map.put(connection, constant);
                 }
             }
+        } else {
+            emptySelection = true;
         }
 
         // Declare Global Constants
