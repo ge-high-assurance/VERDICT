@@ -276,7 +276,7 @@ public class BlameAssignment {
 
         link_name = link_name.replaceAll("_port_", ".");
 
-        link_name = link_name.replace("_dot_", ".");
+        //        link_name = link_name.replace("_dot_", ".");
 
         selected_link.setLinkID(link_name);
     }
