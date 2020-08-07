@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class DTreeConstructorTest {
 
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        double[] costs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
         DTree leaf = new DLeaf("A", "A", "A", 0, 1, costs, factory);
         DTree dtree = new DNot(new DNot(leaf));
@@ -65,7 +66,7 @@ public class DTreeConstructorTest {
 
         ADTree adtree = new ADOr(new ADAnd(new ADNot(defense1), attack1));
 
-        double[] costs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
         DTree dtree =
                 new DAnd(
@@ -129,7 +130,7 @@ public class DTreeConstructorTest {
 
         ADTree adtree = new ADOr(new ADNot(defense1), attack1, attack2);
 
-        double[] costs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
         DTree dtree =
                 new DAnd(
@@ -173,7 +174,7 @@ public class DTreeConstructorTest {
 
         ADTree adtree = new ADOr(new ADNot(defense1), attack1, new ADNot(defense2), attack2);
 
-        double[] costs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
         DTree dtree =
                 new DAnd(

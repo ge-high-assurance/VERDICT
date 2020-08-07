@@ -76,4 +76,7 @@ public class IVCElement implements Serializable, Cloneable {
 		return name;
 	}
 	
+	public boolean isAssumption() {
+		return categ == Category.ASSUMPTION;
+	}
 }

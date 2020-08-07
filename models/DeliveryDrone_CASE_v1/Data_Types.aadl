@@ -1,0 +1,83 @@
+package Data_Types
+public
+	with Data_Model, Base_Types;
+	
+	data Position
+	end Position;
+	
+	data implementation Position.impl
+		subcomponents
+			x: data Base_Types::Float; 
+			y: data Base_Types::Float;
+  	end Position.impl;
+  	
+  	data DeliveryOrder
+  	end DeliveryOrder;
+  	
+  	data implementation DeliveryOrder.impl
+  		subcomponents
+  			target_position: data Position.impl;
+  			target_picture: data Base_Types::Integer;
+  			item_value: data Base_Types::Float;
+  	end DeliveryOrder.impl;
+  	
+  	data DeliveryStatus
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("NOT_STARTED", "IN_PROGRESS", "COMPLETED", "FAILED");
+	end DeliveryStatus;
+  	
+  	data Constellation
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("Satellite0", "Satellite1");
+	end Constellation;
+  	
+  	data InputBus
+  	end InputBus;
+  	
+  	data implementation InputBus.impl
+  		subcomponents
+  			connected: data Base_Types::Boolean;
+  			update_order: data Base_Types::Boolean; -- not used in new delivery planner?
+  			order: data DeliveryOrder.impl; 
+  			-- added
+  			on_off: data Base_Types::Boolean; --Check if it makes sense to come from bus?
+  			abort_cmd: data Base_Types::Boolean; --Check if it makes sense to come from bus?
+  			constellation: data Constellation;
+  			launch_pos: data Position.impl;
+  			init_criteria_satisfied: data Base_Types::Boolean;
+  			mission_store_release_sequence: data Base_Types::Boolean;
+  	end InputBus.impl;
+  	
+  	data RadioResponse
+  	end RadioResponse;
+  	
+  	data implementation RadioResponse.impl
+  		subcomponents
+  			data_available: data Base_Types::Boolean;
+  			target_confirmed: data Base_Types::Boolean;
+  	end RadioResponse.impl;
+  	
+  	data ProbeSafeLanding
+  	end ProbeSafeLanding;
+  	
+  	data implementation ProbeSafeLanding.impl
+  		subcomponents
+  			is_target_clear: data Base_Types::Boolean;
+  			has_valid_marker: data Base_Types::Boolean;
+  	end ProbeSafeLanding.impl;
+ 
+	data DeliveryPlannerState
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("OFF", "INIT", "READY", "LAUNCH", "ABORT", "FLYING_TO_DEST", "MAKING_DELIVERY", "RETURN_TO_TRUCK");
+	end DeliveryPlannerState; 
+	
+	data PackageDeliveryCommand
+  		properties
+	    	Data_Model::Data_Representation => Enum;
+	    	Data_Model::Enumerators => ("NO_OPERATION", "RELEASE_PACKAGE", "ABORT_DELIVERY");
+	end PackageDeliveryCommand;
+ 	
+end Data_Types;

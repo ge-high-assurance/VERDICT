@@ -50,7 +50,7 @@ public class DLeaf implements DTree {
                 String attack,
                 int implDal,
                 int id,
-                double[] costs) {
+                Fraction[] costs) {
             this.component = component;
             this.defenseProperty = defenseProperty;
             this.attack = attack;
@@ -63,14 +63,9 @@ public class DLeaf implements DTree {
             }
             rawCostToDal = new LinkedHashMap<>();
             for (int dal = 0; dal < this.costs.length; dal++) {
-                this.costs[dal] = costFraction(costs[dal]);
+                this.costs[dal] = costs[dal];
                 rawCostToDal.put(this.costs[dal], dal);
             }
-        }
-
-        private Fraction costFraction(double cost) {
-            // using this epsilon should mitigate any floating point error
-            return new Fraction(cost, 0.0000001, 10);
         }
 
         public void normalizeCosts(int[] normalizedCosts) {
@@ -165,7 +160,7 @@ public class DLeaf implements DTree {
                 String defenseProperty,
                 String attack,
                 int implDal,
-                double[] costs) {
+                Fraction[] costs) {
             Pair<String, String> key = new Pair<>(component, defenseProperty);
             if (!componentDefenseMap.containsKey(key)) {
                 ComponentDefense pair =
@@ -175,6 +170,10 @@ public class DLeaf implements DTree {
                 componentDefenseMap.put(key, pair);
             }
             return componentDefenseMap.get(key);
+        }
+
+        public Optional<ComponentDefense> lookup(String component, String defense) {
+            return Optional.ofNullable(componentDefenseMap.get(new Pair<>(component, defense)));
         }
 
         public ComponentDefense fromId(int id) {
@@ -197,7 +196,7 @@ public class DLeaf implements DTree {
             String attack,
             int implDal,
             int targetDal,
-            double[] costs,
+            Fraction[] costs,
             Factory factory) {
 
         componentDefense =
@@ -216,16 +215,22 @@ public class DLeaf implements DTree {
             boolean usePartialSolution,
             boolean meritAssignment) {
 
-        double implCost = costModel.cost(defenseProperty, component, implDal);
+        Fraction implCost = costModel.cost(defenseProperty, component, implDal);
 
-        double[] costs = new double[10];
+        Fraction[] costs = new Fraction[10];
         for (int dal = 0; dal < costs.length; dal++) {
-            double targetCost = costModel.cost(defenseProperty, component, dal);
+            Fraction targetCost = costModel.cost(defenseProperty, component, dal);
             // this handles if implDal > targetDal
-            costs[dal] =
-                    usePartialSolution && !meritAssignment
-                            ? Math.max(targetCost - implCost, 0)
-                            : targetCost;
+            if (usePartialSolution && !meritAssignment) {
+                Fraction difference = targetCost.subtract(implCost);
+                if (difference.compareTo(new Fraction(0)) > 0) {
+                    costs[dal] = difference;
+                } else {
+                    costs[dal] = new Fraction(0);
+                }
+            } else {
+                costs[dal] = targetCost;
+            }
         }
 
         componentDefense =

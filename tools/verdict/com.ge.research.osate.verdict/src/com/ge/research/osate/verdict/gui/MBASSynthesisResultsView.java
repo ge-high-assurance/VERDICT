@@ -89,31 +89,41 @@ public class MBASSynthesisResultsView extends ViewPart {
 				if (results.inputSat) {
 					header.setForeground(new Color(Display.getCurrent(), 0, 102, 51));
 					if (results.meritAssignment) {
-						if (results.inputCost != results.outputCost) {
-							header.setText("Synthesis results: Partial solution SAT, merit assignment, cost: "
+						if (!results.inputCost.equals(results.outputCost)) {
+							header.setText(
+									"Synthesis results: Existing solution SAT, merit assignment, cost: "
 									+ results.inputCost
+											.doubleValue()
 									+ " -> "
-									+ results.outputCost + " (reduction of " + (results.inputCost - results.outputCost)
+									+ results.outputCost.doubleValue()
+									+ " (reduction of "
+									+ (results.inputCost.subtract(results.outputCost).doubleValue())
 									+ ")");
 						} else {
 							header.setText(
-									"Synthesis results: Partial solution SAT, merit assignment already minimal, total cost: "
-									+ results.outputCost);
+									"Synthesis results: Existing solution SAT, merit assignment already minimal, total cost: "
+											+ results.outputCost.doubleValue());
 						}
 					} else {
 						// This one doesn't actually happen because there is no option to disable merit assignment
-						header.setText("Synthesis results: Partial solution SAT, no merit assignment, total cost: "
-								+ results.outputCost);
+						header.setText(
+								"Synthesis results: Existing solution SAT, no merit assignment, total cost: "
+								+ results.outputCost.doubleValue());
 					}
 				} else {
 					header.setForeground(new Color(Display.getCurrent(), 204, 0, 0));
-					header.setText("Synthesis results: Partial solution UNSAT, cost: " + results.inputCost
+					header.setText("Synthesis results: Existing solution UNSAT, cost: "
+							+ results.inputCost
+							.doubleValue()
 							+ " -> "
 							+ results.outputCost
-							+ " (increase of " + (results.outputCost - results.inputCost) + ")");
+									.doubleValue()
+							+ " (increase of " + (results.outputCost.subtract(results.inputCost).doubleValue()) + ")");
 				}
 			} else {
-				header.setText("Synthesis results: No partial solution, total cost: " + results.outputCost);
+				header.setText(
+						"Synthesis results (not using existing solution): total cost: "
+								+ results.outputCost.doubleValue());
 			}
 		}
 
@@ -138,14 +148,15 @@ public class MBASSynthesisResultsView extends ViewPart {
 			Action prev = null;
 			for (ResultsInstance.Item item : sortedItems) {
 				if (!results.partialSolution || item.inputDal != item.outputDal) {
-					double deltaCost = item.outputCost - item.inputCost;
+					double deltaCost = item.outputCost.subtract(item.inputCost).doubleValue();
 					Action action = Action.fromItem(item);
 
 					TableItem row = new TableItem(table, SWT.NONE);
 					row.setText(new String[] { action.checkDitto(prev), item.component,
 							item.defenseProperty,
 							Integer.toString(item.inputDal), Integer.toString(item.outputDal),
-							Double.toString(item.inputCost), Double.toString(item.outputCost),
+							Double.toString(item.inputCost.doubleValue()), Double.toString(item.outputCost
+									.doubleValue()),
 							Double.toString(deltaCost), });
 
 					prev = action;
@@ -166,7 +177,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 
 					row.setText(new String[] { action.checkDitto(prev), item.component,
 							item.defenseProperty,
-							Integer.toString(item.outputDal), Double.toString(item.outputCost) });
+							Integer.toString(item.outputDal), Double.toString(item.outputCost.doubleValue()) });
 
 					prev = action;
 				}

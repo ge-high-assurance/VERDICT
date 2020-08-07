@@ -2,6 +2,8 @@ package com.ge.research.osate.verdict.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -39,7 +41,22 @@ public class MeritAssignmentView extends ViewPart {
 		composite.setLayout(new FillLayout());
 		
 		Tree tree = new Tree (composite, SWT.BORDER);
-		for (IVCNode node : treeContents) {
+		
+		Map<Boolean, List<IVCNode>> partitioned =
+				  treeContents.stream().collect(Collectors.partitioningBy(IVCNode::hasAssumption));
+		
+		List<IVCNode> withAssumptions = partitioned.get(true);
+		fillTree(tree, withAssumptions);
+		
+		List<IVCNode> withoutAssumptions = partitioned.get(false);
+		fillTree(tree, withoutAssumptions);
+		
+		tree.pack();
+		composite.pack();
+	}
+
+	private void fillTree(Tree tree, List<IVCNode> nodes) {
+		for (IVCNode node : nodes) {
 			TreeItem nodeItem = new TreeItem (tree, 0);
 			nodeItem.setText("Component '" + node.getNodeName() + "'");
 			for (IVCElement e : node.getNodeElements()) {
@@ -47,9 +64,6 @@ public class MeritAssignmentView extends ViewPart {
 				eItem.setText(e.getCategory().toString() + " '" + e.getName() + "'");
 			}
 		}
-		
-		tree.pack();
-		composite.pack();
 	}
-
+	
 }

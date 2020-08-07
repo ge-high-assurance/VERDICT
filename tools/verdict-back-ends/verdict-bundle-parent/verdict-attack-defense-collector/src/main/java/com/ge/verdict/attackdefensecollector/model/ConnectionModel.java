@@ -1,5 +1,6 @@
 package com.ge.verdict.attackdefensecollector.model;
 
+import com.ge.verdict.attackdefensecollector.DependentRules;
 import com.ge.verdict.attackdefensecollector.NameResolver;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
@@ -9,6 +10,7 @@ import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +33,8 @@ public class ConnectionModel {
 
     private Attackable attackable;
 
+    private Map<String, String> attributes;
+
     /**
      * Create a new connection.
      *
@@ -51,7 +55,8 @@ public class ConnectionModel {
         this.dest = dest;
         this.sourcePort = sourcePort;
         this.destPort = destPort;
-        this.attackable = new Attackable(this);
+        attackable = new Attackable(this);
+        attributes = new LinkedHashMap<>();
     }
 
     /** @return the name of the connection */
@@ -81,6 +86,14 @@ public class ConnectionModel {
 
     public Attackable getAttackable() {
         return attackable;
+    }
+
+    public void addAttribute(String name, String value) {
+        attributes.put(name, value);
+    }
+
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(attributes);
     }
 
     /** Map from attacks to defenses that defend against those attacks. */
@@ -134,7 +147,17 @@ public class ConnectionModel {
             if (attack.getCia().equals(cia)) {
                 if (attackToDefense.containsKey(attack)) {
                     // There is a defense associated
-                    children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
+                    Optional<ADTree> dependentRules =
+                            DependentRules.getConnectionDependence(this, attack.getName());
+                    if (dependentRules.isPresent()) {
+                        children.add(
+                                new ADAnd(
+                                        new ADNot(attackToDefense.get(attack)),
+                                        attack,
+                                        dependentRules.get()));
+                    } else {
+                        children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
+                    }
                 } else {
                     // There is no defense, just a raw attack
                     children.add(attack);

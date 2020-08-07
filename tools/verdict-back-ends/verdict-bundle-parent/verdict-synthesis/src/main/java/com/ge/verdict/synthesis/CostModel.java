@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.math3.fraction.Fraction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,14 +35,14 @@ public class CostModel {
     // All combinations of (component, defense, DAL).
     // This whole many maps approach isn't very pretty, but no more
     // elegant approach immediately comes to mind so here we are.
-    private Map<Triple<String, String, Integer>, Double> compDefDalModel;
-    private Map<Pair<String, String>, Double> compDefModel;
-    private Map<Pair<String, Integer>, Double> compDalModel;
-    private Map<Pair<String, Integer>, Double> defDalModel;
-    private Map<String, Double> compModel;
-    private Map<String, Double> defModel;
-    private Map<Integer, Double> dalModel;
-    private double defaultModel;
+    private Map<Triple<String, String, Integer>, Fraction> compDefDalModel;
+    private Map<Pair<String, String>, Fraction> compDefModel;
+    private Map<Pair<String, Integer>, Fraction> compDalModel;
+    private Map<Pair<String, Integer>, Fraction> defDalModel;
+    private Map<String, Fraction> compModel;
+    private Map<String, Fraction> defModel;
+    private Map<Integer, Fraction> dalModel;
+    private Fraction defaultModel;
 
     /**
      * Load the cost model from the given XML file.
@@ -56,7 +57,7 @@ public class CostModel {
         compModel = new LinkedHashMap<>();
         defModel = new LinkedHashMap<>();
         dalModel = new LinkedHashMap<>();
-        defaultModel = 1;
+        defaultModel = new Fraction(1);
 
         load(costModelXml);
     }
@@ -69,7 +70,7 @@ public class CostModel {
      * @param costs
      */
     @SafeVarargs
-    public CostModel(Triple<String, String, double[]>... costs) {
+    public CostModel(Triple<String, String, Fraction[]>... costs) {
         compDefDalModel = new LinkedHashMap<>();
         compDefModel = new LinkedHashMap<>();
         compDalModel = new LinkedHashMap<>();
@@ -77,9 +78,9 @@ public class CostModel {
         compModel = new LinkedHashMap<>();
         defModel = new LinkedHashMap<>();
         dalModel = new LinkedHashMap<>();
-        defaultModel = 1;
+        defaultModel = new Fraction(1);
 
-        for (Triple<String, String, double[]> triple : costs) {
+        for (Triple<String, String, Fraction[]> triple : costs) {
             if (triple.right.length != 10) {
                 throw new RuntimeException("invalid costs");
             }
@@ -98,18 +99,18 @@ public class CostModel {
      * @param dal
      * @return
      */
-    public double cost(String defense, String component, int dal) {
+    public Fraction cost(String defense, String component, int dal) {
         // If DAL is not specified, we default to using DAL to linearly scale cost
 
         // System.out.println("Loading cost: " + defense + ", " + component + ", " + dal);
 
-        Double lookup = compDefDalModel.get(new Triple<>(component, defense, dal));
+        Fraction lookup = compDefDalModel.get(new Triple<>(component, defense, dal));
         if (lookup != null) {
             return lookup;
         }
         lookup = compDefModel.get(new Pair<>(component, defense));
         if (lookup != null) {
-            return lookup * dal;
+            return lookup.multiply(dal);
         }
         lookup = compDalModel.get(new Pair<>(component, dal));
         if (lookup != null) {
@@ -121,22 +122,23 @@ public class CostModel {
         }
         lookup = compModel.get(component);
         if (lookup != null) {
-            return lookup * dal;
+            return lookup.multiply(dal);
         }
         lookup = defModel.get(defense);
         if (lookup != null) {
-            return lookup * dal;
+            return lookup.multiply(dal);
         }
         lookup = dalModel.get(dal);
         if (lookup != null) {
             return lookup;
         }
-        return defaultModel * dal;
+        return defaultModel.multiply(dal);
     }
 
     /** Print the cost function. Used for diagnostic purposes. */
     public void printMap() {
-        for (Entry<Triple<String, String, Integer>, Double> mapping : compDefDalModel.entrySet()) {
+        for (Entry<Triple<String, String, Integer>, Fraction> mapping :
+                compDefDalModel.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -147,7 +149,7 @@ public class CostModel {
                             + " to "
                             + mapping.getValue());
         }
-        for (Entry<Pair<String, String>, Double> mapping : compDefModel.entrySet()) {
+        for (Entry<Pair<String, String>, Fraction> mapping : compDefModel.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -156,7 +158,7 @@ public class CostModel {
                             + " to "
                             + mapping.getValue());
         }
-        for (Entry<Pair<String, Integer>, Double> mapping : compDalModel.entrySet()) {
+        for (Entry<Pair<String, Integer>, Fraction> mapping : compDalModel.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -165,7 +167,7 @@ public class CostModel {
                             + " to "
                             + mapping.getValue());
         }
-        for (Entry<Pair<String, Integer>, Double> mapping : defDalModel.entrySet()) {
+        for (Entry<Pair<String, Integer>, Fraction> mapping : defDalModel.entrySet()) {
             System.out.println(
                     "map "
                             + mapping.getKey().left
@@ -174,13 +176,13 @@ public class CostModel {
                             + " to "
                             + mapping.getValue());
         }
-        for (Entry<String, Double> mapping : compModel.entrySet()) {
+        for (Entry<String, Fraction> mapping : compModel.entrySet()) {
             System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
         }
-        for (Entry<String, Double> mapping : defModel.entrySet()) {
+        for (Entry<String, Fraction> mapping : defModel.entrySet()) {
             System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
         }
-        for (Entry<Integer, Double> mapping : dalModel.entrySet()) {
+        for (Entry<Integer, Fraction> mapping : dalModel.entrySet()) {
             System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
         }
         System.out.println("default: " + defaultModel);
@@ -208,7 +210,7 @@ public class CostModel {
                     }
                 }
 
-                double cost = parseCost(rule.getTextContent());
+                Fraction cost = parseCost(rule.getTextContent());
 
                 if (isEmptyStr(component) && isEmptyStr(defense) && isEmptyStr(dalStr)) {
                     defaultModel = cost;
@@ -253,14 +255,14 @@ public class CostModel {
         return dal;
     }
 
-    private static double parseCost(String costStr) {
+    public static Fraction parseCost(String costStr) {
         if ("INF".equals(costStr)) {
-            throw new ParseException("INF not supported yet");
+            throw new RuntimeException("INF not supported yet");
         }
-        double cost = Double.parseDouble(costStr);
-        if (cost < 0) {
-            throw new ParseException("negative cost: " + costStr);
+        double costDouble = Double.parseDouble(costStr);
+        if (costDouble < 0) {
+            throw new RuntimeException("negative cost: " + costStr);
         }
-        return cost;
+        return new Fraction(costDouble, 0.000001, 20);
     }
 }

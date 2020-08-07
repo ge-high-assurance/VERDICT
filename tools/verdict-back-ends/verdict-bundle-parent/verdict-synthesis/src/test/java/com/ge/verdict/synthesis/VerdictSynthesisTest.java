@@ -69,11 +69,15 @@ public class VerdictSynthesisTest {
             doubleCosts2[i] = costs[2];
         }
 
+        Fraction[] fractionCosts0 = Util.fractionCosts(doubleCosts0);
+        Fraction[] fractionCosts1 = Util.fractionCosts(doubleCosts1);
+        Fraction[] fractionCosts2 = Util.fractionCosts(doubleCosts2);
+
         int targetDal = 1;
 
-        DLeaf cd1 = new DLeaf("C1", "D1", "A1", 0, targetDal, doubleCosts0, factory);
-        DLeaf cd2 = new DLeaf("C2", "D2", "A2", 0, targetDal, doubleCosts1, factory);
-        DLeaf cd3 = new DLeaf("C3", "D3", "A3", 0, targetDal, doubleCosts2, factory);
+        DLeaf cd1 = new DLeaf("C1", "D1", "A1", 0, targetDal, fractionCosts0, factory);
+        DLeaf cd2 = new DLeaf("C2", "D2", "A2", 0, targetDal, fractionCosts1, factory);
+        DLeaf cd3 = new DLeaf("C3", "D3", "A3", 0, targetDal, fractionCosts2, factory);
 
         DTree tree = new DOr(new DAnd(cd1, cd2), new DAnd(cd2, cd3), new DAnd(cd1, cd3));
 
@@ -160,7 +164,7 @@ public class VerdictSynthesisTest {
         DLeaf.Factory factory = new DLeaf.Factory();
         SystemModel system = new SystemModel("S1");
         int targetDal = 1;
-        double[] costs = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+        Fraction[] costs = Util.fractionCosts(new double[] {5, 5, 5, 5, 5, 5, 5, 5, 5, 5});
         DLeaf dleaf = new DLeaf("S1", "D1", "A2", 0, targetDal, costs, factory);
         DTree dtree =
                 new DOr(
@@ -240,7 +244,7 @@ public class VerdictSynthesisTest {
     @Test
     public void multipleRequirementsTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
-        double[] costs = {2, 5, 9, 15, 16, 18, 20, 25, 30, 37};
+        Fraction[] costs = Util.fractionCosts(new double[] {2, 5, 9, 15, 16, 18, 20, 25, 30, 37});
         DLeaf leaf1 = new DLeaf("S1", "D1", "A2", 0, 3, costs, factory);
         DLeaf leaf2 = new DLeaf("S1", "D1", "A2", 0, 4, costs, factory);
         DTree dtree = new DAnd(leaf1, leaf2);
@@ -253,15 +257,17 @@ public class VerdictSynthesisTest {
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items).hasSize(1);
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D1", 0, 4, 2, 16));
-        Assertions.assertThat(result.get().outputCost).isEqualTo(16);
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D1", 0, 4, new Fraction(2), new Fraction(16)));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(16));
     }
 
     @Test
     public void meritAssignmentTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
-        double[] costs1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        double[] costs2 = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11};
+        Fraction[] costs1 = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        Fraction[] costs2 = Util.fractionCosts(new double[] {1, 2, 3, 5, 6, 7, 8, 9, 10, 11});
         DLeaf leaf1 = new DLeaf("S1", "D1", "A1", 3, 3, costs1, factory);
         DLeaf leaf2 = new DLeaf("S1", "D2", "A2", 3, 3, costs2, factory);
         DTree dtree = new DOr(leaf1, leaf2);
@@ -275,10 +281,14 @@ public class VerdictSynthesisTest {
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items).hasSize(2);
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D1", 3, 3, 3, 3));
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D1", 3, 3, new Fraction(3), new Fraction(3)));
         Assertions.assertThat(result.get().items)
-                .contains(new ResultsInstance.Item("S1", "D2", 3, 0, 5, 1));
-        Assertions.assertThat(result.get().outputCost).isEqualTo(4);
+                .contains(
+                        new ResultsInstance.Item(
+                                "S1", "D2", 3, 0, new Fraction(5), new Fraction(1)));
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(4));
     }
 
     @Test
@@ -336,12 +346,12 @@ public class VerdictSynthesisTest {
 
         Assertions.assertThat(result.isPresent());
         Assertions.assertThat(result.get().items.size()).isEqualTo(2);
-        Assertions.assertThat(result.get().outputCost).isEqualTo(1);
+        Assertions.assertThat(result.get().outputCost).isEqualTo(new Fraction(1));
     }
 
     @Test
     public void totalCostTest() {
-        double[] costs = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 2, 4, 6, 8, 10, 12, 14, 16, 18});
 
         DLeaf.Factory factory = new DLeaf.Factory();
         new DLeaf("C1", "D1", "A1", 3, 7, costs, factory); // this one counts as 3*2
@@ -356,7 +366,7 @@ public class VerdictSynthesisTest {
     @Test
     public void resultsXmlTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
-        double[] costs = {2, 5, 9, 15, 16, 18, 20, 25, 30, 37};
+        Fraction[] costs = Util.fractionCosts(new double[] {2, 5, 9, 15, 16, 18, 20, 25, 30, 37});
         DTree dtree = new DLeaf("S1", "D1", "A2", 0, 3, costs, factory);
         CostModel costModel = new CostModel(new Triple<>("S1", "D1", costs));
 

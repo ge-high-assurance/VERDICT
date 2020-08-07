@@ -32,4 +32,8 @@ public class IVCNode implements Serializable, Cloneable {
 	public List<IVCElement> getNodeElements() {
 		return nodeElements;
 	}
+	
+	public boolean hasAssumption() {
+		return nodeElements.stream().anyMatch(IVCElement::isAssumption);
+	}
 }
