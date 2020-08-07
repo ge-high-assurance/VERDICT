@@ -7,12 +7,15 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.adtree.DefenseCondition;
 import com.ge.verdict.synthesis.dtree.ALeaf;
 import com.ge.verdict.synthesis.dtree.DAnd;
+import com.ge.verdict.synthesis.dtree.DCondition;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -87,6 +90,7 @@ public class DTreeConstructor {
 
     private final Set<Defense> defenses;
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
+    private final List<DCondition> dconditions;
 
     private DTreeConstructor(
             CostModel costModel,
@@ -102,6 +106,7 @@ public class DTreeConstructor {
 
         defenses = new LinkedHashSet<>();
         attackALeafMap = new LinkedHashMap<>();
+        dconditions = new ArrayList<>();
     }
 
     private DTree perform(ADTree adtree) {
@@ -136,6 +141,34 @@ public class DTreeConstructor {
 
             for (ALeaf aleaf : unmitigated) {
                 System.out.println("Warning: Unmitigated attack: " + aleaf.getAttack().toString());
+            }
+
+            for (DCondition dcond : dconditions) {
+                Optional<DLeaf.ComponentDefense> compDef =
+                        factory.lookup(
+                                dcond.defenseCond.getAttackable().getParentName(),
+                                dcond.defenseCond.getDefenseProperty());
+                if (compDef.isPresent()) {
+                    dcond.setCompDef(compDef.get());
+                } else {
+                    // This means that the defense isn't part of the attack-defense tree,
+                    // so we need to create a dleaf (which implicitly creates an SMT variable)
+                    // for it so that the DAL can get forced down to zero if necessary
+
+                    // TODO this doesn't actually work. This is the screwy case that we need to fix.
+                    DLeaf dleaf =
+                            new DLeaf(
+                                    dcond.defenseCond.getAttackable().getParentName(),
+                                    dcond.defenseCond.getDefenseProperty(),
+                                    "",
+                                    dcond.defenseCond.getImplDal(),
+                                    0,
+                                    costModel,
+                                    factory,
+                                    usePartialSolution,
+                                    meritAssignment);
+                    dcond.setCompDef(dleaf.componentDefense);
+                }
             }
 
             Optional<DTree> prepared = result.prepare();
@@ -186,6 +219,10 @@ public class DTreeConstructor {
         } else if (adtree instanceof ADNot) {
             ADNot adnot = (ADNot) adtree;
             return constructInternal(adnot.child()).map(DNot::new);
+        } else if (adtree instanceof DefenseCondition) {
+            DCondition dcond = new DCondition((DefenseCondition) adtree);
+            dconditions.add(dcond);
+            return Optional.of(dcond);
         } else {
             throw new RuntimeException(
                     "got invalid adtree type: " + adtree.getClass().getCanonicalName());

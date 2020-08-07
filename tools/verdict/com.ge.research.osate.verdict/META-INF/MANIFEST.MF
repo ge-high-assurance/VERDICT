@@ -20,7 +20,8 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.osate.ge,
  org.osate.xtext.aadl2.ui,
  org.eclipse.core.databinding.observable,
- org.eclipse.jface.databinding
+ org.eclipse.jface.databinding,
+ org.apache.commons.math3
 Import-Package: org.apache.commons.logging
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,

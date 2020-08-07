@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.math3.fraction.Fraction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,7 +24,7 @@ import org.xml.sax.SAXException;
 
 public class ResultsInstance {
     public final boolean partialSolution, meritAssignment, inputSat;
-    public final double inputCost, outputCost;
+    public final Fraction inputCost, outputCost;
     public final List<Item> items;
 
     private static final String ROOT_TAG = "synthesis";
@@ -44,15 +45,15 @@ public class ResultsInstance {
     public static class Item {
         public final String component, defenseProperty;
         public final int inputDal, outputDal;
-        public final double inputCost, outputCost;
+        public final Fraction inputCost, outputCost;
 
         public Item(
                 String component,
                 String defenseProperty,
                 int inputDal,
                 int outputDal,
-                double inputCost,
-                double outputCost) {
+                Fraction inputCost,
+                Fraction outputCost) {
             super();
             this.component = component;
             this.defenseProperty = defenseProperty;
@@ -76,8 +77,8 @@ public class ResultsInstance {
                         && defenseProperty.equals(otherItem.defenseProperty)
                         && inputDal == otherItem.inputDal
                         && outputDal == otherItem.outputDal
-                        && inputCost == otherItem.inputCost
-                        && outputCost == otherItem.outputCost;
+                        && inputCost.equals(otherItem.inputCost)
+                        && outputCost.equals(otherItem.outputCost);
             }
             return false;
         }
@@ -87,8 +88,8 @@ public class ResultsInstance {
             boolean partialSolution,
             boolean meritAssignment,
             boolean inputSat,
-            double inputCost,
-            double outputCost,
+            Fraction inputCost,
+            Fraction outputCost,
             List<Item> items) {
         super();
         this.partialSolution = partialSolution;
@@ -117,8 +118,8 @@ public class ResultsInstance {
                                 elem.getAttribute(ITEM_DEFENSE_PROPERTY),
                                 Integer.parseInt(elem.getAttribute(ITEM_INPUT_DAL)),
                                 Integer.parseInt(elem.getAttribute(ITEM_OUTPUT_DAL)),
-                                Double.parseDouble(elem.getAttribute(ITEM_INPUT_COST)),
-                                Double.parseDouble(elem.getAttribute(ITEM_OUTPUT_COST))));
+                                parseCost(elem.getAttribute(ITEM_INPUT_COST)),
+                                parseCost(elem.getAttribute(ITEM_OUTPUT_COST))));
             }
         }
 
@@ -126,8 +127,8 @@ public class ResultsInstance {
                 Boolean.parseBoolean(root.getAttribute(ROOT_PARTIAL_SOLUTION)),
                 Boolean.parseBoolean(root.getAttribute(ROOT_MERIT_ASSIGNMENT)),
                 Boolean.parseBoolean(root.getAttribute(ROOT_INPUT_SAT)),
-                Double.parseDouble(root.getAttribute(ROOT_INPUT_COST)),
-                Double.parseDouble(root.getAttribute(ROOT_OUTPUT_COST)),
+                parseCost(root.getAttribute(ROOT_INPUT_COST)),
+                parseCost(root.getAttribute(ROOT_OUTPUT_COST)),
                 items);
     }
 
@@ -140,8 +141,8 @@ public class ResultsInstance {
             root.setAttribute(ROOT_PARTIAL_SOLUTION, Boolean.toString(partialSolution));
             root.setAttribute(ROOT_MERIT_ASSIGNMENT, Boolean.toString(meritAssignment));
             root.setAttribute(ROOT_INPUT_SAT, Boolean.toString(inputSat));
-            root.setAttribute(ROOT_INPUT_COST, Double.toString(inputCost));
-            root.setAttribute(ROOT_OUTPUT_COST, Double.toString(outputCost));
+            root.setAttribute(ROOT_INPUT_COST, Double.toString(inputCost.doubleValue()));
+            root.setAttribute(ROOT_OUTPUT_COST, Double.toString(outputCost.doubleValue()));
 
             for (Item item : items) {
                 Element elem = doc.createElement(ITEM_TAG);
@@ -151,8 +152,8 @@ public class ResultsInstance {
                 elem.setAttribute(ITEM_DEFENSE_PROPERTY, item.defenseProperty);
                 elem.setAttribute(ITEM_INPUT_DAL, Integer.toString(item.inputDal));
                 elem.setAttribute(ITEM_OUTPUT_DAL, Integer.toString(item.outputDal));
-                elem.setAttribute(ITEM_INPUT_COST, Double.toString(item.inputCost));
-                elem.setAttribute(ITEM_OUTPUT_COST, Double.toString(item.outputCost));
+                elem.setAttribute(ITEM_INPUT_COST, Double.toString(item.inputCost.doubleValue()));
+                elem.setAttribute(ITEM_OUTPUT_COST, Double.toString(item.outputCost.doubleValue()));
             }
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -228,10 +229,14 @@ public class ResultsInstance {
             return partialSolution == otherRes.partialSolution
                     && meritAssignment == otherRes.meritAssignment
                     && inputSat == otherRes.inputSat
-                    && inputCost == otherRes.inputCost
-                    && outputCost == otherRes.outputCost
+                    && inputCost.equals(otherRes.inputCost)
+                    && outputCost.equals(otherRes.outputCost)
                     && items.equals(otherRes.items);
         }
         return false;
+    }
+
+    public static Fraction parseCost(String costStr) {
+        return new Fraction(Double.parseDouble(costStr), 0.000001, 20);
     }
 }
