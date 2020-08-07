@@ -18,14 +18,18 @@
     <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'STEMRules.sadl' and should not be directly edited.</rdfs:comment>
   </owl:Ontology>
   <j.0:Rule rdf:ID="Vul-CAPEC-125-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-151-2"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-507-5"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-74-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-242-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-131-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-112-5"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-188-3"/>
   <j.0:Rule rdf:ID="TA1-Identity_Spoofing_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-192-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-440-3"/>
   <j.0:Rule rdf:ID="InferDataReceivedIsUntrusted2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-586-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-22-1"/>
@@ -59,6 +63,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-439-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-440-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-549-2"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-192-3"/>
   <j.0:Rule rdf:ID="Transitive2"/>
   <j.0:Rule rdf:ID="TA1-Supply_Chain_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-123-1"/>
@@ -84,7 +89,6 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-507-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-28-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-123-3"/>
-  <j.0:Rule rdf:ID="Vul-CAPEC-151-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-248-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-224-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-112-1"/>
@@ -96,6 +100,7 @@
   <j.0:Rule rdf:ID="InferBindingVulAndDataSentIsUntrusted2"/>
   <j.0:Rule rdf:ID="TA1-Sniffing_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-607-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-624-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-28-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-175-2"/>
@@ -125,6 +130,7 @@
   <j.0:Rule rdf:ID="TA1-Flooding_Attack"/>
   <j.0:Rule rdf:ID="TA1-Physical_Theft_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-21-2"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-148-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-390-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-74-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-130-1"/>

@@ -15,17 +15,11 @@ import "http://sadl.org/STEM/Queries".
 // For debugging csv file importing, uncomment the line that writes out the log file in each of the template files.
 //		In VM would need to also replace c:/tmp/ by /home/soteria/tmp/
 
-// On the VM, the text in the node does not always fit inside the box though it fits inside on my desktop computer.
-//		Note that the same file on VM that has text outside is fine on my desktop.
-//		So, the issue seems to be with GraphViz on Ubuntu.
-
-///////////////// SADL VERSIONS ///////////////
-// Got this working on laptop where I have SADL version dated 20190102.
-// I also have eclipse 2020-3 installed where I have SADL dated 20200506 which should be same SADL release 3.3.0
-// Desktop has SADL version dated 12/20/2019.
-// Oracle VM has SADL version dated 20190311.
-// OVA on my laptop is dated 20190311.
-
+// 8/5/2020: updated rules so that we no longer duplicate mitigation on connection on the component
+//				which was what SOTERIA++ needed before handling connections properly.
+//			Also, altered so that SystemAccessControl is now mapped to PE-3 and PE-3-1,
+//				earlier it was mapped to just PE-3-1.
+//			Also, where ever we had PhysicalAccessControl we have added SystemAccessControl as a mitigation. 
 // 5/19/2020: updated rules to handle connection properties, added tooltips for connections in graph; outputting ConnDefenses.csv
 // 5/8/2020: Reconciled properties, cleaned out, updated / cleared out default rules.
 // 4/6/2020:
@@ -41,6 +35,7 @@ Read: data from "ScnConnections.csv" using "ScnConnections.tmpl".  //connections
 Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
 Read: data from "ScnBusBindings.csv" using "ScnBusBindings.tmpl".
 
+//Print:  Model .
 //Explain: Rule InferDataReceivedIsUntrusted1.
 // note this count may be larger than the number of entries in CAPEC.csv as there may be 
 // multiple mitigations for a capec (e.g. capec-148 etc.)
@@ -53,9 +48,10 @@ Write: data {Ask: queries:CAPEC.} to "/Output/CAPEC.csv".
 
 Write: data {Ask: queries:Defenses.} to "/Output/Defenses.csv".
 
-Write: data {Ask: queries:ConnDefenses.} to "/Output/ConnDefenses.csv".
+//Write: data {Ask: queries:ConnDefenses.} to "/Output/ConnDefenses.csv".
 
 Write: data {Ask: queries:ArchMitigation.} to "/Output/ArchMitigation.csv".
+
 
 /////////////////////// GRAPHS ////////////////////////////
 ////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
@@ -195,6 +191,14 @@ Graph: queries:STEMgraph.
 //. ?conn <connectionType> ?t . FILTER(regex(str(?t),'Untrusted'))
 //}".
 
-
+// writing out equivalent of CompDep.csv
+//Write: data {Ask: "select distinct ?comp ?InputPort (?cia as ?InputCIA) ?OutputPort (?cia as ?outputCIA) where
+//{ ?conn <outPort> ?OutputPort . ?conn <connectionSource> ?comp
+//. FILTER(!regex(str(?comp), 'Impl'))
+//. ?conn2 <connectionDestination> ?comp
+//. ?conn2 <inPort> ?InputPort
+//. ?capec <ciaIssue> ?cia
+//. FILTER(!regex(str(?cia), 'Confidentiality'))
+//} order by ?comp ?OutputPort ?InputPort ?cia".} to "/Output/FullCompDep.csv".
 
             
