@@ -201,7 +201,7 @@ public class VDM2Lustre {
         String identifier = componentType.getName();
 
         if (is_implemented) {
-            identifier += "_Impl";
+            identifier += "_dot_Impl";
 
         } else {
             // Imported Node
@@ -387,7 +387,7 @@ public class VDM2Lustre {
         NodeCall nodeCall = new NodeCall();
 
         if (impl_type) {
-            nodeCall.setNodeId(componentType.getName() + "_Impl");
+            nodeCall.setNodeId(componentType.getName() + "_dot_Impl");
         } else {
             nodeCall.setNodeId(componentType.getName());
         }
@@ -505,7 +505,7 @@ public class VDM2Lustre {
                 TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
                 user_defined_type = baseType.getName();
-                String definedType = user_defined_type.replace("_", "Event_");
+                String definedType = user_defined_type.replace("_dot_", "Event_");
 
                 eventTypeDeclaration.setName(definedType);
 
@@ -682,7 +682,7 @@ public class VDM2Lustre {
             if (recordLiteral != null) {
 
                 String identifier = recordLiteral.getRecordType();
-                identifier = identifier.replace(".", "_");
+                identifier = identifier.replace(".", "_dot_");
                 recordLiteral.setRecordType(identifier);
 
                 for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
@@ -1259,11 +1259,11 @@ public class VDM2Lustre {
 
             if (componentType == null) {
                 componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
+                called_node_ID = componentType.getName() + "_dot_Impl";
             }
             if (componentType != null && componentImpl != null) {
                 componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
+                called_node_ID = componentType.getName() + "_dot_Impl";
 
                 String inst_cmp = "(.+)_instrumented";
 
@@ -1384,7 +1384,7 @@ public class VDM2Lustre {
             if (componentType != null && componentImpl != null) {
 
                 componentType = componentImpl.getType();
-                called_node_ID = componentType.getName() + "_Impl";
+                called_node_ID = componentType.getName() + "_dot_Impl";
 
                 String inst_cmp = "(.+)_instrumented";
                 Pattern inst_pattern = Pattern.compile(inst_cmp);
@@ -1529,8 +1529,8 @@ public class VDM2Lustre {
 
         String identifier = typeDeclaration.getName();
         // Renaming dot[.] in Type Declaration Identifier.
-        // identifier = identifier.replace(".", "_id_");
-        // typeDeclaration.setName(identifier);
+        identifier = identifier.replace(".", "_id_");
+        typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
 

@@ -1,23 +1,16 @@
-package edu.uiowa.clc.verdict.merit;
+package edu.uiowa.clc.verdict.crv;
 
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class MeritAssignment {
+public class MeritAssignmentResult {
 
-    File kind2OutputFile = null;
-
-    public MeritAssignment(File kind2OutputFile) {
-        this.kind2OutputFile = kind2OutputFile;
-    }
-
-    public void readAndPrintInfo() {
+    public static void readAndPrintInfo(File kind2OutputFile) {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -34,19 +27,18 @@ public class MeritAssignment {
                 Element MESElement = (Element) MESNode;
                 NodeList nList = MESElement.getElementsByTagName("Node");
 
-                for (int j = 0; j < nList.getLength(); ++j) {
+                for (int j = nList.getLength() - 1; j >= 0; --j) {
                     Node nNode = nList.item(j);
 
                     if (nNode.getNodeType() != Node.ELEMENT_NODE) continue;
 
                     Element nodeElement = (Element) nNode;
 
-                    String element_name = nodeElement.getAttribute("name");
+                    String nodeName = nodeElement.getAttribute("name");
+                    //                    nodeName = nodeName.replaceAll("_port_", ".");
+                    nodeName = nodeName.replace("_dot_", ".");
 
-                    //                    element_name = element_name.replaceAll("_port_", ".");
-                    element_name = element_name.replace("_dot_", ".");
-
-                    System.out.println("Component " + element_name + ":");
+                    System.out.println("Node " + nodeName + ":");
 
                     NodeList eList = nodeElement.getElementsByTagName("Element");
 
@@ -59,9 +51,7 @@ public class MeritAssignment {
 
                         System.out.print("  ");
 
-                        String category =
-                                StringUtils.capitalize(elementElement.getAttribute("category"))
-                                        .replace('_', ' ');
+                        String category = elementElement.getAttribute("category").replace('_', ' ');
 
                         System.out.print(category);
 

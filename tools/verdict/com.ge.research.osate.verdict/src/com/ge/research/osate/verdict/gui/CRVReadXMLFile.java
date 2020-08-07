@@ -21,7 +21,8 @@ import org.w3c.dom.NodeList;
 
 //this class extracts the contents of CRV .xml and stores in the data-structures
 public class CRVReadXMLFile {
-	List<CRVResultAttributes> list = new ArrayList<CRVResultAttributes>();
+	List<CRVResultAttributes> results = new ArrayList<CRVResultAttributes>();
+	List<IVCNode> ivc = new ArrayList<IVCNode>();
 
 	public CRVReadXMLFile(String fileName1, String fileName2) {
 		try {
@@ -54,15 +55,64 @@ public class CRVReadXMLFile {
 							// do nothing
 						}
 					}
-					list.add(newProperty);
+					results.add(newProperty);
 				}
 			}
+			
+			readIVC(doc);
+			
 		} catch (Exception e) {
 			System.out.println("Error in loading .xml file");
 			e.printStackTrace();
 		}
 	}
 
+	protected void readIVC(Document doc) {
+		NodeList MESList = doc.getElementsByTagName("ModelElementSet");
+
+        for (int i = 0; i < MESList.getLength(); ++i) {
+            Node MESNode = MESList.item(i);
+
+            if (MESNode.getNodeType() != Node.ELEMENT_NODE) continue;
+
+            Element MESElement = (Element) MESNode;
+            NodeList nList = MESElement.getElementsByTagName("Node");
+
+            for (int j = 0; j < nList.getLength(); ++j) {
+                Node nNode = nList.item(j);
+
+                if (nNode.getNodeType() != Node.ELEMENT_NODE) continue;
+
+                Element nodeElement = (Element) nNode;
+
+                String element_name = nodeElement.getAttribute("name");
+                element_name = element_name.replace("_dot_", ".");
+                
+                IVCNode ivcNode = new IVCNode();
+                ivcNode.setNodeName(element_name);
+                
+                NodeList eList = nodeElement.getElementsByTagName("Element");
+
+                for (int k = 0; k < eList.getLength(); ++k) {
+                    Node eNode = eList.item(k);
+
+                    if (eNode.getNodeType() != Node.ELEMENT_NODE) continue;
+
+                    Element elementElement = (Element) eNode;
+                    
+                    IVCElement ivcElement = new IVCElement();
+                    String category = elementElement.getAttribute("category").toUpperCase();
+                    ivcElement.setCategory(IVCElement.Category.valueOf(category));
+                    ivcElement.setName(elementElement.getAttribute("name"));
+                    
+                    ivcNode.getNodeElements().add(ivcElement);
+                }
+                
+                ivc.add(ivcNode);
+            }
+        }
+	}
+	
 	// extracts content of a counter-example from the .xml
 	protected List<CounterExampleAttributes> extractCE(Node node) {
 		List<CounterExampleAttributes> list = new ArrayList<CounterExampleAttributes>();
@@ -76,7 +126,7 @@ public class CRVReadXMLFile {
 			CounterExampleAttributes newNode = new CounterExampleAttributes();
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				newNode.setNodeName(eElement.getAttribute("name"));
+				newNode.setNodeName(eElement.getAttribute("name").replace("_dot_", "."));
 				newNode.setNodeAttr(extractCENode(eElement.getElementsByTagName("Stream")));
 				list.add(newNode);
 			}
@@ -172,7 +222,7 @@ public class CRVReadXMLFile {
 			CENode newString = new CENode();
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				newString.setVarName(eElement.getAttribute("name"));
+				newString.setVarName(eElement.getAttribute("name").replace("_dot_", "."));
 				if (eElement.getAttribute("type").equals("enum")) {
 					newString.setVarType(eElement.getAttribute("enumName"));
 				} else {
@@ -197,7 +247,11 @@ public class CRVReadXMLFile {
 		return list;
 	}
 
-	protected List<CRVResultAttributes> getContent() {
-		return list;
+	protected List<CRVResultAttributes> getResults() {
+		return results;
+	}
+	
+	protected List<IVCNode> getIVC() {
+		return ivc;
 	}
 }

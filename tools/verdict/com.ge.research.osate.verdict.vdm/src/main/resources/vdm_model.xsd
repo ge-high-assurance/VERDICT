@@ -266,6 +266,8 @@
                 maxOccurs="1"></element>
             <element name="assumption" type="string" minOccurs="0"
                 maxOccurs="1"></element>
+            <element name="strategy" type="string" minOccurs="0"
+                maxOccurs="1"></element>
             <element name="phases" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
@@ -423,6 +425,8 @@
                 maxOccurs="1"></element>
             <element name="assumption" type="string" minOccurs="0"
                 maxOccurs="1"></element>
+            <element name="strategy" type="string" minOccurs="0"
+                maxOccurs="1"></element>
             <element name="phases" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
@@ -460,6 +464,8 @@
             <element name="justification" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="assumption" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="strategy" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="comment" type="string" minOccurs="0"
                 maxOccurs="1"></element>

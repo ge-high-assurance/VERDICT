@@ -1048,7 +1048,9 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            if (blameAssignment && instrumentor != null) {
+            if (blameAssignment
+                    && instrumentor != null
+                    && instrumentor.emptyIntrumentation() == false) {
                 Binary.invokeBin(
                         kind2Bin,
                         null,
@@ -1092,7 +1094,7 @@ public class App {
                         }
                         break;
                     case 2:
-                        log("Kind2 fails to return correct results");
+                        log("Kind2 terminated with an error");
                         XMLProcessor.parseLog(new File(outputPath));
                         // Terminate the process?
                         break;

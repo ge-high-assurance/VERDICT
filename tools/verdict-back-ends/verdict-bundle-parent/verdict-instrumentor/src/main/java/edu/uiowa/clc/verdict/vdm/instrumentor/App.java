@@ -84,6 +84,8 @@ public class App {
 
         Option bn_opt = new Option("BN", "Benign", false, "Benign (Default)");
 
+        Option all_opt = new Option("AT", "ALL Threats", false, "Enable all attacks");
+
         Option bm_opt =
                 new Option("B", "Blame Assignment", false, "Blame Assignment (Link Level) Default");
 
@@ -102,6 +104,9 @@ public class App {
         options.addOption(ri_opt);
         options.addOption(ot_opt);
         options.addOption(it_opt);
+
+        options.addOption(all_opt);
+
         options.addOption(bn_opt);
         options.addOption(bm_opt);
         options.addOption(bl_opt);
