@@ -11,7 +11,8 @@ import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 
 /**
- * This class is an interface for generating security assurance cases It is still under development
+ * This class is an interface for generating security assurance cases 
+ * It is still under development
  *
  * @author Saswata Paul
  */
@@ -21,13 +22,13 @@ public class SecurityGSNInterface {
     protected static boolean CreateXmlFlag;
 
     /**
-     * The interface for creating GSN artefacts
-     *
-     * @param userInput -- the GUI user input with Ids
-     * @param gsnOutputDir -- the directory where outputs will be stored
-     * @param soteriaOutputDir -- the directory containing Soteria outputs
-     * @param caseAadlPath -- the directory containing the AADL files
-     * @param xmlFla -- determines if xml should be created
+     * The interface for creating security GSN artifacts
+     * @param userInput
+     * @param gsnOutputDir
+     * @param soteriaOutputDir
+     * @param caseAadlPath
+     * @param securityCaseFlag
+     * @param xmlFlag
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -37,6 +38,7 @@ public class SecurityGSNInterface {
             String gsnOutputDir,
             String soteriaOutputDir,
             String caseAadlPath,
+            boolean securityCaseFlag,
             boolean xmlFlag)
             throws IOException, ParserConfigurationException, SAXException {
 
@@ -82,10 +84,10 @@ public class SecurityGSNInterface {
                             safetyOutput,
                             caseAadlPath,
                             rootGoalId,
-                            true,
-                            gsnOutputDirectory);
+                            securityCaseFlag);
             System.out.println("Info: Created Gsn fragment for " + rootGoalId);
 
+            //creating artifacts
             createArtifactFiles(gsnFragment, rootGoalId);
         }
     }

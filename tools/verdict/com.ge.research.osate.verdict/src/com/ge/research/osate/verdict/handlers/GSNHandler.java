@@ -137,7 +137,7 @@ public class GSNHandler extends AbstractHandler {
 						File dataFolder = new File(stemProjPath, "CSVData");
 						File outputFolder = new File(stemProjPath, "Output");
 						File graphsFolder = new File(stemProjPath, "Graphs");
-						File gsnOutputFolder = new File(stemProjPath, "GSN");
+						File gsnOutputFolder = new File(stemProjPath, "gsn");
 						
 						
 						if (dataFolder.exists() && dataFolder.isDirectory()) {

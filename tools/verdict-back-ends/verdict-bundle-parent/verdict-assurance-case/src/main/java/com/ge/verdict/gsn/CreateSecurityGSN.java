@@ -10,7 +10,9 @@ import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.*;
 
 /**
- * This class has been designed for handling security assurance cases It is still under development
+ * This class has been designed for handling security assurance cases
+ * along with general assurance cases 
+ * It is still under development
  *
  * @author Saswata Paul
  */
@@ -25,7 +27,6 @@ public class CreateSecurityGSN {
     private int securityGoalCounter = 1;
     private String soteriaCyberOutputAddr;
     private String soteriaSafetyOutputAddr;
-    private static String gsnOutputDirectory;
 
     /**
      * creates a GsnNode and returns it
@@ -46,14 +47,12 @@ public class CreateSecurityGSN {
             File safetyOutput,
             String addressForCASE,
             String rootGoalId,
-            boolean securityCaseFlag,
-            String gsnOutputDir)
+            boolean securityCaseFlag)
             throws ParserConfigurationException, SAXException, IOException {
 
         // setting class variables
         soteriaCyberOutputAddr = cyberOutput.getAbsolutePath();
         soteriaSafetyOutputAddr = safetyOutput.getAbsolutePath();
-        gsnOutputDirectory = gsnOutputDir;
 
         // The GsnNode to return
         GsnNode returnFragment = new GsnNode();
@@ -621,6 +620,16 @@ public class CreateSecurityGSN {
         return reqNode;
     }
 
+    /**
+     * Populates subcomponent solution nodes for the highest level 
+     * security GSN and also creates the lower threat-level fragments
+     * @param subCompId
+     * @param cutsets
+     * @param acceptableProb
+     * @param cyberReqId
+     * @return
+     * @throws IOException
+     */
     public GsnNode populateSubComponentSolutionNode(
             String subCompId, List<Cutset> cutsets, String acceptableProb, String cyberReqId)
             throws IOException {
@@ -655,6 +664,14 @@ public class CreateSecurityGSN {
         return subCompSolNode;
     }
 
+    /**
+     * Populates the root nodes of the threat-level
+     * security GSN fragments
+     * @param subCompId
+     * @param cutsets
+     * @param acceptableProb
+     * @return
+     */
     public GsnNode populateSubComponentNode(
             String subCompId, List<Cutset> cutsets, String acceptableProb) {
         // GsnNode to pack solution
@@ -715,6 +732,13 @@ public class CreateSecurityGSN {
         return subCompNode;
     }
 
+    /**
+     * populates the threat-nodes of the threat-level GSN fragments
+     * @param componentId
+     * @param cutset
+     * @param acceptableProb
+     * @return
+     */
     public GsnNode populateThreatNode(String componentId, Cutset cutset, String acceptableProb) {
         // GsnNode to pack solution
         GsnNode threatNode = new GsnNode();
@@ -745,9 +769,8 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * Creates a GsnNode for threat level solutions Used for security cases which provide details of
-     * component level vulnerabilities and mitigation
-     *
+     * populates the solutions nodes for threat-level
+     * gsn fragments
      * @param CyberReqId
      * @param results
      * @return
@@ -1113,24 +1136,11 @@ public class CreateSecurityGSN {
      * @return
      */
     public List<Cutset> getComponentThreatInfo(NodeList cyberResults, String cyberReqId) {
-
         // List of all Cutsets for a requirement
         List<Cutset> cutsets = new ArrayList<>();
 
         for (int i = 0; i < cyberResults.getLength(); i++) {
             Node req = cyberResults.item(i);
-
-            if (req.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) req;
-                //               	System.out.println("Req Id-->"+ eElement.getAttribute("label")
-                //               	                    + " computed:
-                // "+eElement.getAttribute("computed_p")
-                //               	                    + "
-                // acceptable:"+eElement.getAttribute("acceptable_p") );
-
-            }
-            //        	System.out.println("Node name-->"+ req.getNodeName() );
-            //        	System.out.println("Node type-->"+ req.getNodeType() );
             NodeList cutsetList = req.getChildNodes();
 
             for (int j = 0; j < cutsetList.getLength(); j++) {
@@ -1140,21 +1150,12 @@ public class CreateSecurityGSN {
                 Node cutset = cutsetList.item(j);
                 if (cutset.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement1 = (Element) cutset;
-                    //                 	System.out.println("Cutset likelihood-->"+
-                    // eElement1.getAttribute("likelihood"));
                     packCutset.setLikelihood(eElement1.getAttribute("likelihood"));
                 }
-
-                //            	System.out.println("ChildNode name-->"+ cutset.getNodeName() );
-                //            	System.out.println("childNode type-->"+ cutset.getNodeType() );
                 NodeList attackDefenseList = cutset.getChildNodes();
 
                 for (int k = 0; k < attackDefenseList.getLength(); k++) {
                     Node attackDefense = attackDefenseList.item(k);
-                    //                	System.out.println("grandChildNode name-->"+
-                    // attackDefense.getNodeName() );
-                    //                	System.out.println("grandChildNode type-->"+
-                    // attackDefense.getNodeType() );
                     NodeList componentList = attackDefense.getChildNodes();
 
                     for (int l = 0; l < componentList.getLength(); l++) {
@@ -1162,12 +1163,6 @@ public class CreateSecurityGSN {
 
                         if (component.getNodeType() == Node.ELEMENT_NODE) {
                             Element eElement2 = (Element) component;
-                            //                          	System.out.println("Comp-->"+
-                            // eElement2.getAttribute("comp")
-                            //                          	                    + " attack:
-                            // "+eElement2.getAttribute("attack")
-                            //                          	                    + "
-                            // suggested:"+eElement2.getAttribute("suggested") );
                             packCutset.setComponent(eElement2.getAttribute("comp"));
                             if (eElement2.getAttribute("attack").length() > 0) {
                                 packCutset.setAttack(eElement2.getAttribute("attack"));
@@ -1176,17 +1171,11 @@ public class CreateSecurityGSN {
                                 packCutset.setDefenses(eElement2.getAttribute("suggested"));
                             }
                         }
-                        //
-                        //                    	System.out.println("greatGrandChildNode name-->"+
-                        // component.getNodeName() );
-                        //                    	System.out.println("greatGrandChildNode type-->"+
-                        // component.getNodeType() );
-                        //
+
                     }
                 }
-
-                // add the packet to the list if the likelihood is not null, i.e., it is not empty
-                // line
+                // add the packet to the list if the likelihood is not null, i.e., 
+                //it is not an empty line
                 if (packCutset.getLikelihood() != null) {
                     cutsets.add(packCutset);
                 }
