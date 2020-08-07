@@ -5,6 +5,7 @@ import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.gsn.GSNInterface;
+import com.ge.verdict.gsn.SecurityGSNInterface;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
@@ -181,6 +182,7 @@ public class App {
         options.addOption("p", false, "Use partial solutions in synthesis");
 
         options.addOption("x", false, "Generate XML files for GSN");
+        options.addOption("z", false, "Generate GSN Fragments for Security Cases");
 
         for (String opt : crvThreats) {
             options.addOption(opt, false, "");
@@ -238,7 +240,7 @@ public class App {
                 "      --synthesis <cost model xml>"
                         + "                             perform synthesis instead of Soteria++");
         helpLine(
-                "      -o ................... synthesis output XML (required if synthesis enabled)");
+                "       -o ................... synthesis output XML (required if synthesis enabled)");
         helpLine("      -p ................... synthesis partial solutions");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
@@ -249,7 +251,7 @@ public class App {
         helpLine("      -MA .................. merit assignment");
         helpLine("      -BA .................. blame assignment");
         helpLine(
-                "      -C ................... component-level blame assignment (default link-level)");
+                "       -C ................... component-level blame assignment (default link-level)");
         helpLine("      -G ................... global blame assignment (default local)");
         helpLine(
                 "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
@@ -258,10 +260,11 @@ public class App {
         helpLine("  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> [-x]");
         helpLine("   <root id> ............... the root goal id for the assurance case fragment");
         helpLine(
-                "   <gsn out dir> ........... the directory where the gsn fragments should be created");
+                "    <gsn out dir> ........... the directory where the gsn fragments should be created");
         helpLine("   <soteria out dir> ....... the directory where Soteria outputs are created");
         helpLine("   <aadl project dir> ...... the directory where the aadl files are present");
         helpLine("        -x ................. key to determine if xml should be created");
+        helpLine("        -z ................. key to determine if security assurance cases should be created");
         helpLine();
         helpLine("-d, --debug <dir> .......... Produce debug output");
         helpLine("      <dir> ................ Intermediary XML output directory");
@@ -400,8 +403,13 @@ public class App {
             String soteriaOutputDir = gsnOpts[2];
             String caseAadlPath = gsnOpts[3];
             boolean generateXml = false;
+            boolean securityCases = false;
             if (opts.hasOption("x")) {
                 generateXml = true;
+            }
+            
+            if (opts.hasOption("z")) {
+                securityCases = true;
             }
 
             runGsn(
@@ -410,6 +418,7 @@ public class App {
                     soteriaOutputDir,
                     caseAadlPath,
                     generateXml,
+                    securityCases,
                     modelName);
         }
     }
@@ -466,20 +475,40 @@ public class App {
             String soteriaOutputDir,
             String caseAadlPath,
             boolean generateXml,
+            boolean securityCases,
             String modelName)
             throws VerdictRunException {
         logHeader("GSN");
-        // calling the function to create GSN artefacts
-        GSNInterface createGsnObj = new GSNInterface();
+        
+        
+        if(!securityCases) {
+            // calling the function to create GSN artefacts
+            GSNInterface createGsnObj = new GSNInterface();
 
-        try {
-            createGsnObj.runGsnArtifactsGenerator(
-                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            // TODO Auto-generated catch block
-            throw new VerdictRunException("Failed to create GSN fragments", e);
+            try {
+                createGsnObj.runGsnArtifactsGenerator(
+                        rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
+            } catch (IOException | ParserConfigurationException | SAXException e) {
+                // TODO Auto-generated catch block
+                throw new VerdictRunException("Failed to create GSN fragments", e);
+            }        	
+        } else {
+            // calling the function to create GSN artefacts
+            SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
+
+            try {
+                createGsnObj.runGsnArtifactsGenerator(
+                        rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, securityCases, generateXml);
+            } catch (IOException | ParserConfigurationException | SAXException e) {
+                // TODO Auto-generated catch block
+                throw new VerdictRunException("Failed to create GSN fragments", e);
+            }        	
         }
 
+        
+        
+        
+        
         logHeader("Finished");
     }
 

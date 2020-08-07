@@ -526,7 +526,7 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * Creates a Gsn node for a given cyber requirement that includes component threat-level details
+     * Creates a Gsn node for a given cyber requirement 
      * for security cases
      *
      * @param cyberReq
@@ -568,7 +568,7 @@ public class CreateSecurityGSN {
         if (cyberReq.getStrategy() != null) {
             strategyText = cyberReq.getStrategy();
         } else {
-            strategyText = "Argument: All subcomponents are secure.";
+            strategyText = "Argument: All subcomponents are secure";
         }
 
         // to populate Strategy of strategyNode
@@ -801,7 +801,9 @@ public class CreateSecurityGSN {
                 "Computed Likelihood = "
                         + cutset.getLikelihood()
                         + "&#10;Acceptable Likelihood = "
-                        + acceptableProb;
+                        + acceptableProb
+                        + "&#10;Implemented Defenses: "
+                        + cutset.getDefenses();
         sol.setExtraInfo(extraInfo);
         sol.setUrl(soteriaCyberOutputAddr);
 
@@ -1141,45 +1143,53 @@ public class CreateSecurityGSN {
 
         for (int i = 0; i < cyberResults.getLength(); i++) {
             Node req = cyberResults.item(i);
-            NodeList cutsetList = req.getChildNodes();
+            
+            //checking if this is the requirement we want
+            if (req.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement0 = (Element) req;
+                if (eElement0.getAttribute("label").equals(cyberReqId)) {
+                    NodeList cutsetList = req.getChildNodes();
+                    for (int j = 0; j < cutsetList.getLength(); j++) {
+                        // to pack the cutset
+                        Cutset packCutset = new Cutset();
 
-            for (int j = 0; j < cutsetList.getLength(); j++) {
-                // to pack the cutset
-                Cutset packCutset = new Cutset();
+                        Node cutset = cutsetList.item(j);
+                        if (cutset.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eElement1 = (Element) cutset;
+                            packCutset.setLikelihood(eElement1.getAttribute("likelihood"));
+                        }
+                        NodeList attackDefenseList = cutset.getChildNodes();
 
-                Node cutset = cutsetList.item(j);
-                if (cutset.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement1 = (Element) cutset;
-                    packCutset.setLikelihood(eElement1.getAttribute("likelihood"));
-                }
-                NodeList attackDefenseList = cutset.getChildNodes();
+                        for (int k = 0; k < attackDefenseList.getLength(); k++) {
+                            Node attackDefense = attackDefenseList.item(k);
+                            NodeList componentList = attackDefense.getChildNodes();
 
-                for (int k = 0; k < attackDefenseList.getLength(); k++) {
-                    Node attackDefense = attackDefenseList.item(k);
-                    NodeList componentList = attackDefense.getChildNodes();
+                            for (int l = 0; l < componentList.getLength(); l++) {
+                                Node component = componentList.item(l);
 
-                    for (int l = 0; l < componentList.getLength(); l++) {
-                        Node component = componentList.item(l);
+                                if (component.getNodeType() == Node.ELEMENT_NODE) {
+                                    Element eElement2 = (Element) component;
+                                    packCutset.setComponent(eElement2.getAttribute("comp"));
+                                    if (eElement2.getAttribute("attack").length() > 0) {
+                                        packCutset.setAttack(eElement2.getAttribute("attack"));
+                                    }
+                                    if (eElement2.getAttribute("suggested").length() > 0) {
+                                        packCutset.setDefenses(eElement2.getAttribute("suggested"));
+                                    }
+                                }
 
-                        if (component.getNodeType() == Node.ELEMENT_NODE) {
-                            Element eElement2 = (Element) component;
-                            packCutset.setComponent(eElement2.getAttribute("comp"));
-                            if (eElement2.getAttribute("attack").length() > 0) {
-                                packCutset.setAttack(eElement2.getAttribute("attack"));
-                            }
-                            if (eElement2.getAttribute("suggested").length() > 0) {
-                                packCutset.setDefenses(eElement2.getAttribute("suggested"));
                             }
                         }
-
+                        // add the packet to the list if the likelihood is not null, i.e., 
+                        //it is not an empty line
+                        if (packCutset.getLikelihood() != null) {
+                            cutsets.add(packCutset);
+                        }
                     }
+       
                 }
-                // add the packet to the list if the likelihood is not null, i.e., 
-                //it is not an empty line
-                if (packCutset.getLikelihood() != null) {
-                    cutsets.add(packCutset);
-                }
-            }
+            }  
+
         }
 
         return cutsets;

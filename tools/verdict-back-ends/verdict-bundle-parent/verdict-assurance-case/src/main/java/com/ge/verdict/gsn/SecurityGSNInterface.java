@@ -1,13 +1,17 @@
 package com.ge.verdict.gsn;
 
-import com.ge.verdict.vdm.VdmTranslator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
-import verdict.vdm.vdm_model.Mission;
+
+import com.ge.verdict.vdm.VdmTranslator;
+
+import verdict.vdm.vdm_model.CyberReq;
 import verdict.vdm.vdm_model.Model;
 
 /**
@@ -52,16 +56,16 @@ public class SecurityGSNInterface {
         Model xmlModel = VdmTranslator.unmarshalFromXml(modelXml);
 
         // List of all mission ids
-        List<String> missionIds = new ArrayList<>();
-        for (Mission aMission : xmlModel.getMission()) {
-            missionIds.add(aMission.getId());
+        List<String> cyberIds = new ArrayList<>();
+        for (CyberReq aCyberReq : xmlModel.getCyberReq()) {
+            cyberIds.add(aCyberReq.getId());
         }
 
         // List of ids to create fragments for
         List<String> forIds = new ArrayList<>();
 
-        if (userInput.equals("ALLMREQKEY")) {
-            forIds.addAll(missionIds);
+        if (userInput.equals("ALLCREQKEY")) {
+            forIds.addAll(cyberIds);
         } else {
 
             // get individual IDs from the user input
@@ -85,7 +89,7 @@ public class SecurityGSNInterface {
                             caseAadlPath,
                             rootGoalId,
                             securityCaseFlag);
-            System.out.println("Info: Created Gsn fragment for " + rootGoalId);
+            System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
             //creating artifacts
             createArtifactFiles(gsnFragment, rootGoalId);
@@ -112,7 +116,7 @@ public class SecurityGSNInterface {
             Gsn2Xml objGsn2Xml = new Gsn2Xml();
             objGsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
             System.out.println(
-                    "Info: Written Gsn to xml for "
+                    "Info: Written GSN to xml for "
                             + rootGoalId
                             + ": "
                             + gsnXmlFile.getAbsolutePath());
@@ -123,7 +127,7 @@ public class SecurityGSNInterface {
         Gsn2Dot objGsn2Dot = new Gsn2Dot();
         objGsn2Dot.createDot(gsnFragment, gsnDotFile);
         System.out.println(
-                "Info: Written Gsn to dot for " + rootGoalId + ": " + gsnDotFile.getAbsolutePath());
+                "Info: Written GSN to dot for " + rootGoalId + ": " + gsnDotFile.getAbsolutePath());
 
         // generate the svg file using graphviz
         String graphDestination = gsnOutputDirectory + SEP + svgFilename;
@@ -131,7 +135,7 @@ public class SecurityGSNInterface {
 
         Dot2GraphViz objDot2GraphViz = new Dot2GraphViz();
         objDot2GraphViz.generateGraph(dotFileSource, graphDestination);
-        System.out.println("Info: Written Gsn to svg for " + rootGoalId + ": " + graphDestination);
+        System.out.println("Info: Written GSN to svg for " + rootGoalId + ": " + graphDestination);
 
         return graphDestination;
     }

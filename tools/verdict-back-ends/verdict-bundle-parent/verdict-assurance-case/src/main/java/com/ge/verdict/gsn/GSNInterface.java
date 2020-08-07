@@ -70,7 +70,7 @@ public class GSNInterface {
             GsnNode gsnFragment =
                     objCreateGSN.gsnCreator(
                             xmlModel, cyberOutput, safetyOutput, caseAadlPath, rootGoalId);
-            System.out.println("Info: Created Gsn fragment for " + rootGoalId);
+            System.out.println("Info: Created GSN fragment for " + rootGoalId);
 
             // Filenames
             String xmlFilename = rootGoalId + "_GsnFragment.xml";
@@ -83,7 +83,7 @@ public class GSNInterface {
                 Gsn2Xml objGsn2Xml = new Gsn2Xml();
                 objGsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
                 System.out.println(
-                        "Info: Written Gsn to xml for "
+                        "Info: Written GSN to xml for "
                                 + rootGoalId
                                 + ": "
                                 + gsnXmlFile.getAbsolutePath());
@@ -94,7 +94,7 @@ public class GSNInterface {
             Gsn2Dot objGsn2Dot = new Gsn2Dot();
             objGsn2Dot.createDot(gsnFragment, gsnDotFile);
             System.out.println(
-                    "Info: Written Gsn to dot for "
+                    "Info: Written GSN to dot for "
                             + rootGoalId
                             + ": "
                             + gsnDotFile.getAbsolutePath());
@@ -106,7 +106,7 @@ public class GSNInterface {
             Dot2GraphViz objDot2GraphViz = new Dot2GraphViz();
             objDot2GraphViz.generateGraph(dotFileSource, graphDestination);
             System.out.println(
-                    "Info: Written Gsn to svg for " + rootGoalId + ": " + graphDestination);
+                    "Info: Written GSN to svg for " + rootGoalId + ": " + graphDestination);
         }
     }
 }

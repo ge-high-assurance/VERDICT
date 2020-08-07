@@ -25,26 +25,16 @@ public class App {
             String gsnOutputDir = args[1];
             String soteriaOutputDir = args[2];
             String caseAadlPath = args[3];
-//            String securityKey = args[4]; //should be -sc
-//            String xmlKey = args[5]; //should be -x
             
             boolean securityCaseFlag = true;
             boolean xmlFlag = false;
             
-//            if(securityKey.equalsIgnoreCase("-sc")) {
-//            	securityCaseFlag = true;
-//            }
-//
-//            if(xmlKey.equalsIgnoreCase("-sc")) {
-//            	xmlFlag = true;
-//            }
+
             
             //calling the security gsn creating interface
             SecurityGSNInterface interfaceObj = new SecurityGSNInterface();
             
             interfaceObj.runGsnArtifactsGenerator(userInput, gsnOutputDir, soteriaOutputDir, caseAadlPath, securityCaseFlag, xmlFlag);
-
-
         }
     }
 }
