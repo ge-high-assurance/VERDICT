@@ -8,6 +8,7 @@ import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
@@ -27,6 +28,7 @@ import com.rockwellcollins.atc.agree.agree.Contract;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
+import com.rockwellcollins.atc.agree.agree.AgreeSubclause;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
 import com.rockwellcollins.atc.agree.agree.Expr;
@@ -41,6 +43,8 @@ import com.rockwellcollins.atc.agree.agree.SelectionExpr;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
+import com.rockwellcollins.atc.agree.parser.*;
+
 public class Agree2Vdm {
 	/**
 	 * The execute() method performs a set of tasks for translating AADL to VDM
@@ -91,44 +95,42 @@ public class Agree2Vdm {
 			System.out.println("Processing systemType "+sysType.getFullName());
 			verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
 			// unpacking sysType
-			for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {
+			for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {				
 				if(annex.getName().equalsIgnoreCase("agree")) {
+					//annex is of type DefaultAnnexSubclause
+					DefaultAnnexSubclause ddASC=(DefaultAnnexSubclause)annex;
+					//AnnexSubclause aSC = ddASC.getParsedAnnexSubclause();
+					AgreeContractSubclause agreeAnnex= (AgreeContractSubclause)ddASC.getParsedAnnexSubclause();
 					//populating agree contracts in the vdm component type -- SHOULD ADD THIS CODE TO AADL2VDM
 					verdict.vdm.vdm_lustre.ContractSpec contractSpec = new verdict.vdm.vdm_lustre.ContractSpec();
 					System.out.println("Processing Agree Annex of the system ");
-					EList<EObject> annexContents= annex.eContents();
+					EList<EObject> annexContents= agreeAnnex.eContents();
 					if(annexContents.isEmpty()) {
 						System.out.println("Empty Agree Annex.");
 					}
 					for(EObject clause : annexContents) {
-						//mapping to AgreeContractSubclause
-						AgreeContractSubclause agreeContractSubClause = (AgreeContractSubclause)clause;
-						//extracting contract
-						Contract contract = agreeContractSubClause.getContract();
-						if(contract instanceof AgreeContract) {
-							//getting specStatements
-							EList<SpecStatement> specStatements = ((AgreeContract) contract).getSpecs();
-							for(SpecStatement specStatement : specStatements) {
-								if (specStatement instanceof EqStatement) {
-									System.out.println("########Found type EqStatement#################");
-									EqStatement eqStmt = (EqStatement)specStatement;
-									//translate EqStatement in Agree to SymbolDefinition in vdm
-									SymbolDefinition symbDef = translateEqStatement(eqStmt, model);
-									//Add agree variable/symbol definition to the contractSpec in vdm
-									contractSpec.getSymbol().add(symbDef);
-									System.out.println("########End of EqStatement processing##########");
-								} else if (specStatement instanceof GuaranteeStatement) {
-									System.out.println("########Found type GuaranteeStatement##########");
-									GuaranteeStatement guaranteeStmt = (GuaranteeStatement)specStatement;
-									ContractItem contractItem = translateGuaranteeStatement(guaranteeStmt);
-									contractSpec.getGuarantee().add(contractItem);
-									System.out.println("########End of GuaranteeStatement processing####");
-								} else {
-									System.out.println("Element not recognizable"+clause.eContents().toString());
-								}
+						//mapping to AgreeContractclause
+						AgreeContract agreeContract = (AgreeContract)clause;						
+						//getting specStatements
+						EList<SpecStatement> specStatements = agreeContract.getSpecs();
+						for(SpecStatement specStatement : specStatements) {
+							if (specStatement instanceof EqStatement) {
+								System.out.println("########Found type EqStatement#################");
+								EqStatement eqStmt = (EqStatement)specStatement;
+								//translate EqStatement in Agree to SymbolDefinition in vdm
+								SymbolDefinition symbDef = translateEqStatement(eqStmt, model);
+								//Add agree variable/symbol definition to the contractSpec in vdm
+								contractSpec.getSymbol().add(symbDef);
+								System.out.println("########End of EqStatement processing##########");
+							} else if (specStatement instanceof GuaranteeStatement) {
+								System.out.println("########Found type GuaranteeStatement##########");
+								GuaranteeStatement guaranteeStmt = (GuaranteeStatement)specStatement;
+								ContractItem contractItem = translateGuaranteeStatement(guaranteeStmt);
+								contractSpec.getGuarantee().add(contractItem);
+								System.out.println("########End of GuaranteeStatement processing####");
+							} else {
+								System.out.println("Element not recognizable"+clause.eContents().toString());
 							}
-						} else {
-							System.out.println("Not of type AgreeContract");
 						}
 					}
 					//populating agree contract details in the componentType instance in vdm
@@ -163,6 +165,8 @@ public class Agree2Vdm {
 				dtype.setPlainType(plaintype);
 			} else if(type instanceof DoubleDotRef) {
 				DoubleDotRef ddrefType = (DoubleDotRef)type;
+				NamedElement elm = ddrefType.getElm();
+				System.out.println(elm.getName());
 				System.out.println("DoubleDotRef Type get elm: "+ddrefType.getElm());//also of type PropertyImpl
 				//verdict.vdm.vdm_data.RecordField  recField= new verdict.vdm.vdm_data.RecordField();
 				//verdict.vdm.vdm_data.RecordType rtype = new verdict.vdm.vdm_data.RecordType();
