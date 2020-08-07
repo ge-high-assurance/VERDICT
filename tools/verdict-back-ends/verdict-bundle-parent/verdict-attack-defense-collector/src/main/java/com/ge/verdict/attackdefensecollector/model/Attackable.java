@@ -62,6 +62,10 @@ public final class Attackable {
         return isSystem() ? getSystem().getName() : getConnection().getName();
     }
 
+    public Map<String, String> getParentAttributes() {
+        return isSystem() ? getSystem().getAttributes() : getConnection().getAttributes();
+    }
+
     public List<Attack> getAttacks() {
         return attacks;
     }

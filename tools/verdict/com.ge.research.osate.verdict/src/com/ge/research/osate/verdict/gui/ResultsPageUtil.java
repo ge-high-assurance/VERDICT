@@ -35,5 +35,9 @@ public class ResultsPageUtil {
 		if (myView7 != null) {
 			wp.hideView(myView7);
 		}
+		IViewPart myView8 = wp.findView(MeritAssignmentView.ID);
+		if (myView8 != null) {
+			wp.hideView(myView8);
+		}
 	}
 }

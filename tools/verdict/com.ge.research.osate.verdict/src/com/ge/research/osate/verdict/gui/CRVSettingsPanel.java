@@ -95,19 +95,19 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
 
-		Label atgLabel = new Label(composite, SWT.NONE);
-		atgLabel.setText("Test Case Generation");
-		atgLabel.setFont(boldFont);
+//		Label atgLabel = new Label(composite, SWT.NONE);
+//		atgLabel.setText("Test Case Generation");
+//		atgLabel.setFont(boldFont);
+//
+//		Group atgGroup = new Group(composite, SWT.NONE);
+//		atgGroup.setLayout(new GridLayout(1, false));
+//
+//		// The "Enable Test Case Generation (ATG)" section
+//		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
+//		atgCheckBox.setText("Enable Test Case Generation");
+//		atgCheckBox.setFont(font);
+//		atgCheckBox.setSelection(testCaseGeneration);
 
-		Group atgGroup = new Group(composite, SWT.NONE);
-		atgGroup.setLayout(new GridLayout(1, false));
-
-		// The "Enable Test Case Generation (ATG)" section
-		Button atgCheckBox = new Button(atgGroup, SWT.CHECK);
-		atgCheckBox.setText("Enable Test Case Generation");
-		atgCheckBox.setFont(font);
-		atgCheckBox.setSelection(testCaseGeneration);
-		
 		// The "Enabled Threat Models" section: all the threats
 		Label threatModelsLabel = new Label(composite, SWT.NONE);
 		threatModelsLabel.setText("Threat Models");
@@ -139,13 +139,13 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		if (selectedThreats.contains(NI)) {
 			ni.setSelection(true);
 		}
-		
+
 		Button ht = new Button(selectionButtonGroup, SWT.CHECK);
 		ht.setText("Hardware Trojans");
 		if (selectedThreats.contains(HT)) {
 			ht.setSelection(true);
-		}		
-		
+		}
+
 		Button ot = new Button(selectionButtonGroup, SWT.CHECK);
 		ot.setText("Outside User Threat");
 		if (selectedThreats.contains(OT)) {
@@ -444,8 +444,8 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				} else if (selectedThreats.contains(HT)) {
 					selectedThreats.remove(HT);
 				}
-				
-				testCaseGeneration = atgCheckBox.getSelection();
+
+//				testCaseGeneration = atgCheckBox.getSelection();
 				isBlameAssignment = blameButton.getSelection();
 				isMeritAssignment = meritButton.getSelection();
 				isNone = noneButton.getSelection();

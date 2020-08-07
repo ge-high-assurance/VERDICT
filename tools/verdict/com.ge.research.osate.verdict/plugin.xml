@@ -86,8 +86,6 @@
              allPopups="false"
              locationURI="menu:org.eclipse.ui.main.menu">             
 		<menu id="VerdictMenu" label="Verdict" >
-		<menu id="MbasMenu" 
-			label="&amp;Model Based Architecture Analysis/Synthesis" >
 	      <command
 	            commandId="com.ge.research.osate.verdict.commands.runMbas"
 	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
@@ -117,9 +115,9 @@
       	        label="&amp;MBAA/MBAS Settings"
       	        style="push"
       	        tooltip="Click to change MBAA/MBAS Settings">
-      	  </command>   	  
-		</menu> 
-		<menu id="CrvMenu" label="&amp;Cyber Resilience Verifier" >
+      	  </command>
+      	  <separator name="separator1" visible="true">
+      	  </separator>
           <command
                 commandId="com.ge.research.osate.verdict.commands.runCrv"
                 label="&amp;Run Cyber Resilience Verifier (CRV)"
@@ -132,8 +130,8 @@
 	            style="push"
 	            tooltip="Click to change CRV Settings">
 	       </command>
-		</menu>      
-		<menu id="GsnMenu" label="&amp;Assurance Case Fragments Generation" >
+	       <separator name="separator2" visible="true">
+	       </separator>
 		   <command
                 commandId="com.ge.research.osate.verdict.commands.runGsn"
                 label="&amp;Create GSN Assurance Case Fragments"
@@ -145,8 +143,7 @@
                 label="&amp;Assurance Case Settings"
                 style="push"
                 tooltip="Click to change Assurance Case settings">
-          </command> 	
-		</menu>  		                     	                         
+          </command>
          </menu>    
        </menuContribution>
        <!--<menuContribution
@@ -328,6 +325,10 @@
 		name="CRV Counter-example"
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$CounterExample"
 		icon="icons/ce.png"/>
+	<view id="com.ge.research.osate.verdict.gui.meritAssignmentView"
+		name="CRV IVC"
+		class="com.ge.research.osate.verdict.gui.MeritAssignmentView"
+		icon="icons/crv.ico"/>
 	<view id="com.ge.research.osate.verdict.gui.testCaseView"
 		name="CRV Test Case"
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"

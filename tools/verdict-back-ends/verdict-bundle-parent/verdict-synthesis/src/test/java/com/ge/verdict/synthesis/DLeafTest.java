@@ -1,6 +1,7 @@
 package com.ge.verdict.synthesis;
 
 import com.ge.verdict.synthesis.dtree.DLeaf;
+import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
@@ -9,7 +10,7 @@ public class DLeafTest {
     public void testUnique() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        double[] costs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
         DLeaf leaf1 = new DLeaf("A", "A", "A", 0, 1, costs, factory);
         DLeaf leaf1Dup = new DLeaf("A", "A", "A", 0, 1, costs, factory);
@@ -26,7 +27,7 @@ public class DLeafTest {
     public void testLookup() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        double[] costs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
         DLeaf leaf1 = new DLeaf("A", "A", "A", 0, 1, costs, factory);
         DLeaf leaf2 = new DLeaf("B", "B", "A", 0, 1, costs, factory);
@@ -43,7 +44,7 @@ public class DLeafTest {
     public void testMultipleRequirements() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        double[] costs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        Fraction[] costs = Util.fractionCosts(new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
         DLeaf leaf1 = new DLeaf("A", "A", "A", 0, 1, costs, factory);
         DLeaf leaf2 = new DLeaf("A", "A", "A", 0, 2, costs, factory);

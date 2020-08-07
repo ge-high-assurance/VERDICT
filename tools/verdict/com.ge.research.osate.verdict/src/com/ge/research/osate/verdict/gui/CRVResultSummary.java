@@ -17,10 +17,12 @@ import java.util.Map;
 public class CRVResultSummary {
 
 	private List<CRVSummaryRow> tableContents;
+	private List<IVCNode> ivc;
 
 	public CRVResultSummary(String fileName1, String fileName2) {
 		CRVReadXMLFile xmlReader = new CRVReadXMLFile(fileName1, fileName2);
-		tableContents = loadTableContents(xmlReader.getContent());
+		tableContents = loadTableContents(xmlReader.getResults());
+		ivc = xmlReader.getIVC();
 	}
 
 	private List<CRVSummaryRow> loadTableContents(List<CRVResultAttributes> attributes) {
@@ -156,5 +158,9 @@ public class CRVResultSummary {
 
 	public List<CRVSummaryRow> getTableContents() {
 		return tableContents;
+	}
+	
+	public List<IVCNode> getIVC() {
+		return ivc;
 	}
 }

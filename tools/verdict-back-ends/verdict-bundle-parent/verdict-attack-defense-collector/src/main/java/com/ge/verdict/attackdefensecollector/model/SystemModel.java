@@ -1,5 +1,6 @@
 package com.ge.verdict.attackdefensecollector.model;
 
+import com.ge.verdict.attackdefensecollector.DependentRules;
 import com.ge.verdict.attackdefensecollector.Logger;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.Util;
@@ -10,6 +11,7 @@ import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +51,8 @@ public class SystemModel {
     /** Map from cyber requirement names to cyber requirements for this system. */
     private Map<String, CyberReq> cyberReqMap;
 
+    private Map<String, String> attributes;
+
     /**
      * Create a new system. Unlike the other modeling classes, the system is not fully realized
      * until everything has been added to it (connections, attacks, cyber relations, etc.).
@@ -67,6 +71,7 @@ public class SystemModel {
         connectionsOutgoingInternal = new ArrayList<>();
         attackable = new Attackable(this);
         cyberReqMap = new LinkedHashMap<>();
+        attributes = new LinkedHashMap<>();
     }
 
     /** @return the name of the system */
@@ -184,6 +189,14 @@ public class SystemModel {
 
     public Attackable getAttackable() {
         return attackable;
+    }
+
+    public void addAttribute(String name, String value) {
+        attributes.put(name, value);
+    }
+
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(attributes);
     }
 
     /** Map from output port concerns to cyber relations with those output port concerns. */
@@ -317,7 +330,17 @@ public class SystemModel {
             if (attack.getCia().equals(concern.getCia())) {
                 if (attackToDefense.containsKey(attack)) {
                     // There is a defense associated
-                    children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
+                    Optional<ADTree> dependentRules =
+                            DependentRules.getComponentDependence(this, attack.getName());
+                    if (dependentRules.isPresent()) {
+                        children.add(
+                                new ADAnd(
+                                        new ADNot(attackToDefense.get(attack)),
+                                        attack,
+                                        dependentRules.get()));
+                    } else {
+                        children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
+                    }
                 } else {
                     // There is no defense, just a raw attack
                     children.add(attack);

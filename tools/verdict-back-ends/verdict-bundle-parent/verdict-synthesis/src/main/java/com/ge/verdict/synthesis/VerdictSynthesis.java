@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -111,7 +112,7 @@ public class VerdictSynthesis {
 
         if (optimizer.Check().equals(Status.SATISFIABLE)) {
             List<ResultsInstance.Item> items = new ArrayList<>();
-            double totalInputCost = 0, totalOutputCost = 0;
+            Fraction totalInputCost = new Fraction(0), totalOutputCost = new Fraction(0);
             Model model = optimizer.getModel();
             for (ComponentDefense pair : pairs) {
                 RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
@@ -119,12 +120,12 @@ public class VerdictSynthesis {
                         new Fraction(expr.getNumerator().getInt(), expr.getDenominator().getInt());
                 int dal = pair.rawCostToDal(rawCost);
 
-                double inputCost =
+                Fraction inputCost =
                         costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
-                double outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
+                Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
 
-                totalInputCost += inputCost;
-                totalOutputCost += outputCost;
+                totalInputCost = totalInputCost.add(inputCost);
+                totalOutputCost = totalOutputCost.add(outputCost);
 
                 items.add(
                         new ResultsInstance.Item(
@@ -297,5 +298,51 @@ public class VerdictSynthesis {
             default:
                 throw new RuntimeException("impossible");
         }
+    }
+
+    public static ResultsInstance addExtraImplDefenses(
+            ResultsInstance results,
+            Map<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer>
+                    implCompDefPairs,
+            CostModel costModel) {
+
+        List<ResultsInstance.Item> items = new ArrayList<>(results.items);
+        Fraction inputCost = results.inputCost;
+        Fraction outputCost = results.outputCost;
+
+        Set<com.ge.verdict.attackdefensecollector.Pair<String, String>> accountedCompDefPairs =
+                results.items.stream()
+                        .map(
+                                item ->
+                                        new com.ge.verdict.attackdefensecollector.Pair<>(
+                                                item.component, item.defenseProperty))
+                        .collect(Collectors.toSet());
+
+        for (Map.Entry<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer> entry :
+                implCompDefPairs.entrySet()) {
+            if (!accountedCompDefPairs.contains(entry.getKey())) {
+                String comp = entry.getKey().left;
+                String defProp = entry.getKey().right;
+                int implDal = entry.getValue();
+
+                Fraction pairInputCost = costModel.cost(defProp, comp, implDal);
+                Fraction pairOutputCost = costModel.cost(defProp, comp, 0);
+
+                items.add(
+                        new ResultsInstance.Item(
+                                comp, defProp, implDal, 0, pairInputCost, pairOutputCost));
+                inputCost = inputCost.add(pairInputCost);
+                // this may seem silly, but in theory we can have a non-zero cost for DAL 0
+                outputCost = outputCost.add(pairOutputCost);
+            }
+        }
+
+        return new ResultsInstance(
+                results.partialSolution,
+                results.meritAssignment,
+                results.inputSat,
+                inputCost,
+                outputCost,
+                items);
     }
 }

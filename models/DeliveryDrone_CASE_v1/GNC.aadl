@@ -1,0 +1,186 @@
+package GNC
+
+public
+	with Base_Types;
+	with Data_Types;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+
+	system GPS
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{CASE_Consolidated_Properties::probe => true; };
+			
+		annex agree {**
+			 -- variables
+			 eq satellite0_selected: bool = (constellation = enum(Data_Types::Constellation, Satellite0));
+			 eq selected_satellite_pos: Data_Types::Position.impl = if satellite0_selected then 
+			 												  			satellite0_pos 
+			 												  		else satellite1_pos;
+			 
+			 -- high-level specification
+			 guarantee "Output: gps_pos": Agree_Nodes::close_locations(gps_pos, selected_satellite_pos);
+			 
+			 -- probe outputs
+			 guarantee "Output: probe_constellation": probe_constellation = constellation;
+		**};
+		
+		annex verdict {**
+			CyberRel "gps_out_I" => gps_pos:I;
+			CyberRel "gps_out_A" => gps_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-9
+				comment = "loss of availability of the GPS"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-8
+				comment = "undetected erroneous data of the GPS"
+				description = "UED"
+			}
+			SafetyRel "gps_out_LOA" = happens("loa_event") => gps_pos:A;
+			SafetyRel "gps_out_UED" = happens("ued_event") => gps_pos:I;
+		**};
+	end GPS;
+
+	system IMU
+		features
+			-- inputs
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			imu_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+		
+		annex agree {**
+			-- probe
+			guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
+		**};
+		
+		annex verdict {**
+			CyberRel "imu_out_I" => imu_pos:I;
+			CyberRel "imu_out_A" => imu_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the IMU"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-8
+				comment = "undetected erroneous data of the IMU"
+				description = "UED"
+			}
+			SafetyRel "imu_out_LOA" = happens("loa_event") => imu_pos:A;
+			SafetyRel "imu_out_UED" = happens("ued_event") => imu_pos:I;
+		**};
+	end IMU;
+		
+	system GNC
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			gps_health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{CASE_Consolidated_Properties::probe => true; };
+			imu_pos: out data port Data_Types::Position.impl;
+			imu_health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			
+		
+	end GNC;
+	
+	system implementation GNC.Impl
+		subcomponents
+			gps: system GPS
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true; -- Another scenario - set this to false along with connectionType for c12 and c34 to Untrusted
+				CASE_Consolidated_Properties::pedigree => COTS;
+				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+
+				-- VERDICT Cyber Defenses & DAL Mitigations
+				
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
+				CASE_Consolidated_Properties::remoteAttestation => 7;
+				CASE_Consolidated_Properties::logging => 7;
+				CASE_Consolidated_Properties::failSafe => 7;
+				CASE_Consolidated_Properties::heterogeneity =>7;
+				
+				};
+			imu: system IMU
+			{ 
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => Sourced;
+				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				
+				-- VERDICT Cyber Defenses & DAL Mitigations
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::remoteAttestation=>7;
+			};
+		connections
+			i1: port constellation -> gps.constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i2: port satellite0_pos -> gps.satellite0_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::deviceAuthentication =>7;
+			CASE_Consolidated_Properties::sessionAuthenticity =>7;};
+			i3: port satellite1_pos -> gps.satellite1_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::deviceAuthentication =>7;
+			CASE_Consolidated_Properties::sessionAuthenticity =>7;};
+			i4: port launch_pos -> imu.launch_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i5: port gps.gps_pos -> gps_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i6: port gps.health_status -> gps_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i7: port gps.probe_constellation -> probe_constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i8: port imu.imu_pos -> imu_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i9: port imu.health_status -> imu_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i10: port imu.probe_launch_pos -> probe_launch_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+	end GNC.Impl;
+end GNC;
