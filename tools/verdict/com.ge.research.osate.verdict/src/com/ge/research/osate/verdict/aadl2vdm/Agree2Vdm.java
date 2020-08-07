@@ -58,6 +58,8 @@ import com.rockwellcollins.atc.agree.agree.SelectionExpr;
 import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
+import com.rockwellcollins.atc.agree.parser.*;
+
 public class Agree2Vdm {
 	/**
 	 * The execute() method performs a set of tasks for translating AADL to VDM
