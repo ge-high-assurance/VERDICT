@@ -34,7 +34,7 @@ public class MeritAssignment {
                 Element MESElement = (Element) MESNode;
                 NodeList nList = MESElement.getElementsByTagName("Node");
 
-                for (int j = nList.getLength() - 1; j >= 0; --j) {
+                for (int j = 0; j < nList.getLength(); ++j) {
                     Node nNode = nList.item(j);
 
                     if (nNode.getNodeType() != Node.ELEMENT_NODE) continue;
@@ -46,7 +46,7 @@ public class MeritAssignment {
                     //                    element_name = element_name.replaceAll("_port_", ".");
                     element_name = element_name.replace("_dot_", ".");
 
-                    System.out.println("Node " + element_name + ":");
+                    System.out.println("Component " + element_name + ":");
 
                     NodeList eList = nodeElement.getElementsByTagName("Element");
 

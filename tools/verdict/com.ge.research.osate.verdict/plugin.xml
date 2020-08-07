@@ -328,6 +328,10 @@
 		name="CRV Counter-example"
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$CounterExample"
 		icon="icons/ce.png"/>
+	<view id="com.ge.research.osate.verdict.gui.meritAssignmentView"
+		name="CRV IVC"
+		class="com.ge.research.osate.verdict.gui.MeritAssignmentView"
+		icon="icons/crv.ico"/>
 	<view id="com.ge.research.osate.verdict.gui.testCaseView"
 		name="CRV Test Case"
 		class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"
