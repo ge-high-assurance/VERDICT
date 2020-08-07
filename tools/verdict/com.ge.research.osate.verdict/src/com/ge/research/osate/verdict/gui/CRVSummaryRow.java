@@ -58,6 +58,10 @@ public class CRVSummaryRow {
 		return propertyName;
 	}
 
+	public boolean hasCounterExample() {
+		return counterExample != null && !counterExample.isEmpty();
+	}
+
 	public boolean hasAttackType() {
 		return rowContents.size() > 2 && rowContents.get(2).length() > 0;
 	}

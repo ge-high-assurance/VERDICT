@@ -63,12 +63,16 @@ public class CRVResultsView extends ViewPart {
 		// In practice, they will all be empty if blame assignment is turned off
 		// and components/links will be selected based on the -C flag
 		// (component/link-level instrumentation/blame assignment)
-		boolean showAttackType = tableContents.stream().anyMatch(CRVSummaryRow::hasAttackType);
-		boolean showCompromisedComponents = tableContents.stream().anyMatch(CRVSummaryRow::hasCompromisedComponents);
-		boolean showCompromisedLinks = tableContents.stream().anyMatch(CRVSummaryRow::hasCompromisedLinks);
-		boolean showUncompromisedComponents = tableContents.stream()
-				.anyMatch(CRVSummaryRow::hasUncompromisedComponents);
-		boolean showUncompromisedLinks = tableContents.stream().anyMatch(CRVSummaryRow::hasUncompromisedLinks);
+//		boolean showAttackType = tableContents.stream().anyMatch(CRVSummaryRow::hasAttackType);
+//		boolean showCompromisedComponents = tableContents.stream().anyMatch(CRVSummaryRow::hasCompromisedComponents);
+//		boolean showCompromisedLinks = tableContents.stream().anyMatch(CRVSummaryRow::hasCompromisedLinks);
+//		boolean showUncompromisedComponents = tableContents.stream()
+//				.anyMatch(CRVSummaryRow::hasUncompromisedComponents);
+//		boolean showUncompromisedLinks = tableContents.stream().anyMatch(CRVSummaryRow::hasUncompromisedLinks);
+
+		boolean showBlameAssignmentInfo =
+				CRVSettingsPanel.isBlameAssignment &&
+				tableContents.stream().anyMatch(CRVSummaryRow::hasCounterExample);;
 
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -86,27 +90,32 @@ public class CRVResultsView extends ViewPart {
 		TableColumn columnTwo = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 		columnTwo.setText("Verification Result");
 		columnTwo.setWidth(500);
-		if (showAttackType) {
+		//if (showAttackType) {
+		if (showBlameAssignmentInfo) {
 			TableColumn columnThree = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnThree.setText("Attack Type");
 			columnsToShow.add(2);
 		}
-		if (showCompromisedComponents) {
+		//if (showCompromisedComponents) {
+		if (showBlameAssignmentInfo && CRVSettingsPanel.componentLevel) {
 			TableColumn columnFour = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnFour.setText("Critical Components");
 			columnsToShow.add(3);
 		}
-		if (showCompromisedLinks) {
+		//if (showCompromisedLinks) {
+		if (showBlameAssignmentInfo && !CRVSettingsPanel.componentLevel) {
 			TableColumn columnFive = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnFive.setText("Critical Links (Ports)");
 			columnsToShow.add(4);
 		}
-		if (showUncompromisedComponents) {
+		//if (showUncompromisedComponents) {
+		if (showBlameAssignmentInfo && CRVSettingsPanel.componentLevel) {
 			TableColumn columnSix = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnSix.setText("Selected Components");
 			columnsToShow.add(5);
 		}
-		if (showUncompromisedLinks) {
+		//if (showUncompromisedLinks) {
+		if (showBlameAssignmentInfo && !CRVSettingsPanel.componentLevel) {
 			TableColumn columnSeven = new TableColumn(table, SWT.CENTER | SWT.WRAP);
 			columnSeven.setText("Selected Links (Ports)");
 			columnsToShow.add(6);
