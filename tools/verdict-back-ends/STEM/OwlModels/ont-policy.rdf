@@ -18,20 +18,6 @@
     <j.0:publicURI rdf:resource="http://sadl.org/sadlimplicitmodel"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/BaseModel.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/BaseModel.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >scn</j.0:prefix>
-    <j.0:createdBy>CsvImporter</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/ScnConnections.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Scenario"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >stemr</j.0:prefix>
     <j.0:createdBy>SADL</j.0:createdBy>
@@ -72,36 +58,12 @@
     <j.0:publicURI rdf:resource="http://sadl.org/sadlbasemodel"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/Run.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/D:/Sadl3Workspace1/VERDICT-STEM/OwlModels/Components.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Components.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >comp</j.0:prefix>
     <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
     <j.0:altURL rdf:resource="file:/D:/Sadl3Workspace1/VERDICT-STEM/OwlModels/Components.owl"/>
     <j.0:publicURI rdf:resource="http://sadl.org/STEM/Components"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Queries.metrics"/>
-    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/Queries.sadl.metrics.owl"/>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/STEMRules.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/STEMRules.metrics"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
