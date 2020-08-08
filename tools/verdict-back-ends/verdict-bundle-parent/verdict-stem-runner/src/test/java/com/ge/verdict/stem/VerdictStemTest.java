@@ -8,12 +8,14 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /** Runs unit tests on a VerdictStem object. */
 public class VerdictStemTest {
 
     @Test
+    @Ignore
     public void testSTEM() throws IOException {
         Path controlOutputDir = Paths.get("../../STEM/Output");
         Path testStemDir = Paths.get("target/test-classes/STEM");

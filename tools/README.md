@@ -31,9 +31,9 @@ OSATE, but you may want to install the AGREE plugin too so that you
 can write both AGREE and VERDICT annexes when developing a model.
 
 1. Download the [OSATE
-   2.7.0](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.0-vfinal/products/)
+   2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
    product for your operating system.  (AGREE does not have a version
-   that works with OSATE 2.7.1 yet.)
+   that works with OSATE 2.8.0 yet.)
 
 2. If necessary, refer to these [installation
    instructions](https://osate.org/download-and-install.html) to
@@ -47,7 +47,7 @@ can write both AGREE and VERDICT annexes when developing a model.
    and install unsigned plugins) until you reach the end and click
    Finish.
 
-`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.4.2`
+`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.1`
 
 5. Restart OSATE when prompted and navigate to Help > Install New
    Software... again.
