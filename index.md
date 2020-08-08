@@ -1,37 +1,3 @@
 ## VERDICT
 
-You can use the [editor on GitHub](https://github.com/ge-high-assurance/VERDICT/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ge-high-assurance/VERDICT/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+The VERDICT tool is intended to perform analysis of a system at the architectural level. Based on the typical workflow shown below, the VERDICT user will capture an architectural model using AADL that represents the high-level functional components of the system along with the data flow between them. The VERDICT Model Based Architecture Synthesis (MBAS) back-end tool will analyze the architecture to identify cyber vulnerabilities and recommend defenses. The defenses will typically be recommendations to improve the resiliency of components, such as control access to and encrypt communications links, or add components to reduce dependence on a specific source of information. For example, add position sensors and voting logic rather than depend exclusively on a GPS signal to determine location. Once the architectural analysis is complete, VERDICT supports refinement of the architecture model with behavioral modeling information using AGREE. The VERDICT Cyber Resiliency Verifier (CRV) back-end tool performs a formal analysis of the updated model with respect to formal cyber properties to identify vulnerabilities to cyber threat effects. This valuable capability provides an additional depth of analysis of a model that includes behavioral details of the architectural component models which will help to catch design mistakes earlier in the development process. Once the CRV analysis is complete, the developer will go off and create a detailed implementation. The intent of VERDICT Automated Test Generation is to verify that the implementation is consistent with the architecture and behavioral models analyzed by VERDICT MBAS and CRV.
