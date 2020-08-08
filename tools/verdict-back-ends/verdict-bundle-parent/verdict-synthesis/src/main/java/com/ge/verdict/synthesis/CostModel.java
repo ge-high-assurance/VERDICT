@@ -1,7 +1,5 @@
 package com.ge.verdict.synthesis;
 
-import com.ge.verdict.synthesis.util.Pair;
-import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,15 +7,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.math3.fraction.Fraction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.ge.verdict.synthesis.util.Pair;
+import com.ge.verdict.synthesis.util.Triple;
 
 public class CostModel {
     public static class ParseException extends RuntimeException {
@@ -200,6 +203,17 @@ public class CostModel {
                 String component = rule.getAttribute("component");
                 String defense = rule.getAttribute("defense");
                 String dalStr = rule.getAttribute("dal");
+
+				if (component.contains(":::")) {
+					// TODO this is temporary, until we support fully qualified names throughout the tool
+					// basically we can just remove this once qualified names are supported
+					String[] parts = component.split(":::");
+					if (parts.length != 2) {
+						throw new RuntimeException(
+								"invalid number of parts in qualified component name (should be 2): " + component);
+					}
+					component = parts[1];
+				}
 
                 for (int i = 0; i < rule.getAttributes().getLength(); i++) {
                     String name = rule.getAttributes().item(i).getNodeName();
