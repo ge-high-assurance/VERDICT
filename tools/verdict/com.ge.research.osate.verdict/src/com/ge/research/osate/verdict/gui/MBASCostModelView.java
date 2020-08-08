@@ -329,7 +329,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		rightColumn.setLayout(new GridLayout(1, false));
 
 		Label componentLabel = new Label(leftColumn, SWT.NONE);
-		componentLabel.setText("Component and Connection Table");
+		componentLabel.setText("Component and Connection");
 		componentLabel.setFont(boldFont);
 //		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
 
@@ -339,7 +339,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		// List all components
 
 		Label propLabel = new Label(leftColumn, SWT.NONE);
-		propLabel.setText("Defense Property Table");
+		propLabel.setText("Defense Property");
 		propLabel.setFont(boldFont);
 		propLabel.setAlignment(SWT.CENTER);
 
@@ -356,6 +356,8 @@ public class MBASCostModelView extends ApplicationWindow{
 
 		Button newRule = new Button(topButtons, SWT.PUSH);
 		newRule.setText("Add Row");
+		newRule.setToolTipText("- Linear scaling cost is used with a scaling factor 1 by default. \n"
+				+ "- Specific costs take precedence over scaling costs.");
 		newRule.setFont(font);
 
 		table = new Table(rightColumn, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -418,13 +420,13 @@ public class MBASCostModelView extends ApplicationWindow{
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setColumnProperties(columnNames);
 
-		createTableViewerColumn("Parent", 200, 0).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("Implementation", 200, 0).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
 				return ((SynthesisCostModel.Rule) elem).getParentStr();
 			}
 		});
-		TableViewerColumn entityCol = createTableViewerColumn("Entity", 200, 1);
+		TableViewerColumn entityCol = createTableViewerColumn("Component/Connection", 200, 1);
 		entityCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
