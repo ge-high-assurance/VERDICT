@@ -13,8 +13,9 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          5/18/2020, Heber Herencia-Zapana, added  cyber relations inferring
          5/22/2020, Heber Herencia-Zapana, added safety relations inferring
          5/26/2020, Heber Herencia-Zapana,  safety/cyber Availability dependes on availability only
-         
-         
+         8/4/2020, Kit Siu, defense properties on connections generates new components to 
+                            represent the connection, with relevant CAPECs and defenses 
+                            moved from the vulnerable component to the new connection component          
 *)
 
 (**
@@ -185,6 +186,7 @@ let defenseRigors name defTag l_defense =
      let def_dal = defenseEventsRigorsAUX name defTag l_defense in
      List.map def_dal ~f:(fun x->if (snd x) = "null" then 0 else int_of_string (snd x) );;
 
+(* - * - * - *)
 
 (* from l_defense2nist (along with l_defense) we get defense_profiles*)
 let(dprop_D,           dprofile_D)=
@@ -223,12 +225,12 @@ let rec convertProp2Profile l l_defense2nist =
          ) :: (convertProp2Profile tl l_defense2nist)
      | [] -> [];;
 
-let defenseProfileAux name defType l_defense l_defense2nist =
+let defenseProfileAux name defType l_defense  =
     let capec x = fst x  
     and defenList x = snd (snd x) in
     let cp = List.concat (List.map (filterDefense name  defType l_defense) ~f:(fun x-> [(capec x, defenList x)])) in
     let cpsplit = List.map cp ~f:(fun (c,pl) -> (c, (List.map pl ~f:(fun p -> String.split_on_chars ~on:[';'] p)))) in
-    let cpconverted = cpsplit in (* List.map cpsplit ~f:(fun (c,pl) -> (c, List.map pl ~f:(fun p -> convertProp2Profile p l_defense2nist))) in *)
+    let cpconverted = cpsplit in 
     List.map cpconverted ~f:(fun (c,pl) -> (c, List.map pl ~f:(fun l -> List.filter l ~f:(fun x -> x<>"null"))))
     ;;   
 
@@ -266,9 +268,10 @@ let rec postProcessDefenseProfile dL =
          | _     -> (c,p) :: postProcessDefenseProfile tl)
    |[] -> [];;
 
-let defenseProfile name defType l_defense l_defense2nist =
-   let compDefensesList = defenseProfileAux name defType l_defense l_defense2nist in
+let defenseProfile name defType l_defense =
+   let compDefensesList = defenseProfileAux name defType l_defense in
    postProcessDefenseProfile (processDL compDefensesList);;
+
 
 (* - * - * - *)
 
@@ -353,8 +356,8 @@ let formulaSafe name coutputs cinputs cevents l_comp_saf iaList =
 (* - * - * - *)
 
 (* from l_arch we get lib component names, lib component inputs & outputs, mdl instances, mdl connections *)
-let (srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
-    ("SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
+let (connName_Arc,     srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
+    ("ConnectionName", "SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
 
 let compInputArch name l_arch = (* by design, lib component inputs are all DestComp DestPortNames *)
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
@@ -366,9 +369,15 @@ let compOutputArch name l_arch = (* by design, lib component outputs are all Src
    let cinfo = compInfo name srcType_Arc l_arch in
    List.dedup_and_sort ~compare:compare (List.map cinfo ~f:(fun x -> f x srcPortName_Arc)) ;;
 
-let instancesArch arch = 
+let instancesArch l_arch = 
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
-   List.dedup_and_sort ~compare:compare (List.map arch ~f:(fun x-> makeInstance ~i:(f x srcIns_Arc) ~c:(f x srcType_Arc ) ()));;
+   List.dedup_and_sort ~compare:compare (List.map l_arch ~f:(fun x-> makeInstance ~i:(f x srcIns_Arc) ~c:(f x srcType_Arc ) ()));;
+
+(* instantiate "Connection" as components the ones that appear in Defenses.csv  *)
+let instancesConn l_defense = 
+   let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
+   let l_defense_Connection = compInfo "Connection" compType_D l_defense in
+   List.dedup_and_sort ~compare:compare (List.map l_defense_Connection ~f:(fun x-> makeInstance ~i:(f x compInst_D) ~c:"Connection" ()));;
 
 let connectionsArch arch = 
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
@@ -377,6 +386,34 @@ let connectionsArch arch =
    let destCompIns x = f x desIns_Arc in
    let destCompPort x = f x desPortName_Arc in     
    List.map arch ~f:(fun x->((destCompIns x, destCompPort x),(compIns x,compPort x)));;
+
+let listConnName l_defense = 
+   let connCompInst x  = List.Assoc.find_exn x compInst_D ~equal:(=) in
+   let l_defense_Connection = compInfo "Connection" compType_D l_defense in
+   List.dedup_and_sort ~compare:compare (List.map l_defense_Connection ~f:(fun x->connCompInst x));;
+
+(* insert connection components by replacing the original connections from arch *)
+let rec replace_connectionArch_with_connectionConn connections connNameList l_arch l_defense = 
+   let f aL tag = List.Assoc.find_exn aL tag ~equal:(=) in
+   let compIns aL = f aL srcIns_Arc 
+   and compPort aL = f aL srcPortName_Arc 
+   and destCompIns aL = f aL desIns_Arc 
+   and destCompPort aL = f aL desPortName_Arc in
+   match connNameList with
+      hd::tl ->
+         (* get the association list that has to do with the connName *)
+         let connInfo = List.concat (compInfo hd connName_Arc l_arch) in
+         (* original connection *)
+         let destComp = destCompIns connInfo
+         and destPort = destCompPort connInfo
+         and srcComp = compIns connInfo
+         and srcPort = compPort connInfo in
+         let orgConn = ((destComp, destPort),(srcComp, srcPort))
+         (* new connection list *)
+         and newConnL = [((hd, "in"),(srcComp, srcPort)); ((destComp, destPort),(hd, "out"))] in
+         let filteredConnections = List.filter connections ~f:(fun x->x<>orgConn) in
+         replace_connectionArch_with_connectionConn (List.append filteredConnections (newConnL)) tl l_arch l_defense
+      | [] -> connections ;;
 
 let list_comp arch = 
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in 
@@ -557,6 +594,7 @@ let missionReqId l_mission = comp_find missionReqId_M l_mission;;
 (* - * - * - *)
 
 (*Independent of Header*)
+(*generate component for component name *)
 let genComp name inp out fault b_events e_info f_formula attacks a_event a_info a_formulas d_events d_rigors d_profiles =
      {name            = name;
      input_flows      = inp;
@@ -572,7 +610,6 @@ let genComp name inp out fault b_events e_info f_formula attacks a_event a_info 
      defense_events   = d_events;
      defense_rigors   = d_rigors;
      defense_profiles = d_profiles};;
-(*generate component for component name *)
 	 
 let formula_And listElement cinputs =
 	match listElement with
@@ -590,26 +627,70 @@ let formula_And listElement cinputs =
 		And aList_allowed 
 	 | _ -> And[] ;;
 
-let formula_aux name out cinputs cia l_comp_dep l_attack =  
-   let l = noEmptyList (attack_cia name cia l_attack) in
-   let l2 = noEmptyList (List.concat [l; compOut_In name out cia l_comp_dep]) in
+let fullAttackList name cia l_attack =
+   List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name cia l_attack));;
+
+let elimAttackList name cia l_attack = 
+   List.concat (noEmptyList (List.dedup_and_sort ~compare:compare (attack_cia name cia l_attack)));;
+   
+let filterList fullListList elimList =
+   List.filter fullListList ~f:(fun x -> not(List.mem elimList (List.hd_exn x) ~equal:(=)));;
+
+(* given a list of Connections with defenses, list (destination comp, destination port name) *)
+let makeConnDestCompList connNameList l_arch =
+	List.map connNameList ~f:(fun x -> let connInfo = List.concat (compInfo x connName_Arc l_arch) in
+	   (List.Assoc.find_exn connInfo desType_Arc ~equal:(=), List.Assoc.find_exn connInfo desPortName_Arc ~equal:(=)));;
+
+let formula_aux name out cinputs cia l_comp_dep l_attack l_defense l_arch =  
+   let l = fullAttackList name cia l_attack in                             (* <-- full attack list *)
+   let lprime = filterList l (elimAttackList "Connection" cia l_attack) in (* <-- attack list with CAPECs on connections eliminated *)
+   let l_compInCIA = compOut_In name out cia l_comp_dep in                 (* <-- [inp; cia] list *)
+   let l_match = List.map l_compInCIA ~f:(fun i -> match i with            (* <-- [true; false] list that shows if an input is part of the elimination list b/c it's already in the connection *)
+        [inp;_] -> List.exists (makeConnDestCompList (listConnName l_defense) l_arch) ~f:(fun m -> m=(name,inp)) 
+      | _     -> false) in 
+   let use_lprime = match l_match with                                     (* <-- fold the list into either T/F bool *)
+        [] -> false
+      | _  -> List.fold l_match ~init:true ~f:(&&) in
+   let l2 = match use_lprime with
+        true  -> noEmptyList(List.concat [lprime; l_compInCIA])            (* <-- if true, use the attack list with connection attack eliminated *)
+      | false -> noEmptyList (List.concat [l; l_compInCIA]) in             (* <-- if false, use the full attack list *)
    let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
    Or (eliminateEmptyAnd l3);;
 
-let formula name coutputs cinputs l_comp_dep l_attack ciaList = 
-    let formula_type name out cia =  ([out; cia],formula_aux name out cinputs cia l_comp_dep l_attack) in
+let formula name coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList = 
+    let formula_type name out cia =  ([out; cia],formula_aux name out cinputs cia l_comp_dep l_attack l_defense l_arch) in
     let formulaOut name out = List.map ciaList ~f:(fun x-> formula_type name out x) in
+    (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
+
+
+(* # listConnName defense;;
+- : Core.String.t Core.List.t = ["c14a"; "c16"; "i2"; "i3"] *)
+(* # makeConnDestCompList (listConnName defense) arch;;
+- : (Core.String.t * Core.String.t) Core.List.t =
+[("Connector", "bus_in"); ("Radio", "comm_in"); ("GPS", "satellite0_pos"); ("GPS", "satellite1_pos")] *)
+(* # compOut_In "Radio" "comm_out" "Integrity" compDepen;;
+- : Core.String.t list Core.List.t = [["comm_in"; "Integrity"]] *)
+
+let formulaConn_aux name cinputs cia l_attack =
+	let l = List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name cia l_attack)) in 
+	let l2 = noEmptyList (List.concat [l; [["in"; cia]]]) in    (* <-- using hardcoded "in" for Connection input *)
+	let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
+	Or (eliminateEmptyAnd l3);;
+
+let formulaConn name coutputs cinputs l_attack ciaList  =
+    let formula_type name out cia = ([out; cia], formulaConn_aux name cinputs cia l_attack) in
+    let formulaOut name out = List.map ciaList ~f:(fun x -> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
 (*Inferring cyber relation *)
 
 let elemExtractVal l ltag = 
-     let extracTags l ltag = List.map ltag (fun x->List.Assoc.find_exn l x ~equal:(=))  in
-     List.dedup_and_sort ~compare:compare (List.map l (fun x-> extracTags x ltag));; 
+     let extracTags l ltag = List.map ltag ~f:(fun x->List.Assoc.find_exn l x ~equal:(=))  in
+     List.dedup_and_sort ~compare:compare (List.map l ~f:(fun x-> extracTags x ltag));; 
      
 let ele_l_nol1 l l1 =
     let clean l = List.concat l in  
-    clean(List.map l (fun x->if (List.mem l1 x ~equal:(=) = true) then [] else [x]));; 
+    clean(List.map l ~f:(fun x->if (List.mem l1 x ~equal:(=) = true) then [] else [x]));; 
 
 (*components without cyber relations, components with implementation are not considered*)
 let compArchImpleAux l =
@@ -626,8 +707,8 @@ let compArchImpleAux l =
        | _             -> ""  ;;
    
 let compArchImple l = 
-    let clean l = List.dedup_and_sort ~compare:compare (List.filter l (fun x->x<>"")) in 
-    clean (List.map l (fun x->compArchImpleAux x));;
+    let clean l = List.dedup_and_sort ~compare:compare (List.filter l ~f:(fun x->x<>"")) in 
+    clean (List.map l ~f:(fun x->compArchImpleAux x));;
 
 let compCyberInfe l_arch l_compDepen =
     let noInferredComp = List.append (compArchImple l_arch) (List.concat (elemExtractVal l_compDepen  [compType_C])) in
@@ -636,8 +717,8 @@ let compCyberInfe l_arch l_compDepen =
 
 let formulaInfer_aux name cia out linputs l_attack= 
     let l = List.concat (noEmptyList (attack_cia name cia l_attack)) in
-    let lattack = List.map l (fun x->A[x]) in
-    let confidIntegAvail = List.map linputs (fun x->A[x;cia]) in
+    let lattack = List.map l ~f:(fun x->A[x]) in
+    let confidIntegAvail = List.map linputs ~f:(fun x->A[x;cia]) in
     (*Heber let availability = List.concat (List.map linputs (fun x->[A[x;cia];A[x;"Integrity"]])) in  
     ([out; cia], Or (List.concat [lattack; if (cia = "Availability") then availability else confidInteg])) *)
     ([out; cia], Or (List.concat [lattack; confidIntegAvail]));;
@@ -650,22 +731,22 @@ let formulaInfer name coutputs cinputs l_attack ciaList =
    
 let formulaInferSafe  coutputs cinputs =
     (*Heber let availa= List.concat (List.map cinputs (fun x-> [F[x;"Availability"];F[x;"Integrity"]])) in *)
-    let availa= List.map cinputs (fun x-> F[x;"Availability"]) in
-    let integ = List.map cinputs (fun x-> F[x;"Integrity"]) in 
-    List.concat(List.map coutputs (fun x-> [([x;"Availability"] , Or availa );([x;"Integrity"], Or integ)]));;
+    let availa= List.map cinputs ~f:(fun x-> F[x;"Availability"]) in
+    let integ = List.map cinputs ~f:(fun x-> F[x;"Integrity"]) in 
+    List.concat(List.map coutputs ~f:(fun x-> [([x;"Availability"] , Or availa );([x;"Integrity"], Or integ)]));;
 
  let eventsNoOutput lcompSafe = 
      let extract l tag = (List.Assoc.find_exn l tag ~equal:(=)) in
      let cond x = ((extract x outputPort_S) = "null" && (extract x inputIAE_S)= "happens") in
      let result x = [extract x compType_S;extract x inputOrEvent_S ;extract x outputCIA_S] in
-     let clean l = List.filter l (fun x->x<>[])in 
-     clean( List.map lcompSafe (fun x->if cond x then (result x) else [])) ;;
+     let clean l = List.filter l ~f:(fun x->x<>[])in 
+     clean( List.map lcompSafe ~f:(fun x->if cond x then (result x) else [])) ;;
 
 let eventsInfer name ia lcompSafe =  
     let comp l = List.nth_exn l 0 in
     let inAvail l = List.nth_exn l 2 in
-    let clean l = List.filter l (fun x->x<>F[]) in 
-    clean (List.map (eventsNoOutput lcompSafe) (fun x->if (comp x = name) && (inAvail x = ia) 
+    let clean l = List.filter l ~f:(fun x->x<>F[]) in 
+    clean (List.map (eventsNoOutput lcompSafe) ~f:(fun x->if (comp x = name) && (inAvail x = ia) 
                                              then F [List.nth_exn x 1] else (F []))) ;;
  
 let formulaInferSafe_aux1 name out cinputs cevents ia l_comp_saf = 
@@ -681,19 +762,18 @@ let formulaInferSafe1 name coutputs cinputs cevents l_comp_saf iaList =
 
 (**)
 
-let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defense2nist 
+let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense 
              l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let coutputs = (compOutputArch name l_arch) 
 	and cinputs = (compInputArch name l_arch)
 	and cevents = (compEvents name l_events)
 	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
-	(*and (eventsList, rigorsList) = (makeDefenseList_DefenseRigorsList name defType l_defense l_defense2nist) *)
 	in 
 	genComp (*name*)            name 
 			(*input_flows*)     cinputs 
 			(*output_flows*)    coutputs
-			(*faults*)          iaList (* (List.filter (List.dedup_and_sort ~compare:compare (List.append (compFaults name l_comp_saf) (compFaultsOut name l_comp_saf))) ~f:(fun x -> x <> "") )*)
+			(*faults*)          iaList 
 			(*basic_events*)    cevents 
 			(*event_info*)      (compEventsInfo name l_events cevents) 
 			(*fault_formulas*)  (if infeSafe  (*&& List.mem comNoSafeRe name ~equal:(=)*)
@@ -701,15 +781,37 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense l_defe
 			                            then (formulaInferSafe  coutputs cinputs)
 			                            else formulaInferSafe1 name coutputs cinputs cevents l_comp_saf iaList)
 			                     else (formulaSafe name coutputs cinputs cevents l_comp_saf iaList))
-			(*attacks*)         ciaList (*  (List.filter (List.dedup_and_sort ~compare:compare (List.append (compAttacks name l_comp_dep ) (compAttacksOut name l_comp_dep))) ~f:(fun x -> x <> "") ) *)
+			(*attacks*)         ciaList 
 			(*attack_events*)   attacksList (* (attack_events name l_attack) *)
 			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
 			(*attack_formula*)  (if (infeCyber && List.mem comNoCyberRe name ~equal:(=))
 			                        then (formulaInfer name coutputs cinputs l_attack ciaList)
-			                        else (formula name coutputs cinputs l_comp_dep l_attack ciaList)) 
+			                        else (formula name coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList)) 
 			(*defense_events*)  (defenseEvents name defType l_defense)   (* eventsList *)
 			(*defense_rigors*)  (defenseRigors name defType l_defense)   (* rigorsList *)  
-			(*defense_profiles*)(defenseProfile name defType l_defense l_defense2nist);;
+			(*defense_profiles*)(defenseProfile name defType l_defense);;
+(* - *)
+
+let gen_ConnComp name defType l_attack l_defense ciaList = 
+	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
+	let cinputs = ["in"]
+	and coutputs = ["out"] 
+	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
+	in 
+	genComp (*name*)            name 
+			(*input_flows*)     cinputs  (* <-- always 1 input called "in" *)
+			(*output_flows*)    coutputs (* <-- always 1 output called "out" *)
+			(*faults*)          [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*basic_events*)    [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*event_info*)      [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*fault_formulas*)  [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*attacks*)         ciaList 
+			(*attack_events*)   attacksList 
+			(*attack_info*)     infoList    
+			(*attack_formula*)  (formulaConn name coutputs cinputs l_attack ciaList) 
+			(*defense_events*)  (defenseEvents name defType l_defense)   (* eventsList *)
+			(*defense_rigors*)  (defenseRigors name defType l_defense)   (* rigorsList *)  
+			(*defense_profiles*)(defenseProfile name defType l_defense);;
 (* - *)
 
 (*generate component mission*)
@@ -771,9 +873,19 @@ let genModel ins conn fault attack =
       top_fault = fault;
       top_attack = attack 
       };;
-let instances reqId l_arch = (makeInstance ~i:reqId ~c:reqId ())::(instancesArch l_arch);;
-let connections reqId l_arch l_mission= List.append (connectionsArch l_arch) (compInstOut reqId l_mission);;
-let gen_model reqId l_arch l_mission = 
+      
+let instances reqId l_arch l_defense = 
+    let i1 = makeInstance ~i:reqId ~c:reqId ()
+    and i2 = instancesArch l_arch
+    and i3 = instancesConn l_defense 
+    in 
+    List.append (i1::i2) i3 ;;
+
+let connections reqId l_arch l_defense l_mission = 
+	List.append (replace_connectionArch_with_connectionConn (connectionsArch l_arch) (listConnName l_defense) l_arch l_defense) 
+	            (compInstOut reqId l_mission);;
+
+let gen_model reqId l_arch l_defense l_mission = 
 	let rType = compReqType reqId l_mission in
 	let (fault,attack) = 
 	    match rType with
@@ -781,17 +893,18 @@ let gen_model reqId l_arch l_mission =
     	| "Safety" -> ((topFault reqId l_mission), ("", A["";""]))
     	| _ -> raise (Error_csv2soteria "gen_model exception: req is neither CyberReq nor SafetyReq") 
     in
-	genModel (instances reqId l_arch) (connections reqId l_arch l_mission) fault attack;;
+	genModel (instances reqId l_arch l_defense) (connections reqId l_arch l_defense l_mission) fault attack;;
  
 (**)
-let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_defense2nist l_mission ciaList iaList infeCyber infeSafe= 
+let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_mission ciaList iaList infeCyber infeSafe= 
     let comNoCyberRe = compCyberInfe l_arch l_comp_dep in
 	let comNoSafeRe  = compCyberInfe l_arch l_comp_saf in
     let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack 
-                                   l_defense l_defense2nist l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe) in
+                                   l_defense l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe)
+    and connComponent = gen_ConnComp "Connection" defType l_attack l_defense ciaList in
     let rType = compReqType reqId l_mission in
     match rType with
-    | "Cyber" -> List.append components [gen_CompMission reqId l_mission]
+    | "Cyber" -> List.append (connComponent::components) [gen_CompMission reqId l_mission]
     | "Safety" -> List.append components [gen_CompSafety reqId l_mission]
     | _ -> raise (Error_csv2soteria "gen_library exception: req is neither CyberReq nor SafetyReq");;
 
@@ -810,8 +923,8 @@ let libraries_threatConditions deftype compDepen compSafe attack events arch mis
        (* find what reqIDs are under this missionReqID and iterate through those *)
        let reqL = List.dedup_and_sort ~compare:(compare) (List.map (compInfo y missionReqId_M mission) ~f:(fun x -> List.Assoc.find_exn x ~equal:(=) reqId_M)) in
 	   (y, List.map reqL ~f:(fun x->
-	      (x,deftype),((gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense defense2nist mission ciaList iaList infeCyber infeSafe), 
-                        gen_model x arch_prime mission)
+	      (x,deftype),((gen_library x deftype compDepen_prime compSafe_prime attack events arch_prime defense mission ciaList iaList infeCyber infeSafe), 
+                        gen_model x arch_prime defense mission)
           )
        )
    ) ;;
@@ -825,6 +938,7 @@ let severity2risk severity =
   | "Hazardous"    -> "1e-07"
   | "Major"        -> "1e-05"
   | "Minor"        -> "1e-03"
+  | "None"         -> "1"
   | prob           -> prob    ;;
 
 (* function that saves the library and model (to .ml file) for debugging *)
@@ -890,8 +1004,6 @@ let cutSets cutSet =
     let (cut,pro1,_) = cutSet in
     List.append [("prob",(string_of_float pro1))] (cutSetToView cut);;
 
-let cutSetsList cutSetList = List.map cutSetList ~f:(fun x-> cutSets x);;
-
 let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) ;;
 
 let rec attacksToView cOpe = 
@@ -902,7 +1014,7 @@ let rec attacksToView cOpe =
 
 let rec defenseCompToView cOpe = 
       match cOpe with 
-      | ANot( AVar (c,d) ) -> c
+      | ANot( AVar (c,_) ) -> c
       | DSum l -> defenseCompToView (List.hd_exn l)
       | DPro l -> defenseCompToView (List.hd_exn l)
       | _ -> "" ;;
@@ -1013,13 +1125,6 @@ let xmlBuilder_Requirement reqIDStr defenseTypeStr tc_adtree l_mission l_defense
                                ("computed_p",(string_of_float likely));
                                ("acceptable_p", (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission)))], ds_Cutset) ;;
 
-let xmlBuilder_RequirementList l_libmdl mission l_defense2nist =
-   List.map l_libmdl ~f:(fun x ->
-      (let ((reqIDStr, defenseTypeStr), (lib, mdl)) = x in
-         let t = model_to_adtree lib mdl in  
-         (* -- print requirement info into .xml file -- *)
-         xmlBuilder_Requirement reqIDStr defenseTypeStr t mission l_defense2nist)) ;;
-        
 let xmlBuilder_Event event = 
    Xml.Element ("Event",[("name",event)],[]) ;;
 
@@ -1110,7 +1215,7 @@ let get_CyberReqText_Risk mission_al cyberReqID =
 (* *)
 let rec extractCyberReq l_libmdl l_mission = 
    match l_libmdl with
-      | hd::tl -> let ((reqIDStr, defenseTypeStr), (lib,mdl)) = hd in
+      | hd::tl -> let ((reqIDStr, defenseTypeStr), _) = hd in
                   let rType = compReqType reqIDStr l_mission in
           	         (match rType with  
           	         | "Cyber" -> hd :: extractCyberReq tl l_mission
@@ -1119,7 +1224,7 @@ let rec extractCyberReq l_libmdl l_mission =
 
 let rec extractSafetyReq l_libmdl l_mission = 
    match l_libmdl with
-      | hd::tl -> let ((reqIDStr, defenseTypeStr), (lib,mdl)) = hd in
+      | hd::tl -> let ((reqIDStr, defenseTypeStr), _) = hd in
                   let rType = compReqType reqIDStr l_mission in
           	         (match rType with  
           	         | "Safety" -> hd :: extractSafetyReq tl l_mission
@@ -1137,24 +1242,30 @@ let rec removeMissionsWithNoReq l_librariesThreats =
 (* *)
 
        
+(* function to rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+let renameConnectionName l_arch =
+   List.map l_arch ~f:(fun aL ->
+      let connName = List.Assoc.find_exn aL ~equal:(=) connName_Arc
+      and srcImpl = List.Assoc.find_exn aL ~equal:(=) srcImpl_Arc
+      and srcComp = List.Assoc.find_exn aL ~equal:(=) srcType_Arc in
+      let newConnName = connName ^ srcImpl ^ srcComp in
+      (connName_Arc, newConnName)::(List.filter aL ~f:(fun (tag, _) -> tag<>connName_Arc)) );;
+       
+
 (* Analyze function - Calls model_to_adtree and model_to_ftree. Generates the artifacts *)
 let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
-   let compDepen =  mainListtag comp_dep_ch  
-   and compSafe = mainListtag comp_saf_ch
-   and attack    = mainListtag attack_ch
-   and events = mainListtag events_ch 
-   and arch = mainListtag arch_ch 
-   and mission = mainListtag mission_ch 
-   and defense = mainListtag defense_ch 
+   let compDepen    = mainListtag comp_dep_ch  
+   and compSafe     = mainListtag comp_saf_ch
+   and attack       = mainListtag attack_ch    
+   and events       = mainListtag events_ch 
+   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+   and mission      = mainListtag mission_ch 
+   and defense      = mainListtag defense_ch 
    and defense2nist = mainListtag defense2nist_ch in
    
    (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
    List.iter [applProps_D; implProps_D] ~f:(fun deftype ->
    
-     (*let xml_oc = Out_channel.create (fpath^deftype^".xml")  
-     and xml_safety_oc = Out_channel.create (fpath^deftype^"-safety.xml")  
-     in*)
-  
      (* check if there's anything to analyze *)
      if List.is_empty mission 
      then Format.printf 

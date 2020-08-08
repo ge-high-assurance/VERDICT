@@ -6,22 +6,54 @@
       <rdf:Bag>
         <rdf:li>
           <Builtin>
+            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >com.ge.research.sadl.jena.reasoner.builtin.GetInstance</class>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >getInstance</name>
+          </Builtin>
+        </rdf:li>
+        <rdf:li>
+          <Builtin>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >oneOf</name>
+            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >com.ge.research.sadl.jena.reasoner.builtin.OneOf</class>
+          </Builtin>
+        </rdf:li>
+        <rdf:li>
+          <Builtin>
             <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
             >noValue</name>
             <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
             >com.ge.research.sadl.jena.reasoner.builtin.NoValue</class>
           </Builtin>
         </rdf:li>
-        <rdf:li>
-          <Builtin>
-            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >com.ge.research.sadl.jena.reasoner.builtin.OneOf</class>
-            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >oneOf</name>
-          </Builtin>
-        </rdf:li>
       </rdf:Bag>
     </subcategory>
   </Category>
-  <Category rdf:about="http://com.ge.research.sadl.configuration#ReasonerSpec"/>
+  <Category rdf:about="http://com.ge.research.sadl.configuration#ReasonerSpec">
+    <reasonerClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.research.sadl.jena.reasoner.JenaReasonerPlugin</reasonerClassName>
+  </Category>
+  <Category rdf:about="http://com.ge.research.sadl.configuration#Jena">
+    <pModelSpec rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >OWL_MEM</pModelSpec>
+    <pOWLTranslation rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</pOWLTranslation>
+    <pUseLuceneIndexer rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</pUseLuceneIndexer>
+    <pTimeOut rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >-1</pTimeOut>
+    <pTrace rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</pTrace>
+    <pRuleMode rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >hybrid</pRuleMode>
+    <pDerivationLogging rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >None</pDerivationLogging>
+    <pTransitiveClosureCaching rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
+    >false</pTransitiveClosureCaching>
+    <translatorClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.research.sadl.jena.translator.JenaTranslatorPlugin</translatorClassName>
+  </Category>
+  <Category rdf:about="http://com.ge.research.sadl.configuration#Builtin"/>
 </rdf:RDF>

@@ -407,6 +407,12 @@ CAPEC-148I-DeviceAuthentication is a CAPEC
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
    with mitigation DeviceAuthentication.
+CAPEC-148I-SystemAccessControl is a CAPEC
+   with id 148
+   with capecDesc "Content Spoofing"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-151I-Heterogeneity is a CAPEC
    with id 151
    with capecDesc "Identity Spoofing"
@@ -496,6 +502,12 @@ CAPEC-188C-EncryptedStorage is a CAPEC
    with ciaIssue Confidentiality
    with likelihoodOfSuccess 1
    with mitigation EncryptedStorage.
+CAPEC-188C-SystemAccessControl is a CAPEC
+   with id 188
+   with capecDesc "Reverse Engineering"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-192C-EncryptedTransmission is a CAPEC
    with id 192
    with capecDesc "Protocol Analysis"
@@ -503,6 +515,12 @@ CAPEC-192C-EncryptedTransmission is a CAPEC
    with likelihoodOfSuccess 1
    with mitigation EncryptedTransmission.
 CAPEC-192C-PhysicalAccessControl is a CAPEC
+   with id 192
+   with capecDesc "Protocol Analysis"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation PhysicalAccessControl.
+CAPEC-192C-SystemAccessControl is a CAPEC
    with id 192
    with capecDesc "Protocol Analysis"
    with ciaIssue Confidentiality
@@ -615,13 +633,15 @@ CAPEC-438I-SupplyChainSecurity-TamperProtection is a CAPEC
    with capecDesc "Modification During Manufacture"
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
-   with mitigation SupplyChainSecurity.
+   with mitigation SupplyChainSecurity
+   with mitigation TamperProtection.
 CAPEC-439I-SupplyChainSecurity-TamperProtection is a CAPEC
    with id 439
    with capecDesc "Manipulation During Distribution"
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
-   with mitigation SupplyChainSecurity.
+   with mitigation SupplyChainSecurity
+   with mitigation TamperProtection.
 CAPEC-440I-TamperProtection is a CAPEC
    with id 440
    with capecDesc "Hardware Integrity Attack"
@@ -634,6 +654,12 @@ CAPEC-440I-PhysicalAccessControl is a CAPEC
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-440I-SystemAccessControl is a CAPEC
+   with id 440
+   with capecDesc "Hardware Integrity Attack"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-507I-PhysicalAccessControl is a CAPEC
    with id 507
    with capecDesc "Physical Theft"
@@ -658,6 +684,12 @@ CAPEC-507A-PhysicalAccessControl is a CAPEC
    with ciaIssue Availability
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-507A-SystemAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Availability
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-549I-SecureBoot-MemoryProtection-RemoteAttestation is a CAPEC
    with id 549
    with capecDesc "Local Execution of Code"
@@ -753,6 +785,12 @@ CAPEC-624C-PhysicalAccessControl is a CAPEC
    with ciaIssue Confidentiality
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-624C-SystemAccessControl is a CAPEC
+   with id 624
+   with capecDesc "Fault Injection"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 
    
 // Generated NIST Control Declarations
@@ -980,6 +1018,7 @@ SupplyChainSecurity is a Mitigation
    with nistControl SA-12.
 SystemAccessControl is a Mitigation
    with implProperty "systemAccessControl"
+   with nistControl PE-3
    with nistControl PE-3-1.
 TamperProtection is a Mitigation
    with implProperty "tamperProtection"
