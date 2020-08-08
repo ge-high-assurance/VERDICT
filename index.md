@@ -1,4 +1,4 @@
-## Welcome to GitHub Pages
+## Verification Evidence and Resilient Design in Anticipation of Cybersecurity Threats (VERDICT)
 
 You can use the [editor on GitHub](https://github.com/ge-high-assurance/VERDICT/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
