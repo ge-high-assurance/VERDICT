@@ -1,3 +1,0 @@
-"ConnectionName","SrcCompInstance","DestCompInstance","Mitigation"
-"c16","DeliveryDroneSystem.Impl","radio","Bind to different bus"
-"c1","positionEstimator","navigation","Bind to different bus"

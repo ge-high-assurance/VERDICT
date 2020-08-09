@@ -938,6 +938,7 @@ let severity2risk severity =
   | "Hazardous"    -> "1e-07"
   | "Major"        -> "1e-05"
   | "Minor"        -> "1e-03"
+  | "None"         -> "1"
   | prob           -> prob    ;;
 
 (* function that saves the library and model (to .ml file) for debugging *)

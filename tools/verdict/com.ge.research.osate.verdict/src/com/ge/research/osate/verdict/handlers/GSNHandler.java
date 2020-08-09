@@ -341,17 +341,18 @@ public class GSNHandler extends AbstractHandler {
 		 *              xmlKey
 		 *              securityCasesKey
 		 */
-		command.env("GraphVizPath", graphVizPath)
-		.jarOrImage(bundleJar, dockerImage)
-			   .arg("--csv")
-			   .arg(projectName)
-			   .arg("--gsn")
-			   .arg(rootId)
-			   .argBind(gsnOutputDir, "/app/gsn")
-			   .argBind(soteriaOutputDir, "/app/Soteria_Output")
-			   .argBind(caseAadlDir, "/app/model")
-		       .arg(xmlKey)
-		       .arg(securityCasesKey); 
+		command
+			.env("GraphVizPath", graphVizPath)
+			.jarOrImage(bundleJar, dockerImage)
+			.arg("--csv")
+			.arg(projectName)
+			.arg("--gsn")
+			.arg(rootId)
+			.argBind(gsnOutputDir, "/app/GSN")
+			.argBind(soteriaOutputDir, "/app/Soteria_Output")
+			.argBind(caseAadlDir, "/app/model")
+		    .arg(xmlKey); 
+
 		
 
 //		/**

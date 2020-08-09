@@ -153,10 +153,8 @@ Rule TA1-Identity_Spoofing_Attack
 	if Identity_Spoofing_Attack of a Subsystem is true
 	then     applicableCM of the Subsystem is CAPEC-151C-DeviceAuthentication
 		 and applicableCM of the Subsystem is CAPEC-151C-Heterogeneity
-		 and applicableCM of the Subsystem is CAPEC-151C-PhysicalAccessControl	
 		 and applicableCM of the Subsystem is CAPEC-151I-DeviceAuthentication
-		 and applicableCM of the Subsystem is CAPEC-151I-Heterogeneity
-		 and applicableCM of the Subsystem is CAPEC-151I-PhysicalAccessControl.	
+		 and applicableCM of the Subsystem is CAPEC-151I-Heterogeneity.	
 
 Rule TA1-Interception_Attack 
 	if Interception_Attack of a Subsystem is true
@@ -185,8 +183,7 @@ Rule Vul-CAPEC-21-1
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
       and XdeviceAuthentication of the Connection is true 
-   then applicableCM of the Subsystem is CAPEC-21I-SessionAuthenticity
-        and applicableCM of the Connection is CAPEC-21I-SessionAuthenticity.
+   then applicableCM of the Connection is CAPEC-21I-SessionAuthenticity.
 Rule Vul-CAPEC-21-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -195,16 +192,14 @@ Rule Vul-CAPEC-21-2
       and connectionType of the Connection is Untrusted
       and the Subsystem is a connectionSource of a second Connection
       and connectionType of the second Connection is Untrusted
-      and XdeviceAuthentication of the second Connection is true 
-   then applicableCM of the Subsystem is CAPEC-21C-SessionAuthenticity
-        and applicableCM of the Connection is CAPEC-21C-SessionAuthenticity.
+      and XdeviceAuthentication of the Connection is true 
+   then applicableCM of the Connection is CAPEC-21C-SessionAuthenticity.
 Rule Vul-CAPEC-22-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-22I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-22I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-22I-DeviceAuthentication.
 Rule Vul-CAPEC-22-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -213,15 +208,13 @@ Rule Vul-CAPEC-22-2
       and connectionType of the Connection is Untrusted
       and the Subsystem is a connectionSource of a second Connection
       and connectionType of the second Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-22C-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-22C-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-22C-DeviceAuthentication.
 Rule Vul-CAPEC-22-3
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-22A-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-22A-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-22A-DeviceAuthentication.
 Rule Vul-CAPEC-25-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -369,10 +362,9 @@ Rule Vul-CAPEC-117-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a Connection
+      and the Subsystem is a connectionSource of a second Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-117C-EncryptedTransmission
-        and applicableCM of the Connection is CAPEC-117C-EncryptedTransmission.
+   then applicableCM of the Connection is CAPEC-117C-EncryptedTransmission.
 Rule Vul-CAPEC-123-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -410,8 +402,7 @@ Rule Vul-CAPEC-137-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-137I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-137I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-137I-DeviceAuthentication.
 Rule Vul-CAPEC-137-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -436,40 +427,32 @@ Rule Vul-CAPEC-148-3
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-148I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-148I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-148I-DeviceAuthentication.
+Rule Vul-CAPEC-148-4
+   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and the Subsystem is a connectionDestination of a Connection
+      and connectionType of the Connection is Untrusted
+   then applicableCM of the Subsystem is CAPEC-148I-SystemAccessControl.
 Rule Vul-CAPEC-151-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and dataReceivedIsUntrusted of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-151I-Heterogeneity.
-//Rule Vul-CAPEC-151-2
-//   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
-//      and insideTrustedBoundary of the Subsystem is true 
-//      and dataReceivedIsUntrusted of the Subsystem is true 
-//   then applicableCM of the Subsystem is CAPEC-151I-PhysicalAccessControl.
-Rule Vul-CAPEC-151-3
+Rule Vul-CAPEC-151-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-151I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-151I-DeviceAuthentication.
-Rule Vul-CAPEC-151-4
+   then applicableCM of the Connection is CAPEC-151I-DeviceAuthentication.
+Rule Vul-CAPEC-151-3
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
       and dataReceivedIsUntrusted of the Subsystem is true 
       and dataSentIsUntrusted of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-151C-Heterogeneity.
-//Rule Vul-CAPEC-151-5
-//   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
-//      and insideTrustedBoundary of the Subsystem is true 
-//      and hasSensitiveInfo of the Subsystem is true 
-//      and dataReceivedIsUntrusted of the Subsystem is true 
-//      and dataSentIsUntrusted of the Subsystem is true 
-//   then applicableCM of the Subsystem is CAPEC-151C-PhysicalAccessControl.
-Rule Vul-CAPEC-151-6
+Rule Vul-CAPEC-151-4
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
@@ -477,8 +460,7 @@ Rule Vul-CAPEC-151-6
       and connectionType of the Connection is Untrusted
       and the Subsystem is a connectionSource of a second Connection
       and connectionType of the second Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-151C-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-151C-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-151C-DeviceAuthentication.
 Rule Vul-CAPEC-169-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -491,8 +473,7 @@ Rule Vul-CAPEC-175-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-175I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-175I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-175I-DeviceAuthentication.
 Rule Vul-CAPEC-175-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -522,20 +503,30 @@ Rule Vul-CAPEC-188-2
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-188C-TamperProtection.
+Rule Vul-CAPEC-188-3
+   if oneOf(componentType of a Subsystem, Software,Hardware,SwHwHybrid,SwHumanHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and hasSensitiveInfo of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-188C-SystemAccessControl.
 Rule Vul-CAPEC-192-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a Connection
+      and the Subsystem is a connectionSource of a second Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-192C-EncryptedTransmission
-        and applicableCM of the Connection is CAPEC-192C-EncryptedTransmission.
+   then applicableCM of the Connection is CAPEC-192C-EncryptedTransmission.
 Rule Vul-CAPEC-192-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
       and dataSentIsUntrusted of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-192C-PhysicalAccessControl.
+Rule Vul-CAPEC-192-3
+   if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and hasSensitiveInfo of the Subsystem is true 
+      and dataSentIsUntrusted of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-192C-SystemAccessControl.
 Rule Vul-CAPEC-224-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -548,8 +539,7 @@ Rule Vul-CAPEC-242-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-242I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-242I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-242I-DeviceAuthentication.
 Rule Vul-CAPEC-242-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -563,8 +553,7 @@ Rule Vul-CAPEC-242-3
       and connectionType of the Connection is Untrusted
       and the Subsystem is a connectionSource of a second Connection
       and connectionType of the second Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-242C-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-242C-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-242C-DeviceAuthentication.
 Rule Vul-CAPEC-242-4
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -577,8 +566,7 @@ Rule Vul-CAPEC-242-5
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-242A-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-242A-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-242A-DeviceAuthentication.
 Rule Vul-CAPEC-242-6
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -589,8 +577,7 @@ Rule Vul-CAPEC-248-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-248I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-248I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-248I-DeviceAuthentication.
 Rule Vul-CAPEC-248-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -604,8 +591,7 @@ Rule Vul-CAPEC-248-3
       and connectionType of the Connection is Untrusted
       and the Subsystem is a connectionSource of a second Connection
       and connectionType of the second Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-248C-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-248C-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-248C-DeviceAuthentication.
 Rule Vul-CAPEC-248-4
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -618,8 +604,7 @@ Rule Vul-CAPEC-248-5
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-248A-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-248A-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-248A-DeviceAuthentication.
 Rule Vul-CAPEC-248-6
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -679,6 +664,10 @@ Rule Vul-CAPEC-440-2
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-440I-PhysicalAccessControl.
+Rule Vul-CAPEC-440-3
+   if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-440I-SystemAccessControl.
 Rule Vul-CAPEC-507-1
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -697,6 +686,10 @@ Rule Vul-CAPEC-507-4
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.
+Rule Vul-CAPEC-507-5
+   if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-507A-SystemAccessControl.
 Rule Vul-CAPEC-549-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -719,8 +712,7 @@ Rule Vul-CAPEC-586-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-586I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-586I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-586I-DeviceAuthentication.
 Rule Vul-CAPEC-586-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -731,8 +723,7 @@ Rule Vul-CAPEC-586-3
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-586A-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-586A-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-586A-DeviceAuthentication.
 Rule Vul-CAPEC-586-4
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -743,8 +734,7 @@ Rule Vul-CAPEC-594-1
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-594I-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-594I-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-594I-DeviceAuthentication.
 Rule Vul-CAPEC-594-2
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -755,8 +745,7 @@ Rule Vul-CAPEC-594-3
       and insideTrustedBoundary of the Subsystem is true 
       and the Subsystem is a connectionDestination of a Connection
       and connectionType of the Connection is Untrusted
-   then applicableCM of the Subsystem is CAPEC-594A-DeviceAuthentication
-        and applicableCM of the Connection is CAPEC-594A-DeviceAuthentication.
+   then applicableCM of the Connection is CAPEC-594A-DeviceAuthentication.
 Rule Vul-CAPEC-594-4
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
@@ -781,4 +770,9 @@ Rule Vul-CAPEC-624-2
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-624C-PhysicalAccessControl.
-	 		 		 		 
+Rule Vul-CAPEC-624-3
+   if oneOf(componentType of a Subsystem, Software,Hardware,SwHwHybrid,SwHumanHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and hasSensitiveInfo of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-624C-SystemAccessControl.
+    		 

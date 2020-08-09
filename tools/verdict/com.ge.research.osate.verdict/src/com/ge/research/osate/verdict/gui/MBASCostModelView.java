@@ -1,6 +1,5 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.awt.font.TextLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
@@ -17,6 +15,7 @@ import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -24,7 +23,6 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -69,15 +67,17 @@ public class MBASCostModelView extends ApplicationWindow{
 	private Table table;
 	private TableViewer tableViewer;
 
-	private final List<String> suggComponents;
-	private final Map<String, Integer> suggComponentsIndexMap;
+	private final List<String> suggParents;
+	private final Map<String, Integer> suggParentsIndexMap;
+	private final Map<String, List<String>> suggComponents;
+	private final Map<String, Map<String, Integer>> suggComponentsIndexMap;
 	private final List<String> suggDefenseProps;
 	private final Map<String, Integer> suggDefensePropsIndexMap;
 	private final List<String> suggDals;
 	private final Map<String, Integer> suggDalsIndexMap;
-	
+
 	Map<String, List<String>> implToSubcompNameMapping;
-	Map<String, List<String>> implToConnNameMapping;	
+	Map<String, List<String>> implToConnNameMapping;
 
 	public MBASCostModelView(List<EObject> aadlObjs, File costModelFile) {
 		super(null);
@@ -98,12 +98,13 @@ public class MBASCostModelView extends ApplicationWindow{
 		// Read/write the data from/to the xml file
 		// every time user opens/save the GUI.
 
-		suggComponents = new ArrayList<>();
+		suggParents = new ArrayList<>();
+		suggComponents = new HashMap<>();
 		suggDefenseProps = new ArrayList<>();
 		suggDals = new ArrayList<>();
-		
+
 		implToSubcompNameMapping = new HashMap<>();
-		implToConnNameMapping = new HashMap<>();		
+		implToConnNameMapping = new HashMap<>();
 
 		List<ComponentImplementation> impls = new ArrayList<>();
 		List<Subcomponent> comps = new ArrayList<>();
@@ -118,8 +119,9 @@ public class MBASCostModelView extends ApplicationWindow{
 				impls.add(impl);
 				List<String> subcompNames = new ArrayList<>();
 				List<String> connNames = new ArrayList<>();
-				
+
 				for (Subcomponent comp : impl.getAllSubcomponents()) {
+					impls.add(comp.getContainingComponentImpl());
 					comps.add(comp);
 					subcompNames.add(comp.getFullName());
 				}
@@ -143,16 +145,28 @@ public class MBASCostModelView extends ApplicationWindow{
 			}
 		}
 
-		Set<String> systemNames = new HashSet<>();
-		systemNames.addAll(impls.stream().map(ComponentImplementation::getFullName).collect(Collectors.toList()));
-		systemNames.addAll(comps.stream().map(Subcomponent::getFullName).collect(Collectors.toList()));
-		systemNames.addAll(conns.stream().map(Connection::getFullName).collect(Collectors.toList()));
-
-		for (String system : systemNames) {
-			suggComponents.add(system);
+		for (ComponentImplementation impl : new HashSet<>(impls)) {
+			if (impl == null) {
+				throw new RuntimeException("impl is null");
+			}
+			suggParents.add(impl.getFullName());
+			suggComponents.put(impl.getFullName(), new ArrayList<>());
 		}
-		suggComponents.sort(null);
-		suggComponents.add(0, SynthesisCostModel.COMPONENT_ALL);
+
+		for (Subcomponent comp : new HashSet<>(comps)) {
+			suggComponents.get(comp.getContainingComponentImpl().getFullName()).add(comp.getFullName());
+		}
+
+		for (Connection conn : new HashSet<>(conns)) {
+			suggComponents.get(conn.getContainingComponentImpl().getFullName()).add(conn.getFullName());
+		}
+
+		suggParents.sort(null);
+		suggParents.add(0, SynthesisCostModel.PARENT_ALL);
+
+		for (List<String> components : suggComponents.values()) {
+			components.sort(null);
+		}
 
 		for (String defenseProp : defensePropNames) {
 			if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
@@ -160,7 +174,7 @@ public class MBASCostModelView extends ApplicationWindow{
 			}
 			if (DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(defenseProp)) {
 				suggDefenseProps.add(defenseProp);
-			}			
+			}
 		}
 		suggDefenseProps.sort(null);
 		suggDefenseProps.add(0, SynthesisCostModel.DEFENSE_PROP_ALL);
@@ -172,9 +186,17 @@ public class MBASCostModelView extends ApplicationWindow{
 		suggDals.add(0, SynthesisCostModel.DAL_LINEAR);
 
 		// We want to be able to check contains in constant time
+		suggParentsIndexMap = new HashMap<>();
+		for (int i = 0; i < suggParents.size(); i++) {
+			suggParentsIndexMap.put(suggParents.get(i), i);
+		}
 		suggComponentsIndexMap = new HashMap<>();
-		for (int i = 0; i < suggComponents.size(); i++) {
-			suggComponentsIndexMap.put(suggComponents.get(i), i);
+		for (Map.Entry<String, List<String>> entry : suggComponents.entrySet()) {
+			Map<String, Integer> map = new HashMap<>();
+			for (int i = 0; i < entry.getValue().size(); i++) {
+				map.put(entry.getValue().get(i), i);
+			}
+			suggComponentsIndexMap.put(entry.getKey(), map);
 		}
 		suggDefensePropsIndexMap = new HashMap<>();
 		for (int i = 0; i < suggDefenseProps.size(); i++) {
@@ -212,10 +234,10 @@ public class MBASCostModelView extends ApplicationWindow{
 	}
 
 	/**
-	 * 
-	 * Create a three-column table always starting with the 
+	 *
+	 * Create a three-column table always starting with the
 	 * component implementation and category being the header
-	 * 
+	 *
 	 * */
 	public void createThreeColumnTableCatByCompAndConn(Composite leftColumn, boolean isProp, int height, int width) {
 		final Table table = new Table(leftColumn,
@@ -236,8 +258,8 @@ public class MBASCostModelView extends ApplicationWindow{
 			createTableContent(table, "Component Properties", "", DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_LIST);
 			createTableContent(table, "Connection Properties", "", DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_LIST);
 		}
-	}	
-	
+	}
+
 	public void createTableContent(Table table, String key, String category, List<String> content) {
 		TableItem keyItem = new TableItem(table, SWT.NONE);
 		keyItem.setText(new String[] {key, category, ""});
@@ -245,7 +267,7 @@ public class MBASCostModelView extends ApplicationWindow{
 
 		keyItem.setFont(boldFont);
 		keyItem.setForeground(blue);
-		
+
 		for (int i = 0; i < content.size(); i += 3) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			if (i + 2 < content.size()) {
@@ -261,11 +283,11 @@ public class MBASCostModelView extends ApplicationWindow{
 			}
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Create a three-column table
-	 * 
+	 *
 	 * */
 	public void createThreeColumnTable(Composite leftColumn, List<String> content, int width) {
 		final Table table = new Table(leftColumn,
@@ -307,7 +329,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		rightColumn.setLayout(new GridLayout(1, false));
 
 		Label componentLabel = new Label(leftColumn, SWT.NONE);
-		componentLabel.setText("Component and Connection Table");
+		componentLabel.setText("Component and Connection");
 		componentLabel.setFont(boldFont);
 //		componentLabel.setAlignment(SWT.CENTER); // I don't know how to put the label in the center??
 
@@ -317,7 +339,7 @@ public class MBASCostModelView extends ApplicationWindow{
 		// List all components
 
 		Label propLabel = new Label(leftColumn, SWT.NONE);
-		propLabel.setText("Defense Property Table");
+		propLabel.setText("Defense Property");
 		propLabel.setFont(boldFont);
 		propLabel.setAlignment(SWT.CENTER);
 
@@ -334,6 +356,8 @@ public class MBASCostModelView extends ApplicationWindow{
 
 		Button newRule = new Button(topButtons, SWT.PUSH);
 		newRule.setText("Add Row");
+		newRule.setToolTipText("- Linear scaling cost is used with a scaling factor 1 by default. \n"
+				+ "- Specific costs take precedence over scaling costs.");
 		newRule.setFont(font);
 
 		table = new Table(rightColumn, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -366,7 +390,8 @@ public class MBASCostModelView extends ApplicationWindow{
 		newRule.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				costModel.rules.add(costModel.createRule(Optional.empty(), Optional.empty(), Optional.empty(), 0));
+				costModel.rules.add(costModel.createRule(Optional.empty(), Optional.empty(), Optional.empty(),
+						Optional.empty(), 0));
 			}
 		});
 
@@ -389,37 +414,44 @@ public class MBASCostModelView extends ApplicationWindow{
 	}
 
 	private void createTableViewer() {
-		String[] columnNames = { "component", "defenseProp", "dal", "cost", "remove" };
+		String[] columnNames = { "parent", "component", "defenseProp", "dal", "cost", "remove" };
 
 		tableViewer = new TableViewer(table);
 		tableViewer.setUseHashlookup(true);
 		tableViewer.setColumnProperties(columnNames);
 
-		createTableViewerColumn("Component", 200, 0).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("Implementation", 200, 0).setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object elem) {
+				return ((SynthesisCostModel.Rule) elem).getParentStr();
+			}
+		});
+		TableViewerColumn entityCol = createTableViewerColumn("Component/Connection", 200, 1);
+		entityCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
 				return ((SynthesisCostModel.Rule) elem).getComponentStr();
 			}
 		});
-		createTableViewerColumn("Defense Property", 200, 1).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("Defense Property", 200, 2).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
 				return ((SynthesisCostModel.Rule) elem).getDefensePropertyStr();
 			}
 		});
-		createTableViewerColumn("DAL", 80, 2).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("DAL", 80, 3).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
 				return ((SynthesisCostModel.Rule) elem).getDalStr();
 			}
 		});
-		createTableViewerColumn("Cost", 120, 3).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("Cost", 120, 4).setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object elem) {
 				return ((SynthesisCostModel.Rule) elem).getValueStr();
 			}
 		});
-		createTableViewerColumn("", 50, 4).setLabelProvider(new ColumnLabelProvider() {
+		createTableViewerColumn("", 50, 5).setLabelProvider(new ColumnLabelProvider() {
 			private Map<Object, Button> buttons = new HashMap<>();
 			private Map<Object, SelectionListener> listeners = new HashMap<>();
 
@@ -463,14 +495,53 @@ public class MBASCostModelView extends ApplicationWindow{
 		});
 
 		CellEditor[] editors = new CellEditor[columnNames.length];
-		editors[0] = new ComboBoxCellEditor(table, suggComponents.toArray(new String[] {}), SWT.NONE);
-		editors[1] = new ComboBoxCellEditor(table, suggDefenseProps.toArray(new String[] {}), SWT.NONE);
-		editors[2] = new ComboBoxCellEditor(table, suggDals.toArray(new String[] {}), SWT.NONE);
-		editors[3] = new TextCellEditor(table, SWT.NONE);
-		editors[4] = null;
+		editors[0] = new ComboBoxCellEditor(table, suggParents.toArray(new String[] {}), SWT.NONE);
+		final ComboBoxCellEditor entityEditor = new ComboBoxCellEditor(table,
+				new String[] {},
+				SWT.NONE);
+		editors[1] = entityEditor;
+		editors[2] = new ComboBoxCellEditor(table, suggDefenseProps.toArray(new String[] {}), SWT.NONE);
+		editors[3] = new ComboBoxCellEditor(table, suggDals.toArray(new String[] {}), SWT.NONE);
+		editors[4] = new TextCellEditor(table, SWT.NONE);
+		editors[5] = null;
 
 		tableViewer.setCellEditors(editors);
 		// tableViewer.setComparator(null);
+
+		entityCol.setEditingSupport(new EditingSupport(tableViewer) {
+			@Override
+			protected boolean canEdit(Object element) {
+				return ((SynthesisCostModel.Rule) element).parent.isPresent();
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				// it's possible that this leaks. that is a problem to figure out later.
+				return new ComboBoxCellEditor(table,
+						suggComponents.get(((SynthesisCostModel.Rule) element).parent.get()).toArray(new String[] {}),
+						SWT.NONE);
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				SynthesisCostModel.Rule rule = (SynthesisCostModel.Rule) element;
+				if (rule.component.isPresent()) {
+					Integer index = suggComponentsIndexMap.get(rule.parent.get()).get(rule.getComponentStr());
+					return index != null ? index : 0;
+				} else {
+					// user just switched parent from [all] to something... so select any entity
+					return 0;
+				}
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				SynthesisCostModel.Rule rule = (SynthesisCostModel.Rule) element;
+				costModel.updateRule(rule,
+						rule.updateComponent(suggComponents.get(rule.parent.get()).get((Integer) value)));
+			}
+
+		});
 
 		tableViewer.setCellModifier(new ICellModifier() {
 			@Override
@@ -483,8 +554,11 @@ public class MBASCostModelView extends ApplicationWindow{
 				if (element instanceof SynthesisCostModel.Rule) {
 					SynthesisCostModel.Rule rule = (SynthesisCostModel.Rule) element;
 					switch (property) {
+					case "parent":
+						return suggParentsIndexMap.get(rule.getParentStr());
 					case "component":
-						return suggComponentsIndexMap.get(rule.getComponentStr());
+						// we handle this above
+						return null;
 					case "defenseProp":
 						return suggDefensePropsIndexMap.get(rule.getDefensePropertyStr());
 					case "dal":
@@ -504,8 +578,18 @@ public class MBASCostModelView extends ApplicationWindow{
 				if (element instanceof SynthesisCostModel.Rule) {
 					SynthesisCostModel.Rule rule = (SynthesisCostModel.Rule) element;
 					switch (property) {
+					case "parent":
+						String parent = suggParents.get((Integer) value);
+						if (!parent.equals(SynthesisCostModel.PARENT_ALL)) {
+							// when switching parents, we select the first entity of the new parent
+							costModel.updateRule(rule,
+									rule.updateParent(parent, Optional.of(suggComponents.get(parent).get(0))));
+						} else {
+							costModel.updateRule(rule, rule.updateParent(parent, Optional.empty()));
+						}
+						break;
 					case "component":
-						costModel.updateRule(rule, rule.updateComponent(suggComponents.get((Integer) value)));
+						// we handle this above
 						break;
 					case "defenseProp":
 						costModel.updateRule(rule, rule.updateDefenseProperty(suggDefenseProps.get((Integer) value)));

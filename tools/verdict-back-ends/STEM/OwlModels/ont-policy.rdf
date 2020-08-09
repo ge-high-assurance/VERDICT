@@ -2,91 +2,75 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:j.0="http://jena.hpl.hp.com/schemas/2003/03/ont-manager#">
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >base</j.0:prefix>
+    <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Queries.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Queries.metrics"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/BaseModel.owl"/>
+    <j.0:publicURI rdf:resource="http://sadl.org/STEM/BaseModel"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >sadlimplicitmodel</j.0:prefix>
     <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/SadlImplicitModel.owl"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/SadlImplicitModel.owl"/>
     <j.0:publicURI rdf:resource="http://sadl.org/sadlimplicitmodel"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >builtinfunctions</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/SadlBuiltinFunctions.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/builtinfunctions"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >sadllistmodel</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/SadlListModel.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/sadllistmodel"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >run</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Run.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/STEMRules.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/STEMRules.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/BaseModel.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/BaseModel.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >base</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/BaseModel.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/BaseModel"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >sadlbasemodel</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/SadlBaseModel.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/sadlbasemodel"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >queries</j.0:prefix>
-    <j.0:createdBy>SADL</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Queries.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Queries"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
     <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
     >stemr</j.0:prefix>
     <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/STEMRules.owl"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/STEMRules.owl"/>
     <j.0:publicURI rdf:resource="http://sadl.org/STEM/STEMRules"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
+    <j.0:publicURI rdf:resource="http://sadl.org/sadllistmodel"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/SadlListModel.owl"/>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/W:/home/interran/CASE/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Run.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run.metrics"/>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >sadllistmodel</j.0:prefix>
+  </j.0:OntologySpec>
+  <j.0:OntologySpec>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >builtinfunctions</j.0:prefix>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/SadlBuiltinFunctions.owl"/>
+    <j.0:publicURI rdf:resource="http://sadl.org/builtinfunctions"/>
+  </j.0:OntologySpec>
+  <j.0:OntologySpec>
+    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Queries"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/Queries.owl"/>
+    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >queries</j.0:prefix>
+  </j.0:OntologySpec>
+  <j.0:OntologySpec>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >sadlbasemodel</j.0:prefix>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/SadlBaseModel.owl"/>
+    <j.0:publicURI rdf:resource="http://sadl.org/sadlbasemodel"/>
+  </j.0:OntologySpec>
+  <j.0:OntologySpec>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >comp</j.0:prefix>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
+    <j.0:altURL rdf:resource="file:/D:/Sadl3Workspace1/VERDICT-STEM/OwlModels/Components.owl"/>
+    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Components"/>
+  </j.0:OntologySpec>
+  <j.0:OntologySpec>
+    <j.0:prefix rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >run</j.0:prefix>
+    <j.0:createdBy>SADL</j.0:createdBy>
+    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
+    <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/Run.owl"/>
+    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run"/>
   </j.0:OntologySpec>
 </rdf:RDF>

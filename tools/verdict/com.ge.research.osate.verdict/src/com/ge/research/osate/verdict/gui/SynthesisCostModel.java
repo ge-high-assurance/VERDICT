@@ -24,20 +24,24 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class SynthesisCostModel {
+	public static final String PARENT_ALL = "[all]";
 	public static final String COMPONENT_ALL = "[all]";
 	public static final String DEFENSE_PROP_ALL = "[all]";
 	public static final String DAL_LINEAR = "[linear]";
 
 	public static class Rule {
 		private final int id;
+		public final Optional<String> parent;
 		public final Optional<String> component;
 		public final Optional<String> defenseProperty;
 		public final Optional<Integer> dal;
 		public final double value;
 
-		private Rule(int id, Optional<String> component, Optional<String> defenseProperty, Optional<Integer> dal,
+		private Rule(int id, Optional<String> parent, Optional<String> component, Optional<String> defenseProperty,
+				Optional<Integer> dal,
 				double value) {
 			this.id = id;
+			this.parent = parent;
 			this.component = component;
 			this.defenseProperty = defenseProperty;
 			this.dal = dal;
@@ -52,6 +56,10 @@ public class SynthesisCostModel {
 		@Override
 		public boolean equals(Object other) {
 			return other instanceof Rule && ((Rule) other).id == id;
+		}
+
+		public String getParentStr() {
+			return parent.orElse(PARENT_ALL);
 		}
 
 		public String getComponentStr() {
@@ -70,33 +78,40 @@ public class SynthesisCostModel {
 			return Double.toString(value);
 		}
 
+		public Rule updateParent(String str, Optional<String> newComponent) {
+			// we require a new component because changing the parent changes the valid components/entities
+			Optional<String> newParent = PARENT_ALL.equals(str) ? Optional.empty() : Optional.of(str);
+			return new Rule(id, newParent, newComponent, defenseProperty, dal, value);
+		}
+
 		public Rule updateComponent(String str) {
 			Optional<String> newComponent = COMPONENT_ALL.equals(str) ? Optional.empty() : Optional.of(str);
-			return new Rule(id, newComponent, defenseProperty, dal, value);
+			return new Rule(id, parent, newComponent, defenseProperty, dal, value);
 		}
 
 		public Rule updateDefenseProperty(String str) {
 			Optional<String> newDefenseProperty = DEFENSE_PROP_ALL.equals(str) ? Optional.empty() : Optional.of(str);
-			return new Rule(id, component, newDefenseProperty, dal, value);
+			return new Rule(id, parent, component, newDefenseProperty, dal, value);
 		}
 
 		public Rule updateDal(String str) {
 			Optional<Integer> newDal = DAL_LINEAR.equals(str) ? Optional.empty() : Optional.of(Integer.parseInt(str));
-			return new Rule(id, component, defenseProperty, newDal, value);
+			return new Rule(id, parent, component, defenseProperty, newDal, value);
 		}
 
 		public Rule updateValue(String str) {
 			double newValue = Double.parseDouble(str);
-			return new Rule(id, component, defenseProperty, dal, newValue);
+			return new Rule(id, parent, component, defenseProperty, dal, newValue);
 		}
 	}
 
 	public final IObservableList<Rule> rules;
 	private int ruleIdCounter;
 
-	public Rule createRule(Optional<String> component, Optional<String> defenseProperty, Optional<Integer> dal,
+	public Rule createRule(Optional<String> parent, Optional<String> component, Optional<String> defenseProperty,
+			Optional<Integer> dal,
 			double value) {
-		return new Rule(ruleIdCounter++, component, defenseProperty, dal, value);
+		return new Rule(ruleIdCounter++, parent, component, defenseProperty, dal, value);
 	}
 
 	public void updateRule(Rule oldRule, Rule newRule) {
@@ -127,7 +142,21 @@ public class SynthesisCostModel {
 				Node node = nodes.item(i);
 				if (node instanceof Element) {
 					Element elem = (Element) node;
-					rules.add(createRule(mkStrOpt(elem.getAttribute("component")), mkStrOpt(elem.getAttribute(
+					String qualifiedComp = elem.getAttribute("component");
+					Optional<String> parent, component;
+					if (qualifiedComp != null && qualifiedComp.length() > 0) {
+						String[] parts = qualifiedComp.split(":::");
+						if (parts.length != 2) {
+							throw new RuntimeException("invalid qualified name (requires two parts): " + qualifiedComp);
+						}
+						parent = Optional.of(parts[0]);
+						component = Optional.of(parts[1]);
+					} else {
+						parent = Optional.empty();
+						component = Optional.empty();
+					}
+					rules.add(createRule(parent, component, mkStrOpt(elem
+							.getAttribute(
 							"defense")),
 							mkStrOpt(elem.getAttribute("dal")).map(Integer::parseInt),
 							Double.parseDouble(elem.getTextContent())));
@@ -148,8 +177,8 @@ public class SynthesisCostModel {
 				Element elem = doc.createElement("cost");
 				root.appendChild(elem);
 
-				if (rule.component.isPresent()) {
-					elem.setAttribute("component", rule.component.get());
+				if (rule.component.isPresent() && rule.parent.isPresent()) {
+					elem.setAttribute("component", rule.parent.get() + ":::" + rule.component.get());
 				}
 				if (rule.defenseProperty.isPresent()) {
 					elem.setAttribute("defense", rule.defenseProperty.get());

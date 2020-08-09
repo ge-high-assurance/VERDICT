@@ -201,6 +201,19 @@ public class CostModel {
                 String defense = rule.getAttribute("defense");
                 String dalStr = rule.getAttribute("dal");
 
+                if (component.contains(":::")) {
+                    // TODO this is temporary, until we support fully qualified names throughout the
+                    // tool
+                    // basically we can just remove this once qualified names are supported
+                    String[] parts = component.split(":::");
+                    if (parts.length != 2) {
+                        throw new RuntimeException(
+                                "invalid number of parts in qualified component name (should be 2): "
+                                        + component);
+                    }
+                    component = parts[1];
+                }
+
                 for (int i = 0; i < rule.getAttributes().getLength(); i++) {
                     String name = rule.getAttributes().item(i).getNodeName();
                     if (!name.equals("component")

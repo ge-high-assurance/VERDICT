@@ -103,10 +103,10 @@ public class MBASSynthesisHandler extends AbstractHandler {
 
 						File outputXml = new File(outputFolder, "synthesis_output.xml");
 
-						if (runBundle(bundleJar, dockerImage, projectDir.getName(), vdmFile.getAbsolutePath(),
+						if (runBundle(bundleJar, dockerImage, projectDir.getName(), vdmFile.getCanonicalPath(),
 								stemProjPath,
 								soteriaPpBin,
-								graphVizPath, costModel.getAbsolutePath(), outputXml.getAbsolutePath())) {
+								graphVizPath, costModel.getCanonicalPath(), outputXml.getCanonicalPath())) {
 							if (outputXml.exists()) {
 								MBASSynthesisReport.report(outputXml, iWindow);
 							}
@@ -133,12 +133,19 @@ public class MBASSynthesisHandler extends AbstractHandler {
 			String soteriaPpBin, String graphVizPath, String costModel, String outputXml) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
-		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage).arg("--csv").arg(projectName)
-				.arg("--mbas").argBind(stemProjectDir, "/app/STEM").arg2(soteriaPpBin, "/app/soteria_pp")
-				.arg("--synthesis").argBind(vdmFile, "/app/vdm/verdict-model.xml")
-				.argBind(costModel, "/app/costs/costModel.xml")
-				.arg("-o")
-				.argBind(outputXml, "/app/output/synthesis_output.xml");
+		command
+			.env("GraphVizPath", graphVizPath)
+			.jarOrImage(bundleJar, dockerImage)
+			.arg("--csv")
+			.arg(projectName)
+			.arg("--mbas")
+			.argBind(stemProjectDir, "/app/STEM")
+			.arg2(soteriaPpBin, "/app/soteria_pp")
+			.arg("--synthesis")
+			.argBind(vdmFile, "/app/vdm/verdict-model.xml")
+			.argBind(costModel, "/app/costs/costModel.xml")
+			.arg("-o")
+			.argBind(outputXml, "/app/output/synthesis_output.xml");
 
 		if (MBASSettingsPanel.synthesisCyberInference) {
 			command.arg("-c");

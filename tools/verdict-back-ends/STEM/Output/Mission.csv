@@ -1,8 +1,0 @@
-ModelVersion,MissionReqId,MissionReq,ReqId,Req,MissionImpactCIA,Effect,Severity,CompInstanceDependency,CompOutputDependency,DependentCompOutputCIA,ReqType
-DeliveryDrone,MReq01,,CyberReq01,,Integrity,,Hazardous,actuation,response,Integrity,Cyber
-DeliveryDrone,MReq01,,CyberReq01,,Integrity,,Hazardous,actuation,response,Availability,Cyber
-DeliveryDrone,MReq01,,CyberReq01,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Integrity,Cyber
-DeliveryDrone,MReq01,,CyberReq01,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Availability,Cyber
-DeliveryDrone,MReq01,,CyberReq02,,Integrity,,Hazardous,deliveryItemMechanism,delivery_status_out,Integrity,Cyber
-DeliveryDrone,MReq01,,SafetyReq01,,,,1e-7,actuation,response,Availability,Safety
-DeliveryDrone,MReq02,,SafetyReq02,,,,1e-7,deliveryItemMechanism,delivery_status_out,Integrity,Safety

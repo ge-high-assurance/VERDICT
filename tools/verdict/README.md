@@ -60,7 +60,7 @@ ahead and edit the file.  Our file also has some other Eclipse update
 sites that you may want to change in lockstep with the OSATE update
 site.  You can use the OSATE source repository's own corresponding
 target
-[definition](https://github.com/osate/osate2/blob/2.7.0/core/org.osate.build.target/osate2-platform.target)
+[definition](https://github.com/osate/osate2/blob/2.7.1/core/org.osate.build.target/osate2-platform.target)
 file as a reference; make sure to copy the same update site urls OSATE
 itself uses for similar Eclipse features to our own target definition
 file.

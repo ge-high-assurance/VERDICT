@@ -156,6 +156,9 @@ External mod(--) returns --:
 External noSubjectsOtherThan(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noSubjectsOtherThan".
 
+External notOnlyValue(--) returns --:
+"com.ge.research.sadl.jena.reasoner.builtin#notOnlyValue".
+
 External noUnknownValues(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noUnknownValues".
 
@@ -164,9 +167,6 @@ External noValue(--) returns --:
 
 External noValuesOtherThan(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#noValuesOtherThan".
-
-External notOnlyValue(--) returns --:
-"com.ge.research.sadl.jena.reasoner.builtin#notOnlyValue".
 
 External oneOf(--) returns --:
 "com.ge.research.sadl.jena.reasoner.builtin#oneOf".
