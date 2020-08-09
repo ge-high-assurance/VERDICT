@@ -5,7 +5,7 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
 ### Main Features
 
 - Model Based Architecture Analysis (MBAA)
-  - Identification of CAPEC threats and recommend NIST controls
+  - Identification of CAPEC threats and recommendation of NIST controls
   - Determination of the likelihood of successful attack of top-level event
   - Calculation the probability of system failure
   - Generation of cut-sets, fault-tree and attack-defense tree
@@ -17,8 +17,8 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
     - if existing implemented defenses do not mitigate the top-level event, MBAS recommends elimination of unnecessary defenses and upgrade of defense DALs. 
     
 - Cyber Resillency Verification (CRV)
-  - Proof of cyber resillency properties with respect to a system behavior model
+  - Proof of cyber resillency properties
     - Merit assignment
-  - Disproof of cyber resillency properties with respect to a system behavior model
+  - Disproof of cyber resillency properties
     - Blame assignment
   
