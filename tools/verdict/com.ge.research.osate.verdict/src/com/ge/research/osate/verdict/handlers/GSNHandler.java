@@ -351,7 +351,8 @@ public class GSNHandler extends AbstractHandler {
 			.argBind(gsnOutputDir, "/app/GSN")
 			.argBind(soteriaOutputDir, "/app/Soteria_Output")
 			.argBind(caseAadlDir, "/app/model")
-		    .arg(xmlKey); 
+		    .arg(xmlKey)
+		    .arg(securityCasesKey); 
 
 		
 
