@@ -273,7 +273,8 @@ public class App {
         helpLine("   <soteria out dir> ....... the directory where Soteria outputs are created");
         helpLine("   <aadl project dir> ...... the directory where the aadl files are present");
         helpLine("        -x ................. key to determine if xml should be created");
-        helpLine("        -z ................. key to determine if security assurance cases should be created");
+        helpLine(
+                "        -z ................. key to determine if security assurance cases should be created");
         helpLine();
         helpLine("-d, --debug <dir> .......... Produce debug output");
         helpLine("      <dir> ................ Intermediary XML output directory");
@@ -423,7 +424,7 @@ public class App {
             if (opts.hasOption("x")) {
                 generateXml = true;
             }
-            
+
             if (opts.hasOption("z")) {
                 securityCases = true;
             }
@@ -495,9 +496,8 @@ public class App {
             String modelName)
             throws VerdictRunException {
         logHeader("GSN");
-        
-        
-        if(!securityCases) {
+
+        if (!securityCases) {
             // calling the function to create GSN artefacts
             GSNInterface createGsnObj = new GSNInterface();
 
@@ -507,24 +507,25 @@ public class App {
             } catch (IOException | ParserConfigurationException | SAXException e) {
                 // TODO Auto-generated catch block
                 throw new VerdictRunException("Failed to create GSN fragments", e);
-            }        	
+            }
         } else {
             // calling the function to create GSN artefacts
             SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
 
             try {
                 createGsnObj.runGsnArtifactsGenerator(
-                        rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, securityCases, generateXml);
+                        rootGoalId,
+                        gsnOutputDir,
+                        soteriaOutputDir,
+                        caseAadlPath,
+                        securityCases,
+                        generateXml);
             } catch (IOException | ParserConfigurationException | SAXException e) {
                 // TODO Auto-generated catch block
                 throw new VerdictRunException("Failed to create GSN fragments", e);
-            }        	
+            }
         }
 
-        
-        
-        
-        
         logHeader("Finished");
     }
 

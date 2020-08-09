@@ -271,8 +271,8 @@ public class GSNHandler extends AbstractHandler {
 							 */
 							String rootId = userInput;
 							String soteriaOutputDir = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
-							String gsnOutputDir = gsnOutputFolder.getAbsolutePath();
-							String caseAadlDir = projectDir.getAbsolutePath();
+							String gsnOutputDir = gsnOutputFolder.getCanonicalPath();
+							String caseAadlDir = projectDir.getCanonicalPath();
 							
 							/**
 							 * Create the xml model for the GSN creator 
@@ -341,33 +341,41 @@ public class GSNHandler extends AbstractHandler {
 		 *              xmlKey
 		 *              securityCasesKey
 		 */
-		command.env("GraphVizPath", graphVizPath).jarOrImage(bundleJar, dockerImage)
-			   .arg("--csv").arg(projectName)
-			   .arg("--gsn").arg(rootId).arg(gsnOutputDir).arg(soteriaOutputDir).arg(caseAadlDir)
+		command.env("GraphVizPath", graphVizPath)
+		.jarOrImage(bundleJar, dockerImage)
+			   .arg("--csv")
+			   .arg(projectName)
+			   .arg("--gsn")
+			   .arg(rootId)
+			   .argBind(gsnOutputDir, "/app/gsn")
+			   .argBind(soteriaOutputDir, "/app/Soteria_Output")
+			   .argBind(caseAadlDir, "/app/model")
 		       .arg(xmlKey)
 		       .arg(securityCasesKey); 
 		
 
-		/**
-		 * For testing only: writing to file 
-		 */
-		String arguments = "--csv DeliveryDrone --gsn "
-				          + rootId + " "
-				          + gsnOutputDir + " " 
-				          + soteriaOutputDir + " "
-				          + caseAadlDir + " "
-				          + xmlKey + " "
-				          + securityCasesKey;
-		File fout = new File("C:/Users/212807042/Desktop/pluginArgs.txt");
-        FileOutputStream fos = new FileOutputStream(fout);
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-        bw.write(arguments);
-        bw.close();
+//		/**
+//		 * For testing only: writing to file 
+//		 */
+//		String arguments = "--csv DeliveryDrone --gsn "
+//				          + rootId + " "
+//				          + gsnOutputDir + " " 
+//				          + soteriaOutputDir + " "
+//				          + caseAadlDir + " "
+//				          + xmlKey + " "
+//				          + securityCasesKey;
+//		File fout = new File("C:/Users/212807042/Desktop/pluginArgs.txt");
+//        FileOutputStream fos = new FileOutputStream(fout);
+//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+//        bw.write(arguments);
+//        bw.close();
 		//-----------------------------------------
         
         
 		int code = command.runJarOrImage();
 		return code == 0;
+		
+
 	}
 
 	

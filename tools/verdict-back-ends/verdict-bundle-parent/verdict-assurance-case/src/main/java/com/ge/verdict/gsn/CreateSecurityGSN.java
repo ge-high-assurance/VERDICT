@@ -10,9 +10,8 @@ import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.*;
 
 /**
- * This class has been designed for handling security assurance cases
- * along with general assurance cases 
- * It is still under development
+ * This class has been designed for handling security assurance cases along with general assurance
+ * cases It is still under development
  *
  * @author Saswata Paul
  */
@@ -526,8 +525,7 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * Creates a Gsn node for a given cyber requirement 
-     * for security cases
+     * Creates a Gsn node for a given cyber requirement for security cases
      *
      * @param cyberReq
      * @param model
@@ -621,8 +619,9 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * Populates subcomponent solution nodes for the highest level 
-     * security GSN and also creates the lower threat-level fragments
+     * Populates subcomponent solution nodes for the highest level security GSN and also creates the
+     * lower threat-level fragments
+     *
      * @param subCompId
      * @param cutsets
      * @param acceptableProb
@@ -665,8 +664,8 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * Populates the root nodes of the threat-level
-     * security GSN fragments
+     * Populates the root nodes of the threat-level security GSN fragments
+     *
      * @param subCompId
      * @param cutsets
      * @param acceptableProb
@@ -734,6 +733,7 @@ public class CreateSecurityGSN {
 
     /**
      * populates the threat-nodes of the threat-level GSN fragments
+     *
      * @param componentId
      * @param cutset
      * @param acceptableProb
@@ -769,8 +769,8 @@ public class CreateSecurityGSN {
     }
 
     /**
-     * populates the solutions nodes for threat-level
-     * gsn fragments
+     * populates the solutions nodes for threat-level gsn fragments
+     *
      * @param CyberReqId
      * @param results
      * @return
@@ -1143,8 +1143,8 @@ public class CreateSecurityGSN {
 
         for (int i = 0; i < cyberResults.getLength(); i++) {
             Node req = cyberResults.item(i);
-            
-            //checking if this is the requirement we want
+
+            // checking if this is the requirement we want
             if (req.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement0 = (Element) req;
                 if (eElement0.getAttribute("label").equals(cyberReqId)) {
@@ -1177,19 +1177,16 @@ public class CreateSecurityGSN {
                                         packCutset.setDefenses(eElement2.getAttribute("suggested"));
                                     }
                                 }
-
                             }
                         }
-                        // add the packet to the list if the likelihood is not null, i.e., 
-                        //it is not an empty line
+                        // add the packet to the list if the likelihood is not null, i.e.,
+                        // it is not an empty line
                         if (packCutset.getLikelihood() != null) {
                             cutsets.add(packCutset);
                         }
                     }
-       
                 }
-            }  
-
+            }
         }
 
         return cutsets;

@@ -8,8 +8,8 @@ import org.xml.sax.SAXException;
 public class App {
 
     /**
-     * This main method can be used for independently using the 
-     * security gsn interface
+     * This main method can be used for independently using the security gsn interface
+     *
      * @param args
      * @throws IOException
      * @throws SAXException
@@ -25,17 +25,20 @@ public class App {
             String gsnOutputDir = args[1];
             String soteriaOutputDir = args[2];
             String caseAadlPath = args[3];
-            
+
             boolean securityCaseFlag = true;
             boolean xmlFlag = false;
-            
 
-            
-            //calling the security gsn creating interface
+            // calling the security gsn creating interface
             SecurityGSNInterface interfaceObj = new SecurityGSNInterface();
-            
-            interfaceObj.runGsnArtifactsGenerator(userInput, gsnOutputDir, soteriaOutputDir, caseAadlPath, securityCaseFlag, xmlFlag);
+
+            interfaceObj.runGsnArtifactsGenerator(
+                    userInput,
+                    gsnOutputDir,
+                    soteriaOutputDir,
+                    caseAadlPath,
+                    securityCaseFlag,
+                    xmlFlag);
         }
     }
 }
-

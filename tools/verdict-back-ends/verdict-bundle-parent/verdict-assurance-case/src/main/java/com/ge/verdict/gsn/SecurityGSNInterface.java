@@ -1,22 +1,17 @@
 package com.ge.verdict.gsn;
 
+import com.ge.verdict.vdm.VdmTranslator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.xml.sax.SAXException;
-
-import com.ge.verdict.vdm.VdmTranslator;
-
 import verdict.vdm.vdm_model.CyberReq;
 import verdict.vdm.vdm_model.Model;
 
 /**
- * This class is an interface for generating security assurance cases 
- * It is still under development
+ * This class is an interface for generating security assurance cases It is still under development
  *
  * @author Saswata Paul
  */
@@ -27,6 +22,7 @@ public class SecurityGSNInterface {
 
     /**
      * The interface for creating security GSN artifacts
+     *
      * @param userInput
      * @param gsnOutputDir
      * @param soteriaOutputDir
@@ -91,7 +87,7 @@ public class SecurityGSNInterface {
                             securityCaseFlag);
             System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
-            //creating artifacts
+            // creating artifacts
             createArtifactFiles(gsnFragment, rootGoalId);
         }
     }
