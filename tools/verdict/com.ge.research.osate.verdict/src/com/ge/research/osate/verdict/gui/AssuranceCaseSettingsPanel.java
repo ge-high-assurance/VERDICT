@@ -34,7 +34,8 @@ public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 	public static boolean showInTab = true;
 	//variable to decide if xml should be generated
 	public static boolean generateXml = true ;
-
+	//variable to decide if security cases should be generated
+	public static boolean securityCases = false ;
 	
 	private Font font;
 	private Font boldFont;
@@ -101,6 +102,12 @@ public class AssuranceCaseSettingsPanel extends ApplicationWindow {
         }
 	    
         //Button to save settings for xml
+        Button securityCasesButton = new Button(acsGroup, SWT.CHECK);	
+        securityCasesButton.setText("Generate Security Cases");	
+        securityCasesButton.setFont(font);	
+        securityCasesButton.setSelection(securityCases);
+        
+        //Button to save settings for xml
         Button xmlButton = new Button(acsGroup, SWT.CHECK);	
         xmlButton.setText("Generate XML Artifacts");	
         xmlButton.setFont(font);	
@@ -140,6 +147,7 @@ public class AssuranceCaseSettingsPanel extends ApplicationWindow {
 				if (idField.getText()!=null) {
 					rootGoalId=idField.getText();
 				} 
+				securityCases = securityCasesButton.getSelection();
 				showInTab = showFragButton.getSelection();
 				generateXml = xmlButton.getSelection();
 				

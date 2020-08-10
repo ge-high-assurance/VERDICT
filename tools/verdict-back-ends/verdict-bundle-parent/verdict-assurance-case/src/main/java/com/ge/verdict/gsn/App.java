@@ -8,6 +8,8 @@ import org.xml.sax.SAXException;
 public class App {
 
     /**
+     * This main method can be used for independently using the security gsn interface
+     *
      * @param args
      * @throws IOException
      * @throws SAXException
@@ -19,16 +21,24 @@ public class App {
         if (args.length != 4) {
             System.out.println("Argument Error: Invalid number of arguments provided.");
         } else {
-            String rootGoalId = args[0];
+            String userInput = args[0];
             String gsnOutputDir = args[1];
             String soteriaOutputDir = args[2];
             String caseAadlPath = args[3];
 
-            // calling the function to create GSN artefacts
-            GSNInterface createGsnObj = new GSNInterface();
+            boolean securityCaseFlag = true;
+            boolean xmlFlag = false;
 
-            createGsnObj.runGsnArtifactsGenerator(
-                    rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, true);
+            // calling the security gsn creating interface
+            SecurityGSNInterface interfaceObj = new SecurityGSNInterface();
+
+            interfaceObj.runGsnArtifactsGenerator(
+                    userInput,
+                    gsnOutputDir,
+                    soteriaOutputDir,
+                    caseAadlPath,
+                    securityCaseFlag,
+                    xmlFlag);
         }
     }
 }

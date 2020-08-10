@@ -1,10 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +47,41 @@ import verdict.vdm.vdm_model.Model;
  */
 public class GSNHandler extends AbstractHandler {
 	static final String SEP = File.separator;
+	
+	/**
+	 * a Tuple class used for packing two lists of strings 
+	 * @author Saswata Paul
+	 *
+	 */
+	protected class ListTuple{
+		protected List<String> allReqs;
+		protected List<String> cyberReqs;
+		/**
+		 * @return the allReqs
+		 */
+		protected List<String> getAllReqs() {
+			return allReqs;
+		}
+		/**
+		 * @param allReqs the allReqs to set
+		 */
+		protected void setAllReqs(List<String> allReqs) {
+			this.allReqs = allReqs;
+		}
+		/**
+		 * @return the cyberReqs
+		 */
+		protected List<String> getCyberReqs() {
+			return cyberReqs;
+		}
+		/**
+		 * @param cyberReqs the cyberReqs to set
+		 */
+		protected void setCyberReqs(List<String> cyberReqs) {
+			this.cyberReqs = cyberReqs;
+		}
+		
+	}
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -68,41 +100,86 @@ public class GSNHandler extends AbstractHandler {
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 						File projectDir = new File(selection.get(0));
 						
-						//Check if input Id is correct, finish otherwise
+						//get Mission and cyber requirement Ids
 						Aadl2Vdm objectVdmTran = new Aadl2Vdm();
-						List<String> allReqIds = getRequirementIds(objectVdmTran.preprocessAadlFiles(projectDir)); 
+						ListTuple idTuple = getRequirementIds(objectVdmTran.preprocessAadlFiles(projectDir)); 
+						
+						List<String> allReqIds = idTuple.getAllReqs();
+						List<String> cyberIds = idTuple.getCyberReqs();						
 						
 						//getting input
 						String userInput;
 						
 						//checking user input
 						if (AssuranceCaseSettingsPanel.rootGoalId==null) {
-							System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
-							userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+							//if security cases have not been selected
+							if(!AssuranceCaseSettingsPanel.securityCases) {
+								System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
+								userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend								
+							} else {
+								System.out.println("Warning: No user specified requirement. Generating security cases for all cyber requirements.");
+								userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend	
+							}
 						} else {
 							if (AssuranceCaseSettingsPanel.rootGoalId.trim().length()==0) {
-								System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
-								userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+								//if security cases have not been selected
+								if(!AssuranceCaseSettingsPanel.securityCases) {
+									System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
+									userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend								
+								} else {
+									System.out.println("Warning: No user specified requirement. Generating security cases for all cyber requirements.");
+									userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend	
+								}
 							} else {
-								boolean correctInputs = true;
 								
-								//splitting the input by ; here
-								String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
-								String[] inputs = inputLine.split(";");
-																
-								//checking if input is valid
-								for(String in : inputs) {
-									if (!allReqIds.contains(in)) {
-										correctInputs = false;
+								
+								if(!AssuranceCaseSettingsPanel.securityCases) {
+									boolean correctInputs = true;
+									
+									//splitting the input by ';' 
+									String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
+									String[] inputs = inputLine.split(";");
+																	
+									//checking if input is valid
+									for(String in : inputs) {
+										if (!allReqIds.contains(in)) {
+											correctInputs = false;
+										}
 									}
+									
+									if (correctInputs) {
+										userInput = inputLine;
+									} else {
+										System.out.println("Warning: Ill Formed Input. Generating for all mission requirements.");
+										userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
+									}															
+									
+								} else {
+									boolean correctInputs = true;
+									
+									//splitting the input by ';' 
+									String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
+									String[] inputs = inputLine.split(";");
+																	
+									//checking if input is valid
+									for(String in : inputs) {
+										if (!cyberIds.contains(in)) {
+											correctInputs = false;
+										}
+									}
+									
+									if (correctInputs) {
+										userInput = inputLine;
+									} else {
+										System.out.println("Warning: Ill Formed Input. Generating security cases for all cyber requirements.");
+										userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend
+									}															
+									
 								}
 								
-								if (correctInputs) {
-									userInput = inputLine;
-								} else {
-									System.out.println("Warning: Ill Formed Input. Generating for all mission requirements.");
-									userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
-								}															
+								
+							
+							
 							}
 
 						}
@@ -137,7 +214,7 @@ public class GSNHandler extends AbstractHandler {
 						File dataFolder = new File(stemProjPath, "CSVData");
 						File outputFolder = new File(stemProjPath, "Output");
 						File graphsFolder = new File(stemProjPath, "Graphs");
-						File gsnOutputFolder = new File(stemProjPath, "GSN");
+						File gsnOutputFolder = new File(stemProjPath, "gsn");
 						
 						
 						if (dataFolder.exists() && dataFolder.isDirectory()) {
@@ -209,8 +286,7 @@ public class GSNHandler extends AbstractHandler {
 								//Show graphs in tab if option selected
 								if(AssuranceCaseSettingsPanel.showInTab) {
 									// Open SVG GSN files
-									VerdictHandlersUtils.openSvgGraphsInDir(new File(stemProjPath, "GSN").getAbsolutePath());
-									
+									VerdictHandlersUtils.openSvgGraphsInDir(new File(stemProjPath, "gsn").getAbsolutePath());
 								}
 							}
 						}
@@ -245,16 +321,24 @@ public class GSNHandler extends AbstractHandler {
 	public static boolean runBundle(String bundleJar, String dockerImage, String rootId, String gsnOutputDir, String soteriaOutputDir,
 			String caseAadlDir, String projectName, String graphVizPath) throws IOException {
 
-		//if xml has been asked by user
+		//if xml has been enabled by user
 		String xmlKey = "";
+		//if security cases has been enabled by user
+		String securityCasesKey = "";
+		
 		if (AssuranceCaseSettingsPanel.generateXml) {
 			xmlKey = "-x";
+		}
+		
+		if (AssuranceCaseSettingsPanel.securityCases) {
+			securityCasesKey = "-z";
 		}
 		
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		/**
 		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <caseAadlDir> 
 		 *              xmlKey
+		 *              securityCasesKey
 		 */
 		command
 			.env("GraphVizPath", graphVizPath)
@@ -263,14 +347,18 @@ public class GSNHandler extends AbstractHandler {
 			.arg(projectName)
 			.arg("--gsn")
 			.arg(rootId)
-			.argBind(gsnOutputDir, "/app/GSN")
+			.argBind(gsnOutputDir, "/app/gsn")
 			.argBind(soteriaOutputDir, "/app/Soteria_Output")
 			.argBind(caseAadlDir, "/app/model")
-		    .arg(xmlKey); 
-		
+		    .arg(xmlKey)
+		    .arg(securityCasesKey); 
 
+        
+        
 		int code = command.runJarOrImage();
 		return code == 0;
+		
+
 	}
 
 	
@@ -358,8 +446,10 @@ public class GSNHandler extends AbstractHandler {
 	 * @param objects
 	 * @return
 	 */
-	public List<String> getRequirementIds(List<EObject> objects) { 				
+	public ListTuple getRequirementIds(List<EObject> objects) { 				
 		List<String> allReqIds = new ArrayList<>();
+		
+		List<String> allCyberReqIds = new ArrayList<>();
 		
 		List<ComponentType> componentTypes = new ArrayList<>();
 
@@ -419,6 +509,7 @@ public class GSNHandler extends AbstractHandler {
 			if(!cyberReqs.isEmpty()) {
 				for(CyberReq aCyberReq : cyberReqs) {
 					allReqIds.add(aCyberReq.getId());
+					allCyberReqIds.add(aCyberReq.getId());
 				}
 			
 			}
@@ -436,9 +527,15 @@ public class GSNHandler extends AbstractHandler {
 		}
 			
 		// Removing duplicates
-        List<String> duplicateFree = new ArrayList<>(new HashSet<>(allReqIds));
+        List<String> duplicateFreeAll = new ArrayList<>(new HashSet<>(allReqIds));
+        List<String> duplicateFreeCyber = new ArrayList<>(new HashSet<>(allCyberReqIds));
 
-        return duplicateFree; 
+        ListTuple tupleObj = new ListTuple();
+        
+        tupleObj.setAllReqs(duplicateFreeAll);
+        tupleObj.setCyberReqs(duplicateFreeCyber);
+        		
+        return tupleObj; 
 	}
 	
 }
