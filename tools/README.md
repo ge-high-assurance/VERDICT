@@ -47,7 +47,7 @@ can write both AGREE and VERDICT annexes when developing a model.
    and install unsigned plugins) until you reach the end and click
    Finish.
 
-`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.1`
+`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2`
 
 5. Restart OSATE when prompted and navigate to Help > Install New
    Software... again.
