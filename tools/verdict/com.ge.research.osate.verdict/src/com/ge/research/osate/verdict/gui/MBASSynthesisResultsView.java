@@ -134,7 +134,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 
 		if (results.partialSolution) {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
@@ -164,7 +164,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 			}
 		} else {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
