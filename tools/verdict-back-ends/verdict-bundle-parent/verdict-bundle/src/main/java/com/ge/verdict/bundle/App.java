@@ -53,7 +53,6 @@ import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.Model;
-import com.ge.verdict.vdm.VdmTranslator;
 
 public class App {
     private static class VerdictRunException extends Exception {
@@ -432,7 +431,7 @@ public class App {
             }
 
             modelName = opts.getOptionValue("csv");
-            
+
             runGsn(
                     rootGoalId,
                     gsnOutputDir,
@@ -483,13 +482,10 @@ public class App {
     }
 
     /**
-     * call the GSN creation interface from verdict-assurance-case
-     * Behavior:
-     * 1. If security cases have not been enabled
-     * 	- Creates normal GSN for every requirement specified
-     * 2. If security cases have been enabled
-     * 	- creates a security GSN for every cyber requirement that is specified
-     *  - creates a normal GSN for all other requirements
+     * call the GSN creation interface from verdict-assurance-case Behavior: 1. If security cases
+     * have not been enabled - Creates normal GSN for every requirement specified 2. If security
+     * cases have been enabled - creates a security GSN for every cyber requirement that is
+     * specified - creates a normal GSN for all other requirements
      *
      * @param rootGoalId
      * @param gsnOutputDir
@@ -506,91 +502,89 @@ public class App {
             String modelName)
             throws VerdictRunException {
         logHeader("GSN");
-        
-        String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName; 
-        
-        //Fetch the model first
+
+        String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName;
+
+        // Fetch the model first
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
 
         // Fetch the DeliveryDrone model from the XML
         Model model = VdmTranslator.unmarshalFromXml(modelXml);
-        
-		//get all cyber Ids
+
+        // get all cyber Ids
         List<String> cyberIds = new ArrayList<>();
         for (verdict.vdm.vdm_model.CyberReq aCyberReq : model.getCyberReq()) {
             cyberIds.add(aCyberReq.getId());
         }
-        
-		//splitting the input by ';' 
-		String[] inputIds = inputLine.split(";");
-		
-		List<String> allIds = new ArrayList<>();
-		
-		for(String inputId :inputIds) {
-			allIds.add(inputId);
-		}
-		
-		
-		//remove duplicates
-		List<String> duplicateFreeIds= new ArrayList<>(new HashSet<>(allIds));
-        
-		for (String id : duplicateFreeIds) {
-			//if cyberId
-			if(cyberIds.contains(id)) {
-				if(securityCases) { //if security is enabled
-		            // calling the function to create GSN artefacts
-		            SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
 
-		            try {
-		                createGsnObj.runGsnArtifactsGenerator(
-		                        id,
-		                        gsnOutputDir,
-		                        soteriaOutputDir,
-		                        caseAadlPath,
-		                        securityCases,
-		                        generateXml,
-		                        soteriaOutputLinkPathPrefix);
-		            } catch (IOException | ParserConfigurationException | SAXException e) {
-		                // TODO Auto-generated catch block
-		                throw new VerdictRunException("Failed to create GSN fragments", e);
-		            }	
-				} else {
-		            // calling the function to create GSN artefacts
-		            GSNInterface createGsnObj = new GSNInterface();
+        // splitting the input by ';'
+        String[] inputIds = inputLine.split(";");
 
-		            try {
-		                createGsnObj.runGsnArtifactsGenerator(
-		                        id, 
-		                        gsnOutputDir, 
-		                        soteriaOutputDir, 
-		                        caseAadlPath, 
-		                        generateXml, 
-		                        soteriaOutputLinkPathPrefix);
-		            } catch (IOException | ParserConfigurationException | SAXException e) {
-		                // TODO Auto-generated catch block
-		                throw new VerdictRunException("Failed to create GSN fragments", e);
-		            }	
-				}
-			} else { //if not cyberId
-	            // calling the function to create GSN artefacts
-	            GSNInterface createGsnObj = new GSNInterface();
+        List<String> allIds = new ArrayList<>();
 
-	            try {
-	                createGsnObj.runGsnArtifactsGenerator(
-	                        id, 
-	                        gsnOutputDir, 
-	                        soteriaOutputDir, 
-	                        caseAadlPath, 
-	                        generateXml, 
-	                        soteriaOutputLinkPathPrefix);
-	            } catch (IOException | ParserConfigurationException | SAXException e) {
-	                // TODO Auto-generated catch block
-	                throw new VerdictRunException("Failed to create GSN fragments", e);
-	            }
-			}
-		}
-        
-        
+        for (String inputId : inputIds) {
+            allIds.add(inputId);
+        }
+
+        // remove duplicates
+        List<String> duplicateFreeIds = new ArrayList<>(new HashSet<>(allIds));
+
+        for (String id : duplicateFreeIds) {
+            // if cyberId
+            if (cyberIds.contains(id)) {
+                if (securityCases) { // if security is enabled
+                    // calling the function to create GSN artefacts
+                    SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
+
+                    try {
+                        createGsnObj.runGsnArtifactsGenerator(
+                                id,
+                                gsnOutputDir,
+                                soteriaOutputDir,
+                                caseAadlPath,
+                                securityCases,
+                                generateXml,
+                                soteriaOutputLinkPathPrefix);
+                    } catch (IOException | ParserConfigurationException | SAXException e) {
+                        // TODO Auto-generated catch block
+                        throw new VerdictRunException("Failed to create GSN fragments", e);
+                    }
+                } else {
+                    // calling the function to create GSN artefacts
+                    GSNInterface createGsnObj = new GSNInterface();
+
+                    try {
+                        createGsnObj.runGsnArtifactsGenerator(
+                                id,
+                                gsnOutputDir,
+                                soteriaOutputDir,
+                                caseAadlPath,
+                                generateXml,
+                                soteriaOutputLinkPathPrefix);
+                    } catch (IOException | ParserConfigurationException | SAXException e) {
+                        // TODO Auto-generated catch block
+                        throw new VerdictRunException("Failed to create GSN fragments", e);
+                    }
+                }
+            } else { // if not cyberId
+                // calling the function to create GSN artefacts
+                GSNInterface createGsnObj = new GSNInterface();
+
+                try {
+                    createGsnObj.runGsnArtifactsGenerator(
+                            id,
+                            gsnOutputDir,
+                            soteriaOutputDir,
+                            caseAadlPath,
+                            generateXml,
+                            soteriaOutputLinkPathPrefix);
+                } catch (IOException | ParserConfigurationException | SAXException e) {
+                    // TODO Auto-generated catch block
+                    throw new VerdictRunException("Failed to create GSN fragments", e);
+                }
+            }
+        }
+
         logHeader("Finished");
     }
 

@@ -71,7 +71,12 @@ public class GSNInterface {
             CreateGSN objCreateGSN = new CreateGSN();
             GsnNode gsnFragment =
                     objCreateGSN.gsnCreator(
-                            xmlModel, cyberOutput, safetyOutput, caseAadlPath, rootGoalId, soteriaOutputLinkPathPrefix);
+                            xmlModel,
+                            cyberOutput,
+                            safetyOutput,
+                            caseAadlPath,
+                            rootGoalId,
+                            soteriaOutputLinkPathPrefix);
             System.out.println("Info: Created GSN fragment for " + rootGoalId);
 
             // Filenames

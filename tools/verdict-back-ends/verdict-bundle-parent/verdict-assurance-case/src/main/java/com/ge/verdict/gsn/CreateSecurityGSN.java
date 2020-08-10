@@ -510,8 +510,8 @@ public class CreateSecurityGSN {
                             + "&#10;Acceptable Likelihood = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            String urlString = soteriaOutputLinkPathPrefix+"-"+reqId+"-ImplProperties.txt";
-//            sol.setUrl(soteriaCyberOutputAddr);
+            String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties.txt";
+            //            sol.setUrl(soteriaCyberOutputAddr);
             sol.setUrl(urlString);
         } else {
             String extraInfo =
@@ -520,9 +520,10 @@ public class CreateSecurityGSN {
                             + "&#10;Acceptable Probability = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            String urlString = soteriaOutputLinkPathPrefix+"-"+reqId+"-ImplProperties-safety.txt";
-//          sol.setUrl(soteriaSafetyOutputAddr);
-          sol.setUrl(urlString);
+            String urlString =
+                    soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
+            //          sol.setUrl(soteriaSafetyOutputAddr);
+            sol.setUrl(urlString);
         }
 
         // add sol to solutionNode
@@ -653,7 +654,8 @@ public class CreateSecurityGSN {
         sol.setDisplayText("Evidence that&#10;" + subCompId + "&#10;is secure");
 
         /** Create a GSN fragment that starts at this subcomponent and create artifacts for it */
-        GsnNode subCompFragment = populateSubComponentFragment(subCompId, cutsets, acceptableProb, cyberReqId);
+        GsnNode subCompFragment =
+                populateSubComponentFragment(subCompId, cutsets, acceptableProb, cyberReqId);
         SecurityGSNInterface interfaceObj = new SecurityGSNInterface();
         String svgDestination =
                 interfaceObj.createArtifactFiles(subCompFragment, cyberReqId + "_" + subCompId);
@@ -746,7 +748,8 @@ public class CreateSecurityGSN {
      * @param acceptableProb
      * @return
      */
-    public GsnNode populateThreatNode(String componentId, Cutset cutset, String acceptableProb, String cyberReqId) {
+    public GsnNode populateThreatNode(
+            String componentId, Cutset cutset, String acceptableProb, String cyberReqId) {
         // GsnNode to pack solution
         GsnNode threatNode = new GsnNode();
 
@@ -782,7 +785,8 @@ public class CreateSecurityGSN {
      * @param results
      * @return
      */
-    public GsnNode populateThreatSolutionNode(Cutset cutset, String acceptableProb, String cyberReqId) {
+    public GsnNode populateThreatSolutionNode(
+            Cutset cutset, String acceptableProb, String cyberReqId) {
         // GsnNode to pack solution
         GsnNode solutionNode = new GsnNode();
 
@@ -812,8 +816,8 @@ public class CreateSecurityGSN {
                         + "&#10;Implemented Defenses: "
                         + cutset.getDefenses();
         sol.setExtraInfo(extraInfo);
-        String urlString = soteriaOutputLinkPathPrefix+"-"+cyberReqId+"-ImplProperties.txt";
-//      sol.setUrl(soteriaCyberOutputAddr);
+        String urlString = soteriaOutputLinkPathPrefix + "-" + cyberReqId + "-ImplProperties.txt";
+        //      sol.setUrl(soteriaCyberOutputAddr);
         sol.setUrl(urlString);
 
         // add sol to solutionNode

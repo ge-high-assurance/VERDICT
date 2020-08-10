@@ -29,7 +29,7 @@ public class SecurityGSNInterface {
      * @param caseAadlPath
      * @param securityCaseFlag
      * @param xmlFlag
-     * @param soteriaOutputLinkPathPrefix  
+     * @param soteriaOutputLinkPathPrefix
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException

@@ -477,8 +477,8 @@ public class CreateGSN {
                             + "&#10;Acceptable Likelihood = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            String urlString = soteriaOutputLinkPathPrefix+"-"+reqId+"-ImplProperties.txt";
-//            sol.setUrl(soteriaCyberOutputAddr);
+            String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties.txt";
+            //            sol.setUrl(soteriaCyberOutputAddr);
             sol.setUrl(urlString);
         } else {
             String extraInfo =
@@ -487,9 +487,10 @@ public class CreateGSN {
                             + "&#10;Acceptable Probability = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            String urlString = soteriaOutputLinkPathPrefix+"-"+reqId+"-ImplProperties-safety.txt";
-//          sol.setUrl(soteriaSafetyOutputAddr);
-          sol.setUrl(urlString);
+            String urlString =
+                    soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
+            //          sol.setUrl(soteriaSafetyOutputAddr);
+            sol.setUrl(urlString);
         }
 
         // add sol to solutionNode
