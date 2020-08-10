@@ -1,10 +1,7 @@
 package com.ge.research.osate.verdict.handlers;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -324,9 +321,11 @@ public class GSNHandler extends AbstractHandler {
 	public static boolean runBundle(String bundleJar, String dockerImage, String rootId, String gsnOutputDir, String soteriaOutputDir,
 			String caseAadlDir, String projectName, String graphVizPath) throws IOException {
 
-		//if xml has been asked by user
+		//if xml has been enabled by user
 		String xmlKey = "";
+		//if security cases has been enabled by user
 		String securityCasesKey = "";
+		
 		if (AssuranceCaseSettingsPanel.generateXml) {
 			xmlKey = "-x";
 		}
@@ -348,30 +347,12 @@ public class GSNHandler extends AbstractHandler {
 			.arg(projectName)
 			.arg("--gsn")
 			.arg(rootId)
-			.argBind(gsnOutputDir, "/app/GSN")
+			.argBind(gsnOutputDir, "/app/gsn")
 			.argBind(soteriaOutputDir, "/app/Soteria_Output")
 			.argBind(caseAadlDir, "/app/model")
 		    .arg(xmlKey)
 		    .arg(securityCasesKey); 
 
-		
-
-//		/**
-//		 * For testing only: writing to file 
-//		 */
-//		String arguments = "--csv DeliveryDrone --gsn "
-//				          + rootId + " "
-//				          + gsnOutputDir + " " 
-//				          + soteriaOutputDir + " "
-//				          + caseAadlDir + " "
-//				          + xmlKey + " "
-//				          + securityCasesKey;
-//		File fout = new File("C:/Users/212807042/Desktop/pluginArgs.txt");
-//        FileOutputStream fos = new FileOutputStream(fout);
-//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-//        bw.write(arguments);
-//        bw.close();
-		//-----------------------------------------
         
         
 		int code = command.runJarOrImage();
