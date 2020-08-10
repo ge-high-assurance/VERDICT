@@ -501,6 +501,7 @@ public class App {
             throws VerdictRunException {
         logHeader("GSN");
         
+        String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName; 
         
         //Fetch the model first
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
@@ -541,7 +542,8 @@ public class App {
 		                        soteriaOutputDir,
 		                        caseAadlPath,
 		                        securityCases,
-		                        generateXml);
+		                        generateXml,
+		                        soteriaOutputLinkPathPrefix);
 		            } catch (IOException | ParserConfigurationException | SAXException e) {
 		                // TODO Auto-generated catch block
 		                throw new VerdictRunException("Failed to create GSN fragments", e);
@@ -552,7 +554,12 @@ public class App {
 
 		            try {
 		                createGsnObj.runGsnArtifactsGenerator(
-		                        id, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
+		                        id, 
+		                        gsnOutputDir, 
+		                        soteriaOutputDir, 
+		                        caseAadlPath, 
+		                        generateXml, 
+		                        soteriaOutputLinkPathPrefix);
 		            } catch (IOException | ParserConfigurationException | SAXException e) {
 		                // TODO Auto-generated catch block
 		                throw new VerdictRunException("Failed to create GSN fragments", e);
@@ -564,7 +571,12 @@ public class App {
 
 	            try {
 	                createGsnObj.runGsnArtifactsGenerator(
-	                        id, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
+	                        id, 
+	                        gsnOutputDir, 
+	                        soteriaOutputDir, 
+	                        caseAadlPath, 
+	                        generateXml, 
+	                        soteriaOutputLinkPathPrefix);
 	            } catch (IOException | ParserConfigurationException | SAXException e) {
 	                // TODO Auto-generated catch block
 	                throw new VerdictRunException("Failed to create GSN fragments", e);

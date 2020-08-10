@@ -29,6 +29,7 @@ public class SecurityGSNInterface {
      * @param caseAadlPath
      * @param securityCaseFlag
      * @param xmlFlag
+     * @param soteriaOutputLinkPathPrefix  
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -39,7 +40,8 @@ public class SecurityGSNInterface {
             String soteriaOutputDir,
             String caseAadlPath,
             boolean securityCaseFlag,
-            boolean xmlFlag)
+            boolean xmlFlag,
+            String soteriaOutputLinkPathPrefix)
             throws IOException, ParserConfigurationException, SAXException {
 
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
@@ -84,7 +86,8 @@ public class SecurityGSNInterface {
                             safetyOutput,
                             caseAadlPath,
                             rootGoalId,
-                            securityCaseFlag);
+                            securityCaseFlag,
+                            soteriaOutputLinkPathPrefix);
             System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
             // creating artifacts
