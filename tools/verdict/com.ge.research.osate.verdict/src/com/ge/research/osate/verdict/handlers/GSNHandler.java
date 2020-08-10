@@ -92,7 +92,6 @@ public class GSNHandler extends AbstractHandler {
 						//getting required input
 						String userInput = decideCorrectInput(model);
 																									
-						System.out.println("INPUT--------------> "+ userInput);
 						
 						//Checking if all necessary settings exist
 						String stemProjPath = BundlePreferences.getStemDir();
@@ -155,13 +154,13 @@ public class GSNHandler extends AbstractHandler {
 						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 						
 						//running MBAS 
-//						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
+						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
 						
 						
-						/**
-						 * For testing only
-						 */
-						boolean outputsGenerated = true;
+//						/**
+//						 * For testing only
+//						 */
+//						boolean outputsGenerated = true;
 						
                         // if MBAS succeeded, proceed to GSN
 						if (outputsGenerated){
@@ -266,19 +265,20 @@ public class GSNHandler extends AbstractHandler {
 		
 
 	}
-
 	
 	
 	/**
-	 * A function that decides which rootIds should be sent to the bundle
+	 * A function that decides which requirement Ids should be sent to the bundle
 	 * Expected Behavior:
 	 * 1. Security disabled:
 	 * 	a. If no input/typo/invalid -> Sends all mission reqs
 	 *  b. If valid inputs -> Sends all input reqs
 	 * 2. Security enabled:
-	 * 	a. If a cyber req or a mission req is specified -> sends all input reqs and the supporting cyber reqs of any mission req
-	 *  b. If no cyber req or mission req is specified -> sends all input reqs 
-	 *  c. If no input/typo/invalid -> sends all mission reqs and supporting cyber reqs
+	 *  a. If all Ids specified are valid -> sends all Ids
+	 * 		(i) For every cyber req that is specified -> sends the cyber requirement 
+	 *  	(ii) For every mission req that is specified -> sends the requirement and all supporting cyber reqs 
+	 *  b. If no input/typo/invalid -> sends all mission reqs and supporting cyber reqs
+	 *   
 	 * 
 	 * @param model
 	 * @return
@@ -399,7 +399,8 @@ public class GSNHandler extends AbstractHandler {
 				if(securityFlag) {
 					List<String> supportingCyberForAllMissions = new ArrayList<>();
 					for(String missionId : missionIds) {
-						supportingCyberForAllMissions.addAll(getAllSupportingCyberReqs(model, missionId));				
+						supportingCyberForAllMissions.addAll(getAllSupportingCyberReqs(model, missionId));	
+						correctInput = correctInput + missionId+ ";";
 					}
 					
 					//removing duplicates from cupporting cybers
@@ -454,7 +455,6 @@ public class GSNHandler extends AbstractHandler {
 	}
 
 	
-	
 	/**
 	 * Calls Aadl2Csv translator
 	 * @param dir
@@ -496,8 +496,7 @@ public class GSNHandler extends AbstractHandler {
 		int code = command.runJarOrImage();
 		return code == 0;
 	}
-	
-	
+		
 	
 	/**
 	 * Delete all files with given extension in given folder
@@ -520,6 +519,7 @@ public class GSNHandler extends AbstractHandler {
 		}
 	}
 
+	
 	/**
 	 * Get the extension of a file
 	 */

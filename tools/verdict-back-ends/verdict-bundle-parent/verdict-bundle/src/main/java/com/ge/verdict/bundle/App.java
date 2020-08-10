@@ -484,6 +484,12 @@ public class App {
 
     /**
      * call the GSN creation interface from verdict-assurance-case
+     * Behavior:
+     * 1. If security cases have not been enabled
+     * 	- Creates normal GSN for every requirement specified
+     * 2. If security cases have been enabled
+     * 	- creates a security GSN for every cyber requirement that is specified
+     *  - creates a normal GSN for all other requirements
      *
      * @param rootGoalId
      * @param gsnOutputDir
@@ -582,7 +588,6 @@ public class App {
 	                throw new VerdictRunException("Failed to create GSN fragments", e);
 	            }
 			}
-	
 		}
         
         
