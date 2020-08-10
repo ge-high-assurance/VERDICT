@@ -102,9 +102,9 @@ public class SecurityGSNInterface {
      */
     public String createArtifactFiles(GsnNode gsnFragment, String rootGoalId) throws IOException {
         // Filenames
-        String xmlFilename = rootGoalId + "_GsnFragment.xml";
-        String dotFilename = rootGoalId + "_GsnFragment.dot";
-        String svgFilename = rootGoalId + "_GsnFragment.svg";
+        String xmlFilename = rootGoalId + "_SecGsnFragment.xml";
+        String dotFilename = rootGoalId + "_SecGsnFragment.dot";
+        String svgFilename = rootGoalId + "_SecGsnFragment.svg";
 
         if (CreateXmlFlag) {
             // Create a file and print the GSN XML
