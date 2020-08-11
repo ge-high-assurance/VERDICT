@@ -12,7 +12,7 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
   
 - Model Based Architecture Synthesis (MBAS)
   - Synthesis of a minimal set of defenses to mitigate the cyber requirements with respect to implementation costs
-  - Synthesis of a minimal set of defenses that mitigate the cyber requirements using existing implemented defenses in two modes: mitigated and unmitigated
+  - Synthesis of a minimal set of defenses to mitigate the cyber requirements using existing implemented defenses in two modes: mitigated and unmitigated
     - mitigated mode: MBAS recommends eliminations of extraneous defenses and downgrades of defense Design Assurance Levels (DALs). 
     - unmitigated mode: MBAS recommends new implementations and upgrades of defense DALs. 
     
