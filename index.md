@@ -5,7 +5,7 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
 ### Main Features
 
 - Model Based Architecture Analysis (MBAA)
-  - Identification of CAPEC threats and recommendation of NIST controls
+  - Identification of CAPEC threats and recommendation of NIST 800-53 controls
   - Determination of the likelihood of successful attack of top-level event
   - Calculation of the probability of system failure
   - Generation of cut-sets, fault-tree and attack-defense tree
