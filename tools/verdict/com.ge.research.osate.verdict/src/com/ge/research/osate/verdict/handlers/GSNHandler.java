@@ -9,31 +9,11 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroPart;
-import org.osate.aadl2.AbstractType;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.BusType;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DeviceType;
-import org.osate.aadl2.MemoryType;
-import org.osate.aadl2.ProcessType;
-import org.osate.aadl2.ProcessorType;
-import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.SystemType;
-import org.osate.aadl2.ThreadGroupType;
-import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.VirtualProcessorType;
 
 import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
 import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
-import com.ge.research.osate.verdict.dsl.VerdictUtil;
-import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
-import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
-import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
-import com.ge.research.osate.verdict.dsl.verdict.Statement;
-import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.verdict.vdm.VdmTranslator;
@@ -100,91 +80,18 @@ public class GSNHandler extends AbstractHandler {
 						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 						File projectDir = new File(selection.get(0));
 						
-						//get Mission and cyber requirement Ids
-						Aadl2Vdm objectVdmTran = new Aadl2Vdm();
-						ListTuple idTuple = getRequirementIds(objectVdmTran.preprocessAadlFiles(projectDir)); 
 						
-						List<String> allReqIds = idTuple.getAllReqs();
-						List<String> cyberIds = idTuple.getCyberReqs();						
+						/**
+						 * Create the xml model for the GSN creator 
+						 * in the GSN output directory as modelXML.xml
+						 */
+						Aadl2Vdm translatorObject = new Aadl2Vdm();
+						Model model = translatorObject.execute(projectDir);
 						
-						//getting input
-						String userInput;
-						
-						//checking user input
-						if (AssuranceCaseSettingsPanel.rootGoalId==null) {
-							//if security cases have not been selected
-							if(!AssuranceCaseSettingsPanel.securityCases) {
-								System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
-								userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend								
-							} else {
-								System.out.println("Warning: No user specified requirement. Generating security cases for all cyber requirements.");
-								userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend	
-							}
-						} else {
-							if (AssuranceCaseSettingsPanel.rootGoalId.trim().length()==0) {
-								//if security cases have not been selected
-								if(!AssuranceCaseSettingsPanel.securityCases) {
-									System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
-									userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend								
-								} else {
-									System.out.println("Warning: No user specified requirement. Generating security cases for all cyber requirements.");
-									userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend	
-								}
-							} else {
-								
-								
-								if(!AssuranceCaseSettingsPanel.securityCases) {
-									boolean correctInputs = true;
-									
-									//splitting the input by ';' 
-									String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
-									String[] inputs = inputLine.split(";");
-																	
-									//checking if input is valid
-									for(String in : inputs) {
-										if (!allReqIds.contains(in)) {
-											correctInputs = false;
-										}
-									}
-									
-									if (correctInputs) {
-										userInput = inputLine;
-									} else {
-										System.out.println("Warning: Ill Formed Input. Generating for all mission requirements.");
-										userInput = "ALLMREQKEY"; //will be interpreted as All mission requirements by backend
-									}															
-									
-								} else {
-									boolean correctInputs = true;
-									
-									//splitting the input by ';' 
-									String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
-									String[] inputs = inputLine.split(";");
-																	
-									//checking if input is valid
-									for(String in : inputs) {
-										if (!cyberIds.contains(in)) {
-											correctInputs = false;
-										}
-									}
-									
-									if (correctInputs) {
-										userInput = inputLine;
-									} else {
-										System.out.println("Warning: Ill Formed Input. Generating security cases for all cyber requirements.");
-										userInput = "ALLCREQKEY"; //will be interpreted as All cyber requirements by backend
-									}															
-									
-								}
-								
-								
-							
-							
-							}
-
-						}
-																			
-						
+												
+						//getting required input
+						String userInput = decideCorrectInput(model);
+																									
 						
 						//Checking if all necessary settings exist
 						String stemProjPath = BundlePreferences.getStemDir();
@@ -272,11 +179,9 @@ public class GSNHandler extends AbstractHandler {
 							String caseAadlDir = projectDir.getCanonicalPath();
 							
 							/**
-							 * Create the xml model for the GSN creator 
+							 * save the xml model for the GSN creator 
 							 * in the GSN output directory as modelXML.xml
 							 */
-							Aadl2Vdm translatorObject = new Aadl2Vdm();
-							Model model = translatorObject.execute(projectDir);
 							File modelXml = new File(gsnOutputFolder, "modelXML.xml");
 							VdmTranslator.marshalToXml(model, modelXml);
 
@@ -303,7 +208,7 @@ public class GSNHandler extends AbstractHandler {
 		}
 		return null;
 	}
-
+	
 
 	/**
 	 * 
@@ -360,6 +265,194 @@ public class GSNHandler extends AbstractHandler {
 		
 
 	}
+	
+	
+	/**
+	 * A function that decides which requirement Ids should be sent to the bundle
+	 * Expected Behavior:
+	 * 1. Security disabled:
+	 * 	a. If no input/typo/invalid -> Sends all mission reqs
+	 *  b. If valid inputs -> Sends all input reqs
+	 * 2. Security enabled:
+	 *  a. If all Ids specified are valid -> sends all Ids
+	 * 		(i) For every cyber req that is specified -> sends the cyber requirement 
+	 *  	(ii) For every mission req that is specified -> sends the requirement and all supporting cyber reqs 
+	 *  b. If no input/typo/invalid -> sends all mission reqs and supporting cyber reqs
+	 *   
+	 * 
+	 * @param model
+	 * @return
+	 */
+	public String decideCorrectInput(Model model) {
+		String correctInput = "";
+		
+		boolean emptyFlag = false;
+		boolean securityFlag = AssuranceCaseSettingsPanel.securityCases;
+
+		//to store all Ids
+		List<String> allIds = new ArrayList<>();
+		
+		//get all mission Ids
+        List<String> missionIds = new ArrayList<>();
+        for (verdict.vdm.vdm_model.Mission aMission : model.getMission()) {
+            missionIds.add(aMission.getId());
+            allIds.add(aMission.getId());
+        }
+
+		//get all cyber Ids
+        List<String> cyberIds = new ArrayList<>();
+        for (verdict.vdm.vdm_model.CyberReq aCyberReq : model.getCyberReq()) {
+            cyberIds.add(aCyberReq.getId());
+            allIds.add(aCyberReq.getId());
+        }
+
+		//get all safety Ids
+        List<String> safetyIds = new ArrayList<>();
+        for (verdict.vdm.vdm_model.SafetyReq aSafetyReq : model.getSafetyReq()) {
+            safetyIds.add(aSafetyReq.getId());
+            allIds.add(aSafetyReq.getId());
+        }
+        
+        
+		if (AssuranceCaseSettingsPanel.rootGoalId==null) {
+			emptyFlag = true;
+		} else if(AssuranceCaseSettingsPanel.rootGoalId.trim().length()==0) {
+			emptyFlag = true;
+		}
+	
+		if(emptyFlag) {
+			System.out.println("Warning: No user specified requirement. Generating for all mission requirements.");
+			//if security is enabled, input will have all mission reqs and all dependent cyber reqs
+			if(securityFlag) {
+				List<String> supportingCyberForAllMissions = new ArrayList<>();
+				for(String missionId : missionIds) {
+					supportingCyberForAllMissions.addAll(getAllSupportingCyberReqs(model, missionId));
+					correctInput = correctInput + missionId+ ";";					
+				}
+				
+				//removing duplicates from cupporting cybers
+				List<String> duplicateFreeSupportingCyberForAllMissions= new ArrayList<>(new HashSet<>(supportingCyberForAllMissions));
+				
+				//addiing supportings to input
+				for(String cyberId : duplicateFreeSupportingCyberForAllMissions) {
+					correctInput = correctInput + cyberId+ ";";
+				}
+			} else { //if security is not enabled, input will have only mission reqs
+				for(String missionId : missionIds) {
+					correctInput = correctInput + missionId+ ";";					
+				}
+			}			
+		} else {
+			//split inputs by ";" and check if all inputs are valid Ids
+			boolean validInputs = true;
+			boolean cyberFlag = false;
+			boolean missionFlag = false;
+		
+			//to collect any correct mission Id user has provided
+			List<String> userProvidedMissions = new ArrayList<>();
+			
+			//splitting the input by ';' 
+			String inputLine = AssuranceCaseSettingsPanel.rootGoalId.trim(); 
+			String[] inputs = inputLine.split(";");
+											
+			//checking if input is valid and has a cyber requirement
+			for(String in : inputs) {
+				if (cyberIds.contains(in)) {
+					cyberFlag = true;
+				}
+				if (missionIds.contains(in)) {
+					missionFlag = true;
+					userProvidedMissions.add(in);
+				}
+				if (!allIds.contains(in)) {
+					validInputs = false;
+				}
+			}
+			
+			//if valid inpus, add all to correct input
+			if(validInputs) {
+				correctInput = inputLine;
+				if(securityFlag) {					
+					if(missionFlag) { //otherwise add only provided mission Ids
+						List<String> supportingCyberForUserProvidedMissions = new ArrayList<>();
+						for(String missionId : userProvidedMissions) {
+							supportingCyberForUserProvidedMissions.addAll(getAllSupportingCyberReqs(model, missionId));
+						}
+						
+						//removing duplicates from cupporting cybers
+						List<String> duplicateFreeSupportingCyberForUserProvidedMissions= new ArrayList<>(new HashSet<>(supportingCyberForUserProvidedMissions));
+						
+						//addiing supportings to input
+						for(String cyberId : duplicateFreeSupportingCyberForUserProvidedMissions) {
+							correctInput = correctInput + cyberId+ ";";
+						}
+						
+					} else { 
+						if(!cyberFlag) {
+							System.out.println("Warning: Only safety requirements specified. Will ignore \"Generate Security Cases\" selection."); 								
+						}
+					}
+				}
+			} else {
+				System.out.println("Warning: Ill formed input. Generating for all mission requirements.");
+				//if security is enabled, input will have all mission reqs and all dependent cyber reqs
+				if(securityFlag) {
+					List<String> supportingCyberForAllMissions = new ArrayList<>();
+					for(String missionId : missionIds) {
+						supportingCyberForAllMissions.addAll(getAllSupportingCyberReqs(model, missionId));	
+						correctInput = correctInput + missionId+ ";";
+					}
+					
+					//removing duplicates from cupporting cybers
+					List<String> duplicateFreeSupportingCyberForAllMissions= new ArrayList<>(new HashSet<>(supportingCyberForAllMissions));
+					
+					//addiing supportings to input
+					for(String cyberId : duplicateFreeSupportingCyberForAllMissions) {
+						correctInput = correctInput + cyberId+ ";";
+					}
+				} else { //if security is not enabled, input will have only mission reqs
+					for(String missionId : missionIds) {
+						correctInput = correctInput + missionId+ ";";					
+					}
+				}
+			}
+		}
+
+		return correctInput;
+	}
+	
+	
+	/**
+	 * Retruns all supporting cyber reqs of a given mission req
+	 * @param model
+	 * @param missionId
+	 * @return
+	 */
+	public List<String> getAllSupportingCyberReqs(Model model, String missionId) {
+		List<String> supCyberReqs= new ArrayList<>();
+		
+		//get all cyber Ids
+        List<String> cyberIds = new ArrayList<>();
+        for (verdict.vdm.vdm_model.CyberReq aCyberReq : model.getCyberReq()) {
+            cyberIds.add(aCyberReq.getId());
+        }
+		
+		//get the object for that mission
+        for (verdict.vdm.vdm_model.Mission aMission : model.getMission()) {
+        	if(aMission.getId().equalsIgnoreCase(missionId)) {
+        		//get supporting requirements of missionId
+        		List<String> supportingReqs = aMission.getCyberReqs();
+        		
+        		//add only cyberReqs to the return list
+        		for(String id : supportingReqs) {
+        			if(cyberIds.contains(id)) {
+        				supCyberReqs.add(id);
+        			}
+        		}        		
+        	}
+        }
+		return supCyberReqs;
+	}
 
 	
 	/**
@@ -403,8 +496,7 @@ public class GSNHandler extends AbstractHandler {
 		int code = command.runJarOrImage();
 		return code == 0;
 	}
-	
-	
+		
 	
 	/**
 	 * Delete all files with given extension in given folder
@@ -427,6 +519,7 @@ public class GSNHandler extends AbstractHandler {
 		}
 	}
 
+	
 	/**
 	 * Get the extension of a file
 	 */
@@ -440,102 +533,5 @@ public class GSNHandler extends AbstractHandler {
 
 	}
 	
-	
-	/**
-	 * A function that returns a list of all requirement IDs
-	 * @param objects
-	 * @return
-	 */
-	public ListTuple getRequirementIds(List<EObject> objects) { 				
-		List<String> allReqIds = new ArrayList<>();
-		
-		List<String> allCyberReqIds = new ArrayList<>();
-		
-		List<ComponentType> componentTypes = new ArrayList<>();
-
-		for(EObject obj : objects) {
-			if (obj instanceof SystemType) {
-				componentTypes.add((SystemType) obj);
-			} else if (obj instanceof BusType) {
-				componentTypes.add((BusType)obj);
-			} else if (obj instanceof SubprogramType) {
-				componentTypes.add((SubprogramType)obj);
-			} else if (obj instanceof ThreadType) {
-				componentTypes.add((ThreadType)obj);
-			} else if (obj instanceof MemoryType) {
-				componentTypes.add((MemoryType)obj);
-			} else if (obj instanceof DeviceType) {
-				componentTypes.add((DeviceType)obj);
-			} else if (obj instanceof AbstractType) {
-				componentTypes.add((AbstractType)obj);
-			} else if (obj instanceof ProcessType) {
-				componentTypes.add((ProcessType)obj);
-			} else if (obj instanceof ThreadGroupType) {
-				componentTypes.add((ThreadGroupType)obj);
-			} else if (obj instanceof VirtualProcessorType) {
-				componentTypes.add((VirtualProcessorType)obj);
-			} else if (obj instanceof ProcessorType) {
-				componentTypes.add((ProcessorType)obj);
-			}
-		}
-			
-		for(ComponentType compType : componentTypes) {
-			List<CyberMission> missionReqs = new ArrayList<>();
-			List<CyberReq> cyberReqs = new ArrayList<>();
-			List<SafetyReq> safetyReqs = new ArrayList<>();			
-			
-			for(AnnexSubclause annex : compType.getOwnedAnnexSubclauses()) {
-				if(annex.getName().equalsIgnoreCase("verdict")) {
-					Verdict verdictAnnex = VerdictUtil.getVerdict(annex);
-
-					for (Statement statement : verdictAnnex.getElements()) {
-						if(statement instanceof CyberMission) {
-							missionReqs.add((CyberMission)statement);
-						} else if(statement instanceof CyberReq) {
-							cyberReqs.add((CyberReq)statement);
-						} else if(statement instanceof SafetyReq) {
-							safetyReqs.add((SafetyReq)statement);
-						}
-					}
-				}
-			}
-			
-			if(!missionReqs.isEmpty()) {
-				for(CyberMission aMission : missionReqs) {
-					allReqIds.add(aMission.getId());
-				}
-			
-			}
-			if(!cyberReqs.isEmpty()) {
-				for(CyberReq aCyberReq : cyberReqs) {
-					allReqIds.add(aCyberReq.getId());
-					allCyberReqIds.add(aCyberReq.getId());
-				}
-			
-			}
-			if(!missionReqs.isEmpty()) {
-				for(CyberMission aMission : missionReqs) {
-					allReqIds.add(aMission.getId());
-				}
-			
-			}
-			if(!safetyReqs.isEmpty()) {
-				for(SafetyReq aSafetyReq : safetyReqs) {
-					allReqIds.add(aSafetyReq.getId());
-				}
-			}
-		}
-			
-		// Removing duplicates
-        List<String> duplicateFreeAll = new ArrayList<>(new HashSet<>(allReqIds));
-        List<String> duplicateFreeCyber = new ArrayList<>(new HashSet<>(allCyberReqIds));
-
-        ListTuple tupleObj = new ListTuple();
-        
-        tupleObj.setAllReqs(duplicateFreeAll);
-        tupleObj.setCyberReqs(duplicateFreeCyber);
-        		
-        return tupleObj; 
-	}
 	
 }

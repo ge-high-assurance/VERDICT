@@ -18,13 +18,14 @@ public class App {
     public static void main(String[] args)
             throws IOException, ParserConfigurationException, SAXException {
 
-        if (args.length != 4) {
+        if (args.length != 5) {
             System.out.println("Argument Error: Invalid number of arguments provided.");
         } else {
             String userInput = args[0];
             String gsnOutputDir = args[1];
             String soteriaOutputDir = args[2];
             String caseAadlPath = args[3];
+            String modelName = args[4];
 
             boolean securityCaseFlag = true;
             boolean xmlFlag = false;
@@ -38,7 +39,8 @@ public class App {
                     soteriaOutputDir,
                     caseAadlPath,
                     securityCaseFlag,
-                    xmlFlag);
+                    xmlFlag,
+                    modelName);
         }
     }
 }

@@ -20,6 +20,7 @@ public class CreateGSN {
     private int assumptionCounter = 1;
     private String soteriaCyberOutputAddr;
     private String soteriaSafetyOutputAddr;
+    private String soteriaOutputLinkPathPrefix;
 
     /**
      * creates a GsnNode and returns it
@@ -39,12 +40,14 @@ public class CreateGSN {
             File cyberOutput,
             File safetyOutput,
             String addressForCASE,
-            String rootGoalId)
+            String rootGoalId,
+            String soteriaOutPathPrefix)
             throws ParserConfigurationException, SAXException, IOException {
 
         // setting class variables
         soteriaCyberOutputAddr = cyberOutput.getAbsolutePath();
         soteriaSafetyOutputAddr = safetyOutput.getAbsolutePath();
+        soteriaOutputLinkPathPrefix = soteriaOutPathPrefix;
 
         // The GsnNode to return
         GsnNode returnFragment = new GsnNode();
@@ -474,7 +477,9 @@ public class CreateGSN {
                             + "&#10;Acceptable Likelihood = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            sol.setUrl(soteriaCyberOutputAddr);
+            String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties.txt";
+            //            sol.setUrl(soteriaCyberOutputAddr);
+            sol.setUrl(urlString);
         } else {
             String extraInfo =
                     "Computed Probability = "
@@ -482,7 +487,10 @@ public class CreateGSN {
                             + "&#10;Acceptable Probability = "
                             + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            sol.setUrl(soteriaSafetyOutputAddr);
+            String urlString =
+                    soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
+            //          sol.setUrl(soteriaSafetyOutputAddr);
+            sol.setUrl(urlString);
         }
 
         // add sol to solutionNode
