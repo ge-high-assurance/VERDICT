@@ -11,8 +11,8 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
   - Generation of cut-sets, fault-tree and attack-defense tree
   
 - Model Based Architecture Syntehsis (MBAS)
-  - Synthesis of a minimal set of defenses that mitigate the top-level event with respect to implementation costs without existing implemented defenses
-  - Synthesis of a minimal set of defenses that mitigate the top-level event with existing implemented defenses 
+  - Synthesis of a global minimal set of defenses that mitigate the top-level event with respect to implementation costs without existing implemented defenses
+  - Synthesis of a local minimal set of defenses that mitigate the top-level event with existing implemented defenses 
     - If existing implemented defenses already mitigate the top-level event, MBAS recommends elimination of extraneous defenses and downgrades of defense Design Assurance Levels (DALs). 
     - If existing implemented defenses do not mitigate the top-level event, MBAS recommends new implementations and upgrades of defense DALs. 
     
