@@ -125,8 +125,9 @@ public class SecurityGSNInterface {
         File gsnDotFile = new File(gsnOutputDirectory, dotFilename);
         Gsn2Dot objGsn2Dot = new Gsn2Dot();
         objGsn2Dot.createDot(gsnFragment, gsnDotFile);
-        System.out.println(
-                "Info: Written GSN to dot for " + rootGoalId + ": " + gsnDotFile.getAbsolutePath());
+        //        System.out.println(
+        //                "Info: Written GSN to dot for " + rootGoalId + ": " +
+        // gsnDotFile.getAbsolutePath());
 
         // generate the svg file using graphviz
         String graphDestination = gsnOutputDirectory + SEP + svgFilename;

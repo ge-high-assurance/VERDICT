@@ -100,11 +100,11 @@ public class GSNInterface {
             File gsnDotFile = new File(gsnOutputDir, dotFilename);
             Gsn2Dot objGsn2Dot = new Gsn2Dot();
             objGsn2Dot.createDot(gsnFragment, gsnDotFile);
-            System.out.println(
-                    "Info: Written GSN to dot for "
-                            + rootGoalId
-                            + ": "
-                            + gsnDotFile.getAbsolutePath());
+            //            System.out.println(
+            //                    "Info: Written GSN to dot for "
+            //                            + rootGoalId
+            //                            + ": "
+            //                            + gsnDotFile.getAbsolutePath());
 
             // generate the svg file using graphviz
             String graphDestination = gsnOutputDir + SEP + svgFilename;
