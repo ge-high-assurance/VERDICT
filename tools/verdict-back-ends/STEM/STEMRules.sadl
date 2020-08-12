@@ -362,7 +362,7 @@ Rule Vul-CAPEC-117-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a second Connection
+      and the Subsystem is a connectionSource of a Connection
       and connectionType of the Connection is Untrusted
    then applicableCM of the Connection is CAPEC-117C-EncryptedTransmission.
 Rule Vul-CAPEC-123-1
@@ -512,7 +512,7 @@ Rule Vul-CAPEC-192-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a second Connection
+      and the Subsystem is a connectionSource of a Connection
       and connectionType of the Connection is Untrusted
    then applicableCM of the Connection is CAPEC-192C-EncryptedTransmission.
 Rule Vul-CAPEC-192-2
