@@ -6,9 +6,13 @@ import java.util.List;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -23,6 +27,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 	public static final String ID = "com.ge.research.osate.verdict.gui.mbasSynthesisResultsView";
 	private Composite composite;
 	public static ResultsInstance results;
+	public static Runnable applyToProject;
 
 	@Override
 	public void setFocus() {
@@ -79,7 +84,10 @@ public class MBASSynthesisResultsView extends ViewPart {
 		}
 
 		{
-			Label header = new Label(composite, SWT.BOLD);
+			Composite headerComposite = new Composite(composite, SWT.NONE);
+			headerComposite.setLayout(new RowLayout());
+
+			Label header = new Label(headerComposite, SWT.BOLD);
 			FontDescriptor descriptor = FontDescriptor.createFrom(header.getFont());
 			descriptor = descriptor.setStyle(SWT.BOLD);
 			header.setFont(descriptor.createFont(Display.getCurrent()));
@@ -125,6 +133,15 @@ public class MBASSynthesisResultsView extends ViewPart {
 						"Synthesis results (not using existing solution): total cost: "
 								+ results.outputCost.doubleValue());
 			}
+
+			Button applyChangesToProject = new Button(headerComposite, SWT.PUSH);
+			applyChangesToProject.setText("Apply Changes to Project");
+			applyChangesToProject.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					applyToProject.run();
+				}
+			});
 		}
 
 		Table table = new Table(composite, SWT.MULTI | SWT.FULL_SELECTION);

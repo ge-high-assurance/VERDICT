@@ -639,16 +639,19 @@ public class AttackDefenseCollector {
 
         // Load all instances as systems
         for (ComponentImpl impl : model.getComponentImpl()) {
-            for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
-                SystemModel system = getSystem(inst.getName());
-                for (GenericAttribute attrib : inst.getAttribute()) {
-                    if (attrib.getValue() instanceof String) {
-                        system.addAttribute(attrib.getName(), (String) attrib.getValue());
+            if (impl.getBlockImpl() != null) {
+                for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
+                    SystemModel system = getSystem(inst.getName());
+                    for (GenericAttribute attrib : inst.getAttribute()) {
+                        if (attrib.getValue() instanceof String) {
+                            system.addAttribute(attrib.getName(), (String) attrib.getValue());
+                        }
                     }
-                }
-                Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
-                if (inst.getImplementation() != null) {
-                    Util.putSetMap(compImplToSystem, inst.getImplementation().getName(), system);
+                    Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                    if (inst.getImplementation() != null) {
+                        Util.putSetMap(
+                                compImplToSystem, inst.getImplementation().getName(), system);
+                    }
                 }
             }
         }
@@ -659,7 +662,10 @@ public class AttackDefenseCollector {
         for (ComponentImpl impl : model.getComponentImpl()) {
             if (!compImplToSystem.containsKey(impl.getName())) {
                 SystemModel system = getSystem(impl.getName());
-                Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
+                if (impl.getType() != null) {
+                    // not entirely clear how this would be null
+                    Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
+                }
                 Util.putSetMap(compImplToSystem, impl.getName(), system);
 
                 topLevelSystemContenders.add(system);
@@ -683,91 +689,96 @@ public class AttackDefenseCollector {
         }
 
         for (ComponentImpl impl : model.getComponentImpl()) {
-            for (Connection conn : impl.getBlockImpl().getConnection()) {
-                boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
-                boolean internalOutgoing = conn.getDestination().getSubcomponentPort() == null;
+            if (impl.getBlockImpl() != null) {
+                for (Connection conn : impl.getBlockImpl().getConnection()) {
+                    boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
+                    boolean internalOutgoing = conn.getDestination().getSubcomponentPort() == null;
 
-                String sourcePort, destPort;
-                if (internalIncoming) {
-                    sourcePort = conn.getSource().getComponentPort().getName();
-                } else {
-                    if (conn.getSource().getSubcomponentPort().getPort() != null) {
-                        sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
+                    String sourcePort, destPort;
+                    if (internalIncoming) {
+                        sourcePort = conn.getSource().getComponentPort().getName();
                     } else {
-                        System.out.println("Null in port: " + conn.getName());
-                        sourcePort = "null";
+                        if (conn.getSource().getSubcomponentPort().getPort() != null) {
+                            sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
+                        } else {
+                            System.out.println("Null in port: " + conn.getName());
+                            sourcePort = "null";
+                        }
                     }
-                }
-                if (internalOutgoing) {
-                    destPort = conn.getDestination().getComponentPort().getName();
-                } else {
-                    if (conn.getDestination().getSubcomponentPort().getPort() != null) {
-                        destPort = conn.getDestination().getSubcomponentPort().getPort().getName();
+                    if (internalOutgoing) {
+                        destPort = conn.getDestination().getComponentPort().getName();
                     } else {
-                        System.out.println("Null out port: " + conn.getName());
-                        destPort = "null";
+                        if (conn.getDestination().getSubcomponentPort().getPort() != null) {
+                            destPort =
+                                    conn.getDestination().getSubcomponentPort().getPort().getName();
+                        } else {
+                            System.out.println("Null out port: " + conn.getName());
+                            destPort = "null";
+                        }
                     }
-                }
 
-                Collection<SystemModel> sources =
-                        internalIncoming
-                                ? compImplToSystem.get(impl.getName())
-                                : Collections.singleton(
-                                        getSystem(
-                                                conn.getSource()
-                                                        .getSubcomponentPort()
-                                                        .getSubcomponent()
-                                                        .getName()));
-                Collection<SystemModel> dests =
-                        internalOutgoing
-                                ? compImplToSystem.get(impl.getName())
-                                : Collections.singleton(
-                                        getSystem(
-                                                conn.getDestination()
-                                                        .getSubcomponentPort()
-                                                        .getSubcomponent()
-                                                        .getName()));
+                    Collection<SystemModel> sources =
+                            internalIncoming
+                                    ? compImplToSystem.get(impl.getName())
+                                    : Collections.singleton(
+                                            getSystem(
+                                                    conn.getSource()
+                                                            .getSubcomponentPort()
+                                                            .getSubcomponent()
+                                                            .getName()));
+                    Collection<SystemModel> dests =
+                            internalOutgoing
+                                    ? compImplToSystem.get(impl.getName())
+                                    : Collections.singleton(
+                                            getSystem(
+                                                    conn.getDestination()
+                                                            .getSubcomponentPort()
+                                                            .getSubcomponent()
+                                                            .getName()));
 
-                for (SystemModel source : sources) {
-                    for (SystemModel dest : dests) {
-                        ConnectionModel connection =
-                                new ConnectionModel(
-                                        conn.getName(),
-                                        resolver(source),
-                                        resolver(dest),
-                                        sourcePort,
-                                        destPort);
+                    for (SystemModel source : sources) {
+                        for (SystemModel dest : dests) {
+                            ConnectionModel connection =
+                                    new ConnectionModel(
+                                            conn.getName(),
+                                            resolver(source),
+                                            resolver(dest),
+                                            sourcePort,
+                                            destPort);
 
-                        for (GenericAttribute attrib : conn.getAttribute()) {
-                            if (attrib.getValue() instanceof String) {
-                                connection.addAttribute(
-                                        attrib.getName(), (String) attrib.getValue());
+                            for (GenericAttribute attrib : conn.getAttribute()) {
+                                if (attrib.getValue() instanceof String) {
+                                    connection.addAttribute(
+                                            attrib.getName(), (String) attrib.getValue());
+                                }
+                            }
+
+                            // System.out.println("ADDING CONNECTION " + conn.getName() + " from "
+                            // + source.getName() + ":"
+                            // + sourcePort + " to " + dest.getName() + ":" + destPort);
+
+                            Util.putSetMap(connections, conn.getName(), connection);
+
+                            // Store connection in a different place depending on internal/external
+                            // and
+                            // outgoing/incoming
+                            if (internalIncoming) {
+                                source.addIncomingInternalConnection(connection);
+                                dest.addIncomingConnection(connection);
+                            } else if (internalOutgoing) {
+                                source.addOutgoingConnection(connection);
+                                dest.addOutgoingInternalConnection(connection);
+                            } else {
+                                source.addOutgoingConnection(connection);
+                                dest.addIncomingConnection(connection);
                             }
                         }
-
-                        //						System.out.println("ADDING CONNECTION " + conn.getName() + " from "
-                        // + source.getName() + ":"
-                        //								+ sourcePort + " to " + dest.getName() + ":" + destPort);
-
-                        Util.putSetMap(connections, conn.getName(), connection);
-
-                        // Store connection in a different place depending on internal/external and
-                        // outgoing/incoming
-                        if (internalIncoming) {
-                            source.addIncomingInternalConnection(connection);
-                            dest.addIncomingConnection(connection);
-                        } else if (internalOutgoing) {
-                            source.addOutgoingConnection(connection);
-                            dest.addOutgoingInternalConnection(connection);
-                        } else {
-                            source.addOutgoingConnection(connection);
-                            dest.addIncomingConnection(connection);
-                        }
                     }
-                }
 
-                connectionAttackNames.put(
-                        conn.getName() + impl.getName() + impl.getType().getName(), conn.getName());
+                    connectionAttackNames.put(
+                            conn.getName() + impl.getName() + impl.getType().getName(),
+                            conn.getName());
+                }
             }
         }
 
@@ -826,63 +837,65 @@ public class AttackDefenseCollector {
 
         // load implemented defense DALs from VDM
         for (ComponentImpl impl : model.getComponentImpl()) {
-            for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
-                for (GenericAttribute attrib : inst.getAttribute()) {
-                    if (attrib.getValue() instanceof String) {
-                        // chop qualifier (normally "CASE_Consolidated_Properties::")
-                        int lastColon = attrib.getName().lastIndexOf(':');
-                        String name =
-                                lastColon != -1
-                                        ? attrib.getName().substring(lastColon + 1)
-                                        : attrib.getName();
+            if (impl.getBlockImpl() != null) {
+                for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
+                    for (GenericAttribute attrib : inst.getAttribute()) {
+                        if (attrib.getValue() instanceof String) {
+                            // chop qualifier (normally "CASE_Consolidated_Properties::")
+                            int lastColon = attrib.getName().lastIndexOf(':');
+                            String name =
+                                    lastColon != -1
+                                            ? attrib.getName().substring(lastColon + 1)
+                                            : attrib.getName();
 
-                        if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(name)) {
-                            try {
-                                Integer dal = Integer.parseInt((String) attrib.getValue());
-                                if (dal > 0) {
-                                    implDal.put(new Pair<>(inst.getName(), name), dal);
+                            if (DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(name)) {
+                                try {
+                                    Integer dal = Integer.parseInt((String) attrib.getValue());
+                                    if (dal > 0) {
+                                        implDal.put(new Pair<>(inst.getName(), name), dal);
+                                    }
+                                } catch (NumberFormatException e) {
+                                    throw new RuntimeException(
+                                            "Invalid DAL for "
+                                                    + impl.getName()
+                                                    + " - "
+                                                    + inst.getName()
+                                                    + ":"
+                                                    + name
+                                                    + ", "
+                                                    + attrib.getValue());
                                 }
-                            } catch (NumberFormatException e) {
-                                throw new RuntimeException(
-                                        "Invalid DAL for "
-                                                + impl.getName()
-                                                + " - "
-                                                + inst.getName()
-                                                + ":"
-                                                + name
-                                                + ", "
-                                                + attrib.getValue());
                             }
                         }
                     }
                 }
-            }
-            for (Connection conn : impl.getBlockImpl().getConnection()) {
-                for (GenericAttribute attrib : conn.getAttribute()) {
-                    if (attrib.getValue() instanceof String) {
-                        // chop qualifier (normally "CASE_Consolidated_Properties::")
-                        int lastColon = attrib.getName().lastIndexOf(':');
-                        String name =
-                                lastColon != -1
-                                        ? attrib.getName().substring(lastColon + 1)
-                                        : attrib.getName();
+                for (Connection conn : impl.getBlockImpl().getConnection()) {
+                    for (GenericAttribute attrib : conn.getAttribute()) {
+                        if (attrib.getValue() instanceof String) {
+                            // chop qualifier (normally "CASE_Consolidated_Properties::")
+                            int lastColon = attrib.getName().lastIndexOf(':');
+                            String name =
+                                    lastColon != -1
+                                            ? attrib.getName().substring(lastColon + 1)
+                                            : attrib.getName();
 
-                        if (DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(name)) {
-                            try {
-                                Integer dal = Integer.parseInt((String) attrib.getValue());
-                                if (dal > 0) {
-                                    implDal.put(new Pair<>(conn.getName(), name), dal);
+                            if (DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(name)) {
+                                try {
+                                    Integer dal = Integer.parseInt((String) attrib.getValue());
+                                    if (dal > 0) {
+                                        implDal.put(new Pair<>(conn.getName(), name), dal);
+                                    }
+                                } catch (NumberFormatException e) {
+                                    throw new RuntimeException(
+                                            "Invalid DAL for "
+                                                    + impl.getName()
+                                                    + " - "
+                                                    + conn.getName()
+                                                    + ":"
+                                                    + name
+                                                    + ", "
+                                                    + attrib.getValue());
                                 }
-                            } catch (NumberFormatException e) {
-                                throw new RuntimeException(
-                                        "Invalid DAL for "
-                                                + impl.getName()
-                                                + " - "
-                                                + conn.getName()
-                                                + ":"
-                                                + name
-                                                + ", "
-                                                + attrib.getValue());
                             }
                         }
                     }
