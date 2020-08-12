@@ -160,7 +160,18 @@ public class MBASSynthesisResultsView extends ViewPart {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
 
 			List<ResultsInstance.Item> sortedItems = new ArrayList<>(results.items);
-			sortedItems.sort((a, b) -> Action.fromItem(a).compareTo(Action.fromItem(b))); // enum implements Comparable
+			sortedItems.sort((a, b) -> {
+				// sort by action, then component/connection, then by defense property
+				int actionComp = Action.fromItem(a).compareTo(Action.fromItem(b)); // enum implements Comparable
+				if (actionComp != 0) {
+					return actionComp;
+				}
+				int nameComp = a.component.compareTo(b.component);
+				if (nameComp != 0) {
+					return nameComp;
+				}
+				return a.defenseProperty.compareTo(b.defenseProperty);
+			});
 
 			Action prev = null;
 			for (ResultsInstance.Item item : sortedItems) {
@@ -186,8 +197,18 @@ public class MBASSynthesisResultsView extends ViewPart {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 
+			List<ResultsInstance.Item> sortedItems = new ArrayList<>(results.items);
+			sortedItems.sort((a, b) -> {
+				// sort by component/connection, then by defense property
+				int nameComp = a.component.compareTo(b.component);
+				if (nameComp != 0) {
+					return nameComp;
+				}
+				return a.defenseProperty.compareTo(b.defenseProperty);
+			});
+
 			Action prev = null;
-			for (ResultsInstance.Item item : results.items) {
+			for (ResultsInstance.Item item : sortedItems) {
 				if (item.outputDal != 0) {
 					TableItem row = new TableItem(table, SWT.NONE);
 					Action action = Action.IMPLEMENT;
