@@ -1,12 +1,11 @@
-# This workflow will build Verdict project artifacts and Docker images
+# This workflow will build the Verdict jars, binaries and Docker images
 
 name: Verdict ci-cd build
 
 on:
   push:
     branches: [ ci-cd ]
-  pull_request:
-    branches: [ ci-cd ]
+    tags: [ '*' ]
 
 jobs:
   build:
@@ -77,7 +76,7 @@ jobs:
         cd tools/verdict-back-ends/soteria_pp
         opam exec make
 
-    - name: Build Docker image
+    - name: Build verdict-dev Docker image
       uses: docker/build-push-action@v1
       env:
         DOCKER_BUILDKIT: 1
@@ -86,7 +85,24 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tags: latest
+        tag_with_ref: true
         path: tools/verdict-back-ends
         build_args: BUILDKIT_INLINE_CACHE=1
         cache_froms: gehighassurance/verdict-dev:latest
+        push: true
+
+    - name: Build verdict Docker image
+      uses: docker/build-push-action@v1
+      env:
+        DOCKER_BUILDKIT: 1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        repository: gehighassurance/verdict
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        tags: latest
+        tag_with_ref: true
+        path: tools/verdict-back-ends
+        build_args: BUILDKIT_INLINE_CACHE=1
+        cache_froms: gehighassurance/verdict:latest
         push: true

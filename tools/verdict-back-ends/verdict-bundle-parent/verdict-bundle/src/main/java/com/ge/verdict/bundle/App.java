@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -429,6 +430,8 @@ public class App {
                 securityCases = true;
             }
 
+            modelName = opts.getOptionValue("csv");
+
             runGsn(
                     rootGoalId,
                     gsnOutputDir,
@@ -479,7 +482,10 @@ public class App {
     }
 
     /**
-     * call the GSN creation interface from verdict-assurance-case
+     * call the GSN creation interface from verdict-assurance-case Behavior: 1. If security cases
+     * have not been enabled - Creates normal GSN for every requirement specified 2. If security
+     * cases have been enabled - creates a security GSN for every cyber requirement that is
+     * specified - creates a normal GSN for all other requirements
      *
      * @param rootGoalId
      * @param gsnOutputDir
@@ -487,7 +493,7 @@ public class App {
      * @param caseAadlPath
      */
     private static void runGsn(
-            String rootGoalId,
+            String inputLine,
             String gsnOutputDir,
             String soteriaOutputDir,
             String caseAadlPath,
@@ -497,32 +503,85 @@ public class App {
             throws VerdictRunException {
         logHeader("GSN");
 
-        if (!securityCases) {
-            // calling the function to create GSN artefacts
-            GSNInterface createGsnObj = new GSNInterface();
+        String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName;
 
-            try {
-                createGsnObj.runGsnArtifactsGenerator(
-                        rootGoalId, gsnOutputDir, soteriaOutputDir, caseAadlPath, generateXml);
-            } catch (IOException | ParserConfigurationException | SAXException e) {
-                // TODO Auto-generated catch block
-                throw new VerdictRunException("Failed to create GSN fragments", e);
-            }
-        } else {
-            // calling the function to create GSN artefacts
-            SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
+        // Fetch the model first
+        File modelXml = new File(gsnOutputDir, "modelXML.xml");
 
-            try {
-                createGsnObj.runGsnArtifactsGenerator(
-                        rootGoalId,
-                        gsnOutputDir,
-                        soteriaOutputDir,
-                        caseAadlPath,
-                        securityCases,
-                        generateXml);
-            } catch (IOException | ParserConfigurationException | SAXException e) {
-                // TODO Auto-generated catch block
-                throw new VerdictRunException("Failed to create GSN fragments", e);
+        // Fetch the DeliveryDrone model from the XML
+        Model model = VdmTranslator.unmarshalFromXml(modelXml);
+
+        // get all cyber Ids
+        List<String> cyberIds = new ArrayList<>();
+        for (verdict.vdm.vdm_model.CyberReq aCyberReq : model.getCyberReq()) {
+            cyberIds.add(aCyberReq.getId());
+        }
+
+        // splitting the input by ';'
+        String[] inputIds = inputLine.split(";");
+
+        List<String> allIds = new ArrayList<>();
+
+        for (String inputId : inputIds) {
+            allIds.add(inputId);
+        }
+
+        // remove duplicates
+        List<String> duplicateFreeIds = new ArrayList<>(new HashSet<>(allIds));
+
+        for (String id : duplicateFreeIds) {
+            // if cyberId
+            if (cyberIds.contains(id)) {
+                if (securityCases) { // if security is enabled
+                    // calling the function to create GSN artefacts
+                    SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
+
+                    try {
+                        createGsnObj.runGsnArtifactsGenerator(
+                                id,
+                                gsnOutputDir,
+                                soteriaOutputDir,
+                                caseAadlPath,
+                                securityCases,
+                                generateXml,
+                                soteriaOutputLinkPathPrefix);
+                    } catch (IOException | ParserConfigurationException | SAXException e) {
+                        // TODO Auto-generated catch block
+                        throw new VerdictRunException("Failed to create GSN fragments", e);
+                    }
+                } else {
+                    // calling the function to create GSN artefacts
+                    GSNInterface createGsnObj = new GSNInterface();
+
+                    try {
+                        createGsnObj.runGsnArtifactsGenerator(
+                                id,
+                                gsnOutputDir,
+                                soteriaOutputDir,
+                                caseAadlPath,
+                                generateXml,
+                                soteriaOutputLinkPathPrefix);
+                    } catch (IOException | ParserConfigurationException | SAXException e) {
+                        // TODO Auto-generated catch block
+                        throw new VerdictRunException("Failed to create GSN fragments", e);
+                    }
+                }
+            } else { // if not cyberId
+                // calling the function to create GSN artefacts
+                GSNInterface createGsnObj = new GSNInterface();
+
+                try {
+                    createGsnObj.runGsnArtifactsGenerator(
+                            id,
+                            gsnOutputDir,
+                            soteriaOutputDir,
+                            caseAadlPath,
+                            generateXml,
+                            soteriaOutputLinkPathPrefix);
+                } catch (IOException | ParserConfigurationException | SAXException e) {
+                    // TODO Auto-generated catch block
+                    throw new VerdictRunException("Failed to create GSN fragments", e);
+                }
             }
         }
 

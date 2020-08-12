@@ -362,7 +362,7 @@ Rule Vul-CAPEC-117-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a second Connection
+      and the Subsystem is a connectionSource of a Connection
       and connectionType of the Connection is Untrusted
    then applicableCM of the Connection is CAPEC-117C-EncryptedTransmission.
 Rule Vul-CAPEC-123-1
@@ -512,7 +512,7 @@ Rule Vul-CAPEC-192-1
    if oneOf(componentType of a Subsystem, Software,SwHwHybrid,SwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-      and the Subsystem is a connectionSource of a second Connection
+      and the Subsystem is a connectionSource of a Connection
       and connectionType of the Connection is Untrusted
    then applicableCM of the Connection is CAPEC-192C-EncryptedTransmission.
 Rule Vul-CAPEC-192-2
@@ -675,18 +675,27 @@ Rule Vul-CAPEC-507-1
 Rule Vul-CAPEC-507-2
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
-      and hasSensitiveInfo of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-507C-PhysicalAccessControl.
+   then applicableCM of the Subsystem is CAPEC-507I-SystemAccessControl.
 Rule Vul-CAPEC-507-3
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-507C-Zeroize.
+   then applicableCM of the Subsystem is CAPEC-507C-PhysicalAccessControl.
 Rule Vul-CAPEC-507-4
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.
+      and hasSensitiveInfo of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-507C-SystemAccessControl.
 Rule Vul-CAPEC-507-5
+   if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and hasSensitiveInfo of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-507C-Zeroize.
+Rule Vul-CAPEC-507-6
+   if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-507A-PhysicalAccessControl.
+Rule Vul-CAPEC-507-7
    if oneOf(componentType of a Subsystem, Hardware,SwHwHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-507A-SystemAccessControl.
@@ -768,11 +777,15 @@ Rule Vul-CAPEC-624-1
 Rule Vul-CAPEC-624-2
    if oneOf(componentType of a Subsystem, Software,Hardware,SwHwHybrid,SwHumanHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
-      and hasSensitiveInfo of the Subsystem is true 
-   then applicableCM of the Subsystem is CAPEC-624C-PhysicalAccessControl.
+   then applicableCM of the Subsystem is CAPEC-624I-SystemAccessControl.
 Rule Vul-CAPEC-624-3
    if oneOf(componentType of a Subsystem, Software,Hardware,SwHwHybrid,SwHumanHybrid,HwHumanHybrid,Hybrid)
       and insideTrustedBoundary of the Subsystem is true 
       and hasSensitiveInfo of the Subsystem is true 
+   then applicableCM of the Subsystem is CAPEC-624C-PhysicalAccessControl.
+Rule Vul-CAPEC-624-4
+   if oneOf(componentType of a Subsystem, Software,Hardware,SwHwHybrid,SwHumanHybrid,HwHumanHybrid,Hybrid)
+      and insideTrustedBoundary of the Subsystem is true 
+      and hasSensitiveInfo of the Subsystem is true 
    then applicableCM of the Subsystem is CAPEC-624C-SystemAccessControl.
-    		 
+	 

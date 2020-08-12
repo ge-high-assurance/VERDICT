@@ -29,6 +29,7 @@ public class SecurityGSNInterface {
      * @param caseAadlPath
      * @param securityCaseFlag
      * @param xmlFlag
+     * @param soteriaOutputLinkPathPrefix
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -39,7 +40,8 @@ public class SecurityGSNInterface {
             String soteriaOutputDir,
             String caseAadlPath,
             boolean securityCaseFlag,
-            boolean xmlFlag)
+            boolean xmlFlag,
+            String soteriaOutputLinkPathPrefix)
             throws IOException, ParserConfigurationException, SAXException {
 
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
@@ -84,7 +86,8 @@ public class SecurityGSNInterface {
                             safetyOutput,
                             caseAadlPath,
                             rootGoalId,
-                            securityCaseFlag);
+                            securityCaseFlag,
+                            soteriaOutputLinkPathPrefix);
             System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
             // creating artifacts
@@ -102,9 +105,9 @@ public class SecurityGSNInterface {
      */
     public String createArtifactFiles(GsnNode gsnFragment, String rootGoalId) throws IOException {
         // Filenames
-        String xmlFilename = rootGoalId + "_GsnFragment.xml";
-        String dotFilename = rootGoalId + "_GsnFragment.dot";
-        String svgFilename = rootGoalId + "_GsnFragment.svg";
+        String xmlFilename = rootGoalId + "_SecGsnFragment.xml";
+        String dotFilename = rootGoalId + "_SecGsnFragment.dot";
+        String svgFilename = rootGoalId + "_SecGsnFragment.svg";
 
         if (CreateXmlFlag) {
             // Create a file and print the GSN XML
@@ -122,8 +125,9 @@ public class SecurityGSNInterface {
         File gsnDotFile = new File(gsnOutputDirectory, dotFilename);
         Gsn2Dot objGsn2Dot = new Gsn2Dot();
         objGsn2Dot.createDot(gsnFragment, gsnDotFile);
-        System.out.println(
-                "Info: Written GSN to dot for " + rootGoalId + ": " + gsnDotFile.getAbsolutePath());
+        //        System.out.println(
+        //                "Info: Written GSN to dot for " + rootGoalId + ": " +
+        // gsnDotFile.getAbsolutePath());
 
         // generate the svg file using graphviz
         String graphDestination = gsnOutputDirectory + SEP + svgFilename;
