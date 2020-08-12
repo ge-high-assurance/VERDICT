@@ -585,6 +585,13 @@ public class App {
             }
         }
 
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new VerdictRunException(
+                    "Failed to create GSN fragments. Thread.sleep exception.", e);
+        }
+
         logHeader("Finished");
     }
 
