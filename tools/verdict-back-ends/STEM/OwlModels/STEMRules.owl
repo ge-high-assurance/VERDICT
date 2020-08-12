@@ -119,6 +119,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-175-1"/>
   <j.0:Rule rdf:ID="TA1-Excessive_Allocation_Attack"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-151-4"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-507-7"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-3"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-169-1"/>
   <j.0:Rule rdf:ID="InferConnectionSource"/>
@@ -132,6 +133,7 @@
   <j.0:Rule rdf:ID="Vul-CAPEC-21-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-148-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-390-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-507-6"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-74-2"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-130-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-242-4"/>
@@ -142,6 +144,7 @@
   <j.0:Rule rdf:ID="InferBindingVulAndDataSentIsUntrusted1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-438-1"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-21-1"/>
+  <j.0:Rule rdf:ID="Vul-CAPEC-624-4"/>
   <j.0:Rule rdf:ID="Vul-CAPEC-26-2"/>
   <j.0:Rule rdf:ID="InferConnectionDestination"/>
 </rdf:RDF>
