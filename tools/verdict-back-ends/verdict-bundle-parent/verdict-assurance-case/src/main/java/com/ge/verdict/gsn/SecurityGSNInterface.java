@@ -38,10 +38,11 @@ public class SecurityGSNInterface {
             String userInput,
             String gsnOutputDir,
             String soteriaOutputDir,
-            String caseAadlPath,
+            String modelAadlPath,
             boolean securityCaseFlag,
             boolean xmlFlag,
-            String soteriaOutputLinkPathPrefix)
+            String soteriaOutputLinkPathPrefix,
+            String hostSTEMDir)
             throws IOException, ParserConfigurationException, SAXException {
 
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
@@ -84,10 +85,11 @@ public class SecurityGSNInterface {
                             xmlModel,
                             cyberOutput,
                             safetyOutput,
-                            caseAadlPath,
+                            modelAadlPath,
                             rootGoalId,
                             securityCaseFlag,
-                            soteriaOutputLinkPathPrefix);
+                            soteriaOutputLinkPathPrefix,
+                            hostSTEMDir);
             System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
             // creating artifacts
@@ -137,6 +139,6 @@ public class SecurityGSNInterface {
         objDot2GraphViz.generateGraph(dotFileSource, graphDestination);
         System.out.println("Info: Written GSN to svg for " + rootGoalId + ": " + graphDestination);
 
-        return graphDestination;
+        return svgFilename;
     }
 }

@@ -176,7 +176,7 @@ public class GSNHandler extends AbstractHandler {
 							String rootId = userInput;
 							String soteriaOutputDir = stemProjPath + SEP + "Output" + SEP + "Soteria_Output";
 							String gsnOutputDir = gsnOutputFolder.getCanonicalPath();
-							String caseAadlDir = projectDir.getCanonicalPath();
+							String modelAadlDir = projectDir.getCanonicalPath();
 							
 							/**
 							 * save the xml model for the GSN creator 
@@ -187,7 +187,7 @@ public class GSNHandler extends AbstractHandler {
 
 														
 			                //send the arguments to the backend 				
-							if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, caseAadlDir, projectDir.getName(), graphVizPath)) {
+							if (runBundle(bundleJar, dockerImage, rootId,  gsnOutputDir, soteriaOutputDir, modelAadlDir, projectDir.getName(), graphVizPath)) {
 								//Show graphs in tab if option selected
 								if(AssuranceCaseSettingsPanel.showInTab) {
 									// Open SVG GSN files
@@ -224,7 +224,7 @@ public class GSNHandler extends AbstractHandler {
 	 * @throws IOException
 	 */
 	public static boolean runBundle(String bundleJar, String dockerImage, String rootId, String gsnOutputDir, String soteriaOutputDir,
-			String caseAadlDir, String projectName, String graphVizPath) throws IOException {
+			String modelAadlDir, String projectName, String graphVizPath) throws IOException {
 
 		//if xml has been enabled by user
 		String xmlKey = "";
@@ -241,7 +241,7 @@ public class GSNHandler extends AbstractHandler {
 		
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		/**
-		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <caseAadlDir> 
+		 * Arguments: --gsn <rootId> <gsnOutputDir> <soteriaOutputDir> <modelAadlDir> <hostSTEMDir> 
 		 *              xmlKey
 		 *              securityCasesKey
 		 */
@@ -254,7 +254,8 @@ public class GSNHandler extends AbstractHandler {
 			.arg(rootId)
 			.argBind(gsnOutputDir, "/app/gsn")
 			.argBind(soteriaOutputDir, "/app/Soteria_Output")
-			.argBind(caseAadlDir, "/app/model")
+			.arg(modelAadlDir) //Using this only as string for embedding links. Don't bind
+			.arg(BundlePreferences.getStemDir()) //Using this only as string for embedding links. Don't bind
 		    .arg(xmlKey)
 		    .arg(securityCasesKey); 
 

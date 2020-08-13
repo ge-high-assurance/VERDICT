@@ -25,6 +25,28 @@ public class Solution {
     /** A clickable URL */
     protected String url;
 
+    @XmlElement
+    /** The address of the soteria output xml file for the solution */
+    protected String soteriaOutputXml;
+
+    /**
+     * Gets the value of the soteriaOutputXml property.
+     *
+     * @return possible object is {@link String }
+     */
+    protected String getSoteriaOutputXml() {
+        return soteriaOutputXml;
+    }
+
+    /**
+     * Sets the value of the soteriaOutputXml property.
+     *
+     * @param value allowed object is {@link String }
+     */
+    protected void setSoteriaOutputXml(String value) {
+        this.soteriaOutputXml = value;
+    }
+
     /**
      * Gets the value of the URL property.
      *
