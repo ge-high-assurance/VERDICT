@@ -32,6 +32,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,6 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -595,12 +599,15 @@ public class App {
             }
         }
 
-        // sleep for three seconds to allow docker to exit gracefully
-        try {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e) {
-            throw new VerdictRunException(
-                    "Failed to create GSN fragments. Thread.sleep exception.", e);
+        // if running inside docker
+        if (isRunningInsideDocker()) {
+            // sleep for three seconds to allow docker to exit gracefully
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                throw new VerdictRunException(
+                        "Failed to create GSN fragments. Thread.sleep exception.", e);
+            }
         }
 
         logHeader("Finished");
@@ -1383,5 +1390,18 @@ public class App {
      */
     private static void deleteDirectoryContents(String dirPath) {
         deleteDirectoryContents(dirPath, file -> true);
+    }
+
+    /**
+     * Checks if running inside docker
+     *
+     * @return
+     */
+    public static Boolean isRunningInsideDocker() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
