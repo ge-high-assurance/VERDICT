@@ -84,6 +84,15 @@ public class MBASSynthesisResultsView extends ViewPart {
 		}
 
 		{
+			Button applyChangesToProject = new Button(composite, SWT.PUSH);
+			applyChangesToProject.setText("Apply Changes to Project");
+			applyChangesToProject.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					applyToProject.run();
+				}
+			});
+			
 			Composite headerComposite = new Composite(composite, SWT.NONE);
 			headerComposite.setLayout(new RowLayout());
 
@@ -133,15 +142,6 @@ public class MBASSynthesisResultsView extends ViewPart {
 						"Synthesis results (not using existing solution): total cost: "
 								+ results.outputCost.doubleValue());
 			}
-
-			Button applyChangesToProject = new Button(headerComposite, SWT.PUSH);
-			applyChangesToProject.setText("Apply Changes to Project");
-			applyChangesToProject.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					applyToProject.run();
-				}
-			});
 		}
 
 		Table table = new Table(composite, SWT.MULTI | SWT.FULL_SELECTION);
