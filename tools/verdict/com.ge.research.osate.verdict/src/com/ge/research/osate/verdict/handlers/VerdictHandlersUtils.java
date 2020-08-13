@@ -241,10 +241,17 @@ public class VerdictHandlersUtils {
 		for (String fileName : aadlFileNames) {
 			try {
 				FileEditorInput file = new FileEditorInput(project.getFile(new Path(fileName)));
+				FileEditorInput backupFile = new FileEditorInput(
+						project.getFile(new Path("synthesis_backup/" + fileName + ".bak")));
+
 				provider.connect(file);
 				IDocument document = provider.getDocument(file);
 				if (document instanceof XtextDocument) {
 					XtextDocument xtextDocument = (XtextDocument) document;
+
+					// save a backup
+					provider.saveDocument(null, backupFile, xtextDocument, true);
+
 					xtextDocument.modify(resource -> {
 						modifier.accept(fileName, resource);
 						return null;
