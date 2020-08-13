@@ -150,7 +150,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 		table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
 		if (results.partialSolution) {
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Designer Action");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
@@ -191,7 +191,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 				}
 			}
 		} else {
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Designer Action");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
