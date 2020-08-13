@@ -74,12 +74,15 @@ public class SynthesisAadlWriter {
 				for (PropertyAssociation assoc : elem.getOwnedPropertyAssociations()) {
 					if (prop.equals(assoc.getProperty())) {
 						if (assoc.getOwnedValues().size() != 1) {
-							throw new RuntimeException("defense property has a list value");
+							throw new RuntimeException("defense property has a list value, component: " + item.component
+									+ ", defense property: " + item.defenseProperty);
 						}
+
 						ModalPropertyValue propVal = assoc.getOwnedValues().get(0);
 						IntegerLiteral val = (IntegerLiteral) propVal
 								.createOwnedValue(Aadl2Package.eINSTANCE.getIntegerLiteral());
 						val.setValue(item.outputDal);
+
 						existing = true;
 						break;
 					}
