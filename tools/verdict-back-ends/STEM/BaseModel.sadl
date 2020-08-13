@@ -194,6 +194,7 @@ Mitigation is a class
 
 ////////////////////// following generated from Excel: CAPEC, NIST, mitigation declarations /////////////////
 
+// Generated CAPEC Declarations
 CAPEC-21I-SessionAuthenticity is a CAPEC
    with id 21
    with capecDesc "Exploitation of Trusted Credentials"
@@ -525,7 +526,7 @@ CAPEC-192C-SystemAccessControl is a CAPEC
    with capecDesc "Protocol Analysis"
    with ciaIssue Confidentiality
    with likelihoodOfSuccess 1
-   with mitigation PhysicalAccessControl.
+   with mitigation SystemAccessControl.
 CAPEC-224C-AuditMessageResponses is a CAPEC
    with id 224
    with capecDesc "Fingerprinting"
@@ -666,12 +667,24 @@ CAPEC-507I-PhysicalAccessControl is a CAPEC
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-507I-SystemAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-507C-PhysicalAccessControl is a CAPEC
    with id 507
    with capecDesc "Physical Theft"
    with ciaIssue Confidentiality
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-507C-SystemAccessControl is a CAPEC
+   with id 507
+   with capecDesc "Physical Theft"
+   with ciaIssue Confidentiality
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-507C-Zeroize is a CAPEC
    with id 507
    with capecDesc "Physical Theft"
@@ -779,6 +792,12 @@ CAPEC-624I-PhysicalAccessControl is a CAPEC
    with ciaIssue Integrity
    with likelihoodOfSuccess 1
    with mitigation PhysicalAccessControl.
+CAPEC-624I-SystemAccessControl is a CAPEC
+   with id 624
+   with capecDesc "Fault Injection"
+   with ciaIssue Integrity
+   with likelihoodOfSuccess 1
+   with mitigation SystemAccessControl.
 CAPEC-624C-PhysicalAccessControl is a CAPEC
    with id 624
    with capecDesc "Fault Injection"
@@ -791,6 +810,7 @@ CAPEC-624C-SystemAccessControl is a CAPEC
    with ciaIssue Confidentiality
    with likelihoodOfSuccess 1
    with mitigation SystemAccessControl.
+
 
    
 // Generated NIST Control Declarations
