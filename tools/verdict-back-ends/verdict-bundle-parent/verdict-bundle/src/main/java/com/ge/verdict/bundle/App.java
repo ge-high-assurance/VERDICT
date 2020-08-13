@@ -595,8 +595,9 @@ public class App {
             }
         }
 
+        // sleep for three seconds to allow docker to exit gracefully
         try {
-            Thread.sleep(3000);
+            TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException e) {
             throw new VerdictRunException(
                     "Failed to create GSN fragments. Thread.sleep exception.", e);
