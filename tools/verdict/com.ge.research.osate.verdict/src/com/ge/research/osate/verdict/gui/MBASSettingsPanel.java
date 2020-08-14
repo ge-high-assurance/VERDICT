@@ -82,15 +82,15 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		openGraphButton.setFont(font);
 		openGraphButton.setSelection(openGraphs);		
 		
-		Button cyberButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		cyberButton.setText("Enable Cyber Relations Inference");
-		cyberButton.setFont(font);
-		cyberButton.setSelection(cyberInference);
-
-		Button safetyButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		safetyButton.setText("Enable Safety Relations Inference");
-		safetyButton.setFont(font);
-		safetyButton.setSelection(safetyInference);
+//		Button cyberButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
+//		cyberButton.setText("Enable Cyber Relations Inference");
+//		cyberButton.setFont(font);
+//		cyberButton.setSelection(cyberInference);
+//
+//		Button safetyButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
+//		safetyButton.setText("Enable Safety Relations Inference");
+//		safetyButton.setFont(font);
+//		safetyButton.setSelection(safetyInference);
 
 		Label synthesisLabel = new Label(composite, SWT.NONE);
 		synthesisLabel.setText("Model Based Architecture Synthesis");
@@ -119,8 +119,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		selectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				cyberButton.setSelection(true);
-				safetyButton.setSelection(true);
+//				cyberButton.setSelection(true);
+//				safetyButton.setSelection(true);
 				synthesisEnableCyberInference.setSelection(true);
 				partialSolution.setSelection(true);
 			}
@@ -132,8 +132,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 		deselectAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				cyberButton.setSelection(false);
-				safetyButton.setSelection(false);
+//				cyberButton.setSelection(false);
+//				safetyButton.setSelection(false);
 				synthesisEnableCyberInference.setSelection(false);
 				partialSolution.setSelection(false);
 			}
@@ -166,8 +166,8 @@ public class MBASSettingsPanel extends ApplicationWindow {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				openGraphs = openGraphButton.getSelection();
-				cyberInference = cyberButton.getSelection();
-				safetyInference = safetyButton.getSelection();
+//				cyberInference = cyberButton.getSelection();
+//				safetyInference = safetyButton.getSelection();
 				synthesisPartialSolution = partialSolution.getSelection();
 				synthesisCyberInference = synthesisEnableCyberInference.getSelection();
 				composite.getShell().close();

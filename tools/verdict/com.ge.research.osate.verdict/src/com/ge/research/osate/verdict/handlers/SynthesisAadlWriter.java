@@ -8,6 +8,11 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataSubcomponent;
@@ -21,7 +26,26 @@ import org.osate.aadl2.Subcomponent;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
 
 public class SynthesisAadlWriter {
+	
+	public static boolean saveEditor() {
+		Shell shell = new Shell();
+		// save the invoking .aadl editor if it has unsaved content
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IEditorPart openEditor = page.getActiveEditor();
+
+		if (openEditor != null) {
+			boolean response = page.saveEditor(openEditor, true);
+			if (response && openEditor.isDirty()) {
+				MessageDialog.openError(shell, "VERDICT MBAS",
+						"Please save unsaved content in the file before proceeding.");
+				return false;
+			}
+		}	
+		return true;
+	}
+	
 	public static void perform(IProject project, File projectDir, ResultsInstance results) {
+		if(!saveEditor()) return;
 		Map<String, Property> props = new LinkedHashMap<>();
 
 		{
