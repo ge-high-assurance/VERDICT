@@ -4,13 +4,11 @@ VERDICT is a framework to perform analysis of a system at the architectural leve
 
 ### Main Features
 
-- Model Based Architecture Analysis (MBAA)
+- Model Based Architecture Analysis and Synthesis (MBAAS)
   - Identification of CAPEC threats and recommendation of NIST 800-53 controls
   - Determination of the likelihood of successful attack of top-level event
   - Calculation of the probability of system failure
   - Generation of cut-sets, fault-tree and attack-defense tree
-  
-- Model Based Architecture Synthesis (MBAS)
   - Synthesis of a minimal set of defenses to mitigate all cyber requirements with respect to implementation costs
   - Synthesis of a minimal set of defenses to mitigate all cyber requirements using existing implemented defenses in two modes: mitigated and unmitigated
     - mitigated mode: MBAS recommends eliminations of extraneous defenses and downgrades of defense Design Assurance Levels (DALs). 
