@@ -566,28 +566,10 @@ public class AttackDefenseCollector {
                 // If a port is not mentioned in a connection, then it doesn't matter
                 // anyway because it can't be traced.
                 for (ConnectionModel outgoing : system.getOutgoingConnections()) {
-                    // For each of C, I, A, we have X -> X
-                    for (CIA cia : CIA.values()) {
-                        CyberExpr condition =
-                                new CyberOr(
-                                        system.getIncomingConnections().stream()
-                                                .map(
-                                                        incoming ->
-                                                                new PortConcern(
-                                                                        incoming
-                                                                                .getDestinationPortName(),
-                                                                        cia))
-                                                .collect(Collectors.toList()));
-                        system.addCyberRel(
-                                new CyberRel(
-                                        "_inference" + (inferenceCounter++),
-                                        condition,
-                                        new PortConcern(outgoing.getSourcePortName(), cia)));
-                    }
-                    // We also have I -> A
-                    system.addCyberRel(
-                            new CyberRel(
-                                    "_inference" + (inferenceCounter++),
+                    if (!system.getIncomingConnections().isEmpty()) {
+                        // For each of C, I, A, we have X -> X
+                        for (CIA cia : CIA.values()) {
+                            CyberExpr condition =
                                     new CyberOr(
                                             system.getIncomingConnections().stream()
                                                     .map(
@@ -595,9 +577,30 @@ public class AttackDefenseCollector {
                                                                     new PortConcern(
                                                                             incoming
                                                                                     .getDestinationPortName(),
-                                                                            CIA.I))
-                                                    .collect(Collectors.toList())),
-                                    new PortConcern(outgoing.getSourcePortName(), CIA.A)));
+                                                                            cia))
+                                                    .collect(Collectors.toList()));
+                            system.addCyberRel(
+                                    new CyberRel(
+                                            "_inference" + (inferenceCounter++),
+                                            condition,
+                                            new PortConcern(outgoing.getSourcePortName(), cia)));
+                        }
+
+                        // We also have I -> A
+                        system.addCyberRel(
+                                new CyberRel(
+                                        "_inference" + (inferenceCounter++),
+                                        new CyberOr(
+                                                system.getIncomingConnections().stream()
+                                                        .map(
+                                                                incoming ->
+                                                                        new PortConcern(
+                                                                                incoming
+                                                                                        .getDestinationPortName(),
+                                                                                CIA.I))
+                                                        .collect(Collectors.toList())),
+                                        new PortConcern(outgoing.getSourcePortName(), CIA.A)));
+                    }
                 }
             }
         }
