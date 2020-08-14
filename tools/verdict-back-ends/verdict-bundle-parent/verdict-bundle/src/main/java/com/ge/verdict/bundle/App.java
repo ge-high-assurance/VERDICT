@@ -282,7 +282,7 @@ public class App {
         helpLine("   <host STEM dir> ......... the host STEM directory address");
         helpLine("        -x ................. key to determine if xml should be created");
         helpLine(
-                "        -z ................. key to determine if security assurance cases should be created");
+                "         -z ................. key to determine if security assurance cases should be created");
         helpLine();
         helpLine("-d, --debug <dir> .......... Produce debug output");
         helpLine("      <dir> ................ Intermediary XML output directory");
@@ -514,7 +514,7 @@ public class App {
         logHeader("GSN");
 
         // The prefix for SOteria++ text outputs that are linked from solution nodes
-        String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName;
+        String soteriaOutputLinkPathPrefix = hostSTEMDir + "/Output/Soteria_Output/" + modelName;
 
         // Fetch the model first
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
