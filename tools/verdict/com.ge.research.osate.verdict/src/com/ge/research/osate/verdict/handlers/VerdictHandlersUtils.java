@@ -7,14 +7,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -27,8 +31,13 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.ui.editor.model.XtextDocument;
+import org.eclipse.xtext.ui.editor.model.XtextDocumentProvider;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
+import org.osate.xtext.aadl2.ui.internal.Aadl2Activator;
 
 import com.google.inject.Injector;
 
@@ -175,18 +184,94 @@ public class VerdictHandlersUtils {
 		return paths;
 	}
 
+	public static IProject getCurrentIProject(ExecutionEvent event) {
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+
+		if (selection instanceof IStructuredSelection && ((IStructuredSelection) selection).size() > 0) {
+			Object[] selObjs = ((IStructuredSelection) selection).toArray();
+
+			for (Object selObj : selObjs) {
+				if (selObj instanceof IFile) {
+					IFile selIFile = (IFile) selObj;
+					return selIFile.getProject();
+				} else if (selObj instanceof IProject) {
+					IProject selIProject = (IProject) selObj;
+					return selIProject;
+				} else if (selObj instanceof IFolder) {
+					IFolder selIFolder = (IFolder) selObj;
+					return selIFolder.getProject();
+				}
+			}
+		}
+
+		VerdictLogger.warning("Selection is not recognized!");
+		return null;
+	}
+
 	/**
-	 * Process an event corresponding to a selection of AADL project
-	 * Translate an AADL project into objects
+	 * Modify all AADL files in a project.
+	 * Modifier function takes in the file name and  resource to modify.
 	 *
-	 * */
-	public static List<EObject> preprocessAadlFiles(File dir) {
+	 * This is currently used in the synthesis AADL modifier.
+	 *
+	 * @param project
+	 * @param modifier
+	 */
+	public static void modifyAadlDocuments(IProject project, BiConsumer<String, XtextResource> modifier) {
+		Injector injector = Aadl2Activator.getInstance().getInjector(Aadl2Activator.ORG_OSATE_XTEXT_AADL2_AADL2);
+		XtextDocumentProvider provider = injector.getInstance(XtextDocumentProvider.class);
+
+		List<File> dirs = collectAllDirs(project.getLocation().toFile());
+		List<String> aadlFileNames = new ArrayList<>();
+
+		// Obtain all AADL files contents in the project
+
+		String projectPath = project.getLocation().toFile().getAbsolutePath();
+
+		for (File subdir : dirs) {
+			for (File file : subdir.listFiles()) {
+				if (file.getAbsolutePath().endsWith(".aadl")) {
+					String absPath = file.getAbsolutePath();
+					String relPath = absPath.substring(projectPath.length() + 1);
+					aadlFileNames.add(relPath);
+				}
+			}
+		}
+
+		for (String fileName : aadlFileNames) {
+			try {
+				FileEditorInput file = new FileEditorInput(project.getFile(new Path(fileName)));
+				FileEditorInput backupFile = new FileEditorInput(
+						project.getFile(new Path("synthesis_backup/" + fileName + ".bak")));
+
+				provider.connect(file);
+				IDocument document = provider.getDocument(file);
+				if (document instanceof XtextDocument) {
+					XtextDocument xtextDocument = (XtextDocument) document;
+
+					// save a backup
+					provider.saveDocument(null, backupFile, xtextDocument, true);
+
+					xtextDocument.modify(resource -> {
+						modifier.accept(fileName, resource);
+						return null;
+					});
+				}
+				provider.saveDocument(null, file, document, true);
+				// don't leak the document
+				provider.disconnect(file);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static List<Resource> loadAadlFiles(File dir) {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
 		List<String> aadlFileNames = new ArrayList<>();
 
 		// Obtain all AADL files contents in the project
-		List<EObject> objects = new ArrayList<>();
 
 		List<File> dirs = collectAllDirs(dir);
 
@@ -198,9 +283,9 @@ public class VerdictHandlersUtils {
 			}
 		}
 
-		final Resource[] resources = new Resource[aadlFileNames.size()];
+		final List<Resource> resources = new ArrayList<>(aadlFileNames.size());
 		for (int i = 0; i < aadlFileNames.size(); i++) {
-			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
+			resources.add(rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true));
 		}
 
 		// Load the resources
@@ -212,8 +297,18 @@ public class VerdictHandlersUtils {
 			}
 		}
 
+		return resources;
+	}
+
+	/**
+	 * Process an event corresponding to a selection of AADL project
+	 * Translate an AADL project into objects
+	 *
+	 * */
+	public static List<EObject> preprocessAadlFiles(File dir) {
+		List<EObject> objects = new ArrayList<>();
 		// Load all objects from resources
-		for (final Resource resource : resources) {
+		for (final Resource resource : loadAadlFiles(dir)) {
 			resource.getAllContents().forEachRemaining(objects::add);
 		}
 		return objects;

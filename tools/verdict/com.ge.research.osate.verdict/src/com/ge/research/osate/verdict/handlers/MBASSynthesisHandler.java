@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -85,6 +86,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							graphsFolder.mkdir();
 						}
 
+						IProject project = VerdictHandlersUtils.getCurrentIProject(event);
 						File projectDir = new File(selection.get(0));
 
 						File costModel = new File(projectDir, "costModel.xml");
@@ -108,7 +110,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 								soteriaPpBin,
 								graphVizPath, costModel.getCanonicalPath(), outputXml.getCanonicalPath())) {
 							if (outputXml.exists()) {
-								MBASSynthesisReport.report(outputXml, iWindow);
+								MBASSynthesisReport.report(project, projectDir, outputXml, iWindow);
 							}
 						}
 					} catch (IOException e) {

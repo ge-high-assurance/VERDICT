@@ -6,9 +6,13 @@ import java.util.List;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -23,6 +27,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 	public static final String ID = "com.ge.research.osate.verdict.gui.mbasSynthesisResultsView";
 	private Composite composite;
 	public static ResultsInstance results;
+	public static Runnable applyToProject;
 
 	@Override
 	public void setFocus() {
@@ -79,7 +84,19 @@ public class MBASSynthesisResultsView extends ViewPart {
 		}
 
 		{
-			Label header = new Label(composite, SWT.BOLD);
+			Button applyChangesToProject = new Button(composite, SWT.PUSH);
+			applyChangesToProject.setText("Apply Changes to Project");
+			applyChangesToProject.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					applyToProject.run();
+				}
+			});
+			
+			Composite headerComposite = new Composite(composite, SWT.NONE);
+			headerComposite.setLayout(new RowLayout());
+
+			Label header = new Label(headerComposite, SWT.BOLD);
 			FontDescriptor descriptor = FontDescriptor.createFrom(header.getFont());
 			descriptor = descriptor.setStyle(SWT.BOLD);
 			header.setFont(descriptor.createFont(Display.getCurrent()));
@@ -133,7 +150,7 @@ public class MBASSynthesisResultsView extends ViewPart {
 		table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
 		if (results.partialSolution) {
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Designer Action");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Original DAL");
@@ -143,7 +160,18 @@ public class MBASSynthesisResultsView extends ViewPart {
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Delta Cost");
 
 			List<ResultsInstance.Item> sortedItems = new ArrayList<>(results.items);
-			sortedItems.sort((a, b) -> Action.fromItem(a).compareTo(Action.fromItem(b))); // enum implements Comparable
+			sortedItems.sort((a, b) -> {
+				// sort by action, then component/connection, then by defense property
+				int actionComp = Action.fromItem(a).compareTo(Action.fromItem(b)); // enum implements Comparable
+				if (actionComp != 0) {
+					return actionComp;
+				}
+				int nameComp = a.component.compareTo(b.component);
+				if (nameComp != 0) {
+					return nameComp;
+				}
+				return a.defenseProperty.compareTo(b.defenseProperty);
+			});
 
 			Action prev = null;
 			for (ResultsInstance.Item item : sortedItems) {
@@ -163,14 +191,24 @@ public class MBASSynthesisResultsView extends ViewPart {
 				}
 			}
 		} else {
-			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Action");
+			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Designer Action");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Component/Connection");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Defense Property");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target DAL");
 			new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Target Cost");
 
+			List<ResultsInstance.Item> sortedItems = new ArrayList<>(results.items);
+			sortedItems.sort((a, b) -> {
+				// sort by component/connection, then by defense property
+				int nameComp = a.component.compareTo(b.component);
+				if (nameComp != 0) {
+					return nameComp;
+				}
+				return a.defenseProperty.compareTo(b.defenseProperty);
+			});
+
 			Action prev = null;
-			for (ResultsInstance.Item item : results.items) {
+			for (ResultsInstance.Item item : sortedItems) {
 				if (item.outputDal != 0) {
 					TableItem row = new TableItem(table, SWT.NONE);
 					Action action = Action.IMPLEMENT;

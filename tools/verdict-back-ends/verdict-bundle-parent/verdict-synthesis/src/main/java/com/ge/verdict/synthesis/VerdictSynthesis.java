@@ -92,12 +92,16 @@ public class VerdictSynthesis {
                                 .collect(Collectors.toList())
                                 .toArray(new BoolExpr[] {})));
 
-        optimizer.MkMinimize(
-                context.mkAdd(
-                        pairs.stream()
-                                .map(pair -> pair.toZ3Multi(context))
-                                .collect(Collectors.toList())
-                                .toArray(new ArithExpr[] {})));
+        if (pairs.isEmpty()) {
+            optimizer.MkMinimize(context.mkInt(0));
+        } else {
+            optimizer.MkMinimize(
+                    context.mkAdd(
+                            pairs.stream()
+                                    .map(pair -> pair.toZ3Multi(context))
+                                    .collect(Collectors.toList())
+                                    .toArray(new ArithExpr[] {})));
+        }
 
         if (dumpSmtLib) {
             try {
