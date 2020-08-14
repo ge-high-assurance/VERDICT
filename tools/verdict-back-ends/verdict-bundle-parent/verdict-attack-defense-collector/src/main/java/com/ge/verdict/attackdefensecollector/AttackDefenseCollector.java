@@ -1,5 +1,19 @@
 package com.ge.verdict.attackdefensecollector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -16,19 +30,7 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -647,7 +649,9 @@ public class AttackDefenseCollector {
                             system.addAttribute(attrib.getName(), (String) attrib.getValue());
                         }
                     }
-                    Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                    if (inst.getSpecification() != null) {
+                        Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                    }
                     if (inst.getImplementation() != null) {
                         Util.putSetMap(
                                 compImplToSystem, inst.getImplementation().getName(), system);
@@ -656,36 +660,15 @@ public class AttackDefenseCollector {
             }
         }
 
-        List<SystemModel> topLevelSystemContenders = new ArrayList<>();
-
         // Load top-level systems that don't exist as instances
         for (ComponentImpl impl : model.getComponentImpl()) {
             if (!compImplToSystem.containsKey(impl.getName())) {
                 SystemModel system = getSystem(impl.getName());
                 if (impl.getType() != null) {
-                    // not entirely clear how this would be null
                     Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
                 }
                 Util.putSetMap(compImplToSystem, impl.getName(), system);
-
-                topLevelSystemContenders.add(system);
             }
-        }
-
-        SystemModel topLevelSystem;
-
-        if (topLevelSystemContenders.isEmpty()) {
-            throw new RuntimeException("No top-level systems!");
-        } else if (topLevelSystemContenders.size() > 1) {
-            throw new RuntimeException(
-                    "Multiple top-level system contenders: "
-                            + String.join(
-                                    ", ",
-                                    topLevelSystemContenders.stream()
-                                            .map(SystemModel::getName)
-                                            .collect(Collectors.toList())));
-        } else {
-            topLevelSystem = topLevelSystemContenders.get(0);
         }
 
         for (ComponentImpl impl : model.getComponentImpl()) {
@@ -814,13 +797,14 @@ public class AttackDefenseCollector {
             for (String reqName : mission.getCyberReqs()) {
                 if (cyberReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
-                    topLevelSystem.addCyberReq(
-                            new CyberReq(
-                                    req.getId(),
-                                    mission.getId(),
-                                    convertSeverity(req.getSeverity()),
-                                    convertCyberExpr(req.getCondition())));
-
+                    for (SystemModel system : compTypeToSystem.get(req.getCompType())) {
+                        system.addCyberReq(
+                                new CyberReq(
+                                        req.getId(),
+                                        mission.getId(),
+                                        convertSeverity(req.getSeverity()),
+                                        convertCyberExpr(req.getCondition())));
+                    }
                 } else if (safetyReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.SafetyReq req = safetyReqMap.get(reqName);
                     // TODO support safety reqs

@@ -272,6 +272,8 @@
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
                 maxOccurs="1"></element>
+            <element name="compType" type="string" minOccurs="1"
+                maxOccurs="1"></element>
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
     </complexType>
@@ -430,6 +432,8 @@
             <element name="phases" type="string" minOccurs="0"
                 maxOccurs="1"></element>
             <element name="extern" type="string" minOccurs="0"
+                maxOccurs="1"></element>
+            <element name="compType" type="string" minOccurs="1"
                 maxOccurs="1"></element>
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
