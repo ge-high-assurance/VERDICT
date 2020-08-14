@@ -146,7 +146,7 @@ jobs:
         mv models/CASE_Toy_Models extern/examples
         mv models/DeliveryDrone extern/examples
         chmod a+x extern/{mac,nix}/{aadl2iml,kind2,soteria_pp}
-        mv tools/verdict-back-ends/verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0.0-SNAPSHOT-capsule.jar extern
+        cp -a tools/verdict-back-ends/verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0.0-SNAPSHOT-capsule.jar extern
         zip -r extern.zip extern
         mkdir tools/verdict-back-ends/{aadl2iml,soteria_pp}/bin
         cp -a extern/nix/aadl2iml tools/verdict-back-ends/aadl2iml/bin
