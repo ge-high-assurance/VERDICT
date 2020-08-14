@@ -21,6 +21,7 @@ public class CreateGSN {
     private String soteriaCyberOutputAddr;
     private String soteriaSafetyOutputAddr;
     private String soteriaOutputLinkPathPrefix;
+    private String aadlModelName;
 
     /**
      * creates a GsnNode and returns it
@@ -28,7 +29,7 @@ public class CreateGSN {
      * @param xmlModel -- a VDM model
      * @param cyberOutput -- file object with soteria++ output for cyber properties
      * @param safetyOutput -- file object with soteria++ output for safety properties
-     * @param addressForCASE -- string address to the CASE consolidated properties
+     * @param aadlModelAddr -- string address to the CASE consolidated properties
      * @param rootGoalId -- the fragment's root requirement ID
      * @return a GsnNode
      * @throws ParserConfigurationException
@@ -39,15 +40,17 @@ public class CreateGSN {
             Model xmlModel,
             File cyberOutput,
             File safetyOutput,
-            String addressForCASE,
+            String aadlModelAddr,
             String rootGoalId,
-            String soteriaOutPathPrefix)
+            String soteriaOutPathPrefix,
+            String hostSTEMDir)
             throws ParserConfigurationException, SAXException, IOException {
 
         // setting class variables
-        soteriaCyberOutputAddr = cyberOutput.getAbsolutePath();
-        soteriaSafetyOutputAddr = safetyOutput.getAbsolutePath();
+        soteriaCyberOutputAddr = hostSTEMDir + "/Output/Soteria_Output/ImplProperties";
+        soteriaSafetyOutputAddr = hostSTEMDir + "/Output/Soteria_Output/ImplProperties-safety";
         soteriaOutputLinkPathPrefix = soteriaOutPathPrefix;
+        aadlModelName = xmlModel.getName();
 
         // The GsnNode to return
         GsnNode returnFragment = new GsnNode();
@@ -71,21 +74,21 @@ public class CreateGSN {
             if (aMission.getId().equalsIgnoreCase(rootGoalId)) {
                 returnFragment =
                         populateMissionNode(
-                                aMission, xmlModel, nListCyber, nListSafety, addressForCASE);
+                                aMission, xmlModel, nListCyber, nListSafety, aadlModelAddr);
             }
         }
         for (CyberReq aCyberReq : xmlModel.getCyberReq()) {
             if (aCyberReq.getId().equalsIgnoreCase(rootGoalId)) {
                 returnFragment =
                         populateCyberRequirementNode(
-                                aCyberReq, xmlModel, nListCyber, addressForCASE);
+                                aCyberReq, xmlModel, nListCyber, aadlModelAddr);
             }
         }
         for (SafetyReq aSafetyReq : xmlModel.getSafetyReq()) {
             if (aSafetyReq.getId().equalsIgnoreCase(rootGoalId)) {
                 returnFragment =
                         populateSafetyRequirementNode(
-                                aSafetyReq, xmlModel, nListSafety, addressForCASE);
+                                aSafetyReq, xmlModel, nListSafety, aadlModelAddr);
             }
         }
 
@@ -107,7 +110,7 @@ public class CreateGSN {
             Model model,
             NodeList cyberResults,
             NodeList safetyResults,
-            String addressForCASE) {
+            String aadlModelAddr) {
 
         // GsnNode to pack mission rootnode
         GsnNode missionNode = new GsnNode();
@@ -147,7 +150,7 @@ public class CreateGSN {
                             .getSupportedBy()
                             .add(
                                     populateCyberRequirementNode(
-                                            cyberReq, model, cyberResults, addressForCASE));
+                                            cyberReq, model, cyberResults, aadlModelAddr));
                 } else continue;
             }
             for (SafetyReq safetyReq : model.getSafetyReq()) {
@@ -156,7 +159,7 @@ public class CreateGSN {
                             .getSupportedBy()
                             .add(
                                     populateSafetyRequirementNode(
-                                            safetyReq, model, safetyResults, addressForCASE));
+                                            safetyReq, model, safetyResults, aadlModelAddr));
                 } else continue;
             }
         }
@@ -229,7 +232,7 @@ public class CreateGSN {
      * @return
      */
     public GsnNode populateCyberRequirementNode(
-            CyberReq cyberReq, Model model, NodeList cyberResults, String addressForCASE) {
+            CyberReq cyberReq, Model model, NodeList cyberResults, String aadlModelAddr) {
         // GsnNode to pack requirement rootnode
         GsnNode reqNode = new GsnNode();
 
@@ -299,7 +302,7 @@ public class CreateGSN {
         strategyNode.getInContextOf().add(strategyContextNode);
 
         // Add the CASE consolidated properties as a context to strategyNode
-        GsnNode strategyContextNode2 = getCASEContext(addressForCASE);
+        GsnNode strategyContextNode2 = getModelContext(aadlModelAddr);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode2);
@@ -332,7 +335,7 @@ public class CreateGSN {
      * @return
      */
     public GsnNode populateSafetyRequirementNode(
-            SafetyReq safetyReq, Model model, NodeList safetyResults, String addressForCASE) {
+            SafetyReq safetyReq, Model model, NodeList safetyResults, String aadlModelAddr) {
         // GsnNode to pack requirement rootnode
         GsnNode reqNode = new GsnNode();
 
@@ -401,7 +404,7 @@ public class CreateGSN {
         strategyNode.getInContextOf().add(strategyContextNode);
 
         // Add the CASE consolidated properties as a context to strategyNode
-        GsnNode strategyContextNode2 = getCASEContext(addressForCASE);
+        GsnNode strategyContextNode2 = getModelContext(aadlModelAddr);
 
         // add the context node to strategyNode
         strategyNode.getInContextOf().add(strategyContextNode2);
@@ -480,6 +483,7 @@ public class CreateGSN {
             String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties.txt";
             //            sol.setUrl(soteriaCyberOutputAddr);
             sol.setUrl(urlString);
+            sol.setSoteriaOutputXml(soteriaCyberOutputAddr);
         } else {
             String extraInfo =
                     "Computed Probability = "
@@ -491,6 +495,7 @@ public class CreateGSN {
                     soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
             //          sol.setUrl(soteriaSafetyOutputAddr);
             sol.setUrl(urlString);
+            sol.setSoteriaOutputXml(soteriaSafetyOutputAddr);
         }
 
         // add sol to solutionNode
@@ -751,25 +756,25 @@ public class CreateGSN {
     /**
      * Creates a context node referring to CASE Properties
      *
-     * @param addressForCASE
+     * @param aadlModelAddr
      * @return
      */
-    public GsnNode getCASEContext(String addressForCASE) {
-        GsnNode caseContextNode = new GsnNode();
+    public GsnNode getModelContext(String aadlModelAddr) {
+        GsnNode modelContextNode = new GsnNode();
 
         // a new Context to pack the context
         Context context = new Context();
 
-        caseContextNode.setNodeType("context");
+        modelContextNode.setNodeType("context");
         String strategyContextId = "CONTEXT_" + Integer.toString(contextCounter);
         contextCounter++;
-        caseContextNode.setNodeId(strategyContextId);
-        context.setDisplayText("CASE Consolidated Properties");
-        context.setExtraInfo("Address:&#10;" + addressForCASE);
-        context.setUrl(addressForCASE);
-        caseContextNode.setContext(context);
+        modelContextNode.setNodeId(strategyContextId);
+        context.setDisplayText(aadlModelName + "&#10;Properties");
+        context.setExtraInfo("Address:&#10;" + aadlModelAddr);
+        context.setUrl(aadlModelAddr);
+        modelContextNode.setContext(context);
 
-        return caseContextNode;
+        return modelContextNode;
     }
 
     /**

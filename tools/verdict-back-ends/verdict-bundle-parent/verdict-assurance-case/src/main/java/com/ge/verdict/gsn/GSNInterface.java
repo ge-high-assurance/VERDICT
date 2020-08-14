@@ -31,9 +31,10 @@ public class GSNInterface {
             String userInput,
             String gsnOutputDir,
             String soteriaOutputDir,
-            String caseAadlPath,
+            String modelAadlPath,
             boolean xmlFlag,
-            String soteriaOutputLinkPathPrefix)
+            String soteriaOutputLinkPathPrefix,
+            String hostSTEMDir)
             throws IOException, ParserConfigurationException, SAXException {
 
         File modelXml = new File(gsnOutputDir, "modelXML.xml");
@@ -74,9 +75,10 @@ public class GSNInterface {
                             xmlModel,
                             cyberOutput,
                             safetyOutput,
-                            caseAadlPath,
+                            modelAadlPath,
                             rootGoalId,
-                            soteriaOutputLinkPathPrefix);
+                            soteriaOutputLinkPathPrefix,
+                            hostSTEMDir);
             System.out.println("Info: Created GSN fragment for " + rootGoalId);
 
             // Filenames

@@ -32,6 +32,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,6 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -149,11 +153,12 @@ public class App {
         Option gsn =
                 Option.builder()
                         .longOpt("gsn")
-                        .numberOfArgs(4)
+                        .numberOfArgs(5)
                         .argName("Root Goal Id")
                         .argName("GSN Output Directory")
                         .argName("Soteria++ Output Directory")
-                        .argName("Project Directory")
+                        .argName("AADL Project Directory")
+                        .argName("Host STEM Directory")
                         .build();
 
         OptionGroup group = new OptionGroup();
@@ -267,12 +272,14 @@ public class App {
                 "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
         helpLine();
         helpLine("Toolchain: Assurance Case Fragment Generator");
-        helpLine("  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> [-x]");
+        helpLine(
+                "  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> <host STEM dir> [-x] [-z]");
         helpLine("   <root id> ............... the root goal id for the assurance case fragment");
         helpLine(
                 "    <gsn out dir> ........... the directory where the gsn fragments should be created");
         helpLine("   <soteria out dir> ....... the directory where Soteria outputs are created");
         helpLine("   <aadl project dir> ...... the directory where the aadl files are present");
+        helpLine("   <host STEM dir> ......... the host STEM directory address");
         helpLine("        -x ................. key to determine if xml should be created");
         helpLine(
                 "        -z ................. key to determine if security assurance cases should be created");
@@ -419,7 +426,8 @@ public class App {
             String rootGoalId = gsnOpts[0];
             String gsnOutputDir = gsnOpts[1];
             String soteriaOutputDir = gsnOpts[2];
-            String caseAadlPath = gsnOpts[3];
+            String modelAadlPath = gsnOpts[3];
+            String hostSTEMDir = gsnOpts[4];
             boolean generateXml = false;
             boolean securityCases = false;
             if (opts.hasOption("x")) {
@@ -436,10 +444,11 @@ public class App {
                     rootGoalId,
                     gsnOutputDir,
                     soteriaOutputDir,
-                    caseAadlPath,
+                    modelAadlPath,
                     generateXml,
                     securityCases,
-                    modelName);
+                    modelName,
+                    hostSTEMDir);
         }
     }
 
@@ -496,13 +505,15 @@ public class App {
             String inputLine,
             String gsnOutputDir,
             String soteriaOutputDir,
-            String caseAadlPath,
+            String modelAadlPath,
             boolean generateXml,
             boolean securityCases,
-            String modelName)
+            String modelName,
+            String hostSTEMDir)
             throws VerdictRunException {
         logHeader("GSN");
 
+        // The prefix for SOteria++ text outputs that are linked from solution nodes
         String soteriaOutputLinkPathPrefix = soteriaOutputDir + "/" + modelName;
 
         // Fetch the model first
@@ -533,7 +544,7 @@ public class App {
             // if cyberId
             if (cyberIds.contains(id)) {
                 if (securityCases) { // if security is enabled
-                    // calling the function to create GSN artefacts
+                    // calling the function to create security GSN artefacts
                     SecurityGSNInterface createGsnObj = new SecurityGSNInterface();
 
                     try {
@@ -541,16 +552,17 @@ public class App {
                                 id,
                                 gsnOutputDir,
                                 soteriaOutputDir,
-                                caseAadlPath,
+                                modelAadlPath,
                                 securityCases,
                                 generateXml,
-                                soteriaOutputLinkPathPrefix);
+                                soteriaOutputLinkPathPrefix,
+                                hostSTEMDir);
                     } catch (IOException | ParserConfigurationException | SAXException e) {
                         // TODO Auto-generated catch block
                         throw new VerdictRunException("Failed to create GSN fragments", e);
                     }
                 } else {
-                    // calling the function to create GSN artefacts
+                    // calling the function to create normal GSN artefacts
                     GSNInterface createGsnObj = new GSNInterface();
 
                     try {
@@ -558,16 +570,17 @@ public class App {
                                 id,
                                 gsnOutputDir,
                                 soteriaOutputDir,
-                                caseAadlPath,
+                                modelAadlPath,
                                 generateXml,
-                                soteriaOutputLinkPathPrefix);
+                                soteriaOutputLinkPathPrefix,
+                                hostSTEMDir);
                     } catch (IOException | ParserConfigurationException | SAXException e) {
                         // TODO Auto-generated catch block
                         throw new VerdictRunException("Failed to create GSN fragments", e);
                     }
                 }
             } else { // if not cyberId
-                // calling the function to create GSN artefacts
+                // calling the function to create normal GSN artefacts
                 GSNInterface createGsnObj = new GSNInterface();
 
                 try {
@@ -575,13 +588,25 @@ public class App {
                             id,
                             gsnOutputDir,
                             soteriaOutputDir,
-                            caseAadlPath,
+                            modelAadlPath,
                             generateXml,
-                            soteriaOutputLinkPathPrefix);
+                            soteriaOutputLinkPathPrefix,
+                            hostSTEMDir);
                 } catch (IOException | ParserConfigurationException | SAXException e) {
                     // TODO Auto-generated catch block
                     throw new VerdictRunException("Failed to create GSN fragments", e);
                 }
+            }
+        }
+
+        // if running inside docker
+        if (isRunningInsideDocker()) {
+            // sleep for three seconds to allow docker to exit gracefully
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                throw new VerdictRunException(
+                        "Failed to create GSN fragments. Thread.sleep exception.", e);
             }
         }
 
@@ -1365,5 +1390,18 @@ public class App {
      */
     private static void deleteDirectoryContents(String dirPath) {
         deleteDirectoryContents(dirPath, file -> true);
+    }
+
+    /**
+     * Checks if running inside docker
+     *
+     * @return
+     */
+    public static Boolean isRunningInsideDocker() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            return stream.anyMatch(line -> line.contains("/docker"));
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
