@@ -1,19 +1,5 @@
 package com.ge.verdict.attackdefensecollector;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -30,7 +16,19 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -70,24 +68,6 @@ public class AttackDefenseCollector {
             systems.put(name, new SystemModel(name));
         }
         return systems.get(name);
-    }
-
-    /**
-     * Builds a NameResolver for the specified system model.
-     *
-     * <p>This method should only be called if the system model has already been added to the system
-     * model resolution table. Calling this method without first adding the system model to the
-     * table (ideally with getSystem()) will throw an exception.
-     *
-     * @param system the system to build the resolver from
-     * @return a resolver to the specified system
-     */
-    private NameResolver<SystemModel> resolver(SystemModel system) {
-        if (!systems.containsKey(system.getName())) {
-            throw new RuntimeException(
-                    "Building resolver for system: " + system.getName() + " without adding to map");
-        }
-        return new NameResolver<>(system.getName(), systems);
     }
 
     /**
@@ -281,8 +261,7 @@ public class AttackDefenseCollector {
             for (SystemModel source : sources) {
                 for (SystemModel dest : dests) {
                     ConnectionModel connection =
-                            new ConnectionModel(
-                                    name, resolver(source), resolver(dest), sourcePort, destPort);
+                            new ConnectionModel(name, source, dest, sourcePort, destPort);
 
                     /*
                      * Logger.println("loaded connection: " + name + " from (" + sourceTypeName + ", " + sourceImplName
@@ -723,11 +702,7 @@ public class AttackDefenseCollector {
                         for (SystemModel dest : dests) {
                             ConnectionModel connection =
                                     new ConnectionModel(
-                                            conn.getName(),
-                                            resolver(source),
-                                            resolver(dest),
-                                            sourcePort,
-                                            destPort);
+                                            conn.getName(), source, dest, sourcePort, destPort);
 
                             for (GenericAttribute attrib : conn.getAttribute()) {
                                 if (attrib.getValue() instanceof String) {
