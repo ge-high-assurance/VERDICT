@@ -2,5 +2,5 @@
 # need to copy to the image:
 *
 !aadl2iml/bin/aadl2iml
-!soteria_pp/_build/soteria_pp.native
+!soteria_pp/bin/soteria_pp
 !verdict-bundle-parent/verdict-bundle/target/verdict-bundle-*-capsule.jar
