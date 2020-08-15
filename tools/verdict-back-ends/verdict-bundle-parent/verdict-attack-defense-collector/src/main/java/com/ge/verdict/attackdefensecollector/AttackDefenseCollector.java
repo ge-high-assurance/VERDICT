@@ -509,13 +509,18 @@ public class AttackDefenseCollector {
 
             // TODO get defense descriptions from Defenses2NIST?
 
+            String entityName =
+                    "Connection".equals(systemTypeName)
+                            ? connectionNameMap.get(systemInstName)
+                            : systemInstName;
+
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
                     int dal = -1;
                     // it will be null if we are not loading from VDM
                     if (implDal != null) {
                         // load DAL from VDM if available
-                        Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
+                        Pair<String, String> pair = new Pair<>(entityName, defenseNames.get(i));
                         if (implDal.containsKey(pair)) {
                             dal = implDal.get(pair);
                         } else {
@@ -523,6 +528,9 @@ public class AttackDefenseCollector {
                             dal = 0;
                         }
                     }
+
+                    System.out.println(
+                            "IMPl DAL FOR " + entityName + ", " + defenseNames.get(i) + ": " + dal);
 
                     // this code treats applicable defense and impl defense as separate things
                     // but we have changed the capitalization so that they should be the same
