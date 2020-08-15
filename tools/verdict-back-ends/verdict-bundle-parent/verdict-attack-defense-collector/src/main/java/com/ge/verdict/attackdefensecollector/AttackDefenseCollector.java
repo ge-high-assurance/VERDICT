@@ -1,5 +1,19 @@
 package com.ge.verdict.attackdefensecollector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -16,19 +30,7 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -528,9 +530,6 @@ public class AttackDefenseCollector {
                             dal = 0;
                         }
                     }
-
-                    System.out.println(
-                            "IMPl DAL FOR " + entityName + ", " + defenseNames.get(i) + ": " + dal);
 
                     // this code treats applicable defense and impl defense as separate things
                     // but we have changed the capitalization so that they should be the same
