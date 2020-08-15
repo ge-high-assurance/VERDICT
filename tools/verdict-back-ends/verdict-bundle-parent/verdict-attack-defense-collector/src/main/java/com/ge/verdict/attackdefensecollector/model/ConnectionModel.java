@@ -1,7 +1,6 @@
 package com.ge.verdict.attackdefensecollector.model;
 
 import com.ge.verdict.attackdefensecollector.DependentRules;
-import com.ge.verdict.attackdefensecollector.NameResolver;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADNot;
@@ -23,9 +22,9 @@ public class ConnectionModel {
     /** The name of the connection. */
     private String name;
     /** The source system. */
-    private NameResolver<SystemModel> source;
+    private SystemModel source;
     /** The destination system. */
-    private NameResolver<SystemModel> dest;
+    private SystemModel dest;
     /** The name of the port on the source system. */
     private String sourcePort;
     /** The name of the port on the destination system. */
@@ -45,11 +44,7 @@ public class ConnectionModel {
      * @param destPort the name of the destination port
      */
     public ConnectionModel(
-            String name,
-            NameResolver<SystemModel> source,
-            NameResolver<SystemModel> dest,
-            String sourcePort,
-            String destPort) {
+            String name, SystemModel source, SystemModel dest, String sourcePort, String destPort) {
         this.name = name;
         this.source = source;
         this.dest = dest;
@@ -66,12 +61,12 @@ public class ConnectionModel {
 
     /** @return the source system model */
     public SystemModel getSource() {
-        return source.get();
+        return source;
     }
 
     /** @return the destination system model */
     public SystemModel getDestination() {
-        return dest.get();
+        return dest;
     }
 
     /** @return the name of the source port */

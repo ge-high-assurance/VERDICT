@@ -1,5 +1,19 @@
 package com.ge.verdict.attackdefensecollector;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
@@ -16,19 +30,7 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -68,24 +70,6 @@ public class AttackDefenseCollector {
             systems.put(name, new SystemModel(name));
         }
         return systems.get(name);
-    }
-
-    /**
-     * Builds a NameResolver for the specified system model.
-     *
-     * <p>This method should only be called if the system model has already been added to the system
-     * model resolution table. Calling this method without first adding the system model to the
-     * table (ideally with getSystem()) will throw an exception.
-     *
-     * @param system the system to build the resolver from
-     * @return a resolver to the specified system
-     */
-    private NameResolver<SystemModel> resolver(SystemModel system) {
-        if (!systems.containsKey(system.getName())) {
-            throw new RuntimeException(
-                    "Building resolver for system: " + system.getName() + " without adding to map");
-        }
-        return new NameResolver<>(system.getName(), systems);
     }
 
     /**
@@ -279,8 +263,7 @@ public class AttackDefenseCollector {
             for (SystemModel source : sources) {
                 for (SystemModel dest : dests) {
                     ConnectionModel connection =
-                            new ConnectionModel(
-                                    name, resolver(source), resolver(dest), sourcePort, destPort);
+                            new ConnectionModel(name, source, dest, sourcePort, destPort);
 
                     /*
                      * Logger.println("loaded connection: " + name + " from (" + sourceTypeName + ", " + sourceImplName
@@ -528,13 +511,18 @@ public class AttackDefenseCollector {
 
             // TODO get defense descriptions from Defenses2NIST?
 
+            String entityName =
+                    "Connection".equals(systemTypeName)
+                            ? connectionNameMap.get(systemInstName)
+                            : systemInstName;
+
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
                     int dal = -1;
                     // it will be null if we are not loading from VDM
                     if (implDal != null) {
                         // load DAL from VDM if available
-                        Pair<String, String> pair = new Pair<>(systemInstName, defenseNames.get(i));
+                        Pair<String, String> pair = new Pair<>(entityName, defenseNames.get(i));
                         if (implDal.containsKey(pair)) {
                             dal = implDal.get(pair);
                         } else {
@@ -585,28 +573,10 @@ public class AttackDefenseCollector {
                 // If a port is not mentioned in a connection, then it doesn't matter
                 // anyway because it can't be traced.
                 for (ConnectionModel outgoing : system.getOutgoingConnections()) {
-                    // For each of C, I, A, we have X -> X
-                    for (CIA cia : CIA.values()) {
-                        CyberExpr condition =
-                                new CyberOr(
-                                        system.getIncomingConnections().stream()
-                                                .map(
-                                                        incoming ->
-                                                                new PortConcern(
-                                                                        incoming
-                                                                                .getDestinationPortName(),
-                                                                        cia))
-                                                .collect(Collectors.toList()));
-                        system.addCyberRel(
-                                new CyberRel(
-                                        "_inference" + (inferenceCounter++),
-                                        condition,
-                                        new PortConcern(outgoing.getSourcePortName(), cia)));
-                    }
-                    // We also have I -> A
-                    system.addCyberRel(
-                            new CyberRel(
-                                    "_inference" + (inferenceCounter++),
+                    if (!system.getIncomingConnections().isEmpty()) {
+                        // For each of C, I, A, we have X -> X
+                        for (CIA cia : CIA.values()) {
+                            CyberExpr condition =
                                     new CyberOr(
                                             system.getIncomingConnections().stream()
                                                     .map(
@@ -614,9 +584,30 @@ public class AttackDefenseCollector {
                                                                     new PortConcern(
                                                                             incoming
                                                                                     .getDestinationPortName(),
-                                                                            CIA.I))
-                                                    .collect(Collectors.toList())),
-                                    new PortConcern(outgoing.getSourcePortName(), CIA.A)));
+                                                                            cia))
+                                                    .collect(Collectors.toList()));
+                            system.addCyberRel(
+                                    new CyberRel(
+                                            "_inference" + (inferenceCounter++),
+                                            condition,
+                                            new PortConcern(outgoing.getSourcePortName(), cia)));
+                        }
+
+                        // We also have I -> A
+                        system.addCyberRel(
+                                new CyberRel(
+                                        "_inference" + (inferenceCounter++),
+                                        new CyberOr(
+                                                system.getIncomingConnections().stream()
+                                                        .map(
+                                                                incoming ->
+                                                                        new PortConcern(
+                                                                                incoming
+                                                                                        .getDestinationPortName(),
+                                                                                CIA.I))
+                                                        .collect(Collectors.toList())),
+                                        new PortConcern(outgoing.getSourcePortName(), CIA.A)));
+                    }
                 }
             }
         }
@@ -647,7 +638,9 @@ public class AttackDefenseCollector {
                             system.addAttribute(attrib.getName(), (String) attrib.getValue());
                         }
                     }
-                    Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                    if (inst.getSpecification() != null) {
+                        Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
+                    }
                     if (inst.getImplementation() != null) {
                         Util.putSetMap(
                                 compImplToSystem, inst.getImplementation().getName(), system);
@@ -656,36 +649,15 @@ public class AttackDefenseCollector {
             }
         }
 
-        List<SystemModel> topLevelSystemContenders = new ArrayList<>();
-
         // Load top-level systems that don't exist as instances
         for (ComponentImpl impl : model.getComponentImpl()) {
             if (!compImplToSystem.containsKey(impl.getName())) {
                 SystemModel system = getSystem(impl.getName());
                 if (impl.getType() != null) {
-                    // not entirely clear how this would be null
                     Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
                 }
                 Util.putSetMap(compImplToSystem, impl.getName(), system);
-
-                topLevelSystemContenders.add(system);
             }
-        }
-
-        SystemModel topLevelSystem;
-
-        if (topLevelSystemContenders.isEmpty()) {
-            throw new RuntimeException("No top-level systems!");
-        } else if (topLevelSystemContenders.size() > 1) {
-            throw new RuntimeException(
-                    "Multiple top-level system contenders: "
-                            + String.join(
-                                    ", ",
-                                    topLevelSystemContenders.stream()
-                                            .map(SystemModel::getName)
-                                            .collect(Collectors.toList())));
-        } else {
-            topLevelSystem = topLevelSystemContenders.get(0);
         }
 
         for (ComponentImpl impl : model.getComponentImpl()) {
@@ -740,11 +712,7 @@ public class AttackDefenseCollector {
                         for (SystemModel dest : dests) {
                             ConnectionModel connection =
                                     new ConnectionModel(
-                                            conn.getName(),
-                                            resolver(source),
-                                            resolver(dest),
-                                            sourcePort,
-                                            destPort);
+                                            conn.getName(), source, dest, sourcePort, destPort);
 
                             for (GenericAttribute attrib : conn.getAttribute()) {
                                 if (attrib.getValue() instanceof String) {
@@ -814,13 +782,14 @@ public class AttackDefenseCollector {
             for (String reqName : mission.getCyberReqs()) {
                 if (cyberReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
-                    topLevelSystem.addCyberReq(
-                            new CyberReq(
-                                    req.getId(),
-                                    mission.getId(),
-                                    convertSeverity(req.getSeverity()),
-                                    convertCyberExpr(req.getCondition())));
-
+                    for (SystemModel system : compTypeToSystem.get(req.getCompType())) {
+                        system.addCyberReq(
+                                new CyberReq(
+                                        req.getId(),
+                                        mission.getId(),
+                                        convertSeverity(req.getSeverity()),
+                                        convertCyberExpr(req.getCondition())));
+                    }
                 } else if (safetyReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.SafetyReq req = safetyReqMap.get(reqName);
                     // TODO support safety reqs
