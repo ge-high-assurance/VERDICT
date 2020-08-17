@@ -14,10 +14,9 @@ Export-Package: com.ge.verdict.vdm,
  verdict.vdm.vdm_lustre,
  verdict.vdm.vdm_model
 Bundle-ClassPath: .,
- lib/FastInfoset.jar,
  lib/istack-commons-runtime.jar,
  lib/jakarta.activation-api.jar,
+ lib/jakarta.activation.jar,
  lib/jakarta.xml.bind-api.jar,
  lib/jaxb-runtime.jar,
- lib/stax-ex.jar,
  lib/txw2.jar
