@@ -1,25 +1,25 @@
 package com.ge.verdict.synthesis;
 
-import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
-import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
-import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
-import com.ge.verdict.synthesis.dtree.DLeaf;
-import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
-import com.ge.verdict.synthesis.dtree.DTree;
-import com.ge.verdict.synthesis.util.Pair;
-import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
-public class App {
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
+import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
+import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
+import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.vdm.synthesis.ResultsInstance;
 
-    /*
-     * Note: please specify how to run this app for testing purposes.
-     */
+public class App {
+	/**
+	 * This is just used for testing purposes. Uses CSV, not VDM (so out of date).
+	 * See below for invocation.
+	 *
+	 * @param args
+	 */
     public static void main(String[] args) {
         if (args.length < 2) {
             throw new RuntimeException("Must specify STEM output directory and cost model XML!");
@@ -27,6 +27,7 @@ public class App {
 
         long startTime = System.currentTimeMillis();
 
+		// Usage:
         String stemOutDir = args[0];
         String costModelXml = args[1];
         boolean inference = arrayContains(args, "--inference");
@@ -56,37 +57,38 @@ public class App {
         List<Result> results = timed("Build attack-defense tree", () -> collector.perform());
 
         // This part is for the single cyber requirement version
-        for (Result result : results) {
-            System.out.println();
-            System.out.println("Result for cyber req: " + result.cyberReq.getName());
-            DLeaf.Factory factory = new DLeaf.Factory();
-            DTree dtree =
-                    timed(
-                            "Construct defense tree",
-                            () ->
-                                    DTreeConstructor.construct(
-                                            result.adtree,
-                                            costModel,
-                                            result.cyberReq.getSeverityDal(),
-                                            partialSolution,
-                                            false,
-                                            factory));
-            Optional<Pair<Set<ComponentDefense>, Double>> selected =
-                    timed(
-                            "Perform synthesis",
-                            () ->
-                                    VerdictSynthesis.performSynthesisSingle(
-                                            dtree,
-                                            result.cyberReq.getSeverityDal(),
-                                            factory,
-                                            VerdictSynthesis.Approach.MAXSMT));
-            if (selected.isPresent()) {
-                for (ComponentDefense pair : selected.get().left) {
-                    System.out.println("Selected leaf: " + pair.toString());
-                }
-                System.out.println("Total cost: " + selected.get().right);
-            }
-        }
+		// disabled because it doesn't work anymore
+//        for (Result result : results) {
+//            System.out.println();
+//            System.out.println("Result for cyber req: " + result.cyberReq.getName());
+//            DLeaf.Factory factory = new DLeaf.Factory();
+//            DTree dtree =
+//                    timed(
+//                            "Construct defense tree",
+//                            () ->
+//                                    DTreeConstructor.construct(
+//                                            result.adtree,
+//                                            costModel,
+//                                            result.cyberReq.getSeverityDal(),
+//                                            partialSolution,
+//                                            false,
+//                                            factory));
+//            Optional<Pair<Set<ComponentDefense>, Double>> selected =
+//                    timed(
+//                            "Perform synthesis",
+//                            () ->
+//                                    VerdictSynthesis.performSynthesisSingle(
+//                                            dtree,
+//                                            result.cyberReq.getSeverityDal(),
+//                                            factory,
+//                                            VerdictSynthesis.Approach.MAXSMT));
+//            if (selected.isPresent()) {
+//                for (ComponentDefense pair : selected.get().left) {
+//                    System.out.println("Selected leaf: " + pair.toString());
+//                }
+//                System.out.println("Total cost: " + selected.get().right);
+//            }
+//        }
 
         System.out.println("\n\n\n");
 

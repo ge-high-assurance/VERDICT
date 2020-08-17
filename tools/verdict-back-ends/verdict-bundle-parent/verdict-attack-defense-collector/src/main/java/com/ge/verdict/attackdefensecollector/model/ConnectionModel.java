@@ -1,14 +1,5 @@
 package com.ge.verdict.attackdefensecollector.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import com.ge.verdict.attackdefensecollector.DependentRules;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
@@ -17,6 +8,14 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /** Stores information about a connection. */
 public class ConnectionModel {
@@ -30,9 +29,9 @@ public class ConnectionModel {
     private String sourcePort;
     /** The name of the port on the destination system. */
     private String destPort;
-	/** Holds attacks and defenses. */
+    /** Holds attacks and defenses. */
     private Attackable attackable;
-	/** All attributes set for this connection. */
+    /** All attributes set for this connection. */
     private Map<String, String> attributes;
 
     /**
@@ -84,12 +83,12 @@ public class ConnectionModel {
         return attackable;
     }
 
-	/**
-	 * Adds an attribute.
-	 * 
-	 * @param name
-	 * @param value
-	 */
+    /**
+     * Adds an attribute.
+     *
+     * @param name
+     * @param value
+     */
     public void addAttribute(String name, String value) {
         attributes.put(name, value);
     }
