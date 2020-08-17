@@ -18,12 +18,11 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -54,7 +53,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeScope>provided</includeScope>
+                            <includeScope>runtime</includeScope>
                             <outputDirectory>${project.basedir}/lib/</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
