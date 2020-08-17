@@ -1,10 +1,9 @@
-# This workflow will build only the Verdict jars
+# Builds the verdict-dev Docker image on each push to master
+# Possibly to be done: push to a verdict-dev update site too
 
 name: Verdict main build
 
 on:
-  pull_request:
-    branches: [ master ]
   push:
     branches: [ master ]
 
@@ -12,8 +11,9 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
         java-version: [ 8 ]
+        ocaml-version: [ 4.07.1 ]
+        os: [ ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -40,3 +40,51 @@ jobs:
       run: mvn -B install -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
+
+    - name: Cache opam repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.opam
+        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
+
+    - name: Set up OCaml
+      uses: avsm/setup-ocaml@v1
+      with:
+        ocaml-version: ${{ matrix.ocaml-version }}
+
+    - name: Install opam packages
+      run: |
+        opam install --yes \
+          async \
+          core \
+          core_extended \
+          dune \
+          menhir \
+          ocamlbuild \
+          ocamlfind \
+          printbox \
+          xml-light
+
+    - name: Build aadl2iml
+      run: |
+        cd tools/verdict-back-ends/aadl2iml
+        opam exec make
+
+    - name: Build soteria_pp
+      run: |
+        cd tools/verdict-back-ends/soteria_pp
+        opam exec make
+
+    - name: Build verdict-dev image
+      uses: docker/build-push-action@v1
+      env:
+        DOCKER_BUILDKIT: 1
+      with:
+        repository: gehighassurance/verdict-dev
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        tags: latest
+        path: tools/verdict-back-ends
+        build_args: BUILDKIT_INLINE_CACHE=1
+        cache_froms: gehighassurance/verdict-dev:latest
+        push: true
