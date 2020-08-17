@@ -1,19 +1,23 @@
 package com.ge.verdict.attackdefensecollector;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.DefenseCondition;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * These are hardcoded rules that replicate parts of the STEM rules to encode the possibility of an
  * attack being dependent upon the presence of a defense. The hope is to replace these hardcoded
  * rules with some kind of output from STEM in the future.
+ *
+ * Note that it is not necessary to encode the entirety of the predicate because all component-attack
+ * pairs that STEM reports must already satisfy the non-defense property parts of the predicate.
  */
 public class DependentRules {
     public static Optional<ADTree> getComponentDependence(
@@ -86,6 +90,14 @@ public class DependentRules {
         }
     }
 
+	/**
+	 * Helper for constructing the return value for the above functions.
+	 *
+	 * @param attackable
+	 * @param attackName
+	 * @param paths
+	 * @return
+	 */
     private static Optional<ADTree> mkRet(
             Attackable attackable, String attackName, List<ADTree> paths) {
         if (paths.isEmpty()) {

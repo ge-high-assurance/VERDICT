@@ -1,5 +1,15 @@
 package com.ge.verdict.attackdefensecollector.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
 import com.ge.verdict.attackdefensecollector.DependentRules;
 import com.ge.verdict.attackdefensecollector.Logger;
 import com.ge.verdict.attackdefensecollector.Pair;
@@ -10,15 +20,6 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Stores information about a system. Information is added as loading progresses. This class also
@@ -36,21 +37,15 @@ public class SystemModel {
     private List<CyberRel> cyberRels;
     /** Cyber requirements within this system. */
     private List<CyberReq> cyberReqs;
-    /** Subcomponent systems within this system. */
-    private List<SystemModel> subcomponents;
-    /**
-     * Connections flowing from an input port of this system to the input port of a subcomponent.
-     */
+	/** Connections flowing from an input port of this system to the input port of a subcomponent. */
     private List<ConnectionModel> connectionsIncomingInternal;
-    /**
-     * Connections flowing from the output port of a subcomponent to an output port of this system.
-     */
+	/** Connections flowing from the output port of a subcomponent to an output port of this system. */
     private List<ConnectionModel> connectionsOutgoingInternal;
-
+	/** Holds attacks and defenses. */
     private Attackable attackable;
     /** Map from cyber requirement names to cyber requirements for this system. */
     private Map<String, CyberReq> cyberReqMap;
-
+	/** All attributes set for this system. */
     private Map<String, String> attributes;
 
     /**
@@ -66,7 +61,6 @@ public class SystemModel {
         connectionsOutgoing = new ArrayList<>();
         cyberRels = new ArrayList<>();
         cyberReqs = new ArrayList<>();
-        subcomponents = new ArrayList<>();
         connectionsIncomingInternal = new ArrayList<>();
         connectionsOutgoingInternal = new ArrayList<>();
         attackable = new Attackable(this);
@@ -114,15 +108,6 @@ public class SystemModel {
     public void addCyberReq(CyberReq cyberReq) {
         cyberReqs.add(cyberReq);
         cyberReqMap.put(cyberReq.getName(), cyberReq);
-    }
-
-    /**
-     * Adds a subcomponent to this system.
-     *
-     * @param subcomponent
-     */
-    public void addSubcomponent(SystemModel subcomponent) {
-        subcomponents.add(subcomponent);
     }
 
     /**
@@ -175,10 +160,6 @@ public class SystemModel {
         }
     }
 
-    public List<SystemModel> getSubcomponents() {
-        return subcomponents;
-    }
-
     public List<ConnectionModel> getInternalIncomingConnections() {
         return connectionsIncomingInternal;
     }
@@ -191,6 +172,12 @@ public class SystemModel {
         return attackable;
     }
 
+	/**
+	 * Adds an attribute.
+	 * 
+	 * @param name
+	 * @param value
+	 */
     public void addAttribute(String name, String value) {
         attributes.put(name, value);
     }

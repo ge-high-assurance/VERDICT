@@ -1,13 +1,14 @@
 package com.ge.verdict.attackdefensecollector.model;
 
-import com.ge.verdict.attackdefensecollector.Pair;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.ge.verdict.attackdefensecollector.Pair;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
 
 public final class Attackable {
     /* either system or connection is populated */
@@ -46,6 +47,11 @@ public final class Attackable {
         return system.isPresent();
     }
 
+	/**
+	 * Fails if !isSystem().
+	 * 
+	 * @return
+	 */
     public SystemModel getSystem() {
         return system.get();
     }
@@ -54,6 +60,11 @@ public final class Attackable {
         return connection.isPresent();
     }
 
+	/**
+	 * Fails if !isConnection().
+	 * 
+	 * @return
+	 */
     public ConnectionModel getConnection() {
         return connection.get();
     }

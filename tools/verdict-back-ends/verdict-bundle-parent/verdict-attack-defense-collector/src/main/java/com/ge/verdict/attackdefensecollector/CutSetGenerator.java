@@ -1,15 +1,10 @@
 package com.ge.verdict.attackdefensecollector;
 
-import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
-import com.ge.verdict.attackdefensecollector.adtree.ADNot;
-import com.ge.verdict.attackdefensecollector.adtree.ADOr;
-import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.logicng.formulas.And;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
@@ -19,7 +14,21 @@ import org.logicng.formulas.Or;
 import org.logicng.formulas.Variable;
 import org.logicng.transformations.dnf.DNFFactorization;
 
+import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
+import com.ge.verdict.attackdefensecollector.adtree.ADNot;
+import com.ge.verdict.attackdefensecollector.adtree.ADOr;
+import com.ge.verdict.attackdefensecollector.adtree.ADTree;
+import com.ge.verdict.attackdefensecollector.adtree.Attack;
+import com.ge.verdict.attackdefensecollector.adtree.Defense;
+
+/**
+ * Generate cut sets. Not currently used.
+ */
 public class CutSetGenerator {
+	/**
+	 * Cache used internally by the cut set generator. Prevents creation of duplicate LogicNG variables
+	 * and allows for reconstructing the attack-defense tree at the end.
+	 */
     public static class Cache {
         public Map<Attack, Variable> attackToVar = new LinkedHashMap<>();
         public Map<String, Attack> varToAttack = new LinkedHashMap<>();
@@ -27,6 +36,12 @@ public class CutSetGenerator {
         public Map<String, Defense> varToDefense = new LinkedHashMap<>();
     }
 
+	/**
+	 * Perform cut set generation for the given attack-defense tree.
+	 *
+	 * @param adtree
+	 * @return
+	 */
     public static ADTree generate(ADTree adtree) {
         FormulaFactory factory = new FormulaFactory();
         Cache cache = new Cache();
@@ -36,6 +51,7 @@ public class CutSetGenerator {
         long startTime = System.currentTimeMillis();
 
         // this is terribly inefficient for any non-trivial system
+		// and it has not yet been observed to terminate
         // Formula minimal = QuineMcCluskeyAlgorithm.compute(formula);
 
         // this should be inefficient too, but it finishes trivially for trees already in DNF form
@@ -49,6 +65,13 @@ public class CutSetGenerator {
         return extract(minimal, cache);
     }
 
+	/**
+	 * Converts a LogicNG formula back into an attack-defense tree.
+	 *
+	 * @param formula
+	 * @param cache
+	 * @return
+	 */
     private static ADTree extract(Formula formula, Cache cache) {
         if (formula instanceof And) {
             List<ADTree> children = new ArrayList<>();

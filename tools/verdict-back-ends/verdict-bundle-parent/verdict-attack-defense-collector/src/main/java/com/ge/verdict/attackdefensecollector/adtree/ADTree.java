@@ -1,10 +1,11 @@
 package com.ge.verdict.attackdefensecollector.adtree;
 
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+
 import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
 
 /**
  * An attack-defense tree. May be comprised of attacks, defenses, AND, OR and NOT. The fundamental
@@ -47,6 +48,14 @@ public abstract class ADTree {
      */
     public abstract void prettyPrint(IndentedStringBuilder builder);
 
+	/**
+	 * Convert to a LogicNG formula, storing information in the cache accordingly. Used when
+	 * generating cut sets.
+	 * 
+	 * @param factory
+	 * @param cache
+	 * @return
+	 */
     public abstract Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache);
 
     @Override
