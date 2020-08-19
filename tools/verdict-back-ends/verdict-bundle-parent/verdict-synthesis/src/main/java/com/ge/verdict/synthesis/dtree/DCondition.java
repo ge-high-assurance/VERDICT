@@ -8,14 +8,32 @@ import java.util.Optional;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
+/**
+ * Represents a conditional dependence on the implementation of a defense property. Used under an
+ * AND with a defense, where the defense defends against an attack that is predicated on the
+ * implementation of the defense within this node.
+ *
+ * <p>This node by itself represents something of the form (d >= x) in the encoded SMT, where d is
+ * some defense property and x is a minimum DAL.
+ *
+ * <p>This node supports an arbitrary minimum DAL to "trigger" the defense condition, but in
+ * practice we only ever use a minimum DAL of 1 (i.e. not zero).
+ */
 public class DCondition implements DTree {
+    /** the encapsulated attack-defense tree defense condition node */
     public final DefenseCondition defenseCond;
+
     private DLeaf.ComponentDefense compDef;
 
     public DCondition(DefenseCondition defenseCond) {
         this.defenseCond = defenseCond;
     }
 
+    /**
+     * Connect this dcondition to a component-defense pair.
+     *
+     * @param compDef
+     */
     public void setCompDef(DLeaf.ComponentDefense compDef) {
         if (this.compDef != null) {
             throw new RuntimeException("compDef has already been set");

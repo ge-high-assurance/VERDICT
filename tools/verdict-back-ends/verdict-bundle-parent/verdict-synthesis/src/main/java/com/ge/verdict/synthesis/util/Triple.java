@@ -2,6 +2,15 @@ package com.ge.verdict.synthesis.util;
 
 import java.util.Objects;
 
+/**
+ * A generic triple. Correctly implements equals() and hashCode(), so may be used as a key to a hash
+ * map. Note that the L, M and, R types must themselves correctly implement equals() and hashCode()
+ * for this to work correctly.
+ *
+ * @param <L> type of left value
+ * @param <M> type of middle value
+ * @param <R> type of right value
+ */
 public final class Triple<L, M, R> {
     public final L left;
     public final M middle;

@@ -32,12 +32,21 @@ import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.solvers.MaxSATSolver;
 
+/** Perform synthesis. */
 public class VerdictSynthesis {
-    public static enum Approach {
-        MAXSMT,
-        MAXSAT
-    }
-
+    /**
+     * Performs synthesis on multiple cyber requirements. This is the only version of synthesis that
+     * should be used.
+     *
+     * @param tree the defense tree
+     * @param factory the dleaf factory used to construct the defense tree
+     * @param costModel the cost model
+     * @param partialSolution whether we are using partial solutions
+     * @param inputSat whether the input tree is satisfied
+     * @param meritAssignment whether to perform merit assignment if the input is satisfied
+     * @param dumpSmtLib whether to output the intermediate SMT-LIB file for debugging
+     * @return the result, if successful
+     */
     public static Optional<ResultsInstance> performSynthesisMultiple(
             DTree tree,
             DLeaf.Factory factory,
@@ -62,6 +71,7 @@ public class VerdictSynthesis {
         optimizer.Assert(tree.toZ3Multi(context));
 
         if (meritAssignment) {
+            // set upper bounds at the current values, so that no upgrades are reported
             optimizer.Assert(
                     context.mkAnd(
                             pairs.stream()
@@ -92,6 +102,7 @@ public class VerdictSynthesis {
                                 .collect(Collectors.toList())
                                 .toArray(new BoolExpr[] {})));
 
+        // we can't make an empty add
         if (pairs.isEmpty()) {
             optimizer.MkMinimize(context.mkInt(0));
         } else {
@@ -105,6 +116,8 @@ public class VerdictSynthesis {
 
         if (dumpSmtLib) {
             try {
+                // this dumps the file in the working directory, i.e. where the process was started
+                // from
                 PrintWriter writer = new PrintWriter("verdict-synthesis-dump.smtlib", "UTF-8");
                 writer.println(optimizer.toString());
                 writer.flush();
@@ -119,15 +132,20 @@ public class VerdictSynthesis {
             Fraction totalInputCost = new Fraction(0), totalOutputCost = new Fraction(0);
             Model model = optimizer.getModel();
             for (ComponentDefense pair : pairs) {
+                // get the value in the model
                 RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
                 Fraction rawCost =
                         new Fraction(expr.getNumerator().getInt(), expr.getDenominator().getInt());
+                // convert back to DAL (the value in the model is cost rather than DAL)
                 int dal = pair.rawCostToDal(rawCost);
 
+                // but we don't trust the cost obtained directly from the model.
+                // instead, we re-calculate using the cost model because it is less prone to failure
                 Fraction inputCost =
                         costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
                 Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
 
+                // keep track of total cost
                 totalInputCost = totalInputCost.add(inputCost);
                 totalOutputCost = totalOutputCost.add(outputCost);
 
@@ -155,12 +173,40 @@ public class VerdictSynthesis {
         }
     }
 
+    /**
+     * Sums the cost of all implemented dleaves in a dleaf factory.
+     *
+     * @param factory
+     * @return
+     */
     public static Fraction totalImplCost(DLeaf.Factory factory) {
         return factory.allComponentDefensePairs().stream()
                 .map(pair -> pair.dalToRawCost(pair.implDal))
                 .reduce(Fraction.ZERO, Fraction::add);
     }
 
+    /**
+     * Approach to use for single requirement synthesis.
+     *
+     * @deprecated use the multi-requirement approach instead
+     */
+    @Deprecated
+    public static enum Approach {
+        MAXSMT,
+        MAXSAT
+    }
+
+    /**
+     * Perform synthesis on a single cyber requirement.
+     *
+     * @param tree
+     * @param targetDal
+     * @param factory
+     * @param approach
+     * @return
+     * @deprecated use the multi-requirement approach instead
+     */
+    @Deprecated
     public static Optional<Pair<Set<ComponentDefense>, Double>> performSynthesisSingle(
             DTree tree, int targetDal, DLeaf.Factory factory, Approach approach) {
         switch (approach) {
@@ -179,7 +225,9 @@ public class VerdictSynthesis {
      *
      * @param pairs
      * @return
+     * @deprecated use the multi-requirement approach instead
      */
+    @Deprecated
     public static int normalizeCosts(Collection<ComponentDefense> pairs) {
         int costLcd =
                 pairs.stream()
@@ -207,6 +255,16 @@ public class VerdictSynthesis {
         return costLcd;
     }
 
+    /**
+     * Perform synthesis using Z3 MaxSMT.
+     *
+     * @param tree
+     * @param targetDal
+     * @param factory
+     * @return
+     * @deprecated use the multi-requirement approach instead
+     */
+    @Deprecated
     public static Optional<Pair<Set<ComponentDefense>, Double>> performSynthesisMaxSmt(
             DTree tree, int targetDal, DLeaf.Factory factory) {
         Context context = new Context();
@@ -257,6 +315,16 @@ public class VerdictSynthesis {
         }
     }
 
+    /**
+     * Perform synthesis using LogicNG MaxSAT.
+     *
+     * @param tree
+     * @param targetDal
+     * @param dleafFactory
+     * @return
+     * @deprecated use the multi-requirement approach instead
+     */
+    @Deprecated
     public static Optional<Pair<Set<ComponentDefense>, Double>> performSynthesisMaxSat(
             DTree tree, int targetDal, DLeaf.Factory dleafFactory) {
         Collection<ComponentDefense> pairs = dleafFactory.allComponentDefensePairs();
@@ -304,6 +372,15 @@ public class VerdictSynthesis {
         }
     }
 
+    /**
+     * Returns a new results instance with any extraneous defenses from the provided list added to
+     * the results items liset as removals.
+     *
+     * @param results the input results to use as a baseline
+     * @param implCompDefPairs the set of all implemented component-defense pairs
+     * @param costModel the cost model
+     * @return a new results instance with the extraneous defenses included
+     */
     public static ResultsInstance addExtraImplDefenses(
             ResultsInstance results,
             Map<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer>
@@ -314,6 +391,7 @@ public class VerdictSynthesis {
         Fraction inputCost = results.inputCost;
         Fraction outputCost = results.outputCost;
 
+        // find all of the pairs already in the defense tree
         Set<com.ge.verdict.attackdefensecollector.Pair<String, String>> accountedCompDefPairs =
                 results.items.stream()
                         .map(
@@ -324,14 +402,17 @@ public class VerdictSynthesis {
 
         for (Map.Entry<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer> entry :
                 implCompDefPairs.entrySet()) {
+            // only add if not already accounted for
             if (!accountedCompDefPairs.contains(entry.getKey())) {
                 String comp = entry.getKey().left;
                 String defProp = entry.getKey().right;
                 int implDal = entry.getValue();
 
+                // compute cost of the implemented pair
                 Fraction pairInputCost = costModel.cost(defProp, comp, implDal);
                 Fraction pairOutputCost = costModel.cost(defProp, comp, 0);
 
+                // the item will be a removal, so from implDal -> 0 DAL
                 items.add(
                         new ResultsInstance.Item(
                                 comp, defProp, implDal, 0, pairInputCost, pairOutputCost));

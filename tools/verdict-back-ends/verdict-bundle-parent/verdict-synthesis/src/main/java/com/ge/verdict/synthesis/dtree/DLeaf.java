@@ -29,19 +29,37 @@ public class DLeaf implements DTree {
     /** The target DAL of this leaf. */
     public final int targetDal;
 
+    /**
+     * A component-defense pair, divorced from a concrete place in the tree.
+     *
+     * <p>You cannot construct this directly. Instead, construct a DLeaf and a new instance of this
+     * will be encapsulated by the constructed DLeaf.
+     */
     public static final class ComponentDefense {
+        /** The unique ID used for encoding to SMT. */
         public final int id;
+        /** The component. */
         public final String component;
+        /** The defense property. */
         public final String defenseProperty;
         /** The DAL of the current implementation, 0 if no implemented property. */
         public final int implDal;
         /** This is purely informative, but should not distinguish different leaves. */
         public final String attack;
 
+        /** The raw fractional costs (indexed by DAL). */
         private final Fraction[] costs;
+        /** Reverse-lookup of the raw fractional costs. */
         private Map<Fraction, Integer> rawCostToDal;
 
+        /**
+         * Normalized costs lookup table, used only in the single-requirement version of synthesis.
+         */
         private Map<Integer, Integer> dalToNormCost;
+        /**
+         * Reverse of normalized costs lookup table, used only in the single-requirement version of
+         * synthesis.
+         */
         private Map<Integer, Integer> normCostToDal;
 
         private ComponentDefense(
@@ -62,12 +80,24 @@ public class DLeaf implements DTree {
                         "invalid costs array, contains " + costs.length + " items instead of 10");
             }
             rawCostToDal = new LinkedHashMap<>();
+            /*
+             * constructing in this way guarantees that if two DALs have the same cost,
+             * the higher of the two will be produced.
+             */
             for (int dal = 0; dal < this.costs.length; dal++) {
                 this.costs[dal] = costs[dal];
+                // we override a previous DAL with this cost if such a thing happens
                 rawCostToDal.put(this.costs[dal], dal);
             }
         }
 
+        /**
+         * Assign normalized costs.
+         *
+         * @param normalizedCosts
+         * @deprecated use the multi-requirement version of synthesis instead
+         */
+        @Deprecated
         public void normalizeCosts(int[] normalizedCosts) {
             dalToNormCost = new LinkedHashMap<>();
             normCostToDal = new LinkedHashMap<>();
@@ -92,10 +122,22 @@ public class DLeaf implements DTree {
             }
         }
 
+        /**
+         * Get the raw fractional cost associated with a DAL.
+         *
+         * @param dal
+         * @return
+         */
         public Fraction dalToRawCost(int dal) {
             return costs[dal];
         }
 
+        /**
+         * Get the DAL associated with a raw fractional cost.
+         *
+         * @param rawCost
+         * @return
+         */
         public int rawCostToDal(Fraction rawCost) {
             Integer val = rawCostToDal.get(rawCost);
             if (val == null) {
@@ -104,6 +146,12 @@ public class DLeaf implements DTree {
             return val;
         }
 
+        /**
+         * @param dal
+         * @return
+         * @deprecated use the multi-requirement version of synthesis instead
+         */
+        @Deprecated
         public int dalToNormCost(int dal) {
             Integer val = dalToNormCost.get(dal);
             if (val == null) {
@@ -112,6 +160,12 @@ public class DLeaf implements DTree {
             return val;
         }
 
+        /**
+         * @param normCost
+         * @return
+         * @deprecated use the multi-requirement version of synthesis instead
+         */
+        @Deprecated
         public int normCostToDal(int normCost) {
             Integer val = normCostToDal.get(normCost);
             if (val == null) {
@@ -126,18 +180,41 @@ public class DLeaf implements DTree {
             return val;
         }
 
+        /** @return the name used for encoding this component-defense pair into SMT */
         private String smtName() {
             return "d" + id;
         }
 
+        /**
+         * Construct the Z3 object used for the MaxSMT single requirement version of synthesis.
+         *
+         * @param context
+         * @return
+         * @deprecated use the multi-requirement version of synthesis instead
+         */
+        @Deprecated
         public BoolExpr toZ3(Context context) {
             return context.mkBoolConst(smtName());
         }
 
+        /**
+         * Construct the Z3 object used for the multi-requirement version of synthesis.
+         *
+         * @param context
+         * @return
+         */
         public ArithExpr toZ3Multi(Context context) {
             return context.mkRealConst(smtName());
         }
 
+        /**
+         * Construct the LogicNG object used for the MaxSAT single requirement version of synthesis.
+         *
+         * @param factory
+         * @return
+         * @deprecated use the multi-requirement version of synthesis instead
+         */
+        @Deprecated
         public Variable toLogicNG(FormulaFactory factory) {
             return factory.variable(smtName());
         }
@@ -148,11 +225,17 @@ public class DLeaf implements DTree {
         }
     }
 
+    /**
+     * Produces component-defense pairs and keeps track of all such constructed component-defense
+     * pairs.
+     */
     public static final class Factory {
+        /** the map from component/defense to constructed component-defense pairs */
         private final Map<Pair<String, String>, ComponentDefense> componentDefenseMap =
                 new LinkedHashMap<>();
-
+        /** use incremental IDs to produce unique SMT names */
         private int idCounter = 0;
+        /** the map from IDs to constructed component-defense pairs */
         private final Map<Integer, ComponentDefense> idMap = new HashMap<>();
 
         private ComponentDefense createIfNeeded(
@@ -190,6 +273,20 @@ public class DLeaf implements DTree {
         }
     }
 
+    /**
+     * This constructor is used for debugging.
+     *
+     * <p>Construct a new DLeaf. Will reuse an existing component-defense pair if it already exists
+     * in the factory.
+     *
+     * @param component the name of the component
+     * @param defenseProperty the defense property
+     * @param attack the name of the attack defended by the defense
+     * @param implDal the current implemented DAL
+     * @param targetDal the target DAL (based on cyber requirement severity)
+     * @param costs the raw fractional costs, indexed by DAL
+     * @param factory the factory to use
+     */
     public DLeaf(
             String component,
             String defenseProperty,
@@ -204,6 +301,20 @@ public class DLeaf implements DTree {
         this.targetDal = targetDal;
     }
 
+    /**
+     * Construct a new DLeaf. Will reuse an existing component-defense pair if it already exists in
+     * the factory.
+     *
+     * @param component the name of the component
+     * @param defenseProperty the defense property
+     * @param attack the name of the attack defended by the defense
+     * @param implDal the current implemented DAL
+     * @param targetDal the target DAL (based on cyber requirement severity)
+     * @param costModel the cost model to use for obtaining costs
+     * @param factory the factory to use
+     * @param usePartialSolution whether we are using partial solutions
+     * @param meritAssignment whether we are performing merit assignment
+     */
     public DLeaf(
             String component,
             String defenseProperty,
@@ -217,15 +328,18 @@ public class DLeaf implements DTree {
 
         Fraction implCost = costModel.cost(defenseProperty, component, implDal);
 
+        // construct each cost
         Fraction[] costs = new Fraction[10];
         for (int dal = 0; dal < costs.length; dal++) {
             Fraction targetCost = costModel.cost(defenseProperty, component, dal);
-            // this handles if implDal > targetDal
             if (usePartialSolution && !meritAssignment) {
+                // in the partial solutions (but no merit assignment) case, we treat
+                // implemented defenses as a sunk cost
                 Fraction difference = targetCost.subtract(implCost);
                 if (difference.compareTo(new Fraction(0)) > 0) {
                     costs[dal] = difference;
                 } else {
+                    // don't have negative cost
                     costs[dal] = new Fraction(0);
                 }
             } else {

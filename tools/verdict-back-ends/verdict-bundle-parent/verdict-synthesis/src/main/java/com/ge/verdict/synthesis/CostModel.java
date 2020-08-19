@@ -1,5 +1,7 @@
 package com.ge.verdict.synthesis;
 
+import com.ge.verdict.synthesis.util.Pair;
+import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,11 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.math3.fraction.Fraction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,17 +19,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ge.verdict.synthesis.util.Pair;
-import com.ge.verdict.synthesis.util.Triple;
-
 /**
  * Reprents a cost model loaded from XML. Allows for efficiently looking up the cost of any
  * component-defense-DAL triple.
  */
 public class CostModel {
-	/**
-	 * Thrown if parsing fails due to an invalid cost model XML.
-	 */
+    /** Thrown if parsing fails due to an invalid cost model XML. */
     public static class ParseException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
@@ -202,11 +197,11 @@ public class CostModel {
         return str.length() == 0;
     }
 
-	/**
-	 * Loads the cost model from XML.
-	 *
-	 * @param costModelXml
-	 */
+    /**
+     * Loads the cost model from XML.
+     *
+     * @param costModelXml
+     */
     private void load(File costModelXml) {
         try {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -218,7 +213,7 @@ public class CostModel {
 
                 if (component.contains(":::")) {
                     // TODO this is temporary, until we support fully qualified names throughout the
-					// tool. basically we can just remove this once qualified names are supported
+                    // tool. basically we can just remove this once qualified names are supported
                     String[] parts = component.split(":::");
                     if (parts.length != 2) {
                         throw new RuntimeException(
@@ -274,6 +269,12 @@ public class CostModel {
         return list;
     }
 
+    /**
+     * Parse a DAL string into an integer.
+     *
+     * @param dalStr
+     * @return
+     */
     private static int parseDal(String dalStr) {
         int dal = Integer.parseInt(dalStr);
         if (dal < 0 || dal > 9) {
@@ -282,15 +283,22 @@ public class CostModel {
         return dal;
     }
 
+    /**
+     * Parse a decimal cost string into a fraction.
+     *
+     * @param costStr
+     * @return
+     */
     public static Fraction parseCost(String costStr) {
         if ("INF".equals(costStr)) {
-			// the idea is to support a notion of an infinite cost at some point
+            // the idea is to support a notion of an infinite cost at some point
             throw new RuntimeException("INF not supported yet");
         }
         double costDouble = Double.parseDouble(costStr);
         if (costDouble < 0) {
             throw new RuntimeException("negative cost: " + costStr);
         }
+        // this precision should mitigate any floating point error
         return new Fraction(costDouble, 0.000001, 20);
     }
 }

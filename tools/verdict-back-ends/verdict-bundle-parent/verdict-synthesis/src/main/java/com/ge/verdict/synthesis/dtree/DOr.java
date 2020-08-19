@@ -11,6 +11,10 @@ import java.util.stream.Stream;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
+/**
+ * A disjunction of defense tree nodes, indicating that at least one of its children must be
+ * satisfied.
+ */
 public final class DOr implements DTree {
     public final List<DTree> children;
 

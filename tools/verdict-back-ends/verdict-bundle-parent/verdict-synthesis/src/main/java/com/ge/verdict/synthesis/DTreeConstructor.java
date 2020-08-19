@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/** Used for constructing defense trees. */
 public class DTreeConstructor {
     /**
      * Construct a defense tree for multiple cyber requirements.
@@ -46,6 +47,7 @@ public class DTreeConstructor {
             throw new RuntimeException(
                     "Cannot enable merit assignment without also enabling partial solutions!");
         }
+        // essentially, construct one dtree for each requirement and AND them together
         return new DAnd(
                 results.stream()
                         .map(
@@ -61,7 +63,8 @@ public class DTreeConstructor {
     }
 
     /**
-     * Construct a defense tree for one cyber requirement.
+     * Construct a defense tree for one cyber requirement. Note: you should probably use the
+     * multi-requirement version above.
      *
      * @param adtree
      * @param costModel
@@ -82,14 +85,25 @@ public class DTreeConstructor {
                 .perform(adtree);
     }
 
+    /** the cost model */
     private final CostModel costModel;
+    /**
+     * the dleaf factory, used to make sure there is only ever one instance of a given
+     * component-defense pair
+     */
     private final DLeaf.Factory factory;
+    /** the target DAL for the requirement */
     private final int targetDal;
+    /** whether to use partial solutions */
     private final boolean usePartialSolution;
+    /** whether we are performing merit assignment */
     private final boolean meritAssignment;
 
+    /** all defenses that have been found */
     private final Set<Defense> defenses;
+    /** map from attacks to raw attack leaves */
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
+    /** all defense conditions that have been found */
     private final List<DCondition> dconditions;
 
     private DTreeConstructor(
@@ -109,6 +123,12 @@ public class DTreeConstructor {
         dconditions = new ArrayList<>();
     }
 
+    /**
+     * This is the part that actually constructs the dtree.
+     *
+     * @param adtree
+     * @return
+     */
     private DTree perform(ADTree adtree) {
         Optional<DTree> resultOpt = constructInternal(adtree);
 
@@ -117,6 +137,7 @@ public class DTreeConstructor {
         } else {
             DTree result = resultOpt.get();
 
+            // remove raw attack leaves that are covered by a defense
             for (Defense defense : defenses) {
                 if (!attackALeafMap.containsKey(defense.getAttack())) {
                     throw new RuntimeException(
@@ -130,6 +151,7 @@ public class DTreeConstructor {
                 }
             }
 
+            // these are the raw attack leaves that aren't covered by a defense
             Set<ALeaf> unmitigated = new LinkedHashSet<>();
             for (Set<ALeaf> set : attackALeafMap.values()) {
                 for (ALeaf aleaf : set) {
@@ -139,10 +161,13 @@ public class DTreeConstructor {
                 }
             }
 
+            // it is probably a problem if this happens because STEM doesn't output
+            // raw attacks without corresponding defenses
             for (ALeaf aleaf : unmitigated) {
                 System.out.println("Warning: Unmitigated attack: " + aleaf.getAttack().toString());
             }
 
+            // connect the defense condition to its corresponding dleaf
             for (DCondition dcond : dconditions) {
                 Optional<DLeaf.ComponentDefense> compDef =
                         factory.lookup(
@@ -171,11 +196,24 @@ public class DTreeConstructor {
                 }
             }
 
+            // important to call prepare - collapses nested NOTs and removes unmitigated raw attack
+            // leaves
             Optional<DTree> prepared = result.prepare();
             return prepared.orElse(new DOr(Collections.emptyList()));
         }
     }
 
+    /**
+     * Inductively-defined function over attack-defense trees.
+     *
+     * <p>The mapping from attack-defense tree to defense tree is pretty straightforward. One of the
+     * most important things to note is that AND and OR nodes are transposed in the transformation
+     * because they mean opposite things in a defense tree compared to an attack-defense tree. (An
+     * attack-defense tree is "how to attack", whereas a defense tree is "how to defend".)
+     *
+     * @param adtree
+     * @return
+     */
     private Optional<DTree> constructInternal(ADTree adtree) {
         if (adtree instanceof Attack) {
             Attack attack = (Attack) adtree;
@@ -229,6 +267,13 @@ public class DTreeConstructor {
         }
     }
 
+    /**
+     * The defense nodes in the attack-defense tree represent entire DNF defense subtrees. This
+     * function produces a defense tree from that DNF.
+     *
+     * @param defense
+     * @return
+     */
     private DTree constructDefenseTree(Defense defense) {
         return new DOr(
                 defense.getDefenseDnf().stream()
@@ -241,6 +286,13 @@ public class DTreeConstructor {
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * Produce a dleaf from a attack-defense tree defense leaf and its parent defense node.
+     *
+     * @param defense
+     * @param leaf
+     * @return
+     */
     private DLeaf constructDLeaf(Defense defense, Defense.DefenseLeaf leaf) {
         String system = defense.getAttack().getAttackable().getParentName();
         String attack = defense.getAttack().getName();
