@@ -67,6 +67,7 @@ import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.VirtualProcessorType;
+import org.osate.aadl2.impl.AccessConnectionImpl;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
@@ -410,6 +411,34 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(sysType.getCategory().getName());
 
+				
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = sysType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = sysType.getOwnedDataAccesses();
 				
@@ -627,6 +656,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(bType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = bType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 //ISSUE: no getOwnedDataAccesses for busType
 				
 				//get all ports
@@ -824,6 +880,9 @@ public class Aadl2Vdm {
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = subprogType.getOwnedDataAccesses();
 				
+//ISSUE: no getOwnedBusAccesses
+				
+				
 				//checking each dataAccess's details and adding it to the port list
 				for(DataAccess dataAccess : dataAccesses) {
 
@@ -1016,6 +1075,8 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(tType.getCategory().getName());
 
+//ISSUE: no getOwnedBusAccesses
+				
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = tType.getOwnedDataAccesses();
 				
@@ -1234,6 +1295,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(memType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = memType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 //ISSUE: no getOwnedDataAccesses for memoryTypes
 				
 				//get all ports
@@ -1428,6 +1516,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(devType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = devType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 //ISSUE: no getOwnedDataAccesses for deviceType
 				
 				//get all ports
@@ -1622,6 +1737,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(absType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = absType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = absType.getOwnedDataAccesses();
 				
@@ -1839,6 +1981,8 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(prcsType.getCategory().getName());
 
+//ISSUE: no getOwnedBusAccesses				
+				
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = prcsType.getOwnedDataAccesses();
 				
@@ -2057,6 +2201,8 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(tgType.getCategory().getName());
 
+//ISSUE: no getOwnedBusAccesses				
+				
 				//get all data accesses and store them as ports
 				List<DataAccess> dataAccesses = tgType.getOwnedDataAccesses();
 				
@@ -2275,6 +2421,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(vprocType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = vprocType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 //ISSUE: no getOwnedDataAccesses for virtualProcessorType
 				
 				//get all ports
@@ -2470,6 +2643,33 @@ public class Aadl2Vdm {
 				//populating "compCateg"
 				packComponent.setCompCateg(proType.getCategory().getName());
 
+				//get all bus accesses and store them as ports
+				List<BusAccess> busAccesses = proType.getOwnedBusAccesses();
+				
+				//checking each busAccess's details and adding it to the port list
+				for(BusAccess busAccess : busAccesses) {
+
+					String portName = busAccess.getName();
+					String modeString = "in";
+					if(busAccess.getKind() == AccessType.PROVIDES) {
+						modeString = "providesBusAccess";
+					}
+					else if(busAccess.getKind() == AccessType.REQUIRES) {
+						modeString = "requiresBusAccess";
+					}
+
+
+			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
+
+			    	//Note: Not populating "type" for now
+
+//ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
+
+			    	//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}//End of checking each busAccess
+				
+				
 //ISSUE: no getOwnedDataAccess for processorType
 				
 				//get all ports
@@ -2724,10 +2924,10 @@ public class Aadl2Vdm {
 					
 //					System.out.println("Connection name: "+aConn.getQualifiedName()+ " kind1: "+aConn.getClass().getSimpleName());
 //					System.out.println("Connection name: "+aConn.getQualifiedName()+ " kind2: "+aConn.getClass().getName());
-//					System.out.println("Connection name: "+aConn.getQualifiedName()+ " kind3: "+aConn.get);
-					
+
+									
 					//populate connectionKind
-					packConn.setConnectionKind(getConnectionKind(aConn.getClass().getSimpleName()));
+					packConn.setConnectionKind(getConnectionKind(aConn));
 					
 					
 					//variables to unpack information from AADL object
@@ -4065,14 +4265,21 @@ public class Aadl2Vdm {
      * @param kind
      * @return
      */
-    verdict.vdm.vdm_model.ConnectionKind getConnectionKind(String kind) {
+    verdict.vdm.vdm_model.ConnectionKind getConnectionKind(Connection aConn) {
     	String kindString = "port";
     	
-    	if(kind.equalsIgnoreCase("AccessConnectionImpl")) {
-    		kindString= "access";
-    	} else if(kind.equalsIgnoreCase("PortConnectionImpl")) {
+    	if(aConn.getClass().getSimpleName().equalsIgnoreCase("AccessConnectionImpl")) {
+    		AccessConnectionImpl accessConnImpl = (AccessConnectionImpl) aConn;    		
+    		if(accessConnImpl.getAccessCategory().getName().equalsIgnoreCase("data")) {
+    			kindString = "dataAccess";	
+    		} else if(accessConnImpl.getAccessCategory().getName().equalsIgnoreCase("bus")) {
+    			kindString = "busAccess";
+    		}
+    	} else if(aConn.getClass().getSimpleName().equalsIgnoreCase("PortConnectionImpl")) {
     		kindString = "port";
-    	}
+    	} else if(aConn.getClass().getSimpleName().equalsIgnoreCase("ParameterConnectionImpl")) {
+    		kindString = "parameter";
+    	} 
     	
     	verdict.vdm.vdm_model.ConnectionKind returnKind =  verdict.vdm.vdm_model.ConnectionKind.fromValue(kindString);
     	return returnKind;
