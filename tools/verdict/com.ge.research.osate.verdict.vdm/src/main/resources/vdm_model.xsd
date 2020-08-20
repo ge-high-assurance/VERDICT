@@ -107,6 +107,21 @@
         </restriction>
     </simpleType>
 
+
+    <simpleType name="ConnectionKind">
+        <restriction base="string">
+            <enumeration value="port"></enumeration>
+            <enumeration value="access"></enumeration>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Direction">
+        <restriction base="string">
+            <enumeration value="unidirectional"></enumeration>
+            <enumeration value="bidirectional"></enumeration>
+        </restriction>
+    </simpleType>
+
     <complexType name="ComponentInstance">
         <choice>
             <element name="specification" type="IDREF">
@@ -151,6 +166,12 @@
 
     <complexType name="Connection">
         <sequence>
+            <element name="connectionKind"
+                type="vdm_model:ConnectionKind" minOccurs="0" maxOccurs="1">
+            </element>
+            <element name="direction" type="vdm_model:Direction"
+                minOccurs="0" maxOccurs="1">
+            </element>
             <element name="source" type="vdm_model:ConnectionEnd"></element>
             <element name="destination" type="vdm_model:ConnectionEnd">
             </element>
