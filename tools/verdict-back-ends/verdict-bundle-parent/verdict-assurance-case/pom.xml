@@ -27,7 +27,17 @@
             <groupId>guru.nidi</groupId>
             <artifactId>graphviz-java</artifactId>
         </dependency>
-        <!-- Dependencies needed only by tests -->
+        <!-- JAXB dependencies needed only under Java 9 or later -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
