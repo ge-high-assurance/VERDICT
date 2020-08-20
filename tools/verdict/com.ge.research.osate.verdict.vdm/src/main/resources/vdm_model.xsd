@@ -103,6 +103,8 @@
             <enumeration value="inOut"></enumeration>
             <enumeration value="requiresDataAccess"></enumeration>
             <enumeration value="providesDataAccess"></enumeration>
+            <enumeration value="requiresBusAccess"></enumeration>
+            <enumeration value="providesBusAccess"></enumeration>
             <enumeration value="data"></enumeration>
         </restriction>
     </simpleType>
@@ -111,7 +113,9 @@
     <simpleType name="ConnectionKind">
         <restriction base="string">
             <enumeration value="port"></enumeration>
-            <enumeration value="access"></enumeration>
+            <enumeration value="busAccess"></enumeration>
+            <enumeration value="dataAccess"></enumeration>
+            <enumeration value="parameter"></enumeration>
         </restriction>
     </simpleType>
 
