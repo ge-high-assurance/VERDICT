@@ -87,8 +87,7 @@ public class DefenseCondition extends ADTree {
 
     @Override
     public Formula toLogicNg(FormulaFactory factory, Cache cache) {
-        throw new RuntimeException(
-                "minimization not implemented for trees with defense conditions");
+        return getImplDal() >= minImplDal ? factory.verum() : factory.falsum();
     }
 
     @Override
