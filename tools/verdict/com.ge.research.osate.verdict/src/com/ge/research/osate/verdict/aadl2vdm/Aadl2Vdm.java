@@ -2921,10 +2921,6 @@ public class Aadl2Vdm {
 					//to pack all information of a connection
 					verdict.vdm.vdm_model.Connection packConn = new verdict.vdm.vdm_model.Connection();
 
-					
-//					System.out.println("Connection name: "+aConn.getQualifiedName()+ " kind1: "+aConn.getClass().getSimpleName());
-//					System.out.println("Connection name: "+aConn.getQualifiedName()+ " kind2: "+aConn.getClass().getName());
-
 									
 					//populate connectionKind
 					packConn.setConnectionKind(getConnectionKind(aConn));

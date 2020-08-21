@@ -88,9 +88,9 @@ public class GSNHandler extends AbstractHandler {
 						Aadl2Vdm translatorObject = new Aadl2Vdm();
 						Model model = translatorObject.execute(projectDir);
 						
-////For testing aadl2vdm translator
-//File modelXml = new File("C:/Users/212807042/Desktop/", "TestModel.xml");
-//VdmTranslator.marshalToXml(model, modelXml);
+						////For testing aadl2vdm translator
+						//File modelXml = new File("", "TestModel.xml");
+						//VdmTranslator.marshalToXml(model, modelXml);
 						
 												
 						//getting required input
