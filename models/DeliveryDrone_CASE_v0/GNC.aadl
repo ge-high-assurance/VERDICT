@@ -124,21 +124,22 @@ public
 
 				-- VERDICT Cyber Defenses & DAL Mitigations
 				
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
+				CASE_Consolidated_Properties::systemAccessControl =>7;
+				CASE_Consolidated_Properties::secureBoot =>7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
 				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
 				CASE_Consolidated_Properties::resourceAvailability => 7;
 				CASE_Consolidated_Properties::antiJamming => 7;
 				CASE_Consolidated_Properties::dosProtection => 7;
 				CASE_Consolidated_Properties::inputValidation => 7;
 				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
-				CASE_Consolidated_Properties::remoteAttestation => 7;
+				CASE_Consolidated_Properties::remoteAttestation =>7;
 				CASE_Consolidated_Properties::logging => 7;
 				CASE_Consolidated_Properties::failSafe => 7;
 				CASE_Consolidated_Properties::heterogeneity =>7;
+				CASE_Consolidated_Properties::tamperProtection =>7;
 				
 				};
 			imu: system IMU
@@ -150,12 +151,13 @@ public
 				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
 				
 				-- VERDICT Cyber Defenses & DAL Mitigations
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
+				CASE_Consolidated_Properties::systemAccessControl =>7;
+				CASE_Consolidated_Properties::secureBoot =>7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
 				CASE_Consolidated_Properties::remoteAttestation=>7;
+				CASE_Consolidated_Properties::tamperProtection =>7;
 			};
 		connections
 			i1: port constellation -> gps.constellation

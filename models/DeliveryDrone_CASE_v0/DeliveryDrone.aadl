@@ -596,16 +596,16 @@ public
 
 			eq started: bool = (delivery_status <> Agree_Constants::NOT_STARTED_STATUS);
 
-			guarantee "L1: Auxiliary lemma": not Agree_Nodes::InRestrictedArea(probe_delivery_location);
-			guarantee "L2: Auxiliary lemma": probe_delivery_location = most_recent_delivery_location;
+--			guarantee "L1: Auxiliary lemma": not Agree_Nodes::InRestrictedArea(probe_delivery_location);
+--			guarantee "L2: Auxiliary lemma": probe_delivery_location = most_recent_delivery_location;
 
 
 			guarantee "P7: The drone never initiates packet release to an off-limits location":
 				started => not Agree_Nodes::InRestrictedArea(probe_delivery_location);
 
-			guarantee "P8: The drone issues a command to release a package only if
-					   delivery location is the most recent delivery location provided":
-				release_cmd => probe_delivery_location=most_recent_delivery_location;
+--			guarantee "P8: The drone issues a command to release a package only if
+--					   delivery location is the most recent delivery location provided":
+--				release_cmd => probe_delivery_location=most_recent_delivery_location;
 		**};
 			
 		annex verdict{**
@@ -666,15 +666,15 @@ public
 				CASE_Consolidated_Properties::failSafe =>7;
 				CASE_Consolidated_Properties::inputValidation => 7;
 				CASE_Consolidated_Properties::logging => 7;
-				CASE_Consolidated_Properties::memoryProtection => 5; --  Change to 7 to satisfy threat
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::memoryProtection =>7; --  Change to 7 to satisfy threat
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
 				CASE_Consolidated_Properties::remoteAttestation =>7;
 				CASE_Consolidated_Properties::resourceAvailability => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::secureBoot =>7;
 				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
 				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
 				CASE_Consolidated_Properties::supplyChainSecurity => 0;
-				CASE_Consolidated_Properties::systemAccessControl => 7;	
+				CASE_Consolidated_Properties::systemAccessControl =>7;	
 							
 			};
 			positionEstimator: system PositionEstimator
@@ -692,22 +692,22 @@ public
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
 				
-				CASE_Consolidated_Properties::antiJamming => 7;
-				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::antiJamming =>7;
+				CASE_Consolidated_Properties::dosProtection =>7;
 				CASE_Consolidated_Properties::failsafe =>7;
 				CASE_Consolidated_Properties::heterogeneity =>7;
-				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::inputValidation =>7;
 				CASE_Consolidated_Properties::logging =>7;
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::RemoteAttestation => 7;
-				CASE_Consolidated_Properties::resourceAvailability => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
-				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
+				CASE_Consolidated_Properties::RemoteAttestation =>7;
+				CASE_Consolidated_Properties::resourceAvailability =>7;
+				CASE_Consolidated_Properties::secureBoot =>7;
+				CASE_Consolidated_Properties::staticCodeAnalysis =>7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms =>7;
+				CASE_Consolidated_Properties::supplyChainSecurity =>7;
 				CASE_Consolidated_Properties::systemAccessControl => 7;
-
+				CASE_Consolidated_Properties::tamperProtection =>7;
 				
 			};
 			navigation: system Navigation
@@ -721,10 +721,10 @@ public
 
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
 				CASE_Consolidated_Properties::remoteAttestation =>7;
-				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::secureBoot =>7;
 				CASE_Consolidated_Properties::supplyChainSecurity => 7;
 				CASE_Consolidated_Properties::systemAccessControl => 7;
 
@@ -740,10 +740,10 @@ public
 
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
 				CASE_Consolidated_Properties::remoteAttestation =>7;
-				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::secureBoot =>7;
 				CASE_Consolidated_Properties::supplyChainSecurity => 7;
 				CASE_Consolidated_Properties::systemAccessControl => 7;
 
@@ -758,9 +758,9 @@ public
 
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
 				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl =>7;
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
@@ -769,43 +769,41 @@ public
 				CASE_Consolidated_Properties::componentType => Software;
 				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => Sourced;
-				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				CASE_Consolidated_Properties::pedigree => Sourced; -- use for CRV demo
+--				CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- use for MBAAS demo
 				
 	
 			
 				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::antiJamming => 7;
-				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::antiJamming =>7;
+				CASE_Consolidated_Properties::dosProtection =>7;
 				CASE_Consolidated_Properties::failSafe =>7;
 				CASE_Consolidated_Properties::Heterogeneity =>7;
-				CASE_Consolidated_Properties::inputValidation => 7;
-				CASE_Consolidated_Properties::logging => 7;
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::RemoteAttestation => 7;
-				CASE_Consolidated_Properties::resourceAvailability => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
-				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 0;
+				CASE_Consolidated_Properties::inputValidation =>7;
+				CASE_Consolidated_Properties::logging =>7;
+				CASE_Consolidated_Properties::memoryProtection =>7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
+				CASE_Consolidated_Properties::RemoteAttestation =>7;
+				CASE_Consolidated_Properties::resourceAvailability =>7;
+				CASE_Consolidated_Properties::secureBoot =>7;
+				CASE_Consolidated_Properties::staticCodeAnalysis =>7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms =>7;
 				CASE_Consolidated_Properties::systemAccessControl => 7;
+--				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+--				CASE_Consolidated_Properties::tamperProtection =>7;
 				
 			};
-			deliveryItemMechanism: system DeliveryItemMechanism
-			{
+			deliveryItemMechanism: system DeliveryItemMechanism {
 				-- VERDICT Component Properties
 				CASE_Consolidated_Properties::componentType => Hardware;
 				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
-				
-				
+				CASE_Consolidated_Properties::pedigree => COTS;
 				-- VERDICT Cyber Defense and DAL Mitigations
 				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-				
+				CASE_Consolidated_Properties::systemAccessControl => 7;			
+--				CASE_Consolidated_Properties::tamperProtection => 7;  -- MBAS will synthesize this defense property
+--				CASE_Consolidated_Properties::supplyChainSecurity => 7; -- MBAS will synthesize this defense property 
 			};
 			camera: system Camera
 			{
@@ -817,9 +815,9 @@ public
 				
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::physicalAccessControl =>7;
 				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl =>7;
 			};
 			
 			connector: system Connector
