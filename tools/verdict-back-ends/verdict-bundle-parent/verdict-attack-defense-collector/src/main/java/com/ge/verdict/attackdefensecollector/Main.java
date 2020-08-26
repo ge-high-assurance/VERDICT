@@ -21,6 +21,9 @@ public class Main {
         boolean inference = arrayContains(args, "--inference");
         boolean cutSet = arrayContains(args, "--cut-set");
         AttackDefenseCollector attackDefenseCollector;
+        
+        // If "--vdm" is present, we will use the vdm file; 
+        // otherwise, we will load csv files
         if (arrayContains(args, "--vdm")) {
             attackDefenseCollector =
                     new AttackDefenseCollector(new File(args[1]), new File(args[0]), inference);
@@ -29,6 +32,7 @@ public class Main {
         }
         List<Result> results = attackDefenseCollector.perform();
         for (Result result : results) {
+        	// Convert adtree to cutset only if --cut-set is on.
             ADTree adtree = cutSet ? CutSetGenerator.generate(result.adtree) : result.adtree;
 
             Logger.println();

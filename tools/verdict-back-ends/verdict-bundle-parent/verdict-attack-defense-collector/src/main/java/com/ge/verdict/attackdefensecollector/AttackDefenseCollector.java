@@ -47,9 +47,9 @@ import verdict.vdm.vdm_model.Severity;
  */
 public class AttackDefenseCollector {
     /** System models. */
-    private Map<String, SystemModel> systems;
+    private Map<String, SystemModel> sysNameToSystemModelMap;
     /** Connection models. */
-    private Map<String, Set<ConnectionModel>> connections;
+    private Map<String, Set<ConnectionModel>> connNameToConnectionModelMap;
 
     /**
      * Keep track of all defense property implemented DALs. We use this because we fool STEM, so it
@@ -58,7 +58,7 @@ public class AttackDefenseCollector {
      * not in the attack-defense tree. This is used when loading from VDM, but it is kept null when
      * loading from CSV.
      */
-    private Map<Pair<String, String>, Integer> implDal;
+    private Map<Pair<String, String>, Integer> compDefenseToImplDal;
 
     /**
      * Get the system model with the specified name, creating it and adding it to the resolution
@@ -71,10 +71,10 @@ public class AttackDefenseCollector {
      * @return the system model with the specified name
      */
     private SystemModel getSystem(String name) {
-        if (!systems.containsKey(name)) {
-            systems.put(name, new SystemModel(name));
+        if (!sysNameToSystemModelMap.containsKey(name)) {
+            sysNameToSystemModelMap.put(name, new SystemModel(name));
         }
-        return systems.get(name);
+        return sysNameToSystemModelMap.get(name);
     }
 
     /**
@@ -120,10 +120,10 @@ public class AttackDefenseCollector {
          * to keep in mind.
          */
 
-        systems = new LinkedHashMap<>();
-        connections = new LinkedHashMap<>();
+        sysNameToSystemModelMap = new LinkedHashMap<>();
+        connNameToConnectionModelMap = new LinkedHashMap<>();
 
-        implDal = null;
+        compDefenseToImplDal = null;
 
         // Load all the files as CSV
         CSVFile compDepCsv =
@@ -277,7 +277,7 @@ public class AttackDefenseCollector {
                      * + destInstName + ")");
                      */
 
-                    Util.putSetMap(connections, name, connection);
+                    Util.putSetMap(connNameToConnectionModelMap, name, connection);
 
                     // Store connection in a different place depending on internal/external and
                     // outgoing/incoming
@@ -371,7 +371,7 @@ public class AttackDefenseCollector {
             }
         }
 
-        loadAttacksDefenses(inputDir, connectionAttackNames);
+        loadAttacksDefensesFromCsv(inputDir, connectionAttackNames);
 
         if (inference) {
             performInference();
@@ -389,7 +389,7 @@ public class AttackDefenseCollector {
      * @throws CSVFile.MalformedInputException
      * @throws IOException
      */
-    private void loadAttacksDefenses(String inputDir, Map<String, String> connectionNameMap)
+    private void loadAttacksDefensesFromCsv(String inputDir, Map<String, String> connectionNameMap)
             throws CSVFile.MalformedInputException, IOException {
         // Load all the files as CSV
         CSVFile capecCsv =
@@ -435,7 +435,7 @@ public class AttackDefenseCollector {
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection : connections.get(connectionName)) {
+                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
                     connection
                             .getAttackable()
                             .addAttack(
@@ -459,7 +459,8 @@ public class AttackDefenseCollector {
             }
         }
 
-        // Load defenses
+        // Load defenses 
+        // Note we don't use implemented property column in csv files if we vdm as input 
         for (CSVFile.RowData row : defensesCsv.getRowDatas()) {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
@@ -494,7 +495,7 @@ public class AttackDefenseCollector {
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection : connections.get(connectionName)) {
+                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
                     Defense defense =
                             connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
                     if (defense == null) {
@@ -537,11 +538,11 @@ public class AttackDefenseCollector {
                 if (!"null".equals(defenseNames.get(i))) {
                     int dal = -1;
                     // it will be null if we are not loading from VDM
-                    if (implDal != null) {
+                    if (compDefenseToImplDal != null) {
                         // load DAL from VDM if available
                         Pair<String, String> pair = new Pair<>(entityName, defenseNames.get(i));
-                        if (implDal.containsKey(pair)) {
-                            dal = implDal.get(pair);
+                        if (compDefenseToImplDal.containsKey(pair)) {
+                            dal = compDefenseToImplDal.get(pair);
                         } else {
                             // if there is no binding present, then it is not implemented
                             dal = 0;
@@ -584,7 +585,7 @@ public class AttackDefenseCollector {
      */
     private void performInference() {
         int inferenceCounter = 0;
-        for (SystemModel system : systems.values()) {
+        for (SystemModel system : sysNameToSystemModelMap.values()) {
             // the internal connections bit is used in lieu of checking for the presence of
             // subcomponents
             // because we don't want to infer cyber relations for a system with subcomponents
@@ -646,17 +647,17 @@ public class AttackDefenseCollector {
      * </ul>
      *
      * @param vdm the input VDM file
-     * @param inputDir the STEM output directory
+     * @param stemOutputDir the STEM output directory
      * @param inference whether or not to infer cyber relations in systems with no cyber relations
      * @throws CSVFile.MalformedInputException
      * @throws IOException
      */
-    public AttackDefenseCollector(File vdm, File inputDir, boolean inference)
+    public AttackDefenseCollector(File vdm, File stemOutputDir, boolean inference)
             throws CSVFile.MalformedInputException, IOException {
-        Model model = VdmTranslator.unmarshalFromXml(vdm);
+        Model vdmModel = VdmTranslator.unmarshalFromXml(vdm);
 
-        systems = new LinkedHashMap<>();
-        connections = new LinkedHashMap<>();
+        sysNameToSystemModelMap = new LinkedHashMap<>();
+        connNameToConnectionModelMap = new LinkedHashMap<>();
 
         // Keep track of component instances associated with each component type and impl
         Map<String, Set<SystemModel>> compTypeToSystem = new HashMap<>();
@@ -667,18 +668,21 @@ public class AttackDefenseCollector {
         // from the confusing names to the correct names
         Map<String, String> connectionAttackNames = new HashMap<>();
 
-        implDal = new LinkedHashMap<>();
+        compDefenseToImplDal = new LinkedHashMap<>();
 
         // Load all instances as systems
-        for (ComponentImpl impl : model.getComponentImpl()) {
+        for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (impl.getBlockImpl() != null) {
                 for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
+                	// TODO: Change the getName() to getQualifiedName() later after changing VDM
                     SystemModel system = getSystem(inst.getName());
                     for (GenericAttribute attrib : inst.getAttribute()) {
+                    	// TODO: Be careful here about types of AADL properties
                         if (attrib.getValue() instanceof String) {
                             system.addAttribute(attrib.getName(), (String) attrib.getValue());
                         }
                     }
+                    // Map AADL component type or implementation name to the internal system object
                     if (inst.getSpecification() != null) {
                         Util.putSetMap(compTypeToSystem, inst.getSpecification().getName(), system);
                     }
@@ -691,9 +695,10 @@ public class AttackDefenseCollector {
         }
 
         // Load top-level systems that don't exist as instances
-        for (ComponentImpl impl : model.getComponentImpl()) {
+        for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (!compImplToSystem.containsKey(impl.getName())) {
                 SystemModel system = getSystem(impl.getName());
+                // TODO: 
                 if (impl.getType() != null) {
                     Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
                 }
@@ -702,7 +707,7 @@ public class AttackDefenseCollector {
         }
 
         // Load connections
-        for (ComponentImpl impl : model.getComponentImpl()) {
+        for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (impl.getBlockImpl() != null) {
                 for (Connection conn : impl.getBlockImpl().getConnection()) {
                     boolean internalIncoming = conn.getSource().getSubcomponentPort() == null;
@@ -750,11 +755,11 @@ public class AttackDefenseCollector {
                                                             .getSubcomponent()
                                                             .getName()));
 
-                    for (SystemModel source : sources) {
-                        for (SystemModel dest : dests) {
+                    for (SystemModel srcSysModel : sources) {
+                        for (SystemModel destSysModel : dests) {
                             ConnectionModel connection =
                                     new ConnectionModel(
-                                            conn.getName(), source, dest, sourcePort, destPort);
+                                            conn.getName(), srcSysModel, destSysModel, sourcePort, destPort);
 
                             for (GenericAttribute attrib : conn.getAttribute()) {
                                 if (attrib.getValue() instanceof String) {
@@ -767,20 +772,20 @@ public class AttackDefenseCollector {
                             // + source.getName() + ":"
                             // + sourcePort + " to " + dest.getName() + ":" + destPort);
 
-                            Util.putSetMap(connections, conn.getName(), connection);
+                            Util.putSetMap(connNameToConnectionModelMap, conn.getName(), connection);
 
                             // Store connection in a different place depending on internal/external
                             // and
                             // outgoing/incoming
                             if (internalIncoming) {
-                                source.addIncomingInternalConnection(connection);
-                                dest.addIncomingConnection(connection);
+                                srcSysModel.addIncomingInternalConnection(connection);
+                                destSysModel.addIncomingConnection(connection);
                             } else if (internalOutgoing) {
-                                source.addOutgoingConnection(connection);
-                                dest.addOutgoingInternalConnection(connection);
+                                srcSysModel.addOutgoingConnection(connection);
+                                destSysModel.addOutgoingInternalConnection(connection);
                             } else {
-                                source.addOutgoingConnection(connection);
-                                dest.addIncomingConnection(connection);
+                                srcSysModel.addOutgoingConnection(connection);
+                                destSysModel.addIncomingConnection(connection);
                             }
                         }
                     }
@@ -795,9 +800,9 @@ public class AttackDefenseCollector {
         }
 
         // Load cyber relations
-        for (ComponentType type : model.getComponentType()) {
-            for (verdict.vdm.vdm_model.CyberRel rel : type.getCyberRel()) {
-                for (SystemModel system : compTypeToSystem.get(type.getName())) {
+        for (ComponentType compType : vdmModel.getComponentType()) {
+            for (verdict.vdm.vdm_model.CyberRel rel : compType.getCyberRel()) {
+                for (SystemModel system : compTypeToSystem.get(compType.getName())) {
                     if (rel.getInputs() != null) {
                         system.addCyberRel(
                                 new CyberRel(
@@ -819,16 +824,16 @@ public class AttackDefenseCollector {
         Map<String, verdict.vdm.vdm_model.CyberReq> cyberReqMap = new HashMap<>();
         Map<String, verdict.vdm.vdm_model.SafetyReq> safetyReqMap = new HashMap<>();
 
-        for (verdict.vdm.vdm_model.CyberReq req : model.getCyberReq()) {
+        for (verdict.vdm.vdm_model.CyberReq req : vdmModel.getCyberReq()) {
             cyberReqMap.put(req.getId(), req);
         }
 
-        for (verdict.vdm.vdm_model.SafetyReq req : model.getSafetyReq()) {
+        for (verdict.vdm.vdm_model.SafetyReq req : vdmModel.getSafetyReq()) {
             safetyReqMap.put(req.getId(), req);
         }
 
-        // load from missions
-        for (Mission mission : model.getMission()) {
+        // load from missions and cyber/safety reqs
+        for (Mission mission : vdmModel.getMission()) {
             for (String reqName : mission.getCyberReqs()) {
                 if (cyberReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
@@ -854,8 +859,9 @@ public class AttackDefenseCollector {
             }
         }
 
-        // load implemented defense DALs from VDM
-        for (ComponentImpl impl : model.getComponentImpl()) {
+        // load all implemented defense DALs from VDM 
+        // determine extraneous defenses later
+        for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (impl.getBlockImpl() != null) {
                 // load defense properties on components
                 for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
@@ -875,7 +881,7 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        implDal.put(new Pair<>(inst.getName(), name), dal);
+                                        compDefenseToImplDal.put(new Pair<>(inst.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
                                     throw new RuntimeException(
@@ -911,7 +917,7 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        implDal.put(new Pair<>(conn.getName(), name), dal);
+                                        compDefenseToImplDal.put(new Pair<>(conn.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
                                     throw new RuntimeException(
@@ -931,7 +937,7 @@ public class AttackDefenseCollector {
             }
         }
 
-        loadAttacksDefenses(inputDir.getAbsolutePath(), connectionAttackNames);
+        loadAttacksDefensesFromCsv(stemOutputDir.getAbsolutePath(), connectionAttackNames);
 
         if (inference) {
             performInference();
@@ -1027,7 +1033,7 @@ public class AttackDefenseCollector {
 
         // Find all cyber requirements, not just those declared in top-level systems
         // We are also ignoring whether or not the cyber requirement is in a mission
-        for (SystemModel system : systems.values()) {
+        for (SystemModel system : sysNameToSystemModelMap.values()) {
             for (CyberReq cyberReq : system.getCyberReqs()) {
                 Optional<ADTree> treeOpt = system.trace(cyberReq.getCondition());
                 // Crush the tree to remove redundant nodes
@@ -1059,7 +1065,7 @@ public class AttackDefenseCollector {
      * @return a map from pairs (component, defense) to implemented DAL.
      */
     public Map<Pair<String, String>, Integer> getImplDal() {
-        return Collections.unmodifiableMap(implDal != null ? implDal : new HashMap<>());
+        return Collections.unmodifiableMap(compDefenseToImplDal != null ? compDefenseToImplDal : new HashMap<>());
     }
 
     public static final class Result {
