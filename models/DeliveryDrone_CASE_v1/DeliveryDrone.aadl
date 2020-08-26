@@ -616,17 +616,17 @@ public
 
 			eq started: bool = (delivery_status <> Agree_Constants::NOT_STARTED_STATUS);
 
-			guarantee "L1: Auxiliary lemma": not Agree_Nodes::InRestrictedArea(probe_delivery_location);
-			guarantee "L2: Auxiliary lemma": probe_delivery_location = most_recent_delivery_location;
-
-			guarantee "L3: Auxiliary lemma": probe_fly_cmd => probe_delivery_location=most_recent_delivery_location;
+--			guarantee "L1: Auxiliary lemma": not Agree_Nodes::InRestrictedArea(probe_delivery_location);
+--			guarantee "L2: Auxiliary lemma": probe_delivery_location = most_recent_delivery_location;
+--
+--			guarantee "L3: Auxiliary lemma": probe_fly_cmd => probe_delivery_location=most_recent_delivery_location;
 
 			guarantee "P7: The drone never initiates packet release to an off-limits location":
 				started => not Agree_Nodes::InRestrictedArea(probe_delivery_location);
 
-			guarantee "P8: The drone issues a command to release a package only if
-					   delivery location is the most recent delivery location provided":
-				release_cmd => probe_delivery_location=most_recent_delivery_location;
+--			guarantee "P8: The drone issues a command to release a package only if
+--					   delivery location is the most recent delivery location provided":
+--				release_cmd => probe_delivery_location=most_recent_delivery_location;
 		**};
 			
 		annex verdict{**
