@@ -3,21 +3,35 @@ package com.ge.research.osate.verdict.aadl2vdm;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.DataImplementation;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.SystemType;
+import org.osate.aadl2.impl.AbstractTypeImpl;
+import org.osate.aadl2.AadlBoolean;
+import org.osate.aadl2.AadlInteger;
+import org.osate.aadl2.ModelUnit;
 
+import verdict.vdm.vdm_data.DataType;
+import verdict.vdm.vdm_data.RecordField;
+import verdict.vdm.vdm_data.RecordType;
+import verdict.vdm.vdm_data.TypeDeclaration;
 import verdict.vdm.vdm_lustre.BinaryOperation;
 import verdict.vdm.vdm_lustre.ContractItem;
 import verdict.vdm.vdm_lustre.Expression;
 import verdict.vdm.vdm_lustre.IfThenElse;
+import verdict.vdm.vdm_lustre.NodeCall;
+import verdict.vdm.vdm_lustre.NodeCall.Builder;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.Model;
 import com.rockwellcollins.atc.agree.agree.Arg;
@@ -36,6 +50,7 @@ import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
+import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
 import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
@@ -75,6 +90,8 @@ public class Agree2Vdm {
 	 *
 	 * */
 	public Model populateVDMFromAadlObjects(List<EObject> objects, Model model) {
+		HashSet<String> dataTypeDecl = new HashSet<String>();
+		HashSet<String> nodeDecl = new HashSet<String>();
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
 		// extracting data from the AADLObject
@@ -84,13 +101,15 @@ public class Agree2Vdm {
 				systemTypes.add((SystemType) obj);
 			}
 		} // end of extracting data from the AADLObjec
+		System.out.println("extracted objects of type systemtype");
 		/* Translating agree annex in System Types */
-		model = translateAgreeAnnex(systemTypes, model);
+		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
 		//return the final model
 		return model;
 	}
 	
-	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model) {
+	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
+		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
 		for(SystemType sysType : systemTypes) {
 			System.out.println("Processing systemType "+sysType.getFullName());
 			verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
@@ -118,14 +137,14 @@ public class Agree2Vdm {
 								System.out.println("########Found type EqStatement#################");
 								EqStatement eqStmt = (EqStatement)specStatement;
 								//translate EqStatement in Agree to SymbolDefinition in vdm
-								SymbolDefinition symbDef = translateEqStatement(eqStmt, model);
+								SymbolDefinition symbDef = translateEqStatement(eqStmt, model, dataTypeDecl, nodeDecl);
 								//Add agree variable/symbol definition to the contractSpec in vdm
 								contractSpec.getSymbol().add(symbDef);
 								System.out.println("########End of EqStatement processing##########");
 							} else if (specStatement instanceof GuaranteeStatement) {
 								System.out.println("########Found type GuaranteeStatement##########");
 								GuaranteeStatement guaranteeStmt = (GuaranteeStatement)specStatement;
-								ContractItem contractItem = translateGuaranteeStatement(guaranteeStmt);
+								ContractItem contractItem = translateGuaranteeStatement(guaranteeStmt,  dataTypeDecl, nodeDecl);
 								contractSpec.getGuarantee().add(contractItem);
 								System.out.println("########End of GuaranteeStatement processing####");
 							} else {
@@ -145,7 +164,7 @@ public class Agree2Vdm {
 	//method to map agree statements of the type EqStatement 
 	//that have the form: 'eq' Arg (',' Arg)* '=' Expr ';'
 	//and create corresponding "SymbolDefinition" for the "ContractSpec" in the vdm model 
-	private SymbolDefinition translateEqStatement(EqStatement eqStmt, Model model) {
+	private SymbolDefinition translateEqStatement(EqStatement eqStmt, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		SymbolDefinition symbDef = new verdict.vdm.vdm_lustre.SymbolDefinition();		
 		//get the right side/expression
 		Expr agreeExpr = eqStmt.getExpr();
@@ -158,25 +177,7 @@ public class Agree2Vdm {
 			System.out.println("Variable name:"+symbDef.getName());
 			//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
 			Type type = lhsArg.getType();
-			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-			if(type instanceof PrimType) {
-				PrimType primType = (PrimType)type;
-				verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
-				dtype.setPlainType(plaintype);
-			} else if(type instanceof DoubleDotRef) {
-				DoubleDotRef ddrefType = (DoubleDotRef)type;
-				NamedElement elm = ddrefType.getElm();
-				System.out.println(elm.getName());
-				System.out.println("DoubleDotRef Type get elm: "+ddrefType.getElm());//also of type PropertyImpl
-				//verdict.vdm.vdm_data.RecordField  recField= new verdict.vdm.vdm_data.RecordField();
-				//verdict.vdm.vdm_data.RecordType rtype = new verdict.vdm.vdm_data.RecordType();
-				//recField.setName();
-				//recField.setType();
-				//rtype.getRecordField().add(recField);
-				//dtype.setRecordType(rtype);
-			} else {
-				System.out.println("Type value is "+type.toString());
-			}
+			verdict.vdm.vdm_data.DataType dtype = translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);
 			//set type
 			symbDef.setDataType(dtype);			
 			//set the expression as the value/definition for each variable on the left
@@ -184,7 +185,85 @@ public class Agree2Vdm {
 		}
 		return symbDef;
 	}
-	private ContractItem translateGuaranteeStatement(GuaranteeStatement guaranteeStmt) {
+	private DataType translateAgreeDataTypeToVdmDataType(Type type, HashSet<String> dataTypeDecl, Model model) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(type instanceof PrimType) {
+			PrimType primType = (PrimType)type;
+			verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
+			dtype.setPlainType(plaintype);
+		} else if(type instanceof DoubleDotRef) {
+			DoubleDotRef ddrefType = (DoubleDotRef)type;
+			NamedElement ddrefTypeElm = ddrefType.getElm();
+			String ddrefTypeElmName = ddrefTypeElm.getName();
+			System.out.println("DoubleDotRef Type Elm Name: "+ddrefTypeElmName);
+			dtype.setUserDefinedType(ddrefTypeElmName);
+			//define data type in type declaration
+			if(!dataTypeDecl.contains(ddrefTypeElmName)) {
+				dataTypeDecl.add(ddrefTypeElmName);
+				TypeDeclaration dataTypeVdm = new TypeDeclaration();
+				dataTypeVdm.setName(ddrefTypeElmName);
+				DataType newDataType = new DataType();
+				RecordType recType = new RecordType();
+				if (ddrefTypeElm instanceof DataImplementation) {
+					DataImplementation elmDataImpl = (DataImplementation)ddrefTypeElm;
+					for (DataSubcomponent dataSubComp: elmDataImpl.getOwnedDataSubcomponents()) {
+						RecordField recField = new RecordField();
+						recField.setName(dataSubComp.getName());
+						DataType subCompDataType = translateAadlDataTypeToVdmDataType(dataSubComp.getDataSubcomponentType(),dataTypeDecl, model);
+						recField.setType(subCompDataType);
+						recType.getRecordField().add(recField);
+					}
+				} else {
+					System.out.println("Undefined or unmapped Data Type Definition");
+				}
+				newDataType.setRecordType(recType);
+				dataTypeVdm.setDefinition(newDataType);
+				//add the typeDeclaration to the model
+				model.getTypeDeclaration().add(dataTypeVdm);
+			}
+		} else {
+			System.out.println("Unresolved type value is "+type.toString());
+		}
+		return dtype;
+	}
+	private DataType translateAadlDataTypeToVdmDataType(DataSubcomponentType dataSubcomponentType, HashSet<String> dataTypeDecl, Model model) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if (dataSubcomponentType instanceof AbstractTypeImpl) {
+			AbstractTypeImpl abstrType = (AbstractTypeImpl)dataSubcomponentType;
+			System.out.println(abstrType.getQualifiedName());
+			//TODO: identify what the abstract type is
+			//set it appropriately in the vdm data type
+		} else if (dataSubcomponentType instanceof DataImplementation) {
+			String ddrefTypeElmName = dataSubcomponentType.getName();
+			//set the name of the type as the vdm_model_datatype name
+			dtype.setUserDefinedType(ddrefTypeElmName);
+			//define data type in type declaration if not already defined
+			if(!dataTypeDecl.contains(ddrefTypeElmName)) {
+				dataTypeDecl.add(ddrefTypeElmName);
+				TypeDeclaration dataTypeVdm = new TypeDeclaration();
+				dataTypeVdm.setName(ddrefTypeElmName);
+				DataType newDataType = new DataType();
+				RecordType recType = new RecordType();
+				//defining any undefined subcomponent types
+				DataImplementation elmDataImpl = (DataImplementation)dataSubcomponentType;
+				for (DataSubcomponent dataSubComp: elmDataImpl.getOwnedDataSubcomponents()) {
+					RecordField recField = new RecordField();
+					recField.setName(dataSubComp.getName());
+					DataType subCompDataType = translateAadlDataTypeToVdmDataType(dataSubComp.getDataSubcomponentType(),dataTypeDecl, model);
+					recField.setType(subCompDataType);
+					recType.getRecordField().add(recField);
+				}
+				newDataType.setRecordType(recType);
+				dataTypeVdm.setDefinition(newDataType);
+				//add the typeDeclaration to the model
+				model.getTypeDeclaration().add(dataTypeVdm);
+			}
+		} else {
+			System.out.println("Unresolved Subcomponent type value is "+dataSubcomponentType.getName());
+		}
+		return dtype;
+	}
+	private ContractItem translateGuaranteeStatement(GuaranteeStatement guaranteeStmt, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		ContractItem contractItem = new ContractItem();
 		contractItem.setName(guaranteeStmt.getStr());
 		System.out.println("Guarantee name: "+contractItem.getName());
@@ -216,14 +295,24 @@ public class Agree2Vdm {
 			CallExpr callExpr = (CallExpr)agreeExpr;
 			DoubleDotRef ddref = (DoubleDotRef)callExpr.getRef();
 			System.out.println("CallExprDoubleDotRef "+ddref.getElm());
-			EList<Expr> callExprArgs = callExpr.getArgs();
-			//below are the parameters passed to the function call
-			for(Expr callExprArg: callExprArgs) {
-				System.out.println("callExpr arg "+callExprArg);
-				Expression argExpr = getVdmExpressionFromAgreeExpression(callExprArg);
+			if (ddref.getElm() instanceof NodeDef) {
+				//TODO: define node
+				//create node call in vdm model				
+				Builder<Void> nodeCallBuilder = new verdict.vdm.vdm_lustre.NodeCall().newCopyBuilder();
+				//setting node name
+				nodeCallBuilder.withNodeId(ddref.getElm().getName());
+				EList<Expr> callExprArgs = callExpr.getArgs();
+				//below are the parameters passed to the function call
+				for(Expr callExprArg: callExprArgs) {
+					System.out.println("callExpr arg "+callExprArg);
+					Expression argExpr = getVdmExpressionFromAgreeExpression(callExprArg);
+					//setting node arguments
+					nodeCallBuilder.addArgument(argExpr);
+				}
+				vdmExpr.setCall(nodeCallBuilder.build());
+			} else {
+				System.out.println("Unmapped Typed");
 			}
-			//TODO: should set vdmExpr once the above function call with arguments are processed right
-			//If if it is AgreeNodes:: then Can do vdmExpr.setCall()
 		} else if(agreeExpr instanceof NamedElmExpr) {
 			System.out.println("Named Elm expr");
 			NamedElmExpr nmExpr = (NamedElmExpr)agreeExpr;
