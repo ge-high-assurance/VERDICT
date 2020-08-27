@@ -184,6 +184,7 @@ public class Agree2Vdm {
 	 *  @return a populated VDM model
 	 *
 	 * */
+
 	public Model populateVDMFromAadlAgreeObjects(List<EObject> objects, Model model) {
 		HashSet<String> dataTypeDecl = new HashSet<String>();
 		HashSet<String> nodeDecl = new HashSet<String>();
