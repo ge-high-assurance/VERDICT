@@ -23,7 +23,8 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.eclipse.jface.databinding,
  org.apache.commons.math3,
  com.rockwellcollins.atc.agree
-Import-Package: org.apache.commons.logging
+Import-Package: org.apache.commons.logging,
+ org.osate.annexsupport
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,
  com.ge.research.osate.verdict.handlers
