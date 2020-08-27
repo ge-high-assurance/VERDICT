@@ -20,7 +20,10 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+<<<<<<< HEAD
 import org.osate.aadl2.AbstractImplementation;
+=======
+>>>>>>> 88fa764b8d5623601635e8a43359d3986efd4780
 import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
 import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
@@ -41,7 +44,10 @@ import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
+<<<<<<< HEAD
 import org.osate.aadl2.DeviceImplementation;
+=======
+>>>>>>> 88fa764b8d5623601635e8a43359d3986efd4780
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;

@@ -19,9 +19,12 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.osate.aadl2,
  org.osate.ge,
  org.osate.xtext.aadl2.ui,
+<<<<<<< HEAD
  org.eclipse.core.databinding.observable,
  org.eclipse.jface.databinding,
  org.apache.commons.math3,
+=======
+>>>>>>> 88fa764b8d5623601635e8a43359d3986efd4780
  com.rockwellcollins.atc.agree
 Import-Package: org.apache.commons.logging,
  org.osate.annexsupport
