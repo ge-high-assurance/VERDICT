@@ -196,12 +196,12 @@ public class Agree2Vdm {
 				systemTypes.add((SystemType) obj);
 			}
 		} // end of extracting data from the AADLObjec
+		System.out.println("extracted objects of type systemtype");
 		/* Translating agree annex in System Types */
 		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
 		//return the final model
 		return model;
 	}
-
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
