@@ -57,6 +57,7 @@ import verdict.vdm.vdm_lustre.ContractItem;
 import verdict.vdm.vdm_lustre.Expression;
 import verdict.vdm.vdm_lustre.FieldDefinition;
 import verdict.vdm.vdm_lustre.IfThenElse;
+
 import verdict.vdm.vdm_lustre.LustreProgram;
 import verdict.vdm.vdm_lustre.Node;
 import verdict.vdm.vdm_lustre.NodeBody;
@@ -87,6 +88,7 @@ import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
 import com.rockwellcollins.atc.agree.agree.IntLitExpr;
 import com.rockwellcollins.atc.agree.agree.NamedElmExpr;
+
 import com.rockwellcollins.atc.agree.agree.NodeBodyExpr;
 import com.rockwellcollins.atc.agree.agree.NodeDef;
 import com.rockwellcollins.atc.agree.agree.NodeEq;
@@ -195,6 +197,7 @@ public class Agree2Vdm {
 				systemTypes.add((SystemType) obj);
 			}
 		} // end of extracting data from the AADLObjec
+		System.out.println("extracted objects of type systemtype");
 		/* Translating agree annex in System Types */
 		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
 		//return the final model
@@ -293,6 +296,7 @@ public class Agree2Vdm {
 		}
 		return symbDef;
 	}
+
 	private void translateAgreeDataTypeToVdmDataType(Type type, HashSet<String> dataTypeDecl, Model model) {
 		if(type instanceof DoubleDotRef) {
 			DoubleDotRef ddrefType = (DoubleDotRef)type;
