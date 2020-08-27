@@ -20,7 +20,8 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.osate.ge,
  org.osate.xtext.aadl2.ui,
  com.rockwellcollins.atc.agree
-Import-Package: org.apache.commons.logging
+Import-Package: org.apache.commons.logging,
+ org.osate.annexsupport
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,
  com.ge.research.osate.verdict.handlers

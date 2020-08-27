@@ -3,6 +3,7 @@ package com.ge.research.osate.verdict.aadl2vdm;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +15,16 @@ import javax.xml.namespace.QName;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
+import org.eclipse.xtext.util.CancelIndicator;
+import org.eclipse.xtext.validation.CheckMode;
+import org.eclipse.xtext.validation.IResourceValidator;
+import org.eclipse.xtext.validation.Issue;
 import org.osate.aadl2.AbstractSubcomponent;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
@@ -28,6 +37,7 @@ import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
@@ -55,7 +65,9 @@ import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.ReferenceValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
+import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.properties.PropertyAcc;
+import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 
 import com.ge.research.osate.verdict.dsl.VerdictUtil;
@@ -80,7 +92,23 @@ import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
+import com.rockwellcollins.atc.agree.agree.AgreeContract;
+import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
+import com.rockwellcollins.atc.agree.agree.Arg;
+import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
+import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.Expr;
+import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
+import com.rockwellcollins.atc.agree.agree.PrimType;
+import com.rockwellcollins.atc.agree.agree.SelectionExpr;
+import com.rockwellcollins.atc.agree.agree.SpecStatement;
+import com.rockwellcollins.atc.agree.agree.Type;
+import com.rockwellcollins.atc.agree.linking.AgreeLinkingService;
+import com.rockwellcollins.atc.agree.parser.antlr.AgreeParser;
 
+import verdict.vdm.vdm_lustre.Expression;
+import verdict.vdm.vdm_lustre.IfThenElse;
+import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.Model;
 
 /**
@@ -1858,16 +1886,11 @@ public class Aadl2Vdm {
 	public List<EObject> preprocessAadlFiles(File dir) {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
+		rs.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 		List<String> aadlFileNames = new ArrayList<>();
-
-		// Set scenario name
-		//scenario = dir.getName();
-
 		// Obtain all AADL files contents in the project
 		List<EObject> objects = new ArrayList<>();
-
 		List<File> dirs = collectAllDirs(dir);
-
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
@@ -1875,25 +1898,127 @@ public class Aadl2Vdm {
 				}
 			}
 		}
-
-		final Resource[] resources = new Resource[aadlFileNames.size()];
 		for (int i = 0; i < aadlFileNames.size(); i++) {
-			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
+			rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
 		}
-
 		// Load the resources
-		for (final Resource resource : resources) {
+		Map<String,Boolean> options = new HashMap<String,Boolean>();
+	    options.put(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+		for (final Resource resource : rs.getResources()) {
 			try {
-				resource.load(null);
+				EcorePlugin.ExtensionProcessor.process(null);
+				resource.load(options);
+				IResourceValidator validator = ((XtextResource) resource).getResourceServiceProvider()
+				        .getResourceValidator();
+				List<Issue> issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
+				for (Issue issue : issues) {
+				    System.out.println(issue.getMessage());
+				}
+				//EcoreUtil2.resolveAll(resource);
+				//resource.load(null);
 			} catch (final IOException e) {
 				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
 			}
 		}
-
-		// Load all objects from resources
-		for (final Resource resource : resources) {
+		//EcoreUtil2.resolveAll(rs);
+		for (final Resource resource : rs.getResources()) {
 			resource.getAllContents().forEachRemaining(objects::add);
 		}
+		/*
+		for(EObject obj : objects) {
+			if (obj instanceof SystemType) {
+				//obtaining system Types
+				SystemType sysType = (SystemType) obj;
+				// unpacking sysType
+				for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {				
+					if(annex.getName().equalsIgnoreCase("agree")) {
+						//annex is of type DefaultAnnexSubclause
+						DefaultAnnexSubclause ddASC=(DefaultAnnexSubclause)annex;
+						//AnnexSubclause aSC = ddASC.getParsedAnnexSubclause();
+						AgreeContractSubclause agreeAnnex= (AgreeContractSubclause)ddASC.getParsedAnnexSubclause();
+						System.out.println("Processing Agree Annex of the system ");
+						EList<EObject> annexContents= agreeAnnex.eContents();
+						for(EObject clause : annexContents) {
+							//mapping to AgreeContractclause
+							AgreeContract agreeContract = (AgreeContract)clause;						
+							//getting specStatements
+							EList<SpecStatement> specStatements = agreeContract.getSpecs();
+							for(SpecStatement specStatement : specStatements) {
+								if (specStatement instanceof EqStatement) {
+									System.out.println("########Found type EqStatement#################");
+									EqStatement eqStmt = (EqStatement)specStatement;
+									System.out.println(eqStmt.getLhs().get(0));
+									Expr agreeExpr = eqStmt.getExpr();
+									if(agreeExpr instanceof IfThenElseExpr) {			
+										IfThenElseExpr ifexpr = (IfThenElseExpr)agreeExpr;
+										System.out.println("If then else expr...Processing then branch");
+										Expr b = ifexpr.getB();
+										if(b instanceof SelectionExpr) {
+											System.out.println("Selection expr");
+											SelectionExpr selExpr = (SelectionExpr)b;
+											if(selExpr.getField()!=null) {
+												System.out.println("Selection Expr field: "+selExpr.getField());
+												if (selExpr.getField() instanceof Property) {
+													Property selProp = (Property)selExpr.getField();
+													if(selProp.getName()!=null) {
+														System.out.println("selProp_name: "+selProp.getName());
+													}
+													if (selProp.getType()!=null) {
+														System.out.println("selProp_type: "+selProp.getType());
+													}
+													if (!selProp.getAppliesTos().isEmpty()) {
+														System.out.println("selProp_appliesto: "+selProp.getAppliesTos());
+													}
+												}
+											}
+											System.out.println("Selection Expr target: "+selExpr.getTarget());
+										}
+									}
+									if(agreeExpr instanceof SelectionExpr) {
+										System.out.println("Selection expr");
+										SelectionExpr selExpr = (SelectionExpr)agreeExpr;
+										if(selExpr.getField()!=null) {
+											System.out.println("Selection Expr field: "+selExpr.getField());
+											if (selExpr.getField() instanceof Property) {
+												Property selProp = (Property)selExpr.getField();
+												if(selProp.getName()!=null) {
+													System.out.println("selProp_name: "+selProp.getName());
+												}
+												if (selProp.getType()!=null) {
+													System.out.println("selProp_type: "+selProp.getType());
+												}
+												if (!selProp.getAppliesTos().isEmpty()) {
+													System.out.println("selProp_appliesto: "+selProp.getAppliesTos());
+												}
+											}
+										}
+										System.out.println("Selection Expr target: "+selExpr.getTarget());
+									}
+									//get left side of the equation
+									EList<Arg> lhsArgs = eqStmt.getLhs();		
+									for(Arg lhsArg : lhsArgs) {//left side has the variable names along with their types
+										//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
+										Type type = lhsArg.getType();
+										if(type instanceof PrimType) {
+										} else if(type instanceof DoubleDotRef) {
+											DoubleDotRef ddrefType = (DoubleDotRef)type;
+											NamedElement elm = ddrefType.getElm();
+											System.out.println(elm.getName());
+											System.out.println("DoubleDotRef Type get elm: "+ddrefType.getElm());//also of type PropertyImpl
+										} else {
+											System.out.println("Type value is "+type.toString());
+										}
+									}
+									System.out.println("########End of EqStatement processing##########");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		System.out.println("returning objects");
+		*/
 		return objects;
 	}
 
