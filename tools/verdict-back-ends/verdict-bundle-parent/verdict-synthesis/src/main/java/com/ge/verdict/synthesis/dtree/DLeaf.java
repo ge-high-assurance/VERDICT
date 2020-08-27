@@ -331,11 +331,11 @@ public class DLeaf implements DTree {
         // construct each cost
         Fraction[] costs = new Fraction[10];
         for (int dal = 0; dal < costs.length; dal++) {
-            Fraction targetCost = costModel.cost(defenseProperty, component, dal);
+            Fraction currentDALCost = costModel.cost(defenseProperty, component, dal);
             if (usePartialSolution && !meritAssignment) {
                 // in the partial solutions (but no merit assignment) case, we treat
                 // implemented defenses as a sunk cost
-                Fraction difference = targetCost.subtract(implCost);
+                Fraction difference = currentDALCost.subtract(implCost);
                 if (difference.compareTo(new Fraction(0)) > 0) {
                     costs[dal] = difference;
                 } else {
@@ -343,7 +343,7 @@ public class DLeaf implements DTree {
                     costs[dal] = new Fraction(0);
                 }
             } else {
-                costs[dal] = targetCost;
+                costs[dal] = currentDALCost;
             }
         }
 

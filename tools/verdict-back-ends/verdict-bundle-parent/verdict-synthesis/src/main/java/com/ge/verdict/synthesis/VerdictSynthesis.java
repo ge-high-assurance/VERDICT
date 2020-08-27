@@ -66,15 +66,20 @@ public class VerdictSynthesis {
                         + ", meritAssignment="
                         + meritAssignment);
 
-        Collection<ComponentDefense> pairs = factory.allComponentDefensePairs();
+        Collection<ComponentDefense> compDefPairs = factory.allComponentDefensePairs();
 
+        // Encode the logical structure of defense tree in MaxSMT
+        // Encode cost(impl_defense_dal) >= the target cost (based on the severity of cyber req)
+        // With merit assignment off and partial solution on, you will 
+        // subtract the cost of each DAL by the impl DAL cost, and use 0 if the result is negative.
         optimizer.Assert(tree.toZ3Multi(context));
 
         if (meritAssignment) {
             // set upper bounds at the current values, so that no upgrades are reported
+        	// Encode component_defense_var <= the the implemented DAL cost
             optimizer.Assert(
                     context.mkAnd(
-                            pairs.stream()
+                            compDefPairs.stream()
                                     .map(
                                             pair ->
                                                     context.mkLe(
@@ -86,13 +91,14 @@ public class VerdictSynthesis {
                                     .toArray(new BoolExpr[] {})));
         }
 
+        // Make all component-defense var >= Cost(DAL(0));
         optimizer.Assert(
                 // This assumes that DAL 0 is the smallest cost. Which will be true if
                 // the cost function is monotone with respect to DAL, which it should be.
                 // If for whatever reason we want to support non-monotone cost with respect
                 // to DAL, then this can be changed to the minimum of all costs.
                 context.mkAnd(
-                        pairs.stream()
+                        compDefPairs.stream()
                                 .map(
                                         pair ->
                                                 context.mkGe(
@@ -103,12 +109,13 @@ public class VerdictSynthesis {
                                 .toArray(new BoolExpr[] {})));
 
         // we can't make an empty add
-        if (pairs.isEmpty()) {
+        // Encode objective function: the sum of all component-defense vars
+        if (compDefPairs.isEmpty()) {
             optimizer.MkMinimize(context.mkInt(0));
         } else {
             optimizer.MkMinimize(
                     context.mkAdd(
-                            pairs.stream()
+                            compDefPairs.stream()
                                     .map(pair -> pair.toZ3Multi(context))
                                     .collect(Collectors.toList())
                                     .toArray(new ArithExpr[] {})));
@@ -131,7 +138,7 @@ public class VerdictSynthesis {
             List<ResultsInstance.Item> items = new ArrayList<>();
             Fraction totalInputCost = new Fraction(0), totalOutputCost = new Fraction(0);
             Model model = optimizer.getModel();
-            for (ComponentDefense pair : pairs) {
+            for (ComponentDefense pair : compDefPairs) {
                 // get the value in the model
                 RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
                 Fraction rawCost =
@@ -141,8 +148,10 @@ public class VerdictSynthesis {
 
                 // but we don't trust the cost obtained directly from the model.
                 // instead, we re-calculate using the cost model because it is less prone to failure
+                // The cost of implemented DAL
                 Fraction inputCost =
                         costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
+                // The cost of output DAL from SMT
                 Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
 
                 // keep track of total cost
