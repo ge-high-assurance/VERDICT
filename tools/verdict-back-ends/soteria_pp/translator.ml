@@ -356,8 +356,8 @@ let formulaSafe name coutputs cinputs cevents l_comp_saf iaList =
 (* - * - * - *)
 
 (* from l_arch we get lib component names, lib component inputs & outputs, mdl instances, mdl connections *)
-let (connName_Arc,     srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
-    ("ConnectionName", "SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
+let (connName_Arc,     comp_Arc, impl_Arc, srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
+    ("ConnectionName", "Comp",   "Impl",   "SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
 
 let compInputArch name l_arch = (* by design, lib component inputs are all DestComp DestPortNames *)
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
@@ -1242,13 +1242,13 @@ let rec removeMissionsWithNoReq l_librariesThreats =
 (* *)
 
        
-(* function to rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+(* function to rename the "ConnectionName" so that it is a concatenation of <ConnectionName><Impl><Comp> *)
 let renameConnectionName l_arch =
    List.map l_arch ~f:(fun aL ->
       let connName = List.Assoc.find_exn aL ~equal:(=) connName_Arc
-      and srcImpl = List.Assoc.find_exn aL ~equal:(=) srcImpl_Arc
-      and srcComp = List.Assoc.find_exn aL ~equal:(=) srcType_Arc in
-      let newConnName = connName ^ srcImpl ^ srcComp in
+      and impl = List.Assoc.find_exn aL ~equal:(=) impl_Arc
+      and comp = List.Assoc.find_exn aL ~equal:(=) comp_Arc in
+      let newConnName = connName ^ impl ^ comp in
       (connName_Arc, newConnName)::(List.filter aL ~f:(fun (tag, _) -> tag<>connName_Arc)) );;
        
 
@@ -1258,7 +1258,7 @@ let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch even
    and compSafe     = mainListtag comp_saf_ch
    and attack       = mainListtag attack_ch    
    and events       = mainListtag events_ch 
-   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><Impl><Comp> *)
    and mission      = mainListtag mission_ch 
    and defense      = mainListtag defense_ch 
    and defense2nist = mainListtag defense2nist_ch in
