@@ -32,6 +32,7 @@ import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
+
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.SystemType;
