@@ -4144,6 +4144,7 @@ public class Aadl2Vdm {
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
+					System.out.println(file.getAbsolutePath());
 					aadlFileNames.add(file.getAbsolutePath());
 				}
 			}
@@ -4151,12 +4152,17 @@ public class Aadl2Vdm {
 		for (int i = 0; i < aadlFileNames.size(); i++) {
 			rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
 		}
+		EcorePlugin.ExtensionProcessor.process(null);
+		//getting aadl imported files
+		final List<URI> contributed = PluginSupportUtil.getContributedAadl();
+		for (final URI uri : contributed) {
+			rs.getResource(uri, true);
+		}
 		// Load the resources
 		Map<String,Boolean> options = new HashMap<String,Boolean>();
 	    options.put(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 		for (final Resource resource : rs.getResources()) {
 			try {
-				EcorePlugin.ExtensionProcessor.process(null);
 				resource.load(options);
 				IResourceValidator validator = ((XtextResource) resource).getResourceServiceProvider()
 				        .getResourceValidator();
@@ -4174,101 +4180,6 @@ public class Aadl2Vdm {
 		for (final Resource resource : rs.getResources()) {
 			resource.getAllContents().forEachRemaining(objects::add);
 		}
-		/*
-		for(EObject obj : objects) {
-			if (obj instanceof SystemType) {
-				//obtaining system Types
-				SystemType sysType = (SystemType) obj;
-				// unpacking sysType
-				for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {				
-					if(annex.getName().equalsIgnoreCase("agree")) {
-						//annex is of type DefaultAnnexSubclause
-						DefaultAnnexSubclause ddASC=(DefaultAnnexSubclause)annex;
-						//AnnexSubclause aSC = ddASC.getParsedAnnexSubclause();
-						AgreeContractSubclause agreeAnnex= (AgreeContractSubclause)ddASC.getParsedAnnexSubclause();
-						System.out.println("Processing Agree Annex of the system ");
-						EList<EObject> annexContents= agreeAnnex.eContents();
-						for(EObject clause : annexContents) {
-							//mapping to AgreeContractclause
-							AgreeContract agreeContract = (AgreeContract)clause;						
-							//getting specStatements
-							EList<SpecStatement> specStatements = agreeContract.getSpecs();
-							for(SpecStatement specStatement : specStatements) {
-								if (specStatement instanceof EqStatement) {
-									System.out.println("########Found type EqStatement#################");
-									EqStatement eqStmt = (EqStatement)specStatement;
-									System.out.println(eqStmt.getLhs().get(0));
-									Expr agreeExpr = eqStmt.getExpr();
-									if(agreeExpr instanceof IfThenElseExpr) {			
-										IfThenElseExpr ifexpr = (IfThenElseExpr)agreeExpr;
-										System.out.println("If then else expr...Processing then branch");
-										Expr b = ifexpr.getB();
-										if(b instanceof SelectionExpr) {
-											System.out.println("Selection expr");
-											SelectionExpr selExpr = (SelectionExpr)b;
-											if(selExpr.getField()!=null) {
-												System.out.println("Selection Expr field: "+selExpr.getField());
-												if (selExpr.getField() instanceof Property) {
-													Property selProp = (Property)selExpr.getField();
-													if(selProp.getName()!=null) {
-														System.out.println("selProp_name: "+selProp.getName());
-													}
-													if (selProp.getType()!=null) {
-														System.out.println("selProp_type: "+selProp.getType());
-													}
-													if (!selProp.getAppliesTos().isEmpty()) {
-														System.out.println("selProp_appliesto: "+selProp.getAppliesTos());
-													}
-												}
-											}
-											System.out.println("Selection Expr target: "+selExpr.getTarget());
-										}
-									}
-									if(agreeExpr instanceof SelectionExpr) {
-										System.out.println("Selection expr");
-										SelectionExpr selExpr = (SelectionExpr)agreeExpr;
-										if(selExpr.getField()!=null) {
-											System.out.println("Selection Expr field: "+selExpr.getField());
-											if (selExpr.getField() instanceof Property) {
-												Property selProp = (Property)selExpr.getField();
-												if(selProp.getName()!=null) {
-													System.out.println("selProp_name: "+selProp.getName());
-												}
-												if (selProp.getType()!=null) {
-													System.out.println("selProp_type: "+selProp.getType());
-												}
-												if (!selProp.getAppliesTos().isEmpty()) {
-													System.out.println("selProp_appliesto: "+selProp.getAppliesTos());
-												}
-											}
-										}
-										System.out.println("Selection Expr target: "+selExpr.getTarget());
-									}
-									//get left side of the equation
-									EList<Arg> lhsArgs = eqStmt.getLhs();		
-									for(Arg lhsArg : lhsArgs) {//left side has the variable names along with their types
-										//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
-										Type type = lhsArg.getType();
-										if(type instanceof PrimType) {
-										} else if(type instanceof DoubleDotRef) {
-											DoubleDotRef ddrefType = (DoubleDotRef)type;
-											NamedElement elm = ddrefType.getElm();
-											System.out.println(elm.getName());
-											System.out.println("DoubleDotRef Type get elm: "+ddrefType.getElm());//also of type PropertyImpl
-										} else {
-											System.out.println("Type value is "+type.toString());
-										}
-									}
-									System.out.println("########End of EqStatement processing##########");
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		System.out.println("returning objects");
-		*/
 		return objects;
 	}
 
