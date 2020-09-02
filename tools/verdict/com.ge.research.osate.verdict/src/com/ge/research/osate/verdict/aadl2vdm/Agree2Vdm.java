@@ -16,8 +16,10 @@ import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.SystemType;
 import org.osate.aadl2.impl.AbstractTypeImpl;
+import org.osate.aadl2.impl.DataTypeImpl;
 import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
 import org.osate.aadl2.ModelUnit;
@@ -193,73 +195,83 @@ public class Agree2Vdm {
 			dtype.setPlainType(plaintype);
 		} else if(type instanceof DoubleDotRef) {
 			DoubleDotRef ddrefType = (DoubleDotRef)type;
-			NamedElement ddrefTypeElm = ddrefType.getElm();
-			String ddrefTypeElmName = ddrefTypeElm.getName();
-			System.out.println("DoubleDotRef Type Elm Name: "+ddrefTypeElmName);
-			dtype.setUserDefinedType(ddrefTypeElmName);
-			//define data type in type declaration
-			if(!dataTypeDecl.contains(ddrefTypeElmName)) {
-				dataTypeDecl.add(ddrefTypeElmName);
-				TypeDeclaration dataTypeVdm = new TypeDeclaration();
-				dataTypeVdm.setName(ddrefTypeElmName);
-				DataType newDataType = new DataType();
-				RecordType recType = new RecordType();
-				if (ddrefTypeElm instanceof DataImplementation) {
-					DataImplementation elmDataImpl = (DataImplementation)ddrefTypeElm;
-					for (DataSubcomponent dataSubComp: elmDataImpl.getOwnedDataSubcomponents()) {
-						RecordField recField = new RecordField();
-						recField.setName(dataSubComp.getName());
-						DataType subCompDataType = translateAadlDataTypeToVdmDataType(dataSubComp.getDataSubcomponentType(),dataTypeDecl, model);
-						recField.setType(subCompDataType);
-						recType.getRecordField().add(recField);
-					}
-				} else {
-					System.out.println("Undefined or unmapped Data Type Definition");
-				}
-				newDataType.setRecordType(recType);
-				dataTypeVdm.setDefinition(newDataType);
-				//add the typeDeclaration to the model
-				model.getTypeDeclaration().add(dataTypeVdm);
+			if (ddrefType.getElm() instanceof DataImplementation) {//if it is a AADL data implementation definition
+				DataImplementation dataImplementationImpl = (DataImplementation)ddrefType.getElm();
+				dtype = resolveAADLDataImplementationType(dataImplementationImpl,dataTypeDecl,model);	
+			} else if (ddrefType.getElm() instanceof org.osate.aadl2.DataType) {//if it is a AADL data implementation definition
+				org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)ddrefType.getElm();
+				dtype = resolveAADLDataType(aadlDataType,dataTypeDecl,model);	
+			} else {
+				System.out.println("Unresolved data type "+ddrefType.getElm().getName()+" in doubledotref. Not AADL DataImplementation or DataType type.");
 			}
 		} else {
 			System.out.println("Unresolved type value is "+type.toString());
 		}
 		return dtype;
 	}
-	private DataType translateAadlDataTypeToVdmDataType(DataSubcomponentType dataSubcomponentType, HashSet<String> dataTypeDecl, Model model) {
+	private verdict.vdm.vdm_data.DataType resolveAADLDataImplementationType(DataImplementation dataImplementationImpl, HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if (dataSubcomponentType instanceof AbstractTypeImpl) {
-			AbstractTypeImpl abstrType = (AbstractTypeImpl)dataSubcomponentType;
-			System.out.println(abstrType.getQualifiedName());
-			//TODO: identify what the abstract type is
-			//set it appropriately in the vdm data type
-		} else if (dataSubcomponentType instanceof DataImplementation) {
-			String ddrefTypeElmName = dataSubcomponentType.getName();
-			//set the name of the type as the vdm_model_datatype name
-			dtype.setUserDefinedType(ddrefTypeElmName);
-			//define data type in type declaration if not already defined
-			if(!dataTypeDecl.contains(ddrefTypeElmName)) {
-				dataTypeDecl.add(ddrefTypeElmName);
-				TypeDeclaration dataTypeVdm = new TypeDeclaration();
-				dataTypeVdm.setName(ddrefTypeElmName);
-				DataType newDataType = new DataType();
-				RecordType recType = new RecordType();
-				//defining any undefined subcomponent types
-				DataImplementation elmDataImpl = (DataImplementation)dataSubcomponentType;
-				for (DataSubcomponent dataSubComp: elmDataImpl.getOwnedDataSubcomponents()) {
-					RecordField recField = new RecordField();
-					recField.setName(dataSubComp.getName());
-					DataType subCompDataType = translateAadlDataTypeToVdmDataType(dataSubComp.getDataSubcomponentType(),dataTypeDecl, model);
-					recField.setType(subCompDataType);
-					recType.getRecordField().add(recField);
+		//GET DETAILS OF THE DATA IMPLEMENTATION AND CREATE CORRESPONDING VDM DATATYPE
+		EList<DataSubcomponent> subcomponents= dataImplementationImpl.getOwnedDataSubcomponents();
+		if(!subcomponents.isEmpty()) {//if the dataType definition has subcomponents
+			RecordType recType = new RecordType();
+			for (DataSubcomponent dataSubComp: subcomponents) {
+				RecordField recField = new RecordField();
+				recField.setName(dataSubComp.getName());
+				DataSubcomponentType dataSubCompType = dataSubComp.getDataSubcomponentType();
+				if (dataSubCompType instanceof org.osate.aadl2.DataType){
+					org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)dataSubCompType;
+					recField.setType(resolveAADLDataType(aadlDataType,dataTypeDecl,model));	
+				} else if (dataSubCompType instanceof DataImplementation){
+					DataImplementation dataSubCompDataImplementationImpl = (DataImplementation)dataSubCompType;
+					recField.setType(resolveAADLDataImplementationType(dataSubCompDataImplementationImpl, dataTypeDecl, model));	
+				} else {
+					System.out.println("Data Subcomponent is not of DataTypeImpl or DataImplementatioImpl.");
 				}
-				newDataType.setRecordType(recType);
-				dataTypeVdm.setDefinition(newDataType);
-				//add the typeDeclaration to the model
-				model.getTypeDeclaration().add(dataTypeVdm);
+				recType.getRecordField().add(recField);
 			}
+			dtype.setRecordType(recType);
+		} else { //if the dataType is base type boolean or integer or char or string
+			System.out.println("Unexpected data implementation type with no subcomponents");
+		}
+		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+		String dataImplementationName = dataImplementationImpl.getName();
+		if(!dataTypeDecl.contains(dataImplementationName)) {
+			dataTypeDecl.add(dataImplementationName);
+			//vdm data type declaration
+			TypeDeclaration dataTypeVdm = new TypeDeclaration();
+			dataTypeVdm.setName(dataImplementationName);
+			dataTypeVdm.setDefinition(dtype);
+			//add the typeDeclaration to the model
+			model.getTypeDeclaration().add(dataTypeVdm);
+		}
+		return dtype;
+	}
+	private DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, HashSet<String> dataTypeDecl, Model model) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(aadlDataType.getName().contentEquals("Float")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
+		} else if(aadlDataType.getName().contentEquals("Integer")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
+		} else if(aadlDataType.getName().contentEquals("Boolean")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
+		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+			EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
+			//TODO:set corresponding VDM type
 		} else {
-			System.out.println("Unresolved Subcomponent type value is "+dataSubcomponentType.getName());
+			System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
+			//TODO: mapping for aadl string base type -- should find corresponding type in vdm model
+		}
+		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+		String aadlDataTypeName = aadlDataType.getName();
+		if(!dataTypeDecl.contains(aadlDataTypeName)) {
+			dataTypeDecl.add(aadlDataTypeName);
+			//vdm data type declaration
+			TypeDeclaration dataTypeVdm = new TypeDeclaration();
+			dataTypeVdm.setName(aadlDataTypeName);
+			dataTypeVdm.setDefinition(dtype);
+			//add the typeDeclaration to the model
+			model.getTypeDeclaration().add(dataTypeVdm);
 		}
 		return dtype;
 	}
