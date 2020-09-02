@@ -801,10 +801,11 @@ let gen_ConnComp name defType l_attack l_defense ciaList =
 	genComp (*name*)            name 
 			(*input_flows*)     cinputs  (* <-- always 1 input called "in" *)
 			(*output_flows*)    coutputs (* <-- always 1 output called "out" *)
-			(*faults*)          [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*faults*)          ["Integrity";"Availability"]
 			(*basic_events*)    [ ]      (* <-- nothing to do with safety; leave empty *)
 			(*event_info*)      [ ]      (* <-- nothing to do with safety; leave empty *)
-			(*fault_formulas*)  [ ]      (* <-- nothing to do with safety; leave empty *)
+         (*fault_formulas*)  [(["out"; "Integrity";],Or[F["in";"Integrity"]]);
+                              (["out"; "Availability"], Or[F["in";"Availability"]]) ] (* <-- pass through formulas *)
 			(*attacks*)         ciaList 
 			(*attack_events*)   attacksList 
 			(*attack_info*)     infoList    
@@ -905,7 +906,7 @@ let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_d
     let rType = compReqType reqId l_mission in
     match rType with
     | "Cyber" -> List.append (connComponent::components) [gen_CompMission reqId l_mission]
-    | "Safety" -> List.append components [gen_CompSafety reqId l_mission]
+    | "Safety" -> List.append (connComponent::components) [gen_CompSafety reqId l_mission]
     | _ -> raise (Error_csv2soteria "gen_library exception: req is neither CyberReq nor SafetyReq");;
 
 
