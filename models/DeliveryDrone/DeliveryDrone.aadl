@@ -9,130 +9,6 @@ public
 	with CASE_Consolidated_Properties;
 	with GNC;
 
-	system PositionEstimator 
-		features
-			-- inputs
-			gps_pos: in data port Data_Types::Position.impl;
-			imu_pos: in data port Data_Types::Position.impl;	
-			pos_act_in: in data port Data_Types::Position.impl;
-			
-			-- outputs
-			est_pos: out data port Data_Types::Position.impl;
-		
-		annex agree {**
-			-- high-level specification
-			guarantee "Output: est_pos": Agree_Nodes::close_locations(est_pos, gps_pos);	
-		**};
-		
-		annex verdict {**
-			CyberRel "pos_out_I" = imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
-			CyberRel "pos_out_A" = imu_pos:A or gps_pos:A or pos_act_in:A => est_pos:A;
-			Event {
-				id = "loa_event"
-				probability = 1.0e-8
-				comment = "loss of availability of the PositionEstimator"
-				description = "LOA"
-			}
-			Event {
-				id = "ued_event"
-				probability = 1.0e-9
-				comment = "undetected erroneous data of the PositionEstimator"
-				description = "UED"
-			}
-			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos:A or gps_pos:A) or pos_act_in:A => est_pos:A;
---			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos:A and gps_pos:A) or pos_act_in:A => est_pos:A;
-			SafetyRel "pos_out_UED" = happens("ued_event") or imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
-		**};
-	end PositionEstimator;
-
-	system Navigation
-		features
-			-- inputs
-			est_pos: in data port Data_Types::Position.impl; 
-			dest_pos: in data port Data_Types::Position.impl;
-			cmd: in data port Base_Types::Boolean;
-			flight_control_state: in data port Base_Types::Boolean;
-			
-			-- outputs
-			move: out data port Base_Types::Boolean;				
-			cur_pos: out data port Data_Types::Position.impl;
-			pos_act_out: out data port Data_Types::Position.impl;
-			probe_dest_pos: out data port Data_Types::Position.impl
-			{CASE_Consolidated_Properties::probe => true; };
-			
-		annex agree {**
-			-- high-level specification
-					
-			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
-				Agree_Nodes::close_locations(cur_pos, est_pos);
-			
-			guarantee "Output: move":
-				move = cmd;
-			
-			-- probe outputs
-			guarantee "Output: probe_dest_pos": probe_dest_pos = dest_pos;
-		**};
-		
-		annex verdict {**
-			CyberRel "move_out_I"         = est_pos:I or cmd:I or flight_control_state:I => move:I;
-			CyberRel "move_out_A"         = est_pos:A or cmd:A or flight_control_state:A => move:A;
-			CyberRel "nav_location_out_I" = est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
-			CyberRel "nav_location_out_A" = est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
-			CyberRel "pos_act_out_I"      = est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
-			CyberRel "pos_act_out_A"      = est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
-			Event {
-				id = "loa_event"
-				probability = 1.0e-8
-				comment = "loss of availability of the Navigator"
-				description = "LOA"
-			}
-			Event {
-				id = "ued_event"
-				probability = 1.0e-9
-				comment = "undetected erroneous data of the Navigator"
-				description = "UED"
-			}
-			SafetyRel "move_out_LOA"         = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => move:A;
-			SafetyRel "move_out_UED"         = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => move:I;
-			SafetyRel "nav_location_out_LOA" = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
-			SafetyRel "nav_location_out_UED" = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
-			SafetyRel "pos_act_out_LOA"      = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
-			SafetyRel "pos_act_out_UED"      = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
-		**};
-	end Navigation;
-	
-	system FlightControl
-		features
-			-- inputs
-			actuation_response: in data port Base_Types::Boolean;
-			move: in data port Base_Types::Boolean;
-			
-			-- outputs
-			motor_cmd: out data port Base_Types::Boolean;
-			fc_state: out data port Base_Types::Boolean;
-		
-		annex verdict {**
-			CyberRel "state_out_I"  = move:I or actuation_response:I => fc_state:I;
-			CyberRel "state_out_A"  = move:A or actuation_response:A => fc_state:A;
-			CyberRel "fc_cmd_out_I" = move:I or actuation_response:I => motor_cmd:I;
-			CyberRel "fc_cmd_out_A" = move:A or actuation_response:A => motor_cmd:A;
-			Event {
-				id = "loa_event"
-				probability = 1.0e-8
-				comment = "loss of availability of the FlightControl"
-				description = "LOA"
-			}
-			Event {
-				id = "ued_event"
-				probability = 1.0e-9
-				comment = "undetected erroneous data of the FlightControl"
-				description = "UED"
-			}
-			SafetyRel "motor_out_LOA" = happens("loa_event") or actuation_response:A or move:A => motor_cmd:A;
-			SafetyRel "motor_out_UED" = happens("ued_event") or actuation_response:I or move:I => motor_cmd:I;
-		**};
-	end FlightControl;
-	
 	system Actuation
 		features
 			-- inputs
@@ -452,20 +328,6 @@ public
 		annex verdict {**
 			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
 			CyberRel "camera_out_A" = camera_in:A => camera_out:A;
-			Event {
-				id = "loa_event"
-				probability = 1.0e-8
-				comment = "loss of availability of the Camera"
-				description = "LOA"
-			}
-			Event {
-				id = "ued_event"
-				probability = 1.0e-9
-				comment = "undetected erroneous data of the Camera"
-				description = "UED"
-			}
-			SafetyRel "camera_out_UED" = happens("ued_event") or camera_in:I => camera_out:I;
-			SafetyRel "camera_out_LOA" = happens("loa_event") or camera_in:A => camera_out:A;
 		**};		
 	end Camera;
 			
@@ -605,37 +467,27 @@ public
 			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
 			condition = delivery_status:I 
 			cia = I
-			severity = Hazardous
+			severity = Major
 			};
-			SafetyReq {
-			id = "SafetyReq01"
-			description = "Loss of actuation shall be less than 1e-7 pfh" 
-			condition = actuation_out:A
-			targetProbability = 1e-07
-		    	};	
-			SafetyReq {
-			id = "SafetyReq02"
-			description = "Delivery Item Mechanism is reliable, where an undetected erroneous command shall be less than 1e-7 pfh" 
-			condition = delivery_status:I 
-			targetProbability = 1e-07 
-		    	};	
 	    	MissionReq {
 		    	id ="MReq01"
 		    	description = "Deliver a package to the intended location."
-		    	reqs = "CyberReq01","CyberReq02","SafetyReq01"
+		    	reqs = "CyberReq01","CyberReq02"
 	    	};
-	    	MissionReq {
-		    	id ="MReq02"
-		    	description = "Reliability "
-		    	reqs =  "SafetyReq02"
-	    	};	    	
 		**};
 	end DeliveryDroneSystem;
 	
 	system implementation DeliveryDroneSystem.Impl
 		subcomponents
-			gnc: system GNC::GNC.Impl;
-			
+			gnc: system GNC::GNC.Impl
+			{
+			 	-- VERDICT Component Properties
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true; --NOTE: this system may contain Waypoints
+				CASE_Consolidated_Properties::canReceiveSWUpdate => false;
+			};
 			radio: system Radio
 			{
 				-- VERDICT Component Properties
@@ -660,77 +512,6 @@ public
 				CASE_Consolidated_Properties::systemAccessControl => 7;	
 							
 			};
-			positionEstimator: system PositionEstimator
-			{
-				-- VERDICT Component Properties
-				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
-				CASE_Consolidated_Properties::componentType => Software;
-				CASE_Consolidated_Properties::hasSensitiveInfo => true;
-				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => COTS; 
-
-		
-				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
-				--CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				
-				CASE_Consolidated_Properties::antiJamming => 7;
-				CASE_Consolidated_Properties::dosProtection => 7;
-				CASE_Consolidated_Properties::failsafe =>7;
-				CASE_Consolidated_Properties::heterogeneity =>7;
-				CASE_Consolidated_Properties::inputValidation => 7;
-				CASE_Consolidated_Properties::logging =>7;
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::RemoteAttestation => 7;
-				CASE_Consolidated_Properties::resourceAvailability => 7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
-				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-
-				
-			};
-			navigation: system Navigation
-			{
-				-- VERDICT Component Properties
-				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
-				CASE_Consolidated_Properties::componentType => Software;
-				CASE_Consolidated_Properties::hasSensitiveInfo => true;
-				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
-
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::remoteAttestation =>7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-
-			};
-			fc: system FlightControl
-			{
-				-- VERDICT Component Properties
-				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
-				CASE_Consolidated_Properties::componentType => Software;
-				CASE_Consolidated_Properties::hasSensitiveInfo => true;
-				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
-
-				
-				-- VERDICT Cyber Defense and DAL Mitigations
-				CASE_Consolidated_Properties::memoryProtection => 7;
-				CASE_Consolidated_Properties::physicalAccessControl => 7;
-				CASE_Consolidated_Properties::remoteAttestation =>7;
-				CASE_Consolidated_Properties::secureBoot => 7;
-				CASE_Consolidated_Properties::supplyChainSecurity => 7;
-				CASE_Consolidated_Properties::systemAccessControl => 7;
-
-			};
 			actuation: system Actuation
 			{
 				-- VERDICT Component Properties
@@ -747,13 +528,18 @@ public
 			};
 			deliveryPlanner: system DeliveryPlanner
 			{	
-			 	-- VERDICT Component Properties
-				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
-				CASE_Consolidated_Properties::componentType => Software;
-				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				-- VERDICT Component Properties
 				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => Sourced;
-				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				CASE_Consolidated_Properties::componentType => Hybrid; -- this is default value
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+
+--			 	-- VERDICT Component Properties
+--				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+--				CASE_Consolidated_Properties::componentType => Software;
+--				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+--				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+--				CASE_Consolidated_Properties::pedigree => Sourced;
+--				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
 				
 	
 			
@@ -796,8 +582,7 @@ public
 				CASE_Consolidated_Properties::componentType => Hardware;
 				CASE_Consolidated_Properties::hasSensitiveInfo => true;
 				CASE_Consolidated_Properties::insideTrustedBoundary => true;
-				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
-				
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;					
 				
 				-- VERDICT Cyber Defense and DAL Mitigations
 				CASE_Consolidated_Properties::physicalAccessControl => 7;
@@ -817,24 +602,13 @@ public
 			};
 
 		connections
-			c1: port positionEstimator.est_pos -> navigation.est_pos
-			{CASE_Consolidated_Properties::connectionType => Trusted;
-			CASE_Consolidated_Properties::encryptedTransmission => 6;
-			};
-			
 			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
-			c2: port navigation.move -> fc.move
-			{CASE_Consolidated_Properties::connectionType => Trusted;};
-
-			c3: port fc.fc_state -> navigation.flight_control_state
+			c4: port deliveryPlanner.dest_location -> gnc.navigation_dest_pos
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
-			c4: port deliveryPlanner.dest_location -> navigation.dest_pos
-			{CASE_Consolidated_Properties::connectionType => Trusted;};
-			
-			c5: port navigation.cur_pos -> deliveryPlanner.cur_pos
+			c5: port gnc.navigation_cur_pos -> deliveryPlanner.cur_pos
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			
@@ -849,12 +623,6 @@ public
 			
 			c11: port radio.radio_out -> deliveryPlanner.radio_response
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
-			
-			c12: port gnc.gps_pos -> positionEstimator.gps_pos
-			{
-			CASE_Consolidated_Properties::connectionType => Trusted;
-			--CASE_Consolidated_Properties::connectionType => Untrusted;
-			};
 			
 			c14a: port bus1 -> connector.bus_in
 			{CASE_Consolidated_Properties::connectionType => Untrusted;};
@@ -876,13 +644,13 @@ public
 			c17: port radio.comm_out -> comm2
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
-			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
+--			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
+--			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c19: port gnc.fc_motor_cmd -> actuation.motor_cmd
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
-			c19: port fc.motor_cmd -> actuation.motor_cmd
-			{CASE_Consolidated_Properties::connectionType => Trusted;};
-			
-			c20: port actuation.response -> fc.actuation_response
+			c20: port actuation.response -> gnc.fc_actuation_response
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
 			c22: port satellite0_sig_pos -> gnc.satellite0_pos
@@ -891,13 +659,10 @@ public
 			c23: port satellite1_sig_pos -> gnc.satellite1_pos
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
-			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
-			{CASE_Consolidated_Properties::connectionType => Trusted;};
-			
 			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 
-			c26: port deliveryPlanner.nav_cmd -> navigation.cmd
+			c26: port deliveryPlanner.nav_cmd -> gnc.navigation_cmd
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c27: port deliveryPlanner.camera -> camera.camera_in			
@@ -945,7 +710,7 @@ public
 			c40: port gnc.probe_launch_pos -> probe_launch_location
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
-			c41: port navigation.probe_dest_pos -> probe_delivery_location
+			c41: port gnc.navigation_probe_dest_pos -> probe_delivery_location
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
 			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
