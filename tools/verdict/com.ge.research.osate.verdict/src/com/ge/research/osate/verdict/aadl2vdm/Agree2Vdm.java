@@ -66,6 +66,7 @@ import verdict.vdm.vdm_lustre.NodeEquationLHS;
 import verdict.vdm.vdm_lustre.NodeParameter;
 import verdict.vdm.vdm_lustre.RecordLiteral;
 import verdict.vdm.vdm_lustre.RecordProjection;
+
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
@@ -374,7 +375,9 @@ public class Agree2Vdm {
 			dataTypeVdm.setName(dataImplementationName);
 			dataTypeVdm.setDefinition(dtype);
 			//add the typeDeclaration to the model
-			model.getTypeDeclaration().add(dataTypeVdm);
+			LustreProgram lustreProgram = model.getDataflowCode();
+			lustreProgram.getTypeDeclaration().add(dataTypeVdm);
+			model.setDataflowCode(lustreProgram);
 		}
 	}
 	private verdict.vdm.vdm_data.DataType getVdmTypeFromAADLType(org.osate.aadl2.DataType aadlDataType) {
@@ -416,7 +419,9 @@ public class Agree2Vdm {
 			dataTypeVdm.setName(aadlDataTypeName);
 			dataTypeVdm.setDefinition(dtype);
 			//add the typeDeclaration to the model
-			model.getTypeDeclaration().add(dataTypeVdm);
+			LustreProgram lustreProgram = model.getDataflowCode();
+			lustreProgram.getTypeDeclaration().add(dataTypeVdm);
+			model.setDataflowCode(lustreProgram);
 		}
 	}
 	//this method checks if the property indicates if it is an enum definition
