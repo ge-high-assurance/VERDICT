@@ -1,12 +1,13 @@
-# Builds an almost complete Verdict release
-# TBD: push to VERDICT-update-sites too (maybe with copycat-action)
+# Builds a Verdict release for end users:
+#        - extern.zip for attaching to GitHub release page
+#        - verdict Docker image
+#        - verdict-latest and verdict-x.x.x update sites
 
 name: Verdict release build
 
 on:
-  push:
-    branches: [ ci-cd ]
-    tags: [ '*' ]
+  release:
+    types: [ published ]
 
 jobs:
   native-binaries:
@@ -173,3 +174,23 @@ jobs:
         build_args: BUILDKIT_INLINE_CACHE=1
         cache_froms: gehighassurance/verdict:latest
         push: true
+
+    - name: Check out VERDICT-update-sites
+      uses: actions/checkout@v2
+      with:
+        repository: ge-high-assurance/VERDICT-update-sites
+        token: ${{ secrets.CI_PAT }}
+        path: VERDICT-update-sites
+
+    - name: Update verdict-latest in VERDICT-update-sites
+      run: |
+        RELEASE="${{ github.event.release.tag_name }}"
+        cd VERDICT-update-sites
+        rm -rf verdict-latest verdict-$RELEASE
+        mv ../tools/verdict/com.ge.research.osate.verdict.updatesite/target/repository verdict-latest
+        cp -a verdict-latest verdict-$RELEASE
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "Update verdict-latest and verdict-$RELEASE in VERDICT-update-sites"
+        git push
