@@ -32,7 +32,6 @@ import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
-
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.SystemType;
@@ -102,6 +101,7 @@ import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.impl.ArgImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
+
 public class Agree2Vdm {
 	/**
 	 * The execute() method performs a set of tasks for translating AADL to VDM
@@ -184,7 +184,6 @@ public class Agree2Vdm {
 	 *  @return a populated VDM model
 	 *
 	 * */
-
 	public Model populateVDMFromAadlAgreeObjects(List<EObject> objects, Model model) {
 		HashSet<String> dataTypeDecl = new HashSet<String>();
 		HashSet<String> nodeDecl = new HashSet<String>();
@@ -197,7 +196,6 @@ public class Agree2Vdm {
 				systemTypes.add((SystemType) obj);
 			}
 		} // end of extracting data from the AADLObjec
-		System.out.println("extracted objects of type systemtype");
 		/* Translating agree annex in System Types */
 		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
 		//return the final model
