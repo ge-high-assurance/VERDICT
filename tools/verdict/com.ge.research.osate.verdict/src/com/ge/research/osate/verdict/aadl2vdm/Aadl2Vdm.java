@@ -4136,48 +4136,40 @@ public class Aadl2Vdm {
 	public List<EObject> preprocessAadlFiles(File dir) {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
-		rs.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
 		List<String> aadlFileNames = new ArrayList<>();
+
+		// Set scenario name
+		//scenario = dir.getName();
+
 		// Obtain all AADL files contents in the project
 		List<EObject> objects = new ArrayList<>();
+
 		List<File> dirs = collectAllDirs(dir);
+
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
-					System.out.println(file.getAbsolutePath());
 					aadlFileNames.add(file.getAbsolutePath());
 				}
 			}
 		}
+
+		final Resource[] resources = new Resource[aadlFileNames.size()];
 		for (int i = 0; i < aadlFileNames.size(); i++) {
-			rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
+			resources[i] = rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
 		}
-		EcorePlugin.ExtensionProcessor.process(null);
-		//getting aadl imported files
-		final List<URI> contributed = PluginSupportUtil.getContributedAadl();
-		for (final URI uri : contributed) {
-			rs.getResource(uri, true);
-		}
+
 		// Load the resources
-		Map<String,Boolean> options = new HashMap<String,Boolean>();
-	    options.put(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
-		for (final Resource resource : rs.getResources()) {
+		for (final Resource resource : resources) {
 			try {
-				resource.load(options);
-				IResourceValidator validator = ((XtextResource) resource).getResourceServiceProvider()
-				        .getResourceValidator();
-				List<Issue> issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
-				for (Issue issue : issues) {
-				    System.out.println(issue.getMessage());
-				}
-				//EcoreUtil2.resolveAll(resource);
-				//resource.load(null);
+				resource.load(null);
 			} catch (final IOException e) {
 				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
 			}
 		}
-		//EcoreUtil2.resolveAll(rs);
-		for (final Resource resource : rs.getResources()) {
+
+		// Load all objects from resources
+		for (final Resource resource : resources) {
 			resource.getAllContents().forEachRemaining(objects::add);
 		}
 		return objects;
