@@ -66,7 +66,6 @@ import verdict.vdm.vdm_lustre.NodeEquationLHS;
 import verdict.vdm.vdm_lustre.NodeParameter;
 import verdict.vdm.vdm_lustre.RecordLiteral;
 import verdict.vdm.vdm_lustre.RecordProjection;
-
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
@@ -197,7 +196,6 @@ public class Agree2Vdm {
 				systemTypes.add((SystemType) obj);
 			}
 		} // end of extracting data from the AADLObjec
-		System.out.println("extracted objects of type systemtype");
 		/* Translating agree annex in System Types */
 		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
 		//return the final model
