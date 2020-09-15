@@ -389,6 +389,12 @@ public class VDM2Lustre {
             String componentInstanceID,
             boolean impl_type) {
 
+        // Rename componentType
+        String cmpName = componentType.getName();
+        cmpName = cmpName.replace(".", "_dot_");
+
+        componentType.setName(cmpName);
+
         // Node Equation
         NodeEquation node_eq = new NodeEquation();
 
@@ -636,7 +642,7 @@ public class VDM2Lustre {
             String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                // user_defined_type = user_defined_type + "_Impl";
+                user_defined_type = user_defined_type.replace(".", "_dot_");
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1171,7 +1177,7 @@ public class VDM2Lustre {
         }
 
         if (user_defined_type != null) {
-            // user_defined_type = user_defined_type + "_Impl";
+            user_defined_type = user_defined_type.replace(".", "_dot_");
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1232,8 +1238,6 @@ public class VDM2Lustre {
 
             if (match) {
                 expr.setIdentifier(id_expr);
-                // System.out.println(">>>>>>>>>>>>>Identifiers: " +
-                // expr.getIdentifier());
 
             } else {
 
@@ -1522,7 +1526,7 @@ public class VDM2Lustre {
 
         String user_defined_type = data_type.getUserDefinedType();
         // Expression expr = constantDeclaration.getDefinition();
-
+        
         if (user_defined_type != null) {
             // user_defined_type = user_defined_type + "_Impl";
 
@@ -1561,10 +1565,11 @@ public class VDM2Lustre {
                     // String identifier = record_field.getName();
 
                     data_type = record_field.getType();
+                     
                     String user_defined_type = data_type.getUserDefinedType();
-
+                    
                     if (user_defined_type != null) {
-                        // user_defined_type = user_defined_type + "_Impl";
+                        user_defined_type = user_defined_type.replace(".", "_dot_");
 
                         for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
                             if (user_defined_type.equals(type_declaration.getName())) {
