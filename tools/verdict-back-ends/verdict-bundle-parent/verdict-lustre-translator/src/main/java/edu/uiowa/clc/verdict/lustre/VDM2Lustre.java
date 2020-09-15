@@ -199,12 +199,16 @@ public class VDM2Lustre {
         Node node = new Node();
 
         String identifier = componentType.getName();
+        // Replace dot identifier to support lustre naming compliance
+        identifier = identifier.replace(".", "_dot_");
 
         if (is_implemented) {
             identifier += "_dot_Impl";
 
         } else {
+
             // Imported Node
+
             node.setIsImported(true);
             // System.out.println("Imported Nodes:" +identifier );
 
@@ -273,6 +277,15 @@ public class VDM2Lustre {
             ComponentType componentType = componentImpl.getType();
 
             for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                // replace to make naming compliant with lustre code
+                String id = componentInstance.getId();
+                id = id.replace(".", "_dot_");
+                componentInstance.setId(id);
+
+                id = componentInstance.getName();
+                id = id.replace(".", "_dot_");
+                componentInstance.setName(id);
 
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
@@ -572,6 +585,7 @@ public class VDM2Lustre {
 
         // Node Name
         String port_name = port.getName();
+
         node_parameter.setName(port_name);
 
         // Node DataType
@@ -1529,7 +1543,8 @@ public class VDM2Lustre {
 
         String identifier = typeDeclaration.getName();
         // Renaming dot[.] in Type Declaration Identifier.
-        identifier = identifier.replace(".", "_id_");
+        identifier = identifier.replace(".", "_dot_");
+
         typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
