@@ -111,6 +111,12 @@ public class VDM2Lustre {
 
         // Copying over Constant Declarations
         for (ConstantDeclaration constDec : program.getConstantDeclaration()) {
+
+            String constName = constDec.getName();
+
+            constName = constName.replace(".", "_dot_");
+            constDec.setName(constName);
+
             visit(constDec);
         }
 
@@ -524,6 +530,9 @@ public class VDM2Lustre {
                 TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
                 user_defined_type = baseType.getName();
+
+                user_defined_type.replace(".", "_dot_");
+
                 String definedType = user_defined_type.replace("_dot_", "Event_");
 
                 eventTypeDeclaration.setName(definedType);
@@ -703,6 +712,7 @@ public class VDM2Lustre {
 
                 String identifier = recordLiteral.getRecordType();
                 identifier = identifier.replace(".", "_dot_");
+
                 recordLiteral.setRecordType(identifier);
 
                 for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
@@ -1526,9 +1536,9 @@ public class VDM2Lustre {
 
         String user_defined_type = data_type.getUserDefinedType();
         // Expression expr = constantDeclaration.getDefinition();
-        
+
         if (user_defined_type != null) {
-            // user_defined_type = user_defined_type + "_Impl";
+            user_defined_type = user_defined_type.replace(".", "_dot_");
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1565,9 +1575,9 @@ public class VDM2Lustre {
                     // String identifier = record_field.getName();
 
                     data_type = record_field.getType();
-                     
+
                     String user_defined_type = data_type.getUserDefinedType();
-                    
+
                     if (user_defined_type != null) {
                         user_defined_type = user_defined_type.replace(".", "_dot_");
 
