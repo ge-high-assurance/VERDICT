@@ -115,9 +115,11 @@ public class Agree2Vdm {
 	  	Aadl2Vdm aadl2vdm= new Aadl2Vdm();
 	    //TODO: invoking this method from AADL2VDM translator for testing -to populate non-agree AADL objects
 	  	//using preprocessAadlFiles method from AADL2VDM to get objects from the aadl files in the directory alone
-	  	m = aadl2vdm.populateVDMFromAadlObjects(aadl2vdm.preprocessAadlFiles(inputDir), m);
+	  	List<EObject> objectsFromAllFiles = preprocessAadlFiles(inputDir);//includes objects from imported aadl files
+	  	List<EObject> objectsFromFilesInProjects = aadl2vdm.preprocessAadlFiles(inputDir);
+	  	m = aadl2vdm.populateVDMFromAadlObjects(objectsFromAllFiles, objectsFromFilesInProjects, m);
 	  	//using preprocessAadlFiles method in this class, to get objects in the aadl files in the directory along with the imported aadl files
-		m = populateVDMFromAadlAgreeObjects(preprocessAadlFiles(inputDir), m);
+		m = populateVDMFromAadlAgreeObjects(objectsFromAllFiles, m);
 		System.err.println("Working Directory = " + System.getProperty("user.dir"));
 		File testXml = new File("/Users/212810885/Desktop/testXML.xml");
 		System.err.println("Created File object to store Xml");
@@ -202,7 +204,7 @@ public class Agree2Vdm {
 	
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
-		model.setDataflowCode(lustreProgram);//intializing the lustre program in the VDM
+		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
 		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
 		for(SystemType sysType : systemTypes) {
 			// unpacking sysType
@@ -281,28 +283,47 @@ public class Agree2Vdm {
 			symbDef.setName(lhsArg.getName());
 			//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
 			Type type = lhsArg.getType();
-			verdict.vdm.vdm_data.DataType dtype = translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);
-			//set type
+			//set just name of the type - but make sure you add the type declaration to the vdm model if not already added
+			if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			dtype.setUserDefinedType(getDataTypeName(type));
+			//set type name
 			symbDef.setDataType(dtype);			
 			//set the expression as the value/definition for each variable on the left
 			symbDef.setDefinition(vdmExpression);
 		}
 		return symbDef;
 	}
-	private DataType translateAgreeDataTypeToVdmDataType(Type type, HashSet<String> dataTypeDecl, Model model) {
-		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if(type instanceof PrimType) {
-			PrimType primType = (PrimType)type;
-			verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
-			dtype.setPlainType(plaintype);
-		} else if(type instanceof DoubleDotRef) {
+	private void translateAgreeDataTypeToVdmDataType(Type type, HashSet<String> dataTypeDecl, Model model) {
+		if(type instanceof DoubleDotRef) {
 			DoubleDotRef ddrefType = (DoubleDotRef)type;
 			if (ddrefType.getElm() instanceof DataImplementation) {//if it is a AADL data implementation definition
 				DataImplementation dataImplementationImpl = (DataImplementation)ddrefType.getElm();
-				dtype = resolveAADLDataImplementationType(dataImplementationImpl,dataTypeDecl,model);	
+				resolveAADLDataImplementationType(dataImplementationImpl,dataTypeDecl,model);	
 			} else if (ddrefType.getElm() instanceof org.osate.aadl2.DataType) {//if it is a AADL data implementation definition
 				org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)ddrefType.getElm();
-				dtype = resolveAADLDataType(aadlDataType,dataTypeDecl,model);	
+				resolveAADLDataType(aadlDataType,dataTypeDecl,model);	
+			} else {
+				System.out.println("Unresolved data type "+ddrefType.getElm().getName()+" in doubledotref. Not AADL DataImplementation or DataType type.");
+			}
+		} else {
+			System.out.println("Unresolved type value is "+type.toString());
+		}
+	}
+	private String getDataTypeName(Type type) {
+		String dtype = "";
+		if(type instanceof PrimType) {
+			PrimType primType = (PrimType)type;
+			verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
+			dtype = plaintype.value();
+		} else if(type instanceof DoubleDotRef) {
+			DoubleDotRef ddrefType = (DoubleDotRef)type;
+			if (ddrefType.getElm() instanceof DataImplementation) {//if it is a AADL data implementation definition
+				DataImplementation dataImplementation = (DataImplementation)ddrefType.getElm();
+				dtype = dataImplementation.getName();
+			} else if (ddrefType.getElm() instanceof org.osate.aadl2.DataType) {//if it is a AADL data implementation definition
+				org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)ddrefType.getElm();
+				dtype = aadlDataType.getName();
 			} else {
 				System.out.println("Unresolved data type "+ddrefType.getElm().getName()+" in doubledotref. Not AADL DataImplementation or DataType type.");
 			}
@@ -311,7 +332,7 @@ public class Agree2Vdm {
 		}
 		return dtype;
 	}
-	private verdict.vdm.vdm_data.DataType resolveAADLDataImplementationType(DataImplementation dataImplementationImpl, HashSet<String> dataTypeDecl, Model model) {
+	private void resolveAADLDataImplementationType(DataImplementation dataImplementationImpl, HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		//GET DETAILS OF THE DATA IMPLEMENTATION AND CREATE CORRESPONDING VDM DATATYPE
 		EList<DataSubcomponent> subcomponents= dataImplementationImpl.getOwnedDataSubcomponents();
@@ -323,12 +344,19 @@ public class Agree2Vdm {
 				DataSubcomponentType dataSubCompType = dataSubComp.getDataSubcomponentType();
 				if (dataSubCompType instanceof org.osate.aadl2.DataType){
 					org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)dataSubCompType;
-					recField.setType(resolveAADLDataType(aadlDataType,dataTypeDecl,model));	
+					//the line below is just to ensure that the type's declaration is added to VDM
+					resolveAADLDataType(aadlDataType,dataTypeDecl,model); 
+					verdict.vdm.vdm_data.DataType recFieldDtype = getVdmTypeFromAADLType(aadlDataType);
+					recField.setType(recFieldDtype);	
 				} else if (dataSubCompType instanceof DataImplementation){
-					DataImplementation dataSubCompDataImplementationImpl = (DataImplementation)dataSubCompType;
-					recField.setType(resolveAADLDataImplementationType(dataSubCompDataImplementationImpl, dataTypeDecl, model));	
+					DataImplementation dataSubCompDataImplementation = (DataImplementation)dataSubCompType;
+					//the line below is just to ensure that the type's declaration is added to VDM
+					resolveAADLDataImplementationType(dataSubCompDataImplementation, dataTypeDecl, model);
+					verdict.vdm.vdm_data.DataType recFieldDtype = new verdict.vdm.vdm_data.DataType();
+					recFieldDtype.setUserDefinedType(dataSubCompDataImplementation.getName());
+					recField.setType(recFieldDtype);	
 				} else {
-					System.out.println("Data Subcomponent is not of DataTypeImpl or DataImplementatioImpl.");
+					System.out.println("Unexpected Data Subcomponent that is not a DataTypeImpl or DataImplementatioImpl.");
 				}
 				recType.getRecordField().add(recField);
 			}
@@ -349,9 +377,24 @@ public class Agree2Vdm {
 			lustreProgram.getTypeDeclaration().add(dataTypeVdm);
 			model.setDataflowCode(lustreProgram);
 		}
+	}
+	private verdict.vdm.vdm_data.DataType getVdmTypeFromAADLType(org.osate.aadl2.DataType aadlDataType) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(aadlDataType.getName().contentEquals("Float")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
+		} else if(aadlDataType.getName().contentEquals("Integer")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
+		} else if(aadlDataType.getName().contentEquals("Boolean")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
+		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+			EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
+			updateVDMDatatypeUsingProperties(dtype,properties);
+		} else {
+			dtype.setUserDefinedType(aadlDataType.getName());
+		}
 		return dtype;
 	}
-	private verdict.vdm.vdm_data.DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, HashSet<String> dataTypeDecl, Model model) {
+	private void resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(aadlDataType.getName().contentEquals("Float")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
@@ -378,11 +421,10 @@ public class Agree2Vdm {
 			lustreProgram.getTypeDeclaration().add(dataTypeVdm);
 			model.setDataflowCode(lustreProgram);
 		}
-		return dtype;
 	}
 	//this method checks if the property indicates if it is an enum definition
 	//and gets information from the properties to define the enum in the VDM
-	private void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
+	public void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
 		if(properties.size()==2) {
 			//check if the property specifies it is enum type
 			PropertyAssociation firstProperty = properties.get(0);
@@ -441,24 +483,9 @@ public class Agree2Vdm {
 			nodeParameter.setName(arg.getName());
 			//get types of each arg and define those types if needed
 			Type argType = arg.getType();
-			DataType dtype = new DataType();
-			if(argType instanceof DoubleDotRef){
-				NamedElement argTypeElm = ((DoubleDotRef)argType).getElm();
-				if(argTypeElm instanceof org.osate.aadl2.DataType) {
-					org.osate.aadl2.DataType argTypeAsAADLDataType = (org.osate.aadl2.DataType)argTypeElm;
-					dtype = resolveAADLDataType(argTypeAsAADLDataType, dataTypeDecl, model);
-				} else if (argTypeElm instanceof DataImplementation) {
-					DataImplementation argTypeAsAADLDataImplementation = (DataImplementation)argTypeElm;
-					dtype = resolveAADLDataImplementationType(argTypeAsAADLDataImplementation, dataTypeDecl, model);
-				} else {
-					System.out.println("Unmapped Type of Arg");
-				}
-			} else if (argType instanceof PrimType){
-				PrimType agreePrimType = (PrimType)argType;
-				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue(agreePrimType.getName()));
-			} else {
-				System.out.println("Unmapped Type of Node Arg");
-			}
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			if(!(argType instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(argType, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
+			dtype.setUserDefinedType(getDataTypeName(argType));
 			nodeParameter.setDataType(dtype);
 			vdmNode.getInputParameter().add(nodeParameter);
 		}
@@ -470,24 +497,9 @@ public class Agree2Vdm {
 			nodeParameter.setName(arg.getName());
 			//get types of each arg and define those types if needed
 			Type argType = arg.getType();
-			DataType dtype = new DataType();
-			if(argType instanceof DoubleDotRef){
-				NamedElement argTypeElm = ((DoubleDotRef)argType).getElm();
-				if(argTypeElm instanceof org.osate.aadl2.DataType) {
-					org.osate.aadl2.DataType argTypeAsAADLDataType = (org.osate.aadl2.DataType)argTypeElm;
-					dtype = resolveAADLDataType(argTypeAsAADLDataType, dataTypeDecl, model);
-				} else if (argTypeElm instanceof DataImplementation) {
-					DataImplementation argTypeAsAADLDataImplementation = (DataImplementation)argTypeElm;
-					dtype = resolveAADLDataImplementationType(argTypeAsAADLDataImplementation, dataTypeDecl, model);
-				} else {
-					System.out.println("Unmapped Type of Arg");
-				}
-			} else if (argType instanceof PrimType){
-				PrimType agreePrimType = (PrimType)argType;
-				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue(agreePrimType.getName()));
-			} else {
-				System.out.println("Unmapped Type of Node Arg");
-			}
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			if(!(argType instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(argType, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
+			dtype.setUserDefinedType(getDataTypeName(argType));
 			nodeParameter.setDataType(dtype);
 			vdmNode.getOutputParameter().add(nodeParameter);
 		}
@@ -587,7 +599,10 @@ public class Agree2Vdm {
 					vdmConstDeclaration.setName(nmElmConstStatementName);
 					vdmConstDeclaration.setDefinition(getVdmExpressionFromAgreeExpression(nmElmConstStatement.getExpr(), dataTypeDecl, nodeDecl, model));
 					Type type = nmElmConstStatement.getType();
-					vdmConstDeclaration.setDataType(translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model));
+					if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
+					verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+					dtype.setUserDefinedType(getDataTypeName(type));
+					vdmConstDeclaration.setDataType(dtype);
 					LustreProgram lustreProgram = model.getDataflowCode();
 					lustreProgram.getConstantDeclaration().add(vdmConstDeclaration);
 					model.setDataflowCode(lustreProgram);
@@ -626,8 +641,7 @@ public class Agree2Vdm {
 					Type argType = arg.getType();
 					defineDataTypeDataImplementationTypeInVDM(argType, dataTypeDecl, model);
 					if(argType instanceof PrimType) {
-						PrimType argTypePrimType = (PrimType)argType;
-						vdmRecordProj.setRecordType(argTypePrimType.getName());
+						vdmRecordProj.setRecordType(getDataTypeName(argType));
 					} else {
 						System.out.println("Unresolved Arg Type so not setting record-type in record-projection.");
 					}
