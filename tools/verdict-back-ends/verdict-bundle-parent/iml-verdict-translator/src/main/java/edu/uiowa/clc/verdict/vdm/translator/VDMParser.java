@@ -998,8 +998,8 @@ public class VDMParser extends Parser {
 
                 type_id = Identifier();
                 // Renaming dot[.] in Type Declaration Identifier.
-                String identifier = type_id.replace(".", "_dot_");
-                typeDeclaration.setName(identifier);
+                //                String identifier = type_id.replace(".", "_dot_");
+                typeDeclaration.setName(type_id);
 
             } else if (token.type == Type.OPTION) {
 
@@ -2676,7 +2676,7 @@ public class VDMParser extends Parser {
 
                 String identifier = Identifier();
                 // Unique Block Implementation ID
-                block_compImpl_Id = block_compImpl_Id.replace(".", "_dot_");
+                //                block_compImpl_Id = block_compImpl_Id.replace(".", "_dot_");
 
                 componentInstance.setName(block_compImpl_Id + "_" + identifier);
                 componentInstance.setId(block_compImpl_Id + "_" + identifier);

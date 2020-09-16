@@ -111,6 +111,12 @@ public class VDM2Lustre {
 
         // Copying over Constant Declarations
         for (ConstantDeclaration constDec : program.getConstantDeclaration()) {
+
+            String constName = constDec.getName();
+
+            constName = constName.replace(".", "_dot_");
+            constDec.setName(constName);
+
             visit(constDec);
         }
 
@@ -199,12 +205,16 @@ public class VDM2Lustre {
         Node node = new Node();
 
         String identifier = componentType.getName();
+        // Replace dot identifier to support lustre naming compliance
+        identifier = identifier.replace(".", "_dot_");
 
         if (is_implemented) {
             identifier += "_dot_Impl";
 
         } else {
+
             // Imported Node
+
             node.setIsImported(true);
             // System.out.println("Imported Nodes:" +identifier );
 
@@ -273,6 +283,15 @@ public class VDM2Lustre {
             ComponentType componentType = componentImpl.getType();
 
             for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
+
+                // replace to make naming compliant with lustre code
+                String id = componentInstance.getId();
+                id = id.replace(".", "_dot_");
+                componentInstance.setId(id);
+
+                id = componentInstance.getName();
+                id = id.replace(".", "_dot_");
+                componentInstance.setName(id);
 
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
@@ -375,6 +394,12 @@ public class VDM2Lustre {
             NodeBody nodeBody,
             String componentInstanceID,
             boolean impl_type) {
+
+        // Rename componentType
+        String cmpName = componentType.getName();
+        cmpName = cmpName.replace(".", "_dot_");
+
+        componentType.setName(cmpName);
 
         // Node Equation
         NodeEquation node_eq = new NodeEquation();
@@ -498,6 +523,8 @@ public class VDM2Lustre {
 
             String user_defined_type = dataType.getUserDefinedType();
 
+            user_defined_type = user_defined_type.replace(".", "_dot_");
+
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
             if (implemented_type) {
@@ -505,6 +532,7 @@ public class VDM2Lustre {
                 TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
                 user_defined_type = baseType.getName();
+
                 String definedType = user_defined_type.replace("_dot_", "Event_");
 
                 eventTypeDeclaration.setName(definedType);
@@ -572,6 +600,7 @@ public class VDM2Lustre {
 
         // Node Name
         String port_name = port.getName();
+
         node_parameter.setName(port_name);
 
         // Node DataType
@@ -622,7 +651,7 @@ public class VDM2Lustre {
             String user_defined_type = data_type.getUserDefinedType();
 
             if (user_defined_type != null) {
-                // user_defined_type = user_defined_type + "_Impl";
+                user_defined_type = user_defined_type.replace(".", "_dot_");
 
                 boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -683,6 +712,7 @@ public class VDM2Lustre {
 
                 String identifier = recordLiteral.getRecordType();
                 identifier = identifier.replace(".", "_dot_");
+
                 recordLiteral.setRecordType(identifier);
 
                 for (FieldDefinition fieldDef : recordLiteral.getFieldDefinition()) {
@@ -1157,7 +1187,7 @@ public class VDM2Lustre {
         }
 
         if (user_defined_type != null) {
-            // user_defined_type = user_defined_type + "_Impl";
+            user_defined_type = user_defined_type.replace(".", "_dot_");
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1218,8 +1248,6 @@ public class VDM2Lustre {
 
             if (match) {
                 expr.setIdentifier(id_expr);
-                // System.out.println(">>>>>>>>>>>>>Identifiers: " +
-                // expr.getIdentifier());
 
             } else {
 
@@ -1510,7 +1538,7 @@ public class VDM2Lustre {
         // Expression expr = constantDeclaration.getDefinition();
 
         if (user_defined_type != null) {
-            // user_defined_type = user_defined_type + "_Impl";
+            user_defined_type = user_defined_type.replace(".", "_dot_");
 
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
@@ -1529,7 +1557,8 @@ public class VDM2Lustre {
 
         String identifier = typeDeclaration.getName();
         // Renaming dot[.] in Type Declaration Identifier.
-        identifier = identifier.replace(".", "_id_");
+        identifier = identifier.replace(".", "_dot_");
+
         typeDeclaration.setName(identifier);
 
         DataType data_type = typeDeclaration.getDefinition();
@@ -1546,10 +1575,12 @@ public class VDM2Lustre {
                     // String identifier = record_field.getName();
 
                     data_type = record_field.getType();
+
                     String user_defined_type = data_type.getUserDefinedType();
 
                     if (user_defined_type != null) {
-                        // user_defined_type = user_defined_type + "_Impl";
+
+                        user_defined_type = user_defined_type.replace(".", "_dot_");
 
                         for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
                             if (user_defined_type.equals(type_declaration.getName())) {

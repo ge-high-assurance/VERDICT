@@ -1673,6 +1673,7 @@ public class VDMInstrumentor {
                         + "_port_"
                         + dest_port.getName();
 
+        instrument_cmp_Id = instrument_cmp_Id.replace(".", "_dot_");
         // Setting Component IDs
         instrumented_cmp.setId(instrument_cmp_Id);
         instrumented_cmp.setName(instrument_cmp_Id);
@@ -1775,6 +1776,8 @@ public class VDMInstrumentor {
 
         // Condition
         Expression cond_expr = new Expression();
+        global_constant_Id = global_constant_Id.replace(".", "_dot_");
+
         cond_expr.setIdentifier(global_constant_Id);
         ifelse.setCondition(cond_expr);
         // Then
