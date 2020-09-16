@@ -331,7 +331,6 @@ public class Agree2Vdm {
 		}
 		return dtype;
 	}
-
 	private void resolveAADLDataImplementationType(DataImplementation dataImplementationImpl, HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		//GET DETAILS OF THE DATA IMPLEMENTATION AND CREATE CORRESPONDING VDM DATATYPE
