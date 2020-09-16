@@ -285,13 +285,13 @@ public class VDM2Lustre {
             for (ComponentInstance componentInstance : blockImpl.getSubcomponent()) {
 
                 // replace to make naming compliant with lustre code
-//                String id = componentInstance.getId();
-//                id = id.replace(".", "_dot_");
-//                componentInstance.setId(id);
-//
-//                id = componentInstance.getName();
-//                id = id.replace(".", "_dot_");
-//                componentInstance.setName(id);
+                String id = componentInstance.getId();
+                id = id.replace(".", "_dot_");
+                componentInstance.setId(id);
+
+                id = componentInstance.getName();
+                id = id.replace(".", "_dot_");
+                componentInstance.setName(id);
 
                 componentType = componentInstance.getSpecification();
                 ComponentImpl subcomponentImpl = componentInstance.getImplementation();
@@ -523,6 +523,8 @@ public class VDM2Lustre {
 
             String user_defined_type = dataType.getUserDefinedType();
 
+            user_defined_type = user_defined_type.replace(".", "_dot_");
+
             boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
 
             if (implemented_type) {
@@ -530,8 +532,6 @@ public class VDM2Lustre {
                 TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
 
                 user_defined_type = baseType.getName();
-
-                user_defined_type.replace(".", "_dot_");
 
                 String definedType = user_defined_type.replace("_dot_", "Event_");
 
@@ -1580,9 +1580,10 @@ public class VDM2Lustre {
 
                     if (user_defined_type != null) {
 
+                        user_defined_type = user_defined_type.replace(".", "_dot_");
+
                         for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
                             if (user_defined_type.equals(type_declaration.getName())) {
-                                user_defined_type = user_defined_type.replace(".", "_dot_");                            	
                                 data_type.setUserDefinedType(user_defined_type);
                             }
                         }
