@@ -294,7 +294,6 @@ public class Agree2Vdm {
 		}
 		return symbDef;
 	}
-
 	private void translateAgreeDataTypeToVdmDataType(Type type, HashSet<String> dataTypeDecl, Model model) {
 		if(type instanceof DoubleDotRef) {
 			DoubleDotRef ddrefType = (DoubleDotRef)type;
