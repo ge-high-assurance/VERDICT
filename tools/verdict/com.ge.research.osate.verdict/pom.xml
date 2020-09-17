@@ -24,6 +24,11 @@
             <artifactId>jakarta.json</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-exec</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

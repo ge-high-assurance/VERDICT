@@ -8,12 +8,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
 import com.amihaiemil.docker.Container;
 import com.amihaiemil.docker.Docker;
@@ -30,10 +33,11 @@ public class VerdictBundleCommand {
     private String dockerImage;
     private List<String> args = new ArrayList<>();
     private List<String> binds = new ArrayList<>();
-    private List<String> env = new ArrayList<>();
+    private Map<String, String> env = new HashMap<>();
     
-    // Stop docker if necessary
+    // Stop container or cancel future if necessary
     private Container container = null;
+    private Future<ProcessResult> future = null;
 
     /** Tells us whether to run verdict-bundle via java or docker. */
     private boolean isImage() {
@@ -129,7 +133,7 @@ public class VerdictBundleCommand {
      * @return this object to allow calls to be chained
      */
     public VerdictBundleCommand env(String name, String value) {
-        env.add(name + "=" + value);
+        env.put(name, value);
         return this;
     }
 
@@ -148,27 +152,33 @@ public class VerdictBundleCommand {
     }
 
     /**
-     * Stops any currently running verdict-bundle.  Needs synchronization
-     * due to two threads accessing container field.
+     * Stops any currently running execution.  Needs synchronization
+     * due to two threads accessing container and future fields.
      */
-	public synchronized void stop() {
-		VerdictLogger.warning("STOP button pushed");
-		if (container != null) {
-			try {
-				container.stop();
-			} catch (UnexpectedResponseException | IOException e) {
-				VerdictLogger.severe("Unable to stop container: " + e);
-			}
-		}
-		// I've looked and there isn't any way to stop a running
-		// Execute object through its public API.  We'd have to break
-		// through its public API abstraction somehow.  To be done later 
-		// if there's enough need for it.
-	}
+    public synchronized void stop() {
+        VerdictLogger.info("STOP button pushed");
+        if (container != null) {
+            try {
+                container.stop();
+            } catch (UnexpectedResponseException | IOException e) {
+                VerdictLogger.severe("Unable to stop container: " + e);
+            }
+        }
+        if (future != null) {
+            if (!future.cancel(true)) {
+                VerdictLogger.severe("Unable to cancel future");
+            }
+        }
+    }
     
     /** Needs synchronization due to two threads accessing container field. */
     private synchronized void setContainer(Container container) {
-    	this.container = container;
+        this.container = container;
+    }
+
+    /** Needs synchronization due to two threads accessing future field. */
+    private synchronized void setFuture(Future<ProcessResult> future) {
+        this.future = future;
     }
     
     /**
@@ -226,8 +236,8 @@ public class VerdictBundleCommand {
             // Start the container and wait for it to exit
             VerdictLogger.info("Running image: " + dockerImage + " " + String.join(" ", args));
             try {
-            	setContainer(container);
-            	StopHandler.enable(this);
+                setContainer(container);
+                StopHandler.enable(this);
                 container.start();
                 VerdictLogger.info("Started, now waiting for container to finish: " + containerId);
                 int statusCode = container.waitOn(null);
@@ -240,9 +250,9 @@ public class VerdictBundleCommand {
                 return statusCode;
             } finally {
                 // Always remove the container before we return
-            	StopHandler.disable();
-            	setContainer(null);
-            	container.remove();
+                StopHandler.disable();
+                setContainer(null);
+                container.remove();
             }
         } catch (IOException | UnexpectedResponseException e) {
             VerdictLogger.severe("Unable to run command: " + e);
@@ -251,7 +261,7 @@ public class VerdictBundleCommand {
     }
 
     /**
-     * Runs verdict-bundle jar with java using the Ant Execute task API.
+     * Runs verdict-bundle jar with java using the Zeroturnaround Process Executor API.
      *
      * @return Exit code from verdict-bundle
      */
@@ -261,20 +271,30 @@ public class VerdictBundleCommand {
             return 1;
         }
 
-        Execute executor = new Execute(new PumpStreamHandler(System.out, System.err));
-        executor.setCommandline(args.toArray(new String[args.size()]));
-        if (!env.isEmpty()) {
-            executor.setEnvironment(env.toArray(new String[env.size()]));
-        }
+        ProcessExecutor executor = new ProcessExecutor();
+        executor.command(args);
+        executor.destroyOnExit();
+        executor.environment(env);
+        executor.redirectError(System.err);
+        executor.redirectOutput(System.out);
 
+        // Start the command and wait for it to exit
         try {
-            VerdictLogger.info("Running command: " + String.join(" ", args));
             StopHandler.enable(this);
-            return executor.execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            setFuture(executor.start().getFuture());
+
+            // Return verdict-bundle's exit code when it finishes
+            int statusCode = future.get().getExitValue();
+            return statusCode;
+        } catch (ExecutionException | InterruptedException | IOException e) {
+            VerdictLogger.severe("Error running command: " + e);
+            return -1;
+        } catch (CancellationException e) {
+            VerdictLogger.info("Command cancelled");
+            return -1;
         } finally {
-        	StopHandler.disable();
+            StopHandler.disable();
+            setFuture(null);
         }
     }
 

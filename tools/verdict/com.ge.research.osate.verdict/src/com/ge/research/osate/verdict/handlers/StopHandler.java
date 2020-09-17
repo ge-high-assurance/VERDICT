@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.HandlerEvent;
 
 /**
- * Stops a running MBAS/CRV command. 
+ * Stops a running MBAA/MBAS/CRV command. 
  */
 public class StopHandler extends AbstractHandler {
 
@@ -19,12 +19,12 @@ public class StopHandler extends AbstractHandler {
 			System.err.println("Something unexpected happened - more than one StopHandler instance has been created");
 		}
 		instance = this;
-		setBaseEnabled(false); // disabled until first MBAS/CRV is run
+		instance.setBaseEnabled(false); // disabled until first MBAA/MBAS/CRV is run
 	}
 	
 	/** Enables the StopHandler when we need it. */
-	public static void enable(VerdictBundleCommand command) {
-		StopHandler.command = command;
+	public static void enable(VerdictBundleCommand aCommand) {
+		command = aCommand;
 		if (instance != null) {
 			instance.setBaseEnabled(true);
 			// Refresh the icon's color more quickly in case it was already enabled
@@ -34,7 +34,7 @@ public class StopHandler extends AbstractHandler {
 
 	/** Disables the StopHandler when we don't need it anymore. */
 	public static void disable() {
-		StopHandler.command = null;
+		command = null;
 		if (instance != null) {
 			instance.setBaseEnabled(false);
 			// Refresh the icon's color more quickly in case it was already disabled
@@ -42,6 +42,7 @@ public class StopHandler extends AbstractHandler {
 		}
 	}
 
+	/** Executes the StopHandler when we click the STOP button. */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (command != null) {
