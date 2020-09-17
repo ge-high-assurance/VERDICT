@@ -290,8 +290,8 @@ public class VerdictBundleCommand {
             VerdictLogger.severe("Error running command: " + e);
             return -1;
         } catch (CancellationException e) {
-        	VerdictLogger.info("Command cancelled");
-        	return -1;
+            VerdictLogger.info("Command cancelled");
+            return -1;
         } finally {
             StopHandler.disable();
             setFuture(null);
