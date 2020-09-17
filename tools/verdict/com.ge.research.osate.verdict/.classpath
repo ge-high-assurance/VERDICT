@@ -21,5 +21,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jnr-posix.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jnr-unixsocket.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jnr-x86asm.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/zt-exec.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

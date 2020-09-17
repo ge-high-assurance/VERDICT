@@ -11,7 +11,6 @@ Bundle-Activator: com.ge.research.osate.verdict.Activator
 Require-Bundle: com.ge.research.osate.verdict.dsl,
  com.ge.research.osate.verdict.dsl.ui,
  com.ge.research.osate.verdict.vdm,
- org.apache.ant,
  org.eclipse.emf.ecore.editor,
  org.eclipse.jface,
  org.eclipse.swt,
@@ -22,7 +21,8 @@ Require-Bundle: com.ge.research.osate.verdict.dsl,
  org.eclipse.core.databinding.observable,
  org.eclipse.jface.databinding,
  org.apache.commons.math3
-Import-Package: org.apache.commons.logging
+Import-Package: org.apache.commons.logging,
+ org.slf4j
 Export-Package: com.ge.research.osate.verdict,
  com.ge.research.osate.verdict.gui,
  com.ge.research.osate.verdict.handlers
@@ -44,4 +44,5 @@ Bundle-ClassPath: .,
  lib/jnr-ffi.jar,
  lib/jnr-posix.jar,
  lib/jnr-unixsocket.jar,
- lib/jnr-x86asm.jar
+ lib/jnr-x86asm.jar,
+ lib/zt-exec.jar
