@@ -201,6 +201,7 @@ public class Agree2Vdm {
 		//return the final model
 		return model;
 	}
+
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
