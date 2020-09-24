@@ -108,27 +108,27 @@ let compOut_In name out cia l_comp_dep= let f x tag =  List.Assoc.find_exn x tag
 (* - * - * - *)
                                                   
 (* from l_attack we get attack_events*)
-let (compType_A, c_A,               i_A,         a_A,            capec_A, likeli_A)=
-    ("CompType", "Confidentiality", "Integrity", "Availability", "CAPEC", "LikelihoodOfSuccess");;
-let compAttack name l_attack = compInfo name compType_A l_attack;;
-let attack_cia name cia l_attack = 
+let (compType_A, compInst_A, c_A,               i_A,         a_A,            capec_A, likeli_A)=
+    ("CompType", "CompInst", "Confidentiality", "Integrity", "Availability", "CAPEC", "LikelihoodOfSuccess");;
+let compAttack name tag l_attack = compInfo name tag l_attack;; (* tag is meant to be compType_A for comp or compInst_A for conn *)
+let attack_cia name tag cia l_attack = 
                           let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
                           let fun_cia x = if f x c_A = cia || f x i_A = cia || f x a_A= cia 
                                           then [f x capec_A] else [] in
-                          List.map (compAttack name l_attack)  ~f:fun_cia;;
+                          List.map (compAttack name tag l_attack)  ~f:fun_cia;;
 (* TODO: zip and unzip *)
-let attack_events name l_attack = let f_capec x = List.Assoc.find_exn x capec_A ~equal:(=) in
-                         List.map (compAttack name l_attack) ~f:f_capec ;;
+let attack_events name tag l_attack = let f_capec x = List.Assoc.find_exn x capec_A ~equal:(=) in
+                         List.map (compAttack name tag l_attack) ~f:f_capec ;;
                          
-let attack_info name l_attack= let f_info x = float_of_string (List.Assoc.find_exn x likeli_A ~equal:(=)) in
-                         List.map (compAttack name l_attack) ~f:f_info ;;                                                   
+let attack_info name tag l_attack= let f_info x = float_of_string (List.Assoc.find_exn x likeli_A ~equal:(=)) in
+                         List.map (compAttack name tag l_attack) ~f:f_info ;;                                                   
 
 (* there could be duplicate attack events. Assuming that each CAPECs in l_attack 
    will each have the same likelihoods, the best way to eliminate duplicates is to 
    zip the attack events and the info lists, dedup, then unzip *)
    
-let makeAttackList_AttackInfoList name l_attack =
-   let aL = List.zip_exn (attack_events name l_attack) (attack_info name l_attack) in
+let makeAttackList_AttackInfoList name tag l_attack =
+   let aL = List.zip_exn (attack_events name tag l_attack) (attack_info name tag l_attack) in
    List.unzip (List.dedup_and_sort ~compare:compare aL) ;;
 
 (* - * - * - *)
@@ -136,16 +136,16 @@ let makeAttackList_AttackInfoList name l_attack =
 (* from l_defense we get defense_events, defense_rigors and defense_profiles*)
 let(compType_D, compInst_D,  capec_D, c_D,               i_D,         a_D,            applProps_D,                   implProps_D,      dal_D)=
    ("CompType", "CompInst",  "CAPEC", "Confidentiality", "Integrity", "Availability", "ApplicableDefenseProperties", "ImplProperties", "DAL");;
-let compDefense name l_defense = compInfo name compType_D l_defense;;
-let compDefenseCapec name capec l_defense = compInfo capec capec_D (compDefense name l_defense);;
-let listCapec name l_defense= let capecType x  = List.Assoc.find_exn x capec_D ~equal:(=) in
-                      List.dedup_and_sort ~compare:compare (List.map (compDefense name l_defense) ~f:(fun x->capecType x));;
-let compDefenseCapecCIA name capec cia ciaTag l_defense = compInfo cia ciaTag (compDefenseCapec name capec l_defense);;
-let filterDefenseCapecCIA name capec cia  defType l_defense =
+let compDefense name tag l_defense = compInfo name tag l_defense;; (* tag is meant to be compType_D for comp or compInst_D for conn *)
+let compDefenseCapec name tag capec l_defense = compInfo capec capec_D (compDefense name tag l_defense);;
+let listCapec name tag l_defense= let capecType x  = List.Assoc.find_exn x capec_D ~equal:(=) in
+                      List.dedup_and_sort ~compare:compare (List.map (compDefense name tag l_defense) ~f:(fun x->capecType x));;
+let compDefenseCapecCIA name tag capec cia ciaTag l_defense = compInfo cia ciaTag (compDefenseCapec name tag capec l_defense);;
+let filterDefenseCapecCIA name tag capec cia  defType l_defense =
                  let defenseType x tag = List.Assoc.find_exn x tag ~equal:(=) in
-                 let defenseListC = compDefenseCapecCIA name capec cia c_D l_defense in
-                 let defenseListI = compDefenseCapecCIA name capec cia i_D l_defense in
-                 let defenseListA = compDefenseCapecCIA name capec cia a_D l_defense in
+                 let defenseListC = compDefenseCapecCIA name tag capec cia c_D l_defense in
+                 let defenseListI = compDefenseCapecCIA name tag capec cia i_D l_defense in
+                 let defenseListA = compDefenseCapecCIA name tag capec cia a_D l_defense in
                  let defenCIA lDef  = List.map lDef ~f:(fun x->defenseType x defType) in
                  let filterNULL l =l|>List.dedup_and_sort ~compare:compare |>(fun x->List.filter x ~f:(fun x-> x <> "null")) in
                  let clean l = l |> (fun x->List.filter x ~f:(fun x-> x <> []))|> List.hd_exn in
@@ -153,37 +153,37 @@ let filterDefenseCapecCIA name capec cia  defType l_defense =
                  [if defenseListC =[] then [] else [(cia,filterNULL(defenCIA defenseListC ))];
                   if defenseListI =[] then [] else [(cia,filterNULL(defenCIA defenseListI ))];
                   if defenseListA =[] then [] else [(cia,filterNULL(defenCIA defenseListA ))]];;
-let filterCIA name capec l_defense =
+let filterCIA name tag capec l_defense =
                  let ciaComp x tag = List.Assoc.find_exn x tag ~equal:(=) in 
-                 let comp_C = List.map (compDefenseCapec name capec l_defense ) ~f:(fun x->ciaComp x c_D) in
-                 let comp_I = List.map (compDefenseCapec name capec l_defense) ~f:(fun x->ciaComp x i_D) in
-                 let comp_A = List.map (compDefenseCapec name capec l_defense ) ~f:(fun x->ciaComp x a_D) in 
+                 let comp_C = List.map (compDefenseCapec name tag capec l_defense ) ~f:(fun x->ciaComp x c_D) in
+                 let comp_I = List.map (compDefenseCapec name tag capec l_defense) ~f:(fun x->ciaComp x i_D) in
+                 let comp_A = List.map (compDefenseCapec name tag capec l_defense ) ~f:(fun x->ciaComp x a_D) in 
                  let clean l = l|>(fun x-> List.filter x ~f:(fun x-> x <> "null"))|>List.dedup_and_sort ~compare:compare in
                  clean (List.concat [comp_C;comp_I;comp_A]);;
-let filterDefense name  defType l_defense =
-                   let filterCIA name capec = List.map (filterCIA name capec l_defense) 
-                     ~f:(fun xcia-> filterDefenseCapecCIA name capec xcia  defType l_defense) in
+let filterDefense name tag defType l_defense =
+                   let filterCIA name capec = List.map (filterCIA name tag capec l_defense) 
+                     ~f:(fun xcia-> filterDefenseCapecCIA name tag capec xcia  defType l_defense) in
                    let clean l = l|> List.concat |> List.hd_exn in   
-                   List.map (listCapec name l_defense) ~f:(fun xcapec->(xcapec,clean(filterCIA name xcapec)));;
+                   List.map (listCapec name tag l_defense) ~f:(fun xcapec->(xcapec,clean(filterCIA name xcapec)));;
 
-let defenseEventsRigors name defTag l_defense = 
+let defenseEventsRigors name tag defTag l_defense = 
                    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
-                   List.dedup_and_sort ~compare:compare (List.map (compDefense name l_defense) ~f:(fun x->(f x defTag,f x dal_D)));;
+                   List.dedup_and_sort ~compare:compare (List.map (compDefense name tag l_defense) ~f:(fun x->(f x defTag,f x dal_D)));;
                                                                                                                                                                                         
 (*Heber defense profiles *)
-let defenseEventsRigorsAUX name defTag l_defense = 
-     let ldefenseDAL = defenseEventsRigors name defTag l_defense in
+let defenseEventsRigorsAUX name tag defTag l_defense = 
+     let ldefenseDAL = defenseEventsRigors name tag defTag l_defense in
      let defenseDalUAux = List.map ldefenseDAL ~f:(fun x->(String.split_on_chars (fst x) ~on:[';'], 
                                                            String.split_on_chars (snd x) ~on:[';'])) in 
      let ldefenseDalU = List.concat (List.map defenseDalUAux ~f:(fun (x,y) -> List.zip_exn x y)) in
      List.filter (List.dedup_and_sort ~compare:compare ldefenseDalU) ~f:(fun x -> x <> ("null","null"));;
      
-let defenseEvents name defTag l_defense = 
-     let def_dal = defenseEventsRigorsAUX name defTag l_defense in
+let defenseEvents name tag defTag l_defense = 
+     let def_dal = defenseEventsRigorsAUX name tag defTag l_defense in
      List.map def_dal ~f:(fun x->fst x);;
 
-let defenseRigors name defTag l_defense = 
-     let def_dal = defenseEventsRigorsAUX name defTag l_defense in
+let defenseRigors name tag defTag l_defense = 
+     let def_dal = defenseEventsRigorsAUX name tag defTag l_defense in
      List.map def_dal ~f:(fun x->if (snd x) = "null" then 0 else int_of_string (snd x) );;
 
 (* - * - * - *)
@@ -205,8 +205,8 @@ let rec makeNIST2DAL_assocList aL l_defense2nist =
                           (pp,dal) :: makeNIST2DAL_assocList tl l_defense2nist)
     | [] -> [];;
 
-let makeDefenseList_DefenseRigorsList comp deftype defense defense2nist =
- let aL = List.zip_exn (defenseEvents comp deftype defense) (defenseRigors comp deftype defense) in
+let makeDefenseList_DefenseRigorsList comp tag deftype defense defense2nist =
+ let aL = List.zip_exn (defenseEvents comp tag deftype defense) (defenseRigors comp tag deftype defense) in
  let f a = 
   (let (p,dal) = a in 
    let strList = String.split_on_chars ~on:[';'] p in
@@ -225,10 +225,10 @@ let rec convertProp2Profile l l_defense2nist =
          ) :: (convertProp2Profile tl l_defense2nist)
      | [] -> [];;
 
-let defenseProfileAux name defType l_defense  =
+let defenseProfileAux name tag defType l_defense  =
     let capec x = fst x  
     and defenList x = snd (snd x) in
-    let cp = List.concat (List.map (filterDefense name  defType l_defense) ~f:(fun x-> [(capec x, defenList x)])) in
+    let cp = List.concat (List.map (filterDefense name tag defType l_defense) ~f:(fun x-> [(capec x, defenList x)])) in
     let cpsplit = List.map cp ~f:(fun (c,pl) -> (c, (List.map pl ~f:(fun p -> String.split_on_chars ~on:[';'] p)))) in
     let cpconverted = cpsplit in 
     List.map cpconverted ~f:(fun (c,pl) -> (c, List.map pl ~f:(fun l -> List.filter l ~f:(fun x -> x<>"null"))))
@@ -268,8 +268,8 @@ let rec postProcessDefenseProfile dL =
          | _     -> (c,p) :: postProcessDefenseProfile tl)
    |[] -> [];;
 
-let defenseProfile name defType l_defense =
-   let compDefensesList = defenseProfileAux name defType l_defense in
+let defenseProfile name tag defType l_defense =
+   let compDefensesList = defenseProfileAux name tag defType l_defense in
    postProcessDefenseProfile (processDL compDefensesList);;
 
 
@@ -356,8 +356,8 @@ let formulaSafe name coutputs cinputs cevents l_comp_saf iaList =
 (* - * - * - *)
 
 (* from l_arch we get lib component names, lib component inputs & outputs, mdl instances, mdl connections *)
-let (connName_Arc,     srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
-    ("ConnectionName", "SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
+let (connName_Arc,     comp_Arc, impl_Arc, srcIns_Arc,        srcType_Arc, srcImpl_Arc, srcPortName_Arc, srcPortType_Arc, desIns_Arc,         desType_Arc, desImpl_Arc, desPortName_Arc, desPortType_Arc )=
+    ("ConnectionName", "Comp",   "Impl",   "SrcCompInstance", "SrcComp",   "SrcImpl",   "SrcPortName",   "SrcPortType",   "DestCompInstance", "DestComp",  "DestImpl",  "DestPortName",  "DestPortType");;
 
 let compInputArch name l_arch = (* by design, lib component inputs are all DestComp DestPortNames *)
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
@@ -377,7 +377,7 @@ let instancesArch l_arch =
 let instancesConn l_defense = 
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
    let l_defense_Connection = compInfo "Connection" compType_D l_defense in
-   List.dedup_and_sort ~compare:compare (List.map l_defense_Connection ~f:(fun x-> makeInstance ~i:(f x compInst_D) ~c:"Connection" ()));;
+   List.dedup_and_sort ~compare:compare (List.map l_defense_Connection ~f:(fun x-> makeInstance ~i:(f x compInst_D) ~c:(f x compInst_D) ()));;
 
 let connectionsArch arch = 
    let f x tag = List.Assoc.find_exn x tag ~equal:(=) in
@@ -627,11 +627,11 @@ let formula_And listElement cinputs =
 		And aList_allowed 
 	 | _ -> And[] ;;
 
-let fullAttackList name cia l_attack =
-   List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name cia l_attack));;
+let fullAttackList name tag cia l_attack =
+   List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name tag cia l_attack));;
 
-let elimAttackList name cia l_attack = 
-   List.concat (noEmptyList (List.dedup_and_sort ~compare:compare (attack_cia name cia l_attack)));;
+let elimAttackList name tag cia l_attack = 
+   List.concat (noEmptyList (List.dedup_and_sort ~compare:compare (attack_cia name tag cia l_attack)));;
    
 let filterList fullListList elimList =
    List.filter fullListList ~f:(fun x -> not(List.mem elimList (List.hd_exn x) ~equal:(=)));;
@@ -641,24 +641,24 @@ let makeConnDestCompList connNameList l_arch =
 	List.map connNameList ~f:(fun x -> let connInfo = List.concat (compInfo x connName_Arc l_arch) in
 	   (List.Assoc.find_exn connInfo desType_Arc ~equal:(=), List.Assoc.find_exn connInfo desPortName_Arc ~equal:(=)));;
 
-let formula_aux name out cinputs cia l_comp_dep l_attack l_defense l_arch =  
-   let l = fullAttackList name cia l_attack in                             (* <-- full attack list *)
-   let lprime = filterList l (elimAttackList "Connection" cia l_attack) in (* <-- attack list with CAPECs on connections eliminated *)
-   let l_compInCIA = compOut_In name out cia l_comp_dep in                 (* <-- [inp; cia] list *)
-   let l_match = List.map l_compInCIA ~f:(fun i -> match i with            (* <-- [true; false] list that shows if an input is part of the elimination list b/c it's already in the connection *)
+let formula_aux name tag out cinputs cia l_comp_dep l_attack l_defense l_arch =  
+   let l = fullAttackList name tag cia l_attack in                                    (* <-- full attack list *)
+   let lprime = filterList l (elimAttackList "Connection" compType_A cia l_attack) in (* <-- attack list with CAPECs on connections eliminated *)
+   let l_compInCIA = compOut_In name out cia l_comp_dep in                            (* <-- [inp; cia] list *)
+   let l_match = List.map l_compInCIA ~f:(fun i -> match i with                       (* <-- [true; false] list that shows if an input is part of the elimination list b/c it's already in the connection *)
         [inp;_] -> List.exists (makeConnDestCompList (listConnName l_defense) l_arch) ~f:(fun m -> m=(name,inp)) 
       | _     -> false) in 
-   let use_lprime = match l_match with                                     (* <-- fold the list into either T/F bool *)
+   let use_lprime = match l_match with                                                (* <-- fold the list into either T/F bool *)
         [] -> false
       | _  -> List.fold l_match ~init:true ~f:(&&) in
    let l2 = match use_lprime with
-        true  -> noEmptyList(List.concat [lprime; l_compInCIA])            (* <-- if true, use the attack list with connection attack eliminated *)
-      | false -> noEmptyList (List.concat [l; l_compInCIA]) in             (* <-- if false, use the full attack list *)
+        true  -> noEmptyList(List.concat [lprime; l_compInCIA])                       (* <-- if true, use the attack list with connection attack eliminated *)
+      | false -> noEmptyList (List.concat [l; l_compInCIA]) in                        (* <-- if false, use the full attack list *)
    let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
    Or (eliminateEmptyAnd l3);;
 
-let formula name coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList = 
-    let formula_type name out cia =  ([out; cia],formula_aux name out cinputs cia l_comp_dep l_attack l_defense l_arch) in
+let formula name tag coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList = 
+    let formula_type name out cia =  ([out; cia],formula_aux name tag out cinputs cia l_comp_dep l_attack l_defense l_arch) in
     let formulaOut name out = List.map ciaList ~f:(fun x-> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
@@ -671,14 +671,14 @@ let formula name coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList =
 (* # compOut_In "Radio" "comm_out" "Integrity" compDepen;;
 - : Core.String.t list Core.List.t = [["comm_in"; "Integrity"]] *)
 
-let formulaConn_aux name cinputs cia l_attack =
-	let l = List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name cia l_attack)) in 
+let formulaConn_aux name tag cinputs cia l_attack =
+	let l = List.dedup_and_sort ~compare:compare (noEmptyList (attack_cia name tag cia l_attack)) in 
 	let l2 = noEmptyList (List.concat [l; [["in"; cia]]]) in    (* <-- using hardcoded "in" for Connection input *)
 	let l3 = List.map l2 ~f:(fun x -> formula_And x cinputs) in
 	Or (eliminateEmptyAnd l3);;
 
-let formulaConn name coutputs cinputs l_attack ciaList  =
-    let formula_type name out cia = ([out; cia], formulaConn_aux name cinputs cia l_attack) in
+let formulaConn name tag coutputs cinputs l_attack ciaList  =
+    let formula_type name out cia = ([out; cia], formulaConn_aux name tag cinputs cia l_attack) in
     let formulaOut name out = List.map ciaList ~f:(fun x -> formula_type name out x) in
     (List.concat (List.map coutputs ~f:(fun x->formulaOut name x)));;
 
@@ -716,7 +716,7 @@ let compCyberInfe l_arch l_compDepen =
 
 
 let formulaInfer_aux name cia out linputs l_attack= 
-    let l = List.concat (noEmptyList (attack_cia name cia l_attack)) in
+    let l = List.concat (noEmptyList (attack_cia name compType_A cia l_attack)) in
     let lattack = List.map l ~f:(fun x->A[x]) in
     let confidIntegAvail = List.map linputs ~f:(fun x->A[x;cia]) in
     (*Heber let availability = List.concat (List.map linputs (fun x->[A[x;cia];A[x;"Integrity"]])) in  
@@ -768,9 +768,9 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense
 	let coutputs = (compOutputArch name l_arch) 
 	and cinputs = (compInputArch name l_arch)
 	and cevents = (compEvents name l_events)
-	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
+	and (attacksList, infoList) = (makeAttackList_AttackInfoList name compType_A l_attack)
 	in 
-	genComp (*name*)            name 
+	genComp (*name*)          name 
 			(*input_flows*)     cinputs 
 			(*output_flows*)    coutputs
 			(*faults*)          iaList 
@@ -786,32 +786,44 @@ let gen_Comp name defType l_arch l_comp_dep l_comp_saf l_attack l_defense
 			(*attack_info*)     infoList    (* (attack_info name l_attack) *)
 			(*attack_formula*)  (if (infeCyber && List.mem comNoCyberRe name ~equal:(=))
 			                        then (formulaInfer name coutputs cinputs l_attack ciaList)
-			                        else (formula name coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList)) 
-			(*defense_events*)  (defenseEvents name defType l_defense)   (* eventsList *)
-			(*defense_rigors*)  (defenseRigors name defType l_defense)   (* rigorsList *)  
-			(*defense_profiles*)(defenseProfile name defType l_defense);;
+			                        else (formula name compType_A coutputs cinputs l_comp_dep l_attack l_defense l_arch ciaList)) 
+			(*defense_events*)  (defenseEvents name compType_D defType l_defense)   (* eventsList *)
+			(*defense_rigors*)  (defenseRigors name compType_D defType l_defense)   (* rigorsList *)  
+			(*defense_profiles*)(defenseProfile name compType_D defType l_defense);;
 (* - *)
+
+let rec list_conn_aux l_defense = 
+   match l_defense with
+   hd::tl -> ((match (List.Assoc.find_exn hd compType_D ~equal:(=)) with
+             "Connection" -> [List.Assoc.find_exn hd compInst_D ~equal:(=)]
+             | _ -> []) :: list_conn_aux tl)
+   | [] -> []
+;;
+
+let list_conn l_defense = 
+   List.concat (List.dedup_and_sort ~compare:compare (list_conn_aux l_defense)) ;; 
 
 let gen_ConnComp name defType l_attack l_defense ciaList = 
 	(* Below calls the function genComp which creates a lib comp with the following fields filled in *)
 	let cinputs = ["in"]
 	and coutputs = ["out"] 
-	and (attacksList, infoList) = (makeAttackList_AttackInfoList name l_attack)
+	and (attacksList, infoList) = (makeAttackList_AttackInfoList name compInst_A l_attack)
 	in 
-	genComp (*name*)            name 
+	genComp (*name*)          name 
 			(*input_flows*)     cinputs  (* <-- always 1 input called "in" *)
 			(*output_flows*)    coutputs (* <-- always 1 output called "out" *)
-			(*faults*)          [ ]      (* <-- nothing to do with safety; leave empty *)
+			(*faults*)          ["Integrity";"Availability"]
 			(*basic_events*)    [ ]      (* <-- nothing to do with safety; leave empty *)
 			(*event_info*)      [ ]      (* <-- nothing to do with safety; leave empty *)
-			(*fault_formulas*)  [ ]      (* <-- nothing to do with safety; leave empty *)
+         (*fault_formulas*)  [(["out"; "Integrity";],Or[F["in";"Integrity"]]);
+                              (["out"; "Availability"], Or[F["in";"Availability"]]) ] (* <-- pass through formulas *)
 			(*attacks*)         ciaList 
 			(*attack_events*)   attacksList 
 			(*attack_info*)     infoList    
-			(*attack_formula*)  (formulaConn name coutputs cinputs l_attack ciaList) 
-			(*defense_events*)  (defenseEvents name defType l_defense)   (* eventsList *)
-			(*defense_rigors*)  (defenseRigors name defType l_defense)   (* rigorsList *)  
-			(*defense_profiles*)(defenseProfile name defType l_defense);;
+			(*attack_formula*)  (formulaConn name compInst_A coutputs cinputs l_attack ciaList) 
+			(*defense_events*)  (defenseEvents name compInst_D defType l_defense)   (* eventsList *)
+			(*defense_rigors*)  (defenseRigors name compInst_D defType l_defense)   (* rigorsList *)  
+			(*defense_profiles*)(defenseProfile name compInst_D defType l_defense);;
 (* - *)
 
 (*generate component mission*)
@@ -898,14 +910,14 @@ let gen_model reqId l_arch l_defense l_mission =
 (**)
 let gen_library reqId defType l_comp_dep l_comp_saf l_attack l_events l_arch l_defense l_mission ciaList iaList infeCyber infeSafe= 
     let comNoCyberRe = compCyberInfe l_arch l_comp_dep in
-	let comNoSafeRe  = compCyberInfe l_arch l_comp_saf in
+	 let comNoSafeRe  = compCyberInfe l_arch l_comp_saf in
     let components = List.map (list_comp l_arch) ~f:(fun x -> gen_Comp x defType l_arch l_comp_dep l_comp_saf l_attack 
                                    l_defense l_events ciaList iaList infeCyber infeSafe comNoCyberRe comNoSafeRe)
-    and connComponent = gen_ConnComp "Connection" defType l_attack l_defense ciaList in
+    and connComponents = List.map (list_conn l_defense) ~f:(fun x -> gen_ConnComp x defType l_attack l_defense ciaList) in
     let rType = compReqType reqId l_mission in
     match rType with
-    | "Cyber" -> List.append (connComponent::components) [gen_CompMission reqId l_mission]
-    | "Safety" -> List.append components [gen_CompSafety reqId l_mission]
+    | "Cyber" -> List.append (List.append connComponents components) [gen_CompMission reqId l_mission]
+    | "Safety" -> List.append (List.append connComponents components) [gen_CompSafety reqId l_mission]
     | _ -> raise (Error_csv2soteria "gen_library exception: req is neither CyberReq nor SafetyReq");;
 
 
@@ -1242,13 +1254,13 @@ let rec removeMissionsWithNoReq l_librariesThreats =
 (* *)
 
        
-(* function to rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+(* function to rename the "ConnectionName" so that it is a concatenation of <ConnectionName><Impl><Comp> *)
 let renameConnectionName l_arch =
    List.map l_arch ~f:(fun aL ->
       let connName = List.Assoc.find_exn aL ~equal:(=) connName_Arc
-      and srcImpl = List.Assoc.find_exn aL ~equal:(=) srcImpl_Arc
-      and srcComp = List.Assoc.find_exn aL ~equal:(=) srcType_Arc in
-      let newConnName = connName ^ srcImpl ^ srcComp in
+      and impl = List.Assoc.find_exn aL ~equal:(=) impl_Arc
+      and comp = List.Assoc.find_exn aL ~equal:(=) comp_Arc in
+      let newConnName = connName ^ impl ^ comp in
       (connName_Arc, newConnName)::(List.filter aL ~f:(fun (tag, _) -> tag<>connName_Arc)) );;
        
 
@@ -1258,7 +1270,7 @@ let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch even
    and compSafe     = mainListtag comp_saf_ch
    and attack       = mainListtag attack_ch    
    and events       = mainListtag events_ch 
-   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><SrcImpl><SrcComp> *)
+   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><Impl><Comp> *)
    and mission      = mainListtag mission_ch 
    and defense      = mainListtag defense_ch 
    and defense2nist = mainListtag defense2nist_ch in

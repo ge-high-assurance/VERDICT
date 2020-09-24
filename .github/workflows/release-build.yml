@@ -1,12 +1,13 @@
-# Builds an almost complete Verdict release
-# TBD: push to VERDICT-update-sites too (maybe with copycat-action)
+# Builds a Verdict release for end users:
+#        - extern.zip and README.md uploaded to GitHub release assets
+#        - verdict Docker image pushed to Docker Hub
+#        - verdict-latest and verdict-x.x.x update sites pushed to GitHub
 
 name: Verdict release build
 
 on:
-  push:
-    branches: [ ci-cd ]
-    tags: [ '*' ]
+  release:
+    types: [ published ]
 
 jobs:
   native-binaries:
@@ -145,7 +146,7 @@ jobs:
         mv tools/verdict-back-ends/STEM extern
         mkdir extern/examples
         mv models/CASE_Toy_Models extern/examples
-        mv models/DeliveryDrone extern/examples
+        mv models/DeliveryDrone_CASE_v* extern/examples
         chmod a+x extern/{mac,nix}/{aadl2iml,kind2,soteria_pp}
         cp -a tools/verdict-back-ends/verdict-bundle-parent/verdict-bundle/target/verdict-bundle-1.0.0-SNAPSHOT-capsule.jar extern
         zip -r extern.zip extern
@@ -153,11 +154,25 @@ jobs:
         cp -a extern/nix/aadl2iml tools/verdict-back-ends/aadl2iml/bin
         cp -a extern/nix/soteria_pp tools/verdict-back-ends/soteria_pp/bin
 
-    - name: Upload extern folder
-      uses: actions/upload-artifact@v2
+    - name: Upload extern.zip to GitHub release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: extern.zip
-        path: extern.zip
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: extern.zip
+        asset_name: extern.zip
+        asset_content_type: application/zip
+
+    - name: Upload README.md to GitHub release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: docs/README.md
+        asset_name: README.md
+        asset_content_type: text/markdown; charset=UTF-8
 
     - name: Build verdict image
       uses: docker/build-push-action@v1
@@ -173,3 +188,23 @@ jobs:
         build_args: BUILDKIT_INLINE_CACHE=1
         cache_froms: gehighassurance/verdict:latest
         push: true
+
+    - name: Check out VERDICT-update-sites
+      uses: actions/checkout@v2
+      with:
+        repository: ge-high-assurance/VERDICT-update-sites
+        token: ${{ secrets.CI_PAT }}
+        path: VERDICT-update-sites
+
+    - name: Update verdict-latest in VERDICT-update-sites
+      run: |
+        RELEASE="${{ github.event.release.tag_name }}"
+        cd VERDICT-update-sites
+        rm -rf verdict-latest verdict-$RELEASE
+        mv ../tools/verdict/com.ge.research.osate.verdict.updatesite/target/repository verdict-latest
+        cp -a verdict-latest verdict-$RELEASE
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "Update verdict-latest and verdict-$RELEASE in VERDICT-update-sites"
+        git push

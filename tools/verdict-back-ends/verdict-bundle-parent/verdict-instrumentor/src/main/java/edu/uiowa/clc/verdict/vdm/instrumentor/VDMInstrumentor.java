@@ -1506,6 +1506,7 @@ public class VDMInstrumentor {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
             identifier = identifier.replace(".", "_dot_");
+            identifier = identifier.replace("::", "_double_colon_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1624,6 +1625,7 @@ public class VDMInstrumentor {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
             identifier = identifier.replace(".", "_dot_");
+            identifier = identifier.replace("::", "_double_colon_");
 
             src_componentInstance.setId(identifier);
             src_componentInstance.setName(identifier);
@@ -1651,6 +1653,7 @@ public class VDMInstrumentor {
             String identifier = compImpl.getId();
             //            identifier = identifier.replace(".I", "_I");
             identifier = identifier.replace(".", "_dot_");
+            identifier = identifier.replace("::", "_double_colon_");
 
             dest_componentInstance.setId(identifier);
             dest_componentInstance.setName(identifier);
@@ -1673,6 +1676,7 @@ public class VDMInstrumentor {
                         + "_port_"
                         + dest_port.getName();
 
+        instrument_cmp_Id = instrument_cmp_Id.replace(".", "_dot_");
         // Setting Component IDs
         instrumented_cmp.setId(instrument_cmp_Id);
         instrumented_cmp.setName(instrument_cmp_Id);
@@ -1775,6 +1779,8 @@ public class VDMInstrumentor {
 
         // Condition
         Expression cond_expr = new Expression();
+        global_constant_Id = global_constant_Id.replace(".", "_dot_");
+
         cond_expr.setIdentifier(global_constant_Id);
         ifelse.setCondition(cond_expr);
         // Then

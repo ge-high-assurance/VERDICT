@@ -1,0 +1,8 @@
+This release contains the following tool improvements:
+
+- A new Model-based Architecture Synthesis (MBAS) feature
+- A new assurance case fragment generation feature for MBAA
+- CRV translator support for more AADL language constructs and better error handling
+- CRV support for merit assignment
+
+Please follow the README.md file in the release attachment to install VERDICT.

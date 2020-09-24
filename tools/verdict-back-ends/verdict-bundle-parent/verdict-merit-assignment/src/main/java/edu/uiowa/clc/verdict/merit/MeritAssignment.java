@@ -45,6 +45,7 @@ public class MeritAssignment {
 
                     //                    element_name = element_name.replaceAll("_port_", ".");
                     element_name = element_name.replace("_dot_", ".");
+                    element_name = element_name.replace("_double_colon_", "::");
 
                     System.out.println("Component " + element_name + ":");
 
