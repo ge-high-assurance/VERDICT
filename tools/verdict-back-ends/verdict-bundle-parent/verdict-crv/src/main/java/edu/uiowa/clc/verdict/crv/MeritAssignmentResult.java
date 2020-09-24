@@ -37,6 +37,7 @@ public class MeritAssignmentResult {
                     String nodeName = nodeElement.getAttribute("name");
                     //                    nodeName = nodeName.replaceAll("_port_", ".");
                     nodeName = nodeName.replace("_dot_", ".");
+                    nodeName = nodeName.replace("_double_colon_", "::");
 
                     System.out.println("Node " + nodeName + ":");
 

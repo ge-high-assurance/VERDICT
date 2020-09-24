@@ -87,6 +87,7 @@ public class CRVReadXMLFile {
 
                 String element_name = nodeElement.getAttribute("name");
                 element_name = element_name.replace("_dot_", ".");
+                element_name = element_name.replace("_double_colon_", "::");
                 
                 IVCNode ivcNode = new IVCNode();
                 ivcNode.setNodeName(element_name);
