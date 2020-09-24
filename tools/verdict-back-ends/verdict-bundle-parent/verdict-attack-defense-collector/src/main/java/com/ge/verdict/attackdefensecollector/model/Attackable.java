@@ -46,6 +46,11 @@ public final class Attackable {
         return system.isPresent();
     }
 
+    /**
+     * Fails if !isSystem().
+     *
+     * @return
+     */
     public SystemModel getSystem() {
         return system.get();
     }
@@ -54,6 +59,11 @@ public final class Attackable {
         return connection.isPresent();
     }
 
+    /**
+     * Fails if !isConnection().
+     *
+     * @return
+     */
     public ConnectionModel getConnection() {
         return connection.get();
     }

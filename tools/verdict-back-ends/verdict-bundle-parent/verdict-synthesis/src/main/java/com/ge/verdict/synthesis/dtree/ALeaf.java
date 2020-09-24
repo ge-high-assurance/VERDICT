@@ -8,8 +8,17 @@ import java.util.Optional;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
+/**
+ * A raw attack leaf in a defense tree. Each aleaf should have a corresponding dleaf, and if such a
+ * corresponding dleaf is found then the aleaf is removed during preparation.
+ *
+ * <p>If there is no corresponding dleaf, then this aleaf represents an unmitigated attack. As a
+ * result, the dtree may not be satisfiable.
+ */
 public class ALeaf implements DTree {
+    /** the encapsulated attack-defense tree attack node */
     private Attack attack;
+    /** is set to true when a corresponding dleaf is found */
     private boolean mitigated;
 
     public ALeaf(Attack attack) {
@@ -62,6 +71,7 @@ public class ALeaf implements DTree {
 
     @Override
     public Optional<DTree> prepare() {
+        // remove from tree if mitigated
         return isMitigated() ? Optional.empty() : Optional.of(this);
     }
 

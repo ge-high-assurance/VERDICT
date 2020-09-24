@@ -1,0 +1,452 @@
+property set CASE_Consolidated_Properties is
+
+-------------------------------------------------------------------------
+--- The following VERDICT_Properties enable the use of the VERDICT tool suite for both the high-level Model-Based
+--- Architectural Analysis (MBAA) and behavioral analysis using the Cyber Resiliency Verifier (CRV). Each property
+--- below is tagged for which tools uses the property followed by a short description.
+---
+--- This file contains four different types of properties:
+--- 	Mandatory User Defined Component Properties must be assigned for VERDICT tools to execute
+--- 	Port Properties are used to designate analysis-only ports for use in behavioral analysis
+--- 	Connection Properties contain necessary inputs as well as annotations for applied mitigations on connections
+--- 	Connection Cyber Defense Properties allow the designer to annotate applied mitigations for connections
+--- 	Component Cyber Defense Properties allow the designer to annotate applied mitigations for system components
+-------------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------------
+--- Mandatory User Defined Component Properties
+---          NOTE: The mandatory user defined component properties must be assigned for each applicable component as a minimum for VERDICT to execute.
+-------------------------------------------------------------------------
+
+ --- MBAA:
+ --- 	canReceiveConfigUpdate is a property used to determine whether the system is susceptible to attacks attempting to tamper with the configuration
+ --- 	of a system. Apply this property if the configuration of software or hardware within the system can be updated outside of the original
+ --- 	manufacturer's facility.
+
+ canReceiveConfigUpdate: aadlboolean => True applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- 	canRecieveSWUpdate is a property used to determine whether the system is susceptible to attacks attempting to install malicious software
+ --- 	updates. Apply this property if the software within the system can be updated outside of the original manufacturer's facility.
+
+ canReceiveSWUpdate: aadlboolean => True applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- 	componentType is a property used to determine whether the system is subject to attacks targeting software, hardware, humans, or hybrid
+ --- 	(software and hardware). For example, systems that represent software only will not be subject to CAPEC-440 Hardware Integrity Attack.
+ --- CRV:
+ --- 	A componentType designates whether a component is a Software, Hardware, Human, Software-Hardware Hybrid, Software-Human Hybrid, 
+ ---	Hardware-Human Hybrid, or Hybrid.
+ --- 	This helps CRV to decide what sort of attack can the component be susceptible to. For instance, a Hybrid component can be susceptible
+ --- 	to both hardware trojan and software Virus/Worm/Malware attacks whereas a Human component can only be susceptible to insider/outsider threat.
+
+ componentType: enumeration (Software, Hardware, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid, Hybrid) => Hybrid applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- 	If a system contains the property hasSensitiveInfo it will be considered for attacks resulting in loss of confidentiality.
+
+ hasSensitiveInfo: aadlboolean => True applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- 	insideTrustedBoundary designates a system that will be analyzed for their potential to be attacked. Also, systems where insideTrustedBoundary=TRUE
+ --- 	will not be considered the initial source of attacks.
+ --- CRV:
+ --- 	If a component's insideTrustedBoundary property is true, it signifies to CRV that the component is inside the system's trusted boundary. 
+ ---	For instance, if a human component is inside the trusted boundary of the system, then an insider attack can occur. Or, a connection coming from
+ ---	a component which is not inside the trusted boundary is also susceptible to Network Injection attack. 
+
+ insideTrustedBoundary: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+
+
+ --- MBAA:
+ --- 	pedigree is a property used to infer the level of trust in a system. A "COTS" component will be untrusted and considered a
+ --- 	potential source of attacks, whereas "Sourced" and "InternallyDeveloped" components will be trusted. Both of these can be explicitly
+ --- 	overridden by the insideTrustedBoundary property.
+ ---
+ --- CRV:
+ --- 	The pedigree component property allows CRV to decide whether a component can be susceptible to a Hardware
+ --- 	Trojan, Remote Code Injection, Software Virus/Worm/Malware, a Logic Bomb attack. If a component is designated
+ --- 	as "InternallyDeveloped", it is neither susceptible to a hardware trojan nor a logic bomb attack. For other values,
+ --- 	however, they can be susceptible to the attacks.
+
+ pedigree: enumeration (InternallyDeveloped, COTS, Sourced) => COTS applies to (abstract, bus, device, system, process, processor, thread);
+
+
+
+-------------------------------------------------------------------------
+--- Port properties
+-------------------------------------------------------------------------
+
+ --- CRV:
+ --- 	If a port's probe property is true, it signifies to CRV that it is not part of the original architecture but is
+ --- 	included just for the convenience of CRV's reasoning. When a system is modeled hierarchically, a probe port allows CRV
+ --- 	to peek inside a component's behavior without needing to expose the behavior completely at a top level.
+
+ probe: aadlboolean => FALSE applies to (port);
+
+
+
+-------------------------------------------------------------------------
+--- Connection properties
+-------------------------------------------------------------------------
+
+
+ --- MBAA:
+ ---          connectionType is used by MBAA to make decisions around the level of trust for connections that are incompletely modeled.
+ ---          An example Untrusted connectionType would be GPS, where the satelite and ground systems may be excluded from the model, but
+ ---          this could also be used for logical models where the physical connection passes outside of the trust boundary.
+ ---          An example Trusted connectionType would be a connection passing between two local systems, where the physical communications
+ ---          medium is entirely contained within the trust boundary indicating that the connection itself can be trusted.
+ --- CRV:
+ ---          connectionType enables CRV to decide whether a certain connection can be susceptible to Network Injection,
+ ---          or the component to which this connection is incident upon is susceptible to Remote code injection or other software
+ ---          attacks (e.g., virus, trojan, worm). 
+
+ connectionType: enumeration (Trusted, Untrusted) => Untrusted applies to (connection);
+
+
+
+------------------------------------------------------------------------
+-- Optional Component Properties
+------------------------------------------------------------------------
+
+ --- CRV:
+ --- 	The category property lets CRV know whether a certain component is one of the pre-defined ones (e.g., GPS, IMU, LIDAR).
+ --- 	If it is one of the pre-defined components, then CRV targets that on some of its pre-defined set of attacks (e.g., Location spoofing).
+
+ category: aadlstring => "Unknown" applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- CRV:
+ --- 	If adversariallyTestedForTrojanOrLogicBomb property of a component is assigned an integer greater than '0', it suggests CRV that even if the
+ --- 	component's pedigree is sourced/COTS, it is not susceptible to hardware trojan or logic bomb type of attacks.
+
+ adversariallyTestedForTrojanOrLogicBomb: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+
+
+------------------------------------------------------------------------
+-- Connection Cyber Defense Properties
+---          NOTE: Each cyber defense represents one or more NIST 800-53r4 controls that has been applied to the system and the relative level of rigor
+---          that is used to develop the implementation of that control. If the system does not have the property or the value is '0', it is assumed that this
+---          defense has not been applied. More information on NIST 800-53 controls can be found at: https://csrc.nist.gov/publications/detail/sp/800-53/rev-4/final.
+------------------------------------------------------------------------
+
+ --- MBAA:
+ --- encryptedTransmission
+ ---          SC-8 Transmission Confidentiality and Integrity
+ ---                         SC-8 generally covers protection of the confidentiality of communications between two components, which
+ ---                         can include encryption of the data payload, protection of the header or protocol fields, and confidentiality
+ ---                         of data just prior to sending and just after receipt.
+
+ encryptedTransmission: aadlinteger 0 .. 9 => 0 applies to (connection);
+
+ --- MBAA:
+ --- deviceAuthentication
+ ---          IA-3 Device Identification and Authentication
+ ---          IA-3 (1) Cryptographic Bidirectional Authentication
+ ---                         IA-3 specifies general verification of the identity of other connected systems, while enhancement IA-3 (1) establishes
+ ---                         requirements for mutual verification of identity through cryptographic algorithms.
+ --- CRV:
+ ---    The deviceAuthentication cyber-defense property is applied to channels instead of components, which indicates whether or not 
+ ---    the component originates this connection is authenticated, and if so (values greater than 0) how strong is that. Channels with zero 
+ ---	deviceAuthentication are susceptible to Network Injection, Remote Code Injection, or Software Virus/Worm/Malware.
+ 
+ deviceAuthentication: aadlinteger 0 .. 9 => 0 applies to (connection);
+
+ --- MBAA:
+ --- sessionAuthenticity
+ ---          SC-23 Session Authenticity
+ ---                         SC-23 specifies technical means to maintain the authenticity of communications after establishing initial
+ ---                         identity. Mitigations focus on unique randomly generated session identifiers.
+ --- CRV:
+ ---    The sessionAuthenticity cyber-defense property is applied to channels instead of components, which indicates whether or not 
+ ---    the connection session is authenticated, and if so (values greater than 0) how strong is that. Channels with zero sessionAuthenticity are
+ ---	susceptible to Network Injection, Remote Code Injection, or Software Virus/Worm/Malware.
+
+ sessionAuthenticity: aadlinteger 0 .. 9 => 0 applies to (connection);
+
+
+
+-------------------------------------------------------------------------
+--- Component Cyber Defense Properties
+---          NOTE: Each cyber defense represents one or more NIST 800-53r4 controls that has been applied to the system and the relative level of rigor
+---          that is used to develop the implementation of that control. If the system does not have the property or the value is '0', it is assumed that this
+---          defense has not been applied. More information on NIST 800-53 controls can be found at: https://csrc.nist.gov/publications/detail/sp/800-53/rev-4/final.
+-------------------------------------------------------------------------
+
+ --- MBAA:
+ --- antiJamming
+ ---          SC-40 Wireless Link Protection
+ ---          SC-40 (1) Electromagnetic Interference
+ ---                         SC-40 specifies general protections for wireless links by directing protection on signal parameters,
+ ---                         while SC-40 (1) specifies more specific techniques, such as cryptographic frequency hopping to prevent
+ ---                         the adversary from jamming communications.
+
+ antiJamming: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- auditMessageResponses
+ ---          SI-11 Error Handling
+ ---                         SI-11 ensures that error messages are designed to provide only the minimal information necessary for
+ ---                         informed authorized users to take the appropriate corrective actions and exclude any additional information that
+ ---                         would reveal more about the systems to potential attackers.
+
+ auditMessageResponses: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- dosProtection
+ ---          SC-5 Denial of Service Protection
+ ---          SC-5 (2) Excess Capacity/Bandwidth/Redundancy
+ ---                         SC-5 specifies general denial of service protections, including packet filtering and increased capacities
+ ---                         to withstand attacks. Enhancement SC-5 (2) describes more specific solutions to manage capacities, which
+ ---                         include usage priorities, quotas, and partitioning.
+
+ dosProtection: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- encryptedStorage
+ ---          SC-28 Protection of Information at Rest
+ ---                         SC-28 specifies means to protect sensitive information stored within the system, which can include
+ ---                         encryption of stored data or stored configuration files.
+
+ encryptedStorage: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- failSafe
+ ---          SI-17 Fail-Safe Procedures
+ ---                         SI-17 specifies the implementation of logic within the system to follow a known procedure during attacks
+ ---                         that result in sustained communication interruptions. Fail-Safe procedures can include shutdown process, alerts,
+ ---                         or predefined operational paths to follow.
+
+ failSafe: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- heterogeneity
+ ---          SC-29 Heterogeneity
+ ---                         SC-29 promotes the use of a diverse set of technologies to defend against common mode failures, which prevent
+ ---                         the same attack from successfully defeating two systems intended to be independent.
+
+ heterogeneity: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- inputValidation
+ ---          SI-10 Information Input Validation
+ ---          SI-10 (5) Restrict Inputs to Trusted Sources and Approved Formats
+ ---                         SI-10 specifies checking of the validity of incoming communications. Validity checks can be performed based
+ ---                         on a whitelisted character set, packet length, numerical ranges, or a list of acceptable values, as well as many
+ ---                         other factors. Enhancement SI-10 (5) focuses on enforcing only known trusted sources and valid message formats.
+ --- CRV:
+ ---	inputValidation for a component describes at which level of strongness a component exercises input validation. If there is zero inputValidation
+ ---	for a component, it is susceptible to Remote Code Injection attack or Software Virus/Worm/Malware.
+
+ inputValidation: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- logging
+ ---          AU-12 Audit Generation
+ ---          AU-12 (1) System-Wide/Time-Correlated Audit Trails
+ ---          AU-12 (3) Changes by Authorized Individuals
+ ---          AU-9 Protection of Audit Information
+ ---          AU-9 (3) Cryptographic Protection
+ ---                         AU-12 with enhancements (1) and (3) focuses on the implementation of auditable records that are time-synced across
+ ---                         the broader system to aid in forensic activities and available only to authorized users. AU-9 with enhancement (3)
+ ---                         ensures audit records are protected from tampering or deletion via signed hash functions or asymmetric encryption.
+
+ logging: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- memoryProtection
+ ---          SI-16 Memory Protection
+ ---                         SI-16 describes protections from unauthorized code execution, including non-executable regions of memory and
+ ---                         address space layout randomization.
+
+ memoryProtection: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- physicalAccessControl
+ ---          PE-3 Physical Access Control
+ ---                         PE-3 is an operational control that describes elements of a program to physically secure a facility or site that
+ ---                         containing a sensitive system. This includes verifying an individual's identity and authorization, logging physical
+ ---                         accesses, escorting visitors, taking inventory of devices, and installing/maintaining physical access devices
+ ---                         (e.g. locks, key readers, etc.).
+
+ physicalAccessControl: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- remoteAttestation
+ ---          IA-3 (4) Device Attestation
+ ---                         Enhancement IS-3 (4) describes means for one system to assure to another system the authenticity of its configuration
+ ---                         and operating state. This is often paired with secure boot, secure update, and other run-time mechanisms to
+ ---                         maintain trusted authenticity and identity between interdependent systems.
+
+ remoteAttestation: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- removeIdentifyingInformation
+ ---          SI-15 Information Output Filtering
+ ---                         SI-15 requires validation of the output of the system to ensure that appropriate outputs are being sent given the context
+ ---                         of the request. Mitigations satisfying this control could be to block unnecessary data or alert on anomalous behavior.
+
+ removeIdentifyingInformation: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- resourceAvailability
+ ---          SC-6 Resource Availability
+ ---                         SC-6 describes protections preventing an attacker from consuming the resources of a system, including
+ ---                         prioritization or quotas.
+
+ resourceAvailability: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- resourceIsolation
+ ---          SC-4 Information in Shared Resources
+ ---                         SC-4 provides general protection mechanisms to prevent sensitive information from being leaked through
+ ---                         shared registers, memory, or hard disk space.
+
+ resourceIsolation: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- secureBoot
+ ---          SI-7 (1) Integrity Checks
+ ---          SI-7 (5) Automated Response to Integrity Violations
+ ---          SI-7 (6) Cryptographic Protection
+ ---          SI-7 (9) Verify Boot Process
+ ---          SI-7 (15) Code Authentication
+ ---                         SI-7 Enhancement (1) specifies integrity checks of software, firmware, and information on a system. Enhancement SI-7 (5) defines
+ ---                         the response to detected violations of these checks. Enhancement SI-7 (6) specifies cryptographic algorithms should
+ ---                         be used to perform these checks. Enhancement SI-7 (9) specifies the checks be performed on the boot process to ensures
+ ---                         the system is operating correctly prior to execution. Enhancement SI-7 (15) specifies the checks be performed on all
+ ---                         new software prior to installation and execution to ensure no malicious code is injected.
+ --- CRV:
+ ---    secureBoot is a security mechanism to make sure a device boots using only software that is trusted by the Original Equipment Manufacturer (OEM).
+ ---	Absence of secureBoot (value 0) makes a component vulnerable to Software Virus/Worm/Malware.
+ 
+ secureBoot: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- staticCodeAnalysis
+ ---          SA-11 (1) Static Code Analysis
+ ---                         Enhancement SA-11 (1) is an organizational control specifying the use of software tools to look for common
+ ---                         source code patterns that can be exploited by known attacks.
+ --- CRV:
+ ---    staticCodeAnalysis describes the quality of security analysis that has been performed on the component's implementation source code. Components
+ ---	with zero staticCodeAnalysis may open the door to attacks such as Remote Code Injection and Software Virus/Worm/Malware.
+ 
+ staticCodeAnalysis: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- strongCryptoAlgorithms
+ ---          SC-13 Cryptographic Protection
+ ---                         SC-13 is an enhancement to controls specifying the use of cryptographic algorithms. Application of this control
+ ---                         ensures only approved algorithms are used and their implementation is sufficient to protect against known attacks.
+ --- CRV:
+ ---    strongCryptoAlgorithms signifies the strength level of cryptographic algorithms in a component's cipher suite. A zero value of strongCryptoAlgorithms
+ ---	for a component means it could expose other components (at the receiving end of its channels) to Network Injection, Remote Code Injection, and 
+ ---	Software Virus/Worm/Malware.
+ 
+ strongCryptoAlgorithms: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- supplyChainSecurity
+ ---          SA-12 Supply Chain Protection
+ ---                         SA-12 is an organizational control listing best practices for acquiring services, systems, components securely. These
+ ---                         best practices include supplier reviews, operational security, component validation, and component identification
+ ---                         and traceability.
+ --- CRV:
+ ---    If there is no supply chain security for a sourced software/hardware component, that is, supplyChainSecurity=0, CRV considers that component to be susceptible 
+ ---    to software and hardware attacks such as Logic bomb and hardware trojans. 
+ 
+ supplyChainSecurity: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- systemAccessControl
+ ---          PE-3 (1) Information System Access
+ ---                         Enhancement PE-3 (1) improves the protection applied in the "physicalAccessControl" defense by additionally restricting
+ ---                         physical access to each critical system beyond those applied to a site or facility, such that only authentic and
+ ---                         authorized individuals for that system can gain physical access.
+ --- CRV:
+ ---    systemAccessControl indicates the strength level of the access control mechanism employed by a component to regulate access to the system resources.
+ ---    CRV interprets zero systemAccessControl as a possibility for Insider Threats and Outsider Threats to a component.
+        
+ systemAccessControl: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- tamperProtection
+ ---          SA-18 (1) [Tamper Resistance and Detection] Multiple Phases of SDLC
+ ---                         Enhancement SA-18 (1) describes multiple technical countermeasures to prevent reverse engineering or tampering with a
+ ---                         component. These countermeasures can include obfuscation, self-checking, and customization.
+ --- CRV:
+ ---    tamperProtection describes the strength level of security mechanism used to protect sensitive information from being changed by an unauthorized 
+ ---	entity. When we have zero tamperProtection, the component is susceptible to Hardware Trojans and Logic Bomb/Software Trojan.
+ 
+ tamperProtection: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- userAuthentication
+ ---          userAuthentication is NOT USED. It is a placeholder for future tool improvements.
+ --- CRV:
+ ---    userAuthentication is meant to signify the strength level of user authentication mechanism employed by a component. Absence of userAuthentication (value 0) 
+ --- 	is a red flag, raised by CRV, that may indicate the existence of Insider Threats or Outsider Threats to the component.
+ 
+ userAuthentication: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ --- MBAA:
+ --- zeroize
+ ---          MP-6 (8) Remote Purging / Wiping of Information
+ ---                         Enhancement MP-6 (8) specifies the purging or wiping of sensitive information either from a remote command or following
+ ---                         some logic within the device to prevent unauthorized individuals from extracting that information.
+
+ zeroize: aadlinteger 0 .. 9 => 0 applies to (abstract, bus, device, system, process, processor, thread);
+
+ -- Cyber Attack Properties from TA1
+ Configuration_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Physical_Theft_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Interception_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Hardware_Integrity_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Supply_Chain_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Brute_Force_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Fault_Injection_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Identity_Spoofing_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Excessive_Allocation_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Sniffing_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Buffer_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+ Flooding_Attack: aadlboolean => False applies to (abstract, bus, device, system, process, processor, thread);
+
+
+ -- CASE MODEL TRANSFORMATION TYPE
+Component_Type: enumeration (FILTER, ATTESTATION, MONITOR, VIRTUAL_MACHINE, COMM_DRIVER, SEL4, SWITCH) applies to (system, process, thread, thread group, device, abstract, processor, virtual processor);
+-- Implementation language for this component (eg c, CakeML)
+Component_Impl: aadlstring applies to (system, process, thread, thread group, abstract);
+-- ID of the AGREE CONTRACT that specifies the behavior of this component
+Component_Spec: list of aadlstring applies to (system, process, thread, abstract);
+
+-- Remote Attestation
+Cache_Timeout: aadlinteger applies to (system, process, thread, thread group, device, abstract);
+Cache_Size: aadlinteger applies to (system, process, thread, thread group, device, abstract);
+
+-- Communication Modality
+Comm_Modality: enumeration (RF, WIFI, WIRED_ETHERNET, SERIAL, BT, NFC) applies to (bus);
+
+-- Runtime
+OS: aadlstring applies to (processor, virtual processor);
+
+-- Trust level of a connection or component.
+-- 0 <= Trust_Level <= 100.
+-- 0 indicates "no trust", and 100 indicates "complete trust".
+Trust_Level: aadlinteger 0 .. 100 applies to (feature, connection, classifier, subcomponent);
+
+-- Control level of a connection or component.
+-- 0 <= Control_Level <= 100.
+-- 0 indicates that a component cannot be altered in any way (i.e. "no control"),
+-- and 100 indicates "complete complete".
+-- Previously, the annotation UNCONTROLLED was used to denote Control_Level 0.
+Control_Level: aadlinteger 0 .. 100 applies to (feature, connection, classifier, subcomponent);
+
+-- An annotation to indicate the sensitivity of data.
+-- TODO: add detail to each
+-- FOUO: For Official Use Only
+Data_Classification : enumeration (TOP_SECRET, SECRET, CONFIDENTIAL, FOUO, TIME_SENSITIVE) applies to (feature, connection, subcomponent, classifier);
+
+end CASE_Consolidated_Properties;

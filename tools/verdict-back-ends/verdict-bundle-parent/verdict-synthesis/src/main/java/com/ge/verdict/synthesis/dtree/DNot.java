@@ -6,6 +6,11 @@ import java.util.Optional;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
+/**
+ * Represents a NOT in a defense tree. NOT nodes are not valid in the prepared defense tree, but
+ * they may appear in the intermediary defense tree. Preparation cancels out two consecutive nots,
+ * resulting in both being removed from the tree.
+ */
 public final class DNot implements DTree {
     public final DTree child;
 
@@ -38,6 +43,7 @@ public final class DNot implements DTree {
     @Override
     public Optional<DTree> prepare() {
         if (child instanceof DNot) {
+            // we can flatten by applying the rule (not (not x)) -> x
             return Optional.of(((DNot) child).child);
         } else {
             throw new RuntimeException("unable to flatten NOT node: " + prettyPrint());

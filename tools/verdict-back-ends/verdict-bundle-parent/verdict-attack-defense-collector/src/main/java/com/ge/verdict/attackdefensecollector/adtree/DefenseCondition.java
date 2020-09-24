@@ -8,9 +8,17 @@ import java.util.Objects;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 
+/**
+ * Represents the situation where an attack is dependent on the implementation of a defense. This
+ * structure does not store the attack itself; instead, it is embedded in the attack-defense tree in
+ * a conjunction next to the dependent attack.
+ */
 public class DefenseCondition extends ADTree {
+    /** The attackable (component/defense) to which this defense condition applies. */
     private Attackable attackable;
+    /** The defense property which, when implemented, triggers this defense condition. */
     private String defenseProperty;
+    /** The minimum implemented DAL to trigger this defense condition. */
     private int minImplDal;
 
     public DefenseCondition(Attackable attackable, String defenseProperty, int minImplDal) {
@@ -31,6 +39,11 @@ public class DefenseCondition extends ADTree {
         return minImplDal;
     }
 
+    /**
+     * Retrieves the actual implemented DAL in the model.
+     *
+     * @return
+     */
     public int getImplDal() {
         String dalStr = attackable.getParentAttributes().get(defenseProperty);
         if (dalStr != null) {
@@ -74,8 +87,7 @@ public class DefenseCondition extends ADTree {
 
     @Override
     public Formula toLogicNg(FormulaFactory factory, Cache cache) {
-        throw new RuntimeException(
-                "minimization not implemented for trees with defense conditions");
+        return getImplDal() >= minImplDal ? factory.verum() : factory.falsum();
     }
 
     @Override
