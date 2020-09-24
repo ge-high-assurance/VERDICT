@@ -70,13 +70,13 @@ public class VerdictSynthesis {
 
         // Encode the logical structure of defense tree in MaxSMT
         // Encode cost(impl_defense_dal) >= the target cost (based on the severity of cyber req)
-        // With merit assignment off and partial solution on, you will 
+        // With merit assignment off and partial solution on, you will
         // subtract the cost of each DAL by the impl DAL cost, and use 0 if the result is negative.
         optimizer.Assert(tree.toZ3Multi(context));
 
         if (meritAssignment) {
             // set upper bounds at the current values, so that no upgrades are reported
-        	// Encode component_defense_var <= the the implemented DAL cost
+            // Encode component_defense_var <= the the implemented DAL cost
             optimizer.Assert(
                     context.mkAnd(
                             compDefPairs.stream()

@@ -435,7 +435,8 @@ public class AttackDefenseCollector {
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
+                for (ConnectionModel connection :
+                        connNameToConnectionModelMap.get(connectionName)) {
                     connection
                             .getAttackable()
                             .addAttack(
@@ -459,8 +460,8 @@ public class AttackDefenseCollector {
             }
         }
 
-        // Load defenses 
-        // Note we don't use implemented property column in csv files if we vdm as input 
+        // Load defenses
+        // Note we don't use implemented property column in csv files if we vdm as input
         for (CSVFile.RowData row : defensesCsv.getRowDatas()) {
             String systemTypeName = row.getCell("CompType");
             String systemInstName = row.getCell("CompInst");
@@ -495,7 +496,8 @@ public class AttackDefenseCollector {
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
+                for (ConnectionModel connection :
+                        connNameToConnectionModelMap.get(connectionName)) {
                     Defense defense =
                             connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
                     if (defense == null) {
@@ -674,10 +676,10 @@ public class AttackDefenseCollector {
         for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (impl.getBlockImpl() != null) {
                 for (ComponentInstance inst : impl.getBlockImpl().getSubcomponent()) {
-                	// TODO: Change the getName() to getQualifiedName() later after changing VDM
+                    // TODO: Change the getName() to getQualifiedName() later after changing VDM
                     SystemModel system = getSystem(inst.getName());
                     for (GenericAttribute attrib : inst.getAttribute()) {
-                    	// TODO: Be careful here about types of AADL properties
+                        // TODO: Be careful here about types of AADL properties
                         if (attrib.getValue() instanceof String) {
                             system.addAttribute(attrib.getName(), (String) attrib.getValue());
                         }
@@ -698,7 +700,7 @@ public class AttackDefenseCollector {
         for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (!compImplToSystem.containsKey(impl.getName())) {
                 SystemModel system = getSystem(impl.getName());
-                // TODO: 
+                // TODO:
                 if (impl.getType() != null) {
                     Util.putSetMap(compTypeToSystem, impl.getType().getName(), system);
                 }
@@ -759,7 +761,11 @@ public class AttackDefenseCollector {
                         for (SystemModel destSysModel : dests) {
                             ConnectionModel connection =
                                     new ConnectionModel(
-                                            conn.getName(), srcSysModel, destSysModel, sourcePort, destPort);
+                                            conn.getName(),
+                                            srcSysModel,
+                                            destSysModel,
+                                            sourcePort,
+                                            destPort);
 
                             for (GenericAttribute attrib : conn.getAttribute()) {
                                 if (attrib.getValue() instanceof String) {
@@ -772,7 +778,8 @@ public class AttackDefenseCollector {
                             // + source.getName() + ":"
                             // + sourcePort + " to " + dest.getName() + ":" + destPort);
 
-                            Util.putSetMap(connNameToConnectionModelMap, conn.getName(), connection);
+                            Util.putSetMap(
+                                    connNameToConnectionModelMap, conn.getName(), connection);
 
                             // Store connection in a different place depending on internal/external
                             // and
@@ -859,7 +866,7 @@ public class AttackDefenseCollector {
             }
         }
 
-        // load all implemented defense DALs from VDM 
+        // load all implemented defense DALs from VDM
         // determine extraneous defenses later
         for (ComponentImpl impl : vdmModel.getComponentImpl()) {
             if (impl.getBlockImpl() != null) {
@@ -881,7 +888,8 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        compDefenseToImplDal.put(new Pair<>(inst.getName(), name), dal);
+                                        compDefenseToImplDal.put(
+                                                new Pair<>(inst.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
                                     throw new RuntimeException(
@@ -917,7 +925,8 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        compDefenseToImplDal.put(new Pair<>(conn.getName(), name), dal);
+                                        compDefenseToImplDal.put(
+                                                new Pair<>(conn.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
                                     throw new RuntimeException(
@@ -1065,7 +1074,8 @@ public class AttackDefenseCollector {
      * @return a map from pairs (component, defense) to implemented DAL.
      */
     public Map<Pair<String, String>, Integer> getImplDal() {
-        return Collections.unmodifiableMap(compDefenseToImplDal != null ? compDefenseToImplDal : new HashMap<>());
+        return Collections.unmodifiableMap(
+                compDefenseToImplDal != null ? compDefenseToImplDal : new HashMap<>());
     }
 
     public static final class Result {
