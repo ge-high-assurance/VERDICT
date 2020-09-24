@@ -46,7 +46,6 @@ import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 
-import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.EnumType;
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.RecordType;
@@ -385,8 +384,7 @@ public class Agree2Vdm {
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
 		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
-			EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
-			updateVDMDatatypeUsingProperties(dtype,properties);
+			dtype.setUserDefinedType(aadlDataType.getName());
 		} else {
 			dtype.setUserDefinedType(aadlDataType.getName());
 		}

@@ -2,9 +2,7 @@ package com.ge.research.osate.verdict.aadl2vdm;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,17 +14,9 @@ import javax.xml.namespace.QName;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.osate.aadl2.AbstractImplementation;
-import org.eclipse.xtext.ui.resource.XtextResourceSetProvider;
-import org.eclipse.xtext.util.CancelIndicator;
-import org.eclipse.xtext.validation.CheckMode;
-import org.eclipse.xtext.validation.IResourceValidator;
-import org.eclipse.xtext.validation.Issue;
 import org.osate.aadl2.AbstractSubcomponent;
 import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AccessType;
@@ -45,7 +35,6 @@ import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DeviceImplementation;
-import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.EventDataPort;
@@ -63,6 +52,7 @@ import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertyOwner;
+import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponent;
@@ -79,9 +69,11 @@ import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.VirtualProcessorType;
+import org.osate.aadl2.impl.AadlBooleanImpl;
+import org.osate.aadl2.impl.AadlIntegerImpl;
+import org.osate.aadl2.impl.AadlStringImpl;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.DataImplementationImpl;
-import org.osate.aadl2.impl.DataPortImpl;
 import org.osate.aadl2.impl.DataTypeImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
@@ -91,11 +83,8 @@ import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.PropertySetImpl;
 import org.osate.aadl2.impl.ReferenceValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
-import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.properties.PropertyAcc;
-import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
-import org.osate.pluginsupport.PluginSupportUtil;
 
 import com.ge.research.osate.verdict.dsl.VerdictUtil;
 import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
@@ -118,28 +107,6 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
-import com.rockwellcollins.atc.agree.agree.AgreeContract;
-import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
-import com.rockwellcollins.atc.agree.agree.Arg;
-import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
-import com.rockwellcollins.atc.agree.agree.EqStatement;
-import com.rockwellcollins.atc.agree.agree.Expr;
-import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
-import com.rockwellcollins.atc.agree.agree.PrimType;
-import com.rockwellcollins.atc.agree.agree.SelectionExpr;
-import com.rockwellcollins.atc.agree.agree.SpecStatement;
-import com.rockwellcollins.atc.agree.agree.Type;
-import com.rockwellcollins.atc.agree.linking.AgreeLinkingService;
-import com.rockwellcollins.atc.agree.parser.antlr.AgreeParser;
-
-import verdict.vdm.vdm_data.DataType;
-import verdict.vdm.vdm_data.RecordField;
-import verdict.vdm.vdm_data.RecordType;
-import verdict.vdm.vdm_data.TypeDeclaration;
-import verdict.vdm.vdm_lustre.Expression;
-import verdict.vdm.vdm_lustre.IfThenElse;
-import verdict.vdm.vdm_lustre.LustreProgram;
-import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.Model;
 
 
@@ -539,7 +506,6 @@ public class Aadl2Vdm {
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
 			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
-
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
 
@@ -728,7 +694,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -1089,8 +1055,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 			    	//Note: Not populating "type" for now
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
@@ -1282,7 +1247,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -1475,7 +1440,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -1668,7 +1633,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -1861,7 +1826,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -2054,7 +2019,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -2247,7 +2212,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -2441,7 +2406,7 @@ public class Aadl2Vdm {
 
 					//fetching data type information
 					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
 
 			    	//Note: Not populating "type" for now
 
@@ -2647,8 +2612,20 @@ public class Aadl2Vdm {
 							anAttribute.setName(componentPropertyToName.get(prop));
 							anAttribute.setValue(value);
 
-
-							QName type = new QName(prop.getQualifiedName().toString());
+							//get the property type
+							PropertyType propType = prop.getPropertyType();
+							QName type = new QName("");
+							if(propType instanceof AadlBooleanImpl) {
+								type = new QName("Bool");
+							} else if(propType instanceof AadlIntegerImpl) {
+								type = new QName("Int");
+							} else if(propType instanceof AadlStringImpl) {
+								type = new QName("String");
+							} else {
+								System.out.println("WARNING: Unexpected connection property type.");
+								type = new QName("String");
+							}
+							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							anAttribute.setType(type);
 
 
@@ -2677,30 +2654,30 @@ public class Aadl2Vdm {
 					//variables to unpack information from AADL object
 					String srcCompInstName = "";
 					String destCompInstName = "";
-					String srcCompName = aCompImpl.getTypeName();
-					String destCompName = aCompImpl.getTypeName();
-					String srcCompImplName = aCompImpl.getName();
-					String destCompImplName = aCompImpl.getName();
-					String srcCompCatName = aCompImpl.getCategory().getName();
-					String destCompCatName = aCompImpl.getCategory().getName();
+//					String srcCompName = aCompImpl.getTypeName();
+//					String destCompName = aCompImpl.getTypeName();
+//					String srcCompImplName = aCompImpl.getName();
+//					String destCompImplName = aCompImpl.getName();
+//					String srcCompCatName = aCompImpl.getCategory().getName();
+//					String destCompCatName = aCompImpl.getCategory().getName();
 					Context srcConnContext = aConn.getAllSourceContext();
 					Context destConnContext = aConn.getAllDestinationContext();
 					ConnectionEnd srcConnectionEnd = aConn.getAllSource();
     				ConnectionEnd destConnectionEnd = aConn.getAllDestination();
 
 					if(srcConnContext != null) {
-						String info[] = obtainConnCompInfo(srcConnContext);
 						srcCompInstName = srcConnContext.getName();
-						srcCompCatName = info[0];
-						srcCompName = info[1];
-						srcCompImplName = info[2];
+//						String info[] = obtainConnCompInfo(srcConnContext);
+//						srcCompCatName = info[0];
+//						srcCompName = info[1];
+//						srcCompImplName = info[2];
 					}
 					if(destConnContext != null) {
-						String info[] = obtainConnCompInfo(destConnContext);
 						destCompInstName = destConnContext.getName();
-						destCompCatName = info[0];
-						destCompName = info[1];
-						destCompImplName = info[2];
+//						String info[] = obtainConnCompInfo(destConnContext);
+//						destCompCatName = info[0];
+//						destCompName = info[1];
+//						destCompImplName = info[2];
 					}
 
     				String srcPortTypeName = "";
@@ -2802,8 +2779,7 @@ public class Aadl2Vdm {
 
 					//to pack "componentPort"  of packDestEnd
     				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
-
-
+    				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
         				packDestEnd.setComponentPort(packDestEndPort);
@@ -2852,8 +2828,19 @@ public class Aadl2Vdm {
 							aConnAttribute.setName(connPropertyToName.get(prop));
 							aConnAttribute.setValue(value);
 
-
-							QName type = new QName(prop.getQualifiedName().toString());
+							PropertyType propType = prop.getPropertyType();
+							QName type = new QName("");
+							if(propType instanceof AadlBooleanImpl) {
+								type = new QName("Bool");
+							} else if(propType instanceof AadlIntegerImpl) {
+								type = new QName("Int");
+							} else if(propType instanceof AadlStringImpl) {
+								type = new QName("String");
+							} else {
+								System.out.println("WARNING: Unexpected property type.");
+								type = new QName("String");
+							}
+							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							aConnAttribute.setType(type);
 
 
