@@ -22,10 +22,26 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * The result of the synthesis operation. This class is serializable and deserializable to XML. It
+ * is located in the vdm project so that it can be shared between the bundle and plugin projects.
+ * This class is also fully immutable.
+ */
 public class ResultsInstance {
-    public final boolean partialSolution, meritAssignment, inputSat;
-    public final Fraction inputCost, outputCost;
+    /** Whether synthesis was performed with partial solutions enabled. */
+    public final boolean partialSolution;
+    /** Whether synthesis was performed with merit assignment. */
+    public final boolean meritAssignment;
+    /** Whether the input to synthesis was SAT. */
+    public final boolean inputSat;
+    /** The total input cost (zero if not using partial solutions). */
+    public final Fraction inputCost;
+    /** The total output cost of all recommended items. */
+    public final Fraction outputCost;
+    /** The list of recommendations. */
     public final List<Item> items;
+
+    // these are the names of the XML tags
 
     private static final String ROOT_TAG = "synthesis";
     private static final String ROOT_PARTIAL_SOLUTION = "partialSolution";
@@ -42,10 +58,22 @@ public class ResultsInstance {
     private static final String ITEM_INPUT_COST = "inputCost";
     private static final String ITEM_OUTPUT_COST = "outputCost";
 
+    /** A single synthesis recommendation. */
     public static class Item {
-        public final String component, defenseProperty;
-        public final int inputDal, outputDal;
-        public final Fraction inputCost, outputCost;
+        /** The component/connection to which a recommendation applies. */
+        public final String component;
+        /** The defense property to which a recommendation applies. */
+        public final String defenseProperty;
+        /** The DAL of this component-defense pair in the synthesis input. */
+        public final int inputDal;
+        /** The recommended output DAL of this component-defense pair. */
+        public final int outputDal;
+        /**
+         * The cost corresponding to the DAL of this component-defense pair in the synthesis input.
+         */
+        public final Fraction inputCost;
+        /** The cost corresponding to the recommended output DAL of this component-defense pair. */
+        public final Fraction outputCost;
 
         public Item(
                 String component,
@@ -100,6 +128,15 @@ public class ResultsInstance {
         this.items = Collections.unmodifiableList(items);
     }
 
+    /**
+     * Deserialize a results instance from an XML file.
+     *
+     * @param file the XML file
+     * @return the deserialized results instance
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
     public static ResultsInstance fromFile(File file)
             throws SAXException, IOException, ParserConfigurationException {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
@@ -132,6 +169,11 @@ public class ResultsInstance {
                 items);
     }
 
+    /**
+     * Serialize this results instance to a stream target.
+     *
+     * @param target the stream target
+     */
     private void toStreamResult(StreamResult target) {
         try {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -164,14 +206,30 @@ public class ResultsInstance {
         }
     }
 
+    /**
+     * Serialize this results instance to an XML file.
+     *
+     * @param file the output XML file
+     */
     public void toFileXml(File file) {
         toStreamResult(new StreamResult(file));
     }
 
+    /**
+     * Serialize this results instance as XML to a print stream (e.g. System.out).
+     *
+     * @param stream the print stream
+     */
     public void toStreamXml(PrintStream stream) {
         toStreamResult(new StreamResult(stream));
     }
 
+    /**
+     * Pretty print this results instance to a print stream (e.g. System.out) in human-readable
+     * form.
+     *
+     * @param stream the print stream
+     */
     public void prettyPrint(PrintStream stream) {
         int maxLength =
                 Math.min(
@@ -236,6 +294,12 @@ public class ResultsInstance {
         return false;
     }
 
+    /**
+     * Parses a decimal cost as a fraction.
+     *
+     * @param costStr the decimal in string representation
+     * @return the parsed fractional cost
+     */
     public static Fraction parseCost(String costStr) {
         return new Fraction(Double.parseDouble(costStr), 0.000001, 20);
     }

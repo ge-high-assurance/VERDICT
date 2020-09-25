@@ -29,9 +29,9 @@ public class ConnectionModel {
     private String sourcePort;
     /** The name of the port on the destination system. */
     private String destPort;
-
+    /** Holds attacks and defenses. */
     private Attackable attackable;
-
+    /** All attributes set for this connection. */
     private Map<String, String> attributes;
 
     /**
@@ -83,6 +83,12 @@ public class ConnectionModel {
         return attackable;
     }
 
+    /**
+     * Adds an attribute.
+     *
+     * @param name
+     * @param value
+     */
     public void addAttribute(String name, String value) {
         attributes.put(name, value);
     }

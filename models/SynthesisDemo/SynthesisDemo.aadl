@@ -1,0 +1,60 @@
+package SynthesisDemo
+public
+	with Base_Types;
+	with CASE_Consolidated_Properties;
+	
+	system Component
+		features
+			p: out data port Base_Types::Integer;
+	end Component;
+	
+	system SynthesisDemo
+		features
+			p: out data port Base_Types::Integer;
+			
+		annex verdict {**
+			CyberReq {
+				id = "req01"
+				condition = p:I
+				cia = I
+				severity = Major
+			}
+			
+			MissionReq {
+				id = "mreq01"
+				reqs = "req01"
+			}
+		**};
+	end SynthesisDemo;
+	
+	system implementation SynthesisDemo.Impl
+		subcomponents
+			comp: system SynthesisDemo {
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => COTS;
+				
+				CASE_Consolidated_Properties::tamperProtection => 5;
+				CASE_Consolidated_Properties::supplyChainSecurity => 5;
+				CASE_Consolidated_Properties::systemAccessControl => 5;
+				CASE_Consolidated_Properties::physicalAccessControl => 5;
+				CASE_Consolidated_Properties::remoteAttestation => 7; -- recommended downgrade
+				CASE_Consolidated_Properties::memoryProtection => 3; -- recommended upgrade
+				-- recommended implementation of secureBoot
+				CASE_Consolidated_Properties::failSafe => 5; -- recommended removal
+				
+				-- below is the fully correct solution
+				
+--				CASE_Consolidated_Properties::tamperProtection => 5;
+--				CASE_Consolidated_Properties::supplyChainSecurity => 5;
+--				CASE_Consolidated_Properties::systemAccessControl => 5;
+--				CASE_Consolidated_Properties::physicalAccessControl => 5;
+--				CASE_Consolidated_Properties::remoteAttestation => 5;
+--				CASE_Consolidated_Properties::memoryProtection => 5
+--				CASE_Consolidated_Properties::secureBoot => 5;
+			};
+			
+		connections
+			c1: port comp.p -> p;
+	end SynthesisDemo.Impl;
+end SynthesisDemo;

@@ -1,0 +1,72 @@
+package AttackDefenseCollectorDemo
+public
+	with Base_Types;
+	with CASE_Consolidated_Properties;
+	
+	system Comp1
+		features
+			p2: in data port Base_Types::Integer;
+			p3: out data port Base_Types::Integer;
+			
+		annex verdict {**
+			CyberRel {
+				id = "rel2"
+				inputs = p2:I
+				output = p3:I
+			}
+		**};
+	end Comp1;
+	
+	system Comp2
+		features
+			p4: in data port Base_Types::Integer;
+			p5: out data port Base_Types::Integer;
+			
+		annex verdict {**
+			CyberRel {
+				id = "rel2"
+				inputs = p4:I
+				output = p5:I
+			}
+		**};
+	end Comp2;
+	
+	system AttackDefenseCollectorDemo
+		features
+			p1: in data port Base_Types::Integer;
+			p6: out data port Base_Types::Integer;
+			
+		annex verdict {**
+			CyberReq {
+				id = "req01"
+				condition = p6:I
+				cia = I
+				severity = Major
+			}
+			
+			MissionReq {
+				id = "mreq01"
+				reqs = "req01"
+			}
+		**};
+	end AttackDefenseCollectorDemo;
+	
+	system implementation AttackDefenseCollectorDemo.Impl
+		subcomponents
+			comp1: system Comp1 {
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => COTS;
+			};
+			comp2: system Comp2 {
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => COTS;
+			};
+			
+		connections
+			c1: port p1 -> comp1.p2; -- internal incoming
+			c2: port comp1.p3 -> comp2.p4; -- external (relative to the two components it connects)
+			c3: port comp2.p5 -> p6; -- internal outgoing
+	end AttackDefenseCollectorDemo.Impl;
+end AttackDefenseCollectorDemo;
