@@ -110,6 +110,7 @@ import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Port;
 
 
 
@@ -133,6 +134,10 @@ public class Aadl2Vdm {
       		logHeader("AADL2VDM");
 		    Model m = new Model();
 		    Agree2Vdm agree2vdm= new Agree2Vdm();
+		    //first argument in the function call returns list of objects from all AADL files in the project including 
+		    //imported files - this is needed to resolve issue of missing cross references to types defined in imported files
+		    //second argument returns the list of objects from only AADL files in the project - only these 
+		    //objects are used while populating the VDM
 			m = populateVDMFromAadlObjects(agree2vdm.preprocessAadlFiles(inputDir), preprocessAadlFiles(inputDir), m);
 			System.out.println("Info: Created VDM object");
 			return m;
@@ -549,18 +554,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -656,7 +650,6 @@ public class Aadl2Vdm {
 		//returning the populated Model
 		return m1;
 	}//End of translateSystemTypeObjects
-
 
 	/**
 	 * Analyzing each busType:
@@ -768,20 +761,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1187,19 +1167,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1408,18 +1376,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -1630,20 +1587,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1874,21 +1818,8 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-					
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
 
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2096,18 +2027,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -2317,20 +2237,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2538,19 +2445,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -2761,21 +2656,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-					//fetching data type information
-					DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName(), dSubCompType);
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2981,16 +2862,15 @@ public class Aadl2Vdm {
 
 							//get the property type
 							PropertyType propType = prop.getPropertyType();
-							QName type = new QName("");
+							QName type = new QName("String");
 							if(propType instanceof AadlBooleanImpl) {
 								type = new QName("Bool");
 							} else if(propType instanceof AadlIntegerImpl) {
 								type = new QName("Int");
-							} else if(propType instanceof AadlStringImpl) {
-								type = new QName("String");
-							} else {
-								System.out.println("WARNING: Unexpected connection property type.");
-								type = new QName("String");
+							} else { 
+								if(!(propType instanceof AadlStringImpl)) {
+									System.out.println("WARNING: Unexpected connection property type.");
+								}
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							anAttribute.setType(type);
@@ -3026,12 +2906,6 @@ public class Aadl2Vdm {
 					//variables to unpack information from AADL object
 					String srcCompInstName = "";
 					String destCompInstName = "";
-//					String srcCompName = aCompImpl.getTypeName();
-//					String destCompName = aCompImpl.getTypeName();
-//					String srcCompImplName = aCompImpl.getName();
-//					String destCompImplName = aCompImpl.getName();
-//					String srcCompCatName = aCompImpl.getCategory().getName();
-//					String destCompCatName = aCompImpl.getCategory().getName();
 					Context srcConnContext = aConn.getAllSourceContext();
 					Context destConnContext = aConn.getAllDestinationContext();
 					ConnectionEnd srcConnectionEnd = aConn.getAllSource();
@@ -3039,17 +2913,9 @@ public class Aadl2Vdm {
 
 					if(srcConnContext != null) {
 						srcCompInstName = srcConnContext.getName();
-//						String info[] = obtainConnCompInfo(srcConnContext);
-//						srcCompCatName = info[0];
-//						srcCompName = info[1];
-//						srcCompImplName = info[2];
 					}
 					if(destConnContext != null) {
 						destCompInstName = destConnContext.getName();
-//						String info[] = obtainConnCompInfo(destConnContext);
-//						destCompCatName = info[0];
-//						destCompName = info[1];
-//						destCompImplName = info[2];
 					}
 
     				String srcPortTypeName = "";
@@ -3117,7 +2983,7 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packSrcEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packSrcEnd
-    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
+    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
 
 
     				//If source port is independent of a component instance
@@ -3150,7 +3016,7 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packDestEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packDestEnd
-    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
+    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
     				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
@@ -3201,16 +3067,15 @@ public class Aadl2Vdm {
 							aConnAttribute.setValue(value);
 
 							PropertyType propType = prop.getPropertyType();
-							QName type = new QName("");
+							QName type = new QName("String");
 							if(propType instanceof AadlBooleanImpl) {
 								type = new QName("Bool");
 							} else if(propType instanceof AadlIntegerImpl) {
 								type = new QName("Int");
-							} else if(propType instanceof AadlStringImpl) {
-								type = new QName("String");
-							} else {
-								System.out.println("WARNING: Unexpected property type.");
-								type = new QName("String");
+							} else { 
+								if(!(propType instanceof AadlStringImpl)) {
+									System.out.println("WARNING: Unexpected connection property type.");
+								}
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							aConnAttribute.setType(type);
@@ -4267,12 +4132,46 @@ public class Aadl2Vdm {
      * @author Vidhya Tekken Valapil
      * Creates a new Vdm Port object and returns
      * Populates "name", "mode" and "type"
+     * @param dataport
+     * @return vdm port
+     */
+	private Port createVdmPort(DataPort dataPort) {
+		String modeString = "in";
+		if(dataPort.isIn()) {
+			modeString = "in";
+		}
+		else if(dataPort.isOut()) {
+			modeString = "out";
+		}
+		//fetching data type information
+		DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(dSubCompType instanceof DataTypeImpl) {
+			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
+			dtype = resolveAADLDataType(aadlDType);
+		} else if(dSubCompType instanceof DataImplementationImpl) {
+			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
+			dtype = resolveAADLDataImplementationType(aadlDImpl);
+		} else {
+			System.out.println("Unresolved/unexpected Named Element.");
+		}
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(dataPort.getQualifiedName());
+		newPort.setName(dataPort.getName());
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setType(dtype);
+		return newPort;
+	}
+    /**
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
      * @param portName
      * @param modeString
      * @param dSubCompType 
-     * @return
+     * @return vdm port
      */
-	verdict.vdm.vdm_model.Port createVdmPort(String portName, String modeString, String qualifiedname, DataSubcomponentType dSubCompType){		
+	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedname, DataSubcomponentType dSubCompType){		
 		//fetching data type information
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(dSubCompType instanceof DataTypeImpl) {

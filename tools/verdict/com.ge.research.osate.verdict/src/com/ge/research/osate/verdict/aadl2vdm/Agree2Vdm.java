@@ -127,6 +127,15 @@ public class Agree2Vdm {
 		System.err.println("Marshalled Model to XML");
 		return m;
 	}
+	/**
+	 * Method to parse the AADL files in the project
+	 * 1. load all AADL files in the directory and the imported contributed AADL files as Resources
+	 * 2. get contents from the loaded resources and create/return them as list of objects
+	 * NOTE: this method is different from preprocessAadlFiles in Aadl2Vdm, 
+	 *       here imported contributed AADL files are also loaded as Resources
+	 * @param project directory
+	 * @return list of objects
+	 * */
 	//method that processes all aadl files in the directory and the imported contributed aadl files
 	public List<EObject> preprocessAadlFiles(File dir) {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
@@ -166,13 +175,10 @@ public class Agree2Vdm {
 				for (Issue issue : issues) {
 				    System.out.println(issue.getMessage());
 				}
-				//EcoreUtil2.resolveAll(resource);
-				//resource.load(null);
 			} catch (final IOException e) {
 				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
 			}
 		}
-		//EcoreUtil2.resolveAll(rs);
 		for (final Resource resource : rs.getResources()) {
 			resource.getAllContents().forEachRemaining(objects::add);
 		}
@@ -182,7 +188,10 @@ public class Agree2Vdm {
 	 *  @param objects a List of AADL objects,
 	 * 	@param model an empty VDM model to populate
 	 *  @return a populated VDM model
-	 *
+	 *  This method is invoked after preprocessAadlFiles and populateVDMFromAadlObjects,
+	 *  i.e., the aadl files are first parsed, translated into objects in preprocessAadlFiles(), 
+	 *  then VDM is populated with objects corresponding to AADL constructs in populateVDMFromAadlObjects(),
+	 *  then this method is invoked to populate the agree constructs in the vdm model
 	 * */
 	public Model populateVDMFromAadlAgreeObjects(List<EObject> objects, Model model) {
 		HashSet<String> dataTypeDecl = new HashSet<String>();
@@ -417,9 +426,13 @@ public class Agree2Vdm {
 			model.getTypeDeclaration().add(dataTypeVdm);
 		}
 	}
-	//this method checks if the property indicates if it is an enum definition
-	//and gets information from the properties to define the enum in the VDM
-	public void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
+	/**
+	 *  @param vdm dataType,
+	 * 	@param list of property associations
+	 *  this method checks if the property indicates if it is an enum definition
+	 *  and gets information from the properties to define the enum in the VDM
+	 *  **/
+	private void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
 		if(properties.size()==2) {
 			//check if the property specifies it is enum type
 			PropertyAssociation firstProperty = properties.get(0);
