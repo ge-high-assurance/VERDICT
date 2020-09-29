@@ -31,8 +31,10 @@ import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
@@ -51,6 +53,7 @@ import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PropertyOwner;
+import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponent;
@@ -67,8 +70,13 @@ import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.VirtualProcessorType;
+import org.osate.aadl2.impl.AadlBooleanImpl;
+import org.osate.aadl2.impl.AadlIntegerImpl;
+import org.osate.aadl2.impl.AadlStringImpl;
 import org.osate.aadl2.impl.AccessConnectionImpl;
 import org.osate.aadl2.impl.BooleanLiteralImpl;
+import org.osate.aadl2.impl.DataImplementationImpl;
+import org.osate.aadl2.impl.DataTypeImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
 import org.osate.aadl2.impl.ListValueImpl;
@@ -101,8 +109,8 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
-
 import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Port;
 
 
 
@@ -125,7 +133,12 @@ public class Aadl2Vdm {
 	   {
       		logHeader("AADL2VDM");
 		    Model m = new Model();
-			m = populateVDMFromAadlObjects(preprocessAadlFiles(inputDir), m);
+		    Agree2Vdm agree2vdm= new Agree2Vdm();
+		    //first argument in the function call returns list of objects from all AADL files in the project including 
+		    //imported files - this is needed to resolve issue of missing cross references to types defined in imported files
+		    //second argument returns the list of objects from only AADL files in the project - only these 
+		    //objects are used while populating the VDM
+			m = populateVDMFromAadlObjects(agree2vdm.preprocessAadlFiles(inputDir), preprocessAadlFiles(inputDir), m);
 			System.out.println("Info: Created VDM object");
 			return m;
 	   }
@@ -136,11 +149,12 @@ public class Aadl2Vdm {
 	 * Populate mission req, cyber and safety reqs and rels from AADL objects
 	 *
 	 *  @param objects a List of AADL objects,
+	 * @param objectsFromFilesInProject 
 	 * 	@param model an empty VDM model to populate
 	 *  @return a populated VDM model
-	 *
+	 * Vidhya: modified function to add and process only objects in the aadl files in the project excluding those in imported aadl files
 	 * */
-	public Model populateVDMFromAadlObjects(List<EObject> objects, Model model) {
+	public Model populateVDMFromAadlObjects(List<EObject> objects, List<EObject> objectsFromFilesInProject, Model model) {
 
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
@@ -157,58 +171,103 @@ public class Aadl2Vdm {
 		List<ComponentImplementation> compImpls = new ArrayList<>();
 		Map<Property, String> connPropertyToName = new LinkedHashMap<>();
 		Map<Property, String> componentPropertyToName = new LinkedHashMap<>();
-
+		
+		//process only those properties defined in files in the project and not in the imported files
+		HashSet<String> objectNamesFromFilesInProject = getObjectNames(objectsFromFilesInProject);
 
 		// extracting data from the AADLObject
 		for(EObject obj : objects) {
 			if (obj instanceof SystemType) {
-				systemTypes.add((SystemType) obj);
+				if(objectNamesFromFilesInProject.contains(((SystemType) obj).getName())) {
+					systemTypes.add((SystemType) obj);
+				}
 			} else if (obj instanceof BusType) {
-				busTypes.add((BusType)obj);
+				if(objectNamesFromFilesInProject.contains(((BusType) obj).getName())) {
+					busTypes.add((BusType)obj);
+				}
 			} else if (obj instanceof SubprogramType) {
-				subprogramTypes.add((SubprogramType)obj);
+				if(objectNamesFromFilesInProject.contains(((SubprogramType) obj).getName())) {
+					subprogramTypes.add((SubprogramType)obj);
+				}
 			} else if (obj instanceof ThreadType) {
-				threadTypes.add((ThreadType)obj);
+				if(objectNamesFromFilesInProject.contains(((ThreadType) obj).getName())) {
+					threadTypes.add((ThreadType)obj);
+				}
 			} else if (obj instanceof MemoryType) {
-				memoryTypes.add((MemoryType)obj);
+				if(objectNamesFromFilesInProject.contains(((MemoryType) obj).getName())) {
+					memoryTypes.add((MemoryType)obj);
+				}
 			} else if (obj instanceof DeviceType) {
-				deviceTypes.add((DeviceType)obj);
+				if(objectNamesFromFilesInProject.contains(((DeviceType) obj).getName())) {
+					deviceTypes.add((DeviceType)obj);
+				}
 			} else if (obj instanceof AbstractType) {
-				abstractTypes.add((AbstractType)obj);
+				if(objectNamesFromFilesInProject.contains(((AbstractType) obj).getName())) {
+					abstractTypes.add((AbstractType)obj);
+				}
 			} else if (obj instanceof ProcessType) {
-				processTypes.add((ProcessType)obj);
+				if(objectNamesFromFilesInProject.contains(((ProcessType) obj).getName())) {
+					processTypes.add((ProcessType)obj);
+				}
 			} else if (obj instanceof ThreadGroupType) {
-				threadGroupTypes.add((ThreadGroupType)obj);
+				if(objectNamesFromFilesInProject.contains(((ThreadGroupType) obj).getName())) {
+					threadGroupTypes.add((ThreadGroupType)obj);
+				}
 			} else if (obj instanceof VirtualProcessorType) {
-				virtualProcessorTypes.add((VirtualProcessorType)obj);
+				if(objectNamesFromFilesInProject.contains(((VirtualProcessorType) obj).getName())) {
+					virtualProcessorTypes.add((VirtualProcessorType)obj);
+				}
 			} else if (obj instanceof ProcessorType) {
-				processorTypes.add((ProcessorType)obj);
+				if(objectNamesFromFilesInProject.contains(((ProcessorType) obj).getName())) {
+					processorTypes.add((ProcessorType)obj);
+				}
 			} else if (obj instanceof SystemImplementation) {
-				compImpls.add((SystemImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((SystemImplementation) obj).getName())) {
+					compImpls.add((SystemImplementation) obj);
+				}
 			} else if (obj instanceof SubprogramImplementation) {
-				compImpls.add((SubprogramImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((SubprogramImplementation) obj).getName())) {
+					compImpls.add((SubprogramImplementation) obj);
+				}
 			} else if (obj instanceof ThreadImplementation) {
-				compImpls.add((ThreadImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((ThreadImplementation) obj).getName())) {
+					compImpls.add((ThreadImplementation) obj);
+				}
 			} else if (obj instanceof MemoryImplementation) {
-				compImpls.add((MemoryImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((MemoryImplementation) obj).getName())) {
+					compImpls.add((MemoryImplementation) obj);
+				}
 			} else if (obj instanceof BusImplementation) {
-				compImpls.add((BusImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((BusImplementation) obj).getName())) {
+					compImpls.add((BusImplementation) obj);
+				}
 			} else if (obj instanceof AbstractImplementation) {
-				compImpls.add((AbstractImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((AbstractImplementation) obj).getName())) {
+					compImpls.add((AbstractImplementation) obj);
+				}
 			} else if (obj instanceof DeviceImplementation) {
-				compImpls.add((DeviceImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((DeviceImplementation) obj).getName())) {
+					compImpls.add((DeviceImplementation) obj);
+				}
 			} else if (obj instanceof ProcessImplementation) {
-				compImpls.add((ProcessImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((ProcessImplementation) obj).getName())) {
+					compImpls.add((ProcessImplementation) obj);
+				}
 			} else if (obj instanceof ThreadGroupImplementation) {
-				compImpls.add((ThreadGroupImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((ThreadGroupImplementation) obj).getName())) {
+					compImpls.add((ThreadGroupImplementation) obj);
+				}
 			} else if (obj instanceof VirtualProcessorImplementation) {
-				compImpls.add((VirtualProcessorImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((VirtualProcessorImplementation) obj).getName())) {
+					compImpls.add((VirtualProcessorImplementation) obj);
+				}
 			} else if (obj instanceof ProcessorImplementation) {
-				compImpls.add((ProcessorImplementation) obj);
+				if(objectNamesFromFilesInProject.contains(((ProcessorImplementation) obj).getName())) {
+					compImpls.add((ProcessorImplementation) obj);
+				}
 			}  else if(obj instanceof PropertySetImpl) {
 				Set<Property> compPropSet = new HashSet<Property>();
 				Set<Property> connPropSet = new HashSet<Property>();
-
 				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
 					// Save property owner to be used later
 					for(PropertyOwner po : prop.getAppliesTos()) {
@@ -217,57 +276,79 @@ public class Aadl2Vdm {
 
 						switch(propCat) {
 							case "system": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "thread": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "processor": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "memory": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "connection": {
-								connPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									connPropertyToName.put(prop, propName);
+								}
 								connPropSet.add(prop);
 								break;
 							}
 							case "process": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "abstract": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "device": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "threadgroup": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "virtualprocessor": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
 							case "bus": {
-								componentPropertyToName.put(prop, propName);
+								if(objectNamesFromFilesInProject.contains(propName)) {
+									componentPropertyToName.put(prop, propName);
+								}
 								compPropSet.add(prop);
 								break;
 							}
@@ -280,7 +361,6 @@ public class Aadl2Vdm {
 					}
 				}
 			}
-
 		} // end of extracting data from the AADLObject
 
 
@@ -334,6 +414,9 @@ public class Aadl2Vdm {
 		//return the final model
 		return model;
 	}//End of populateVDMFromAadlObjects
+
+
+
 
 
 	/**
@@ -427,7 +510,7 @@ public class Aadl2Vdm {
 						modeString = "requiresBusAccess";
 					}
 
-
+					//fetching data type information
 			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, busAccess.getQualifiedName());
 
 			    	//Note: Not populating "type" for now
@@ -471,19 +554,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -579,7 +650,6 @@ public class Aadl2Vdm {
 		//returning the populated Model
 		return m1;
 	}//End of translateSystemTypeObjects
-
 
 	/**
 	 * Analyzing each busType:
@@ -691,19 +761,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1109,19 +1167,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1330,17 +1376,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -1551,19 +1587,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1794,20 +1818,8 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-					
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
 
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2015,17 +2027,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -2235,19 +2237,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2455,18 +2445,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 			    	//Note: Not populating "type" for now
 
@@ -2677,20 +2656,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-
-					String portName = dataPort.getName();
-					String modeString = "in";
-					if(dataPort.isIn()) {
-						modeString = "in";
-					}
-					else if(dataPort.isOut()) {
-						modeString = "out";
-					}
-
-
-			    	verdict.vdm.vdm_model.Port newPort = createVdmPort(portName, modeString, dataPort.getQualifiedName());
-
-			    	//Note: Not populating "type" for now
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2894,8 +2860,19 @@ public class Aadl2Vdm {
 							anAttribute.setName(componentPropertyToName.get(prop));
 							anAttribute.setValue(value);
 
-
-							QName type = new QName(prop.getQualifiedName().toString());
+							//get the property type
+							PropertyType propType = prop.getPropertyType();
+							QName type = new QName("String");
+							if(propType instanceof AadlBooleanImpl) {
+								type = new QName("Bool");
+							} else if(propType instanceof AadlIntegerImpl) {
+								type = new QName("Int");
+							} else { 
+								if(!(propType instanceof AadlStringImpl)) {
+									System.out.println("WARNING: Unexpected connection property type.");
+								}
+							}
+							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							anAttribute.setType(type);
 
 
@@ -2929,41 +2906,34 @@ public class Aadl2Vdm {
 					//variables to unpack information from AADL object
 					String srcCompInstName = "";
 					String destCompInstName = "";
-					String srcCompName = aCompImpl.getTypeName();
-					String destCompName = aCompImpl.getTypeName();
-					String srcCompImplName = aCompImpl.getName();
-					String destCompImplName = aCompImpl.getName();
-					String srcCompCatName = aCompImpl.getCategory().getName();
-					String destCompCatName = aCompImpl.getCategory().getName();
 					Context srcConnContext = aConn.getAllSourceContext();
 					Context destConnContext = aConn.getAllDestinationContext();
 					ConnectionEnd srcConnectionEnd = aConn.getAllSource();
     				ConnectionEnd destConnectionEnd = aConn.getAllDestination();
 
 					if(srcConnContext != null) {
-						String info[] = obtainConnCompInfo(srcConnContext);
 						srcCompInstName = srcConnContext.getName();
-						srcCompCatName = info[0];
-						srcCompName = info[1];
-						srcCompImplName = info[2];
 					}
 					if(destConnContext != null) {
-						String info[] = obtainConnCompInfo(destConnContext);
 						destCompInstName = destConnContext.getName();
-						destCompCatName = info[0];
-						destCompName = info[1];
-						destCompImplName = info[2];
 					}
 
     				String srcPortTypeName = "";
     				String destPortTypeName = "";
     				String srcPortName = srcConnectionEnd.getName();
     				String destPortName = destConnectionEnd.getName();
+    				
+    				
+    				//variables to capture data type information
+					DataSubcomponentType srcDataSubCompType = null;
+					DataSubcomponentType destDataSubCompType = null;
 
     				if(srcConnectionEnd instanceof DataPort) {
     					srcPortTypeName = ((DataPort)srcConnectionEnd).isIn()?(((DataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
+    					srcDataSubCompType = ((DataPort)srcConnectionEnd).getDataFeatureClassifier();
     				} else if(srcConnectionEnd instanceof EventDataPort) {
     					srcPortTypeName = ((EventDataPort)srcConnectionEnd).isIn()?(((EventDataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
+    					srcDataSubCompType = ((EventDataPort)srcConnectionEnd).getDataFeatureClassifier();
     				} else if(srcConnectionEnd instanceof DataAccess) {
     					AccessType type = ((DataAccess) srcConnectionEnd).getKind();
     					if(type == AccessType.PROVIDES) {
@@ -2973,7 +2943,9 @@ public class Aadl2Vdm {
     					} else {
     						throw new RuntimeException("Unexpected access type: " + type);
     					}
+    					srcDataSubCompType = ((DataAccess) srcConnectionEnd).getDataFeatureClassifier();
     				} else if(srcConnectionEnd instanceof DataSubcomponent){
+    					srcDataSubCompType = ((DataSubcomponent)srcConnectionEnd).getDataSubcomponentType();
     					srcPortTypeName = "data";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd);
@@ -2981,8 +2953,10 @@ public class Aadl2Vdm {
 
     				if(destConnectionEnd instanceof DataPort) {
     					destPortTypeName = ((DataPort)destConnectionEnd).isIn()?(((DataPort)destConnectionEnd).isOut()? "inOut":"in"):"out";
+    					destDataSubCompType = ((DataPort)destConnectionEnd).getDataFeatureClassifier();
     				} else if(destConnectionEnd instanceof EventDataPort) {
     					destPortTypeName = ((EventDataPort)destConnectionEnd).isIn()?(((EventDataPort)destConnectionEnd).isOut()? "inOut":"in"):"out";
+    					destDataSubCompType = ((EventDataPort)destConnectionEnd).getDataFeatureClassifier();
     				} else if(destConnectionEnd instanceof DataAccess) {
     					AccessType type = ((DataAccess) destConnectionEnd).getKind();
     					if(type == AccessType.PROVIDES) {
@@ -2990,7 +2964,9 @@ public class Aadl2Vdm {
     					} else  if(type == AccessType.REQUIRES) {
     						destPortTypeName = "requiresDataAccess";
     					}
+    					destDataSubCompType = ((DataAccess) destConnectionEnd).getDataFeatureClassifier();
     				}  else if(destConnectionEnd instanceof DataSubcomponent){
+    					destDataSubCompType = ((DataSubcomponent)destConnectionEnd).getDataSubcomponentType();
     					destPortTypeName = "data";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd);
@@ -3007,7 +2983,7 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packSrcEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packSrcEnd
-    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName());
+    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
 
 
     				//If source port is independent of a component instance
@@ -3040,9 +3016,8 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packDestEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packDestEnd
-    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName());
-
-
+    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
+    				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
         				packDestEnd.setComponentPort(packDestEndPort);
@@ -3091,8 +3066,18 @@ public class Aadl2Vdm {
 							aConnAttribute.setName(connPropertyToName.get(prop));
 							aConnAttribute.setValue(value);
 
-
-							QName type = new QName(prop.getQualifiedName().toString());
+							PropertyType propType = prop.getPropertyType();
+							QName type = new QName("String");
+							if(propType instanceof AadlBooleanImpl) {
+								type = new QName("Bool");
+							} else if(propType instanceof AadlIntegerImpl) {
+								type = new QName("Int");
+							} else { 
+								if(!(propType instanceof AadlStringImpl)) {
+									System.out.println("WARNING: Unexpected connection property type.");
+								}
+							}
+							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							aConnAttribute.setType(type);
 
 
@@ -4126,8 +4111,6 @@ public class Aadl2Vdm {
 
 		return event;
 	}
-
-
     /**
      * Creates a new Vdm Port object and returns
      * Populates only "name" and "mode" for now
@@ -4141,6 +4124,71 @@ public class Aadl2Vdm {
 		newPort.setId(qualifiedname);
 		newPort.setName(portName);
 		newPort.setMode(convertToVdmPortMode(modeString));
+		return newPort;
+	}
+	
+
+    /**
+     * @author Vidhya Tekken Valapil
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
+     * @param dataport
+     * @return vdm port
+     */
+	private Port createVdmPort(DataPort dataPort) {
+		String modeString = "in";
+		if(dataPort.isIn()) {
+			modeString = "in";
+		}
+		else if(dataPort.isOut()) {
+			modeString = "out";
+		}
+		//fetching data type information
+		DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(dSubCompType instanceof DataTypeImpl) {
+			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
+			dtype = resolveAADLDataType(aadlDType);
+		} else if(dSubCompType instanceof DataImplementationImpl) {
+			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
+			dtype = resolveAADLDataImplementationType(aadlDImpl);
+		} else {
+			System.out.println("Unresolved/unexpected Named Element.");
+		}
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(dataPort.getQualifiedName());
+		newPort.setName(dataPort.getName());
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setType(dtype);
+		return newPort;
+	}
+    /**
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
+     * @param portName
+     * @param modeString
+     * @param dSubCompType 
+     * @return vdm port
+     */
+	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedname, DataSubcomponentType dSubCompType){		
+		//fetching data type information
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(dSubCompType instanceof DataTypeImpl) {
+			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
+			dtype = resolveAADLDataType(aadlDType);
+		} else if(dSubCompType instanceof DataImplementationImpl) {
+			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
+			dtype = resolveAADLDataImplementationType(aadlDImpl);
+		} else {
+			System.out.println("Unresolved/unexpected Named Element.");
+		}
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(qualifiedname);
+		newPort.setName(portName);
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setType(dtype);
 		return newPort;
 	}
 
@@ -4620,4 +4668,147 @@ public class Aadl2Vdm {
         	}
         	return full;
         }
+    /**
+     * @author Vidhya Tekken Valapil
+     * Obtain data type information and return vdm-data-type
+     * */   
+    private verdict.vdm.vdm_data.DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(aadlDataType.getName().contentEquals("Float")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
+		} else if(aadlDataType.getName().contentEquals("Integer")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
+		} else if(aadlDataType.getName().contentEquals("Boolean")){
+			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
+		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+			dtype.setUserDefinedType(aadlDataType.getName());
+		} else {//not float or int or bool or enum
+			System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
+		}
+		return dtype;
+	}
+    /**
+     * @author Vidhya Tekken Valapil
+     * Fetch data implementation type information and return vdm-data-type
+     * */
+    private verdict.vdm.vdm_data.DataType resolveAADLDataImplementationType(DataImplementation dataImplementation) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		dtype.setUserDefinedType(dataImplementation.getName());
+		return dtype;
+	}
+    /**
+     * @author Vidhya Tekken Valapil
+     * Fetch names of objects and return the list of names
+     * */
+	private HashSet<String> getObjectNames(List<EObject> objects) {
+		HashSet<String> objNames = new HashSet<String>();
+		for(EObject obj : objects) {
+			//process only those objects in files in the project and not in the imported files
+			if (obj instanceof SystemType) {
+				objNames.add(((SystemType) obj).getName());
+			} else if (obj instanceof BusType) {
+				objNames.add(((BusType)obj).getName());
+			} else if (obj instanceof SubprogramType) {
+				objNames.add(((SubprogramType)obj).getName());
+			} else if (obj instanceof ThreadType) {
+				objNames.add(((ThreadType)obj).getName());
+			} else if (obj instanceof MemoryType) {
+				objNames.add(((MemoryType)obj).getName());
+			} else if (obj instanceof DeviceType) {
+				objNames.add(((DeviceType)obj).getName());
+			} else if (obj instanceof AbstractType) {
+				objNames.add(((AbstractType)obj).getName());
+			} else if (obj instanceof ProcessType) {
+				objNames.add(((ProcessType)obj).getName());
+			} else if (obj instanceof ThreadGroupType) {
+				objNames.add(((ThreadGroupType)obj).getName());
+			} else if (obj instanceof VirtualProcessorType) {
+				objNames.add(((VirtualProcessorType)obj).getName());
+			} else if (obj instanceof ProcessorType) {
+				objNames.add(((ProcessorType)obj).getName());
+			} else if (obj instanceof SystemImplementation) {
+				objNames.add(((SystemImplementation) obj).getName());
+			} else if (obj instanceof SubprogramImplementation) {
+				objNames.add(((SubprogramImplementation) obj).getName());
+			} else if (obj instanceof ThreadImplementation) {
+				objNames.add(((ThreadImplementation) obj).getName());
+			} else if (obj instanceof MemoryImplementation) {
+				objNames.add(((MemoryImplementation) obj).getName());
+			} else if (obj instanceof BusImplementation) {
+				objNames.add(((BusImplementation) obj).getName());
+			} else if (obj instanceof AbstractImplementation) {
+				objNames.add(((AbstractImplementation) obj).getName());
+			} else if (obj instanceof DeviceImplementation) {
+				objNames.add(((DeviceImplementation) obj).getName());
+			} else if (obj instanceof ProcessImplementation) {
+				objNames.add(((ProcessImplementation) obj).getName());
+			} else if (obj instanceof ThreadGroupImplementation) {
+				objNames.add(((ThreadGroupImplementation) obj).getName());
+			} else if (obj instanceof VirtualProcessorImplementation) {
+				objNames.add(((VirtualProcessorImplementation) obj).getName());
+			} else if (obj instanceof ProcessorImplementation) {
+				objNames.add(((ProcessorImplementation) obj).getName());
+			}  else if(obj instanceof PropertySetImpl) {
+				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
+					// Save property owner to be used later
+					for(PropertyOwner po : prop.getAppliesTos()) {
+						String propCat = ((MetaclassReferenceImpl)po).getMetaclass().getName().toLowerCase();
+						String propName = prop.getName();
+						switch(propCat) {
+							case "system": {
+								objNames.add(propName);
+								break;
+							}
+							case "thread": {
+								objNames.add(propName);
+								break;
+							}
+							case "processor": {
+								objNames.add(propName);
+								break;
+							}
+							case "memory": {
+								objNames.add(propName);
+								break;
+							}
+							case "connection": {
+								objNames.add(propName);
+								break;
+							}
+							case "process": {
+								objNames.add(propName);
+								break;
+							}
+							case "abstract": {
+								objNames.add(propName);
+								break;
+							}
+							case "device": {
+								objNames.add(propName);
+								break;
+							}
+							case "threadgroup": {
+								objNames.add(propName);
+								break;
+							}
+							case "virtualprocessor": {
+								objNames.add(propName);
+								break;
+							}
+							case "bus": {
+								objNames.add(propName);
+								break;
+							}
+							default: {
+								System.out.println(
+										"Warning: unsupported property: " + propName + ", applies to: " + propCat);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		return objNames;
+	}
 }
