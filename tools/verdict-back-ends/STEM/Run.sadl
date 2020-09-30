@@ -15,6 +15,13 @@ import "http://sadl.org/STEM/Queries".
 // For debugging csv file importing, uncomment the line that writes out the log file in each of the template files.
 //		In VM would need to also replace c:/tmp/ by /home/soteria/tmp/
 
+// 9/29/2020: updated so that the rules generated a new object; this is so that the CAPEC.csv
+//				and Defenses.csv can have a new column that has "unique mitigation" so that
+//				SOTERIA++ and "Synthesis" can correlate when a capec mitigation is
+//				do X1 on a component or X2 on a connection.
+//				The rules are no longer generated from the excel file; in fact the
+//				Excel file needs to be updated.
+//				The rules need to be checked!!!
 // 8/5/2020: updated rules so that we no longer duplicate mitigation on connection on the component
 //				which was what SOTERIA++ needed before handling connections properly.
 //			Also, altered so that SystemAccessControl is now mapped to PE-3 and PE-3-1,
@@ -35,12 +42,12 @@ Read: data from "ScnConnections.csv" using "ScnConnections.tmpl".  //connections
 Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specific properties of component instances
 Read: data from "ScnBusBindings.csv" using "ScnBusBindings.tmpl".
 
-//Print:  Model .
-//Explain: Rule InferDataReceivedIsUntrusted1.
+////Print:  Model .
+//Explain: Rule TA1-Supply_Chain_Attack-I1.
 // note this count may be larger than the number of entries in CAPEC.csv as there may be 
 // multiple mitigations for a capec (e.g. capec-148 etc.)
 Print: "Just get the counts of all CIA Issues".
-Ask: "select count(*) where {?x <applicableCM> ?z2 } ".
+Ask: "select count(*) where {?x <rdf:type> <CMitigation> } ".
 
 Write: data {Ask: queries:Defenses2NIST.} to "/Output/Defenses2NIST.csv".
 
@@ -48,21 +55,19 @@ Write: data {Ask: queries:CAPEC.} to "/Output/CAPEC.csv".
 
 Write: data {Ask: queries:Defenses.} to "/Output/Defenses.csv".
 
-//Write: data {Ask: queries:ConnDefenses.} to "/Output/ConnDefenses.csv".
-
 Write: data {Ask: queries:ArchMitigation.} to "/Output/ArchMitigation.csv".
 
 
-/////////////////////// GRAPHS ////////////////////////////
-////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
-//// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
-//// changed by dropping ". FILTER(?dal > 0)" in 2 places
-
+///////////////////////// GRAPHS ////////////////////////////
+//////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
+////// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
+////// changed by dropping ". FILTER(?dal > 0)" in 2 places
+//
 Graph: queries:STEMgraph.
 
 /////////////////////// THE FOLLOWING TO GENERATE DATA FOR COMBINED VIEW //////////////////
 //// to get count for verification
-////Ask: "select count(*) where {?conn <rdf:type> <Connection> . ?conn <outPort> ?z1 . ?conn <inPort> ?z2} order by ?conn ".	 	
+//Ask: "select count(*) where {?conn <rdf:type> <Connection> . ?conn <outPort> ?z1 . ?conn <inPort> ?z2} order by ?conn ".	 	
 //
 //// first part of Combined View tab is for each mitigation, what are the NIST defenses
 //Ask: "select ?m (group_concat(distinct ?nist2;separator='; ') as ?nistlist) where
@@ -93,112 +98,5 @@ Graph: queries:STEMgraph.
 //{?n <rdf:type> <NISTControl> . ?n <nistId> ?id . ?n <nistDesc> ?desc
 //. LET(?desc2 := replace(str(?desc),'http.*#',''))}
 //order by ?id".
-//
-//// now the CAPEC info
-//Ask: "select distinct ?id ?desc2 where 
-//{?c <rdf:type> <CAPEC> . ?c <id> ?id . ?c <capecDesc> ?desc
-//. LET(?desc2 := replace(str(?desc),'http.*#',''))}
-//order by ?id".
-//
-//// what are the capecs with no mitigation - tested that it works by commenting out part of a declaration
-//Ask: "select * where
-//{?c <rdf:type> <CAPEC> . FILTER NOT EXISTS{?c <mitigation> ?m}
-//}".
 
-//The following 2 should be equivalent but are not - why?
-//Ask: "select distinct ?acm ?CompInst ?CAPEC ?CAPECDescription ?Mitigation ?DAL
-//where {
-//
-//{select distinct ?newacm ?newCompInst (?dal as ?DAL) (?mit as ?Mitigation)
-//where { ?newacm <mitigation> ?mit  . LET(?tx1 := lcase(str(?mit)))
-//        . ?newCompInst ?prop ?val  . LET(?tx2 := lcase(str(?prop))) 
-//        . FILTER(?tx1 = ?tx2) . ?val <dal> ?dal }
-//}
-//
-//?CompInst <applicableCM> ?acm 
-//. ?acm <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
-//. ?acm <capecDesc> ?CAPECDescription
-//. FILTER(?newacm = ?acm)
-//. FILTER(?newCompInst = ?CompInst)
-//
-//} order by ?CompInst ?CAPEC ?Mitigation ".
-//
-//Ask: "select distinct ?acm ?CompInst ?CAPEC ?CAPECDescription ?mit ?DAL
-//where {?CompInst <applicableCM> ?acm 
-//. ?acm <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
-//. ?acm <capecDesc> ?CAPECDescription
-//
-//. ?acm <mitigation> ?mit . LET(?tx1 := lcase(str(?mit)))
-//. OPTIONAL{?CompInst ?prop ?val . LET(?tx2 := lcase(str(?prop))) 
-//           . FILTER(?tx1 = ?tx2) . ?val <dal> ?DAL }
-//
-//} order by ?CompInst ?CAPEC ?mit ".
 
-//Ask: "select * where
-//{?x <trustedConnection> false} ".
-//
-//Ask: "select ?x (?z0 as ?pedigree) (?z1 as ?controlReceivedFromUntrusted) (?z2 as ?controlSentToUntrusted)
-//(?z3 as ?dataReceivedFromUntrusted) (?z4 as ?dataSentToUntrusted) where
-//{ OPTIONAL{?x <pedigree> ?z0} 
-//. OPTIONAL{?x <controlReceivedFromUntrusted> ?z1}
-//. OPTIONAL{?x <controlSentToUntrusted> ?z2}
-//. OPTIONAL{?x <dataReceivedFromUntrusted> ?z3}
-//. OPTIONAL{?x <dataSentToUntrusted> ?z4}
-//} order by ?x ".
-//
-//Ask: "select ?x (?z0 as ?pedigree) (?z1 as ?controlReceivedFromUntrusted) (?z2 as ?controlSentToUntrusted)
-//(?z3 as ?dataReceivedFromUntrusted) (?z4 as ?dataSentToUntrusted) where
-//{ OPTIONAL{?x <pedigree> ?z0} 
-//. OPTIONAL{?x <controlReceivedFromUntrusted> ?z1}
-//. OPTIONAL{?x <controlSentToUntrusted> ?z2}
-//. OPTIONAL{?x <dataSentToUntrusted> ?z4}
-//. OPTIONAL{?x <dataReceivedFromUntrusted> ?z3}
-//} order by ?x ".
-
-//Ask: "select * where {?x <dataSentToUntrusted> ?z4} order by ?x".
-
-// query to summarize capec vulnerabilities in a table form
-// of course, the ?comList is not sorted - there is no way to do that
-// can this be improved?
-//Ask: "select distinct ?cid ?desc2 (group_concat(distinct ?comp) as ?compList) 
-//{?c <capecDesc> ?desc . ?c <id> ?cid 
-//  . LET(?desc2 := replace(str(?desc),'http.*#','')) . ?CompInst <applicableCM> ?x 
-//  . LET(?x2 := replace(str(?x),'http.*#',''))
-//  . LET(?x3 := replace(str(?x2),'CAPEC-',''))
-//  . LET(?x4 := substr(?x3,1,3))
-//  . LET(?x5 := replace(str(?x4),'[CIA]',''))
-//  . FILTER(str(?cid) = ?x5)
-//  . LET(?comp := replace(str(?CompInst),'http.*#',''))
-//} group by ?cid ?desc2
-//order by ?cid".
-
-// get all the capecs for components
-//Ask: "select distinct ?CompInst ?Capec ?Desc where 
-//{?CompInst <applicableCM> ?x
-//  . ?x <id> ?Capec . ?x <capecDesc> ?Desc
-//} order by ?CompInst ?Capec".
-
-// get all dataSent and dataReceived is untrusted
-//Ask: "select * where
-//{?x <dataSentIsUntrusted> ?y}".
-//
-//Ask: "select * where
-//{?x <dataReceivedIsUntrusted> ?y}".
-
-//Ask: "select * where
-//{?conn <rdf:type> <Connection> . ?conn <connectionName> ?connname
-//. LET(?strippedcname := replace(str(?connname),'^.*#',''))
-//. ?conn <connectionType> ?t . FILTER(regex(str(?t),'Untrusted'))
-//}".
-
-// writing out equivalent of CompDep.csv
-//Write: data {Ask: "select distinct ?comp ?InputPort (?cia as ?InputCIA) ?OutputPort (?cia as ?outputCIA) where
-//{ ?conn <outPort> ?OutputPort . ?conn <connectionSource> ?comp
-//. FILTER(!regex(str(?comp), 'Impl'))
-//. ?conn2 <connectionDestination> ?comp
-//. ?conn2 <inPort> ?InputPort
-//. ?capec <ciaIssue> ?cia
-//. FILTER(!regex(str(?cia), 'Confidentiality'))
-//} order by ?comp ?OutputPort ?InputPort ?cia".} to "/Output/FullCompDep.csv".
-
-            
