@@ -107,11 +107,9 @@ $ echo 'open Core ;;' >> $HOME/.ocamlinit
 ```
 
 The kind2 sources are written in OCaml and live in a separate git
-repository.  If you want to build kind2 without using Docker, you will
-have to install OCaml as above and clone the kind2 sources from
-[https://github.com/daniel-larraz/kind2/tree/verdict_blame_assign](https://github.com/daniel-larraz/kind2/tree/verdict_blame_assign).
-You will have to check out the verdict_blame_assign branch and follow
-the build instructions in kind2's README.md.
+repository. If you want to build kind2 without using Docker,
+please follow the installation instructions in
+Kind2's [README.rst](https://github.com/kind2-mc/kind2/).
 
 The STEM sources are written in [SADL](http://sadl.sourceforge.net/),
 the Semantic Application Design Language.  SADL is an English-like
@@ -139,13 +137,11 @@ to make a unit test pass.  You also must allow Maven to download jars
 from our sadl-snapshot-repository.
 
 The z3 sources are written in C++ and live in a separate git
-repository.  Unfortunately, kind2 will not work with the latest
-version of z3; if you want to run kind2 without using Docker, you will
-need to download version 4.7.1 of the z3 [source
-tarball](https://github.com/Z3Prover/z3/archive/z3-4.7.1.tar.gz) and
-follow the build instructions in z3's
-[README.md](https://github.com/Z3Prover/z3/tree/z3-4.7.1) unless your
-operating system already has a z3-4.7.1 package.
+repository. If you want to run kind2 without using Docker, you will
+need to download a recent z3
+[release package](https://github.com/Z3Prover/z3/releases), or
+follow the build instructions in z3's README.md to create a binary
+for your operating system.
 
 ## Build the back-end programs with Java and Docker
 
