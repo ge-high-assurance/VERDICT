@@ -1,50 +1,62 @@
-# VERDICT: Building the VERDICT back-end programs
+# VERDICT: Calling the VERDICT back-end programs
 
 ## About the VERDICT back-end programs
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
 tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.  The OSATE plugin sources are in
-another directory [(../verdict)](../verdict) and the back-end program
-sources are in these directories:
+programs invoked by the plugin.  Our OSATE plugin sources are in
+the [(../verdict)](../verdict) directory and our back-end program
+sources are in the following subdirectories:
 
-- [aadl2iml](aadl2iml) translates a model from AADL to IML
-- [soteria_pp](soteria_pp) analyzes the safety and security of a model's system architecture
 - [STEM](STEM) models and queries a model's system architecture
-- [verdict-bundle-parent](verdict-bundle-parent) runs the back-end programs
+- [aadl2iml](aadl2iml) translates a model from AADL to IML
+- [iml-verdict-translator](iml-verdict-translator) translates a model from IML to VDM
+- [soteria_pp](soteria_pp) analyzes the safety and security of a model's system architecture
+- [verdict-assurance-case](verdict-assurance-case) builds an assurance case
+- [verdict-attack-defense-collector](verdict-attack-defense-collector) collects some attack defenses
+- [verdict-blame-assignment](verdict-blame-assignment) prepares some blame assignments
+- [verdict-bundle](verdict-bundle) provides an executable jar which can call any of the back-end programs
+- [verdict-crv](verdict-crv) analyzes a model's behavior
+- [verdict-instrumentor](verdict-instrumentor) instruments a model for analysis
+- [verdict-lustre-translator](verdict-lustre-translator) translates a model from VDM to Lustre
+- [verdict-mbas-translator](verdict-mbas-translator) analyzes a model's architecture
+- [verdict-merit-assignment](verdict-merit-assignment) prepares merit assignments
+- [verdict-stem-runner](verdict-stem-runner) runs STEM queries
+- [verdict-synthesis](verdict-synthesis) synthesizes defenses
+- [verdict-test-instrumentor](verdict-test-instrumentor) tests an instrumented model
+- [z3-native-libs](z3-native-libs) encapsulates z3 native libraries
 
-Not all of our back-end programs have sources inside this directory.
-We also use programs called kind2 and z3 which come from different
-source repositories or source tarballs than this repository.  If you
-want to build all of these back-end programs natively from source, you
-will need C/C++, Java, and OCaml compilers.  However, we normally
-build only the Java programs directly on our system; we use a
-Dockerfile in this directory with a builder image to build the rest of
-the back-end programs.  If you want to build our Docker image, you
-have come to the right place; you can use this directory's Dockerfile
-to build a Docker image which contains all of our back-end programs.
+We also use two prebuilt executables which come from other source
+repositories, not this repository:
 
-The majority of our back-end program sources are written in Java; they
-are all in the [verdict-bundle-parent](verdict-bundle-parent)
-directory and get bundled together into an executable jar called
-verdict-bundle-\<VERSION\>-capsule.jar.  The rest of our back-end
-program sources (those that are not written in Java) are in the other
-directories mentioned above or in other source repositories.  Our
-verdict-bundle jar (the back-end programs' sole point of entry)
-directly calls the back-end programs written in Java and runs the
-back-end programs not written in Java in subprocesses.
+- [kind2](https://github.com/kind2-mc/kind2) checks the safety properties of a Lustre model
+- [z3](https://github.com/Z3Prover/z3) solves Satisfiability Modulo Theories
+
+## Building the VERDICT back-end programs
+
+Our back-end programs are written in Java and OCaml.  You will need
+both Java and OCaml software development kits if you want to build all
+of the back-end programs.  However, our GitHub repository has a
+continuous integration workflow using GitHub Actions which will build
+a Docker image and an Eclipse update site each time you merge a pull
+request or push a commit to the main branch.  If you don't want to
+edit any of the OCaml code, you can build only the Java programs with
+Maven and let the CI workflow produce a Docker image which contains
+all of the back-end programs ready to be called when needed.  You will
+need to install both OSATE and Docker on your system and configure the
+OSATE plugin to run the back-end programs using the Docker image.
 
 ## Set up your build environment
 
-You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 8 or 11) to build all of our Java program sources.  We have
-tried Java 11 LTS successfully, but OSATE itself is officially
-supported only on Java 8 LTS so we recommend using Java 8 LTS anyway.
-If you want to switch to a later LTS version of Java, replace the
-maven.compiler.source and maven.compiler.target properties in our
-tools' parent [pom.xml](../../pom.xml) with maven.compiler.release and
-set the release number to 11, e.g.,
+You will need both a [Java Development Kit](https://adoptopenjdk.net/)
+and [Apache Maven](https://maven.apache.org) to build our Java program
+sources.  You can use either Java 8 LTS or Java LTS 11 even though
+OSATE itself officially supports only Java 8 LTS.  If OSATE switches
+to Java 11 LTS and you don't want to support Java 8 LTS anymore, you
+can replace the maven.compiler.source and maven.compiler.target
+properties in our tools' parent [pom.xml](../../pom.xml) with
+maven.compiler.release and set the release number to 11, e.g.,
 
 ```
     <properties>
@@ -54,62 +66,100 @@ set the release number to 11, e.g.,
     </properties>
 ```
 
-You also will need [Apache Maven](https://maven.apache.org) to build
-all of our Java program sources.  Your operating system may have a
-prebuilt Maven package available, but many developers would prefer to
-download the latest Maven release from Apache's website, unpack the
-Maven release someplace, and
-[add](https://maven.apache.org/install.html) the unpacked directory's
-bin directory to their PATH.
+The usual way to install Maven is to download the latest Maven
+distribution from Apache's website, unpack the Maven distribution
+someplace, and [add](https://maven.apache.org/install.html) the
+unpacked distribution's bin directory to your PATH.  If you don't want
+to install both Java and Maven manually or fiddle with prebuilt system
+packages yourself, you can use [SDKMAN!](https://sdkman.io/) to manage
+parallel versions of multiple software development kits on a Unix
+based system.  SDKMAN! provides a convenient command line interface
+for installing, switching, removing, and listing multiple versions of
+JDKs and SDKs.
 
 Some developers also will need to tell Maven to [use a
 proxy](https://maven.apache.org/guides/mini/guide-proxies.html) in
 their settings.xml file (usually ${user.home}/.m2/settings.xml).
-Maven is unaffected by proxy environment variables, so you still need
-to create your own settings.xml file if Maven needs to use a proxy at
+Proxy environment variables won't affect Maven, so you still need to
+create your own settings.xml file to tell Maven to use a proxy at
 your site.
 
-You can use our Dockerfile to build all of the back-end programs not
-written in Java so you can avoid needing to install C/C++ and OCaml
-compilers on your system.  If you really want to build these programs
-directly on your system with your system's native compilers, we will
-describe briefly how to set up these native compilers on your system.
-Our [Dockerfile](Dockerfile) also shows how to install or set up these
-native compilers within a Debian 10-based OCaml builder image.
+If you want verdict-stem-runner's unit test to pass (right now it's
+disabled by default), you also will need to install the
+[GraphViz](https://graphviz.gitlab.io/download/) software on your
+system and set the environment variable `GraphVizPath` to the
+directory where the `dot` executable can be found (usually `/usr/bin`
+on Linux).
+
+## Note the use of our Maven snapshot repository
+
+Two of our back-end programs (iml-verdict-translator and
+verdict-stem-runner) depend on libraries which are not available in
+the Maven central repository.  For example, we use some SADL libraries
+(reasoner-api, reasoner-impl, sadlserver-api, and sadlserver-impl)
+which are part of the Semantic Application Design Language version 3
+([SADL](http://sadl.sourceforge.net/)).  GE Global Research has open
+sourced SADL but these SADL libraries have not been officially
+released and put into the Maven central repository since SADL still is
+used mostly by other GE Global Research software such as the SADL
+Integrated Development Environment (SADL IDE).  Since the Maven
+central repository normally distributes only releases of libraries,
+not snapshots, we have set up our own Maven snapshot repository to
+make these SADL libraries available when we build verdict-stem-runner.
+
+The good news is that you will not need to clone SADL from its own git
+[repository](https://github.com/crapo/sadlos2) and build SADL before
+you can build our program sources.  We have already built the SADL
+libraries and put them into another git repository
+([sadl-snapshot-repository](https://github.com/ge-high-assurance/sadl-snapshot-repository)).
+We have a repositories section inside verdict-stem-runner's pom.xml
+which tells Maven how to download these SADL libraries from the above
+git repository.
+
+However, some developers have been putting a `<mirrorOf>*</mirrorOf>`
+in their .m2/settings.xml file.  Redirecting all Maven downloads to
+the same mirror repository will prevent Maven from being able to
+download any jars from our sadl-snapshot-repository.  You will have to
+remove `*` from that mirrorOf section before your build will finish
+successfully.
+
+## Build the Java back-end programs
+
+To build the Java program sources on your system, simply run the
+following Maven command in this directory:
+
+`mvn clean install`
+
+When the build completes, you will have an executable jar called
+verdict-bundle-\<VERSION\>-capsule.jar in the verdict-bundle/target
+directory.  The OSATE plugin can run this verdict-bundle jar directly
+on your system although you also would need to build or install the
+OCaml and prebuilt back-end programs that the jar calls in
+subprocesses.
+
+## Build the non-Java back-end programs (optional)
 
 The aadl2iml and soteria_pp sources are written in
 [OCaml](https://ocaml.org/learn/description.html).  If you want to
-build and/or debug these programs without using Docker, you will need
-to install OCaml version 4.07, install some opam packages, run make,
-copy/rename the newly built native executables some place, and tell
-the verdict-bundle jar or the VERDICT plugin where the executables
-are.  You will have to find out how to do that for your operating
-system, although you can use the following commands if you have an
-Ubuntu 18.04 LTS system:
+build or debug the OCaml programs yourself, you will need to install
+OCaml version 4.07.1, install some opam packages, run `opam exec make`
+in each of these directories, and configure the OSATE plugin to tell
+it where the executables are.
+
+Here are some commands that might successfully set up OCaml and build
+each program if you have an Ubuntu 20.04 LTS system:
 
 ```shell
-$ sudo apt install build-essential m4
-$ sudo add-apt-repository ppa:avsm/ppa  $ Skip this on Ubuntu 20.04
+$ sudo apt install build-essential m4 
 $ sudo apt update
 $ sudo apt install opam
-$ opam init --disable-sandboxing  # Need --disable-sandboxing only on WSL1
-$ eval $(opam env)
 $ opam switch create ocaml 4.07.1
-$ eval $(opam env)
-$ opam install async camlp4 core core_extended menhir
-$ opam install num ocamlbuild ocamlfind printbox xml-light yojson
-$ echo '#use "topfind" ;;' >> $HOME/.ocamlinit
-$ echo '#thread ;;' >> $HOME/.ocamlinit
-$ echo '#load "stdlib.cma" ;;' >> $HOME/.ocamlinit
-$ echo '#require "async" ;;' >> $HOME/.ocamlinit
-$ echo '#require "core_extended" ;;' >> $HOME/.ocamlinit
-$ echo 'open Core ;;' >> $HOME/.ocamlinit
+$ opam install async core core_extended dune menhir ocamlbuild ocamlfind printbox xml-light
+$ cd tools/verdict-back-ends/aadl2iml
+$ opam exec make
+$ cd tools/verdict-back-ends/soteria_pp
+$ opam exec make
 ```
-
-The kind2 sources are written in OCaml and live in a separate git
-repository. If you want to build kind2 without using Docker,
-please follow the installation instructions in
-Kind2's [README.rst](https://github.com/kind2-mc/kind2/).
 
 The STEM sources are written in [SADL](http://sadl.sourceforge.net/),
 the Semantic Application Design Language.  SADL is an English-like
@@ -128,99 +178,38 @@ reads translated OWL files from a STEM project and runs STEM's rules
 on semantic model data loaded from CSV data files created by some of
 our other back-end programs.
 
-The verdict-bundle sources are written in Java.  You will find some
-important notes about building these sources in verdict-bundle's
-[README.md](verdict-bundle-parent/README.md).  In short, you will need
-to set an environment variable `GraphVizPath` to the directory where
-Graphviz's `dot` executable can be found (usually `/usr/bin` on Linux)
-to make a unit test pass.  You also must allow Maven to download jars
-from our sadl-snapshot-repository.
-
-The z3 sources are written in C++ and live in a separate git
-repository. If you want to run kind2 without using Docker, you will
-need to download a recent z3
-[release package](https://github.com/Z3Prover/z3/releases), or
-follow the build instructions in z3's README.md to create a binary
-for your operating system.
-
-## Build the back-end programs with Java and Docker
-
-As we have said before, you normally will build only the Java program
-sources on your system and use Docker to build the rest of the program
-sources not written in Java.  If Docker is not installed on your
-operating system, please see our parent [README.md](../README.md) for
-instructions how to install Docker.  You also will need to download
-two Docker images before you can build our own Docker image:
+If you want to run graphviz, kind2, and z3 without using Docker, you
+will need to download or install prebuilt executables on your
+operating system too.  Here are some commands that might successfully
+set up some of these programs if you have an Ubuntu 20.04 LTS system:
 
 ```shell
-$ docker pull ocaml/opam2:latest
-$ docker pull openjdk:11-jre-slim-buster
+$ sudo apt install graphviz libzmq5 z3
 ```
 
-You need to run the above commands only when you haven't downloaded a
-Docker image yet or you want to download a later version which you
-know is available now.  You also need a fresh build of the Java
-program sources on your system as well.  To get the fresh build, run
-Maven in either this directory or the verdict-bundle-parent directory:
+You'll probably have to download and install a prebuilt kind2
+executable manually, though:
 
-`mvn clean install`
+<https://github.com/kind2-mc/kind2/releases>
 
-Now cd back into this directory and run either of the following
-commands to build a Docker image containing all of the back-end
-programs:
+## Build the Docker image (optional)
+
+You usually won't need to build a Docker image since our CI workflow
+will do it automatically for you.  If you still want to build a Docker
+image yourself, you must build all of the Java and OCaml programs
+first.  Then cd back into this directory and run the following
+command:
 
 ```shell
-: If you don't need a HTTP proxy
-$ docker build -t gehighassurance/verdict .
-: If you need a HTTP proxy
-$ docker build --build-arg http_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ --build-arg https_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ -t gehighassurance/verdict .
+$ docker build -t gehighassurance/verdict-dev .
 ```
 
-Omit or change the build arguments if you don't need a HTTP proxy or
-you use a different HTTP proxy.  If the docker build command finishes
-successfully, you will have a gehighassurance/verdict image that will
-be able to run all of the VERDICT back-end programs in a container:
+Proxy environment variables won't affect Docker either, so if you need
+Docker to use a proxy, you will need to go into Docker's Settings
+(General -> Network), configure a proxy there, and restart Docker.
+You also will have to run your `docker build` command with some
+additional arguments:
 
 ```shell
-$ docker image ls
-REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
-gehighassurance/verdict   latest              8bac939d1ece        25 minutes ago      336MB
-ocaml/opam2               latest              f58ef9d0ce70        2 weeks ago         3.56GB
-openjdk                   8-jre-slim-buster   bf20b099be53        2 weeks ago         184MB
+$ docker build --build-arg http_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ --build-arg https_proxy=http://PITC-Zscaler-US-Niskayuna.proxy.corporate.ge.com:8080/ -t gehighassurance/verdict-dev .
 ```
-
-Once you have done sufficient testing to make sure that the latest
-version of the Docker image works with the latest version of our OSATE
-plugin, then push the image to DockerHub to publish the image and make
-its latest version available for everyone else to use:
-
-```shell
-$ docker push gehighassurance/verdict
-```
-
-# Run the VERDICT back-end programs in a container
-
-Once you have built and pushed the gehighassurance/verdict image, our
-OSATE plugin will run the back-end programs in a container
-automatically for you.  However, you can run the VERDICT back-end
-programs with commands like these if you want to perform some manual
-testing or debugging yourself:
-
-### CRV
-
-```shell
-$ docker run --mount type=bind,src=C:/Users/200003548/git/VERDICT,dst=/data verdict --aadl /data/models/DeliveryDrone /app/aadl2iml --crv /data/crv_output.xml /app/kind2 -BA -LS -NI -LB -IT -OT -RI -SV
-```
-
-You will see two output files (crv_output.xml and crv_output_ba.xml)
-appear in your host's directory (the src=VERDICT directory above).
-
-### MBAS
-
-```shell
-$ docker run --mount type=bind,src=C:/Users/200003548/git/VERDICT,dst=/data verdict --csv DeliveryDrone /app/aadl2iml --mbas /data/tools/verdict-back-ends/STEM /app/soteria_pp
-```
-
-You will see some CSV and SVG files appear in your host's STEM/Graphs,
-STEM/Output, and STEM/Output/Soteria_Output directories (inside the
-src=VERDICT directory above).

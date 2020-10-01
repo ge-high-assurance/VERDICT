@@ -18,6 +18,7 @@
     <modules>
         <module>verdict</module>
         <module>verdict-back-ends</module>
+        <module>verdict-data-model</module>
     </modules>
 
     <!-- Set properties used by all modules -->
@@ -45,11 +46,6 @@
                 <groupId>com.amihaiemil.web</groupId>
                 <artifactId>docker-java-api</artifactId>
                 <version>0.0.13</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ge.research.osate.verdict</groupId>
-                <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
-                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.ge.research.sadl</groupId>
@@ -91,6 +87,11 @@
             <dependency>
                 <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-attack-defense-collector</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-data-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
