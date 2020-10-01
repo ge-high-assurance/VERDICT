@@ -14,11 +14,11 @@ import "http://sadl.org/STEM/STEMRules".
 Ask Defenses2NIST: "
 select distinct (?m1 as ?DefenseProperty)
 (?ApplicableDefense1 as ?NISTProfile) (?DefenseDescription1 as ?DefenseDescription)
-where {#?m1 <rdf:type> <CMitigation>
+where {#?m1 <rdf:type> <Mitigation>
 # get NIST controls and their names for mitigation m1
 {select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1)
     (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where
-   {?m1 <rdf:type> <CMitigation> . ?m1 <nistControl> ?yy2
+   {?m1 <rdf:type> <Mitigation> . ?m1 <nistControl> ?yy2
     . ?yy2 <nistId> ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))
     . ?yy2 <nistDesc> ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))
    } group by ?m1}
