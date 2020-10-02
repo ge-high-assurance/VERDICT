@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,18 +6,22 @@
 
     <parent>
         <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-back-ends</artifactId>
+        <artifactId>verdict-bundle</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- Verdict Synthesis -->
-    <artifactId>verdict-synthesis</artifactId>
+    <!-- Verdict Bundle App (single entry point to run all back-end tools) -->
+    <artifactId>verdict-bundle-app</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ge.verdict</groupId>
-            <artifactId>com.microsoft.z3</artifactId>
+            <artifactId>verdict-assurance-case</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ge.verdict</groupId>
@@ -28,37 +32,54 @@
             <artifactId>verdict-data-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-lustre-translator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.logicng</groupId>
-            <artifactId>logicng</artifactId>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-mbas-translator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-stem-runner</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-synthesis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-test-instrumentor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiowa.clc.verdict</groupId>
+            <artifactId>verdict-merit-assignment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiowa.clc.verdict.blm</groupId>
+            <artifactId>verdict-blame-assignment</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiowa.clc.verdict.crv</groupId>
+            <artifactId>verdict-crv</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiowa.clc.verdict.vdm</groupId>
+            <artifactId>iml-verdict-translator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-graphite</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>z3-native-libs</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -77,7 +98,7 @@
                     <execution>
                         <?m2e ignore?>
                         <id>unpack-native-libs</id>
-                        <phase>process-test-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
@@ -90,25 +111,12 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Run unit tests with native libs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>"-Djava.library.path=${project.build.directory}/native-libs"</argLine>
-                    <environmentVariables>
-                        <DYLD_LIBRARY_PATH>${project.build.directory}/native-libs</DYLD_LIBRARY_PATH>
-                        <LD_LIBRARY_PATH>${project.build.directory}/native-libs</LD_LIBRARY_PATH>
-                    </environmentVariables>
-                    <workingDirectory>${project.build.directory}/native-libs</workingDirectory>
-                </configuration>
-            </plugin>
             <!-- Add native libs to capsule -->
             <plugin>
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
-                    <appClass>com.ge.verdict.synthesis.App</appClass>
+                    <appClass>com.ge.verdict.bundle.App</appClass>
                     <caplets>SharedLibraryPathCapsule</caplets>
                     <fileSets>
                         <fileSet>

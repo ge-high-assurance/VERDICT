@@ -6,9 +6,9 @@ tools consist of an OSATE plugin and a set of VERDICT back-end
 programs invoked by the plugin to perform cyber resiliency analysis
 (CRV) and model based architecture analysis (MBAA).  The plugin has
 two ways to call the back-end programs; it can run an executable jar
-called verdict-bundle-1.0.0-SNAPSHOT-capsule.jar in a subprocess or it
-can run a Docker image called gehighassurance/verdict in a temporary
-container.
+called verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar in a subprocess
+or it can run a Docker image called gehighassurance/verdict in a
+temporary container.
 
 1. Install OSATE and the VERDICT front-end plugin
 
@@ -132,8 +132,8 @@ configure some VERDICT settings in OSATE:
   the following steps instead.
 
 - Click the Browse... button next to the "Bundle Jar:" field, navigate
-  to the "verdict-bundle-1.0.0-SNAPSHOT-capsule.jar" file inside the
-  "extern" folder, and make it the field's setting.
+  to the "verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar" file inside
+  the "extern" folder, and make it the field's setting.
 
 - Click the Browse... button next to the "Aadl2iml Binary:" field,
   navigate to the appropriate "aadl2iml" binary for your operating

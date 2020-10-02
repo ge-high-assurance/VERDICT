@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-back-ends</artifactId>
+        <artifactId>verdict-bundle</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- Verdict Test Instrumentor -->
-    <artifactId>verdict-test-instrumentor</artifactId>
+    <!-- Verdict MBAS Translator -->
+    <artifactId>verdict-mbas-translator</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -37,7 +37,7 @@
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
-                    <appClass>com.ge.verdict.test.instrumentor.App</appClass>
+                    <appClass>com.ge.verdict.mbas.App</appClass>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>

@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-back-ends</artifactId>
+        <artifactId>verdict-bundle</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- Verdict Attack-Defense Collector -->
-    <artifactId>verdict-attack-defense-collector</artifactId>
+    <!-- Verdict Test Instrumentor -->
+    <artifactId>verdict-test-instrumentor</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -20,25 +20,10 @@
             <artifactId>verdict-data-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.logicng</groupId>
-            <artifactId>logicng</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <!-- Dependencies needed only by tests or capsule jar -->
-        <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -52,7 +37,7 @@
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
-                    <appClass>com.ge.verdict.attackdefensecollector.Main</appClass>
+                    <appClass>com.ge.verdict.test.instrumentor.App</appClass>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>

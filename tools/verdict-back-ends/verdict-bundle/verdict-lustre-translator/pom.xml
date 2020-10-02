@@ -6,41 +6,46 @@
 
     <parent>
         <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-back-ends</artifactId>
+        <artifactId>verdict-bundle</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- Verdict STEM Runner -->
-    <artifactId>verdict-stem-runner</artifactId>
+    <!-- Verdict Lustre Translator -->
+    <artifactId>verdict-lustre-translator</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>reasoner-api</artifactId>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-data-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>reasoner-impl</artifactId>
+            <groupId>net.htmlparser.jericho</groupId>
+            <artifactId>jericho-html</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>sadlserver-api</artifactId>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ge.research.sadl</groupId>
-            <artifactId>sadlserver-impl</artifactId>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- Dependencies needed only by tests or capsule jar -->
+        <!-- JAXB dependencies needed only under Java 9 or later -->
         <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>javax.activation</artifactId>
-            <scope>test</scope>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -58,36 +63,13 @@
         </dependency>
     </dependencies>
 
-    <!-- This microrepository has our SADL dependencies -->
-    <repositories>
-        <repository>
-            <id>sadl-snapshot-repository</id>
-            <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
-    <build><!-- Let's use the STEM project above us rather than copying it into
-            src/test/resources -->
-        <testResources>
-            <testResource>
-                <directory>${basedir}/../..</directory>
-                <includes>
-                    <include>STEM/</include>
-                </includes>
-            </testResource>
-        </testResources>
+    <build>
         <plugins>
             <plugin>
                 <groupId>com.github.chrisdchristo</groupId>
                 <artifactId>capsule-maven-plugin</artifactId>
                 <configuration>
-                    <appClass>com.ge.verdict.stem.App</appClass>
+                    <appClass>com.ge.verdict.lustre.App</appClass>
                     <includeApp>true</includeApp>
                     <includeAppDep>true</includeAppDep>
                     <includePluginDep>false</includePluginDep>
@@ -107,6 +89,40 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Run slower integration tests only when -Pverify is added -->
+        <profile>
+            <id>verify</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

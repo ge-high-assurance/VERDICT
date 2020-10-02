@@ -23,7 +23,7 @@ RUN apt-get update -qq \
 COPY --from=kind2/kind2:dev /kind2 /app/kind2
 COPY aadl2iml/bin/aadl2iml /app/aadl2iml
 COPY soteria_pp/bin/soteria_pp /app/soteria_pp
-COPY verdict-bundle/target/verdict-bundle-*-capsule.jar /app/verdict.jar
+COPY verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar /app/verdict.jar
 
 # Run verdict.jar as the verdict user, not as root
 

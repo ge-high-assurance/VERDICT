@@ -14,19 +14,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>iml-verdict-translator</module>
-        <module>verdict-assurance-case</module>
-        <module>verdict-attack-defense-collector</module>
-        <module>verdict-blame-assignment</module>
         <module>verdict-bundle</module>
-        <module>verdict-crv</module>
-        <module>verdict-instrumentor</module>
-        <module>verdict-lustre-translator</module>
-        <module>verdict-mbas-translator</module>
-        <module>verdict-merit-assignment</module>
-        <module>verdict-stem-runner</module>
-        <module>verdict-synthesis</module>
-        <module>verdict-test-instrumentor</module>
-        <module>z3-native-libs</module>
     </modules>
 </project>
