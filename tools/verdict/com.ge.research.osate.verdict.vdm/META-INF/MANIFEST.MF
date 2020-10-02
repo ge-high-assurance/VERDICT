@@ -19,4 +19,5 @@ Bundle-ClassPath: .,
  lib/jakarta.activation.jar,
  lib/jakarta.xml.bind-api.jar,
  lib/jaxb-runtime.jar,
- lib/txw2.jar
+ lib/txw2.jar,
+ lib/verdict-data-model.jar

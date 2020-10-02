@@ -9,7 +9,7 @@
 The VERDICT feature consists of an OSATE plugin and a set of VERDICT
 back-end programs invoked by the plugin.  The plugin has two ways to
 call the back-end programs; it can run an executable jar
-(verdict-bundle-&lt;VERSION&gt;-capsule.jar) in a subprocess or it can
+(verdict-bundle-app-&lt;VERSION&gt;-capsule.jar) in a subprocess or it can
 run a Docker image (gehighassurance/verdict) in a temporary container.
    </description>
 

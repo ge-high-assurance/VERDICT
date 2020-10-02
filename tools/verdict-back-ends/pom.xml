@@ -14,6 +14,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>verdict-bundle-parent</module>
+        <module>verdict-bundle</module>
     </modules>
 </project>

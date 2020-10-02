@@ -3,4 +3,4 @@
 *
 !aadl2iml/bin/aadl2iml
 !soteria_pp/bin/soteria_pp
-!verdict-bundle-parent/verdict-bundle/target/verdict-bundle-*-capsule.jar
+!verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar
