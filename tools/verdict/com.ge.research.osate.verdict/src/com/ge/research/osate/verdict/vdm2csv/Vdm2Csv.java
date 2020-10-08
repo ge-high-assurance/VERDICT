@@ -27,6 +27,9 @@ import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.CyberExpr;
 import verdict.vdm.vdm_model.CyberExprList;
+import verdict.vdm.vdm_model.EventHappens;
+import verdict.vdm.vdm_model.IAPort;
+import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.SafetyRelExpr;
@@ -48,6 +51,10 @@ public class Vdm2Csv {
 	Map<String, List<CyberMission>> compTypeNameToMissions = new LinkedHashMap<>();
 	Map<ComponentImplementation, List<Connection>> sysImplToConns = new LinkedHashMap<>();
 	/**
+	 * @param inputVDM
+	 * @param stem directory 
+	 * @param soteria directory
+	 * @param model name i.e., project directory name 
 	 * 1. Populate the data structure TODO: update
 	 * 2. Build tables for STEM:
 	 *        ScnCompProps.csv, ScnConnections.csv, ScnBusBindings.csv
@@ -56,16 +63,17 @@ public class Vdm2Csv {
 	 *        Events.csv, ScnCompProps.csv, ScnConnections.csv
 	 * 4. Output the csv files
 	 * */
-	public void execute(File inputVdm, String stemDir, String soteriaDir) {
+	public void execute(File inputVdm, String stemDir, String soteriaDir, String modelName) {
 		Table scnCompPropsTable = new Table();
 		Table eventsTable = new Table("Comp", "Event", "Probability");
 		Table compSafTable = new Table("Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
 		Table compDepTable = new Table("Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
-		Table missionTable = new Table();
+		Table missionTable =  new Table("ModelVersion", "MissionReqId", "MissionReq", "ReqId","Req", "MissionImpactCIA",
+                "Effect", "Severity", "CompInstanceDependency", "CompOutputDependency", "DependentCompOutputCIA", "ReqType");
 		Table scnConnTable = new Table();
 		Table scnBusBindingsTable = new Table();
 		Model vdm = VdmTranslator.unmarshalFromXml(inputVdm);
-		updateListsMapsWithDataFromVDM(vdm, eventsTable, compDepTable,compSafTable);
+		updateListsMapsWithDataFromVDM(vdm, modelName, eventsTable, compDepTable,compSafTable, missionTable);
 		updateTablesWithDataFromListsMaps(scnCompPropsTable, eventsTable, compSafTable, compDepTable, missionTable, scnConnTable);
 
 		// For STEM
@@ -87,11 +95,19 @@ public class Vdm2Csv {
 	 * @param eventsTable 
 	 * @param compDepTable 
 	 */
-	private void updateListsMapsWithDataFromVDM(Model inputVDM, Table eventsTable, Table compDepTable, Table compSafTable) {	
+	private void updateListsMapsWithDataFromVDM(Model inputVDM, String modelName, Table eventsTable, Table compDepTable, Table compSafTable, Table missionTable) {	
 		List<ComponentType> compTypes = inputVDM.getComponentType();
 		processComponentTypes(compTypes, eventsTable, compDepTable, compSafTable);
 		List<ComponentImpl> compImpls = inputVDM.getComponentImpl();
+		processMissionReqs(inputVDM.getMission(), missionTable, modelName);
 		System.out.println("Updated all tables.");
+	}
+	private void processMissionReqs(List<Mission> missionReqs, Table missionTable, String scenario) {
+		for(Mission missionReq : missionReqs) {
+			missionTable.addValue(scenario);
+			missionTable.addValue(sanitizeValue(missionReq.getId()));
+			missionTable.addValue(""); // MissionReq
+		}
 	}
 	private void processComponentTypes(List<ComponentType> compTypes, Table eventsTable, Table compDepTable, Table compSafTable) {
 		//each ComponentType contains id, name, compCateg, List<Port>, ContractSpec, List<CyberRel>, List<SafetyRel>, List<Event>
@@ -109,9 +125,39 @@ public class Vdm2Csv {
 	private void updateCompSafTable(Table compSafTable, String compTypeName,
 			List<verdict.vdm.vdm_model.SafetyRel> safetyRels) {
 		for(verdict.vdm.vdm_model.SafetyRel safetyRel : safetyRels) {
-			SafetyRelExpr safetyRelExpr = safetyRel.getFaultSrc();
+			updateCompSafTable(compSafTable, compTypeName, safetyRel.getFaultSrc(), safetyRel.getOutput());
 		}
 	}
+	private void updateCompSafTable(Table compSafTable, String compTypeName,
+			verdict.vdm.vdm_model.SafetyRelExpr safetyRelExpr, IAPort outputIAPort) {
+		if(safetyRelExpr.getKind()==null) {
+			if(safetyRelExpr.getFault()!=null) {
+				compSafTable.addValue(compTypeName);
+				compSafTable.addValue(safetyRelExpr.getFault().getEventName());
+				compSafTable.addValue(safetyRelExpr.getFault().getHappens().toString());
+				compSafTable.addValue(outputIAPort.getName());
+				compSafTable.addValue(outputIAPort.getIa().name());
+				compSafTable.capRow();
+			} else if(safetyRelExpr.getPort()!=null){
+				compSafTable.addValue(compTypeName);
+				compSafTable.addValue(safetyRelExpr.getPort().getName());
+				compSafTable.addValue(safetyRelExpr.getPort().getIa().name());
+				compSafTable.addValue(outputIAPort.getName());
+				compSafTable.addValue(outputIAPort.getIa().name());
+				compSafTable.capRow();
+			} else {
+				System.out.println("WARNING: Safety Expression has null values for expr-kind and event-happens/fault");
+			}
+		} else if (safetyRelExpr.getKind().toString().equalsIgnoreCase("Or")){
+			List<SafetyRelExpr> subInpSafList =safetyRelExpr.getOr().getExpr();
+			for (SafetyRelExpr subInpSafExpr: subInpSafList) {
+				updateCompSafTable(compSafTable, compTypeName, subInpSafExpr, outputIAPort);
+			}
+		} else {
+			System.out.println("WARNING: Expression used as Safety Relation input is not supported.");
+		}
+	}
+	
 	private void updateCompDepTable(Table compDepTable, String compTypeName,
 			List<verdict.vdm.vdm_model.CyberRel> cyberRels) {
     	for(verdict.vdm.vdm_model.CyberRel cyberRel : cyberRels) {
