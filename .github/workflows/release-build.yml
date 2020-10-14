@@ -187,6 +187,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: tools/verdict-back-ends
+        file: tools/verdict-back-ends/Dockerfile
         push: true
         cache-from: type=registry,ref=gehighassurance/verdict:latest
         cache-to: type=inline
