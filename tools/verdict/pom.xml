@@ -25,8 +25,9 @@
         <module>com.ge.research.osate.verdict.vdm</module>
     </modules>
 
-    <build><!-- Use Tycho to build our Eclipse plugin code -->
+    <build>
         <plugins>
+            <!-- Use Tycho to build our Eclipse plugin code -->
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-maven-plugin</artifactId>
