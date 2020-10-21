@@ -56,9 +56,9 @@ public class Vdm2Csv {
 	 * */
 	//public void execute(File inputVdm, String stemDir, String soteriaDir, String modelName) {//TODO:remove if function is invokable with VDM as input parameter
 	public void execute(Model vdm, String stemDir, String soteriaDir, String modelName) {
-		Table eventsTable = new Table("Comp", "Event", "Probability");
-		Table compSafTable = new Table("Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
-		Table compDepTable = new Table("Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
+		Table eventsTable = new Table("QualifiedName", "PackageName", "Comp", "Event", "Probability");
+		Table compSafTable = new Table("QualifiedName", "PackageName","Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
+		Table compDepTable = new Table("QualifiedName", "PackageName","Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
 		Table missionTable =  new Table("ModelVersion", "MissionReqId", "MissionReq", "ReqId","Req", "MissionImpactCIA",
                 "Effect", "Severity", "CompInstanceDependency", "CompOutputDependency", "DependentCompOutputCIA", "ReqType");
 		Table scnBusBindingsTable = new Table("Scenario", "Comp", "Impl", "ActualConnectionBindingSrcComp",
@@ -188,8 +188,8 @@ public class Vdm2Csv {
 	private Table updateConnectionsTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToConnections, Map<String, HashMap<String, String>> connectionAttributesMap, Map<String, String> compToCompImpl) {
 		// --update headers of connections csv
 		List<String> headers = new ArrayList<String>(
-    			Arrays.asList("Scenario", "Comp", "Impl", "ConnectionName", "SrcComp", "SrcImpl", "SrcCompInstance", "SrcCompCategory",
-    					     "SrcPortName", "SrcPortType", "DestComp", "DestImpl", "DestCompInstance", "DestCompCategory",
+    			Arrays.asList("Scenario", "QualifiedName", "PackageName","Comp", "Impl", "ConnectionName","SrcCompInstQualifiedName", "SrcCompInstPackage", "SrcComp", "SrcImpl", "SrcCompInstance", "SrcCompCategory",
+    					     "SrcPortName", "SrcPortType", "DestCompInstQualifiedName", "DestCompInstPackage", "DestComp", "DestImpl", "DestCompInstance", "DestCompCategory",
     					     "DestPortName", "DestPortType"));
 	    headers.addAll(propToConnections.keySet());
 	    Table scnConnTable = new Table(headers);
@@ -208,7 +208,7 @@ public class Vdm2Csv {
 	}
 	private Table updateCompInstTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToCompInsts, Map<String, HashMap<String, String>> compInstAttributesMap, Map<String, String> compToCompImpl) {
 		//update component instances prop table
-		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "Comp", "Impl", "CompInstance"));
+		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "QualifiedName", "PackageName", "Comp", "Impl", "CompInstance"));
 	    headers.addAll(propToCompInsts.keySet());
 	    Table scnCompPropsTable = new Table(headers);
     	for (ComponentImpl compImpl: compImpls) {
@@ -224,6 +224,9 @@ public class Vdm2Csv {
 			Map<String, HashMap<String, String>> compInstAttributesMap, String scenario, ComponentImpl compImpl,
 			Map<String, String> compToCompImpl, Map<String, HashSet<String>> propToCompInsts) {
 		scnCompPropsTable.addValue(scenario);
+		String compQualName = compInst.getId();
+		scnCompPropsTable.addValue(compQualName);
+		scnCompPropsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));
 		scnCompPropsTable.addValue(compInst.getSpecification().getName());//comp
 		if(compInst.getImplementation()!=null) {
 			scnCompPropsTable.addValue(compInst.getImplementation().getName());//impl
@@ -246,6 +249,9 @@ public class Vdm2Csv {
 	private void updateConnectionTable(String connName, verdict.vdm.vdm_model.ConnectionEnd source, verdict.vdm.vdm_model.ConnectionEnd destination, 
 			Table scnConnTable, Map<String, HashMap<String, String>> connectionAttributesMap, String scenario, ComponentImpl compImpl, Map<String, String> compToCompImpl, Map<String, HashSet<String>> propToConnections) {
 		scnConnTable.addValue(scenario);
+		String compQualName = compImpl.getType().getId();
+		scnConnTable.addValue(compQualName);
+		scnConnTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));
 		scnConnTable.addValue(compImpl.getType().getName());//component
 		scnConnTable.addValue(compImpl.getName());//component implementation
 		scnConnTable.addValue(connName);//connection name
@@ -258,20 +264,25 @@ public class Vdm2Csv {
 			if(!compToCompImpl.containsKey(compName)) {
 				throw new RuntimeException("Unable to find Component Implementation corresponding to "+compName);
 			}
+			scnConnTable.addValue("");//SrcCompInstQualifiedName
+			scnConnTable.addValue("");//SrcCompInstPackage
 			scnConnTable.addValue(compName);//SrcComp
-			scnConnTable.addValue(compToCompImpl.get(compName));
+			scnConnTable.addValue(compToCompImpl.get(compName));//SrcImpl
 			scnConnTable.addValue("");//SrcCompInstance
 			scnConnTable.addValue(compImpl.getType().getCompCateg().toString());//SrcCompCategory
 			scnConnTable.addValue(srcCompPort.getName());//SrcPortName
 			scnConnTable.addValue(srcCompPort.getMode().value());//SrcPortType
 		} else if (source.getSubcomponentPort()!=null) {
+			String sourceInstQualName = source.getSubcomponentPort().getSubcomponent().getId();
+			scnConnTable.addValue(sourceInstQualName);//SrcCompInstQualifiedName
+			scnConnTable.addValue(sourceInstQualName.substring(0, compQualName.indexOf(':')));//SrcCompInstPackage
 			CompInstancePort srcCompPort = source.getSubcomponentPort();
 			String fullQualNameSrcCompPort = srcCompPort.getPort().getId();
 			//get the component name
 			//remove port name from fullQualNameSrcCompPort and text before "::" and after "." to get the source component name
 			String compName = fullQualNameSrcCompPort.substring(fullQualNameSrcCompPort.indexOf(':')+2,fullQualNameSrcCompPort.indexOf('.'));
 			scnConnTable.addValue(compName);//SrcComp
-			scnConnTable.addValue("");
+			scnConnTable.addValue("");//SrcImpl
 			scnConnTable.addValue(srcCompPort.getSubcomponent().getName());//SrcCompInstance
 			scnConnTable.addValue(srcCompPort.getSubcomponent().getSpecification().getCompCateg());//SrcCompCategory
 			scnConnTable.addValue(srcCompPort.getPort().getName());//SrcPortName
@@ -288,6 +299,8 @@ public class Vdm2Csv {
 			if(!compToCompImpl.containsKey(compName)) {
 				throw new RuntimeException("Unable to find Component Implementation corresponding to "+compName);
 			}
+			scnConnTable.addValue("");//DestCompInstQualifiedName
+			scnConnTable.addValue("");//DestCompInstPackage
 			scnConnTable.addValue(compName);//DestComp
 			scnConnTable.addValue(compToCompImpl.get(compName));
 			scnConnTable.addValue("");//DestCompInstance
@@ -295,6 +308,9 @@ public class Vdm2Csv {
 			scnConnTable.addValue(destCompPort.getName());//DestPortName
 			scnConnTable.addValue(destCompPort.getMode().value());//DestPortType
 		} else if (destination.getSubcomponentPort()!=null) {
+			String destInstQualName = destination.getSubcomponentPort().getSubcomponent().getId();
+			scnConnTable.addValue(destInstQualName);//DestCompInstQualifiedName
+			scnConnTable.addValue(destInstQualName.substring(0, compQualName.indexOf(':')));//DestCompInstPackage
 			CompInstancePort destCompPort = destination.getSubcomponentPort();
 			String fullQualNameDestCompPort = destCompPort.getPort().getId();
 			//get the component name
@@ -444,22 +460,26 @@ public class Vdm2Csv {
 		//each ComponentType contains id, name, compCateg, List<Port>, ContractSpec, List<CyberRel>, List<SafetyRel>, List<Event>
 		for (ComponentType compType : compTypes) {
 			String compTypeName = compType.getName();
+			String compQualName = compType.getId();
+			String packageName = compQualName.substring(0, compQualName.indexOf(':'));
 			//populate compTypeNameToEvents,  compTypeNameToCyberRels, compTypeNameToSafetyRels
-			updateEventsTable(eventsTable, compTypeName, compType.getEvent());
-			updateCompDepTable(compDepTable, compTypeName, compType.getCyberRel());
-			updateCompSafTable(compSafTable, compTypeName, compType.getSafetyRel());
+			updateEventsTable(eventsTable, compQualName, packageName, compTypeName, compType.getEvent());
+			updateCompDepTable(compDepTable, compQualName, packageName, compTypeName, compType.getCyberRel());
+			updateCompSafTable(compSafTable, compQualName, packageName, compTypeName, compType.getSafetyRel());
 		}
 	}
-	private void updateCompSafTable(Table compSafTable, String compTypeName,
+	private void updateCompSafTable(Table compSafTable, String qualNameComp, String packageName, String compTypeName,
 			List<verdict.vdm.vdm_model.SafetyRel> safetyRels) {
 		for(verdict.vdm.vdm_model.SafetyRel safetyRel : safetyRels) {
-			updateCompSafTable(compSafTable, compTypeName, safetyRel.getFaultSrc(), safetyRel.getOutput());
+			updateCompSafTable(compSafTable, qualNameComp, packageName, compTypeName, safetyRel.getFaultSrc(), safetyRel.getOutput());
 		}
 	}
-	private void updateCompSafTable(Table compSafTable, String compTypeName,
+	private void updateCompSafTable(Table compSafTable, String qualNameComp, String packageName, String compTypeName,
 			verdict.vdm.vdm_model.SafetyRelExpr safetyRelExpr, IAPort outputIAPort) {
 		if(safetyRelExpr.getKind()==null) {
 			if(safetyRelExpr.getFault()!=null) {
+				compSafTable.addValue(qualNameComp);
+				compSafTable.addValue(packageName);
 				compSafTable.addValue(compTypeName);
 				compSafTable.addValue(safetyRelExpr.getFault().getEventName());
 				compSafTable.addValue(safetyRelExpr.getFault().getHappens().toString());
@@ -467,6 +487,8 @@ public class Vdm2Csv {
 				compSafTable.addValue(formatToSmall(outputIAPort.getIa().name()));
 				compSafTable.capRow();
 			} else if(safetyRelExpr.getPort()!=null){
+				compSafTable.addValue(qualNameComp);
+				compSafTable.addValue(packageName);
 				compSafTable.addValue(compTypeName);
 				compSafTable.addValue(safetyRelExpr.getPort().getName());
 				compSafTable.addValue(formatToSmall(safetyRelExpr.getPort().getIa().name()));
@@ -479,7 +501,7 @@ public class Vdm2Csv {
 		} else if (safetyRelExpr.getKind().toString().equalsIgnoreCase("Or")){
 			List<SafetyRelExpr> subInpSafList =safetyRelExpr.getOr().getExpr();
 			for (SafetyRelExpr subInpSafExpr: subInpSafList) {
-				updateCompSafTable(compSafTable, compTypeName, subInpSafExpr, outputIAPort);
+				updateCompSafTable(compSafTable, qualNameComp, packageName, compTypeName, subInpSafExpr, outputIAPort);
 			}
 		} else {
 			throw new RuntimeException("Expression used as Safety Relation input is not supported.");
@@ -493,12 +515,14 @@ public class Vdm2Csv {
 		}
 		return updName;
 	}
-	private void updateCompDepTable(Table compDepTable, String compTypeName,
+	private void updateCompDepTable(Table compDepTable, String qualNameComp, String packageName, String compTypeName,
 			List<verdict.vdm.vdm_model.CyberRel> cyberRels) {
     	for(verdict.vdm.vdm_model.CyberRel cyberRel : cyberRels) {
     		if(cyberRel.getInputs()!=null) {
-    			updateCompDepTable(compDepTable, compTypeName, cyberRel.getInputs(), cyberRel.getOutput());
+    			updateCompDepTable(compDepTable, qualNameComp, packageName, compTypeName, cyberRel.getInputs(), cyberRel.getOutput());
     		} else {
+    			compDepTable.addValue(qualNameComp);
+    			compDepTable.addValue(packageName);
     			compDepTable.addValue(compTypeName);
     			compDepTable.addValue("");
 				compDepTable.addValue("");
@@ -508,8 +532,10 @@ public class Vdm2Csv {
     		}
     	}
 	}
-	private void updateCompDepTable(Table compDepTable, String compTypeName, CyberExpr inputCyberExpr, CIAPort outputCIAPort) {
+	private void updateCompDepTable(Table compDepTable, String qualNameComp, String packageName, String compTypeName, CyberExpr inputCyberExpr, CIAPort outputCIAPort) {
 		if(inputCyberExpr.getKind()==null) {//expression is not an AND, OR, NOT expression
+			compDepTable.addValue(qualNameComp);
+			compDepTable.addValue(packageName);
 			compDepTable.addValue(compTypeName);
 			CIAPort inpCIAPort = inputCyberExpr.getPort();
 			compDepTable.addValue(inpCIAPort.getName());
@@ -520,14 +546,16 @@ public class Vdm2Csv {
 		} else if (inputCyberExpr.getKind().toString().equalsIgnoreCase("Or")) {
 			List<CyberExpr> subInpCyberList =inputCyberExpr.getOr().getExpr();
 			for (CyberExpr subInpCyberExpr: subInpCyberList) {
-				updateCompDepTable(compDepTable, compTypeName, subInpCyberExpr, outputCIAPort);
+				updateCompDepTable(compDepTable, qualNameComp, packageName, compTypeName, subInpCyberExpr, outputCIAPort);
 			}
 		} else {
 			throw new RuntimeException("Expression used as Cyber Relation input is not supported.");
 		}
 	}
-	private void updateEventsTable(Table eventsTable, String compTypeName, List<verdict.vdm.vdm_model.Event> events) {
+	private void updateEventsTable(Table eventsTable, String qualNameComp, String packageName, String compTypeName, List<verdict.vdm.vdm_model.Event> events) {
 		for(verdict.vdm.vdm_model.Event event : events) {
+			eventsTable.addValue(qualNameComp);
+			eventsTable.addValue(packageName);
 			eventsTable.addValue(sanitizeValue(compTypeName));
 			eventsTable.addValue(sanitizeValue(event.getId()));
 			eventsTable.addValue(sanitizeValue(event.getProbability()));
