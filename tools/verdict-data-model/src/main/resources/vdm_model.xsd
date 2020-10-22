@@ -186,6 +186,9 @@
         <attribute name="name" type="vdm_data:Identifier"
             use="required">
         </attribute>
+        <attribute name="actual_connection_binding" type="vdm_model:ComponentInstance"
+            use="optional">
+        </attribute>
     </complexType>
 
 
