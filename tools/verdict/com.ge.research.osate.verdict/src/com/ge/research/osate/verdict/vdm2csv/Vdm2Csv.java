@@ -20,6 +20,7 @@ import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
 import com.ge.research.osate.verdict.dsl.verdict.Event;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
 import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
+import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_data.GenericAttribute;
@@ -35,12 +36,25 @@ import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.SafetyRelExpr;
 import verdict.vdm.vdm_model.SafetyReqExpr;
+
 /**
 *
 * @author Vidhya Tekken Valapil
 *
 */
 public class Vdm2Csv {	
+	private final boolean synthesis;
+	public Vdm2Csv() {
+		this(false);
+	}
+	/**
+	 * If synthesis is enabled, then fools STEM by setting DAL 9 on all MBAA/MBAS defense properties.
+	 * --code synonymous to code by William in the previous aadl2csvtranslator
+	 * @param synthesis
+	 */
+	public Vdm2Csv(boolean synthesis) {
+		this.synthesis = synthesis;
+	}
 	/**
 	 * @param VDM
 	 * @param stem directory 
@@ -293,8 +307,10 @@ public class Vdm2Csv {
 		//add connection attributes/properties
 		HashMap<String,String> connAttrMap = connectionAttributesMap.get(connName);
 		for(String propName: propToConnections.keySet()) {
-			//check if the connection has that property - add it to csv if it does
-			if (connAttrMap.containsKey(propName)) {
+			if (synthesis && DefenseProperties.MBAA_CONN_DEFENSE_PROPERTIES_SET.contains(propName)) {
+				// this fools stem - --code synonymous to code by William in the previous aadl2csvtranslator
+				scnConnTable.addValue("9");
+			} else if (connAttrMap.containsKey(propName)) {//check if the connection has that property - add it to csv if it does
 				scnConnTable.addValue(connAttrMap.get(propName));//connection property
 			} else {
 				scnConnTable.addValue("");
