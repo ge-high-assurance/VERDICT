@@ -2806,7 +2806,11 @@ public class Aadl2Vdm {
 						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
 					} else {
 						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
-						String busInstanceName = refVal.getPath().getNamedElement().getQualifiedName();
+						ContainmentPathElement pathEle = refVal.getPath();
+						while(!(pathEle.getNamedElement() instanceof BusSubcomponent)) {
+							pathEle = pathEle.getPath();
+						}
+						String busInstanceName = pathEle.getNamedElement().getQualifiedName();
 						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
 							//updating map (connection name -> bus name)
 							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);

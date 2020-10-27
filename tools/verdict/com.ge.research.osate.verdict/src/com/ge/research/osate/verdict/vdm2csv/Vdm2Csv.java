@@ -56,9 +56,9 @@ public class Vdm2Csv {
 	 * */
 	//public void execute(File inputVdm, String stemDir, String soteriaDir, String modelName) {//TODO:remove if function is invokable with VDM as input parameter
 	public void execute(Model vdm, String stemDir, String soteriaDir, String modelName) {
-		Table eventsTable = new Table("QualifiedName", "PackageName", "Comp", "Event", "Probability");
-		Table compSafTable = new Table("QualifiedName", "PackageName","Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
-		Table compDepTable = new Table("QualifiedName", "PackageName","Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
+		Table eventsTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName", "Comp", "Event", "Probability");
+		Table compSafTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName","Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
+		Table compDepTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName","Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
 		Table missionTable =  new Table("ModelVersion", "MissionReqId", "MissionReq", "ReqId","Req", "MissionImpactCIA",
                 "Effect", "Severity", "CompInstanceDependency", "CompOutputDependency", "DependentCompOutputCIA", "ReqType");
 		//Model vdm = VdmTranslator.unmarshalFromXml(inputVdm);//TODO:remove if function is invokable with VDM as input parameter
@@ -184,8 +184,8 @@ public class Vdm2Csv {
 	private Table updateConnectionsTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToConnections, Map<String, HashMap<String, String>> connectionAttributesMap, Map<String, String> compToCompImpl) {
 		// --update headers of connections csv
 		List<String> headers = new ArrayList<String>(
-    			Arrays.asList("Scenario", "QualifiedName", "PackageName","Comp", "Impl", "ConnectionName","SrcCompInstQualifiedName", "SrcCompInstPackage", "SrcComp", "SrcImpl", "SrcCompInstance", "SrcCompCategory",
-    					     "SrcPortName", "SrcPortType", "DestCompInstQualifiedName", "DestCompInstPackage", "DestComp", "DestImpl", "DestCompInstance", "DestCompCategory",
+    			Arrays.asList("Scenario", "QualifiedName", "SanitizedQualifiedName", "PackageName","Comp", "Impl", "ConnectionName", "SrcCompInstQualifiedName", "SanitizedSrcCompInstQualifiedName", "SrcCompInstPackage", "SrcComp", "SrcImpl", "SrcCompInstance", "SrcCompCategory",
+    					     "SrcPortName", "SrcPortType", "DestCompInstQualifiedName", "SanitizedDestCompInstQualifiedName", "DestCompInstPackage", "DestComp", "DestImpl", "DestCompInstance", "DestCompCategory",
     					     "DestPortName", "DestPortType"));
 	    headers.addAll(propToConnections.keySet());
 	    Table scnConnTable = new Table(headers);
@@ -206,99 +206,12 @@ public class Vdm2Csv {
 		}
     	return scnConnTable;
 	}
-	//Assumption: component implementation containing the connection is same as the component implementation where the actual_connection_binding property was defined
-	private Table updateBusBindingsTable(List<ComponentImpl> compImpls, String scenario, Map<String, String> compToCompImpl) {
-		Table scnBusBindingsTable = new Table("Scenario", "QualifiedName", "PackageName", "Comp", "Impl", "SrcCompInstQualifiedName", "SrcCompInstPackage", "ActualConnectionBindingSrcComp",
-				"ActualConnectionBindingSrcImpl",
-				"ActualConnectionBindingSrcCompInst", "ActualConnectionBindingSrcBusInst",
-				"DestCompInstQualifiedName", "DestCompInstPackage", "ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
-				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
-		//creating hashmap (compImpl -> comp) from (comp -> compImpl)
-		HashMap<String, String> compImplToComp = new HashMap<String, String>();
-		for (String key : compToCompImpl.keySet()){
-			compImplToComp.put(compToCompImpl.get(key), key);
-		}
-    	for (ComponentImpl compImpl: compImpls) {
-			List<verdict.vdm.vdm_model.Connection> compConnections = compImpl.getBlockImpl().getConnection();
-			// --add rows to scnbusbindings csv
-			for (verdict.vdm.vdm_model.Connection compConnection2 : compConnections) {
-				if(compConnection2.getActualConnectionBinding()!=null) {
-					String actualConnectionBinding = compConnection2.getActualConnectionBinding();
-					scnBusBindingsTable.addValue(scenario);
-					String compQualName = compImpl.getType().getId();
-					scnBusBindingsTable.addValue(compQualName);//QualifiedName
-					scnBusBindingsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));//PackageName
-					scnBusBindingsTable.addValue(compImpl.getType().getName());//Comp
-					scnBusBindingsTable.addValue(compImpl.getName());//Impl - component implementation		
-					scnBusBindingsTable.addValue("");//SrcCompInstQualifiedName
-					scnBusBindingsTable.addValue("");//SrcCompInstPackage
-					String bindingSubStr = actualConnectionBinding.substring(0,actualConnectionBinding.lastIndexOf("."));//everything except the instance name
-					String implName = bindingSubStr.substring(bindingSubStr.lastIndexOf(":")+1,bindingSubStr.length());
-					if(!compImplToComp.containsKey(implName)) {
-						throw new RuntimeException("Unable to find Component corresponding to Implementation "+implName);
-					}
-					scnBusBindingsTable.addValue(compImplToComp.get(implName));//ActualConnectionBindingSrcComp
-					scnBusBindingsTable.addValue(implName);//ActualConnectionBindingSrcImpl
-					scnBusBindingsTable.addValue("");//ActualConnectionBindingSrcCompInst
-					scnBusBindingsTable.addValue(actualConnectionBinding.substring(actualConnectionBinding.lastIndexOf('.')+1,actualConnectionBinding.length()));//ActualConnectionBindingSrcBusInst
-					scnBusBindingsTable.addValue("");//DestCompInstQualifiedName
-					scnBusBindingsTable.addValue("");//DestCompInstPackage
-					scnBusBindingsTable.addValue(compImpl.getType().getName());//ActualConnectionBindingDestConnComp
-					scnBusBindingsTable.addValue(compImpl.getName());//ActualConnectionBindingDestConnImpl
-					scnBusBindingsTable.addValue("");//ActualConnectionBindingDestConnCompInst
-					scnBusBindingsTable.addValue(compConnection2.getName());//ActualConnectionBindingDestConn
-					scnBusBindingsTable.capRow();
-				}
-			}
-		}
-    	return scnBusBindingsTable;
-	}
-	
-	private Table updateCompInstTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToCompInsts, Map<String, HashMap<String, String>> compInstAttributesMap, Map<String, String> compToCompImpl) {
-		//update component instances prop table
-		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "QualifiedName", "PackageName", "Comp", "Impl", "CompInstance"));
-	    headers.addAll(propToCompInsts.keySet());
-	    Table scnCompPropsTable = new Table(headers);
-    	for (ComponentImpl compImpl: compImpls) {
-			List<verdict.vdm.vdm_model.ComponentInstance> compInstances = compImpl.getBlockImpl().getSubcomponent();
-			// --add rows to comp properties csv
-			for (verdict.vdm.vdm_model.ComponentInstance compInst : compInstances) {
-				updateCompPropsTable(compInst.getName(), compInst, scnCompPropsTable, compInstAttributesMap, scenario, compImpl, compToCompImpl, propToCompInsts);
-			}
-		}
-    	return scnCompPropsTable;
-	}
-	private void updateCompPropsTable(String compInstName, ComponentInstance compInst, Table scnCompPropsTable,
-			Map<String, HashMap<String, String>> compInstAttributesMap, String scenario, ComponentImpl compImpl,
-			Map<String, String> compToCompImpl, Map<String, HashSet<String>> propToCompInsts) {
-		scnCompPropsTable.addValue(scenario);
-		String compQualName = compInst.getId();
-		scnCompPropsTable.addValue(compQualName);
-		scnCompPropsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));
-		scnCompPropsTable.addValue(compInst.getSpecification().getName());//comp
-		if(compInst.getImplementation()!=null) {
-			scnCompPropsTable.addValue(compInst.getImplementation().getName());//impl
-		} else {
-			scnCompPropsTable.addValue("");//impl
-		}
-		scnCompPropsTable.addValue(compInstName);//comp instance
-		//add connection attributes/properties
-		HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInstName);
-		for(String propName: propToCompInsts.keySet()) {
-			//check if the connection has that property - add it to csv if it does
-			if (connAttrMap.containsKey(propName)) {
-				scnCompPropsTable.addValue(connAttrMap.get(propName));//connection property
-			} else {
-				scnCompPropsTable.addValue("");
-			}
-		}
-		scnCompPropsTable.capRow();
-	}
 	private void updateConnectionTable(String connName, verdict.vdm.vdm_model.ConnectionEnd source, verdict.vdm.vdm_model.ConnectionEnd destination, 
 			Table scnConnTable, Map<String, HashMap<String, String>> connectionAttributesMap, String scenario, ComponentImpl compImpl, Map<String, String> compToCompImpl, Map<String, HashSet<String>> propToConnections) {
 		scnConnTable.addValue(scenario);
 		String compQualName = compImpl.getType().getId();
 		scnConnTable.addValue(compQualName);
+		scnConnTable.addValue(replaceColonsWithUnderscore(compQualName));
 		scnConnTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));
 		scnConnTable.addValue(compImpl.getType().getName());//component
 		scnConnTable.addValue(compImpl.getName());//component implementation
@@ -313,6 +226,7 @@ public class Vdm2Csv {
 				throw new RuntimeException("Unable to find Component Implementation corresponding to "+compName);
 			}
 			scnConnTable.addValue("");//SrcCompInstQualifiedName
+			scnConnTable.addValue("");//SanitizedSrcCompInstQualifiedName
 			scnConnTable.addValue("");//SrcCompInstPackage
 			scnConnTable.addValue(compName);//SrcComp
 			scnConnTable.addValue(compToCompImpl.get(compName));//SrcImpl
@@ -323,6 +237,7 @@ public class Vdm2Csv {
 		} else if (source.getSubcomponentPort()!=null) {
 			String sourceInstQualName = source.getSubcomponentPort().getSubcomponent().getId();
 			scnConnTable.addValue(sourceInstQualName);//SrcCompInstQualifiedName
+			scnConnTable.addValue(replaceColonsWithUnderscore(sourceInstQualName));//SanitizedSrcCompInstQualifiedName
 			scnConnTable.addValue(sourceInstQualName.substring(0, compQualName.indexOf(':')));//SrcCompInstPackage
 			CompInstancePort srcCompPort = source.getSubcomponentPort();
 			String fullQualNameSrcCompPort = srcCompPort.getPort().getId();
@@ -348,6 +263,7 @@ public class Vdm2Csv {
 				throw new RuntimeException("Unable to find Component Implementation corresponding to "+compName);
 			}
 			scnConnTable.addValue("");//DestCompInstQualifiedName
+			scnConnTable.addValue("");//SanitizedDestCompInstQualifiedName
 			scnConnTable.addValue("");//DestCompInstPackage
 			scnConnTable.addValue(compName);//DestComp
 			scnConnTable.addValue(compToCompImpl.get(compName));
@@ -358,6 +274,7 @@ public class Vdm2Csv {
 		} else if (destination.getSubcomponentPort()!=null) {
 			String destInstQualName = destination.getSubcomponentPort().getSubcomponent().getId();
 			scnConnTable.addValue(destInstQualName);//DestCompInstQualifiedName
+			scnConnTable.addValue(replaceColonsWithUnderscore(destInstQualName));//SanitizedDestCompInstQualifiedName
 			scnConnTable.addValue(destInstQualName.substring(0, compQualName.indexOf(':')));//DestCompInstPackage
 			CompInstancePort destCompPort = destination.getSubcomponentPort();
 			String fullQualNameDestCompPort = destCompPort.getPort().getId();
@@ -384,6 +301,97 @@ public class Vdm2Csv {
 			}
 		}
 		scnConnTable.capRow();
+	}
+	//Assumption: component implementation containing the connection is same as the component implementation where the actual_connection_binding property was defined
+	private Table updateBusBindingsTable(List<ComponentImpl> compImpls, String scenario, Map<String, String> compToCompImpl) {
+		Table scnBusBindingsTable = new Table("Scenario", "QualifiedName", "SanitizedQualifiedName", "PackageName", "Comp", "Impl", "SrcCompInstQualifiedName", 
+				"SanitizedSrcCompInstQualifiedName", "SrcCompInstPackage", "ActualConnectionBindingSrcComp","ActualConnectionBindingSrcImpl",
+				"ActualConnectionBindingSrcCompInst", "ActualConnectionBindingSrcBusInst",
+				"DestCompInstQualifiedName", "SanitizedDestCompInstQualifiedName", "DestCompInstPackage", "ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
+				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
+		//creating hashmap (compImpl -> comp) from (comp -> compImpl)
+		HashMap<String, String> compImplToComp = new HashMap<String, String>();
+		for (String key : compToCompImpl.keySet()){
+			compImplToComp.put(compToCompImpl.get(key), key);
+		}
+    	for (ComponentImpl compImpl: compImpls) {
+			List<verdict.vdm.vdm_model.Connection> compConnections = compImpl.getBlockImpl().getConnection();
+			// --add rows to scnbusbindings csv
+			for (verdict.vdm.vdm_model.Connection compConnection2 : compConnections) {
+				if(compConnection2.getActualConnectionBinding()!=null) {
+					String actualConnectionBinding = compConnection2.getActualConnectionBinding();
+					scnBusBindingsTable.addValue(scenario);
+					String compQualName = compImpl.getType().getId();
+					scnBusBindingsTable.addValue(compQualName);//QualifiedName
+					scnBusBindingsTable.addValue(replaceColonsWithUnderscore(compQualName));//SanitizedQualifiedName
+					scnBusBindingsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));//PackageName
+					scnBusBindingsTable.addValue(compImpl.getType().getName());//Comp
+					scnBusBindingsTable.addValue(compImpl.getName());//Impl - component implementation		
+					scnBusBindingsTable.addValue("");//SrcCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//SanitizedSrcCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//SrcCompInstPackage
+					String bindingSubStr = actualConnectionBinding.substring(0,actualConnectionBinding.lastIndexOf("."));//everything except the instance name
+					String implName = bindingSubStr.substring(bindingSubStr.lastIndexOf(":")+1,bindingSubStr.length());
+					if(!compImplToComp.containsKey(implName)) {
+						throw new RuntimeException("Unable to find Component corresponding to Implementation "+implName);
+					}
+					scnBusBindingsTable.addValue(compImplToComp.get(implName));//ActualConnectionBindingSrcComp
+					scnBusBindingsTable.addValue(implName);//ActualConnectionBindingSrcImpl
+					scnBusBindingsTable.addValue("");//ActualConnectionBindingSrcCompInst
+					scnBusBindingsTable.addValue(actualConnectionBinding.substring(actualConnectionBinding.lastIndexOf('.')+1,actualConnectionBinding.length()));//ActualConnectionBindingSrcBusInst
+					scnBusBindingsTable.addValue("");//DestCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//SanitizedDestCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//DestCompInstPackage
+					scnBusBindingsTable.addValue(compImpl.getType().getName());//ActualConnectionBindingDestConnComp
+					scnBusBindingsTable.addValue(compImpl.getName());//ActualConnectionBindingDestConnImpl
+					scnBusBindingsTable.addValue("");//ActualConnectionBindingDestConnCompInst
+					scnBusBindingsTable.addValue(compConnection2.getName());//ActualConnectionBindingDestConn
+					scnBusBindingsTable.capRow();
+				}
+			}
+		}
+    	return scnBusBindingsTable;
+	}	
+	private Table updateCompInstTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToCompInsts, Map<String, HashMap<String, String>> compInstAttributesMap, Map<String, String> compToCompImpl) {
+		//update component instances prop table
+		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "QualifiedName", "SanitizedQualifiedName", "PackageName", "Comp", "Impl", "CompInstance"));
+	    headers.addAll(propToCompInsts.keySet());
+	    Table scnCompPropsTable = new Table(headers);
+    	for (ComponentImpl compImpl: compImpls) {
+			List<verdict.vdm.vdm_model.ComponentInstance> compInstances = compImpl.getBlockImpl().getSubcomponent();
+			// --add rows to comp properties csv
+			for (verdict.vdm.vdm_model.ComponentInstance compInst : compInstances) {
+				updateCompPropsTable(compInst.getName(), compInst, scnCompPropsTable, compInstAttributesMap, scenario, compImpl, compToCompImpl, propToCompInsts);
+			}
+		}
+    	return scnCompPropsTable;
+	}
+	private void updateCompPropsTable(String compInstName, ComponentInstance compInst, Table scnCompPropsTable,
+			Map<String, HashMap<String, String>> compInstAttributesMap, String scenario, ComponentImpl compImpl,
+			Map<String, String> compToCompImpl, Map<String, HashSet<String>> propToCompInsts) {
+		scnCompPropsTable.addValue(scenario);
+		String compQualName = compInst.getId();
+		scnCompPropsTable.addValue(compQualName);
+		scnCompPropsTable.addValue(replaceColonsWithUnderscore(compQualName));
+		scnCompPropsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));
+		scnCompPropsTable.addValue(compInst.getSpecification().getName());//comp
+		if(compInst.getImplementation()!=null) {
+			scnCompPropsTable.addValue(compInst.getImplementation().getName());//impl
+		} else {
+			scnCompPropsTable.addValue("");//impl
+		}
+		scnCompPropsTable.addValue(compInstName);//comp instance
+		//add connection attributes/properties
+		HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInstName);
+		for(String propName: propToCompInsts.keySet()) {
+			//check if the connection has that property - add it to csv if it does
+			if (connAttrMap.containsKey(propName)) {
+				scnCompPropsTable.addValue(connAttrMap.get(propName));//connection property
+			} else {
+				scnCompPropsTable.addValue("");
+			}
+		}
+		scnCompPropsTable.capRow();
 	}
 	private void updateCyberSafetyReqsMaps(List<verdict.vdm.vdm_model.CyberReq> cyberReqs, Map<String, verdict.vdm.vdm_model.CyberReq> cyberReqsMap, List<verdict.vdm.vdm_model.SafetyReq> safetyReqs, Map<String, verdict.vdm.vdm_model.SafetyReq> safetyReqsMap) {
 		for (verdict.vdm.vdm_model.CyberReq cyberReq:cyberReqs) {
@@ -527,6 +535,7 @@ public class Vdm2Csv {
 		if(safetyRelExpr.getKind()==null) {
 			if(safetyRelExpr.getFault()!=null) {
 				compSafTable.addValue(qualNameComp);
+				compSafTable.addValue(replaceColonsWithUnderscore(qualNameComp));
 				compSafTable.addValue(packageName);
 				compSafTable.addValue(compTypeName);
 				compSafTable.addValue(safetyRelExpr.getFault().getEventName());
@@ -536,6 +545,7 @@ public class Vdm2Csv {
 				compSafTable.capRow();
 			} else if(safetyRelExpr.getPort()!=null){
 				compSafTable.addValue(qualNameComp);
+				compSafTable.addValue(replaceColonsWithUnderscore(qualNameComp));
 				compSafTable.addValue(packageName);
 				compSafTable.addValue(compTypeName);
 				compSafTable.addValue(safetyRelExpr.getPort().getName());
@@ -570,6 +580,7 @@ public class Vdm2Csv {
     			updateCompDepTable(compDepTable, qualNameComp, packageName, compTypeName, cyberRel.getInputs(), cyberRel.getOutput());
     		} else {
     			compDepTable.addValue(qualNameComp);
+    			compDepTable.addValue(replaceColonsWithUnderscore(qualNameComp));
     			compDepTable.addValue(packageName);
     			compDepTable.addValue(compTypeName);
     			compDepTable.addValue("");
@@ -583,6 +594,7 @@ public class Vdm2Csv {
 	private void updateCompDepTable(Table compDepTable, String qualNameComp, String packageName, String compTypeName, CyberExpr inputCyberExpr, CIAPort outputCIAPort) {
 		if(inputCyberExpr.getKind()==null) {//expression is not an AND, OR, NOT expression
 			compDepTable.addValue(qualNameComp);
+			compDepTable.addValue(replaceColonsWithUnderscore(qualNameComp));
 			compDepTable.addValue(packageName);
 			compDepTable.addValue(compTypeName);
 			CIAPort inpCIAPort = inputCyberExpr.getPort();
@@ -603,6 +615,7 @@ public class Vdm2Csv {
 	private void updateEventsTable(Table eventsTable, String qualNameComp, String packageName, String compTypeName, List<verdict.vdm.vdm_model.Event> events) {
 		for(verdict.vdm.vdm_model.Event event : events) {
 			eventsTable.addValue(qualNameComp);
+			eventsTable.addValue(replaceColonsWithUnderscore(qualNameComp));
 			eventsTable.addValue(packageName);
 			eventsTable.addValue(sanitizeValue(compTypeName));
 			eventsTable.addValue(sanitizeValue(event.getId()));
@@ -611,6 +624,11 @@ public class Vdm2Csv {
     	}
 		
 	}
+	String replaceColonsWithUnderscore(String inpStr) {
+		inpStr = inpStr.replaceAll("(:)+", "_");
+		return inpStr;
+	}
+	
     /**
      * @author Paul Meng
      * To make sure the input is not null
