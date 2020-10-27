@@ -61,11 +61,6 @@ public class Vdm2Csv {
 		Table compDepTable = new Table("QualifiedName", "PackageName","Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
 		Table missionTable =  new Table("ModelVersion", "MissionReqId", "MissionReq", "ReqId","Req", "MissionImpactCIA",
                 "Effect", "Severity", "CompInstanceDependency", "CompOutputDependency", "DependentCompOutputCIA", "ReqType");
-		Table scnBusBindingsTable = new Table("Scenario", "Comp", "Impl", "ActualConnectionBindingSrcComp",
-				"ActualConnectionBindingSrcImpl",
-				"ActualConnectionBindingSrcCompInst", "ActualConnectionBindingSrcBusInst",
-				"ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
-				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
 		//Model vdm = VdmTranslator.unmarshalFromXml(inputVdm);//TODO:remove if function is invokable with VDM as input parameter
 		List<ComponentImpl> compImpls = vdm.getComponentImpl();
 		Map<String, HashSet<String>> propToConnections = new HashMap<>();//map(property_name, hash_set_of_connections)
@@ -80,6 +75,7 @@ public class Vdm2Csv {
 		//these maps will be used to build tables scnConnTable and scnCompPropsTable
 		preprocessCompImpls(compImpls, modelName, propToConnections, connectionAttributesMap, compToCompImpl, propToCompInsts, compInstAttributesMap, connectionDestToSourceMap);
 		Table scnConnTable = updateConnectionsTable(compImpls, modelName, propToConnections, connectionAttributesMap, compToCompImpl);
+		Table scnBusBindingsTable = updateBusBindingsTable(compImpls, modelName, compToCompImpl);
 		Table scnCompPropsTable = updateCompInstTable(compImpls, modelName, propToCompInsts, compInstAttributesMap, compToCompImpl);
 		//build events, compDep, compSaf, mission tables
 		updateTablesWithDataFromVDM(vdm, modelName, eventsTable, compDepTable,compSafTable, missionTable, connectionDestToSourceMap);
@@ -198,6 +194,10 @@ public class Vdm2Csv {
 			// --add rows to connections csv
 			for (verdict.vdm.vdm_model.Connection compConnection2 : compConnections) {
 				updateConnectionTable(compConnection2.getName(), compConnection2.getSource(), compConnection2.getDestination(), scnConnTable, connectionAttributesMap, scenario, compImpl, compToCompImpl, propToConnections);
+				HashMap<String, String> compImplToComp = new HashMap<String, String>();
+				for (String key : compToCompImpl.keySet()){
+					compImplToComp.put(compToCompImpl.get(key), key);
+				}
 				if (compConnection2.getDirection().value().equalsIgnoreCase("bidirectional")) {
 					//add the connection in the reverse direction to the table
 					updateConnectionTable(compConnection2.getName(), compConnection2.getDestination(), compConnection2.getSource(), scnConnTable, connectionAttributesMap, scenario, compImpl, compToCompImpl, propToConnections);
@@ -206,6 +206,54 @@ public class Vdm2Csv {
 		}
     	return scnConnTable;
 	}
+	//Assumption: component implementation containing the connection is same as the component implementation where the actual_connection_binding property was defined
+	private Table updateBusBindingsTable(List<ComponentImpl> compImpls, String scenario, Map<String, String> compToCompImpl) {
+		Table scnBusBindingsTable = new Table("Scenario", "QualifiedName", "PackageName", "Comp", "Impl", "SrcCompInstQualifiedName", "SrcCompInstPackage", "ActualConnectionBindingSrcComp",
+				"ActualConnectionBindingSrcImpl",
+				"ActualConnectionBindingSrcCompInst", "ActualConnectionBindingSrcBusInst",
+				"DestCompInstQualifiedName", "DestCompInstPackage", "ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
+				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
+		//creating hashmap (compImpl -> comp) from (comp -> compImpl)
+		HashMap<String, String> compImplToComp = new HashMap<String, String>();
+		for (String key : compToCompImpl.keySet()){
+			compImplToComp.put(compToCompImpl.get(key), key);
+		}
+    	for (ComponentImpl compImpl: compImpls) {
+			List<verdict.vdm.vdm_model.Connection> compConnections = compImpl.getBlockImpl().getConnection();
+			// --add rows to scnbusbindings csv
+			for (verdict.vdm.vdm_model.Connection compConnection2 : compConnections) {
+				if(compConnection2.getActualConnectionBinding()!=null) {
+					String actualConnectionBinding = compConnection2.getActualConnectionBinding();
+					scnBusBindingsTable.addValue(scenario);
+					String compQualName = compImpl.getType().getId();
+					scnBusBindingsTable.addValue(compQualName);//QualifiedName
+					scnBusBindingsTable.addValue(compQualName.substring(0, compQualName.indexOf(':')));//PackageName
+					scnBusBindingsTable.addValue(compImpl.getType().getName());//Comp
+					scnBusBindingsTable.addValue(compImpl.getName());//Impl - component implementation		
+					scnBusBindingsTable.addValue("");//SrcCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//SrcCompInstPackage
+					String bindingSubStr = actualConnectionBinding.substring(0,actualConnectionBinding.lastIndexOf("."));//everything except the instance name
+					String implName = bindingSubStr.substring(bindingSubStr.lastIndexOf(":")+1,bindingSubStr.length());
+					if(!compImplToComp.containsKey(implName)) {
+						throw new RuntimeException("Unable to find Component corresponding to Implementation "+implName);
+					}
+					scnBusBindingsTable.addValue(compImplToComp.get(implName));//ActualConnectionBindingSrcComp
+					scnBusBindingsTable.addValue(implName);//ActualConnectionBindingSrcImpl
+					scnBusBindingsTable.addValue("");//ActualConnectionBindingSrcCompInst
+					scnBusBindingsTable.addValue(actualConnectionBinding.substring(actualConnectionBinding.lastIndexOf('.')+1,actualConnectionBinding.length()));//ActualConnectionBindingSrcBusInst
+					scnBusBindingsTable.addValue("");//DestCompInstQualifiedName
+					scnBusBindingsTable.addValue("");//DestCompInstPackage
+					scnBusBindingsTable.addValue(compImpl.getType().getName());//ActualConnectionBindingDestConnComp
+					scnBusBindingsTable.addValue(compImpl.getName());//ActualConnectionBindingDestConnImpl
+					scnBusBindingsTable.addValue("");//ActualConnectionBindingDestConnCompInst
+					scnBusBindingsTable.addValue(compConnection2.getName());//ActualConnectionBindingDestConn
+					scnBusBindingsTable.capRow();
+				}
+			}
+		}
+    	return scnBusBindingsTable;
+	}
+	
 	private Table updateCompInstTable(List<ComponentImpl> compImpls, String scenario, Map<String, HashSet<String>> propToCompInsts, Map<String, HashMap<String, String>> compInstAttributesMap, Map<String, String> compToCompImpl) {
 		//update component instances prop table
 		List<String> headers = new ArrayList<String>(Arrays.asList("Scenario", "QualifiedName", "PackageName", "Comp", "Impl", "CompInstance"));

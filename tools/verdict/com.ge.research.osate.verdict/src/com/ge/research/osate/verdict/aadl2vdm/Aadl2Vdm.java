@@ -3,6 +3,7 @@ package com.ge.research.osate.verdict.aadl2vdm;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.osate.aadl2.BusType;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
+import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.Context;
 import org.osate.aadl2.DataAccess;
@@ -2761,10 +2763,11 @@ public class Aadl2Vdm {
 	 * @param comImpls
 	 * @param m2
 	 * @return
+	 * Vidhya: added code to set actual_connection_binding attribute to connections
 	 */
 	public Model translateComponentImplObjects(List<ComponentImplementation> comImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) {
 
-
+		Map<String, String> connectionToBusMap = new HashMap<>();
 		//creating an object for each implementation first as we will need it later
 		for(ComponentImplementation aSystemImpl : comImpls) {
 			//to pack the sysImpl as a VDM componentImpl
@@ -2781,6 +2784,38 @@ public class Aadl2Vdm {
 
 			//adding object to "componentImpl" field of m2
 			m2.getComponentImpl().add(packCompImpl);
+			
+			
+			/* Getting all the bus binding information from all component implementations*/
+			//get and process properties associated with the implementation - especially aadl property - actual_connection_binding
+			//update map (connection-name -> bus-Instance-Name)
+			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
+				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
+					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+				}
+				if(propAssoc.getOwnedValues().size() != 1) {
+					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
+				}
+				if(!(propAssoc.getOwnedValues().get(0).getOwnedValue() instanceof ListValueImpl)) {
+					throw new RuntimeException("Unexpected type of property owned value");
+				} else {
+					ListValueImpl listVal = (ListValueImpl)propAssoc.getOwnedValues().get(0).getOwnedValue();
+					if(listVal.getOwnedListElements().size() != 1) {
+						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+					} else if(!(listVal.getOwnedListElements().get(0) instanceof ReferenceValueImpl)) {
+						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+					} else {
+						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
+						String busInstanceName = refVal.getPath().getNamedElement().getQualifiedName();
+						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
+							//updating map (connection name -> bus name)
+							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);
+						}
+					}
+				}
+				
+			}
+			
 		}//End of creating an object
 
 		//Getting the reference of the object previously created and populating
@@ -2885,13 +2920,11 @@ public class Aadl2Vdm {
 					}
 				}
 
-
-
 				//adding packSubComp to packBlockImpl
                 packBlockImpl.getSubcomponent().add(packSubComp);
 			}//End of adding all subcomponents
-
-
+	
+			
 			//adding all connections to "connections" field of packBlockImpl
 			if(aCompImpl.getOwnedConnections() != null && !aCompImpl.getOwnedConnections().isEmpty()) {
 				for (Connection aConn : aCompImpl.getOwnedConnections()) {
@@ -2974,8 +3007,10 @@ public class Aadl2Vdm {
 
     				//setting name
     				packConn.setName(aConn.getFullName());
-
-
+    				
+    				if(connectionToBusMap.containsKey(aConn.getQualifiedName())) {
+    					packConn.setActualConnectionBinding(connectionToBusMap.get(aConn.getQualifiedName()));
+    				}
 
     				//--- Populate packConn below ---
 
