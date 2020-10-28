@@ -23,8 +23,10 @@ import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.BusAccess;
+import org.osate.aadl2.BusFeatureClassifier;
 import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
+import org.osate.aadl2.BusSubcomponentType;
 import org.osate.aadl2.BusType;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.Connection;
@@ -2964,6 +2966,10 @@ public class Aadl2Vdm {
     				//variables to capture data type information
 					DataSubcomponentType srcDataSubCompType = null;
 					DataSubcomponentType destDataSubCompType = null;
+					BusSubcomponentType srcBusSubCompType = null;
+					BusSubcomponentType destBusSubCompType = null;
+					BusImplementation srcBusImpl = null;
+					BusImplementation destBusImpl = null;
 
     				if(srcConnectionEnd instanceof DataPort) {
     					srcPortTypeName = ((DataPort)srcConnectionEnd).isIn()?(((DataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
@@ -2984,8 +2990,24 @@ public class Aadl2Vdm {
     				} else if(srcConnectionEnd instanceof DataSubcomponent){
     					srcDataSubCompType = ((DataSubcomponent)srcConnectionEnd).getDataSubcomponentType();
     					srcPortTypeName = "data";
+    				} else if(srcConnectionEnd instanceof BusAccess) {
+    					AccessType type = ((BusAccess) srcConnectionEnd).getKind();
+    					if(type == AccessType.PROVIDES) {
+    						srcPortTypeName = "providesBusAccess";
+    					} else if(type == AccessType.REQUIRES) {
+    						srcPortTypeName = "requiresBusAccess";
+    					} else {
+    						throw new RuntimeException("Unexpected access type: " + type);
+    					}
+    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) srcConnectionEnd).getBusFeatureClassifier();
+    					if(busfeatureClassifier instanceof BusImplementation) {
+    						srcBusImpl = (BusImplementation)busfeatureClassifier;
+    					}
+    				} else if(srcConnectionEnd instanceof BusSubcomponent){
+    					srcBusSubCompType = ((BusSubcomponent)srcConnectionEnd).getBusSubcomponentType();
+    					srcPortTypeName = "bus";
     				} else {
-    					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd);
+    					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd+ "encountered while processing connections");
     				}
 
     				if(destConnectionEnd instanceof DataPort) {
@@ -3005,8 +3027,24 @@ public class Aadl2Vdm {
     				}  else if(destConnectionEnd instanceof DataSubcomponent){
     					destDataSubCompType = ((DataSubcomponent)destConnectionEnd).getDataSubcomponentType();
     					destPortTypeName = "data";
+    				} else if(destConnectionEnd instanceof BusAccess) {
+    					AccessType type = ((BusAccess) destConnectionEnd).getKind();
+    					if(type == AccessType.PROVIDES) {
+    						destPortTypeName = "providesBusAccess";
+    					} else if(type == AccessType.REQUIRES) {
+    						destPortTypeName = "requiresBusAccess";
+    					} else {
+    						throw new RuntimeException("Unexpected access type: " + type);
+    					}
+    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) destConnectionEnd).getBusFeatureClassifier();
+    					if(busfeatureClassifier instanceof BusImplementation) {
+    						destBusImpl = (BusImplementation)busfeatureClassifier;
+    					}
+    				}  else if(destConnectionEnd instanceof BusSubcomponent){
+    					destBusSubCompType = ((BusSubcomponent)destConnectionEnd).getBusSubcomponentType();
+    					destPortTypeName = "bus";
     				} else {
-    					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd);
+    					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd+ "encountered while processing connections");
     				}
 
     				//setting name
@@ -3022,8 +3060,15 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packSrcEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packSrcEnd
-    				verdict.vdm.vdm_model.Port packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
-
+    				verdict.vdm.vdm_model.Port packSrcEndPort = new verdict.vdm.vdm_model.Port();
+    				
+    				if(srcBusImpl != null) {
+    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusImpl);
+    				} else if(srcBusSubCompType != null) {
+    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusSubCompType);
+    				} else {//if not a bus access port or bus implementation port
+    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
+    				}
 
     				//If source port is independent of a component instance
     				if(srcCompInstName.equals("")) {
@@ -3055,7 +3100,14 @@ public class Aadl2Vdm {
     				verdict.vdm.vdm_model.ConnectionEnd packDestEnd = new verdict.vdm.vdm_model.ConnectionEnd();
 
 					//to pack "componentPort"  of packDestEnd
-    				verdict.vdm.vdm_model.Port packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
+    				verdict.vdm.vdm_model.Port packDestEndPort = new verdict.vdm.vdm_model.Port();
+    				if(destBusImpl != null){
+    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusImpl);
+    				} else if(destBusSubCompType != null){
+    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusSubCompType);
+    				} else {//if not a bus access port or bus implementation port
+    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
+    				}
     				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
@@ -3159,6 +3211,7 @@ public class Aadl2Vdm {
 		//return populated Model
 		return m2;
 	}//End of translateSystemImplObjects
+
 
 
 /** AUXILIARY FUNCTIONS */
@@ -4230,7 +4283,51 @@ public class Aadl2Vdm {
 		newPort.setType(dtype);
 		return newPort;
 	}
-
+    /**
+     * @author Vidhya Tekken Valapil
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
+     * @param portName
+     * @param modeString
+     * @param BusSubcomponentType  
+     * @return vdm port
+     */
+	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedName,
+			BusSubcomponentType busSubCompType) {
+		//fetching data type information
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		dtype.setUserDefinedType(busSubCompType.getName());
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(qualifiedName);
+		newPort.setName(portName);
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setType(dtype);
+		return newPort;
+		
+	}
+    /**
+     * @author Vidhya Tekken Valapil
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
+     * @param portName
+     * @param modeString
+     * @param busImplementation  
+     * @return vdm port
+     */
+	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedName,
+			BusImplementation srcBusImpl) {
+		//fetching data type information
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		dtype.setUserDefinedType(srcBusImpl.getName());
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(qualifiedName);
+		newPort.setName(portName);
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setType(dtype);
+		return newPort;
+	}
 
     /**
      * Creates a new Vdm CIAPort object and returns

@@ -212,10 +212,6 @@ public class Vdm2Csv {
 				for (String key : compToCompImpl.keySet()){
 					compImplToComp.put(compToCompImpl.get(key), key);
 				}
-				if (compConnection2.getDirection().value().equalsIgnoreCase("bidirectional")) {
-					//add the connection in the reverse direction to the table
-					updateConnectionTable(compConnection2.getName(), compConnection2.getDestination(), compConnection2.getSource(), scnConnTable, connectionAttributesMap, scenario, compImpl, compToCompImpl, propToConnections);
-				}
 			}
 		}
     	return scnConnTable;
