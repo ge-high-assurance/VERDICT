@@ -5,23 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.Connection;
-import org.osate.aadl2.Property;
-
 import com.ge.research.osate.verdict.aadl2csv.Table;
-import com.ge.research.osate.verdict.dsl.verdict.CyberMission;
-import com.ge.research.osate.verdict.dsl.verdict.CyberRel;
-import com.ge.research.osate.verdict.dsl.verdict.CyberReq;
-import com.ge.research.osate.verdict.dsl.verdict.Event;
-import com.ge.research.osate.verdict.dsl.verdict.SafetyRel;
-import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.verdict.vdm.DefenseProperties;
-import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIAPort;
@@ -68,7 +56,6 @@ public class Vdm2Csv {
 	 *        Events.csv, ScnCompProps.csv, ScnConnections.csv
 	 * 4. Output the csv files
 	 * */
-	//public void execute(File inputVdm, String stemDir, String soteriaDir, String modelName) {//TODO:remove if function is invokable with VDM as input parameter
 	public void execute(Model vdm, String stemDir, String soteriaDir, String modelName) {
 		Table eventsTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName", "Comp", "Event", "Probability");
 		Table compSafTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName","Comp", "InputPortOrEvent", "InputIAOrEvent", "OutputPort", "OutputIA");
