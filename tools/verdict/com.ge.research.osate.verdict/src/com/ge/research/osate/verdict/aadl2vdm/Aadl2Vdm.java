@@ -2765,7 +2765,6 @@ public class Aadl2Vdm {
 	 * @param comImpls
 	 * @param m2
 	 * @return
-	 * Vidhya: added code to set actual_connection_binding attribute to connections
 	 */
 	public Model translateComponentImplObjects(List<ComponentImplementation> comImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) {
 
@@ -2966,10 +2965,10 @@ public class Aadl2Vdm {
     				//variables to capture data type information
 					DataSubcomponentType srcDataSubCompType = null;
 					DataSubcomponentType destDataSubCompType = null;
-					BusSubcomponentType srcBusSubCompType = null;
-					BusSubcomponentType destBusSubCompType = null;
-					BusImplementation srcBusImpl = null;
-					BusImplementation destBusImpl = null;
+//					BusSubcomponentType srcBusSubCompType = null;
+//					BusSubcomponentType destBusSubCompType = null;
+//					BusImplementation srcBusImpl = null;
+//					BusImplementation destBusImpl = null;
 
     				if(srcConnectionEnd instanceof DataPort) {
     					srcPortTypeName = ((DataPort)srcConnectionEnd).isIn()?(((DataPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
@@ -2991,21 +2990,25 @@ public class Aadl2Vdm {
     					srcDataSubCompType = ((DataSubcomponent)srcConnectionEnd).getDataSubcomponentType();
     					srcPortTypeName = "data";
     				} else if(srcConnectionEnd instanceof BusAccess) {
-    					AccessType type = ((BusAccess) srcConnectionEnd).getKind();
-    					if(type == AccessType.PROVIDES) {
-    						srcPortTypeName = "providesBusAccess";
-    					} else if(type == AccessType.REQUIRES) {
-    						srcPortTypeName = "requiresBusAccess";
-    					} else {
-    						throw new RuntimeException("Unexpected access type: " + type);
-    					}
-    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) srcConnectionEnd).getBusFeatureClassifier();
-    					if(busfeatureClassifier instanceof BusImplementation) {
-    						srcBusImpl = (BusImplementation)busfeatureClassifier;
-    					}
+//    					AccessType type = ((BusAccess) srcConnectionEnd).getKind();
+//    					if(type == AccessType.PROVIDES) {
+//    						srcPortTypeName = "providesBusAccess";
+//    					} else if(type == AccessType.REQUIRES) {
+//    						srcPortTypeName = "requiresBusAccess";
+//    					} else {
+//    						throw new RuntimeException("Unexpected access type: " + type);
+//    					}
+//    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) srcConnectionEnd).getBusFeatureClassifier();
+//    					if(busfeatureClassifier instanceof BusImplementation) {
+//    						srcBusImpl = (BusImplementation)busfeatureClassifier;
+//    					}
+    					System.out.println("WARNING: Unsupported AADL component element type: " + srcConnectionEnd);
+    					continue;
     				} else if(srcConnectionEnd instanceof BusSubcomponent){
-    					srcBusSubCompType = ((BusSubcomponent)srcConnectionEnd).getBusSubcomponentType();
-    					srcPortTypeName = "bus";
+//    					srcBusSubCompType = ((BusSubcomponent)srcConnectionEnd).getBusSubcomponentType();
+//    					srcPortTypeName = "bus";
+    					System.out.println("WARNING: Unsupported AADL component element type: " + srcConnectionEnd);
+    					continue;
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd+ "encountered while processing connections");
     				}
@@ -3028,21 +3031,25 @@ public class Aadl2Vdm {
     					destDataSubCompType = ((DataSubcomponent)destConnectionEnd).getDataSubcomponentType();
     					destPortTypeName = "data";
     				} else if(destConnectionEnd instanceof BusAccess) {
-    					AccessType type = ((BusAccess) destConnectionEnd).getKind();
-    					if(type == AccessType.PROVIDES) {
-    						destPortTypeName = "providesBusAccess";
-    					} else if(type == AccessType.REQUIRES) {
-    						destPortTypeName = "requiresBusAccess";
-    					} else {
-    						throw new RuntimeException("Unexpected access type: " + type);
-    					}
-    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) destConnectionEnd).getBusFeatureClassifier();
-    					if(busfeatureClassifier instanceof BusImplementation) {
-    						destBusImpl = (BusImplementation)busfeatureClassifier;
-    					}
+//    					AccessType type = ((BusAccess) destConnectionEnd).getKind();
+//    					if(type == AccessType.PROVIDES) {
+//    						destPortTypeName = "providesBusAccess";
+//    					} else if(type == AccessType.REQUIRES) {
+//    						destPortTypeName = "requiresBusAccess";
+//    					} else {
+//    						throw new RuntimeException("Unexpected access type: " + type);
+//    					}
+//    					BusFeatureClassifier busfeatureClassifier = ((BusAccess) destConnectionEnd).getBusFeatureClassifier();
+//    					if(busfeatureClassifier instanceof BusImplementation) {
+//    						destBusImpl = (BusImplementation)busfeatureClassifier;
+//    					}
+    					System.out.println("WARNING: Unsupported AADL component element type: " + destConnectionEnd);
+    					continue;
     				}  else if(destConnectionEnd instanceof BusSubcomponent){
-    					destBusSubCompType = ((BusSubcomponent)destConnectionEnd).getBusSubcomponentType();
-    					destPortTypeName = "bus";
+//    					destBusSubCompType = ((BusSubcomponent)destConnectionEnd).getBusSubcomponentType();
+//    					destPortTypeName = "bus";
+    					System.out.println("WARNING: Unsupported AADL component element type: " + destConnectionEnd);
+    					continue;
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd+ "encountered while processing connections");
     				}
@@ -3062,13 +3069,13 @@ public class Aadl2Vdm {
 					//to pack "componentPort"  of packSrcEnd
     				verdict.vdm.vdm_model.Port packSrcEndPort = new verdict.vdm.vdm_model.Port();
     				
-    				if(srcBusImpl != null) {
-    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusImpl);
-    				} else if(srcBusSubCompType != null) {
-    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusSubCompType);
-    				} else {//if not a bus access port or bus implementation port
+//    				if(srcBusImpl != null) {
+//    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusImpl);
+//    				} else if(srcBusSubCompType != null) {
+//    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusSubCompType);
+//    				} else {//if not a bus access port or bus implementation port
     					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
-    				}
+//    				}
 
     				//If source port is independent of a component instance
     				if(srcCompInstName.equals("")) {
@@ -3101,13 +3108,13 @@ public class Aadl2Vdm {
 
 					//to pack "componentPort"  of packDestEnd
     				verdict.vdm.vdm_model.Port packDestEndPort = new verdict.vdm.vdm_model.Port();
-    				if(destBusImpl != null){
-    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusImpl);
-    				} else if(destBusSubCompType != null){
-    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusSubCompType);
-    				} else {//if not a bus access port or bus implementation port
+//    				if(destBusImpl != null){
+//    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusImpl);
+//    				} else if(destBusSubCompType != null){
+//    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusSubCompType);
+//    				} else {//if not a bus access port or bus implementation port
     					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
-    				}
+//    				}
     				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
