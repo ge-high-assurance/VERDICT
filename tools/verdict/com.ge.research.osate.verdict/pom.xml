@@ -19,9 +19,16 @@
             <artifactId>docker-java-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- Needed by docker-java-api -->
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Needed by zt-exec -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -58,6 +65,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <excludeGroupIds>com.ge.verdict,com.ge.research.osate.verdict</excludeGroupIds>
                             <includeScope>provided</includeScope>
                             <outputDirectory>${project.basedir}/lib/</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>

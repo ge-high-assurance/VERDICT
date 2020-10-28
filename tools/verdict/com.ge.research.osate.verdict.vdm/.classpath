@@ -12,6 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.xml.bind-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/txw2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/verdict-data-model.jar" sourcepath="/Users/212810885/GitRepos/VERDICT/tools/verdict-data-model/target/verdict-data-model-1.0.0-SNAPSHOT-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/verdict-data-model.jar" sourcepath="/verdict-data-model"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
