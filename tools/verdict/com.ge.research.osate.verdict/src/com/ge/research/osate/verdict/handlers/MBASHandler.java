@@ -13,7 +13,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
 import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;

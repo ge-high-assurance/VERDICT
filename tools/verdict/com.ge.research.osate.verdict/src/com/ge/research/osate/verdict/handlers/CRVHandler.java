@@ -68,7 +68,7 @@ public class CRVHandler extends AbstractHandler {
 						String outputPathBa = new File(System.getProperty("java.io.tmpdir"), "crv_output_ba.xml")
 								.getCanonicalPath();
 
-						if (runBundle(bundleJar, dockerImage, vdmFile.getCanonicalPath(), outputPath, kind2Bin)) {
+						if (runBundle(bundleJar, dockerImage, vdmFile, outputPath, kind2Bin)) {
 							// Run this code on the UI thread
 							mainThreadDisplay.asyncExec(() -> {
 								new CRVReportGenerator(outputPath, outputPathBa, iWindow);
@@ -97,14 +97,14 @@ public class CRVHandler extends AbstractHandler {
 		VdmTranslator.marshalToXml(model, vdmFile);
 	}
 
-	public static boolean runBundle(String bundleJar, String dockerImage, String vdmFile, String outputPath,
+	public static boolean runBundle(String bundleJar, String dockerImage, File vdmFile, String outputPath,
 			String kind2bin) throws IOException {
 
 		VerdictBundleCommand command = new VerdictBundleCommand();
 		command
 			.jarOrImage(bundleJar, dockerImage)
 			.arg("--vdm")
-			.argBind(vdmFile, "/app/tmp/verdict_model.xml")
+			.argBind(vdmFile.getCanonicalPath(), "/app/vdm/" + vdmFile.getName())
 			.arg("--crv")
 			.argBind(outputPath, "/app/tmp/crv_output.xml")
 			.arg2(kind2bin, "/app/kind2");

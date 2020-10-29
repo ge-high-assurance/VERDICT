@@ -13,7 +13,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
 import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
@@ -148,7 +147,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 			.argBind(stemProjectDir, "/app/STEM")
 			.arg2(soteriaPpBin, "/app/soteria_pp")
 			.arg("--synthesis")
-			.argBind(vdmFile, "/app/vdm/verdict-model.xml")
+			.argBind(vdmFile, "/app/vdm/verdict_model.xml")
 			.argBind(costModel, "/app/costs/costModel.xml")
 			.arg("-o")
 			.argBind(outputXml, "/app/output/synthesis_output.xml");

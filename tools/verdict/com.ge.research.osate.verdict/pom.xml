@@ -19,6 +19,11 @@
             <artifactId>docker-java-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ge.verdict</groupId>
+            <artifactId>verdict-data-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!-- Needed by docker-java-api -->
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -65,7 +70,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <excludeGroupIds>com.ge.verdict,com.ge.research.osate.verdict</excludeGroupIds>
+                            <excludeGroupIds>com.ge.research.osate.verdict</excludeGroupIds>
                             <includeScope>provided</includeScope>
                             <outputDirectory>${project.basedir}/lib/</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
