@@ -3002,12 +3002,12 @@ public class Aadl2Vdm {
 //    					if(busfeatureClassifier instanceof BusImplementation) {
 //    						srcBusImpl = (BusImplementation)busfeatureClassifier;
 //    					}
-    					System.out.println("WARNING: Unsupported AADL component element type: " + srcConnectionEnd);
+    					System.out.println("Warning: Unsupported AADL component element type: " + srcConnectionEnd);
     					continue;
     				} else if(srcConnectionEnd instanceof BusSubcomponent){
 //    					srcBusSubCompType = ((BusSubcomponent)srcConnectionEnd).getBusSubcomponentType();
 //    					srcPortTypeName = "bus";
-    					System.out.println("WARNING: Unsupported AADL component element type: " + srcConnectionEnd);
+    					System.out.println("Warning: Unsupported AADL component element type: " + srcConnectionEnd);
     					continue;
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd+ "encountered while processing connections");
@@ -3043,12 +3043,12 @@ public class Aadl2Vdm {
 //    					if(busfeatureClassifier instanceof BusImplementation) {
 //    						destBusImpl = (BusImplementation)busfeatureClassifier;
 //    					}
-    					System.out.println("WARNING: Unsupported AADL component element type: " + destConnectionEnd);
+    					System.out.println("Warning: Unsupported AADL component element type: " + destConnectionEnd);
     					continue;
     				}  else if(destConnectionEnd instanceof BusSubcomponent){
 //    					destBusSubCompType = ((BusSubcomponent)destConnectionEnd).getBusSubcomponentType();
 //    					destPortTypeName = "bus";
-    					System.out.println("WARNING: Unsupported AADL component element type: " + destConnectionEnd);
+    					System.out.println("Warning: Unsupported AADL component element type: " + destConnectionEnd);
     					continue;
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd+ "encountered while processing connections");
@@ -3172,7 +3172,7 @@ public class Aadl2Vdm {
 								type = new QName("Int");
 							} else { 
 								if(!(propType instanceof AadlStringImpl)) {
-									System.out.println("WARNING: Unexpected connection property type.");
+									System.out.println("Warning: Unexpected connection property type.");
 								}
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"

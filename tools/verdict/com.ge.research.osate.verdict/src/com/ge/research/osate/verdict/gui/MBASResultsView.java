@@ -63,6 +63,44 @@ public class MBASResultsView extends ViewPart {
 		return ResourceLocator.imageDescriptorFromBundle("com.ge.research.osate.verdict",
 				success ? "icons/valid.png" : "icons/false.png").get().createImage();
 	}
+	
+	String convertNumToSeverityOrDAL(String num, boolean isDAL) {
+		switch(num) {
+		case "1e-9":
+		case "1e-09":
+		case "1e-08":
+		case "1e-8":
+			if(isDAL) return "A";
+			return "Catastrophic";
+		
+		case "1e-7":
+		case "1e-07":
+		case "1e-06":
+		case "1e-6":
+			if(isDAL) return "B";
+			return "Hazardous";
+		
+		case "1e-5":
+		case "1e-05":
+		case "1e-04":
+		case "1e-4":
+			if(isDAL) return "C";
+			return "Major";	
+			
+		case "1e-3":
+		case "1e-03":
+		case "1e-02":
+		case "1e-2":
+		case "1e-01":
+		case "1e-1":			
+			if(isDAL) return "D";
+			return "Minor";
+			
+		default:
+			if(isDAL) return "E";
+			return "None";			
+		}
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -106,8 +144,8 @@ public class MBASResultsView extends ViewPart {
 				table.setHeaderForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_FOREGROUND));
 
 				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Cyber Requirement");
-				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Acceptable Likelihood of Successful Attack");
-				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Calculated Likelihood of Successful Attack");
+				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Severity of Successful Attack");
+				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Implemented Security Design Assurance Level");
 				new TableColumn(table, SWT.CENTER | SWT.WRAP).setText("Analysis Result");
 
 				List<String> keys = new ArrayList<String>();
@@ -116,7 +154,7 @@ public class MBASResultsView extends ViewPart {
 				for (int i = 0; i < tableContents.size(); i++) {
 					TableItem item = new TableItem(table, SWT.NONE);
 					List<String> currRow = tableContents.get(i).getRowContents();
-					item.setText(new String[] { currRow.get(0), currRow.get(1), currRow.get(2), " " });
+					item.setText(new String[] { currRow.get(0), convertNumToSeverityOrDAL(currRow.get(1), false), convertNumToSeverityOrDAL(currRow.get(2), true), " " });
 					keys.add(currRow.get(0));
 					answers.add(currRow.get(3));
 				}

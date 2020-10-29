@@ -113,7 +113,6 @@ public class Agree2Vdm {
 	 *
 	 * */
 	public Model execute(File inputDir){
-		System.err.println("Successfully entered Agree2Vdm Translator! \n\n\n");
 		Model m = new Model();
 		Aadl2Vdm aadl2vdm= new Aadl2Vdm();
 	  	//using preprocessAadlFiles method in this class, to get objects in the aadl files in the directory along with the imported aadl files
@@ -147,7 +146,7 @@ public class Agree2Vdm {
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
-					System.out.println(file.getAbsolutePath());
+//					System.out.println(file.getAbsolutePath());
 					aadlFileNames.add(file.getAbsolutePath());
 				}
 			}
@@ -212,7 +211,7 @@ public class Agree2Vdm {
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
-		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
+//		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
 		for(SystemType sysType : systemTypes) {
 			// unpacking sysType
 			for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {				
