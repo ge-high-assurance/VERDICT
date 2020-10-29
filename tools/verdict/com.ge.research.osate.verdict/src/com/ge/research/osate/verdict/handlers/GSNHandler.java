@@ -13,6 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroPart;
 
 import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
@@ -459,8 +460,8 @@ public class GSNHandler extends AbstractHandler {
 	 * @param soteriaOutputDir
 	 */
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2Vdm aadl2vdm = new Aadl2Vdm();
-		Model model = aadl2vdm.execute(dir);
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
 		Vdm2Csv vdm2csv = new Vdm2Csv();
 		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());
 	}

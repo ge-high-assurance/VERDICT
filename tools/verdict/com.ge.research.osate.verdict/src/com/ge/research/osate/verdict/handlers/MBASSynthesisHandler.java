@@ -14,6 +14,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
 import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.research.osate.verdict.gui.MBASSynthesisReport;
@@ -126,8 +127,8 @@ public class MBASSynthesisHandler extends AbstractHandler {
 	 * @param soteriaOutputDir
 	 */
 	public static void runAadl2CsvWithSynthesis(File dir, File vdmFile, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2Vdm aadl2vdm = new Aadl2Vdm();
-		Model model = aadl2vdm.execute(dir);
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
 		VdmTranslator.marshalToXml(model, vdmFile);
 		Vdm2Csv vdm2csv = new Vdm2Csv(true);
 		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());

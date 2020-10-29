@@ -13,7 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.CRVReportGenerator;
 import com.ge.research.osate.verdict.gui.CRVSettingsPanel;
@@ -92,8 +92,8 @@ public class CRVHandler extends AbstractHandler {
 	 * @param vdmFile
 	 */
 	public static void runAadl2Vdm(File dir, File vdmFile) {
-		Aadl2Vdm aadl2vdm = new Aadl2Vdm();
-		Model model = aadl2vdm.execute(dir);
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
 		VdmTranslator.marshalToXml(model, vdmFile);
 	}
 
