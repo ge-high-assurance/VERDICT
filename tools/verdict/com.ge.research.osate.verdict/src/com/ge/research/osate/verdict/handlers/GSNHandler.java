@@ -12,10 +12,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
 import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
+import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
 import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_model.Model;
@@ -152,19 +153,11 @@ public class GSNHandler extends AbstractHandler {
 						}
 						
 
-						//Running MBAS First to create the soteria++ outputs
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-
-						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+						//translating AADL to CSV first to create the soteria++ outputs
+						runAadl2Csv(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 						
 						//running MBAS 
 						boolean outputsGenerated = runBundleMBAS(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin, graphVizPath);
-						
-						
-//						/**
-//						 * For testing only
-//						 */
-//						boolean outputsGenerated = true;
 						
                         // if MBAS succeeded, proceed to GSN
 						if (outputsGenerated){
@@ -467,8 +460,10 @@ public class GSNHandler extends AbstractHandler {
 	 * @param soteriaOutputDir
 	 */
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
+		Vdm2Csv vdm2csv = new Vdm2Csv();
+		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());
 	}
 
 	/**

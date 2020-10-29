@@ -7,7 +7,6 @@ import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.gsn.GSNInterface;
 import com.ge.verdict.gsn.SecurityGSNInterface;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
-import com.ge.verdict.mbas.VDM2CSV;
 import com.ge.verdict.stem.VerdictStem;
 import com.ge.verdict.synthesis.CostModel;
 import com.ge.verdict.synthesis.DTreeConstructor;
@@ -22,7 +21,6 @@ import edu.uiowa.clc.verdict.crv.Instrumentor;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
 import edu.uiowa.clc.verdict.merit.MeritAssignment;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
-import edu.uiowa.clc.verdict.vdm.utest.ResourceTest;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
@@ -34,7 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -100,24 +97,6 @@ public class App {
     }
 
     private static Options buildOptions() {
-        Option aadl =
-                Option.builder()
-                        .desc("AADL input")
-                        .longOpt("aadl")
-                        .numberOfArgs(3)
-                        .argName("AADL project directory")
-                        .argName("aadl2iml binary")
-                        .argName("VERDICT Properties name")
-                        .build();
-
-        Option iml =
-                Option.builder()
-                        .desc("IML input")
-                        .longOpt("iml")
-                        .hasArg()
-                        .argName("IML file")
-                        .build();
-
         Option csv =
                 Option.builder()
                         .desc("CSV input")
@@ -126,10 +105,17 @@ public class App {
                         .argName("Model name")
                         .build();
 
+        Option vdm =
+                Option.builder()
+                        .desc("VDM input")
+                        .longOpt("vdm")
+                        .hasArg()
+                        .argName("VDM file")
+                        .build();
+
         OptionGroup inputGroup = new OptionGroup();
-        inputGroup.addOption(aadl);
-        inputGroup.addOption(iml);
         inputGroup.addOption(csv);
+        inputGroup.addOption(vdm);
         inputGroup.setRequired(true);
 
         Option mbas =
@@ -230,20 +216,15 @@ public class App {
     private static void printHelp() {
         String jarName = getJarName();
 
-        helpLine("Usage: %s (--aadl <args> | --iml <args> | --csv <args>)", jarName);
+        helpLine("Usage: %s (--csv <args> | --vdm <args>)", jarName);
         helpLine("       (--mbas <args> | --crv <args>) [-d, --debug <args>]");
         helpLine();
-        helpLine("Input: Use AADL or IML or CSV input");
-        helpLine("  --aadl <dir> <aadl2iml bin> <property set> .. AADL input");
-        helpLine("      <dir> ................ AADL project directory");
-        helpLine("      <aadl2iml bin> ....... aadl2iml binary");
-        helpLine("      <property set> ....... VERDICT Properties name");
-        helpLine();
-        helpLine("  --iml <file> ............. IML input");
-        helpLine("      <file> ............... IML file");
-        helpLine();
+        helpLine("Input: Use CSV or VDM input");
         helpLine("  --csv <model name> ....... CSV input");
         helpLine("      <model name> ......... Model name");
+        helpLine();
+        helpLine("  --vdm <file> ............. VDM input");
+        helpLine("      <file> ............... VDM file");
         helpLine();
         helpLine("Toolchain: MBAS (Model Based Architecture & Synthesis)");
         helpLine("  --mbas <stem dir> <soteria++ bin> [-c] [-s]");
@@ -291,33 +272,20 @@ public class App {
     private static void handleOpts(CommandLine opts) throws VerdictRunException {
         String debugDir = opts.hasOption('d') ? opts.getOptionValue('d') : null;
 
-        String aadlPath = null,
-                imlPath = null,
-                aadl2imlBin = null,
-                propertySet = null,
-                modelName = null;
         String csvProjectName = null;
-
+        String vdmPath = null;
         if (opts.hasOption("csv")) {
             csvProjectName = opts.getOptionValue("csv");
-        } else if (opts.hasOption("aadl")) {
-            String[] aadlOpts = opts.getOptionValues("aadl");
-            aadlPath = aadlOpts[0];
-            aadl2imlBin = aadlOpts[1];
-            propertySet = aadlOpts[2];
-            imlPath =
-                    new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.iml")
-                            .getAbsolutePath();
-            modelName = new File(aadlPath).getName();
-        } else if (opts.hasOption("iml")) {
-            aadlPath = null;
-            aadl2imlBin = null;
-            propertySet = null;
-            imlPath = opts.getOptionValue("iml");
-            modelName = imlPath;
+        } else if (opts.hasOption("vdm")) {
+            vdmPath = opts.getOptionValue("vdm");
         } else {
-            throw new VerdictRunException("Must specifiy either AADL or IML input");
+            throw new VerdictRunException("Must specify CSV or VDM input");
         }
+
+        String modelName =
+                csvProjectName != null
+                        ? csvProjectName
+                        : new File(vdmPath).getName().replace(".xml", "");
 
         Timer.Sample sample = Timer.start(Metrics.globalRegistry);
         if (opts.hasOption("mbas")) {
@@ -328,56 +296,42 @@ public class App {
             boolean cyberInference = opts.hasOption("c");
             boolean safetyInference = opts.hasOption("s");
 
-            if (csvProjectName != null) {
-                if (opts.hasOption("y")) {
-                    if (!opts.hasOption("o")) {
-                        throw new VerdictRunException("Must specify synthesis output XML");
-                    }
-
-                    String[] synthesisOpts = opts.getOptionValues("y");
-                    if (synthesisOpts.length != 2) {
-                        throw new VerdictRunException("Missing --synthesis args");
-                    }
-
-                    String vdmFile = synthesisOpts[0];
-                    String costModelPath = synthesisOpts[1];
-                    String output = opts.getOptionValue("o");
-                    boolean partialSolution = opts.hasOption("p");
-
-                    runMbasSynthesis(
-                            vdmFile,
-                            csvProjectName,
-                            stemProjectDir,
-                            debugDir,
-                            soteriaPpBin,
-                            cyberInference,
-                            safetyInference,
-                            partialSolution,
-                            costModelPath,
-                            output);
-                } else {
-                    runMbas(
-                            csvProjectName,
-                            stemProjectDir,
-                            debugDir,
-                            soteriaPpBin,
-                            cyberInference,
-                            safetyInference);
+            if (opts.hasOption("y")) {
+                if (!opts.hasOption("o")) {
+                    throw new VerdictRunException("Must specify synthesis output XML");
                 }
-                sample.stop(Metrics.timer("Timer.mbas", "model", csvProjectName));
+
+                String[] synthesisOpts = opts.getOptionValues("y");
+                if (synthesisOpts.length != 2) {
+                    throw new VerdictRunException("Missing --synthesis args");
+                }
+
+                String vdmFile = synthesisOpts[0];
+                String costModelPath = synthesisOpts[1];
+                String output = opts.getOptionValue("o");
+                boolean partialSolution = opts.hasOption("p");
+
+                runMbasSynthesis(
+                        vdmFile,
+                        modelName,
+                        stemProjectDir,
+                        debugDir,
+                        soteriaPpBin,
+                        cyberInference,
+                        safetyInference,
+                        partialSolution,
+                        costModelPath,
+                        output);
             } else {
                 runMbas(
-                        aadlPath,
-                        aadl2imlBin,
-                        propertySet,
-                        imlPath,
+                        modelName,
                         stemProjectDir,
                         debugDir,
                         soteriaPpBin,
                         cyberInference,
                         safetyInference);
-                sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
             }
+            sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
 
         } else if (opts.hasOption("crv")) {
             String instrPath =
@@ -404,10 +358,8 @@ public class App {
             String outputBaPath = outputPath.replace(".xml", "").replace(".json", "") + "_ba.xml";
 
             runCrv(
-                    aadlPath,
-                    aadl2imlBin,
-                    propertySet,
-                    imlPath,
+                    vdmPath,
+                    modelName,
                     instrPath,
                     lustrePath,
                     threats,
@@ -437,8 +389,6 @@ public class App {
             if (opts.hasOption("z")) {
                 securityCases = true;
             }
-
-            modelName = opts.getOptionValue("csv");
 
             runGsn(
                     rootGoalId,
@@ -614,9 +564,9 @@ public class App {
     }
 
     /**
-     * Run MBAS with csv files input
+     * Run MBAS with CSV input files
      *
-     * @param modelName
+     * @param modelName Name of model
      * @param stemDir output directory for STEM input files
      * @param soteriaDir output directory for Soteria++ input files
      * @throws VerdictRunException
@@ -716,15 +666,16 @@ public class App {
     }
 
     /**
-     * Run MBAS Synthesis with csv files input
+     * Run MBAS Synthesis with CSV input files
      *
-     * @param modelName
+     * @param vdmPath VDM input file for synthesis
+     * @param modelName Name of model
      * @param stemDir output directory for STEM input files
      * @param soteriaDir output directory for Soteria++ input files
      * @throws VerdictRunException
      */
     public static void runMbasSynthesis(
-            String vdmFile,
+            String vdmPath,
             String modelName,
             String stemProjectDir,
             String debugDir,
@@ -744,15 +695,15 @@ public class App {
         soteriaOutputDir.mkdirs();
         String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
 
-        checkFile(vdmFile, true, false, false, false, "xml");
         checkFile(stemCsvDir, true, true, true, false, null);
         checkFile(stemOutputDir, true, true, true, false, null);
         checkFile(stemGraphsDir, true, true, true, false, null);
         checkFile(stemSadlFile, true, false, false, false, null);
         checkFile(soteriaPpOutputDir, true, true, true, false, null);
         checkFile(soteriaPpBin, true, false, false, true, null);
-        checkFile(costModelPath, true, false, false, false, "xml");
 
+        checkFile(vdmPath, true, false, false, false, "xml");
+        checkFile(costModelPath, true, false, false, false, "xml");
         checkFile(outputPath, false, false, true, false, "xml");
 
         deleteDirectoryContents(stemGraphsDir);
@@ -801,7 +752,7 @@ public class App {
 
             AttackDefenseCollector collector =
                     new AttackDefenseCollector(
-                            new File(vdmFile), new File(stemOutputDir), cyberInference);
+                            new File(vdmPath), new File(stemOutputDir), cyberInference);
             List<AttackDefenseCollector.Result> results = collector.perform();
 
             boolean sat =
@@ -847,172 +798,18 @@ public class App {
     }
 
     /**
-     * Run MBAS.
-     *
-     * @param aadlPath AADL input file
-     * @param imlPath temporary IML file
-     * @param stemDir output directory for STEM input files
-     * @param soteriaDir output directory for Soteria++ input files
-     * @throws VerdictRunException
-     */
-    public static void runMbas(
-            String aadlPath,
-            String aadl2imlBin,
-            String propertySet,
-            String imlPath,
-            String stemProjectDir,
-            String debugDir,
-            String soteriaPpBin,
-            boolean cyberInference,
-            boolean safetyInference)
-            throws VerdictRunException {
-
-        String stemCsvDir = (new File(stemProjectDir, "CSVData")).getAbsolutePath();
-        String stemOutputDir = (new File(stemProjectDir, "Output")).getAbsolutePath();
-        String stemGraphsDir = (new File(stemProjectDir, "Graphs")).getAbsolutePath();
-        String stemSadlFile = (new File(stemProjectDir, "Run.sadl")).getAbsolutePath();
-        File soteriaOutputDir = new File(stemOutputDir, "Soteria_Output");
-        soteriaOutputDir.mkdirs();
-        String soteriaPpOutputDir = soteriaOutputDir.getAbsolutePath();
-
-        checkFile(stemCsvDir, true, true, true, false, null);
-        checkFile(stemOutputDir, true, true, true, false, null);
-        checkFile(stemGraphsDir, true, true, true, false, null);
-        checkFile(stemSadlFile, true, false, false, false, null);
-        checkFile(soteriaPpOutputDir, true, true, true, false, null);
-        checkFile(soteriaPpBin, true, false, false, true, null);
-
-        deleteDirectoryContents(stemCsvDir);
-        deleteDirectoryContents(stemOutputDir);
-        deleteDirectoryContents(stemGraphsDir);
-        deleteDirectoryContents(soteriaPpOutputDir);
-
-        if (debugDir != null) {
-            logHeader("DEBUGGING XML OUTPUT");
-        }
-
-        try {
-            // Copy Soteria++ pngs
-            for (String soteria_png : soteria_pngs) {
-                Binary.copyResource(
-                        "soteria_pngs/" + soteria_png + ".png",
-                        new File(soteriaPpOutputDir, soteria_png + ".png"),
-                        false);
-            }
-        } catch (Binary.ExecutionException e) {
-            throw new VerdictRunException("Failed to copy Soteria++ pngs", e);
-        }
-
-        String modelName = imlPath;
-        if (aadlPath != null) {
-            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-            checkFile(aadlPath, true, true, false, false, null);
-            checkFile(aadl2imlBin, true, false, false, true, null);
-            deleteFile(imlPath);
-            runAadl2iml(aadlPath, imlPath, aadl2imlBin, propertySet);
-            modelName = new File(aadlPath).getName();
-            sample.stop(Metrics.timer("Timer.mbas.aadl2iml", "model", modelName));
-        } else {
-            checkFile(imlPath, true, false, false, false, ".iml");
-        }
-
-        logHeader("IML2VDM");
-
-        log("Loading IML into Verdict data model");
-        log("Input IML file: " + imlPath);
-
-        Model vdmModel;
-        try {
-            // Translate the model from IML to VDM
-            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-            vdmModel = ResourceTest.setup(imlPath);
-            sample.stop(Metrics.timer("Timer.mbas.iml2vdm", "model", modelName));
-        } catch (IOException e) {
-            throw new VerdictRunException("Failed to translate IML to VDM", e);
-        }
-
-        // Try to produce the XML file if debugDir is given
-        debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
-
-        logHeader("VDM2CSV");
-
-        log("Converting Verdict data model to CSV");
-        log("Outputing STEM files to directory: " + stemCsvDir);
-        log("Outputing Soteria++ files to directory: " + stemOutputDir);
-
-        // Generate MBAS inputs
-        Metrics.timer("Timer.mbas.vdm2csv", "model", modelName)
-                .record(
-                        () ->
-                                VDM2CSV.marshalToMbasInputs(
-                                        vdmModel, imlPath, stemCsvDir, stemOutputDir));
-
-        logHeader("STEM");
-
-        log("STEM project directory: " + stemProjectDir);
-        log("STEM output directory: " + stemOutputDir);
-        log("STEM graphs directory: " + stemGraphsDir);
-        log("STEM is running. Please be patient...");
-
-        VerdictStem stemRunner = new VerdictStem();
-        Metrics.timer("Timer.mbas.stem", "model", modelName)
-                .record(
-                        () ->
-                                stemRunner.runStem(
-                                        new File(stemProjectDir),
-                                        new File(stemOutputDir),
-                                        new File(stemGraphsDir)));
-
-        log("STEM finished!");
-
-        logHeader("Soteria++");
-
-        log("Soteria++ input directory: " + stemOutputDir);
-        log("Soteria++ output directory: " + soteriaPpOutputDir);
-        log("Soteria++ is running. Please be patient...");
-
-        // Soteria has optional arguments, so need to add all args to this list
-        List<String> args = new ArrayList<>();
-        args.add("-o");
-        args.add(soteriaPpOutputDir);
-        args.add(stemOutputDir);
-        if (cyberInference) {
-            args.add("-c");
-        }
-        if (safetyInference) {
-            args.add("-s");
-        }
-
-        try {
-            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-            Binary.invokeBin(
-                    soteriaPpBin,
-                    soteriaPpOutputDir,
-                    new PumpStreamHandler(),
-                    args.toArray(new String[args.size()]));
-            sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
-        } catch (Binary.ExecutionException e) {
-            throw new VerdictRunException("Failed to execute soteria_pp", e);
-        }
-
-        logHeader("Finished");
-    }
-
-    /**
      * Run CRV.
      *
-     * @param aadlPath AADL input file
-     * @param imlPath temporary IML file
+     * @param vdmPath VDM input file
+     * @param modelName Name of model
      * @param instrPath temporary instrumented model file
      * @param lustrePath temporary Lustre file
      * @param threats list of threats to instrument (LB, NI, etc.)
      * @throws VerdictRunException
      */
     public static void runCrv(
-            String aadlPath,
-            String aadl2imlBin,
-            String propertySet,
-            String imlPath,
+            String vdmPath,
+            String modelName,
             String instrPath,
             String lustrePath,
             List<String> threats,
@@ -1027,6 +824,7 @@ public class App {
             String kind2Bin)
             throws VerdictRunException {
 
+        checkFile(vdmPath, true, false, false, false, ".xml");
         checkFile(lustrePath, false, false, true, false, ".lus");
         checkFile(outputPath, false, false, true, false, null);
 
@@ -1040,47 +838,19 @@ public class App {
             throw new VerdictRunException("Output file must be .xml or .json");
         }
 
-        deleteFile(instrPath);
-        deleteFile(lustrePath);
-        deleteFile(outputPath);
-
         if (debugDir != null) {
             logHeader("DEBUGGING XML OUTPUT");
         }
 
-        String modelName = imlPath;
-        if (aadlPath != null) {
-            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-            checkFile(aadlPath, true, true, false, false, null);
-            checkFile(aadl2imlBin, true, false, false, true, null);
-            deleteFile(imlPath);
-            runAadl2iml(aadlPath, imlPath, aadl2imlBin, propertySet);
-            modelName = new File(aadlPath).getName();
-            sample.stop(Metrics.timer("Timer.crv.aadl2iml", "model", modelName));
-        } else {
-            checkFile(imlPath, true, false, false, false, ".iml");
-        }
-
+        deleteFile(instrPath);
+        deleteFile(lustrePath);
+        deleteFile(outputPath);
         if (outputBaPath != null) {
             deleteFile(outputBaPath);
         }
 
-        log("Loading IML into Verdict data model");
-        logHeader("IML2VDM");
-
-        log("IML file: " + imlPath);
-
-        Model vdmModel;
-        try {
-            // Translate the model from IML to VDM
-            Timer.Sample sample = Timer.start(Metrics.globalRegistry);
-            vdmModel = ResourceTest.setup(imlPath);
-            sample.stop(Metrics.timer("Timer.crv.iml2vdm", "model", modelName));
-        } catch (IOException e) {
-            throw new VerdictRunException("Failed to translate IML to VDM", e);
-        }
-
-        debugOutVdm(debugDir, "VERDICT_output_debug_vdm.xml", vdmModel);
+        File vdmFile = new File(vdmPath);
+        Model vdmModel = VdmTranslator.unmarshalFromXml(vdmFile);
 
         logHeader("VDM Instrumentor");
 
@@ -1268,34 +1038,6 @@ public class App {
             File out = new File(debugDir, name);
             log("Debug output: " + out.getAbsolutePath());
             VdmTranslator.marshalToXml(vdm, out);
-        }
-    }
-
-    private static void runAadl2iml(
-            String aadlPath, String imlPath, String aadl2imlBin, String propertySet)
-            throws VerdictRunException {
-        logHeader("AADL2IML");
-
-        log("Converting AADL to IML");
-        log("Input AADL project: " + aadlPath);
-        log("Output IML file: " + imlPath);
-        log("VERDICT Properties Name: " + propertySet);
-        System.out.println(); // Make any message provided by aadl2iml more visible
-
-        try {
-            Binary.invokeBin(aadl2imlBin, "-ps", propertySet, "-o", imlPath, aadlPath);
-        } catch (Binary.ExecutionException e) {
-            if (e.getCode().isPresent()) {
-                // If an exit code is present, aadl2iml should have printed a message
-                System.exit(2);
-            } else {
-                throw new VerdictRunException("Failed to execute aadl2iml", e);
-            }
-        }
-
-        if (!(new File(imlPath)).exists()) {
-            logError("Failed to execute aadl2iml, no output generated");
-            System.exit(2);
         }
     }
 

@@ -13,11 +13,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
-import com.ge.research.osate.verdict.aadl2vdm.Aadl2Vdm;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.research.osate.verdict.gui.MBASSynthesisReport;
+import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
 import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_model.Model;
@@ -61,14 +61,12 @@ public class MBASSynthesisHandler extends AbstractHandler {
 						}
 
 						VerdictHandlersUtils.printGreeting();
-						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 
 						// Create CSVData, Output, Graphs folders if they don't exist
 						// If they exist, delete all the csv and svg files
 						File dataFolder = new File(stemProjPath, "CSVData");
 						File outputFolder = new File(stemProjPath, "Output");
 						File graphsFolder = new File(stemProjPath, "Graphs");
-						File vdmFile = new File(outputFolder, "verdict-model.xml");
 
 						if (dataFolder.exists() && dataFolder.isDirectory()) {
 							deleteFilesInDir("csv", dataFolder);
@@ -86,9 +84,8 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							graphsFolder.mkdir();
 						}
 
-						IProject project = VerdictHandlersUtils.getCurrentIProject(event);
+						List<String> selection = VerdictHandlersUtils.getCurrentSelection(event);
 						File projectDir = new File(selection.get(0));
-
 						File costModel = new File(projectDir, "costModel.xml");
 						if (!costModel.exists()) {
 							System.out.println(
@@ -96,20 +93,16 @@ public class MBASSynthesisHandler extends AbstractHandler {
 							return;
 						}
 
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator(true);
-						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
-
-						Aadl2Vdm aadl2vdm = new Aadl2Vdm();
-						Model vdmModel = aadl2vdm.execute(projectDir);
-						VdmTranslator.marshalToXml(vdmModel, vdmFile);
+						File vdmFile = new File(outputFolder, "verdict_model.xml");
+						runAadl2CsvWithSynthesis(projectDir, vdmFile, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 
 						File outputXml = new File(outputFolder, "synthesis_output.xml");
-
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), vdmFile.getCanonicalPath(),
 								stemProjPath,
 								soteriaPpBin,
 								graphVizPath, costModel.getCanonicalPath(), outputXml.getCanonicalPath())) {
 							if (outputXml.exists()) {
+								IProject project = VerdictHandlersUtils.getCurrentIProject(event);
 								MBASSynthesisReport.report(project, projectDir, outputXml, iWindow);
 							}
 						}
@@ -125,9 +118,19 @@ public class MBASSynthesisHandler extends AbstractHandler {
 		return null;
 	}
 
-	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
+	/**
+	 * Calls Aadl2Csv translator with synthesis enabled
+	 * @param dir
+	 * @param vdmFile
+	 * @param stemOutputDir
+	 * @param soteriaOutputDir
+	 */
+	public static void runAadl2CsvWithSynthesis(File dir, File vdmFile, String stemOutputDir, String soteriaOutputDir) {
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
+		VdmTranslator.marshalToXml(model, vdmFile);
+		Vdm2Csv vdm2csv = new Vdm2Csv(true);
+		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());
 	}
 
 	public static boolean runBundle(String bundleJar, String dockerImage, String projectName, String vdmFile,
@@ -144,7 +147,7 @@ public class MBASSynthesisHandler extends AbstractHandler {
 			.argBind(stemProjectDir, "/app/STEM")
 			.arg2(soteriaPpBin, "/app/soteria_pp")
 			.arg("--synthesis")
-			.argBind(vdmFile, "/app/vdm/verdict-model.xml")
+			.argBind(vdmFile, "/app/vdm/verdict_model.xml")
 			.argBind(costModel, "/app/costs/costModel.xml")
 			.arg("-o")
 			.argBind(outputXml, "/app/output/synthesis_output.xml");

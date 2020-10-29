@@ -13,10 +13,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
 
-import com.ge.research.osate.verdict.aadl2csv.Aadl2CsvTranslator;
+import com.ge.research.osate.verdict.aadl2vdm.Agree2Vdm;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
+import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
+
+import verdict.vdm.vdm_model.Model;
 
 /**
 *
@@ -89,9 +92,7 @@ public class MBASHandler extends AbstractHandler {
 						}
 
 						File projectDir = new File(selection.get(0));
-						Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-
-						aadl2csv.execute(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
+						runAadl2Csv(projectDir, dataFolder.getAbsolutePath(), outputFolder.getAbsolutePath());
 
 						if (runBundle(bundleJar, dockerImage, projectDir.getName(), stemProjPath, soteriaPpBin,
 								graphVizPath)) {
@@ -125,8 +126,6 @@ public class MBASHandler extends AbstractHandler {
 									System.err.println("Info: No Soteria++ output generated!");
 								}
 							});
-							// Display safety related text.
-//							VerdictHandlersUtils.openSafetyTxtInDir(soteriaOut);
 						}
 					} catch (IOException e) {
 						VerdictLogger.severe(e.toString());
@@ -141,8 +140,10 @@ public class MBASHandler extends AbstractHandler {
 	}
 
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
-		Aadl2CsvTranslator aadl2csv = new Aadl2CsvTranslator();
-		aadl2csv.execute(dir, stemOutputDir, soteriaOutputDir);
+		Agree2Vdm agree2vdm = new Agree2Vdm();
+		Model model = agree2vdm.execute(dir);
+		Vdm2Csv vdm2csv = new Vdm2Csv();
+		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());
 	}
 
 	public static boolean runBundle(String bundleJar, String dockerImage, String projectName,

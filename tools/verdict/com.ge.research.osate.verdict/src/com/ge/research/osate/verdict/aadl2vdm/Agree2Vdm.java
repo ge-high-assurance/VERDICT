@@ -78,7 +78,6 @@ import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
 
-import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
@@ -101,7 +100,11 @@ import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.impl.ArgImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
-
+/**
+*
+* @author Vidhya Tekken Valapil
+*
+*/
 public class Agree2Vdm {
 	/**
 	 * The execute() method performs a set of tasks for translating AADL to VDM
@@ -110,21 +113,15 @@ public class Agree2Vdm {
 	 *
 	 * */
 	public Model execute(File inputDir){
-		System.err.println("Successfully entered Agree2Vdm Translator! \n\n\n");
-	    Model m = new Model();
-	  	Aadl2Vdm aadl2vdm= new Aadl2Vdm();
-	    //TODO: invoking this method from AADL2VDM translator for testing -to populate non-agree AADL objects
-	  	//using preprocessAadlFiles method from AADL2VDM to get objects from the aadl files in the directory alone
-	  	List<EObject> objectsFromAllFiles = preprocessAadlFiles(inputDir);//includes objects from imported aadl files
-	  	List<EObject> objectsFromFilesInProjects = aadl2vdm.preprocessAadlFiles(inputDir);
-	  	m = aadl2vdm.populateVDMFromAadlObjects(objectsFromAllFiles, objectsFromFilesInProjects, m);
+		Model m = new Model();
+		Aadl2Vdm aadl2vdm= new Aadl2Vdm();
 	  	//using preprocessAadlFiles method in this class, to get objects in the aadl files in the directory along with the imported aadl files
+	  	List<EObject> objectsFromAllFiles = preprocessAadlFiles(inputDir);
+	  	//using preprocessAadlFiles method from AADL2VDM to get objects from the aadl files in the directory alone
+	  	List<EObject> objectsFromFilesInProjects = aadl2vdm.preprocessAadlFiles(inputDir);
+	    //invoking this method from AADL2VDM translator to populate non-agree AADL objects
+	  	m = aadl2vdm.populateVDMFromAadlObjects(objectsFromAllFiles, objectsFromFilesInProjects, m);
 		m = populateVDMFromAadlAgreeObjects(objectsFromAllFiles, m);
-		System.err.println("Working Directory = " + System.getProperty("user.dir"));
-		File testXml = new File("/Users/212810885/Desktop/testXML.xml");
-		System.err.println("Created File object to store Xml");
-		VdmTranslator.marshalToXml(m, testXml);
-		System.err.println("Marshalled Model to XML");
 		return m;
 	}
 	/**
@@ -149,7 +146,7 @@ public class Agree2Vdm {
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
-					System.out.println(file.getAbsolutePath());
+//					System.out.println(file.getAbsolutePath());
 					aadlFileNames.add(file.getAbsolutePath());
 				}
 			}
@@ -214,7 +211,7 @@ public class Agree2Vdm {
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
-		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
+//		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
 		for(SystemType sysType : systemTypes) {
 			// unpacking sysType
 			for(AnnexSubclause annex : sysType.getOwnedAnnexSubclauses()) {				

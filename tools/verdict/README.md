@@ -100,7 +100,6 @@ successful build ends with the following output:
 [INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 38.026 s]
 [INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.296 s]
 [INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  1.160 s]
-[INFO] com.ge.research.osate.verdict.vdm .................. SUCCESS [  2.029 s]
 [INFO] com.ge.research.osate.verdict ...................... SUCCESS [  2.278 s]
 [INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.298 s]
 [INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.066 s]

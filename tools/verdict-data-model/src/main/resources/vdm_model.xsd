@@ -106,6 +106,7 @@
             <enumeration value="requiresBusAccess"></enumeration>
             <enumeration value="providesBusAccess"></enumeration>
             <enumeration value="data"></enumeration>
+            <enumeration value="bus"></enumeration>
         </restriction>
     </simpleType>
 
@@ -185,6 +186,9 @@
         </sequence>
         <attribute name="name" type="vdm_data:Identifier"
             use="required">
+        </attribute>
+        <attribute name="actual_connection_binding" type="string"
+            use="optional">
         </attribute>
     </complexType>
 
