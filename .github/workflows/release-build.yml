@@ -189,7 +189,7 @@ jobs:
         context: tools/verdict-back-ends
         file: tools/verdict-back-ends/Dockerfile
         push: true
-        cache-from: type=registry,ref=gehighassurance/verdict:latest
+        cache-from: type=registry,ref=gehighassurance/verdict-dev:latest
         cache-to: type=inline
         tags: |
           gehighassurance/verdict:latest
