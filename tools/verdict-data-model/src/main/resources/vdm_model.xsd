@@ -190,6 +190,7 @@
         <attribute name="actual_connection_binding" type="string"
             use="optional">
         </attribute>
+        <attribute name="qualifiedName" type="string" use="optional"></attribute>
     </complexType>
 
 
