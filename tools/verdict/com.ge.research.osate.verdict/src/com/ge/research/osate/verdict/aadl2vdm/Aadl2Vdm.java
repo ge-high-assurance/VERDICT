@@ -43,6 +43,7 @@ import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
 import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.EventPort;
 import org.osate.aadl2.MemoryImplementation;
 import org.osate.aadl2.MemorySubcomponent;
 import org.osate.aadl2.MemoryType;
@@ -270,101 +271,102 @@ public class Aadl2Vdm {
 					compImpls.add((ProcessorImplementation) obj);
 				}
 			}  else if(obj instanceof PropertySetImpl) {
-				Set<Property> compPropSet = new HashSet<Property>();
-				Set<Property> connPropSet = new HashSet<Property>();
-				for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
-					// Save property owner to be used later
-					for(PropertyOwner po : prop.getAppliesTos()) {
-						String propCat = ((MetaclassReferenceImpl)po).getMetaclass().getName().toLowerCase();
-						String propName = prop.getName();
-
-						switch(propCat) {
-							case "system": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+					Set<Property> compPropSet = new HashSet<Property>();
+					Set<Property> connPropSet = new HashSet<Property>();
+					for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
+						// Save property owner to be used later
+						for(PropertyOwner po : prop.getAppliesTos()) {
+							String propCat = ((MetaclassReferenceImpl)po).getMetaclass().getName().toLowerCase();
+							String propName = prop.getName();
+							switch(propCat) {
+								case "system": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "thread": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "thread": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "processor": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "processor": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "memory": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "memory": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "connection": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									connPropertyToName.put(prop, propName);
+								case "connection": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										connPropertyToName.put(prop, propName);
+									}
+									connPropSet.add(prop);
+									break;
 								}
-								connPropSet.add(prop);
-								break;
-							}
-							case "process": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "process": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "abstract": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "abstract": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "device": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "device": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "threadgroup": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "threadgroup": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "virtualprocessor": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "virtualprocessor": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							case "bus": {
-								if(objectNamesFromFilesInProject.contains(propName)) {
-									componentPropertyToName.put(prop, propName);
+								case "bus": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
 								}
-								compPropSet.add(prop);
-								break;
-							}
-							default: {
-								System.out.println(
-										"Warning: unsupported property: " + propName + ", applies to: " + propCat);
-								break;
+								default: {
+									if(objectNamesFromFilesInProject.contains(((PropertySetImpl) obj).getName())) {
+										System.out.println(
+											"Warning: unsupported property: " + propName + ", applies to: " + propCat);
+									}
+									break;
+								}
 							}
 						}
 					}
 				}
-			}
 		} // end of extracting data from the AADLObject
 
 
@@ -2787,39 +2789,38 @@ public class Aadl2Vdm {
 			m2.getComponentImpl().add(packCompImpl);
 			
 			
-			/* Getting all the bus binding information from all component implementations*/
-			//get and process properties associated with the implementation - especially aadl property - actual_connection_binding
-			//update map (connection-name -> bus-Instance-Name)
-			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
-				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
-					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
-				}
-				if(propAssoc.getOwnedValues().size() != 1) {
-					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
-				}
-				if(!(propAssoc.getOwnedValues().get(0).getOwnedValue() instanceof ListValueImpl)) {
-					throw new RuntimeException("Unexpected type of property owned value");
-				} else {
-					ListValueImpl listVal = (ListValueImpl)propAssoc.getOwnedValues().get(0).getOwnedValue();
-					if(listVal.getOwnedListElements().size() != 1) {
-						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
-					} else if(!(listVal.getOwnedListElements().get(0) instanceof ReferenceValueImpl)) {
-						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
-					} else {
-						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
-						ContainmentPathElement pathEle = refVal.getPath();
-						while(!(pathEle.getNamedElement() instanceof BusSubcomponent)) {
-							pathEle = pathEle.getPath();
-						}
-						String busInstanceName = pathEle.getNamedElement().getQualifiedName();
-						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
-							//updating map (connection name -> bus name)
-							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);
-						}
-					}
-				}
-				
-			}
+//			/* Getting all the bus binding information from all component implementations*/
+//			//get and process properties associated with the implementation - especially aadl property - actual_connection_binding
+//			//update map (connection-name -> bus-Instance-Name)
+//			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
+//				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
+//					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+//				}
+//				if(propAssoc.getOwnedValues().size() != 1) {
+//					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
+//				}
+//				if(!(propAssoc.getOwnedValues().get(0).getOwnedValue() instanceof ListValueImpl)) {
+//					throw new RuntimeException("Unexpected type of property owned value");
+//				} else {
+//					ListValueImpl listVal = (ListValueImpl)propAssoc.getOwnedValues().get(0).getOwnedValue();
+//					if(listVal.getOwnedListElements().size() != 1) {
+//						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+//					} else if(!(listVal.getOwnedListElements().get(0) instanceof ReferenceValueImpl)) {
+//						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+//					} else {
+//						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
+//						ContainmentPathElement pathEle = refVal.getPath();
+//						while(!(pathEle.getNamedElement() instanceof BusSubcomponent)) {
+//							pathEle = pathEle.getPath();
+//						}
+//						String busInstanceName = pathEle.getNamedElement().getQualifiedName();
+//						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
+//							//updating map (connection name -> bus name)
+//							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);
+//						}
+//					}
+//				}
+//			}
 			
 		}//End of creating an object
 
@@ -2907,9 +2908,9 @@ public class Aadl2Vdm {
 								type = new QName("Bool");
 							} else if(propType instanceof AadlIntegerImpl) {
 								type = new QName("Int");
-							} else { 
+							} else {
 								if(!(propType instanceof AadlStringImpl)) {
-									System.out.println("WARNING: Unexpected connection property type.");
+									type = new QName(propType.toString());
 								}
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
@@ -3009,6 +3010,8 @@ public class Aadl2Vdm {
 //    					srcPortTypeName = "bus";
     					System.out.println("Warning: Unsupported AADL component element type: " + srcConnectionEnd);
     					continue;
+    				} else if(srcConnectionEnd instanceof EventPort){
+    					srcPortTypeName = ((EventPort)srcConnectionEnd).isIn()?(((EventPort)srcConnectionEnd).isOut()? "inOut":"in"):"out";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + srcConnectionEnd+ "encountered while processing connections");
     				}
@@ -3050,12 +3053,15 @@ public class Aadl2Vdm {
 //    					destPortTypeName = "bus";
     					System.out.println("Warning: Unsupported AADL component element type: " + destConnectionEnd);
     					continue;
+    				} else if(destConnectionEnd instanceof EventPort){
+    					destPortTypeName = ((EventPort)destConnectionEnd).isIn()?(((EventPort)destConnectionEnd).isOut()? "inOut":"in"):"out";
     				} else {
     					throw new RuntimeException("Unsupported AADL component element type: " + destConnectionEnd+ "encountered while processing connections");
     				}
 
     				//setting name
     				packConn.setName(aConn.getFullName());
+    				packConn.setQualifiedName(aConn.getQualifiedName());
     				
     				if(connectionToBusMap.containsKey(aConn.getQualifiedName())) {
     					packConn.setActualConnectionBinding(connectionToBusMap.get(aConn.getQualifiedName()));
@@ -3073,9 +3079,13 @@ public class Aadl2Vdm {
 //    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusImpl);
 //    				} else if(srcBusSubCompType != null) {
 //    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcBusSubCompType);
-//    				} else {//if not a bus access port or bus implementation port
+//   				} else
+    				if(srcConnectionEnd instanceof EventPort) {
+    					packSrcEndPort = createVdmConnectionEventPort(srcPortName, srcPortTypeName, srcConnectionEnd.getQualifiedName());
+    				} else {//if not a bus access port or bus implementation port or event port
     					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
-//    				}
+        			}	
+    				
 
     				//If source port is independent of a component instance
     				if(srcCompInstName.equals("")) {
@@ -3112,9 +3122,12 @@ public class Aadl2Vdm {
 //    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusImpl);
 //    				} else if(destBusSubCompType != null){
 //    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destBusSubCompType);
-//    				} else {//if not a bus access port or bus implementation port
+//    				} else 
+    				if(destConnectionEnd instanceof EventPort) {
+    					packDestEndPort = createVdmConnectionEventPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName());
+    				} else {//if not a bus access port or bus implementation port or eventport
     					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
-//    				}
+    				}
     				
     				//If source port is independent of a component instance
     				if(destCompInstName.equals("")) {
@@ -3172,7 +3185,7 @@ public class Aadl2Vdm {
 								type = new QName("Int");
 							} else { 
 								if(!(propType instanceof AadlStringImpl)) {
-									System.out.println("Warning: Unexpected connection property type.");
+									type = new QName(propType.toString());
 								}
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
@@ -4310,6 +4323,25 @@ public class Aadl2Vdm {
 		newPort.setName(portName);
 		newPort.setMode(convertToVdmPortMode(modeString));
 		newPort.setType(dtype);
+		return newPort;
+		
+	}
+    /**
+     * @author Vidhya Tekken Valapil
+     * Creates a new Vdm Port object and returns
+     * Populates "name", "mode" and "type"
+     * @param portName
+     * @param modeString
+     * @param BusSubcomponentType  
+     * @return vdm port
+     */
+	verdict.vdm.vdm_model.Port createVdmConnectionEventPort(String portName, String modeString, String qualifiedName) {
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(qualifiedName);
+		newPort.setName(portName);
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setEvent(true);
 		return newPort;
 		
 	}
