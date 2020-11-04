@@ -1,7 +1,7 @@
 # Builds a Verdict release for end users:
-#        - extern.zip and README.md uploaded to GitHub release assets
-#        - verdict Docker image pushed to Docker Hub
-#        - verdict-latest and verdict-x.x.x update sites pushed to GitHub
+# - Uploads extern.zip and README.md to GitHub release assets
+# - Pushes verdict:latest image to Docker Hub
+# - Updates verdict-latest and verdict-$RELEASE update sites
 
 name: Verdict release build
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Check out verdict source
+    - name: Check out VERDICT source
       uses: actions/checkout@v2
 
     - name: Check out kind2 source
@@ -106,7 +106,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Check out source
+    - name: Check out VERDICT source
       uses: actions/checkout@v2
 
     - name: Set up GraphViz
