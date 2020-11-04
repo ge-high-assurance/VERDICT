@@ -45,7 +45,7 @@ jobs:
         restore-keys: ${{ matrix.os }}-m2
 
     - name: Run Maven build
-      run: mvn -B install -Dtycho.localArtifacts=ignore --file tools/pom.xml
+      run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
 
