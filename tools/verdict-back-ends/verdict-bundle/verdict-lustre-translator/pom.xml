@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>edu.uiowa.kind2</groupId>
+            <artifactId>kind2-java-api</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.ge.verdict</groupId>
             <artifactId>verdict-data-model</artifactId>
         </dependency>
