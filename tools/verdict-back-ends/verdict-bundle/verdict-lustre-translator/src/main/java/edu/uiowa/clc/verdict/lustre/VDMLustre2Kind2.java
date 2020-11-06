@@ -38,6 +38,12 @@ import verdict.vdm.vdm_lustre.VariableDeclaration;
 import verdict.vdm.vdm_model.Model;
 
 public class VDMLustre2Kind2 {
+    /**
+     * Translate the VDM-Lustre AST into Kind2-java-api AST.
+     *
+     * @param vdmModel the VDM-Lustre AST
+     * @return the Kind2-java-api AST.
+     */
     public static Program translate(Model vdmModel) {
         return visit(vdmModel.getDataflowCode());
     }
