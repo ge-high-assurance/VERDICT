@@ -1,4 +1,4 @@
-"type PLAIN_REAL = real;
+type PLAIN_REAL = real;
 type PLAIN_BOOL = bool;
 type SUBRANGE_INT = subrange [0, 1] of int;
 type PLAIN_INT = int;
@@ -40,14 +40,14 @@ let
   );
 tel
 
-node ml(
+node ml (
   altRequest : bool;
   deactivate : bool
 ) returns (
   altEngaged : bool
 );
 (*@contract
-  import spec(altRequest, deactivate) returns (altEngaged);
+  import spec (altRequest, deactivate) returns (altEngaged);
 *)
 var
   altRequested : bool;
@@ -56,7 +56,7 @@ let
   altEngaged = altRequested;
 tel
 
-node top(
+node top (
   n : int
 ) returns (
   out : bool
