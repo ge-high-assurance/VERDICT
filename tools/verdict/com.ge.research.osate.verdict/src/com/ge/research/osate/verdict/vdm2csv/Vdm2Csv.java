@@ -12,6 +12,7 @@ import com.ge.research.osate.verdict.aadl2csv.Table;
 import com.ge.verdict.vdm.DefenseProperties;
 
 import verdict.vdm.vdm_data.GenericAttribute;
+import verdict.vdm.vdm_model.CIA;
 import verdict.vdm.vdm_model.CIAPort;
 import verdict.vdm.vdm_model.CompInstancePort;
 import verdict.vdm.vdm_model.ComponentImpl;
@@ -24,6 +25,7 @@ import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.SafetyRelExpr;
 import verdict.vdm.vdm_model.SafetyReqExpr;
+import verdict.vdm.vdm_model.Severity;
 
 /**
 *
@@ -62,7 +64,6 @@ public class Vdm2Csv {
 		Table compDepTable = new Table("QualifiedName", "SanitizedQualifiedName", "PackageName","Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
 		Table missionTable =  new Table("ModelVersion", "MissionReqId", "MissionReq", "ReqId","Req", "MissionImpactCIA",
                 "Effect", "Severity", "CompInstanceDependency", "CompOutputDependency", "DependentCompOutputCIA", "ReqType");
-		//Model vdm = VdmTranslator.unmarshalFromXml(inputVdm);//TODO:remove if function is invokable with VDM as input parameter
 		List<ComponentImpl> compImpls = vdm.getComponentImpl();
 		Map<String, HashSet<String>> propToConnections = new HashMap<>();//map(property_name, hash_set_of_connections)
 		//create map for connection names to attributes names and attribute names to attribute value
@@ -243,11 +244,8 @@ public class Vdm2Csv {
 			scnConnTable.addValue(replaceColonsWithUnderscore(sourceInstQualName));//SanitizedSrcCompInstQualifiedName
 			scnConnTable.addValue(sourceInstQualName.substring(0, compQualName.indexOf(':')));//SrcCompInstPackage
 			CompInstancePort srcCompPort = source.getSubcomponentPort();
-			String fullQualNameSrcCompPort = srcCompPort.getPort().getId();
 			//get the component name
-			//remove port name from fullQualNameSrcCompPort and text before "::" and after "." to get the source component name
-			String compName = fullQualNameSrcCompPort.substring(fullQualNameSrcCompPort.indexOf(':')+2,fullQualNameSrcCompPort.indexOf('.'));
-			scnConnTable.addValue(compName);//SrcComp
+			scnConnTable.addValue(srcCompPort.getSubcomponent().getSpecification().getName());//SrcComp
 			scnConnTable.addValue("");//SrcImpl
 			scnConnTable.addValue(srcCompPort.getSubcomponent().getName());//SrcCompInstance
 			scnConnTable.addValue(srcCompPort.getSubcomponent().getSpecification().getCompCateg());//SrcCompCategory
@@ -280,11 +278,8 @@ public class Vdm2Csv {
 			scnConnTable.addValue(replaceColonsWithUnderscore(destInstQualName));//SanitizedDestCompInstQualifiedName
 			scnConnTable.addValue(destInstQualName.substring(0, compQualName.indexOf(':')));//DestCompInstPackage
 			CompInstancePort destCompPort = destination.getSubcomponentPort();
-			String fullQualNameDestCompPort = destCompPort.getPort().getId();
 			//get the component name
-			//remove port name from fullQualNameDestCompPort and text before "::" and after "." to get the source component name
-			String compName = fullQualNameDestCompPort.substring(fullQualNameDestCompPort.indexOf(':')+2,fullQualNameDestCompPort.indexOf('.'));
-			scnConnTable.addValue(compName);//DestComp
+			scnConnTable.addValue(destination.getSubcomponentPort().getSubcomponent().getSpecification().getName());//DestComp
 			scnConnTable.addValue("");
 			scnConnTable.addValue(destCompPort.getSubcomponent().getName());//DestCompInstance
 			scnConnTable.addValue(destCompPort.getSubcomponent().getSpecification().getCompCateg());//DestCompCategory
@@ -425,13 +420,15 @@ public class Vdm2Csv {
 						if(cyberReqCondition.getKind().toString().equalsIgnoreCase("Or")) {
 							List<CyberExpr> subCyberCondList =cyberReqCondition.getOr().getExpr();
 							for (CyberExpr subCyberCond: subCyberCondList) {
-								updateMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, cyberReqDef.getCia(), cyberReqDef.getSeverity(), subCyberCond, "Cyber", connectionDestToSourceMap);
+								updateCyberMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, cyberReqDef.getCia(), cyberReqDef.getSeverity(), subCyberCond, connectionDestToSourceMap);
 							}
+						} else if(cyberReqCondition.getKind().toString().equalsIgnoreCase("And")) {
+								updateAndExprCyberMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, cyberReqDef.getCia(), cyberReqDef.getSeverity(), cyberReqCondition, connectionDestToSourceMap);
 						} else {
 							throw new RuntimeException("Expression used as condition in Cyber Requirement is not supported.");
 						}
 					} else {//if condition has single port and CIa
-						updateMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, cyberReqDef.getCia(), cyberReqDef.getSeverity(), cyberReqCondition, "Cyber", connectionDestToSourceMap);
+						updateCyberMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, cyberReqDef.getCia(), cyberReqDef.getSeverity(), cyberReqCondition, connectionDestToSourceMap);
 					}
 				} else if (safetyReqsMap.containsKey(cyberReqId)) {
 					verdict.vdm.vdm_model.SafetyReq safetyReqDef = safetyReqsMap.get(cyberReqId);
@@ -443,13 +440,15 @@ public class Vdm2Csv {
 						if(safetyReqCondition.getKind().toString().equalsIgnoreCase("Or")) {
 							List<verdict.vdm.vdm_model.SafetyReqExpr> subSafetyExprCondList =safetyReqCondition.getOr().getExpr();
 							for (verdict.vdm.vdm_model.SafetyReqExpr subCyberCond: subSafetyExprCondList) {
-								updateMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, safetyReqDef.getTargetProbability(), subCyberCond, "Safety", connectionDestToSourceMap);
+								updateSafetyMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, safetyReqDef.getTargetProbability(), subCyberCond, connectionDestToSourceMap);
 							}
+						} else if(safetyReqCondition.getKind().toString().equalsIgnoreCase("And")) {
+							updateAndExprSafetyMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, safetyReqDef.getTargetProbability(), safetyReqCondition, connectionDestToSourceMap);
 						} else {
 							throw new RuntimeException("Expression used as condition in Safety Requirement is not supported.");
 						}
 					} else {//if condition has single port and CIa
-						updateMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, safetyReqDef.getTargetProbability(), safetyReqCondition, "Safety", connectionDestToSourceMap);
+						updateSafetyMissionsTable(missionTable, scenario, missionReq.getId(), cyberReqId, safetyReqDef.getTargetProbability(), safetyReqCondition, connectionDestToSourceMap);
 					}
 				} else {
 					throw new RuntimeException("Undefined cyber or safety requirement used in mission requirement.");
@@ -457,8 +456,34 @@ public class Vdm2Csv {
 			}
 		}
 	}
-	private void updateMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
-			verdict.vdm.vdm_model.CIA cyberCIA, verdict.vdm.vdm_model.Severity cyberSeverity, CyberExpr cyberReqCondition, String CyberOrSafety, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
+	private void updateAndExprCyberMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
+			CIA cyberCIA, Severity cyberSeverity, CyberExpr cyberExpr,
+			Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
+		missionTable.addValue(scenario);
+		missionTable.addValue(sanitizeValue(missionReqId));
+		missionTable.addValue(""); // MissionReq
+		missionTable.addValue(cyberReqId);
+		missionTable.addValue(""); // Req
+		//get cia and add as MissionImpactCIA
+		missionTable.addValue(formatToSmall(cyberCIA.toString()));
+		missionTable.addValue(""); // Effect
+		//get and add severity
+		missionTable.addValue(formatToSmall(cyberSeverity.name()));
+		//get concatenated port's linked source instances and concatenated CIAs
+		String[] portsCIAs = new String[3];
+		portsCIAs[0] = "";
+		portsCIAs[1] = "";
+		portsCIAs[2] = "";
+		getPortsAndCIAsForMission(cyberExpr, portsCIAs, connectionDestToSourceMap);		
+		//add it to table
+		missionTable.addValue(portsCIAs[0]);
+		missionTable.addValue(portsCIAs[1]);
+		missionTable.addValue(portsCIAs[2]);
+		missionTable.addValue("Cyber");
+		missionTable.capRow();
+	}
+	private void updateCyberMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
+			verdict.vdm.vdm_model.CIA cyberCIA, verdict.vdm.vdm_model.Severity cyberSeverity, CyberExpr cyberReqCondition, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
 		missionTable.addValue(scenario);
 		missionTable.addValue(sanitizeValue(missionReqId));
 		missionTable.addValue(""); // MissionReq
@@ -486,11 +511,37 @@ public class Vdm2Csv {
 		}
 		//get CIA and add it to table
 		missionTable.addValue(formatToSmall(cyberReqCondition.getPort().getCia().name()));
-		missionTable.addValue(CyberOrSafety);
+		missionTable.addValue("Cyber");
 		missionTable.capRow();
 	}
-	private void updateMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
-			 String probability, SafetyReqExpr safetyReqCondition, String CyberOrSafety, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
+	private void updateAndExprSafetyMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
+			String targetProbability, SafetyReqExpr subCyberCond, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
+		missionTable.addValue(scenario);
+		missionTable.addValue(sanitizeValue(missionReqId));
+		missionTable.addValue(""); // MissionReq
+		missionTable.addValue(cyberReqId);
+		missionTable.addValue(""); // Req
+		//get cia and add as MissionImpactCIA
+		missionTable.addValue("");
+		missionTable.addValue(""); // Effect
+		//get and add severity
+		missionTable.addValue(targetProbability);
+		//get concatenated port's linked source instances and concatenated CIAs
+		String[] portsIAs = new String[3];
+		portsIAs[0] = "";
+		portsIAs[1] = "";
+		portsIAs[2] = "";
+		getPortsAndIAsForMission(subCyberCond, portsIAs, connectionDestToSourceMap);
+		//add IA it to table
+		missionTable.addValue(portsIAs[0]);
+		missionTable.addValue(portsIAs[1]);
+		missionTable.addValue(portsIAs[2]);
+		missionTable.addValue("Safety");
+		missionTable.capRow();
+	}
+
+	private void updateSafetyMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
+			 String probability, SafetyReqExpr safetyReqCondition, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
 		missionTable.addValue(scenario);
 		missionTable.addValue(sanitizeValue(missionReqId));
 		missionTable.addValue(""); // MissionReq
@@ -518,7 +569,7 @@ public class Vdm2Csv {
 		}
 		//get CIA and add it to table
 		missionTable.addValue(formatToSmall(safetyReqCondition.getPort().getIa().name()));
-		missionTable.addValue(CyberOrSafety);
+		missionTable.addValue("Safety");
 		missionTable.capRow();
 	}
 	private void processComponentTypes(List<ComponentType> compTypes, Table eventsTable, Table compDepTable, Table compSafTable) {
@@ -570,11 +621,49 @@ public class Vdm2Csv {
 			for (SafetyRelExpr subInpSafExpr: subInpSafList) {
 				updateCompSafTable(compSafTable, qualNameComp, packageName, compTypeName, subInpSafExpr, outputIAPort);
 			}
+		} else if (safetyRelExpr.getKind().toString().equalsIgnoreCase("And")){
+			updateCompSafTableWithAndExpr(compSafTable, qualNameComp, packageName, compTypeName, safetyRelExpr, outputIAPort);
 		} else {
 			throw new RuntimeException("Expression used as Safety Relation input is not supported.");
 		}
 	}
-	
+	//Assuming that the sub-expression in the safety relation is AND over port-IA types
+	private void updateCompSafTableWithAndExpr(Table compSafTable, String qualNameComp, String packageName,
+			String compTypeName, SafetyRelExpr safetyRelExpr, IAPort outputIAPort) {		
+		//get input ports and input cia concatenated
+		String[] portsIAs = new String[2];
+		portsIAs[0] = "";
+		portsIAs[1] = "";
+		getPortsAndIAsForCompSaf(safetyRelExpr, portsIAs);
+		compSafTable.addValue(qualNameComp);
+		compSafTable.addValue(replaceColonsWithUnderscore(qualNameComp));
+		compSafTable.addValue(packageName);
+		compSafTable.addValue(compTypeName);
+		compSafTable.addValue(portsIAs[0]);
+		compSafTable.addValue(portsIAs[1]);
+		compSafTable.addValue(outputIAPort.getName());
+		compSafTable.addValue(formatToSmall(outputIAPort.getIa().name()));
+		compSafTable.capRow();
+	}
+	private void getPortsAndIAsForCompSaf(SafetyRelExpr safetyRelExpr, String[] portsIAs) {
+		if(safetyRelExpr.getKind()==null) {
+			if (portsIAs[0].equalsIgnoreCase("")) {
+				portsIAs[0] = safetyRelExpr.getPort().getName();
+				portsIAs[1] = formatToSmall(safetyRelExpr.getPort().getIa().name());
+			} else {
+				portsIAs[0] = portsIAs[0] + ";"+ safetyRelExpr.getPort().getName();
+				portsIAs[1] = portsIAs[1] + ";" + formatToSmall(safetyRelExpr.getPort().getIa().name());
+			}
+		} else if (safetyRelExpr.getKind().toString().equalsIgnoreCase("And")){
+			List<SafetyRelExpr> subInpCyberList =safetyRelExpr.getAnd().getExpr();
+			for (SafetyRelExpr subInpSafetyExpr: subInpCyberList) {
+				getPortsAndIAsForCompSaf(subInpSafetyExpr, portsIAs);
+			}
+		} else {
+			throw new RuntimeException("VERDICT only supports DNF in safety relations.");
+		}
+		
+	}
 	private String formatToSmall(String name) {
 		String updName = name;
 		if(name.length()>1) {
@@ -617,8 +706,117 @@ public class Vdm2Csv {
 			for (CyberExpr subInpCyberExpr: subInpCyberList) {
 				updateCompDepTable(compDepTable, qualNameComp, packageName, compTypeName, subInpCyberExpr, outputCIAPort);
 			}
+		} else if (inputCyberExpr.getKind().toString().equalsIgnoreCase("And")) {
+			updateCompDepTableWithAndCyberExpr(compDepTable, qualNameComp, packageName, compTypeName, inputCyberExpr, outputCIAPort);
 		} else {
 			throw new RuntimeException("Expression used as Cyber Relation input is not supported.");
+		}
+	}
+	private void updateCompDepTableWithAndCyberExpr(Table compDepTable, String qualNameComp, String packageName,
+			String compTypeName, CyberExpr inputCyberExpr, CIAPort outputCIAPort) {
+		//get input ports and input cia concatenated
+		String[] portsCIAs = new String[2];
+		portsCIAs[0] = "";
+		portsCIAs[1] = "";
+		getPortsAndCIAsForCompDepTable(inputCyberExpr, portsCIAs);
+		//add row to comp dep table
+		compDepTable.addValue(qualNameComp);
+		compDepTable.addValue(replaceColonsWithUnderscore(qualNameComp));
+		compDepTable.addValue(packageName);
+		compDepTable.addValue(compTypeName);
+		compDepTable.addValue(portsCIAs[0]);
+		compDepTable.addValue(portsCIAs[1]);
+		compDepTable.addValue(outputCIAPort.getName());
+		compDepTable.addValue(formatToSmall(outputCIAPort.getCia().name()));
+		compDepTable.capRow();
+	}
+	private void getPortsAndCIAsForCompDepTable(CyberExpr inputCyberExpr, String[] portsCIAs) {
+		if(inputCyberExpr.getKind()==null) {
+			if (portsCIAs[0].equalsIgnoreCase("")) {
+				portsCIAs[0] = inputCyberExpr.getPort().getName();
+				portsCIAs[1] = formatToSmall(inputCyberExpr.getPort().getCia().name());
+			} else {
+				portsCIAs[0] = portsCIAs[0] + ";"+ inputCyberExpr.getPort().getName();
+				portsCIAs[1] = portsCIAs[1] + ";" + formatToSmall(inputCyberExpr.getPort().getCia().name());
+			}
+		} else if (inputCyberExpr.getKind().toString().equalsIgnoreCase("And")){
+			List<CyberExpr> subInpCyberList =inputCyberExpr.getAnd().getExpr();
+			for (CyberExpr subInpCyberExpr: subInpCyberList) {
+				getPortsAndCIAsForCompDepTable(subInpCyberExpr, portsCIAs);
+			}
+		} else {
+			throw new RuntimeException("VERDICT only supports DNF in cyber relations.");
+		}
+	}
+	private void getPortsAndCIAsForMission(CyberExpr inputCyberExpr, String[] portsCIAs, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
+		if(inputCyberExpr.getKind()==null) {
+			//get port's linked source instance
+			if(connectionDestToSourceMap.containsKey(inputCyberExpr.getPort().getName())) {
+				List<ConnectionEnd> linkedSourcePorts = connectionDestToSourceMap.get(inputCyberExpr.getPort().getName());
+				if(linkedSourcePorts.size()>1) {
+					throw new RuntimeException("Multiple Linked Source Ports is unexpected for ports in cyber expression.");
+				}
+				if(linkedSourcePorts.get(0).getSubcomponentPort()!=null) {
+					CompInstancePort depCompPort = linkedSourcePorts.get(0).getSubcomponentPort();
+					if (portsCIAs[0].equalsIgnoreCase("")) {
+						portsCIAs[0] = depCompPort.getSubcomponent().getName();
+						portsCIAs[1] = depCompPort.getPort().getName();
+						portsCIAs[2] = formatToSmall(inputCyberExpr.getPort().getCia().name());
+					} else {
+						portsCIAs[0] = portsCIAs[0] + ";"+ depCompPort.getSubcomponent().getName();
+						portsCIAs[1] = portsCIAs[1] + ";" + depCompPort.getPort().getName();
+						portsCIAs[2] = portsCIAs[2] + ";"+ formatToSmall(inputCyberExpr.getPort().getCia().name());
+					}
+				} else {
+					throw new RuntimeException("Linked Source Port has no instance information");
+				}
+			} else {
+				throw new RuntimeException("Missing component instance dependency. "+inputCyberExpr.getPort().getName()+" is not linked to a source port");
+			}
+		} else if (inputCyberExpr.getKind().toString().equalsIgnoreCase("And")){
+			List<CyberExpr> subInpCyberList =inputCyberExpr.getAnd().getExpr();
+			for (CyberExpr subInpCyberExpr: subInpCyberList) {
+				getPortsAndCIAsForMission(subInpCyberExpr, portsCIAs, connectionDestToSourceMap);
+			}
+		} else {
+			throw new RuntimeException("VERDICT only supports DNF in cyber requirements.");
+		}
+	}
+	private void getPortsAndIAsForMission(SafetyReqExpr inputSafetyExpr, String[] portsIAs,
+			Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {		
+		if(inputSafetyExpr.getKind()==null) {
+			//get port's linked source instance
+			if(connectionDestToSourceMap.containsKey(inputSafetyExpr.getPort().getName())) {
+				List<ConnectionEnd> linkedSourcePorts = connectionDestToSourceMap.get(inputSafetyExpr.getPort().getName());
+				if(linkedSourcePorts.size()>1) {
+					throw new RuntimeException("Multiple Linked Source Ports is unexpected for ports in cyber expression.");
+				}
+				if(linkedSourcePorts.get(0).getSubcomponentPort()!=null) {
+					CompInstancePort destCompPort = linkedSourcePorts.get(0).getSubcomponentPort();
+					if(portsIAs[0].equalsIgnoreCase("")) {
+						portsIAs[0] = destCompPort.getSubcomponent().getName();
+						portsIAs[1] = destCompPort.getPort().getName();
+						//get IA
+						portsIAs[2] = formatToSmall(inputSafetyExpr.getPort().getIa().name());
+					} else {
+						portsIAs[0] = portsIAs[0]  + ";" + destCompPort.getSubcomponent().getName();
+						portsIAs[1] = portsIAs[1]  + ";" + destCompPort.getPort().getName();
+						//get IA
+						portsIAs[2] = portsIAs[2]  + ";" + formatToSmall(inputSafetyExpr.getPort().getIa().name());						
+					}
+				} else {
+					throw new RuntimeException("Linked Source Port has no instance information");
+				}
+			} else {
+				throw new RuntimeException("Missing component instance dependency. "+inputSafetyExpr.getPort().getName()+" is not linked to a source port");
+			}
+		} else if (inputSafetyExpr.getKind().toString().equalsIgnoreCase("And")) {
+			List<SafetyReqExpr> subInpSafetyList =inputSafetyExpr.getAnd().getExpr();
+			for (SafetyReqExpr subInpSafetyExpr: subInpSafetyList) {
+				getPortsAndIAsForMission(subInpSafetyExpr, portsIAs, connectionDestToSourceMap);
+			}
+		} else {
+			throw new RuntimeException("VERDICT only supports DNF in safety requirements.");
 		}
 	}
 	private void updateEventsTable(Table eventsTable, String qualNameComp, String packageName, String compTypeName, List<verdict.vdm.vdm_model.Event> events) {

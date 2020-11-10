@@ -28,6 +28,7 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EventPort;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
@@ -77,10 +78,11 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
-
+import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
+import com.rockwellcollins.atc.agree.agree.EventExpr;
 import com.rockwellcollins.atc.agree.agree.Expr;
 import com.rockwellcollins.atc.agree.agree.GuaranteeStatement;
 import com.rockwellcollins.atc.agree.agree.IfThenElseExpr;
@@ -92,6 +94,7 @@ import com.rockwellcollins.atc.agree.agree.NodeEq;
 import com.rockwellcollins.atc.agree.agree.NodeStmt;
 import com.rockwellcollins.atc.agree.agree.PreExpr;
 import com.rockwellcollins.atc.agree.agree.PrimType;
+import com.rockwellcollins.atc.agree.agree.RealCast;
 import com.rockwellcollins.atc.agree.agree.RealLitExpr;
 import com.rockwellcollins.atc.agree.agree.RecordLitExpr;
 import com.rockwellcollins.atc.agree.agree.SelectionExpr;
@@ -592,7 +595,9 @@ public class Agree2Vdm {
 					DataSubcomponentType dSubCompType = nmElmDataPort.getDataFeatureClassifier();
 					defineDataTypeDataImplementationTypeInVDM(dSubCompType, dataTypeDecl, model);
 				} else {
-					System.out.println("Unresolved Port Type");
+					if(!(nmElmPort instanceof EventPort)) {
+						System.out.println("Unresolved Port Type");
+					}
 				}
 			} else if(nmExpr.getElm() instanceof ConstStatement) {
 				ConstStatement nmElmConstStatement = (ConstStatement)nmExpr.getElm();
@@ -769,6 +774,16 @@ public class Agree2Vdm {
 			RealLitExpr realLitExpr = (RealLitExpr)agreeExpr;
 			BigDecimal bigDecimal = new BigDecimal(realLitExpr.getVal());
 			vdmExpr.setRealLiteral(bigDecimal);		
+		} else if(agreeExpr instanceof EventExpr){
+			EventExpr eventExpr = (EventExpr)agreeExpr;
+			if(eventExpr.getPort()!=null) {
+				vdmExpr.setEvent(getVdmExpressionFromAgreeExpression(eventExpr.getPort(), dataTypeDecl, nodeDecl, model));
+			} else {
+				System.out.println("EventExpr does not have port infornation.");
+			}
+		} else if(agreeExpr instanceof RealCast){
+			RealCast realCastExpr = (RealCast)agreeExpr;
+			vdmExpr.setToReal(getVdmExpressionFromAgreeExpression(realCastExpr.getExpr(), dataTypeDecl, nodeDecl, model));
 		} else {
 			System.out.println("Unresolved/umapped agree expr"+agreeExpr.toString());
 		}
