@@ -83,6 +83,7 @@ import org.osate.aadl2.impl.BooleanLiteralImpl;
 import org.osate.aadl2.impl.DataImplementationImpl;
 import org.osate.aadl2.impl.DataTypeImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
+import org.osate.aadl2.impl.EnumerationTypeImpl;
 import org.osate.aadl2.impl.IntegerLiteralImpl;
 import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.MetaclassReferenceImpl;
@@ -356,6 +357,13 @@ public class Aadl2Vdm {
 									compPropSet.add(prop);
 									break;
 								}
+								case "port": {
+									if(objectNamesFromFilesInProject.contains(propName)) {
+										componentPropertyToName.put(prop, propName);
+									}
+									compPropSet.add(prop);
+									break;
+								}
 								default: {
 									if(objectNamesFromFilesInProject.contains(((PropertySetImpl) obj).getName())) {
 										System.out.println(
@@ -570,6 +578,14 @@ public class Aadl2Vdm {
 				}//End of checking each port
 
 
+				//get all event ports
+				List<EventPort> eventPorts = sysType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
+
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -656,6 +672,7 @@ public class Aadl2Vdm {
 		//returning the populated Model
 		return m1;
 	}//End of translateSystemTypeObjects
+
 
 	/**
 	 * Analyzing each busType:
@@ -776,7 +793,13 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = bType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -975,6 +998,13 @@ public class Aadl2Vdm {
 //				List<DataPort> dataPorts = subprogType.getOwnedDataPorts();
 
 
+				//get all event ports
+				List<EventPort> eventPorts = subprogType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 
 				//packing all events and adding to component
 				for(Event anEvent : events) {
@@ -1182,7 +1212,14 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = tType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
+				
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -1393,7 +1430,13 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = memType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -1602,7 +1645,13 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = devType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -1834,6 +1883,13 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
+				//get all event ports
+				List<EventPort> eventPorts = absType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 
 				//packing all events and adding to component
 				for(Event anEvent : events) {
@@ -2045,6 +2101,14 @@ public class Aadl2Vdm {
 				}//End of checking each port
 
 
+				//get all event ports
+				List<EventPort> eventPorts = prcsType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
+				
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -2252,6 +2316,14 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
+				
+				//get all event ports
+				List<EventPort> eventPorts = tgType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 
 				//packing all events and adding to component
 				for(Event anEvent : events) {
@@ -2462,7 +2534,13 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = vprocType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -2671,7 +2749,14 @@ public class Aadl2Vdm {
 			    	packComponent.getPort().add(newPort);
 				}//End of checking each port
 
-
+				//get all event ports
+				List<EventPort> eventPorts = proType.getOwnedEventPorts();
+				for(EventPort eventPort:eventPorts) {
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					//add to port list of component
+			    	packComponent.getPort().add(newPort);
+				}
+				
 				//packing all events and adding to component
 				for(Event anEvent : events) {
 					//To pack the event as a VDM event
@@ -2789,38 +2874,38 @@ public class Aadl2Vdm {
 			m2.getComponentImpl().add(packCompImpl);
 			
 			
-//			/* Getting all the bus binding information from all component implementations*/
-//			//get and process properties associated with the implementation - especially aadl property - actual_connection_binding
-//			//update map (connection-name -> bus-Instance-Name)
-//			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
-//				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
-//					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
-//				}
-//				if(propAssoc.getOwnedValues().size() != 1) {
-//					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
-//				}
-//				if(!(propAssoc.getOwnedValues().get(0).getOwnedValue() instanceof ListValueImpl)) {
-//					throw new RuntimeException("Unexpected type of property owned value");
-//				} else {
-//					ListValueImpl listVal = (ListValueImpl)propAssoc.getOwnedValues().get(0).getOwnedValue();
-//					if(listVal.getOwnedListElements().size() != 1) {
-//						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
-//					} else if(!(listVal.getOwnedListElements().get(0) instanceof ReferenceValueImpl)) {
-//						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
-//					} else {
-//						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
-//						ContainmentPathElement pathEle = refVal.getPath();
-//						while(!(pathEle.getNamedElement() instanceof BusSubcomponent)) {
-//							pathEle = pathEle.getPath();
-//						}
-//						String busInstanceName = pathEle.getNamedElement().getQualifiedName();
-//						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
-//							//updating map (connection name -> bus name)
-//							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);
-//						}
-//					}
-//				}
-//			}
+			/* Getting all the bus binding information from all component implementations*/
+			//get and process properties associated with the implementation - especially aadl property - actual_connection_binding
+			//update map (connection-name -> bus-Instance-Name)
+			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
+				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
+					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+				}
+				if(propAssoc.getOwnedValues().size() != 1) {
+					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
+				}
+				if(!(propAssoc.getOwnedValues().get(0).getOwnedValue() instanceof ListValueImpl)) {
+					throw new RuntimeException("Unexpected type of property owned value");
+				} else {
+					ListValueImpl listVal = (ListValueImpl)propAssoc.getOwnedValues().get(0).getOwnedValue();
+					if(listVal.getOwnedListElements().size() != 1) {
+						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+					} else if(!(listVal.getOwnedListElements().get(0) instanceof ReferenceValueImpl)) {
+						throw new RuntimeException("Unexpected number of list elements are associated with the property owned value");
+					} else {
+						ReferenceValueImpl refVal = (ReferenceValueImpl)listVal.getOwnedListElements().get(0);
+						ContainmentPathElement pathEle = refVal.getPath();
+						while(!(pathEle.getNamedElement() instanceof BusSubcomponent)) {
+							pathEle = pathEle.getPath();
+						}
+						String busInstanceName = pathEle.getNamedElement().getQualifiedName();
+						for(ContainedNamedElement connection: propAssoc.getAppliesTos()) {
+							//updating map (connection name -> bus name)
+							connectionToBusMap.put(connection.getPath().getNamedElement().getQualifiedName(),busInstanceName);
+						}
+					}
+				}
+			}
 			
 		}//End of creating an object
 
@@ -2908,6 +2993,8 @@ public class Aadl2Vdm {
 								type = new QName("Bool");
 							} else if(propType instanceof AadlIntegerImpl) {
 								type = new QName("Int");
+							} else if(propType instanceof EnumerationTypeImpl) {
+								type = new QName("String");
 							} else {
 								if(!(propType instanceof AadlStringImpl)) {
 									type = new QName(propType.toString());
@@ -3183,6 +3270,8 @@ public class Aadl2Vdm {
 								type = new QName("Bool");
 							} else if(propType instanceof AadlIntegerImpl) {
 								type = new QName("Int");
+							} else if(propType instanceof EnumerationTypeImpl) {
+								type = new QName("String");
 							} else { 
 								if(!(propType instanceof AadlStringImpl)) {
 									type = new QName(propType.toString());
@@ -4240,6 +4329,23 @@ public class Aadl2Vdm {
 	}
 	
 
+	private Port createVdmPort(EventPort eventPort) {
+		String modeString = "in";
+		if(eventPort.isIn()) {
+			modeString = "in";
+		}
+		else if(eventPort.isOut()) {
+			modeString = "out";
+		}
+		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		newPort.setProbe(false);
+		newPort.setId(eventPort.getQualifiedName());
+		newPort.setName(eventPort.getName());
+		newPort.setMode(convertToVdmPortMode(modeString));
+		newPort.setEvent(true);
+		return newPort;
+	}
+
     /**
      * @author Vidhya Tekken Valapil
      * Creates a new Vdm Port object and returns
@@ -4323,8 +4429,7 @@ public class Aadl2Vdm {
 		newPort.setName(portName);
 		newPort.setMode(convertToVdmPortMode(modeString));
 		newPort.setType(dtype);
-		return newPort;
-		
+		return newPort;	
 	}
     /**
      * @author Vidhya Tekken Valapil
@@ -4342,8 +4447,7 @@ public class Aadl2Vdm {
 		newPort.setName(portName);
 		newPort.setMode(convertToVdmPortMode(modeString));
 		newPort.setEvent(true);
-		return newPort;
-		
+		return newPort;	
 	}
     /**
      * @author Vidhya Tekken Valapil
@@ -4971,6 +5075,10 @@ public class Aadl2Vdm {
 								break;
 							}
 							case "bus": {
+								objNames.add(propName);
+								break;
+							}
+							case "port": {
 								objNames.add(propName);
 								break;
 							}
