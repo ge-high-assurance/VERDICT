@@ -448,7 +448,6 @@ public class Aadl2Vdm {
 	 */
 	public Model translateSystemTypeObjects(List<SystemType> systemTypes, Model m1) {
 		for(SystemType sysType : systemTypes) {
-
 			// variables for unpacking sysType
 			List<Event> events = new ArrayList<>();
 			List<CyberMission> missionReqs = new ArrayList<>();
@@ -587,7 +586,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = sysType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -809,7 +808,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = bType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1021,7 +1020,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = subprogType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1242,7 +1241,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = tType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1467,7 +1466,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = memType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1689,7 +1688,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = devType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1934,7 +1933,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = absType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2158,7 +2157,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = prcsType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2380,7 +2379,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = tgType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2604,7 +2603,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = vprocType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2826,7 +2825,7 @@ public class Aadl2Vdm {
 				//get all event ports
 				List<EventPort> eventPorts = proType.getOwnedEventPorts();
 				for(EventPort eventPort:eventPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmEventPort(eventPort);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -4403,7 +4402,7 @@ public class Aadl2Vdm {
 	}
 	
 
-	private Port createVdmPort(EventPort eventPort) {
+	private Port createVdmEventPort(EventPort eventPort) {
 		String modeString = "in";
 		if(eventPort.isIn()) {
 			modeString = "in";
@@ -4472,22 +4471,24 @@ public class Aadl2Vdm {
 		}
 		//fetching data type information
 		DataSubcomponentType dSubCompType = dataPort.getDataFeatureClassifier();
-		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if(dSubCompType instanceof DataTypeImpl) {
-			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
-			dtype = resolveAADLDataType(aadlDType);
-		} else if(dSubCompType instanceof DataImplementationImpl) {
-			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
-			dtype = resolveAADLDataImplementationType(aadlDImpl);
-		} else {
-			System.out.println("Unresolved/unexpected Named Element.");
-		}
 		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
+		if(dSubCompType!=null) {
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			if(dSubCompType instanceof DataTypeImpl) {
+				org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
+				dtype = resolveAADLDataType(aadlDType);
+			} else if(dSubCompType instanceof DataImplementationImpl) {
+				org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
+				dtype = resolveAADLDataImplementationType(aadlDImpl);
+			} else {
+				System.out.println("Unresolved/unexpected Named Element.");
+			}
+			newPort.setType(dtype);
+		}
 		newPort.setProbe(false);
 		newPort.setId(dataPort.getQualifiedName());
 		newPort.setName(dataPort.getName());
 		newPort.setMode(convertToVdmPortMode(modeString));
-		newPort.setType(dtype);
 		newPort.setEvent(true);
 		return newPort;
 	}
