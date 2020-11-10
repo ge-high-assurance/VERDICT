@@ -1,11 +1,11 @@
 # Checks that a pull request can build the Verdict jars
-#  - Runs code analysis scan too
 
 name: Verdict continuous build
 
 on:
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,11 +19,6 @@ jobs:
     steps:
     - name: Check out VERDICT source
       uses: actions/checkout@v2
-
-    - name: Set up CodeQL for scanning
-      uses: github/codeql-action/init@v1
-      with:
-        languages: java
 
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
@@ -44,6 +39,3 @@ jobs:
       run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
-
-    - name: Perform CodeQL analysis
-      uses: github/codeql-action/analyze@v1

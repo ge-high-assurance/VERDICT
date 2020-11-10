@@ -1,5 +1,4 @@
 # Builds a Verdict release for developers on each push to master:
-#  - Runs code analysis scan
 #  - Pushes verdict-dev:latest image to Docker Hub
 #  - Updates verdict-dev update site
 
@@ -9,6 +8,7 @@ on:
   push:
     branches: [ master ]
     tags-ignore: [ '*' ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,11 +23,6 @@ jobs:
     steps:
     - name: Check out VERDICT source
       uses: actions/checkout@v2
-
-    - name: Set up CodeQL for scanning
-      uses: github/codeql-action/init@v1
-      with:
-        languages: java
 
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
@@ -48,9 +43,6 @@ jobs:
       run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
-
-    - name: Perform CodeQL analysis
-      uses: github/codeql-action/analyze@v1
 
     - name: Cache opam repository
       uses: actions/cache@v2
