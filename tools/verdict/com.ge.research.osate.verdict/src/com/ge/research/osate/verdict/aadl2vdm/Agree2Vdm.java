@@ -28,6 +28,7 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.EventPort;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.NamedElement;
@@ -41,6 +42,7 @@ import org.osate.aadl2.impl.DataPortImpl;
 import org.osate.aadl2.impl.DataSubcomponentImpl;
 import org.osate.aadl2.impl.DataTypeImpl;
 import org.osate.aadl2.impl.EnumerationLiteralImpl;
+import org.osate.aadl2.impl.EventDataPortImpl;
 import org.osate.aadl2.impl.ListValueImpl;
 import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
@@ -78,7 +80,6 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
-import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
@@ -149,7 +150,6 @@ public class Agree2Vdm {
 		for(File subdir: dirs) {
 			for (File file : subdir.listFiles()) {
 				if (file.getAbsolutePath().endsWith(".aadl")) {
-//					System.out.println(file.getAbsolutePath());
 					aadlFileNames.add(file.getAbsolutePath());
 				}
 			}
@@ -194,7 +194,7 @@ public class Agree2Vdm {
 	 *  then this method is invoked to populate the agree constructs in the vdm model
 	 * */
 	public Model populateVDMFromAadlAgreeObjects(List<EObject> objects, Model model) {
-		HashSet<String> dataTypeDecl = new HashSet<String>();
+		HashSet<String> dataTypeDecl = getTypeDeclarationsAsHashSet(model);
 		HashSet<String> nodeDecl = new HashSet<String>();
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
@@ -211,6 +211,14 @@ public class Agree2Vdm {
 		return model;
 	}
 
+	private HashSet<String> getTypeDeclarationsAsHashSet(Model model) {
+		HashSet<String> dataTypeDecl = new HashSet<String>();
+		List<TypeDeclaration> typeDeclarations = model.getTypeDeclaration();
+		for (TypeDeclaration typeDeclaration : typeDeclarations) {
+			dataTypeDecl.add(typeDeclaration.getName());
+		}
+		return dataTypeDecl;
+	}
 	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
@@ -385,7 +393,7 @@ public class Agree2Vdm {
 			model.getTypeDeclaration().add(dataTypeVdm);
 		}
 	}
-	private verdict.vdm.vdm_data.DataType getVdmTypeFromAADLType(org.osate.aadl2.DataType aadlDataType) {
+	public verdict.vdm.vdm_data.DataType getVdmTypeFromAADLType(org.osate.aadl2.DataType aadlDataType) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(aadlDataType.getName().contentEquals("Float")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
@@ -412,7 +420,8 @@ public class Agree2Vdm {
 			EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
 			updateVDMDatatypeUsingProperties(dtype,properties);
 		} else {//not float or int or bool or enum
-			System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
+			dtype.setUserDefinedType(aadlDataType.getName());
+			//System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
 		}
 		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
 		String aadlDataTypeName = aadlDataType.getName();
@@ -432,7 +441,7 @@ public class Agree2Vdm {
 	 *  this method checks if the property indicates if it is an enum definition
 	 *  and gets information from the properties to define the enum in the VDM
 	 *  **/
-	private void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
+	public void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
 		if(properties.size()==2) {
 			//check if the property specifies it is enum type
 			PropertyAssociation firstProperty = properties.get(0);
@@ -592,6 +601,10 @@ public class Agree2Vdm {
 				//define corresponding type in the VDM if not already defined
 				if(nmElmPort instanceof DataPortImpl) {
 					DataPort nmElmDataPort = (DataPort)nmElmPort;
+					DataSubcomponentType dSubCompType = nmElmDataPort.getDataFeatureClassifier();
+					defineDataTypeDataImplementationTypeInVDM(dSubCompType, dataTypeDecl, model);
+				} else if(nmElmPort instanceof EventDataPortImpl) {
+					EventDataPort nmElmDataPort = (EventDataPort)nmElmPort;
 					DataSubcomponentType dSubCompType = nmElmDataPort.getDataFeatureClassifier();
 					defineDataTypeDataImplementationTypeInVDM(dSubCompType, dataTypeDecl, model);
 				} else {

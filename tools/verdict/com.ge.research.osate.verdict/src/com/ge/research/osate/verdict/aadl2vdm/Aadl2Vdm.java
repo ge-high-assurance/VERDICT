@@ -23,12 +23,12 @@ import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.BusAccess;
-import org.osate.aadl2.BusFeatureClassifier;
 import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
 import org.osate.aadl2.BusSubcomponentType;
 import org.osate.aadl2.BusType;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.ContainedNamedElement;
@@ -39,6 +39,7 @@ import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
+import org.osate.aadl2.DataType;
 import org.osate.aadl2.DeviceImplementation;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.DeviceType;
@@ -115,6 +116,10 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
+
+import verdict.vdm.vdm_data.RecordField;
+import verdict.vdm.vdm_data.RecordType;
+import verdict.vdm.vdm_data.TypeDeclaration;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 
@@ -161,7 +166,7 @@ public class Aadl2Vdm {
 	 * Vidhya: modified function to add and process only objects in the aadl files in the project excluding those in imported aadl files
 	 * */
 	public Model populateVDMFromAadlObjects(List<EObject> objects, List<EObject> objectsFromFilesInProject, Model model) {
-
+		HashSet<String> dataTypeDecl = new HashSet<String>();
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
 		List<BusType> busTypes = new ArrayList<>();
@@ -271,7 +276,7 @@ public class Aadl2Vdm {
 				if(objectNamesFromFilesInProject.contains(((ProcessorImplementation) obj).getName())) {
 					compImpls.add((ProcessorImplementation) obj);
 				}
-			}  else if(obj instanceof PropertySetImpl) {
+			} else if(obj instanceof PropertySetImpl) {
 					Set<Property> compPropSet = new HashSet<Property>();
 					Set<Property> connPropSet = new HashSet<Property>();
 					for(Property prop : ((PropertySetImpl)obj).getOwnedProperties()) {
@@ -381,37 +386,37 @@ public class Aadl2Vdm {
 
 		/* Translating all Component Types */
 		if(systemTypes.size()>0) {
-			model = translateSystemTypeObjects(systemTypes, model);
+			model = translateSystemTypeObjects(systemTypes, model, dataTypeDecl);
 		}
 		if(busTypes.size()>0) {
-			model = translateBusTypeObjects(busTypes, model);
+			model = translateBusTypeObjects(busTypes, model, dataTypeDecl);
 		}
 		if(subprogramTypes.size()>0) {
-			model = translateSubprogramTypeObjects(subprogramTypes, model);
+			model = translateSubprogramTypeObjects(subprogramTypes, model, dataTypeDecl);
 		}
 		if(threadTypes.size()>0) {
-			model = translateThreadTypeObjects(threadTypes, model);
+			model = translateThreadTypeObjects(threadTypes, model, dataTypeDecl);
 		}
 		if(memoryTypes.size()>0) {
-			model = translateMemoryTypeObjects(memoryTypes, model);
+			model = translateMemoryTypeObjects(memoryTypes, model, dataTypeDecl);
 		}
 		if(deviceTypes.size()>0) {
-			model = translateDeviceTypeObjects(deviceTypes, model);
+			model = translateDeviceTypeObjects(deviceTypes, model, dataTypeDecl);
 		}
 		if(abstractTypes.size()>0) {
-			model = translateAbstractTypeObjects(abstractTypes, model);
+			model = translateAbstractTypeObjects(abstractTypes, model, dataTypeDecl);
 		}
 		if(processTypes.size()>0) {
-			model = translateProcessTypeObjects(processTypes, model);
+			model = translateProcessTypeObjects(processTypes, model, dataTypeDecl);
+		}
+		if(processTypes.size()>0) {
+			model = translateProcessorTypeObjects(processorTypes, model, dataTypeDecl);
 		}
 		if(threadGroupTypes.size()>0) {
-			model = translateThreadGroupTypeObjects(threadGroupTypes, model);
+			model = translateThreadGroupTypeObjects(threadGroupTypes, model, dataTypeDecl);
 		}
 		if(virtualProcessorTypes.size()>0) {
-			model = translateVirtualProcessorTypeObjects(virtualProcessorTypes, model);
-		}
-		if(processorTypes.size()>0) {
-			model = translateProcessorTypeObjects(processorTypes, model);
+			model = translateVirtualProcessorTypeObjects(virtualProcessorTypes, model, dataTypeDecl);
 		}
 
 
@@ -421,15 +426,13 @@ public class Aadl2Vdm {
 
 
 		/** Translating all component implementations */
-		model = translateComponentImplObjects(compImpls, componentPropertyToName, connPropertyToName,model);
+		model = translateComponentImplObjects(compImpls, componentPropertyToName, connPropertyToName,model, dataTypeDecl);
 
 
 
 		//return the final model
 		return model;
 	}//End of populateVDMFromAadlObjects
-
-
 
 
 
@@ -446,7 +449,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateSystemTypeObjects(List<SystemType> systemTypes, Model m1) {
+	public Model translateSystemTypeObjects(List<SystemType> systemTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(SystemType sysType : systemTypes) {
 			// variables for unpacking sysType
 			List<Event> events = new ArrayList<>();
@@ -567,7 +570,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -579,7 +582,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = sysType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -692,7 +695,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateBusTypeObjects(List<BusType> busTypes, Model m1) {
+	public Model translateBusTypeObjects(List<BusType> busTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(BusType bType : busTypes) {
 
 			// variables for unpacking bType
@@ -789,7 +792,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -801,7 +804,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = bType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -913,7 +916,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateSubprogramTypeObjects(List<SubprogramType> subprogramTypes, Model m1) {
+	public Model translateSubprogramTypeObjects(List<SubprogramType> subprogramTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(SubprogramType subprogType : subprogramTypes) {
 
 			// variables for unpacking subprogType
@@ -1013,7 +1016,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = subprogType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1126,7 +1129,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateThreadTypeObjects(List<ThreadType> threadTypes, Model m1) {
+	public Model translateThreadTypeObjects(List<ThreadType> threadTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(ThreadType tType : threadTypes) {
 
 			// variables for unpacking tType
@@ -1222,7 +1225,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1234,7 +1237,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = tType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1348,7 +1351,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateMemoryTypeObjects(List<MemoryType> memoryTypes, Model m1) {
+	public Model translateMemoryTypeObjects(List<MemoryType> memoryTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(MemoryType memType : memoryTypes) {
 
 			// variables for unpacking memType
@@ -1445,7 +1448,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 			    	//Note: Not populating "type" for now
 
@@ -1459,7 +1462,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = memType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1572,7 +1575,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateDeviceTypeObjects(List<DeviceType> deviceTypes, Model m1) {
+	public Model translateDeviceTypeObjects(List<DeviceType> deviceTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(DeviceType devType : deviceTypes) {
 
 			// variables for unpacking devType
@@ -1669,7 +1672,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1681,7 +1684,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = devType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -1794,7 +1797,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateAbstractTypeObjects(List<AbstractType> abstractTypes, Model m1) {
+	public Model translateAbstractTypeObjects(List<AbstractType> abstractTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(AbstractType absType : abstractTypes) {
 
 			// variables for unpacking absType
@@ -1914,7 +1917,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -1926,7 +1929,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = absType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2040,7 +2043,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateProcessTypeObjects(List<ProcessType> processTypes, Model m1) {
+	public Model translateProcessTypeObjects(List<ProcessType> processTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(ProcessType prcsType : processTypes) {
 			// variables for unpacking prcsType
 			List<Event> events = new ArrayList<>();
@@ -2135,7 +2138,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 			    	//Note: Not populating "type" for now
 
@@ -2149,7 +2152,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = prcsType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}
@@ -2264,7 +2267,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateThreadGroupTypeObjects(List<ThreadGroupType> threadGroupTypes, Model m1) {
+	public Model translateThreadGroupTypeObjects(List<ThreadGroupType> threadGroupTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(ThreadGroupType tgType : threadGroupTypes) {
 
 			// variables for unpacking tgType
@@ -2360,7 +2363,7 @@ public class Aadl2Vdm {
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
 
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2372,7 +2375,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = tgType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}				
@@ -2486,7 +2489,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateVirtualProcessorTypeObjects(List<VirtualProcessorType> virtualProcessorTypes, Model m1) {
+	public Model translateVirtualProcessorTypeObjects(List<VirtualProcessorType> virtualProcessorTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(VirtualProcessorType vprocType : virtualProcessorTypes) {
 
 			// variables for unpacking vprocType
@@ -2582,7 +2585,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 			    	//Note: Not populating "type" for now
 
@@ -2596,7 +2599,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = vprocType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}				
@@ -2710,7 +2713,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateProcessorTypeObjects(List<ProcessorType> processorTypes, Model m1) {
+	public Model translateProcessorTypeObjects(List<ProcessorType> processorTypes, Model m1, HashSet<String> dataTypeDecl) {
 		for(ProcessorType proType : processorTypes) {
 
 			// variables for unpacking proType
@@ -2806,7 +2809,7 @@ public class Aadl2Vdm {
 
 				//checking each port's mode and name and adding it to the port list
 				for(DataPort dataPort : dataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(dataPort, m1, dataTypeDecl);
 
 //ISSUE: "probe", "event", and "id" not found in DataPort class or superclass
 
@@ -2818,7 +2821,7 @@ public class Aadl2Vdm {
 				//get all event data ports
 				List<EventDataPort> eventDataPorts = proType.getOwnedEventDataPorts();
 				for(EventDataPort eventDataPort:eventDataPorts) {
-					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort);
+					verdict.vdm.vdm_model.Port newPort = createVdmPort(eventDataPort, m1, dataTypeDecl);
 					//add to port list of component
 			    	packComponent.getPort().add(newPort);
 				}	
@@ -2926,11 +2929,12 @@ public class Aadl2Vdm {
 	 * @param m2
 	 * @return
 	 */
-	public Model translateComponentImplObjects(List<ComponentImplementation> comImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2) {
+	public Model translateComponentImplObjects(List<ComponentImplementation> comImpls, Map<Property, String> componentPropertyToName, Map<Property, String> connPropertyToName, Model m2, HashSet<String> dataTypeDecl) {
 
 		Map<String, String> connectionToBusMap = new HashMap<>();
 		//creating an object for each implementation first as we will need it later
 		for(ComponentImplementation aSystemImpl : comImpls) {
+
 			//to pack the sysImpl as a VDM componentImpl
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();
 
@@ -2985,9 +2989,8 @@ public class Aadl2Vdm {
 		//Getting the reference of the object previously created and populating
 		for(ComponentImplementation aCompImpl : comImpls) {
 
-
 			//variable to refer to previously created object
-			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();;
+			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();
 
 			//finding previously created object
 			for (verdict.vdm.vdm_model.ComponentImpl anImplObj : m2.getComponentImpl()) {
@@ -3029,7 +3032,8 @@ public class Aadl2Vdm {
 
 				//setting the "implementation" field of packSubComp
 				for(verdict.vdm.vdm_model.ComponentImpl cImpl : m2.getComponentImpl()) {
-					if(aSubComp.getSubcomponentType().getName().equals(cImpl.getName())){
+					//if(aSubComp.getSubcomponentType().getName().equals(cImpl.getName())){
+					if(aSubComp.getSubcomponentType().getQualifiedName().equals(cImpl.getId())){	
 						packSubComp.setImplementation(cImpl);
 
 					}
@@ -3089,8 +3093,7 @@ public class Aadl2Vdm {
 				//adding packSubComp to packBlockImpl
                 packBlockImpl.getSubcomponent().add(packSubComp);
 			}//End of adding all subcomponents
-	
-			
+		
 			//adding all connections to "connections" field of packBlockImpl
 			if(aCompImpl.getOwnedConnections() != null && !aCompImpl.getOwnedConnections().isEmpty()) {
 				for (Connection aConn : aCompImpl.getOwnedConnections()) {
@@ -3243,7 +3246,7 @@ public class Aadl2Vdm {
     				if(srcConnectionEnd instanceof EventPort) {
     					packSrcEndPort = createVdmConnectionEventPort(srcPortName, srcPortTypeName, srcConnectionEnd.getQualifiedName());
     				} else {//if not a bus access port or bus implementation port or event port
-    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType);
+    					packSrcEndPort = createVdmConnectionPort(srcPortName,srcPortTypeName, srcConnectionEnd.getQualifiedName(), srcDataSubCompType, m2, dataTypeDecl);
         			}	
     				
 
@@ -3286,7 +3289,7 @@ public class Aadl2Vdm {
     				if(destConnectionEnd instanceof EventPort) {
     					packDestEndPort = createVdmConnectionEventPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName());
     				} else {//if not a bus access port or bus implementation port or eventport
-    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType);
+    					packDestEndPort = createVdmConnectionPort(destPortName,destPortTypeName, destConnectionEnd.getQualifiedName(), destDataSubCompType, m2, dataTypeDecl);
     				}
     				
     				//If source port is independent of a component instance
@@ -4426,7 +4429,7 @@ public class Aadl2Vdm {
      * @param dataport
      * @return vdm port
      */
-	private Port createVdmPort(DataPort dataPort) {
+	private Port createVdmPort(DataPort dataPort,Model model, HashSet<String> dataTypeDecl) {
 		String modeString = "in";
 		if(dataPort.isIn()) {
 			modeString = "in";
@@ -4439,10 +4442,10 @@ public class Aadl2Vdm {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(dSubCompType instanceof DataTypeImpl) {
 			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
-			dtype = resolveAADLDataType(aadlDType);
+			dtype = resolveAADLDataType(aadlDType, model, dataTypeDecl);
 		} else if(dSubCompType instanceof DataImplementationImpl) {
 			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
-			dtype = resolveAADLDataImplementationType(aadlDImpl);
+			dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 		} else {
 			System.out.println("Unresolved/unexpected Named Element.");
 		}
@@ -4461,7 +4464,7 @@ public class Aadl2Vdm {
      * @param eventdataport
      * @return vdm port
      */
-	private Port createVdmPort(EventDataPort dataPort) {
+	private Port createVdmPort(EventDataPort dataPort, Model model, HashSet<String> dataTypeDecl) {
 		String modeString = "in";
 		if(dataPort.isIn()) {
 			modeString = "in";
@@ -4476,10 +4479,10 @@ public class Aadl2Vdm {
 			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 			if(dSubCompType instanceof DataTypeImpl) {
 				org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
-				dtype = resolveAADLDataType(aadlDType);
+				dtype = resolveAADLDataType(aadlDType, model, dataTypeDecl);
 			} else if(dSubCompType instanceof DataImplementationImpl) {
 				org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
-				dtype = resolveAADLDataImplementationType(aadlDImpl);
+				dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 			} else {
 				System.out.println("Unresolved/unexpected Named Element.");
 			}
@@ -4501,15 +4504,15 @@ public class Aadl2Vdm {
      * @param dSubCompType 
      * @return vdm port
      */
-	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedname, DataSubcomponentType dSubCompType){		
+	verdict.vdm.vdm_model.Port createVdmConnectionPort(String portName, String modeString, String qualifiedname, DataSubcomponentType dSubCompType, Model model, HashSet<String> dataTypeDecl){		
 		//fetching data type information
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(dSubCompType instanceof DataTypeImpl) {
 			org.osate.aadl2.DataType aadlDType = (org.osate.aadl2.DataType)dSubCompType;
-			dtype = resolveAADLDataType(aadlDType);
+			dtype = resolveAADLDataType(aadlDType, model, dataTypeDecl);
 		} else if(dSubCompType instanceof DataImplementationImpl) {
 			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
-			dtype = resolveAADLDataImplementationType(aadlDImpl);
+			dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 		} else {
 			System.out.println("Unresolved/unexpected Named Element.");
 		}
@@ -4753,7 +4756,8 @@ public class Aadl2Vdm {
 		String[] values = new String[4];
 		if (expr instanceof BooleanLiteralImpl) {
 			BooleanLiteralImpl bool = ((BooleanLiteralImpl) expr);
-			values[0] = bool.getValue()?"1":"0";
+			//values[0] = bool.getValue()?"1":"0";
+			values[0] = bool.getValue()?"true":"false";
 		} else if (expr instanceof IntegerLiteralImpl) {
 			IntegerLiteralImpl intVal = ((IntegerLiteralImpl) expr);
 			values[0] = String.valueOf((int)intVal.getValue());
@@ -5063,7 +5067,7 @@ public class Aadl2Vdm {
      * @author Vidhya Tekken Valapil
      * Obtain data type information and return vdm-data-type
      * */   
-    private verdict.vdm.vdm_data.DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType) {
+    private verdict.vdm.vdm_data.DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, Model model, HashSet<String> dataTypeDecl) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		if(aadlDataType.getName().contentEquals("Float")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
@@ -5071,20 +5075,23 @@ public class Aadl2Vdm {
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
-		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
-			dtype.setUserDefinedType(aadlDataType.getName());
+//TODO:remove		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+//			dtype.setUserDefinedType(aadlDataType.getName());
 		} else {//not float or int or bool or enum
-			System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
+			dtype.setUserDefinedType(aadlDataType.getName());
+			//System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
 		}
+		defineDataType(aadlDataType, model, dataTypeDecl);
 		return dtype;
 	}
     /**
      * @author Vidhya Tekken Valapil
      * Fetch data implementation type information and return vdm-data-type
      * */
-    private verdict.vdm.vdm_data.DataType resolveAADLDataImplementationType(DataImplementation dataImplementation) {
+    private verdict.vdm.vdm_data.DataType resolveAADLDataImplementationType(DataImplementation dataImplementation, Model model, HashSet<String> dataTypeDecl) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 		dtype.setUserDefinedType(dataImplementation.getName());
+		defineDataImplementationType(dataImplementation, model, dataTypeDecl);
 		return dtype;
 	}
     /**
@@ -5205,5 +5212,84 @@ public class Aadl2Vdm {
 			}
 		}
 		return objNames;
+	}
+
+    /**
+     * @author Vidhya Tekken Valapil
+     * populate information related to data implementation types in the vdm
+     * */
+	private void defineDataImplementationType(DataImplementation dataImplementation, Model model, HashSet<String> dataTypeDecl) {
+		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+		String dataImplementationName = dataImplementation.getName();
+		if(!dataTypeDecl.contains(dataImplementationName)) {
+			dataTypeDecl.add(dataImplementationName);
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			//GET DETAILS OF THE DATA IMPLEMENTATION AND CREATE CORRESPONDING VDM DATATYPE
+			EList<DataSubcomponent> subcomponents= dataImplementation.getOwnedDataSubcomponents();
+			if(!subcomponents.isEmpty()) {//if the dataType definition has subcomponents
+				RecordType recType = new RecordType();
+				for (DataSubcomponent dataSubComp: subcomponents) {
+					RecordField recField = new RecordField();
+					recField.setName(dataSubComp.getName());
+					DataSubcomponentType dataSubCompType = dataSubComp.getDataSubcomponentType();
+					if (dataSubCompType instanceof org.osate.aadl2.DataType){
+						org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)dataSubCompType;
+						Agree2Vdm agree2vdm= new Agree2Vdm();
+						verdict.vdm.vdm_data.DataType recFieldDtype = agree2vdm.getVdmTypeFromAADLType(aadlDataType);
+						recField.setType(recFieldDtype);	
+					} else if (dataSubCompType instanceof DataImplementation){
+						DataImplementation dataSubCompDataImplementation = (DataImplementation)dataSubCompType;
+						verdict.vdm.vdm_data.DataType recFieldDtype = new verdict.vdm.vdm_data.DataType();
+						recFieldDtype.setUserDefinedType(dataSubCompDataImplementation.getName());
+						recField.setType(recFieldDtype);	
+					} else {
+						System.out.println("Unexpected Data Subcomponent that is not a DataTypeImpl or DataImplementatioImpl.");
+					}
+					recType.getRecordField().add(recField);
+				}
+				dtype.setRecordType(recType);
+			} else { //if the dataType is base type boolean or integer or char or string
+				System.out.println("Data implementation type has no subcomponents");
+			}
+			//vdm data type declaration
+			TypeDeclaration dataTypeVdm = new TypeDeclaration();
+			dataTypeVdm.setName(dataImplementation.getName());
+			dataTypeVdm.setDefinition(dtype);
+			//add the typeDeclaration to the model
+			model.getTypeDeclaration().add(dataTypeVdm);
+		}
+	}
+
+    /**
+     * @author Vidhya Tekken Valapil
+     * populate information related to data types in the vdm
+     * */
+	private void defineDataType(DataType aadlDataType, Model model, HashSet<String> dataTypeDecl) {
+		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+		String aadlDataTypeName = aadlDataType.getName();
+		if(!dataTypeDecl.contains(aadlDataTypeName) && (!aadlDataTypeName.equalsIgnoreCase("Float")) && (!aadlDataTypeName.equalsIgnoreCase("Integer")) && (!aadlDataTypeName.equalsIgnoreCase("Boolean"))) {
+			dataTypeDecl.add(aadlDataType.getName());
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			if(aadlDataType.getName().contentEquals("Float")){
+				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
+			} else if(aadlDataType.getName().contentEquals("Integer")){
+				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
+			} else if(aadlDataType.getName().contentEquals("Boolean")){
+				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
+			} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+				EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
+				Agree2Vdm agree2vdm= new Agree2Vdm();
+				agree2vdm.updateVDMDatatypeUsingProperties(dtype,properties);
+			} else {//not float or int or bool or enum
+				dtype.setUserDefinedType(aadlDataType.getName());
+				//System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
+			}
+			//vdm data type declaration
+			TypeDeclaration dataTypeVdm = new TypeDeclaration();
+			dataTypeVdm.setName(aadlDataType.getName());
+			dataTypeVdm.setDefinition(dtype);
+			//add the typeDeclaration to the model
+			model.getTypeDeclaration().add(dataTypeVdm);
+		}
 	}
 }
