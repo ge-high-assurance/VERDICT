@@ -169,16 +169,19 @@ public class Vdm2Csv {
 						if(propToCompInsts.containsKey(attr.getName())) {
 							String PropName = attr.getName();
 							HashSet<String> propToCompInst = propToCompInsts.get(PropName);
-							propToCompInst.add(compInst.getName());
+							//propToCompInst.add(compInst.getName());//TODO:remove
+							propToCompInst.add(compInst.getId());//TODO:check all instances of propToCompInst
 							propToCompInsts.replace(PropName, propToCompInst);
 						} else {
 							HashSet<String> propToCompInst = new HashSet<>();
-							propToCompInst.add(compInst.getName());
+							//propToCompInst.add(compInst.getName());//TODO:remove
+							propToCompInst.add(compInst.getId());
 							propToCompInsts.put(attr.getName(), propToCompInst);
 						}
 					}
 					//Update component instances to attributes/properties map
-					compInstAttributesMap.put(compInst.getName(), compInstAttributes);	
+					//compInstAttributesMap.put(compInst.getName(), compInstAttributes);//TODO:remove
+					compInstAttributesMap.put(compInst.getId(), compInstAttributes);//TODO:check all instances of compInstAttributesMap
 				}
 				//-- Create component to component-implementation mapping
 				compToCompImpl.put(compImpl.getType().getName(), compImpl.getName());
@@ -346,7 +349,7 @@ public class Vdm2Csv {
 						scnBusBindingsTable.addValue(compImpl.getType().getName());//ActualConnectionBindingDestConnComp
 						scnBusBindingsTable.addValue(compImpl.getName());//ActualConnectionBindingDestConnImpl
 						scnBusBindingsTable.addValue("");//ActualConnectionBindingDestConnCompInst
-						scnBusBindingsTable.addValue(compConnection2.getName());//ActualConnectionBindingDestConn
+						scnBusBindingsTable.addValue(replaceColonsWithUnderscore(compConnection2.getQualifiedName()));//ActualConnectionBindingDestConn
 						scnBusBindingsTable.capRow();
 					}
 				}
@@ -386,7 +389,8 @@ public class Vdm2Csv {
 		}
 		scnCompPropsTable.addValue(compInstName);//comp instance
 		//add connection attributes/properties
-		HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInstName);
+		//HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInstName);//TODO:remove
+		HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInst.getId());
 		for(String propName: propToCompInsts.keySet()) {
 			//check if the connection has that property - add it to csv if it does
 			if (connAttrMap.containsKey(propName)) {
