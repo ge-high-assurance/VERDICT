@@ -12,7 +12,6 @@ import edu.uiowa.kind2.lustre.Program;
 import edu.uiowa.kind2.lustre.ProgramBuilder;
 import edu.uiowa.kind2.lustre.Type;
 import edu.uiowa.kind2.lustre.TypeUtil;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -97,35 +96,33 @@ public class VDMLustre2Kind2 {
 
     private static Type visit(DataType definition) {
         if (definition.getPlainType() != null) {
-            return TypeUtil.mkNamedType(definition.getPlainType().value());
+            return TypeUtil.named(definition.getPlainType().value());
         }
 
         if (definition.getUserDefinedType() != null) {
-            return TypeUtil.mkNamedType(definition.getUserDefinedType());
+            return TypeUtil.named(definition.getUserDefinedType());
         }
 
         if (definition.getSubrangeType() != null) {
             SubrangeType subrange = definition.getSubrangeType();
-            return TypeUtil.mkIntSubrangeType(
-                    new BigInteger(subrange.getLowerBound()),
-                    new BigInteger(subrange.getUpperBound()));
+            return TypeUtil.intSubrange(subrange.getLowerBound(), subrange.getUpperBound());
         }
 
         if (definition.getArrayType() != null) {
-            return TypeUtil.mkArrayType(
+            return TypeUtil.array(
                     visit(definition.getArrayType().getDataType()),
                     Integer.parseInt(definition.getArrayType().getDimension()));
         }
 
         if (definition.getTupleType() != null) {
-            return TypeUtil.mkTupleType(
+            return TypeUtil.tuple(
                     definition.getTupleType().getDataType().stream()
                             .map(dt -> visit(dt))
                             .collect(Collectors.toList()));
         }
 
         if (definition.getEnumType() != null) {
-            return TypeUtil.mkEnumType(definition.getEnumType().getEnumValue());
+            return TypeUtil.enumeration(definition.getEnumType().getEnumValue());
         }
 
         if (definition.getRecordType() != null) {
@@ -135,7 +132,7 @@ public class VDMLustre2Kind2 {
             for (RecordField field : definition.getRecordType().getRecordField()) {
                 fields.put(field.getName(), visit(field.getType()));
             }
-            return TypeUtil.mkRecordType(fields);
+            return TypeUtil.record(fields);
         }
 
         throw new IllegalArgumentException(
@@ -519,10 +516,10 @@ public class VDMLustre2Kind2 {
         for (ContractMode mode : contractSpec.getMode()) {
             ModeBuilder mb = new ModeBuilder(mode.getName());
             for (ContractItem require : mode.getRequire()) {
-                mb.addRequire(require.getName(), visit(require.getExpression()));
+                mb.require(require.getName(), visit(require.getExpression()));
             }
             for (ContractItem ensure : mode.getEnsure()) {
-                mb.addEnsure(ensure.getName(), visit(ensure.getExpression()));
+                mb.ensure(ensure.getName(), visit(ensure.getExpression()));
             }
             cbb.addMode(mb);
         }
