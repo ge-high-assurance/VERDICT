@@ -505,12 +505,16 @@ public class VDMLustre2Kind2 {
             }
         }
 
+        for (ContractItem assumption : contractSpec.getWeaklyassume()) {
+            cbb.weaklyAssume(assumption.getName(), visit(assumption.getExpression()));
+        }
+
         for (ContractItem assumption : contractSpec.getAssume()) {
-            cbb.addAssumption(assumption.getName(), visit(assumption.getExpression()));
+            cbb.assume(assumption.getName(), visit(assumption.getExpression()));
         }
 
         for (ContractItem guarantee : contractSpec.getGuarantee()) {
-            cbb.addGuarantee(guarantee.getName(), visit(guarantee.getExpression()));
+            cbb.guarantee(guarantee.getName(), visit(guarantee.getExpression()));
         }
 
         for (ContractMode mode : contractSpec.getMode()) {

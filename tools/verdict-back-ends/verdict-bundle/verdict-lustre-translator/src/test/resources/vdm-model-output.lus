@@ -13,7 +13,7 @@ const CONST_BOOL : bool = true;
 const LAUNCH_DIR : ENUM_DIR = NORTH;
 const RETURN_DIR = WEST;
 const LAUNCH_POS = POSITION {x = 0; y = 0};
-const CONST_EXPR = (int (1.5), real (1), LAUNCH_POS.x, (1 - 1), (-1), (1 + 1), (1 * 1), (1 / 1), (1 div 1), (1 mod 1), (not 1), (1 and 1), (1 or 1), (1 xor 1), (1 => 1), (1 < 1), (1 > 1), (1 <= 1), (1 >= 1), (1 = 1), (1 <> 1), (if 1 then 1 else 1), (1 -> 1), (pre 1), call(1, 1));
+const CONST_EXPR = (int (1.5), real (1), (LAUNCH_POS).(x), (1) - (1), -(1), (1) + (1), (1) * (1), (1) / (1), (1) div (1), (1) mod (1), not (1), (1) and (1), (1) or (1), (1) xor (1), (1) => (1), (1) < (1), (1) > (1), (1) <= (1), (1) >= (1), (1) = (1), (1) <> (1), if (1) then (1) else (1), (1) -> (1), pre (1), call(1, 1));
 
 node top (
   n : int
@@ -23,9 +23,9 @@ node top (
 var
   count : int;
 let
-  count = (0 -> (if ((n < (pre count))) then (pre count) else ((pre count) + 1)));
-  out = (n < count);
-  assert (n = ((n -> (pre (n)))));
+  count = (0) -> (if (((n) < (pre (count)))) then (pre (count)) else ((pre (count)) + (1)));
+  out = (n) < (count);
+  assert (n) = (((n) -> (pre ((n)))));
 tel
 
 node imported switch (
@@ -45,11 +45,11 @@ contract spec (
 let
   const a = 1;
   var altRequested : bool = switch(altRequest, deactivate);
-  assume (a >= 0);
-  guarantee (not altEngaged);
+  assume (a) >= (0);
+  guarantee not (altEngaged);
   mode noAlt (
-    require (not altRequested);
-    ensure (not altEngaged);
+    require not (altRequested);
+    ensure not (altEngaged);
   );
 tel
 
