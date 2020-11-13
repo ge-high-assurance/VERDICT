@@ -15,6 +15,19 @@ const RETURN_DIR = WEST;
 const LAUNCH_POS = POSITION {x = 0; y = 0};
 const CONST_EXPR = (int (1.5), real (1), LAUNCH_POS.x, (1 - 1), (-1), (1 + 1), (1 * 1), (1 / 1), (1 div 1), (1 mod 1), (not 1), (1 and 1), (1 or 1), (1 xor 1), (1 => 1), (1 < 1), (1 > 1), (1 <= 1), (1 >= 1), (1 = 1), (1 <> 1), (if 1 then 1 else 1), (1 -> 1), (pre 1), call(1, 1));
 
+node top (
+  n : int
+) returns (
+  out : bool
+);
+var
+  count : int;
+let
+  count = (0 -> (if ((n < (pre count))) then (pre count) else ((pre count) + 1)));
+  out = (n < count);
+  assert (n = ((n -> (pre (n)))));
+tel
+
 node imported switch (
   on : bool;
   off : bool
@@ -56,15 +69,3 @@ let
   altEngaged = altRequested;
 tel
 
-node top (
-  n : int
-) returns (
-  out : bool
-);
-var
-  count : int;
-let
-  count = (0 -> (if ((n < (pre count))) then (pre count) else ((pre count) + 1)));
-  out = (n < count);
-  assert (n = ((n -> (pre (n)))));
-tel
