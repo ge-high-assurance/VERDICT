@@ -5075,11 +5075,8 @@ public class Aadl2Vdm {
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
-//TODO:remove		} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
-//			dtype.setUserDefinedType(aadlDataType.getName());
 		} else {//not float or int or bool or enum
 			dtype.setUserDefinedType(aadlDataType.getName());
-			//System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
 		}
 		defineDataType(aadlDataType, model, dataTypeDecl);
 		return dtype;
