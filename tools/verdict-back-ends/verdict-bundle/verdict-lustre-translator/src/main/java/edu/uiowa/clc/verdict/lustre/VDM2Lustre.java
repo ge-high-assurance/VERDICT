@@ -359,6 +359,7 @@ public class VDM2Lustre {
 
         if (srcPort == null) {
             CompInstancePort compPort = srcConnection.getSubcomponentPort();
+            //            System.out.println(">>>>>>>>" + con.getName());
             srcPort = compPort.getPort();
 
             ComponentInstance srcCompInstance = compPort.getSubcomponent();
@@ -1592,17 +1593,20 @@ public class VDM2Lustre {
                     data_type = record_field.getType();
 
                     String user_defined_type = data_type.getUserDefinedType();
+                    System.out.println(identifier + " Record Type:" + user_defined_type);
 
                     if (user_defined_type != null) {
 
-                        user_defined_type = user_defined_type.replace(".", "_dot_");
-                        user_defined_type = user_defined_type.replace("::", "_double_colon_");
+                        String updated_defined_type = user_defined_type.replace(".", "_dot_");
+                        updated_defined_type = updated_defined_type.replace("::", "_double_colon_");
 
-                        for (TypeDeclaration type_declaration : program.getTypeDeclaration()) {
-                            if (user_defined_type.equals(type_declaration.getName())) {
-                                data_type.setUserDefinedType(user_defined_type);
-                            }
-                        }
+                        //                        for (TypeDeclaration type_declaration :
+                        // program.getTypeDeclaration()) {
+                        //                            if
+                        // (user_defined_type.equals(type_declaration.getName())) {
+                        data_type.setUserDefinedType(updated_defined_type);
+                        //                            }
+                        //                        }
                     }
                 }
 
