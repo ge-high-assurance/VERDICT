@@ -1593,7 +1593,7 @@ public class VDM2Lustre {
                     data_type = record_field.getType();
 
                     String user_defined_type = data_type.getUserDefinedType();
-                    System.out.println(identifier + " Record Type:" + user_defined_type);
+                    // System.out.println(identifier + " Record Type:" + user_defined_type);
 
                     if (user_defined_type != null) {
 
