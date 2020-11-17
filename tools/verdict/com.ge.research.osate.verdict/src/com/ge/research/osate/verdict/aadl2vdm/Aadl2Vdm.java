@@ -22,6 +22,7 @@ import org.osate.aadl2.AbstractSubcomponent;
 import org.osate.aadl2.AbstractType;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.BusAccess;
 import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
@@ -4451,6 +4452,23 @@ public class Aadl2Vdm {
 		}
 		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
 		newPort.setProbe(false);
+		if(dataPort.getOwnedPropertyAssociations().size()!=0) {
+			EList<PropertyAssociation> propertyAssocs = dataPort.getOwnedPropertyAssociations();
+			for(PropertyAssociation propertyAssoc : propertyAssocs) {
+				if(propertyAssoc.getProperty().getName().equalsIgnoreCase("probe")) {
+					EList<ModalPropertyValue> propVals = propertyAssoc.getOwnedValues();
+					if(propVals.size()==0 || propVals.size()>1) {
+						throw new RuntimeException("Unexpected number for values for probe property of port.");
+					}
+					if(propVals.get(0).getOwnedValue() instanceof BooleanLiteral) {
+						BooleanLiteral probeVal = (BooleanLiteral)propVals.get(0).getOwnedValue();
+						newPort.setProbe(probeVal.getValue());
+					} else {
+						throw new RuntimeException("Unexpected type of value for probe property of port.");
+					}
+				}
+			}
+		}
 		newPort.setId(dataPort.getQualifiedName());
 		newPort.setName(dataPort.getName());
 		newPort.setMode(convertToVdmPortMode(modeString));
