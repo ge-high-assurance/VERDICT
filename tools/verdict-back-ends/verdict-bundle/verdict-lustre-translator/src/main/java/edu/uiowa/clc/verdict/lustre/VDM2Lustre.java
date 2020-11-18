@@ -602,6 +602,12 @@ public class VDM2Lustre {
         return eventRecord;
     }
 
+    private DataType defaultType() {
+        DataType dataType = new DataType();
+        dataType.setPlainType(PlainType.INT);
+        return dataType;
+    }
+
     public void visit(Port port, Node node) {
 
         PortMode port_mode = port.getMode();
@@ -618,10 +624,7 @@ public class VDM2Lustre {
 
         // Change Null DataType to Integer Default Type
         if (dataType == null) {
-
-            dataType = new DataType();
-            dataType.setPlainType(PlainType.INT);
-            port.setType(dataType);
+            port.setType(defaultType());
         }
 
         node_parameter.setDataType(dataType);
@@ -1591,6 +1594,10 @@ public class VDM2Lustre {
                     // String identifier = record_field.getName();
 
                     data_type = record_field.getType();
+                    if (data_type == null) {
+                        data_type = defaultType();
+                        record_field.setType(data_type);
+                    }
 
                     String user_defined_type = data_type.getUserDefinedType();
                     // System.out.println(identifier + " Record Type:" + user_defined_type);
