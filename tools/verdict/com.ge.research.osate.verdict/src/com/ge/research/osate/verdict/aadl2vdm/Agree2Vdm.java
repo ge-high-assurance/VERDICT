@@ -80,6 +80,7 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
+import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
@@ -364,40 +365,53 @@ public class Agree2Vdm {
 					//the line below is just to ensure that the type's declaration is added to VDM
 					resolveAADLDataType(aadlDataType,dataTypeDecl,model); 
 					verdict.vdm.vdm_data.DataType recFieldDtype = getVdmTypeFromAADLType(aadlDataType);
-					recField.setType(recFieldDtype);	
+					recField.setType(recFieldDtype);
+					recType.getRecordField().add(recField);
 				} else if (dataSubCompType instanceof DataImplementation){
 					DataImplementation dataSubCompDataImplementation = (DataImplementation)dataSubCompType;
 					//the line below is just to ensure that the type's declaration is added to VDM
 					resolveAADLDataImplementationType(dataSubCompDataImplementation, dataTypeDecl, model);
 					verdict.vdm.vdm_data.DataType recFieldDtype = new verdict.vdm.vdm_data.DataType();
 					recFieldDtype.setUserDefinedType(dataSubCompDataImplementation.getName());
-					recField.setType(recFieldDtype);	
+					recField.setType(recFieldDtype);
+					recType.getRecordField().add(recField);
 				} else {
 					System.out.println("Unexpected Data Subcomponent that is not a DataTypeImpl or DataImplementatioImpl.");
 				}
-				recType.getRecordField().add(recField);
 			}
-			dtype.setRecordType(recType);
+			if(recType.getRecordField().size()!=0) {
+				dtype.setRecordType(recType);
+				//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+				String dataImplementationName = dataImplementationImpl.getName();
+				if(!dataTypeDecl.contains(dataImplementationName)) {
+					dataTypeDecl.add(dataImplementationName);
+					//vdm data type declaration
+					TypeDeclaration dataTypeVdm = new TypeDeclaration();
+					dataTypeVdm.setName(dataImplementationName);
+					dataTypeVdm.setDefinition(dtype);
+					//add the typeDeclaration to the model
+					model.getTypeDeclaration().add(dataTypeVdm);
+				}
+			}
 		} else { //if the dataType is base type boolean or integer or char or string
 			System.out.println("Unexpected data implementation type with no subcomponents");
-		}
-		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
-		String dataImplementationName = dataImplementationImpl.getName();
-		if(!dataTypeDecl.contains(dataImplementationName)) {
-			dataTypeDecl.add(dataImplementationName);
-			//vdm data type declaration
-			TypeDeclaration dataTypeVdm = new TypeDeclaration();
-			dataTypeVdm.setName(dataImplementationName);
-			dataTypeVdm.setDefinition(dtype);
-			//add the typeDeclaration to the model
-			model.getTypeDeclaration().add(dataTypeVdm);
+			//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
+			String dataImplementationName = dataImplementationImpl.getName();
+			if(!dataTypeDecl.contains(dataImplementationName)) {
+				dataTypeDecl.add(dataImplementationName);
+				//vdm data type declaration
+				TypeDeclaration dataTypeVdm = new TypeDeclaration();
+				dataTypeVdm.setName(dataImplementationName);
+				//add the typeDeclaration to the model
+				model.getTypeDeclaration().add(dataTypeVdm);
+			}
 		}
 	}
 	public verdict.vdm.vdm_data.DataType getVdmTypeFromAADLType(org.osate.aadl2.DataType aadlDataType) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if(aadlDataType.getName().contentEquals("Float")){
+		if(aadlDataType.getName().contentEquals("Float") || aadlDataType.getName().contentEquals("Float_32") ||aadlDataType.getName().contentEquals("Float_64")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
-		} else if(aadlDataType.getName().contentEquals("Integer")){
+		} else if(aadlDataType.getName().contentEquals("Integer") || aadlDataType.getName().contentEquals("Integer_8") ||aadlDataType.getName().contentEquals("Integer_16")|| aadlDataType.getName().contentEquals("Integer_32") ||aadlDataType.getName().contentEquals("Integer_64") || aadlDataType.getName().contentEquals("Unsigned_8") || aadlDataType.getName().contentEquals("Unsigned_16") || aadlDataType.getName().contentEquals("Unsigned_32") || aadlDataType.getName().contentEquals("Unsigned_64") || aadlDataType.getName().contentEquals("Natural")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
@@ -410,9 +424,9 @@ public class Agree2Vdm {
 	}
 	private void resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if(aadlDataType.getName().contentEquals("Float")){
+		if(aadlDataType.getName().contentEquals("Float") || aadlDataType.getName().contentEquals("Float_32") ||aadlDataType.getName().contentEquals("Float_64")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
-		} else if(aadlDataType.getName().contentEquals("Integer")){
+		} else if(aadlDataType.getName().contentEquals("Integer") || aadlDataType.getName().contentEquals("Integer_8") ||aadlDataType.getName().contentEquals("Integer_16")|| aadlDataType.getName().contentEquals("Integer_32") ||aadlDataType.getName().contentEquals("Integer_64") || aadlDataType.getName().contentEquals("Unsigned_8") || aadlDataType.getName().contentEquals("Unsigned_16") || aadlDataType.getName().contentEquals("Unsigned_32") || aadlDataType.getName().contentEquals("Unsigned_64") || aadlDataType.getName().contentEquals("Natural")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
@@ -441,7 +455,7 @@ public class Agree2Vdm {
 	 *  this method checks if the property indicates if it is an enum definition
 	 *  and gets information from the properties to define the enum in the VDM
 	 *  **/
-	public void updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
+	public boolean updateVDMDatatypeUsingProperties(verdict.vdm.vdm_data.DataType dtype, EList<PropertyAssociation> properties) {
 		if(properties.size()==2) {
 			//check if the property specifies it is enum type
 			PropertyAssociation firstProperty = properties.get(0);
@@ -472,6 +486,7 @@ public class Agree2Vdm {
 										}
 									}
 									dtype.setEnumType(vdmEnumType);
+									return true;
 								} else {System.out.println("The second property of the data definition is not of ListValueImp type");}
 							} else {System.out.println("Unresolved data property. The first property of the data definition has no values or multiple values.");}
 						} else {System.out.println("Unresolved data property value. Property's owned value's named value does not contain Enum");}
@@ -479,6 +494,7 @@ public class Agree2Vdm {
 				} else {System.out.println("Unresolved data property value. Property's owned value is not NamedValueImpl type.");}
 			} else {System.out.println("Unresolved data property with no values or multiple values.");}
 		} else {System.out.println("Unresolved data property. Data definition has 0 or more than 2 properties associated with it");}
+		return false;
 	}
 	private ContractItem translateGuaranteeStatement(GuaranteeStatement guaranteeStmt, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl, Model model) {
 		ContractItem contractItem = new ContractItem();
@@ -490,7 +506,8 @@ public class Agree2Vdm {
 	}
 	private void addNodeDefToTypeDeclarations(NodeDef nodeDef, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl, Model model) {
 		Node vdmNode = new Node();
-		String agreeNodeName = nodeDef.getName();
+		//String agreeNodeName = nodeDef.getName();
+		String agreeNodeName = nodeDef.getQualifiedName();
 		vdmNode.setName(agreeNodeName);
 		//SETTING NODE INPUT PARAMETERS
 		//get agree node's args and set them as input parameter

@@ -28,6 +28,7 @@ import org.osate.aadl2.BusImplementation;
 import org.osate.aadl2.BusSubcomponent;
 import org.osate.aadl2.BusSubcomponentType;
 import org.osate.aadl2.BusType;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Connection;
@@ -74,6 +75,7 @@ import org.osate.aadl2.ThreadGroupType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.TypeExtension;
 import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.VirtualProcessorType;
@@ -2957,7 +2959,8 @@ public class Aadl2Vdm {
 			//update map (connection-name -> bus-Instance-Name)
 			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
 				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
-					throw new RuntimeException("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+					System.out.println("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+					continue;
 				}
 				if(propAssoc.getOwnedValues().size() != 1) {
 					throw new RuntimeException("Unexpected number of property owned values: " + propAssoc.getOwnedValues().size());
@@ -2989,13 +2992,12 @@ public class Aadl2Vdm {
 
 		//Getting the reference of the object previously created and populating
 		for(ComponentImplementation aCompImpl : comImpls) {
-
 			//variable to refer to previously created object
 			verdict.vdm.vdm_model.ComponentImpl packCompImpl = new verdict.vdm.vdm_model.ComponentImpl();
 
 			//finding previously created object
 			for (verdict.vdm.vdm_model.ComponentImpl anImplObj : m2.getComponentImpl()) {
-				if(anImplObj.getName().equals(aCompImpl.getName())) {
+				if(anImplObj.getId().equalsIgnoreCase(aCompImpl.getQualifiedName())) {
 					packCompImpl = anImplObj;
 
 				}
@@ -3003,11 +3005,11 @@ public class Aadl2Vdm {
 
 			//setting "type" field of packCompImpl
 			for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
-				if(aCompImpl.getTypeName().equals(cType.getName())){
+				if(aCompImpl.getType().getQualifiedName().equals(cType.getId())){
 					packCompImpl.setType(cType);
 				}
 			}//End of setting "type"
-
+			
 			//a BlockImpl object to pack all info for packCompImpl.blockImpl
 			verdict.vdm.vdm_model.BlockImpl packBlockImpl = new verdict.vdm.vdm_model.BlockImpl();
 
@@ -5086,17 +5088,17 @@ public class Aadl2Vdm {
      * Obtain data type information and return vdm-data-type
      * */   
     private verdict.vdm.vdm_data.DataType resolveAADLDataType(org.osate.aadl2.DataType aadlDataType, Model model, HashSet<String> dataTypeDecl) {
-		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		if(aadlDataType.getName().contentEquals("Float")){
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();		
+		if(aadlDataType.getName().contentEquals("Float") || aadlDataType.getName().contentEquals("Float_32") ||aadlDataType.getName().contentEquals("Float_64")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
-		} else if(aadlDataType.getName().contentEquals("Integer")){
+		} else if(aadlDataType.getName().contentEquals("Integer") || aadlDataType.getName().contentEquals("Integer_8") ||aadlDataType.getName().contentEquals("Integer_16")|| aadlDataType.getName().contentEquals("Integer_32") ||aadlDataType.getName().contentEquals("Integer_64") || aadlDataType.getName().contentEquals("Unsigned_8") || aadlDataType.getName().contentEquals("Unsigned_16") || aadlDataType.getName().contentEquals("Unsigned_32") || aadlDataType.getName().contentEquals("Unsigned_64") || aadlDataType.getName().contentEquals("Natural")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
 		} else if(aadlDataType.getName().contentEquals("Boolean")){
 			dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
 		} else {//not float or int or bool or enum
 			dtype.setUserDefinedType(aadlDataType.getName());
+			defineDataType(aadlDataType, model, dataTypeDecl);
 		}
-		defineDataType(aadlDataType, model, dataTypeDecl);
 		return dtype;
 	}
     /**
@@ -5238,10 +5240,13 @@ public class Aadl2Vdm {
 		String dataImplementationName = dataImplementation.getName();
 		if(!dataTypeDecl.contains(dataImplementationName)) {
 			dataTypeDecl.add(dataImplementationName);
+			//vdm data type declaration
+			TypeDeclaration dataTypeVdm = new TypeDeclaration();
+			dataTypeVdm.setName(dataImplementationName);
 			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
 			//GET DETAILS OF THE DATA IMPLEMENTATION AND CREATE CORRESPONDING VDM DATATYPE
 			EList<DataSubcomponent> subcomponents= dataImplementation.getOwnedDataSubcomponents();
-			if(!subcomponents.isEmpty()) {//if the dataType definition has subcomponents
+			if(!(subcomponents.isEmpty())) {//if the dataType definition has subcomponents
 				RecordType recType = new RecordType();
 				for (DataSubcomponent dataSubComp: subcomponents) {
 					RecordField recField = new RecordField();
@@ -5251,25 +5256,27 @@ public class Aadl2Vdm {
 						org.osate.aadl2.DataType aadlDataType = (org.osate.aadl2.DataType)dataSubCompType;
 						Agree2Vdm agree2vdm= new Agree2Vdm();
 						verdict.vdm.vdm_data.DataType recFieldDtype = agree2vdm.getVdmTypeFromAADLType(aadlDataType);
-						recField.setType(recFieldDtype);	
+						recField.setType(recFieldDtype);
+						resolveAADLDataType(aadlDataType, model, dataTypeDecl);
+						recType.getRecordField().add(recField);
 					} else if (dataSubCompType instanceof DataImplementation){
 						DataImplementation dataSubCompDataImplementation = (DataImplementation)dataSubCompType;
 						verdict.vdm.vdm_data.DataType recFieldDtype = new verdict.vdm.vdm_data.DataType();
 						recFieldDtype.setUserDefinedType(dataSubCompDataImplementation.getName());
-						recField.setType(recFieldDtype);	
+						recField.setType(recFieldDtype);
+						defineDataImplementationType(dataSubCompDataImplementation, model, dataTypeDecl);
+						recType.getRecordField().add(recField);
 					} else {
 						System.out.println("Unexpected Data Subcomponent that is not a DataTypeImpl or DataImplementatioImpl.");
 					}
-					recType.getRecordField().add(recField);
 				}
-				dtype.setRecordType(recType);
+				if(recType.getRecordField().size()!=0) {
+					dtype.setRecordType(recType);
+					dataTypeVdm.setDefinition(dtype);
+				}
 			} else { //if the dataType is base type boolean or integer or char or string
 				System.out.println("Data implementation type has no subcomponents");
 			}
-			//vdm data type declaration
-			TypeDeclaration dataTypeVdm = new TypeDeclaration();
-			dataTypeVdm.setName(dataImplementation.getName());
-			dataTypeVdm.setDefinition(dtype);
 			//add the typeDeclaration to the model
 			model.getTypeDeclaration().add(dataTypeVdm);
 		}
@@ -5282,29 +5289,20 @@ public class Aadl2Vdm {
 	private void defineDataType(DataType aadlDataType, Model model, HashSet<String> dataTypeDecl) {
 		//DEFINE DATA TYPE IN DECLARATIONS IF NOT ALREADY DEFINED
 		String aadlDataTypeName = aadlDataType.getName();
-		if(!dataTypeDecl.contains(aadlDataTypeName) && (!aadlDataTypeName.equalsIgnoreCase("Float")) && (!aadlDataTypeName.equalsIgnoreCase("Integer")) && (!aadlDataTypeName.equalsIgnoreCase("Boolean"))) {
+		if(!dataTypeDecl.contains(aadlDataTypeName)) {
 			dataTypeDecl.add(aadlDataType.getName());
-			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-			if(aadlDataType.getName().contentEquals("Float")){
-				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("real"));
-			} else if(aadlDataType.getName().contentEquals("Integer")){
-				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("int"));
-			} else if(aadlDataType.getName().contentEquals("Boolean")){
-				dtype.setPlainType(verdict.vdm.vdm_data.PlainType.fromValue("bool"));
-			} else if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
-				EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
-				Agree2Vdm agree2vdm= new Agree2Vdm();
-				agree2vdm.updateVDMDatatypeUsingProperties(dtype,properties);
-			} else {//not float or int or bool or enum
-				dtype.setUserDefinedType(aadlDataType.getName());
-				//System.out.println("Unresolved AADL Data type value is "+aadlDataType.getName());
-			}
 			//vdm data type declaration
 			TypeDeclaration dataTypeVdm = new TypeDeclaration();
 			dataTypeVdm.setName(aadlDataType.getName());
-			if((aadlDataType.getName().contentEquals("Float")) || (aadlDataType.getName().contentEquals("Integer")) || (aadlDataType.getName().contentEquals("Boolean")) || !(aadlDataType.getAllPropertyAssociations().isEmpty())) {
-				dataTypeVdm.setDefinition(dtype);
-			}
+			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+			if (!(aadlDataType.getAllPropertyAssociations().isEmpty())){//if the dataType definition has properties
+				EList<PropertyAssociation> properties= aadlDataType.getAllPropertyAssociations();
+				Agree2Vdm agree2vdm= new Agree2Vdm();
+				boolean setPropInDataType = agree2vdm.updateVDMDatatypeUsingProperties(dtype,properties);
+				if(setPropInDataType) {
+					dataTypeVdm.setDefinition(dtype);
+				}
+			} 
 			//add the typeDeclaration to the model
 			model.getTypeDeclaration().add(dataTypeVdm);
 		}
