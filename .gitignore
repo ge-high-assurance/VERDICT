@@ -208,4 +208,6 @@ xtend-gen/
 .aadlbin-gen/
 tools/verdict-back-ends/STEM/CSVData/
 tools/verdict-back-ends/STEM/Graphs/
+tools/verdict-back-ends/STEM/GSN/
+tools/verdict-back-ends/STEM/gsn/
 tools/verdict-back-ends/STEM/Output/
