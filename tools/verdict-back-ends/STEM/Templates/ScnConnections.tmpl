@@ -13,19 +13,36 @@ import "http://sadl.org/STEM/BaseModel".
 
 //log "c:/tmp/scnconnections.log"
 
-validate <Scenario> not blank skip
+// all the columns in the csv file with column name below them
+// Scenario	QualifiedName	SanitizedQualifiedName	PackageName	Comp	Impl	ConnQualifiedName	SanitizedConnQualifiedName	ConnectionName	SrcCompInstQualifiedName	SanitizedSrcCompInstQualifiedName	SrcCompInstPackage	SrcComp	SrcImpl	SrcCompInstance	SrcCompCategory	SrcPortName	SrcPortType	DestCompInstQualifiedName	SanitizedDestCompInstQualifiedName	DestCompInstPackage	DestComp	DestImpl	DestCompInstance	DestCompCategory	DestPortName	DestPortType	sessionAuthenticity	deviceAuthentication	connectionType	encryptedTransmission
+// A		B				C						D			E		F		G					H							I				J							K									L					M		N		O				P				Q			R			S							T									U					V			W			X					Y					Z				AA				AB					AC						AD				AE		
+
+// following columns (and column headers) can be empty; for these we do not use "valid <> not blank skip"
+// J SrcCompInstQualifiedName
+// K SanitizedSrcCompInstQualifiedName
+// L SrcCompInstPackage
+// N SrcImpl
+// O SrcCompInstance
+// S DestCompInstQualifiedName
+// T SanitizedDestCompInstQualifiedName
+// U DestCompInstPackage
+// W DestImpl
+// X DestCompInstance
+
+validate <Scenario> not blank skip 
+validate <QualifiedName> not blank skip
+validate <SanitizedQualifiedName> not blank skip
+validate <PackageName> not blank skip
 validate <Comp> not blank skip
 validate <Impl> not blank skip
-validate <ConnectionName> not blank skip
+validate <ConnQualifiedName> not blank skip
+validate <SanitizedConnQualifiedName> not blank skip
+validate <ConnectionName> not blank skip 
 validate <SrcComp> not blank skip
-validate <SrcImpl> not blank skip
-validate <SrcCompInstance> not blank skip
 validate <SrcCompCategory> not blank skip
 validate <SrcPortName> not blank skip
-validate <SrcPortType> not blank skip
+validate <SrcPortType> not blank skip 
 validate <DestComp> not blank skip
-validate <DestImpl> not blank skip
-validate <DestCompInstance> not blank skip
 validate <DestCompCategory> not blank skip
 validate <DestPortName> not blank skip
 validate <DestPortType> not blank skip
@@ -38,47 +55,37 @@ transform <deviceAuthentication> to <def0> replace 1:true,2:true,3:true,4:true,5
 transform <encryptedTransmission> to <def1> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 transform <sessionAuthenticity> to <def2> replace 1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true,0:false
 
-<SrcComp> rdfs:subClassOf Subsystem
-<SrcCompInstance> rdf:type <SrcComp>
-<SrcImpl> rdf:type <SrcComp>  
-<DestComp> rdfs:subClassOf Subsystem
-<DestCompInstance> rdf:type <DestComp>
-<DestImpl> rdf:type <DestComp>
-
-// ignoring SrcPortType and DestPortType as these were for SOTERIA++
-// ignoring SrcCompCategory and DestCompCategory as they are currently only 'system', eventually we will have 'bus' etc
-// note that I do not have 'system' in my model
-
 // do I need to introduce XsessionAuthenticity in BaseModel and set it here?
 
-<ConnectionName><Impl><Comp> rdf:type Connection
-<ConnectionName><Impl><Comp> connectionName <ConnectionName>
-<ConnectionName><Impl><Comp> srcCompType <SrcComp>
-<ConnectionName><Impl><Comp> srcCompImpl <SrcImpl> 
-<ConnectionName><Impl><Comp> connectionSource <SrcCompInstance>
-<ConnectionName><Impl><Comp> outPort <SrcPortName>
-<ConnectionName><Impl><Comp> destCompType <DestComp>
-<ConnectionName><Impl><Comp> destCompImpl <DestImpl> 
-<ConnectionName><Impl><Comp> connectionDestination <DestCompInstance>
-<ConnectionName><Impl><Comp> inPort <DestPortName>
-<ConnectionName><Impl><Comp> connectionType <connectionType>
-<ConnectionName><Impl><Comp> XdeviceAuthentication <def0>
-<ConnectionName><Impl><Comp> XencryptedTransmission <def1>
+//11/17: have simplified what all I set
+
+<SrcComp> rdfs:subClassOf Subsystem
+<SanitizedSrcCompInstQualifiedName><SrcImpl> rdf:type <SrcComp>
+<DestComp> rdfs:subClassOf Subsystem
+<SanitizedDestCompInstQualifiedName><DestImpl> rdf:type <DestComp>
+
+<SanitizedConnQualifiedName> rdf:type Connection
+<SanitizedConnQualifiedName> connectionName <ConnectionName>
+<SanitizedConnQualifiedName> connectionSource <SanitizedSrcCompInstQualifiedName><SrcImpl>
+<SanitizedConnQualifiedName> connectionDestination <SanitizedDestCompInstQualifiedName><DestImpl>
+<SanitizedConnQualifiedName> connectionType <connectionType>
+<SanitizedConnQualifiedName> XdeviceAuthentication <def0>
+<SanitizedConnQualifiedName> XencryptedTransmission <def1>
 
 <1> rdf:type ImplProperty
 <1> name "deviceAuthentication"
 <1> val <def0>
 <1> dal <deviceAuthentication>
-<ConnectionName><Impl><Comp> deviceAuthentication <1>
+<SanitizedConnQualifiedName> deviceAuthentication <1>
 
 <2> rdf:type ImplProperty
 <2> name "encryptedTransmission"
 <2> val <def1>
 <2> dal <encryptedTransmission>
-<ConnectionName><Impl><Comp> encryptedTransmission <2>
+<SanitizedConnQualifiedName> encryptedTransmission <2>
 
 <3> rdf:type ImplProperty
 <3> name "sessionAuthenticity"
 <3> val <def2>
 <3> dal <sessionAuthenticity>
-<ConnectionName><Impl><Comp> sessionAuthenticity <3>
+<SanitizedConnQualifiedName> sessionAuthenticity <3>

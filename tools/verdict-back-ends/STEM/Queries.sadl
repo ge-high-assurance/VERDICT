@@ -368,9 +368,9 @@ Graph STEMgraph: " # link color not taking effect inside OPTIONAL - seems to be 
 # but link_style worked
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color 
 (?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where
-{  ?conn <rdf:type> <Connection>
- . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest
- . ?conn <outPort> ?oport . ?conn <inPort> ?iport
+{ ?conn <rdf:type> <Connection> 
+ . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest 
+ #. ?conn <outPort> ?oport . ?conn <inPort> ?iport
  . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#','')) #strip ?src and ?dest to get ?N1 and ?n2 resp.
  . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')
  . OPTIONAL{?h1 <component> ?src . LET(?N1_fillcolor := 'red')}
@@ -386,9 +386,9 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
            }
 # now get list of component CAPECs
  .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where # use &#10; for newline in tooltip
-      {?src <applicableCM> ?longcapec
-       . ?longcapec <id> ?id . ?longcapec <capecDesc> ?desc
-       . LET(?capec := concat(concat(concat('CAPEC-',str(?id)),':'),?desc))
+      {?xm <rdf:type> <CMitigation> . ?xm <component> ?src . ?xm <capec> ?capecId
+       . ?xm <compCM> ?compCM
+       . ?compCM <capecDesc> ?capecDesc . LET(?capec := concat(?capecId, concat(':',?capecDesc)))
       } group by ?src}
    }
 
@@ -413,19 +413,19 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
 # now concat capec list and property list
  . LET(?f7  := COALESCE(?capeclist,''))
  . LET(?f8  := COALESCE(?plist,''))
- . LET(?f9  := concat(concat(?f7,'; &#10;'),?f8))
+ . LET(?f9  := concat(concat(?f7,'; &#10;'),?f8)) 
  . LET(?f10 := replace(?f9,'^; ',''))  # get rid of initial ';'
  . LET(?f11 := replace(?f10,';','; ')) # having a space ensures that we get quotes around in .dot file
  . LET(?f12 := replace(?f11,'  ',' ')) # do not need 2 spaces
- . LET(?finallist := COALESCE(?f12,''))
+ . LET(?finallist := COALESCE(?f12,'')) 
 
 # set tooltip props for connection properties (just like what was done for components)
 # variables are like those used in processing components but have a 'c' prefix
 # now get list of CAPECs
  .  OPTIONAL {{select distinct ?conn (group_concat(distinct ?ccapec;separator='; &#10;') as ?ccapeclist) where # use &#10; for newline in tooltip
-      {?conn <applicableCM> ?clongcapec
-       . ?clongcapec <id> ?cid . ?clongcapec <capecDesc> ?cdesc
-       . LET(?ccapec := concat(concat(concat('CAPEC-',str(?cid)),':'),?cdesc))
+      {?cxm <rdf:type> <CMitigation> . ?cxm <connection> ?conn . ?cxm <capec> ?ccapecId
+       . ?cxm <connCM> ?connCM
+       . ?connCM <capecDesc> ?ccapecDesc . LET(?ccapec := concat(?ccapecId, concat(':',?ccapecDesc)))
       } group by ?conn}
    }
 
@@ -452,7 +452,7 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
  . LET(?cf8  := COALESCE(?cplist,''))
  . ?conn <connectionType> ?xxx1 # add in connectionType value
  . LET(?xxx2 := replace(str(?xxx1),'^.*#',''))
- . LET(?xxx3 := concat(concat(?cf8, '; &#10;'),?xxx2))
+ . LET(?xxx3 := concat(concat(?cf8, '; &#10;'),?xxx2)) 
  . LET(?cf9  := concat(concat(?cf7,'; &#10;'),?xxx3)) 
  . LET(?cf10 := replace(?cf9,'^; ',''))  # get rid of initial ';'
  . LET(?cf11 := replace(?cf10,';','; ')) # having a space ensures that we get quotes around in .dot file
