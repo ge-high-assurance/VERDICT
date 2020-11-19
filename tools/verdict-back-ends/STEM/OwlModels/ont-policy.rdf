@@ -2,12 +2,6 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:j.0="http://jena.hpl.hp.com/schemas/2003/03/ont-manager#">
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Users/200001866/Documents/GitHub/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Queries.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Queries.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
     <j.0:sadlSourceURL>platform:/resource/VERDICT-STEM/Queries.sadl</j.0:sadlSourceURL>
     <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
@@ -55,29 +49,11 @@
     <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Users/200001866/Documents/GitHub/VERDICT/tools/verdict-back-ends/STEM/OwlModels/Run.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/Run.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
     <j.0:publicURI rdf:resource="http://sadl.org/sadlbasemodel"/>
     <j.0:altURL rdf:resource="file:/C:/Sadl3Workspace2/VERDICT-STEM/OwlModels/SadlBaseModel.owl"/>
     <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
     <j.0:createdBy>SADL</j.0:createdBy>
     <j.0:prefix>sadlbasemodel</j.0:prefix>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Users/200001866/Documents/GitHub/VERDICT/tools/verdict-back-ends/STEM/OwlModels/BaseModel.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/BaseModel.metrics"/>
-  </j.0:OntologySpec>
-  <j.0:OntologySpec>
-    <j.0:createdBy>SRL_Metrics</j.0:createdBy>
-    <j.0:language rdf:resource="http://www.w3.org/2002/07/owl"/>
-    <j.0:altURL rdf:resource="file:/C:/Users/200001866/Documents/GitHub/VERDICT/tools/verdict-back-ends/STEM/OwlModels/STEMRules.sadl.metrics.owl"/>
-    <j.0:publicURI rdf:resource="http://sadl.org/STEM/STEMRules.metrics"/>
   </j.0:OntologySpec>
   <j.0:OntologySpec>
     <j.0:sadlSourceURL>platform:/resource/VERDICT-STEM/STEMRules.sadl</j.0:sadlSourceURL>
