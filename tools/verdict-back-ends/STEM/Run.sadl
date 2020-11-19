@@ -11,14 +11,16 @@ uri "http://sadl.org/STEM/Run" alias run.
 
 import "http://sadl.org/STEM/STEMRules".
 import "http://sadl.org/STEM/Queries".
+//import "http://sadl.org/STEM/ScnBusBindings".
 
 // For debugging csv file importing, uncomment the line that writes out the log file in each of the template files.
 //		In VM would need to also replace c:/tmp/ by /home/soteria/tmp/
 
+// 11/9/2020: have updated templates for the new translator
 // 9/29/2020: updated so that the rules generated a new object; this is so that the CAPEC.csv
 //				and Defenses.csv can have a new column that has "unique mitigation" so that
 //				SOTERIA++ and "Synthesis" can correlate when a capec mitigation is
-//				do X1 on a component or X2 on a connection.
+//				to do X1 on a component or X2 on a connection.
 //				The rules are no longer generated from the excel file; in fact the
 //				Excel file needs to be updated.
 //				The rules need to be checked!!!
@@ -43,7 +45,7 @@ Read: data from "ScnCompProps.csv" using "ScnCompProps.tmpl". //scenario specifi
 Read: data from "ScnBusBindings.csv" using "ScnBusBindings.tmpl".
 
 ////Print:  Model .
-//Explain: Rule TA1-Supply_Chain_Attack-I1.
+//Explain: Rule InferBindingVulAndDataSentIsUntrusted1.
 // note this count may be larger than the number of entries in CAPEC.csv as there may be 
 // multiple mitigations for a capec (e.g. capec-148 etc.)
 Print: "Just get the counts of all CIA Issues".
@@ -58,45 +60,9 @@ Write: data {Ask: queries:Defenses.} to "/Output/Defenses.csv".
 Write: data {Ask: queries:ArchMitigation.} to "/Output/ArchMitigation.csv".
 
 
-///////////////////////// GRAPHS ////////////////////////////
-//////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
-////// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
-////// changed by dropping ". FILTER(?dal > 0)" in 2 places
-//
+/////////////////////// GRAPHS ////////////////////////////
+////For graphing to work, install GraphViz and set path in environment variable GraphVizPath
+//// if DAL is 0 then I show the property but the capec is "not addressed". Of course, this can be
+//// changed by dropping ". FILTER(?dal > 0)" in 2 places
+
 Graph: queries:STEMgraph.
-
-/////////////////////// THE FOLLOWING TO GENERATE DATA FOR COMBINED VIEW //////////////////
-//// to get count for verification
-//Ask: "select count(*) where {?conn <rdf:type> <Connection> . ?conn <outPort> ?z1 . ?conn <inPort> ?z2} order by ?conn ".	 	
-//
-//// first part of Combined View tab is for each mitigation, what are the NIST defenses
-//Ask: "select ?m (group_concat(distinct ?nist2;separator='; ') as ?nistlist) where
-//{?m <rdf:type> <Mitigation> . ?m <nistControl> ?nist
-//. LET(?nist2 := replace(str(?nist),'http.*#',''))
-//} group by ?m order by ?m".
-//
-//// the following query will get most of the second piece of info that I have in the Combined View tab
-//// the following will not surface capec-137 which in 1 row has more than 1 mitigation
-//// note that the list of capecs is not sorted
-//Ask: "select distinct ?m (group_concat(distinct ?id2;separator='; ') as ?capeclist) 
-//  where { ?m <rdf:type> <Mitigation> . ?c <mitigation> ?m 
-//. FILTER NOT EXISTS {?c <mitigation> ?m2 . FILTER(?m != ?m2)} 
-//. ?c <ciaIssue> ?cia . ?c <id> ?id . ?c <capecDesc> ?desc
-//. LET(?cia2 := replace(str(?cia),'http.*#',''))
-//. LET(?cia3 := substr(str(?cia2),1,1))
-//# use only one of the 2 LET lines below, the first one does not give capec description while the second one does
-//. LET(?id2 := concat(str(?id), ?cia3))
-//#. LET(?id2 := concat(concat(concat(str(?id),?cia3),'-'),?desc))
-//} group by ?m order by ?m" .
-//
-//// the following lists the capecs that have more than 1 mitigation in a row
-//Ask: "select ?c (count(*) as ?num) where
-//{?c <mitigation> ?m1 } group by ?c having (?num > 1) order by ?c".
-//
-//// now the NIST info
-//Ask: "select distinct ?id ?desc2 where 
-//{?n <rdf:type> <NISTControl> . ?n <nistId> ?id . ?n <nistDesc> ?desc
-//. LET(?desc2 := replace(str(?desc),'http.*#',''))}
-//order by ?id".
-
-
