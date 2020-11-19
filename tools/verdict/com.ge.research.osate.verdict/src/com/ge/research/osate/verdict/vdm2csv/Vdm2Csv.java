@@ -339,7 +339,7 @@ public class Vdm2Csv {
 						scnBusBindingsTable.addValue(compImplToComp.get(implName));//ActualConnectionBindingSrcComp
 						scnBusBindingsTable.addValue(implName);//ActualConnectionBindingSrcImpl
 						scnBusBindingsTable.addValue("");//ActualConnectionBindingSrcCompInst
-						scnBusBindingsTable.addValue(actualConnectionBinding.substring(actualConnectionBinding.lastIndexOf('.')+1,actualConnectionBinding.length()));//ActualConnectionBindingSrcBusInst
+						scnBusBindingsTable.addValue(actualConnectionBinding);//ActualConnectionBindingSrcBusInst
 						scnBusBindingsTable.addValue("");//DestCompInstQualifiedName
 						scnBusBindingsTable.addValue("");//SanitizedDestCompInstQualifiedName
 						scnBusBindingsTable.addValue("");//DestCompInstPackage
