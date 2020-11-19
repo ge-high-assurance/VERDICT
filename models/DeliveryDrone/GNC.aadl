@@ -376,11 +376,6 @@ public
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			c3: port fc.fc_state -> navigation.flight_control_state
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
-			c12: port gps.gps_pos -> positionEstimator.gps_pos
-			{
-			CASE_Consolidated_Properties::connectionType => Trusted;
-			--CASE_Consolidated_Properties::connectionType => Untrusted;
-			};
 			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
 			{CASE_Consolidated_Properties::connectionType => Trusted;};
 			
