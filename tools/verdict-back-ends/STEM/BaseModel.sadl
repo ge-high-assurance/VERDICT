@@ -42,8 +42,8 @@ System is a type of Thing
 	// properties
 	described by canReceiveSWUpdate with a single value of type boolean
 	described by canReceiveConfigUpdate with a single value of type boolean
-	described by dataReceivedIsUntrusted with a single value of type boolean
-	described by dataSentIsUntrusted with a single value of type boolean
+//	described by dataReceivedIsUntrusted with a single value of type boolean //commented 8/26/2020
+//	described by dataSentIsUntrusted with a single value of type boolean //commented 8/26/2020
 	described by hasSensitiveInfo with a single value of type boolean	
 	described by insideTrustedBoundary with a single value of type boolean
 	described by pedigree with a single value of type Pedigree		
@@ -107,6 +107,8 @@ Connection is a type of Subsystem
 	described by encryptedTransmission with a single value of type ImplProperty 
 	described by XencryptedTransmission with a single value of type boolean
 	described by sessionAuthenticity with a single value of type ImplProperty
+	described by dataSentIsUntrusted with a single value of type boolean //added 8/26/2020
+	described by dataReceivedIsUntrusted with a single value of type boolean //added 8/26/2020	
     described by srcCompType with a single value of type Thing // SrcCompType
     described by srcCompImpl with a single value of type System // SrcCompImpl
     described by srcCompCategory with a single value of type System // SrcCompCategory
@@ -192,6 +194,13 @@ Mitigation is a class
 	described by implProperty with a single value of type string 
 	described by nistControl with values of type NISTControl. 
 
+// rename stuff in next declaration
+CMitigation is a class 
+	described by capec with a single value of type string 
+	described by component with a single value of type Subsystem
+	described by connection with a single value of type Connection
+	described by compCM with values of type CAPEC
+	described by connCM with values of type CAPEC.
 ////////////////////// following generated from Excel: CAPEC, NIST, mitigation declarations /////////////////
 
 // Generated CAPEC Declarations
