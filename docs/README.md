@@ -10,9 +10,9 @@ called verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar in a subprocess
 or it can run a Docker image called gehighassurance/verdict in a
 temporary container.
 
-1. Install OSATE and the VERDICT front-end plugin
+## 1. Install OSATE and the VERDICT front-end plugin
 
-**Prerequisites**
+Front-end **prerequisites**
 
 - [Java 8](https://adoptopenjdk.net/)
 - [OSATE 2](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
@@ -39,7 +39,7 @@ To install our VERDICT plugin in OSATE:
 - Click the Finish button in the Install dialog and restart OSATE when
   prompted to do so.
 
-2. Install the VERDICT back-end tool chain
+## 2. Install the VERDICT back-end tool chain
 
 We support two ways to run the VERDICT back-end programs: Docker image
 and native binaries.  Users may choose whichever approach they prefer.
@@ -47,9 +47,9 @@ The native binaries work only on up to date Mac (Catalina 10.15) and
 Ubuntu (20.04) distributions.  The Docker image works on any other
 platform which can run Docker.
 
-a. Run the back-end tool chain via Docker
+### a. Run the back-end tool chain via Docker
 
-**Prerequisites**
+Docker **prerequisites**
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
@@ -97,12 +97,12 @@ your machine by running the following command in your terminal:
 
 `docker pull gehighassurance/verdict:latest`
 
-b. Run the back-end binaries natively
+### b. Run the back-end binaries natively
 
 You can run the VERDICT back-end native binaries on Ubuntu 20.04 and
 MacOS Catalina 10.15.
 
-**Prerequisites**
+Native **prerequisites**
 
 - [GraphViz](https://www.graphviz.org/download/): Graph Visualization Software
 - [Z3](https://github.com/Z3Prover/z3): The Z3 Theorem Prover
@@ -120,10 +120,6 @@ configure some VERDICT settings in OSATE:
 - Launch OSATE, go to Window > Preferences > Verdict > Verdict
   Settings, and fill out the following fields.
 
-- Fill in the "VERDICT Properties Name:" field with the property set
-  name. In the VERDICT program, we use the property set name
-  "CASE_Consolidated_Properties".
-
 - Click the Browse... button next to the "STEM Project PATH:" field,
   navigate to the "STEM" folder inside the "extern" folder, and make
   it the field's setting.
@@ -134,11 +130,6 @@ configure some VERDICT settings in OSATE:
 - Click the Browse... button next to the "Bundle Jar:" field, navigate
   to the "verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar" file inside
   the "extern" folder, and make it the field's setting.
-
-- Click the Browse... button next to the "Aadl2iml Binary:" field,
-  navigate to the appropriate "aadl2iml" binary for your operating
-  system inside either the "extern/mac" or "extern/nix" folders, and
-  make it the field's setting.
 
 - Click the Browse... button next to the "Kind2 Binary:" field,
   navigate to the appropriate "kind2" binary for your operating system
@@ -158,7 +149,7 @@ configure some VERDICT settings in OSATE:
 - Click the "Apply and Close" button to save all the settings that you
   just entered into the fields.
 
-3. Run VERDICT
+## 3. Run VERDICT
 
 Now you are ready to run the VERDICT plugin on an AADL model.  You can
 use one of the example AADL models in the extern.zip file you unpacked

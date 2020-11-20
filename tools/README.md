@@ -48,7 +48,7 @@ can write both AGREE and VERDICT annexes when developing a model.
    and install unsigned plugins) until you reach the end and click
    Finish.
 
-`https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2`
+   `https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2`
 
 5. Restart OSATE when prompted and navigate to Help > Install New
    Software... again.
@@ -59,7 +59,7 @@ can write both AGREE and VERDICT annexes when developing a model.
    agreement and install unsigned plugins) until you reach the end and
    click Finish.
 
-`https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest`
+   `https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest`
 
 7. Restart OSATE when prompted.
 
@@ -88,7 +88,7 @@ your operating system:
 
 - [Install Docker on
   Ubuntu](https://phoenixnap.com/kb/how-to-install-docker-on-ubuntu-18-04)
-  
+
 - [Install Docker on other Linux operating
   systems](https://docs.docker.com/install/)
 
@@ -140,49 +140,38 @@ image or our back-end programs:
 
 3. Launch OSATE, go to Window > Preferences > Verdict > Verdict
    Settings, and fill out the following fields.
-   
-4. Skip the "VERDICT Properties Name" field unless you are working on
-   the DeliveryDrone model or another model which uses a differently
-   named property set than "VERDICT_Properties".  If so, enter that
-   property set's name into the field, e.g.,
-   "CASE_Consolidated_Properties" for DeliveryDrone.
 
-5. Click the Browse... button next to the "STEM Project PATH:" field,
+4. Click the Browse... button next to the "STEM Project PATH:" field,
    navigate to the "STEM" folder inside the "extern" folder, and make
    it the field's setting.
 
-6. Click within the "Bundle Docker Image:" field, type
+5. Click within the "Bundle Docker Image:" field, type
    "gehighassurance/verdict" for our Docker image's name, and save
    your changes by clicking the "Apply and Close" button.  If you
    don't want to run our Docker image, make sure this field stays
    empty and follow steps 6-11 instead.
 
-7. Click the Browse... button next to the "Bundle Jar:" field,
+6. Click the Browse... button next to the "Bundle Jar:" field,
    navigate to the "verdict-bundle-app-\<VERSION\>-capsule.jar" file
    inside the "extern" folder, and make it the field's setting.
 
-8. Click the Browse... button next to the "Aadl2iml Binary:" field,
-   navigate to the appropriate "aadl2iml" binary for your operating
-   system inside either the "extern/mac" or "extern/nix" folders, and
-   make it the field's setting.
-
-9. Click the Browse... button next to the "Kind2 Binary:" field,
+7. Click the Browse... button next to the "Kind2 Binary:" field,
    navigate to the appropriate "kind2" binary for your operating
    system inside either the "extern/mac" or "extern/nix" folders, and
    make it the field's setting.
 
-10. Click the Browse... button next to the "Soteria++ Binary:" field,
+8. Click the Browse... button next to the "Soteria++ Binary:" field,
    navigate to the appropriate "soteria_pp" binary for your operating
    system inside either the "extern/mac" or "extern/nix" folders, and
    make it the field's setting.
 
-11. Click the Browse... button next to the "GraphViz Path:" field,
+9. Click the Browse... button next to the "GraphViz Path:" field,
    navigate to the folder on your operating system where your
    [GraphViz](https://www.graphviz.org/download/) Graph Visualization
    software is installed, and make it the field's setting.  On Linux,
    that location probably would be "/usr/bin".
 
-12. Click the "Apply and Close" button to save all the settings that
+10. Click the "Apply and Close" button to save all the settings that
    you just entered into the fields.
 
 ## Run our OSATE plugin

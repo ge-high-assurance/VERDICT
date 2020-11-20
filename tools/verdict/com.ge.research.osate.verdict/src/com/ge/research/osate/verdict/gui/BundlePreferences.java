@@ -16,12 +16,10 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 public class BundlePreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	// preference keys
-	private static final String PROPERTY_SET = "verdict_properties_name";
 	private static final String STEM_DIR = "STEM";
 	private static final String DOCKER_IMAGE = "verdict_bundle_image";
 	private static final int FIRST_NON_DOCKER_INDEX = 4; // index of first non-Docker field editor (including separator)
 	private static final String BUNDLE_JAR = "verdict_bundle_jar";
-	private static final String AADL2IML_BIN = "aadl2iml_bin";
 	private static final String KIND2_BIN = "kind2_bin";
 	private static final String SOTERIA_PP_BIN = "soteria_pp_bin";
 	private static final String GRAPH_VIZ_PATH = "graph_viz_path";
@@ -39,14 +37,6 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(preferenceStore);
 		setDescription("Preferences for Verdict (MBAS/CRV)");
-		// Set PROPERTY_SET to our default if it has no value yet
-		if (preferenceStore.getString(PROPERTY_SET).isEmpty()) {
-			preferenceStore.setValue(PROPERTY_SET, "VERDICT_Properties");
-		}
-	}
-
-	public static String getPropertySet() {
-		return preferenceStore.getString(PROPERTY_SET);
 	}
 
 	public static String getStemDir() {
@@ -59,10 +49,6 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 
 	public static String getBundleJar() {
 		return preferenceStore.getString(BUNDLE_JAR);
-	}
-
-	public static String getAadl2imlBin() {
-		return preferenceStore.getString(AADL2IML_BIN);
 	}
 
 	public static String getKind2Bin() {
@@ -93,9 +79,6 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 
 	@Override
 	protected void createFieldEditors() {
-		StringFieldEditor propertySet = new StringFieldEditor(PROPERTY_SET, "VERDICT Properties Name:", getFieldEditorParent());
-		addField(propertySet);
-
 		DirectoryFieldEditor stemDir = new DirectoryFieldEditor(STEM_DIR, "STEM Project Path:", getFieldEditorParent());
 		addField(stemDir);
 
@@ -108,9 +91,6 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 		FileFieldEditor bundleJar = new FileFieldEditor(BUNDLE_JAR, "Bundle Jar:", true, getFieldEditorParent());
 		bundleJar.setFileExtensions(new String[] { "*.jar" });
 		addField(bundleJar);
-
-		FileFieldEditor aadl2imlBin = new FileFieldEditor(AADL2IML_BIN, "Aadl2iml Binary:", true, getFieldEditorParent());
-		addField(aadl2imlBin);
 
 		FileFieldEditor kind2Bin = new FileFieldEditor(KIND2_BIN, "Kind2 Binary:", true, getFieldEditorParent());
 		addField(kind2Bin);
