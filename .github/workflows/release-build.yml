@@ -1,6 +1,7 @@
 # Builds a Verdict release for end users:
-# - Uploads extern.zip and README.md to GitHub release assets
-# - Pushes verdict:latest image to Docker Hub
+# - Uploads native binaries as build artifacts
+# - Uploads extern.zip and README.md as GitHub release assets
+# - Pushes verdict Docker image to Docker Hub
 # - Updates verdict-latest and verdict-$RELEASE update sites
 
 name: Verdict release build
@@ -33,19 +34,19 @@ jobs:
         repository: kind2-mc/kind2
         path: tools/verdict-back-ends/kind2
 
-    - name: Cache opam repository
-      uses: actions/cache@v2
-      with:
-        path: ~/.opam
-        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
-
     - name: Set up OCaml
       uses: avsm/setup-ocaml@v1
       with:
         ocaml-version: ${{ matrix.ocaml-version }}
 
-    - name: Install zmq library
+    - name: Set up zmq library
       run: ${{ matrix.zmq_install }}
+
+    - name: Cache opam repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.opam
+        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
 
     - name: Install opam packages
       run: |
@@ -68,14 +69,14 @@ jobs:
         cd tools/verdict-back-ends/aadl2iml
         opam exec make
 
-    - name: Build soteria_pp
-      run: |
-        cd tools/verdict-back-ends/soteria_pp
-        opam exec make
-
     - name: Build kind2
       run: |
         cd tools/verdict-back-ends/kind2
+        opam exec make
+
+    - name: Build soteria_pp
+      run: |
+        cd tools/verdict-back-ends/soteria_pp
         opam exec make
 
     - name: Upload aadl2iml
@@ -84,17 +85,17 @@ jobs:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/aadl2iml/bin/aadl2iml
 
-    - name: Upload soteria_pp
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.os }}-binaries
-        path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
-
     - name: Upload kind2
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/kind2/bin/kind2
+
+    - name: Upload soteria_pp
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
 
   release:
     strategy:

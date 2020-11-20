@@ -1,6 +1,7 @@
 # Builds a Verdict release for developers on each push to master:
-#  - Pushes verdict-dev:latest image to Docker Hub
-#  - Updates verdict-dev update site
+# - Uploads native binaries as build artifacts
+# - Pushes verdict-dev Docker image to Docker Hub
+# - Updates verdict-dev update site
 
 name: Verdict main build
 
@@ -16,7 +17,12 @@ jobs:
       matrix:
         java-version: [ 8 ]
         ocaml-version: [ 4.07.1 ]
-        os: [ ubuntu-20.04 ]
+        os: [ macos-10.15, ubuntu-20.04 ]
+        include:
+          - os: macos-10.15
+            zmq_install: brew install zmq
+          - os: ubuntu-20.04
+            zmq_install: sudo apt-get install -y libzmq3-dev
 
     runs-on: ${{ matrix.os }}
 
@@ -44,16 +50,25 @@ jobs:
       env:
         GraphVizPath: /usr/bin
 
-    - name: Cache opam repository
-      uses: actions/cache@v2
+    - name: Check out kind2 source
+      uses: actions/checkout@v2
       with:
-        path: ~/.opam
-        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
+        repository: kind2-mc/kind2
+        path: tools/verdict-back-ends/kind2
 
     - name: Set up OCaml
       uses: avsm/setup-ocaml@v1
       with:
         ocaml-version: ${{ matrix.ocaml-version }}
+
+    - name: Set up zmq library
+      run: ${{ matrix.zmq_install }}
+
+    - name: Cache opam repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.opam
+        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
 
     - name: Install opam packages
       run: |
@@ -62,21 +77,53 @@ jobs:
           core \
           core_extended \
           dune \
+          dune-build-info \
           menhir \
           ocamlbuild \
           ocamlfind \
           printbox \
-          xml-light
+          xml-light \
+          yojson \
+          zmq
 
     - name: Build aadl2iml
       run: |
         cd tools/verdict-back-ends/aadl2iml
         opam exec make
 
+    - name: Build kind2
+      run: |
+        cd tools/verdict-back-ends/kind2
+        opam exec make
+
     - name: Build soteria_pp
       run: |
         cd tools/verdict-back-ends/soteria_pp
         opam exec make
+
+    - name: Upload aadl2iml
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/aadl2iml/bin/aadl2iml
+
+    - name: Upload kind2
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/kind2/bin/kind2
+
+    - name: Upload soteria_pp
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
+
+    - name: Upload verdict-bundle-app
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
