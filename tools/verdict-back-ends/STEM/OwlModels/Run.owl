@@ -1,13 +1,13 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
     xmlns:run="http://sadl.org/STEM/Run#"
-    xmlns:builtinfunctions="http://sadl.org/builtinfunctions#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
-    xmlns:stemr="http://sadl.org/STEM/STEMRules#"
-    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
+    xmlns:stemr="http://sadl.org/STEM/STEMRules"
+    xmlns:queries="http://sadl.org/STEM/Queries"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-    xmlns:queries="http://sadl.org/STEM/Queries#"
-    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://sadl.org/STEM/Run">
   <owl:Ontology rdf:about="">

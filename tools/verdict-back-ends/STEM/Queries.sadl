@@ -27,42 +27,27 @@ where {#?m1 <rdf:type> <Mitigation>
 
 Ask CAPEC: "
 select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription
-(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess 
-(?x0 as ?uniqMitigation)
-where {{?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-. ?x0 <compCM> ?x
+(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess
+where {?CompInst <applicableCM> ?x
+. ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
 . ?x <capecDesc> ?CAPECDescription
 . ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess
-. ?x0 <component> ?CompInst . ?CompInst <type> ?CompType
+. ?CompInst <type> ?CompType
 . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
 . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
 . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
 . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
 . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-}
-union
-{
-?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-. ?x0 <connCM> ?x
-. ?x <capecDesc> ?CAPECDescription
-. ?x <likelihoodOfSuccess> ?LikelihoodOfSuccess
-. ?x0 <connection> ?CompInst . ?CompInst <type> ?CompType
-. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-. FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
-. OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-. OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
-. OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-}} order by ?CompType ?CompInst ?CAPEC  
+} order by ?CompType ?CompInst ?CAPEC
 ".
 
 Ask Defenses: "
 select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) 
-             (?ADP as ?ApplicableDefenseProperties) (?Prop as ?ImplProperties) (?DALx as ?DAL) ?uniqMitigation where 
-    {{{{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <compCM> ?x
+             (?ADP as ?ApplicableDefenseProperties) (?Prop as ?ImplProperties) (?DALx as ?DAL) where 
+    {{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) where 
+      {?CompInst <applicableCM> ?x
+      . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <component> ?CompInst 
       . ?CompInst <type> ?CompType
       . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
@@ -70,7 +55,7 @@ select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) 
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
       . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
       . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}
+     } group by ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}
      ?x <mitigation> ?m1
     . LET(?nullstr1 := 'null')
     . LET(?ADP1 := replace(str(?m1),'http.*#',''))
@@ -88,11 +73,10 @@ select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) 
     . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
   }
 UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <compCM> ?x
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) where 
+      {?CompInst <applicableCM> ?x
+      . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <component> ?CompInst
       . ?CompInst <type> ?CompType
       . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
@@ -100,7 +84,7 @@ UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
       . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
       . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}
+     } group by ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}
       # now get applicable defenses, implementation properties and their DALs
      ?x <mitigation> ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
     . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
@@ -139,11 +123,10 @@ UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
     . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))
   }
 UNION # now where there are 3 mitigations for a capec
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <compCM> ?x
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) where 
+      {?CompInst <applicableCM> ?x
+      . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
       . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <component> ?CompInst
       . ?CompInst <type> ?CompType
       . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
       . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
@@ -151,7 +134,7 @@ UNION # now where there are 3 mitigations for a capec
       . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
       . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
       . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}
+     } group by ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}
      # now get applicable defenses, implementation properties and their DALs
      ?x <mitigation> ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
     . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
@@ -207,174 +190,37 @@ UNION # now where there are 3 mitigations for a capec
     . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))
     . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))
   }
-}}
-union
-{
-    {{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <connCM> ?x
-      . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <connection> ?CompInst 
-      . ?CompInst <type> ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
-      . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}
-     ?x <mitigation> ?m1
-    . LET(?nullstr1 := 'null')
-    . LET(?ADP1 := replace(str(?m1),'http.*#',''))
-    . LET(?ADP := concat(?ADP1,concat(';',concat(?nullstr1,concat(';',?nullstr1))))) 
-
-    . LET(?temp1 := lcase(str(?m1)))
-    . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
-               . FILTER(?temp1 = ?temp2) . ?z4 <val> true . ?z4 <dal> ?dal1
-               . LET(?Prop1 := ?y2)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr1)) . LET(?dal11 := coalesce(?dal1,?nullstr1)) 
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal11)) 
-    . LET(?Prop := concat(?strippedProp1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-  }
-UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <connCM> ?x
-      . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <connection> ?CompInst
-      . ?CompInst <type> ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
-      . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}
-      # now get applicable defenses, implementation properties and their DALs
-     ?x <mitigation> ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . LET(?nullstr2 := 'null')
-    . ?x <mitigation> ?m2 . FILTER(?m1 != ?m2)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2,concat(';',?nullstr2)))))
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 <val> true . ?z14 <dal> ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr2)) . LET(?dal111 := coalesce(?dal11,?nullstr2))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 <val> true . ?z24 <dal> ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr2)) . LET(?dal212 := coalesce(?dal21,?nullstr2))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal212)) 
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2,concat(';',?nullstr2)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))
-  }
-UNION # now where there are 3 mitigations for a capec
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 <rdf:type> <CMitigation> . ?x0 <capec> ?CAPEC
-      . ?x0 <connCM> ?x
-      . ?x <capecDesc> ?CAPECDescription
-      . ?x0 <connection> ?CompInst
-      . ?CompInst <type> ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst <type> ?a1 . ?a1 <rdfs:subClassOf> ?CompType }
-      . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x <mitigation> ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}
-     # now get applicable defenses, implementation properties and their DALs
-     ?x <mitigation> ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . ?x <mitigation> ?m2 . FILTER(?m1 != ?m2)
-      # ensure that ?x ends with ?m2 concat with ?m1 (with '-' separation)
-    . LET(?strippedm2 := replace(str(?m2),'http.*#',''))
-    . LET(?strippedm2m1 := concat(?strippedm2, concat('-',?strippedm1)))
-    . LET(?tail2 := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm2m1)+1 ,strlen(?strippedm2m1)))
-    . FILTER(?tail2 = ?strippedm2m1)
-
-    . ?x <mitigation> ?m3 . FILTER(?m1 != ?m3) . FILTER(?m2 != ?m3)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP3 := replace(str(?m3),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2, concat(';',?ADP3)))))
-    . LET(?nullstr3 := 'null')
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix; DO I NEED IT?
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 <val> true . ?z14 <dal> ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr3)) . LET(?dal111 := coalesce(?dal11,?nullstr3))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 <val> true . ?z24 <dal> ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr3)) . LET(?dal211 := coalesce(?dal21,?nullstr3))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal211)) 
-
-    # looking for implementation property corresponding to ?m3
-    . LET(?temp31 := lcase(str(?m3)))
-    . LET(?q32 := replace(str(?temp31),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y32 ?z34 . LET(?temp32 := lcase(str(?y32)))
-              . FILTER(?temp31 = ?temp32) . ?z34 <val> true . ?z34 <dal> ?dal31
-              . LET(?Prop3 := ?y32)}
-    . LET(?Prop31 := coalesce(?Prop3,?nullstr3)) . LET(?dal311 := coalesce(?dal31,?nullstr3))
-    . LET(?strippedProp3 := replace(str(?Prop31),'http.*#',''))
-    . LET(?strippedDal3 := str(?dal311)) #replace(str(?dal31),'http.*#',''))
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))
-  }
-}
-}
 } order by ?CompInst ?CAPEC ?ic ?ii ?ia ?ADP
+".
+
+Ask ConnDefenses: " # for connections, each capec has only a single mitigation
+select ('Connection' as ?CompType) ?CompInst ?Src ?Dest ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
+       (?m1 as ?ApplicableDefenseProperties) (?y2 as ?ImplProperties) ?DAL where
+{  ?conn <connectionName> ?CompInst . ?conn <applicableCM> ?x
+ . ?x <id> ?id . LET(?CAPEC := concat('CAPEC-',str(?id)))
+ . OPTIONAL{?x <ciaIssue> ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
+ . OPTIONAL{?x <ciaIssue> ?ii . FILTER(regex(str(?ii),'Integrity'))}
+ . OPTIONAL{?x <ciaIssue> ?ia . FILTER(regex(str(?ia),'Availability'))}
+ . ?x <mitigation> ?m1
+ . LET(?temp1 := lcase(str(?m1)))
+ . OPTIONAL{?conn ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
+            . FILTER(?temp1 = ?temp2) . ?z4 <dal> ?DAL 
+           }
+ . ?conn <connectionSource> ?Src . ?conn <connectionDestination> ?Dest
+}order by ?CompInst ?CAPEC 
 ".
 
 Graph STEMgraph: " # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl
 # but link_style worked
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color 
 (?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where
-{ ?conn <rdf:type> <Connection> 
- . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest 
- #. ?conn <outPort> ?oport . ?conn <inPort> ?iport
+{  ?conn <rdf:type> <Connection>
+ . ?conn <connectionSource> ?src . ?conn <connectionDestination> ?dest
+ . ?conn <outPort> ?oport . ?conn <inPort> ?iport
  . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#','')) #strip ?src and ?dest to get ?N1 and ?n2 resp.
  . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')
- . OPTIONAL{?h1 <component> ?src . LET(?N1_fillcolor := 'red')}
- . OPTIONAL{?h2 <connection> ?dest . LET(?N2_fillcolor := 'red')}
+ . OPTIONAL{?src <applicableCM> ?acm . LET(?N1_fillcolor := 'red')}
+ . OPTIONAL{?dest <applicableCM> ?acm2 . LET(?N2_fillcolor := 'red')}
  . ?conn <connectionName> ?connname # connection name
  . LET(?strippedcname := replace(str(?connname),'^.*#',''))
 # select what we want to show on links - so comment all but one LET(?link...
@@ -386,9 +232,9 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
            }
 # now get list of component CAPECs
  .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &#10;') as ?capeclist) where # use &#10; for newline in tooltip
-      {?xm <rdf:type> <CMitigation> . ?xm <component> ?src . ?xm <capec> ?capecId
-       . ?xm <compCM> ?compCM
-       . ?compCM <capecDesc> ?capecDesc . LET(?capec := concat(?capecId, concat(':',?capecDesc)))
+      {?src <applicableCM> ?longcapec
+       . ?longcapec <id> ?id . ?longcapec <capecDesc> ?desc
+       . LET(?capec := concat(concat(concat('CAPEC-',str(?id)),':'),?desc))
       } group by ?src}
    }
 
@@ -413,19 +259,19 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
 # now concat capec list and property list
  . LET(?f7  := COALESCE(?capeclist,''))
  . LET(?f8  := COALESCE(?plist,''))
- . LET(?f9  := concat(concat(?f7,'; &#10;'),?f8)) 
+ . LET(?f9  := concat(concat(?f7,'; &#10;'),?f8))
  . LET(?f10 := replace(?f9,'^; ',''))  # get rid of initial ';'
  . LET(?f11 := replace(?f10,';','; ')) # having a space ensures that we get quotes around in .dot file
  . LET(?f12 := replace(?f11,'  ',' ')) # do not need 2 spaces
- . LET(?finallist := COALESCE(?f12,'')) 
+ . LET(?finallist := COALESCE(?f12,''))
 
 # set tooltip props for connection properties (just like what was done for components)
 # variables are like those used in processing components but have a 'c' prefix
 # now get list of CAPECs
  .  OPTIONAL {{select distinct ?conn (group_concat(distinct ?ccapec;separator='; &#10;') as ?ccapeclist) where # use &#10; for newline in tooltip
-      {?cxm <rdf:type> <CMitigation> . ?cxm <connection> ?conn . ?cxm <capec> ?ccapecId
-       . ?cxm <connCM> ?connCM
-       . ?connCM <capecDesc> ?ccapecDesc . LET(?ccapec := concat(?ccapecId, concat(':',?ccapecDesc)))
+      {?conn <applicableCM> ?clongcapec
+       . ?clongcapec <id> ?cid . ?clongcapec <capecDesc> ?cdesc
+       . LET(?ccapec := concat(concat(concat('CAPEC-',str(?cid)),':'),?cdesc))
       } group by ?conn}
    }
 
@@ -452,7 +298,7 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
  . LET(?cf8  := COALESCE(?cplist,''))
  . ?conn <connectionType> ?xxx1 # add in connectionType value
  . LET(?xxx2 := replace(str(?xxx1),'^.*#',''))
- . LET(?xxx3 := concat(concat(?cf8, '; &#10;'),?xxx2)) 
+ . LET(?xxx3 := concat(concat(?cf8, '; &#10;'),?xxx2))
  . LET(?cf9  := concat(concat(?cf7,'; &#10;'),?xxx3)) 
  . LET(?cf10 := replace(?cf9,'^; ',''))  # get rid of initial ';'
  . LET(?cf11 := replace(?cf10,';','; ')) # having a space ensures that we get quotes around in .dot file

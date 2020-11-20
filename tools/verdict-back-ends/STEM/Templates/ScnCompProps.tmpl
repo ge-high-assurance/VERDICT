@@ -16,68 +16,52 @@ import "http://sadl.org/STEM/BaseModel".
 // need to put 1 and 0 in quotes - just to make it work with an updated SADL version
 // note that the val* numbers are not contiguous
 
-// all the columns in the csv file with column name below them
-// Scenario	QualifiedName	SanitizedQualifiedName	PackageName	Comp	Impl	CompInstance	staticCodeAnalysis	removeIdentifyingInformation	userAuthentication	canReceiveSWUpdate	encryptedStorage	inputValidation	secureBoot	resourceIsolation	Flooding_Attack	dosProtection	Hardware_Integrity_Attack	hasSensitiveInfo	Sniffing_Attack	zeroize	componentType	resourceAvailability	Physical_Theft_Attack	canReceiveConfigUpdate	Supply_Chain_Attack	tamperProtection	auditMessageResponses	adversariallyTestedForTrojanOrLogicBomb	Configuration_Attack	Identity_Spoofing_Attack	heterogeneity	Brute_Force_Attack	pedigree	remoteAttestation	Fault_Injection_Attack	failSafe	Interception_Attack	antiJamming	Buffer_Attack	systemAccessControl	logging	physicalAccessControl	strongCryptoAlgorithms	Excessive_Allocation_Attack	category	supplyChainSecurity	memoryProtection	insideTrustedBoundary
-// A		B				C						D			E		F		G				H					I								J					K					L					M				N			O					P				Q				R							S					T				U		V				W						X						Y						Z					AA					AB						AC										AD						AE							AF				AG					AH			AI					AJ						AK			AL					AM			AN				AO					AP		AQ						AR						AS							AT			AU					AV					AW		
-
-// following columns (and column headers) can be empty; for these we do not use "valid <> not blank skip"
-// F Impl
-
-// 11/3: note order of columns is different then what it used to be - should not matter
-// the following 3 are new in the csv files; have not added them in yet
-// 	Cache_Size		: has value 7 for radio- but that was just put into AADL file for testing	
-// 	adversariallyTestedForTrojanOrLogicBomb			
-// 	category	: all values in the column are "Unknown"	
-
-//the following is re-ordered to match the updated csv file
 validate <Scenario> not blank skip
-validate <QualifiedName> not blank skip
-validate <SanitizedQualifiedName> not blank skip
-validate <PackageName> not blank skip
 validate <Comp> not blank skip
+validate <Impl> not blank skip
 validate <CompInstance> not blank skip
-validate <staticCodeAnalysis> not blank skip
-validate <removeIdentifyingInformation> not blank skip
-validate <userAuthentication> not blank skip
-validate <canReceiveSWUpdate> not blank skip
-validate <encryptedStorage> not blank skip
-validate <inputValidation> not blank skip
-validate <secureBoot> not blank skip
-validate <resourceIsolation> not blank skip
-validate <Flooding_Attack> not blank skip
-validate <dosProtection> not blank skip
-validate <Hardware_Integrity_Attack> not blank skip
-validate <hasSensitiveInfo> not blank skip
-validate <Sniffing_Attack> not blank skip
-validate <zeroize> not blank skip
-validate <componentType> not blank skip
-validate <resourceAvailability> not blank skip
-validate <Physical_Theft_Attack> not blank skip
 validate <canReceiveConfigUpdate> not blank skip
-validate <Supply_Chain_Attack> not blank skip
-validate <tamperProtection> not blank skip
-validate <auditMessageResponses> not blank skip
-validate <adversariallyTestedForTrojanOrLogicBomb> not blank skip
-validate <Configuration_Attack> not blank skip
-validate <Identity_Spoofing_Attack> not blank skip
-validate <heterogeneity> not blank skip
-validate <Brute_Force_Attack> not blank skip
-validate <pedigree> not blank skip
-validate <remoteAttestation> not blank skip
-validate <Fault_Injection_Attack> not blank skip
-validate <failSafe> not blank skip
-validate <Interception_Attack> not blank skip
-validate <antiJamming> not blank skip
-validate <Buffer_Attack> not blank skip
-validate <systemAccessControl> not blank skip
-validate <logging> not blank skip
-validate <physicalAccessControl> not blank skip
-validate <strongCryptoAlgorithms> not blank skip
-validate <Excessive_Allocation_Attack> not blank skip
-validate <category> not blank skip
-validate <supplyChainSecurity> not blank skip
-validate <memoryProtection> not blank skip
+validate <canReceiveSWUpdate> not blank skip
+validate <hasSensitiveInfo> not blank skip
 validate <insideTrustedBoundary> not blank skip
+validate <componentType> not blank skip
+validate <pedigree> not blank skip
+
+validate <antiJamming> not blank skip
+validate <auditMessageResponses> not blank skip
+validate <dosProtection> not blank skip
+validate <encryptedStorage> not blank skip
+validate <heterogeneity> not blank skip
+validate <inputValidation> not blank skip
+validate <logging> not blank skip
+validate <memoryProtection> not blank skip
+validate <physicalAccessControl> not blank skip
+validate <removeIdentifyingInformation> not blank skip
+validate <resourceAvailability> not blank skip
+validate <resourceIsolation> not blank skip
+validate <secureBoot> not blank skip
+validate <staticCodeAnalysis> not blank skip
+validate <strongCryptoAlgorithms> not blank skip
+validate <supplyChainSecurity> not blank skip
+validate <systemAccessControl> not blank skip
+validate <tamperProtection> not blank skip
+validate <userAuthentication> not blank skip
+validate <Configuration_Attack> not blank skip
+validate <Physical_Theft_Attack> not blank skip
+validate <Interception_Attack> not blank skip
+validate <Hardware_Integrity_Attack> not blank skip
+validate <Supply_Chain_Attack> not blank skip
+validate <Brute_Force_Attack> not blank skip
+validate <Fault_Injection_Attack> not blank skip
+validate <Identity_Spoofing_Attack> not blank skip
+validate <Excessive_Allocation_Attack> not blank skip
+validate <Sniffing_Attack> not blank skip
+validate <Buffer_Attack> not blank skip
+validate <Flooding_Attack> not blank skip
+
+validate <failSafe> not blank skip
+validate <remoteAttestation> not blank skip
+validate <zeroize> not blank skip
 
 transform <hasSensitiveInfo> to <val1> replace "1" : true,"0" : false
 transform <insideTrustedBoundary> to <val2> replace "1" : true,"0" : false
@@ -122,155 +106,155 @@ transform <Sniffing_Attack> to <val22> replace "1" : true,"0" : false
 transform <Buffer_Attack> to <val23> replace "1" : true,"0" : false
 transform <Flooding_Attack> to <val24> replace "1" : true,"0" : false
 
-<SanitizedQualifiedName> hasSensitiveInfo <val1> 
-<SanitizedQualifiedName> insideTrustedBoundary <val2> 
-<SanitizedQualifiedName> componentType <componentType> 
-<SanitizedQualifiedName> canReceiveSWUpdate <val11> 
-<SanitizedQualifiedName> canReceiveConfigUpdate <val12> 
-<SanitizedQualifiedName> pedigree <pedigree> 
+<CompInstance> hasSensitiveInfo <val1> 
+<CompInstance> insideTrustedBoundary <val2> 
+<CompInstance> componentType <componentType> 
+<CompInstance> canReceiveSWUpdate <val11> 
+<CompInstance> canReceiveConfigUpdate <val12> 
+<CompInstance> pedigree <pedigree> 
 
-<SanitizedQualifiedName> Configuration_Attack <val13>
-<SanitizedQualifiedName> Physical_Theft_Attack <val14>
-<SanitizedQualifiedName> Interception_Attack <val15>
-<SanitizedQualifiedName> Hardware_Integrity_Attack <val16>
-<SanitizedQualifiedName> Supply_Chain_Attack <val17>
-<SanitizedQualifiedName> Brute_Force_Attack <val18>
-<SanitizedQualifiedName> Fault_Injection_Attack <val19>
-<SanitizedQualifiedName> Identity_Spoofing_Attack <val20>
-<SanitizedQualifiedName> Excessive_Allocation_Attack <val21>
-<SanitizedQualifiedName> Sniffing_Attack <val22>
-<SanitizedQualifiedName> Buffer_Attack <val23>
-<SanitizedQualifiedName> Flooding_Attack <val24>
+<CompInstance> Configuration_Attack <val13>
+<CompInstance> Physical_Theft_Attack <val14>
+<CompInstance> Interception_Attack <val15>
+<CompInstance> Hardware_Integrity_Attack <val16>
+<CompInstance> Supply_Chain_Attack <val17>
+<CompInstance> Brute_Force_Attack <val18>
+<CompInstance> Fault_Injection_Attack <val19>
+<CompInstance> Identity_Spoofing_Attack <val20>
+<CompInstance> Excessive_Allocation_Attack <val21>
+<CompInstance> Sniffing_Attack <val22>
+<CompInstance> Buffer_Attack <val23>
+<CompInstance> Flooding_Attack <val24>
 
 <1> rdf:type ImplProperty
 <1> name "antiJamming"
 <1> val <def1>
 <1> dal <antiJamming>
-<SanitizedQualifiedName> antiJamming <1>
+<CompInstance> antiJamming <1>
 
 <2> rdf:type ImplProperty
 <2> name "auditMessageResponses"
 <2> val <def2>
 <2> dal <auditMessageResponses>
-<SanitizedQualifiedName> auditMessageResponses <2>
+<CompInstance> auditMessageResponses <2>
 
 <4> rdf:type ImplProperty
 <4> name "dosProtection"
 <4> val <def4>
 <4> dal <dosProtection>
-<SanitizedQualifiedName> dosProtection <4>
+<CompInstance> dosProtection <4>
 
 <5> rdf:type ImplProperty
 <5> name "encryptedStorage"
 <5> val <def5>
 <5> dal <encryptedStorage>
-<SanitizedQualifiedName> encryptedStorage <5>
+<CompInstance> encryptedStorage <5>
 
 <7> rdf:type ImplProperty
 <7> name "heterogeneity"
 <7> val <def7>
 <7> dal <heterogeneity>
-<SanitizedQualifiedName> heterogeneity <7>
+<CompInstance> heterogeneity <7>
 
 <8> rdf:type ImplProperty
 <8> name "inputValidation"
 <8> val <def8>
 <8> dal <inputValidation>
-<SanitizedQualifiedName> inputValidation <8>
+<CompInstance> inputValidation <8>
 
 <9> rdf:type ImplProperty
 <9> name "logging"
 <9> val <def9>
 <9> dal <logging>
-<SanitizedQualifiedName> logging <9>
+<CompInstance> logging <9>
 
 <10> rdf:type ImplProperty
 <10> name "memoryProtection"
 <10> val <def10>
 <10> dal <memoryProtection>
-<SanitizedQualifiedName> memoryProtection <10>
+<CompInstance> memoryProtection <10>
 
 <11> rdf:type ImplProperty
 <11> name "physicalAccessControl"
 <11> val <def11>
 <11> dal <physicalAccessControl>
-<SanitizedQualifiedName> physicalAccessControl <11>
-<SanitizedQualifiedName> XphysicalAccessControl <def11> 
+<CompInstance> physicalAccessControl <11>
+<CompInstance> XphysicalAccessControl <def11> 
 
 <12> rdf:type ImplProperty
 <12> name "removeIdentifyingInformation"
 <12> val <def12>
 <12> dal <removeIdentifyingInformation>
-<SanitizedQualifiedName> removeIdentifyingInformation <12>
+<CompInstance> removeIdentifyingInformation <12>
 
 <13> rdf:type ImplProperty
 <13> name "resourceAvailability"
 <13> val <def13>
 <13> dal <resourceAvailability>
-<SanitizedQualifiedName> resourceAvailability <13>
+<CompInstance> resourceAvailability <13>
 
 <14> rdf:type ImplProperty
 <14> name "resourceIsolation"
 <14> val <def14>
 <14> dal <resourceIsolation>
-<SanitizedQualifiedName> resourceIsolation <14>
+<CompInstance> resourceIsolation <14>
 
 <15> rdf:type ImplProperty
 <15> name "secureBoot"
 <15> val <def15>
 <15> dal <secureBoot>
-<SanitizedQualifiedName> secureBoot <15>
+<CompInstance> secureBoot <15>
 
 <17> rdf:type ImplProperty
 <17> name "staticCodeAnalysis"
 <17> val <def17>
 <17> dal <staticCodeAnalysis>
-<SanitizedQualifiedName> staticCodeAnalysis <17>
+<CompInstance> staticCodeAnalysis <17>
 
 <18> rdf:type ImplProperty
 <18> name "strongCryptoAlgorithms"
 <18> val <def18>
 <18> dal <strongCryptoAlgorithms>
-<SanitizedQualifiedName> strongCryptoAlgorithms <18>
+<CompInstance> strongCryptoAlgorithms <18>
 
 <19> rdf:type ImplProperty
 <19> name "supplyChainSecurity"
 <19> val <def19>
 <19> dal <supplyChainSecurity>
-<SanitizedQualifiedName> supplyChainSecurity <19>
+<CompInstance> supplyChainSecurity <19>
 
 <20> rdf:type ImplProperty
 <20> name "systemAccessControl"
 <20> val <def20>
 <20> dal <systemAccessControl>
-<SanitizedQualifiedName> systemAccessControl <20>
+<CompInstance> systemAccessControl <20>
 
 <21> rdf:type ImplProperty
 <21> name "tamperProtection"
 <21> val <def21>
 <21> dal <tamperProtection>
-<SanitizedQualifiedName> tamperProtection <21>
+<CompInstance> tamperProtection <21>
 
 <22> rdf:type ImplProperty
 <22> name "userAuthentication"
 <22> val <def22>
 <22> dal <userAuthentication>
-<SanitizedQualifiedName> userAuthentication <22>
+<CompInstance> userAuthentication <22>
 
 <23> rdf:type ImplProperty
 <23> name "failSafe"
 <23> val <def23>
 <23> dal <failSafe>
-<SanitizedQualifiedName> failSafe <23>
+<CompInstance> failSafe <23>
 
 <24> rdf:type ImplProperty
 <24> name "remoteAttestation"
 <24> val <def24>
 <24> dal <remoteAttestation>
-<SanitizedQualifiedName> remoteAttestation <24>
+<CompInstance> remoteAttestation <24>
 
 <25> rdf:type ImplProperty
 <25> name "zeroize"
 <25> val <def25>
 <25> dal <zeroize>
-<SanitizedQualifiedName> zeroize <25>
+<CompInstance> zeroize <25>

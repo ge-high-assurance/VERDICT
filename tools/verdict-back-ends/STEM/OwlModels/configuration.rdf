@@ -6,48 +6,54 @@
       <rdf:Bag>
         <rdf:li>
           <Builtin>
-            <name>getInstance</name>
-            <class>com.ge.research.sadl.jena.reasoner.builtin.GetInstance</class>
+            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >com.ge.research.sadl.jena.reasoner.builtin.GetInstance</class>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >getInstance</name>
           </Builtin>
         </rdf:li>
         <rdf:li>
           <Builtin>
-            <class>com.ge.research.sadl.jena.reasoner.builtin.OneOf</class>
-            <name>oneOf</name>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >oneOf</name>
+            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >com.ge.research.sadl.jena.reasoner.builtin.OneOf</class>
           </Builtin>
         </rdf:li>
         <rdf:li>
           <Builtin>
-            <class>com.ge.research.sadl.jena.reasoner.builtin.NoValue</class>
-            <name>noValue</name>
-          </Builtin>
-        </rdf:li>
-        <rdf:li>
-          <Builtin>
-            <class>com.ge.research.sadl.jena.reasoner.builtin.ThereExists</class>
-            <name>thereExists</name>
+            <name rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >noValue</name>
+            <class rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+            >com.ge.research.sadl.jena.reasoner.builtin.NoValue</class>
           </Builtin>
         </rdf:li>
       </rdf:Bag>
     </subcategory>
   </Category>
   <Category rdf:about="http://com.ge.research.sadl.configuration#ReasonerSpec">
-    <reasonerClassName>com.ge.research.sadl.jena.reasoner.JenaReasonerPlugin</reasonerClassName>
+    <reasonerClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.research.sadl.jena.reasoner.JenaReasonerPlugin</reasonerClassName>
   </Category>
   <Category rdf:about="http://com.ge.research.sadl.configuration#Jena">
-    <pModelSpec>OWL_MEM</pModelSpec>
+    <pModelSpec rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >OWL_MEM</pModelSpec>
     <pOWLTranslation rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
     >false</pOWLTranslation>
     <pUseLuceneIndexer rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
     >false</pUseLuceneIndexer>
-    <pTimeOut>-1</pTimeOut>
+    <pTimeOut rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >-1</pTimeOut>
     <pTrace rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
     >false</pTrace>
-    <pRuleMode>hybrid</pRuleMode>
-    <pDerivationLogging>None</pDerivationLogging>
+    <pRuleMode rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >hybrid</pRuleMode>
+    <pDerivationLogging rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >None</pDerivationLogging>
     <pTransitiveClosureCaching rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean"
     >false</pTransitiveClosureCaching>
-    <translatorClassName>com.ge.research.sadl.jena.translator.JenaTranslatorPlugin</translatorClassName>
+    <translatorClassName rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >com.ge.research.sadl.jena.translator.JenaTranslatorPlugin</translatorClassName>
   </Category>
   <Category rdf:about="http://com.ge.research.sadl.configuration#Builtin"/>
 </rdf:RDF>
