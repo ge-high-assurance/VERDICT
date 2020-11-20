@@ -31,7 +31,7 @@ jobs:
     - name: Cache Maven repository
       uses: actions/cache@v2
       with:
-        path: ~/.m2
+        path: ~/.m2/repository
         key: ${{ matrix.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ matrix.os }}-m2
 

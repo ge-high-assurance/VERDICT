@@ -34,6 +34,12 @@ jobs:
         repository: kind2-mc/kind2
         path: tools/verdict-back-ends/kind2
 
+    - name: Cache opam repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.opam
+        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
+
     - name: Set up OCaml
       uses: avsm/setup-ocaml@v1
       with:
@@ -41,12 +47,6 @@ jobs:
 
     - name: Set up zmq library
       run: ${{ matrix.zmq_install }}
-
-    - name: Cache opam repository
-      uses: actions/cache@v2
-      with:
-        path: ~/.opam
-        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
 
     - name: Install opam packages
       run: |
@@ -121,7 +121,7 @@ jobs:
     - name: Cache Maven repository
       uses: actions/cache@v2
       with:
-        path: ~/.m2
+        path: ~/.m2/repository
         key: ${{ matrix.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ matrix.os }}-m2
 
