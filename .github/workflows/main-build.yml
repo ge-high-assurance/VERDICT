@@ -73,12 +73,6 @@ jobs:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
 
-    - name: Upload verdict-bundle-app
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.os }}-binaries
-        path: tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar
-
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
 
@@ -101,16 +95,27 @@ jobs:
       env:
         GraphVizPath: /usr/bin
 
+    - name: Upload verdict-bundle-app
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar
+
+    # Rest of steps can run on only Linux, other OS isn't needed
+
     - name: Set up Docker Buildx
+      if: runner.os == 'Linux'
       uses: docker/setup-buildx-action@v1
 
     - name: Login to Docker Hub
+      if: runner.os == 'Linux'
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push verdict-dev image
+      if: runner.os == 'Linux'
       uses: docker/build-push-action@v2
       with:
         context: tools/verdict-back-ends
@@ -121,6 +126,7 @@ jobs:
         tags: gehighassurance/verdict-dev:latest
 
     - name: Check out VERDICT-update-sites
+      if: runner.os == 'Linux'
       uses: actions/checkout@v2
       with:
         repository: ge-high-assurance/VERDICT-update-sites
@@ -128,6 +134,7 @@ jobs:
         path: VERDICT-update-sites
 
     - name: Update verdict-dev in VERDICT-update-sites
+      if: runner.os == 'Linux'
       run: |
         cd VERDICT-update-sites
         rm -rf verdict-dev
