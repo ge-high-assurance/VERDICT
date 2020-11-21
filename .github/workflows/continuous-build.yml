@@ -1,4 +1,4 @@
-# Checks that a pull request can build the Verdict jars
+# Builds Verdict jars on each pull request as a CI check
 
 name: Verdict continuous build
 
@@ -36,6 +36,8 @@ jobs:
         restore-keys: ${{ matrix.os }}-m2
 
     - name: Run Maven build
-      run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
+      run: |
+        mvn -B install --file tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
+        mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin

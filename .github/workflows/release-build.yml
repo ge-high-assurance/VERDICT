@@ -1,8 +1,8 @@
-# Builds a Verdict release for end users:
+# Builds Verdict release artifacts on each published release:
 # - Uploads native binaries as build artifacts
 # - Uploads extern.zip and README.md as GitHub release assets
 # - Pushes verdict Docker image to Docker Hub
-# - Updates verdict-latest and verdict-$RELEASE update sites
+# - Updates verdict-latest & verdict-$RELEASE update sites
 
 name: Verdict release build
 
@@ -126,7 +126,9 @@ jobs:
         restore-keys: ${{ matrix.os }}-m2
 
     - name: Run Maven build
-      run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
+      run: |
+        mvn -B install --file tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
+        mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
 
