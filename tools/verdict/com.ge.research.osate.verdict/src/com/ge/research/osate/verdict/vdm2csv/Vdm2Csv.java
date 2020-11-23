@@ -306,9 +306,9 @@ public class Vdm2Csv {
 	private Table updateBusBindingsTable(List<ComponentImpl> compImpls, String scenario, Map<String, String> compToCompImpl) {
 		Table scnBusBindingsTable = new Table("Scenario", "QualifiedName", "SanitizedQualifiedName", "PackageName", "Comp", "Impl", "SrcCompInstQualifiedName", 
 				"SanitizedSrcCompInstQualifiedName", "SrcCompInstPackage", "ActualConnectionBindingSrcComp","ActualConnectionBindingSrcImpl",
-				"ActualConnectionBindingSrcCompInst", "ActualConnectionBindingSrcBusInst",
+				"ActualConnectionBindingSrcCompInst", "SanitizedActualConnectionBindingSrcBusInstName","ActualConnectionBindingSrcBusInst",
 				"DestCompInstQualifiedName", "SanitizedDestCompInstQualifiedName", "DestCompInstPackage", "ActualConnectionBindingDestConnComp", "ActualConnectionBindingDestConnImpl",
-				"ActualConnectionBindingDestConnCompInst", "ActualConnectionBindingDestConn");
+				"ActualConnectionBindingDestConnCompInst", "SanitizedActualConnectionBindingDestConnName", "ActualConnectionBindingDestConn");
 		//creating hashmap (compImpl -> comp) from (comp -> compImpl)
 		HashMap<String, String> compImplToComp = new HashMap<String, String>();
 		for (String key : compToCompImpl.keySet()){
@@ -339,14 +339,16 @@ public class Vdm2Csv {
 						scnBusBindingsTable.addValue(compImplToComp.get(implName));//ActualConnectionBindingSrcComp
 						scnBusBindingsTable.addValue(implName);//ActualConnectionBindingSrcImpl
 						scnBusBindingsTable.addValue("");//ActualConnectionBindingSrcCompInst
-						scnBusBindingsTable.addValue(actualConnectionBinding);//ActualConnectionBindingSrcBusInst
+						scnBusBindingsTable.addValue(replaceColonsWithUnderscore(actualConnectionBinding));//SanitizedActualConnectionBindingSrcBusInstName
+						scnBusBindingsTable.addValue(actualConnectionBinding.substring(actualConnectionBinding.lastIndexOf('.')+1,actualConnectionBinding.length()));//ActualConnectionBindingSrcBusInst
 						scnBusBindingsTable.addValue("");//DestCompInstQualifiedName
 						scnBusBindingsTable.addValue("");//SanitizedDestCompInstQualifiedName
 						scnBusBindingsTable.addValue("");//DestCompInstPackage
 						scnBusBindingsTable.addValue(compImpl.getType().getName());//ActualConnectionBindingDestConnComp
 						scnBusBindingsTable.addValue(compImpl.getName());//ActualConnectionBindingDestConnImpl
 						scnBusBindingsTable.addValue("");//ActualConnectionBindingDestConnCompInst
-						scnBusBindingsTable.addValue(replaceColonsWithUnderscore(compConnection2.getQualifiedName()));//ActualConnectionBindingDestConn
+						scnBusBindingsTable.addValue(replaceColonsWithUnderscore(compConnection2.getQualifiedName()));//SanitizedActualConnectionBindingDestConnName
+						scnBusBindingsTable.addValue(compConnection2.getName());//ActualConnectionBindingDestConn
 						scnBusBindingsTable.capRow();
 					}
 				}
