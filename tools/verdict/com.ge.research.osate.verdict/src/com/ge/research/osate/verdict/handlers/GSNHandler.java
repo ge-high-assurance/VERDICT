@@ -243,25 +243,23 @@ public class GSNHandler extends AbstractHandler {
 		 *              securityCasesKey
 		 */
 		command
-			.env("GraphVizPath", graphVizPath)
-			.jarOrImage(bundleJar, dockerImage)
-			.arg("--csv")
-			.arg(projectName)
-			.arg("--gsn")
-			.arg(rootId)
-			.argBind(gsnOutputDir, "/app/gsn")
-			.argBind(soteriaOutputDir, "/app/Soteria_Output")
-			.arg(modelAadlDir) //Using this only as string for embedding links. Don't bind
-			.arg(BundlePreferences.getStemDir()) //Using this only as string for embedding links. Don't bind
+		    .env("GraphVizPath", graphVizPath)
+		    .jarOrImage(bundleJar, dockerImage)
+		    .arg("--csv")
+		    .arg(projectName)
+		    .arg("--gsn")
+		    .arg(rootId)
+		    .argBind(gsnOutputDir, "/app/gsn")
+		    .argBind(soteriaOutputDir, "/app/Soteria_Output")
+		    // Next two args are used only as strings in embedded links
+		    // Don't bind them, but do need to replace backslashes with slashes
+		    .arg(modelAadlDir.replaceAll("\\\\", "/"))
+		    .arg(BundlePreferences.getStemDir().replaceAll("\\\\", "/"))
 		    .arg(xmlKey)
 		    .arg(securityCasesKey); 
-
-        
         
 		int code = command.runJarOrImage();
 		return code == 0;
-		
-
 	}
 	
 	

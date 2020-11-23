@@ -280,6 +280,7 @@ public class VerdictBundleCommand {
 
         // Start the command and wait for it to exit
         try {
+            VerdictLogger.info("Running java: verdict-bundle-app " + String.join(" ", args));
             StopHandler.enable(this);
             setFuture(executor.start().getFuture());
 
