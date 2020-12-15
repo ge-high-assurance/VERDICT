@@ -544,24 +544,28 @@ public class Vdm2Csv {
 
 	private void updateSafetyMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
 			 String probability, SafetyReqExpr safetyReqCondition, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
-		missionTable.addValue(scenario);
-		missionTable.addValue(sanitizeValue(missionReqId));
-		missionTable.addValue(""); // MissionReq
-		missionTable.addValue(cyberReqId);
-		missionTable.addValue(""); // Req
-		//get cia and add as MissionImpactCIA
-		missionTable.addValue("");
-		missionTable.addValue(""); // Effect
-		//get and add severity
-		missionTable.addValue(probability);
-		//get port's linked source instance
 		if(connectionDestToSourceMap.containsKey(safetyReqCondition.getPort().getName())) {
 			List<ConnectionEnd> linkedSourcePorts = connectionDestToSourceMap.get(safetyReqCondition.getPort().getName());
 			for (ConnectionEnd linkedSourcePort : linkedSourcePorts) {
 				if(linkedSourcePort.getSubcomponentPort()!=null) {
 					CompInstancePort destCompPort = linkedSourcePort.getSubcomponentPort();
+					missionTable.addValue(scenario);
+					missionTable.addValue(sanitizeValue(missionReqId));
+					missionTable.addValue(""); // MissionReq
+					missionTable.addValue(cyberReqId);
+					missionTable.addValue(""); // Req
+					//get cia and add as MissionImpactCIA
+					missionTable.addValue("");
+					missionTable.addValue(""); // Effect
+					//get and add severity
+					missionTable.addValue(probability);
+					//get port's linked source instance
 					missionTable.addValue(destCompPort.getSubcomponent().getName());
 					missionTable.addValue(destCompPort.getPort().getName());
+					//get CIA and add it to table
+					missionTable.addValue(formatToSmall(safetyReqCondition.getPort().getIa().name()));
+					missionTable.addValue("Safety");
+					missionTable.capRow();
 				} else {
 					throw new RuntimeException("Linked Source Port has no instance information");
 				}
@@ -569,10 +573,6 @@ public class Vdm2Csv {
 		} else {
 			throw new RuntimeException("Missing component instance dependency. "+safetyReqCondition.getPort().getName()+" is not linked to a source port");
 		}
-		//get CIA and add it to table
-		missionTable.addValue(formatToSmall(safetyReqCondition.getPort().getIa().name()));
-		missionTable.addValue("Safety");
-		missionTable.capRow();
 	}
 	private void processComponentTypes(List<ComponentType> compTypes, Table eventsTable, Table compDepTable, Table compSafTable) {
 		//each ComponentType contains id, name, compCateg, List<Port>, ContractSpec, List<CyberRel>, List<SafetyRel>, List<Event>
