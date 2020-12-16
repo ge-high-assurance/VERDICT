@@ -485,25 +485,29 @@ public class Vdm2Csv {
 		missionTable.capRow();
 	}
 	private void updateCyberMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
-			verdict.vdm.vdm_model.CIA cyberCIA, verdict.vdm.vdm_model.Severity cyberSeverity, CyberExpr cyberReqCondition, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
-		missionTable.addValue(scenario);
-		missionTable.addValue(sanitizeValue(missionReqId));
-		missionTable.addValue(""); // MissionReq
-		missionTable.addValue(cyberReqId);
-		missionTable.addValue(""); // Req
-		//get cia and add as MissionImpactCIA
-		missionTable.addValue(formatToSmall(cyberCIA.toString()));
-		missionTable.addValue(""); // Effect
-		//get and add severity
-		missionTable.addValue(formatToSmall(cyberSeverity.name()));
+			verdict.vdm.vdm_model.CIA cyberCIA, verdict.vdm.vdm_model.Severity cyberSeverity, CyberExpr cyberReqCondition, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {		
 		//get port's linked source instance
 		if(connectionDestToSourceMap.containsKey(cyberReqCondition.getPort().getName())) {
 			List<ConnectionEnd> linkedSourcePorts = connectionDestToSourceMap.get(cyberReqCondition.getPort().getName());
 			for (ConnectionEnd linkedSourcePort : linkedSourcePorts) {
 				if(linkedSourcePort.getSubcomponentPort()!=null) {
+					missionTable.addValue(scenario);
+					missionTable.addValue(sanitizeValue(missionReqId));
+					missionTable.addValue(""); // MissionReq
+					missionTable.addValue(cyberReqId);
+					missionTable.addValue(""); // Req
+					//get cia and add as MissionImpactCIA
+					missionTable.addValue(formatToSmall(cyberCIA.toString()));
+					missionTable.addValue(""); // Effect
+					//get and add severity
+					missionTable.addValue(formatToSmall(cyberSeverity.name()));
 					CompInstancePort destCompPort = linkedSourcePort.getSubcomponentPort();
 					missionTable.addValue(destCompPort.getSubcomponent().getName());
 					missionTable.addValue(destCompPort.getPort().getName());
+					//get CIA and add it to table
+					missionTable.addValue(formatToSmall(cyberReqCondition.getPort().getCia().name()));
+					missionTable.addValue("Cyber");
+					missionTable.capRow();
 				} else {
 					throw new RuntimeException("Linked Source Port has no instance information");
 				}
@@ -511,10 +515,6 @@ public class Vdm2Csv {
 		} else {
 			throw new RuntimeException("Missing component instance dependency. "+cyberReqCondition.getPort().getName()+" is not linked to a source port");
 		}
-		//get CIA and add it to table
-		missionTable.addValue(formatToSmall(cyberReqCondition.getPort().getCia().name()));
-		missionTable.addValue("Cyber");
-		missionTable.capRow();
 	}
 	private void updateAndExprSafetyMissionsTable(Table missionTable, String scenario, String missionReqId, String cyberReqId,
 			String targetProbability, SafetyReqExpr subCyberCond, Map<String, List<ConnectionEnd>> connectionDestToSourceMap) {
