@@ -834,6 +834,7 @@ public class Vdm2Csv {
 		
 	}
 	String replaceColonsWithUnderscore(String inpStr) {
+		if(inpStr == null) {return "";}
 		inpStr = inpStr.replaceAll("(:)+", "_");
 		return inpStr;
 	}
