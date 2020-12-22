@@ -13,7 +13,7 @@ const CONST_BOOL : bool = true;
 const LAUNCH_DIR : ENUM_DIR = NORTH;
 const RETURN_DIR = WEST;
 const LAUNCH_POS = POSITION {x = 0; y = 0};
-const CONST_EXPR = (int (1.5), real (1), (LAUNCH_POS).(x), (1) - (1), -(1), (1) + (1), (1) * (1), (1) / (1), (1) div (1), (1) mod (1), not (1), (1) and (1), (1) or (1), (1) xor (1), (1) => (1), (1) < (1), (1) > (1), (1) <= (1), (1) >= (1), (1) = (1), (1) <> (1), if (1) then (1) else (1), (1) -> (1), pre (1), call(1, 1));
+const CONST_EXPR = (int (1.5), real (1), (LAUNCH_POS).x, (1) - (1), -(1), (1) + (1), (1) * (1), (1) / (1), (1) div (1), (1) mod (1), not (1), (1) and (1), (1) or (1), (1) xor (1), (1) => (1), (1) < (1), (1) > (1), (1) <= (1), (1) >= (1), (1) = (1), (1) <> (1), if (1) then (1) else (1), (1) -> (1), pre (1), call(1, 1));
 
 node top (
   n : int

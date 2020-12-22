@@ -56,10 +56,14 @@ public class VDMLustre2Kind2 {
 
         for (ConstantDeclaration modelConstDecl : modelProgram.getConstantDeclaration()) {
             if (modelConstDecl.getDataType() != null) {
-                pb.createConst(
-                        modelConstDecl.getName(),
-                        visit(modelConstDecl.getDataType()),
-                        visit(modelConstDecl.getDefinition()));
+                if (modelConstDecl.getDefinition() != null) {
+                    pb.createConst(
+                            modelConstDecl.getName(),
+                            visit(modelConstDecl.getDataType()),
+                            visit(modelConstDecl.getDefinition()));
+                } else {
+                    pb.createConst(modelConstDecl.getName(), visit(modelConstDecl.getDataType()));
+                }
             } else {
                 pb.createConst(modelConstDecl.getName(), visit(modelConstDecl.getDefinition()));
             }
