@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ge.verdict</groupId>
+        <artifactId>verdict-bundle</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Verdict STEM Runner -->
+    <artifactId>verdict-stem-runner</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>reasoner-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>reasoner-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ge.research.sadl</groupId>
+            <artifactId>sadlserver-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Dependencies needed only by tests or capsule jar -->
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- This microrepository has our SADL dependencies -->
+    <repositories>
+        <repository>
+            <id>sadl-snapshot-repository</id>
+            <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+    <build><!-- Let's use the STEM project above us rather than copying it into
+            src/test/resources -->
+        <testResources>
+            <testResource>
+                <directory>${basedir}/../..</directory>
+                <includes>
+                    <include>STEM/</include>
+                </includes>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>com.github.chrisdchristo</groupId>
+                <artifactId>capsule-maven-plugin</artifactId>
+                <configuration>
+                    <appClass>com.ge.verdict.stem.App</appClass>
+                    <includeApp>true</includeApp>
+                    <includeAppDep>true</includeAppDep>
+                    <includePluginDep>false</includePluginDep>
+                    <includeTransitiveDep>true</includeTransitiveDep>
+                    <includeCompileDep>true</includeCompileDep>
+                    <includeRuntimeDep>true</includeRuntimeDep>
+                    <includeProvidedDep>false</includeProvidedDep>
+                    <includeSystemDep>false</includeSystemDep>
+                    <includeTestDep>true</includeTestDep>
+                    <includeOptionalDep>false</includeOptionalDep>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

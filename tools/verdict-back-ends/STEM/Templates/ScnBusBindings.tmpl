@@ -13,6 +13,10 @@ import "http://sadl.org/STEM/BaseModel".
 
 //log "c:/tmp/scnconnections.log"
 
+// the following comments need to be updated as the translator added 2 more columns (noted on 12/20/2020))
+// the 2 columns added are 
+//		SanitizedActualConnectionBindingSrcBusInstName SanitizedActualConnectionBindingDestConnName
+
 // all the columns in the csv file with column name below them
 // Scenario	QualifiedName	SanitizedQualifiedName	PackageName	Comp	Impl	SrcCompInstQualifiedName	SanitizedSrcCompInstQualifiedName	SrcCompInstPackage	ActualConnectionBindingSrcComp	ActualConnectionBindingSrcImpl	ActualConnectionBindingSrcCompInst	ActualConnectionBindingSrcBusInst	DestCompInstQualifiedName	SanitizedDestCompInstQualifiedName	DestCompInstPackage	ActualConnectionBindingDestConnComp	ActualConnectionBindingDestConnImpl	ActualConnectionBindingDestConnCompInst	ActualConnectionBindingDestConn
 // A		B				C						D			E		F		G							H									I					J								K								L									M									N							O									P					Q									R									S										T													
@@ -23,22 +27,20 @@ import "http://sadl.org/STEM/BaseModel".
 // O SanitizedDestCompInstQualifiedName
 // P DestCompInstPackage
 
-// only putting in "validate" for a column headers I am using
-//validate <Scenario> not blank skip
-//validate <QualifiedName> not blank skip
-//validate <SanitizedQualifiedName> not blank skip
-//validate <PackageName> not blank skip
-//validate <Comp> not blank skip
-//validate <Impl> not blank skip
-//validate <ActualConnectionBindingSrcComp> not blank skip
-//validate <ActualConnectionBindingSrcImpl> not blank skip
-//validate <ActualConnectionBindingDestConnComp> not blank skip
-//validate <ActualConnectionBindingDestConnImpl> not blank skip
-//validate <ActualConnectionBindingDestConn> not blank skip
-validate <ActualConnectionBindingSrcBusInst> not blank skip
+validate <Scenario> not blank skip
+validate <QualifiedName> not blank skip
+validate <SanitizedQualifiedName> not blank skip
+validate <PackageName> not blank skip
+validate <Comp> not blank skip
+validate <Impl> not blank skip
+validate <ActualConnectionBindingSrcComp> not blank skip
+validate <ActualConnectionBindingSrcImpl> not blank skip
+validate <ActualConnectionBindingDestConnComp> not blank skip
+validate <ActualConnectionBindingDestConnImpl> not blank skip
 validate <ActualConnectionBindingDestConn> not blank skip
+validate <SanitizedActualConnectionBindingSrcBusInstName> not blank skip
+validate <SanitizedActualConnectionBindingDestConnName> not blank skip
 
-
-<ActualConnectionBindingSrcBusInst> rdf:type Bus
-<ActualConnectionBindingDestConn> binding <ActualConnectionBindingSrcBusInst>
+<SanitizedActualConnectionBindingSrcBusInstName> rdf:type Bus
+<SanitizedActualConnectionBindingDestConnName> binding <SanitizedActualConnectionBindingSrcBusInstName>
 

@@ -17,465 +17,465 @@
     <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'Queries.sadl' and should not be directly edited.</rdfs:comment>
   </owl:Ontology>
   <sadlimplicitmodel:NamedQuery rdf:ID="Defenses2NIST">
-    <rdfs:isDefinedBy>
-select distinct (?m1 as ?DefenseProperty)
-(?ApplicableDefense1 as ?NISTProfile) (?DefenseDescription1 as ?DefenseDescription)
-where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Mitigation&gt;
-# get NIST controls and their names for mitigation m1
-{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1)
-    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where
-   {?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Mitigation&gt; . ?m1 &lt;http://sadl.org/STEM/BaseModel#nistControl&gt; ?yy2
-    . ?yy2 &lt;http://sadl.org/STEM/BaseModel#nistId&gt; ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))
-    . ?yy2 &lt;http://sadl.org/STEM/BaseModel#nistDesc&gt; ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))
-   } group by ?m1}
-} order by ?m1 ?ApplicableDefense1
+    <rdfs:isDefinedBy>&#xD;
+select distinct (?m1 as ?DefenseProperty)&#xD;
+(?ApplicableDefense1 as ?NISTProfile) (?DefenseDescription1 as ?DefenseDescription)&#xD;
+where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Mitigation&gt;&#xD;
+# get NIST controls and their names for mitigation m1&#xD;
+{select distinct ?m1 (group_concat(distinct ?nc;separator=';') as ?ApplicableDefense1)&#xD;
+    (group_concat(distinct ?ncd;separator=';') as ?DefenseDescription1) where&#xD;
+   {?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Mitigation&gt; . ?m1 &lt;http://sadl.org/STEM/BaseModel#nistControl&gt; ?yy2&#xD;
+    . ?yy2 &lt;http://sadl.org/STEM/BaseModel#nistId&gt; ?yy3 . LET(?nc := replace(str(?yy3),'http.*#',''))&#xD;
+    . ?yy2 &lt;http://sadl.org/STEM/BaseModel#nistDesc&gt; ?yy4 . LET(?ncd := replace(str(?yy4),'http.*#',''))&#xD;
+   } group by ?m1}&#xD;
+} order by ?m1 ?ApplicableDefense1&#xD;
 </rdfs:isDefinedBy>
   </sadlimplicitmodel:NamedQuery>
   <sadlimplicitmodel:NamedQuery rdf:ID="STEMgraph">
-    <rdfs:isDefinedBy> # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl
-# but link_style worked
-select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color 
-(?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where
-{ ?conn &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Connection&gt; 
- . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?src . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?dest 
- #. ?conn &lt;http://sadl.org/STEM/BaseModel#outPort&gt; ?oport . ?conn &lt;http://sadl.org/STEM/BaseModel#inPort&gt; ?iport
- . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#','')) #strip ?src and ?dest to get ?N1 and ?n2 resp.
- . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')
- . OPTIONAL{?h1 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?src . LET(?N1_fillcolor := 'red')}
- . OPTIONAL{?h2 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?dest . LET(?N2_fillcolor := 'red')}
- . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?connname # connection name
- . LET(?strippedcname := replace(str(?connname),'^.*#',''))
-# select what we want to show on links - so comment all but one LET(?link...
-# . LET(?link := concat(concat(str(?oport),':'),str(?iport)))  # if we want to show port names at both ends
-# . LET(?link := ' ') 										   # if we want to show nothing
- . LET(?link := ?strippedcname) 								# if we want to show connection name
- . OPTIONAL{?conn &lt;http://sadl.org/STEM/BaseModel#connectionType&gt; ?t . FILTER(regex(str(?t),'Untrusted')) . 
-             LET(?link_style := 'dashed') # . LET(?link_color := 'red')
-           }
-# now get list of component CAPECs
- .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &amp;#10;') as ?capeclist) where # use &amp;#10; for newline in tooltip
-      {?xm &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?xm &lt;http://sadl.org/STEM/BaseModel#component&gt; ?src . ?xm &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?capecId
-       . ?xm &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?compCM
-       . ?compCM &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?capecDesc . LET(?capec := concat(?capecId, concat(':',?capecDesc)))
-      } group by ?src}
-   }
-
-# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
-# using OPTIONAL as the 'generated' object does not have capecs or properties on it
- . OPTIONAL{{select distinct ?src (group_concat(distinct ?f6;separator='; &amp;#10;') as ?plist) where
-    { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false
-         ?src ?prop ?f1 		
-       . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?f2 . ?f1 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?prop_val
-       . LET(?f3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) 
-      }
-    UNION
-    { # this get properties, not implementation properties
-      OPTIONAL{?src ?prop ?prop_val . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?f2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}
-      . LET(?f3 := concat(str(?prop_val),str(?prop)))
-    }
-   
-   . LET(?f4 := replace(str(?f3),'http.*#',''))
-   . LET(?f5 := replace(str(?f4),'^true',''))
-   . LET(?f6 := replace(str(?f5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working
-   } group by ?src}}
-# now concat capec list and property list
- . LET(?f7  := COALESCE(?capeclist,''))
- . LET(?f8  := COALESCE(?plist,''))
- . LET(?f9  := concat(concat(?f7,'; &amp;#10;'),?f8)) 
- . LET(?f10 := replace(?f9,'^; ',''))  # get rid of initial ';'
- . LET(?f11 := replace(?f10,';','; ')) # having a space ensures that we get quotes around in .dot file
- . LET(?f12 := replace(?f11,'  ',' ')) # do not need 2 spaces
- . LET(?finallist := COALESCE(?f12,'')) 
-
-# set tooltip props for connection properties (just like what was done for components)
-# variables are like those used in processing components but have a 'c' prefix
-# now get list of CAPECs
- .  OPTIONAL {{select distinct ?conn (group_concat(distinct ?ccapec;separator='; &amp;#10;') as ?ccapeclist) where # use &amp;#10; for newline in tooltip
-      {?cxm &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?cxm &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?conn . ?cxm &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?ccapecId
-       . ?cxm &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?connCM
-       . ?connCM &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?ccapecDesc . LET(?ccapec := concat(?ccapecId, concat(':',?ccapecDesc)))
-      } group by ?conn}
-   }
-
-# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)
-# using OPTIONAL as the 'generated' object does not have capecs or properties on it
- . OPTIONAL{{select distinct ?conn (group_concat(distinct ?cf6;separator='; &amp;#10;') as ?cplist) where
-    { {  #target: ?conn is component instance, ?cprop is property, ?cprop_val is whether the property is true or false
-         ?conn ?cprop ?cf1 		
-       . ?cprop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?cf2 . ?cf1 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?cprop_val
-       . LET(?cf3 := concat(str(?cprop),concat(' DAL ',str(?cprop_val)))) 
-      }
-    UNION
-    { # this get properties, not implementation properties
-      OPTIONAL{?conn ?cprop ?cprop_val . ?cprop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?cf2 . FILTER(regex(str(?cprop_val),'true') || regex(str(?cprop_val),'false'))}
-      . LET(?cf3 := concat(str(?cprop_val),str(?cprop)))
-    }
-   
-   . LET(?cf4 := replace(str(?cf3),'http.*#',''))
-   . LET(?cf5 := replace(str(?cf4),'^true',''))
-   . LET(?cf6 := replace(str(?cf5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working
-   } group by ?conn}}
-# now concat conncapec list (ccapeclist) and conn property list (cplist)
- . LET(?cf7  := COALESCE(?ccapeclist,''))
- . LET(?cf8  := COALESCE(?cplist,''))
- . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionType&gt; ?xxx1 # add in connectionType value
- . LET(?xxx2 := replace(str(?xxx1),'^.*#',''))
- . LET(?xxx3 := concat(concat(?cf8, '; &amp;#10;'),?xxx2)) 
- . LET(?cf9  := concat(concat(?cf7,'; &amp;#10;'),?xxx3)) 
- . LET(?cf10 := replace(?cf9,'^; ',''))  # get rid of initial ';'
- . LET(?cf11 := replace(?cf10,';','; ')) # having a space ensures that we get quotes around in .dot file
- . LET(?cf12 := replace(?cf11,'  ',' ')) # do not need 2 spaces
- . LET(?cf13 := COALESCE(?cf12,''))
- . LET(?cfinallist := concat('Connection: ',concat(?strippedcname,concat('&amp;#10;',?cf13)))) # add connection name at top
-}
+    <rdfs:isDefinedBy> # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl&#xD;
+# but link_style worked&#xD;
+select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color &#xD;
+(?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where&#xD;
+{ ?conn &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Connection&gt; &#xD;
+ . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?src . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?dest &#xD;
+ #. ?conn &lt;http://sadl.org/STEM/BaseModel#outPort&gt; ?oport . ?conn &lt;http://sadl.org/STEM/BaseModel#inPort&gt; ?iport&#xD;
+ . LET(?N1 := replace(str(?src),'^.*#','')) . LET(?N2 := replace(str(?dest),'^.*#','')) #strip ?src and ?dest to get ?N1 and ?n2 resp.&#xD;
+ . LET(?N1_style := 'filled') . LET(?N2_style := 'filled')&#xD;
+ . OPTIONAL{?h1 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?src . LET(?N1_fillcolor := 'red')}&#xD;
+ . OPTIONAL{?h2 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?dest . LET(?N2_fillcolor := 'red')}&#xD;
+ . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?connname # connection name&#xD;
+ . LET(?strippedcname := replace(str(?connname),'^.*#',''))&#xD;
+# select what we want to show on links - so comment all but one LET(?link...&#xD;
+# . LET(?link := concat(concat(str(?oport),':'),str(?iport)))  # if we want to show port names at both ends&#xD;
+# . LET(?link := ' ') 										   # if we want to show nothing&#xD;
+ . LET(?link := ?strippedcname) 								# if we want to show connection name&#xD;
+ . OPTIONAL{?conn &lt;http://sadl.org/STEM/BaseModel#connectionType&gt; ?t . FILTER(regex(str(?t),'Untrusted')) . &#xD;
+             LET(?link_style := 'dashed') # . LET(?link_color := 'red')&#xD;
+           }&#xD;
+# now get list of component CAPECs&#xD;
+ .  OPTIONAL {{select distinct ?src (group_concat(distinct ?capec;separator='; &amp;#10;') as ?capeclist) where # use &amp;#10; for newline in tooltip&#xD;
+      {?xm &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?xm &lt;http://sadl.org/STEM/BaseModel#component&gt; ?src . ?xm &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?capecId&#xD;
+       . ?xm &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?compCM&#xD;
+       . ?compCM &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?capecDesc . LET(?capec := concat(?capecId, concat(':',?capecDesc)))&#xD;
+      } group by ?src}&#xD;
+   }&#xD;
+&#xD;
+# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)&#xD;
+# using OPTIONAL as the 'generated' object does not have capecs or properties on it&#xD;
+ . OPTIONAL{{select distinct ?src (group_concat(distinct ?f6;separator='; &amp;#10;') as ?plist) where&#xD;
+    { {  #target: ?src is component instance, ?prop is property, ?prop_val is whether the property is true or false&#xD;
+         ?src ?prop ?f1 		&#xD;
+       . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?f2 . ?f1 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?prop_val&#xD;
+       . LET(?f3 := concat(str(?prop),concat(' DAL ',str(?prop_val)))) &#xD;
+      }&#xD;
+    UNION&#xD;
+    { # this get properties, not implementation properties&#xD;
+      OPTIONAL{?src ?prop ?prop_val . ?prop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?f2 . FILTER(regex(str(?prop_val),'true') || regex(str(?prop_val),'false'))}&#xD;
+      . LET(?f3 := concat(str(?prop_val),str(?prop)))&#xD;
+    }&#xD;
+   &#xD;
+   . LET(?f4 := replace(str(?f3),'http.*#',''))&#xD;
+   . LET(?f5 := replace(str(?f4),'^true',''))&#xD;
+   . LET(?f6 := replace(str(?f5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working&#xD;
+   } group by ?src}}&#xD;
+# now concat capec list and property list&#xD;
+ . LET(?f7  := COALESCE(?capeclist,''))&#xD;
+ . LET(?f8  := COALESCE(?plist,''))&#xD;
+ . LET(?f9  := concat(concat(?f7,'; &amp;#10;'),?f8)) &#xD;
+ . LET(?f10 := replace(?f9,'^; ',''))  # get rid of initial ';'&#xD;
+ . LET(?f11 := replace(?f10,';','; ')) # having a space ensures that we get quotes around in .dot file&#xD;
+ . LET(?f12 := replace(?f11,'  ',' ')) # do not need 2 spaces&#xD;
+ . LET(?finallist := COALESCE(?f12,'')) &#xD;
+&#xD;
+# set tooltip props for connection properties (just like what was done for components)&#xD;
+# variables are like those used in processing components but have a 'c' prefix&#xD;
+# now get list of CAPECs&#xD;
+ .  OPTIONAL {{select distinct ?conn (group_concat(distinct ?ccapec;separator='; &amp;#10;') as ?ccapeclist) where # use &amp;#10; for newline in tooltip&#xD;
+      {?cxm &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?cxm &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?conn . ?cxm &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?ccapecId&#xD;
+       . ?cxm &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?connCM&#xD;
+       . ?connCM &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?ccapecDesc . LET(?ccapec := concat(?ccapecId, concat(':',?ccapecDesc)))&#xD;
+      } group by ?conn}&#xD;
+   }&#xD;
+&#xD;
+# now get the list of properties (note we have simple properties and ImplProperties and they have different structures)&#xD;
+# using OPTIONAL as the 'generated' object does not have capecs or properties on it&#xD;
+ . OPTIONAL{{select distinct ?conn (group_concat(distinct ?cf6;separator='; &amp;#10;') as ?cplist) where&#xD;
+    { {  #target: ?conn is component instance, ?cprop is property, ?cprop_val is whether the property is true or false&#xD;
+         ?conn ?cprop ?cf1 		&#xD;
+       . ?cprop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?cf2 . ?cf1 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?cprop_val&#xD;
+       . LET(?cf3 := concat(str(?cprop),concat(' DAL ',str(?cprop_val)))) &#xD;
+      }&#xD;
+    UNION&#xD;
+    { # this get properties, not implementation properties&#xD;
+      OPTIONAL{?conn ?cprop ?cprop_val . ?cprop &lt;http://sadl.org/STEM/BaseModel#tooltipProp&gt; ?cf2 . FILTER(regex(str(?cprop_val),'true') || regex(str(?cprop_val),'false'))}&#xD;
+      . LET(?cf3 := concat(str(?cprop_val),str(?cprop)))&#xD;
+    }&#xD;
+   &#xD;
+   . LET(?cf4 := replace(str(?cf3),'http.*#',''))&#xD;
+   . LET(?cf5 := replace(str(?cf4),'^true',''))&#xD;
+   . LET(?cf6 := replace(str(?cf5),'^false','NOT_')) # had wanted it to be NOT(...) but was having trouble getting that working&#xD;
+   } group by ?conn}}&#xD;
+# now concat conncapec list (ccapeclist) and conn property list (cplist)&#xD;
+ . LET(?cf7  := COALESCE(?ccapeclist,''))&#xD;
+ . LET(?cf8  := COALESCE(?cplist,''))&#xD;
+ . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionType&gt; ?xxx1 # add in connectionType value&#xD;
+ . LET(?xxx2 := replace(str(?xxx1),'^.*#',''))&#xD;
+ . LET(?xxx3 := concat(concat(?cf8, '; &amp;#10;'),?xxx2)) &#xD;
+ . LET(?cf9  := concat(concat(?cf7,'; &amp;#10;'),?xxx3)) &#xD;
+ . LET(?cf10 := replace(?cf9,'^; ',''))  # get rid of initial ';'&#xD;
+ . LET(?cf11 := replace(?cf10,';','; ')) # having a space ensures that we get quotes around in .dot file&#xD;
+ . LET(?cf12 := replace(?cf11,'  ',' ')) # do not need 2 spaces&#xD;
+ . LET(?cf13 := COALESCE(?cf12,''))&#xD;
+ . LET(?cfinallist := concat('Connection: ',concat(?strippedcname,concat('&amp;#10;',?cf13)))) # add connection name at top&#xD;
+}&#xD;
 </rdfs:isDefinedBy>
   </sadlimplicitmodel:NamedQuery>
   <sadlimplicitmodel:NamedQuery rdf:ID="ArchMitigation">
-    <rdfs:isDefinedBy>
-select distinct ?ConnectionName ?SrcCompInstance ?DestCompInstance ('Bind to different bus' as ?Mitigation) 
-where {?c &lt;http://sadl.org/STEM/BaseModel#bindingVulnerability&gt; true . ?c &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?ConnectionName
-. ?c &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?SrcCompInstance . ?c &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?DestCompInstance}
+    <rdfs:isDefinedBy>&#xD;
+select distinct ?ConnectionName ?SrcCompInstance ?DestCompInstance ('Bind to different bus' as ?Mitigation) &#xD;
+where {?c &lt;http://sadl.org/STEM/BaseModel#bindingVulnerability&gt; true . ?c &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?ConnectionName&#xD;
+. ?c &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?SrcCompInstance . ?c &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?DestCompInstance}&#xD;
 </rdfs:isDefinedBy>
   </sadlimplicitmodel:NamedQuery>
   <sadlimplicitmodel:NamedQuery rdf:ID="CAPEC">
-    <rdfs:isDefinedBy>
-select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription
-(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess 
-(?x0 as ?uniqMitigation)
-where {{?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-. ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x
-. ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-. ?x &lt;http://sadl.org/STEM/BaseModel#likelihoodOfSuccess&gt; ?LikelihoodOfSuccess
-. ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-. FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-}
-union
-{
-?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-. ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x
-. ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-. ?x &lt;http://sadl.org/STEM/BaseModel#likelihoodOfSuccess&gt; ?LikelihoodOfSuccess
-. ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-. FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-}} order by ?CompType ?CompInst ?CAPEC  
+    <rdfs:isDefinedBy>&#xD;
+select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription&#xD;
+(?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess &#xD;
+(?x0 as ?uniqMitigation)&#xD;
+where {{?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+. ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x&#xD;
+. ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+. ?x &lt;http://sadl.org/STEM/BaseModel#likelihoodOfSuccess&gt; ?LikelihoodOfSuccess&#xD;
+. ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+. FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+}&#xD;
+union&#xD;
+{&#xD;
+?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+. ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x&#xD;
+. ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+. ?x &lt;http://sadl.org/STEM/BaseModel#likelihoodOfSuccess&gt; ?LikelihoodOfSuccess&#xD;
+. ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+. FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+. FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+. OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+}} order by ?CompType ?CompInst ?CAPEC  &#xD;
 </rdfs:isDefinedBy>
   </sadlimplicitmodel:NamedQuery>
   <sadlimplicitmodel:NamedQuery rdf:ID="Defenses">
-    <rdfs:isDefinedBy>
-select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) 
-             (?ADP as ?ApplicableDefenseProperties) (?Prop as ?ImplProperties) (?DALx as ?DAL) ?uniqMitigation where 
-    {{{{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst 
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1
-    . LET(?nullstr1 := 'null')
-    . LET(?ADP1 := replace(str(?m1),'http.*#',''))
-    . LET(?ADP := concat(?ADP1,concat(';',concat(?nullstr1,concat(';',?nullstr1))))) 
-
-    . LET(?temp1 := lcase(str(?m1)))
-    . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
-               . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1
-               . LET(?Prop1 := ?y2)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr1)) . LET(?dal11 := coalesce(?dal1,?nullstr1)) 
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal11)) 
-    . LET(?Prop := concat(?strippedProp1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-  }
-UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}
-      # now get applicable defenses, implementation properties and their DALs
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . LET(?nullstr2 := 'null')
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2,concat(';',?nullstr2)))))
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr2)) . LET(?dal111 := coalesce(?dal11,?nullstr2))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr2)) . LET(?dal212 := coalesce(?dal21,?nullstr2))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal212)) 
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2,concat(';',?nullstr2)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))
-  }
-UNION # now where there are 3 mitigations for a capec
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}
-     # now get applicable defenses, implementation properties and their DALs
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)
-      # ensure that ?x ends with ?m2 concat with ?m1 (with '-' separation)
-    . LET(?strippedm2 := replace(str(?m2),'http.*#',''))
-    . LET(?strippedm2m1 := concat(?strippedm2, concat('-',?strippedm1)))
-    . LET(?tail2 := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm2m1)+1 ,strlen(?strippedm2m1)))
-    . FILTER(?tail2 = ?strippedm2m1)
-
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m3 . FILTER(?m1 != ?m3) . FILTER(?m2 != ?m3)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP3 := replace(str(?m3),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2, concat(';',?ADP3)))))
-    . LET(?nullstr3 := 'null')
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix; DO I NEED IT?
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr3)) . LET(?dal111 := coalesce(?dal11,?nullstr3))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr3)) . LET(?dal211 := coalesce(?dal21,?nullstr3))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal211)) 
-
-    # looking for implementation property corresponding to ?m3
-    . LET(?temp31 := lcase(str(?m3)))
-    . LET(?q32 := replace(str(?temp31),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y32 ?z34 . LET(?temp32 := lcase(str(?y32)))
-              . FILTER(?temp31 = ?temp32) . ?z34 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z34 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal31
-              . LET(?Prop3 := ?y32)}
-    . LET(?Prop31 := coalesce(?Prop3,?nullstr3)) . LET(?dal311 := coalesce(?dal31,?nullstr3))
-    . LET(?strippedProp3 := replace(str(?Prop31),'http.*#',''))
-    . LET(?strippedDal3 := str(?dal311)) #replace(str(?dal31),'http.*#',''))
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))
-  }
-}}
-union
-{
-    {{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst 
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1
-    . LET(?nullstr1 := 'null')
-    . LET(?ADP1 := replace(str(?m1),'http.*#',''))
-    . LET(?ADP := concat(?ADP1,concat(';',concat(?nullstr1,concat(';',?nullstr1))))) 
-
-    . LET(?temp1 := lcase(str(?m1)))
-    . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))
-               . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1
-               . LET(?Prop1 := ?y2)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr1)) . LET(?dal11 := coalesce(?dal1,?nullstr1)) 
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal11)) 
-    . LET(?Prop := concat(?strippedProp1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))
-  }
-UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}
-      # now get applicable defenses, implementation properties and their DALs
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . LET(?nullstr2 := 'null')
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2,concat(';',?nullstr2)))))
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr2)) . LET(?dal111 := coalesce(?dal11,?nullstr2))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr2)) . LET(?dal212 := coalesce(?dal21,?nullstr2))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal212)) 
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2,concat(';',?nullstr2)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))
-  }
-UNION # now where there are 3 mitigations for a capec
-    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where 
-      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x
-      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription
-      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst
-      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType
-      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name
-      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}
-      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
-      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 
-     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}
-     # now get applicable defenses, implementation properties and their DALs
-     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations
-    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))
-      # ensure that ?x ends with ?strippedm1
-    . LET(?strippedx := replace(str(?x),'http.*#',''))
-    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))
-    . FILTER(?tail = ?strippedm1)
-
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)
-      # ensure that ?x ends with ?m2 concat with ?m1 (with '-' separation)
-    . LET(?strippedm2 := replace(str(?m2),'http.*#',''))
-    . LET(?strippedm2m1 := concat(?strippedm2, concat('-',?strippedm1)))
-    . LET(?tail2 := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm2m1)+1 ,strlen(?strippedm2m1)))
-    . FILTER(?tail2 = ?strippedm2m1)
-
-    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m3 . FILTER(?m1 != ?m3) . FILTER(?m2 != ?m3)
-    . LET(?ADP1 := replace(str(?m1),'http.*#','')) 
-    . LET(?ADP2 := replace(str(?m2),'http.*#',''))
-    . LET(?ADP3 := replace(str(?m3),'http.*#',''))
-    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2, concat(';',?ADP3)))))
-    . LET(?nullstr3 := 'null')
-
-    # looking for implementation property corresponding to ?m1
-    . LET(?temp11 := lcase(str(?m1)))
-    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix; DO I NEED IT?
-    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))
-              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11
-              . LET(?Prop1 := ?y12)}
-    . LET(?Prop11 := coalesce(?Prop1,?nullstr3)) . LET(?dal111 := coalesce(?dal11,?nullstr3))
-    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))
-    . LET(?strippedDal1 := str(?dal111)) 
-
-    # looking for implementation property corresponding to ?m2
-    . LET(?temp21 := lcase(str(?m2)))
-    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))
-              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21
-              . LET(?Prop2 := ?y22)}
-    . LET(?Prop21 := coalesce(?Prop2,?nullstr3)) . LET(?dal211 := coalesce(?dal21,?nullstr3))
-    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))
-    . LET(?strippedDal2 := str(?dal211)) 
-
-    # looking for implementation property corresponding to ?m3
-    . LET(?temp31 := lcase(str(?m3)))
-    . LET(?q32 := replace(str(?temp31),'http.*#','')) # strip out prefix
-    . OPTIONAL{?CompInst ?y32 ?z34 . LET(?temp32 := lcase(str(?y32)))
-              . FILTER(?temp31 = ?temp32) . ?z34 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z34 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal31
-              . LET(?Prop3 := ?y32)}
-    . LET(?Prop31 := coalesce(?Prop3,?nullstr3)) . LET(?dal311 := coalesce(?dal31,?nullstr3))
-    . LET(?strippedProp3 := replace(str(?Prop31),'http.*#',''))
-    . LET(?strippedDal3 := str(?dal311)) #replace(str(?dal31),'http.*#',''))
-
-    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))
-    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))
-  }
-}
-}
-} order by ?CompInst ?CAPEC ?ic ?ii ?ia ?ADP
+    <rdfs:isDefinedBy>&#xD;
+select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) &#xD;
+             (?ADP as ?ApplicableDefenseProperties) (?Prop as ?ImplProperties) (?DALx as ?DAL) ?uniqMitigation where &#xD;
+    {{{{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst &#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1&#xD;
+    . LET(?nullstr1 := 'null')&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1,concat(';',concat(?nullstr1,concat(';',?nullstr1))))) &#xD;
+&#xD;
+    . LET(?temp1 := lcase(str(?m1)))&#xD;
+    . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))&#xD;
+               . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1&#xD;
+               . LET(?Prop1 := ?y2)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr1)) . LET(?dal11 := coalesce(?dal1,?nullstr1)) &#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal11)) &#xD;
+    . LET(?Prop := concat(?strippedProp1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))&#xD;
+  }&#xD;
+UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)&#xD;
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst&#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}&#xD;
+      # now get applicable defenses, implementation properties and their DALs&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations&#xD;
+    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))&#xD;
+      # ensure that ?x ends with ?strippedm1&#xD;
+    . LET(?strippedx := replace(str(?x),'http.*#',''))&#xD;
+    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))&#xD;
+    . FILTER(?tail = ?strippedm1)&#xD;
+&#xD;
+    . LET(?nullstr2 := 'null')&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#','')) &#xD;
+    . LET(?ADP2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2,concat(';',?nullstr2)))))&#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m1&#xD;
+    . LET(?temp11 := lcase(str(?m1)))&#xD;
+    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))&#xD;
+              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11&#xD;
+              . LET(?Prop1 := ?y12)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr2)) . LET(?dal111 := coalesce(?dal11,?nullstr2))&#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal111)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m2&#xD;
+    . LET(?temp21 := lcase(str(?m2)))&#xD;
+    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))&#xD;
+              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21&#xD;
+              . LET(?Prop2 := ?y22)}&#xD;
+    . LET(?Prop21 := coalesce(?Prop2,?nullstr2)) . LET(?dal212 := coalesce(?dal21,?nullstr2))&#xD;
+    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))&#xD;
+    . LET(?strippedDal2 := str(?dal212)) &#xD;
+&#xD;
+    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2,concat(';',?nullstr2)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))&#xD;
+  }&#xD;
+UNION # now where there are 3 mitigations for a capec&#xD;
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#compCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#component&gt; ?CompInst&#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}&#xD;
+     # now get applicable defenses, implementation properties and their DALs&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations&#xD;
+    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))&#xD;
+      # ensure that ?x ends with ?strippedm1&#xD;
+    . LET(?strippedx := replace(str(?x),'http.*#',''))&#xD;
+    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))&#xD;
+    . FILTER(?tail = ?strippedm1)&#xD;
+&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)&#xD;
+      # ensure that ?x ends with ?m2 concat with ?m1 (with '-' separation)&#xD;
+    . LET(?strippedm2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?strippedm2m1 := concat(?strippedm2, concat('-',?strippedm1)))&#xD;
+    . LET(?tail2 := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm2m1)+1 ,strlen(?strippedm2m1)))&#xD;
+    . FILTER(?tail2 = ?strippedm2m1)&#xD;
+&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m3 . FILTER(?m1 != ?m3) . FILTER(?m2 != ?m3)&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#','')) &#xD;
+    . LET(?ADP2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?ADP3 := replace(str(?m3),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2, concat(';',?ADP3)))))&#xD;
+    . LET(?nullstr3 := 'null')&#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m1&#xD;
+    . LET(?temp11 := lcase(str(?m1)))&#xD;
+    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix; DO I NEED IT?&#xD;
+    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))&#xD;
+              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11&#xD;
+              . LET(?Prop1 := ?y12)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr3)) . LET(?dal111 := coalesce(?dal11,?nullstr3))&#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal111)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m2&#xD;
+    . LET(?temp21 := lcase(str(?m2)))&#xD;
+    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))&#xD;
+              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21&#xD;
+              . LET(?Prop2 := ?y22)}&#xD;
+    . LET(?Prop21 := coalesce(?Prop2,?nullstr3)) . LET(?dal211 := coalesce(?dal21,?nullstr3))&#xD;
+    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))&#xD;
+    . LET(?strippedDal2 := str(?dal211)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m3&#xD;
+    . LET(?temp31 := lcase(str(?m3)))&#xD;
+    . LET(?q32 := replace(str(?temp31),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y32 ?z34 . LET(?temp32 := lcase(str(?y32)))&#xD;
+              . FILTER(?temp31 = ?temp32) . ?z34 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z34 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal31&#xD;
+              . LET(?Prop3 := ?y32)}&#xD;
+    . LET(?Prop31 := coalesce(?Prop3,?nullstr3)) . LET(?dal311 := coalesce(?dal31,?nullstr3))&#xD;
+    . LET(?strippedProp3 := replace(str(?Prop31),'http.*#',''))&#xD;
+    . LET(?strippedDal3 := str(?dal311)) #replace(str(?dal31),'http.*#',''))&#xD;
+&#xD;
+    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))&#xD;
+  }&#xD;
+}}&#xD;
+union&#xD;
+{&#xD;
+    {{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst &#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=1) order by ?CompInst ?x}&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1&#xD;
+    . LET(?nullstr1 := 'null')&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1,concat(';',concat(?nullstr1,concat(';',?nullstr1))))) &#xD;
+&#xD;
+    . LET(?temp1 := lcase(str(?m1)))&#xD;
+    . LET(?q2 := replace(str(?temp1),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y2 ?z4 . LET(?temp2 := lcase(str(?y2)))&#xD;
+               . FILTER(?temp1 = ?temp2) . ?z4 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z4 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal1&#xD;
+               . LET(?Prop1 := ?y2)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr1)) . LET(?dal11 := coalesce(?dal1,?nullstr1)) &#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal11)) &#xD;
+    . LET(?Prop := concat(?strippedProp1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?nullstr1,concat(';',?nullstr1)))))&#xD;
+  }&#xD;
+UNION # now for cases with exactly 2 mitigations for a capec (i.e. m1 and m2)&#xD;
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst&#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=2) order by ?CompInst ?x}&#xD;
+      # now get applicable defenses, implementation properties and their DALs&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations&#xD;
+    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))&#xD;
+      # ensure that ?x ends with ?strippedm1&#xD;
+    . LET(?strippedx := replace(str(?x),'http.*#',''))&#xD;
+    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))&#xD;
+    . FILTER(?tail = ?strippedm1)&#xD;
+&#xD;
+    . LET(?nullstr2 := 'null')&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#','')) &#xD;
+    . LET(?ADP2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2,concat(';',?nullstr2)))))&#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m1&#xD;
+    . LET(?temp11 := lcase(str(?m1)))&#xD;
+    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))&#xD;
+              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11&#xD;
+              . LET(?Prop1 := ?y12)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr2)) . LET(?dal111 := coalesce(?dal11,?nullstr2))&#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal111)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m2&#xD;
+    . LET(?temp21 := lcase(str(?m2)))&#xD;
+    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))&#xD;
+              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21&#xD;
+              . LET(?Prop2 := ?y22)}&#xD;
+    . LET(?Prop21 := coalesce(?Prop2,?nullstr2)) . LET(?dal212 := coalesce(?dal21,?nullstr2))&#xD;
+    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))&#xD;
+    . LET(?strippedDal2 := str(?dal212)) &#xD;
+&#xD;
+    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2,concat(';',?nullstr2)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?nullstr2)))))&#xD;
+  }&#xD;
+UNION # now where there are 3 mitigations for a capec&#xD;
+    {{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) (?x0 as ?uniqMitigation) where &#xD;
+      {?x0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#CMitigation&gt; . ?x0 &lt;http://sadl.org/STEM/BaseModel#capec&gt; ?CAPEC&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connCM&gt; ?x&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#capecDesc&gt; ?CAPECDescription&#xD;
+      . ?x0 &lt;http://sadl.org/STEM/BaseModel#connection&gt; ?CompInst&#xD;
+      . ?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?CompType&#xD;
+      . FILTER(!regex(str(?CompType), 'Class')) #needed if CompInst and CompType have same name&#xD;
+      . FILTER NOT EXISTS {?CompInst &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; ?a1 . ?a1 &lt;http://www.w3.org/2000/01/rdf-schema#subClassOf&gt; ?CompType }&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ic . FILTER(regex(str(?ic),'Confidentiality'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ii . FILTER(regex(str(?ii),'Integrity'))}&#xD;
+      . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}&#xD;
+      . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m0 &#xD;
+     } group by ?x0 ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x having (?num=3) order by ?CompInst ?x}&#xD;
+     # now get applicable defenses, implementation properties and their DALs&#xD;
+     ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m1 #ensure that ?m1 matches with tail of ?x so that we do not go twice through this for 2 mitigations&#xD;
+    . LET(?strippedm1 := replace(str(?m1),'http.*#',''))&#xD;
+      # ensure that ?x ends with ?strippedm1&#xD;
+    . LET(?strippedx := replace(str(?x),'http.*#',''))&#xD;
+    . LET(?tail := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm1)+1 ,strlen(?strippedm1)))&#xD;
+    . FILTER(?tail = ?strippedm1)&#xD;
+&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m2 . FILTER(?m1 != ?m2)&#xD;
+      # ensure that ?x ends with ?m2 concat with ?m1 (with '-' separation)&#xD;
+    . LET(?strippedm2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?strippedm2m1 := concat(?strippedm2, concat('-',?strippedm1)))&#xD;
+    . LET(?tail2 := substr(?strippedx,strlen(?strippedx) - strlen(?strippedm2m1)+1 ,strlen(?strippedm2m1)))&#xD;
+    . FILTER(?tail2 = ?strippedm2m1)&#xD;
+&#xD;
+    . ?x &lt;http://sadl.org/STEM/BaseModel#mitigation&gt; ?m3 . FILTER(?m1 != ?m3) . FILTER(?m2 != ?m3)&#xD;
+    . LET(?ADP1 := replace(str(?m1),'http.*#','')) &#xD;
+    . LET(?ADP2 := replace(str(?m2),'http.*#',''))&#xD;
+    . LET(?ADP3 := replace(str(?m3),'http.*#',''))&#xD;
+    . LET(?ADP := concat(?ADP1, concat(';',concat(?ADP2, concat(';',?ADP3)))))&#xD;
+    . LET(?nullstr3 := 'null')&#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m1&#xD;
+    . LET(?temp11 := lcase(str(?m1)))&#xD;
+    . LET(?q12 := replace(str(?temp11),'http.*#','')) # strip out prefix; DO I NEED IT?&#xD;
+    . OPTIONAL{?CompInst ?y12 ?z14 . LET(?temp12 := lcase(str(?y12)))&#xD;
+              . FILTER(?temp11 = ?temp12) . ?z14 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z14 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal11&#xD;
+              . LET(?Prop1 := ?y12)}&#xD;
+    . LET(?Prop11 := coalesce(?Prop1,?nullstr3)) . LET(?dal111 := coalesce(?dal11,?nullstr3))&#xD;
+    . LET(?strippedProp1 := replace(str(?Prop11),'http.*#',''))&#xD;
+    . LET(?strippedDal1 := str(?dal111)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m2&#xD;
+    . LET(?temp21 := lcase(str(?m2)))&#xD;
+    . LET(?q22 := replace(str(?temp21),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y22 ?z24 . LET(?temp22 := lcase(str(?y22)))&#xD;
+              . FILTER(?temp21 = ?temp22) . ?z24 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z24 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal21&#xD;
+              . LET(?Prop2 := ?y22)}&#xD;
+    . LET(?Prop21 := coalesce(?Prop2,?nullstr3)) . LET(?dal211 := coalesce(?dal21,?nullstr3))&#xD;
+    . LET(?strippedProp2 := replace(str(?Prop21),'http.*#',''))&#xD;
+    . LET(?strippedDal2 := str(?dal211)) &#xD;
+&#xD;
+    # looking for implementation property corresponding to ?m3&#xD;
+    . LET(?temp31 := lcase(str(?m3)))&#xD;
+    . LET(?q32 := replace(str(?temp31),'http.*#','')) # strip out prefix&#xD;
+    . OPTIONAL{?CompInst ?y32 ?z34 . LET(?temp32 := lcase(str(?y32)))&#xD;
+              . FILTER(?temp31 = ?temp32) . ?z34 &lt;http://sadl.org/STEM/BaseModel#val&gt; true . ?z34 &lt;http://sadl.org/STEM/BaseModel#dal&gt; ?dal31&#xD;
+              . LET(?Prop3 := ?y32)}&#xD;
+    . LET(?Prop31 := coalesce(?Prop3,?nullstr3)) . LET(?dal311 := coalesce(?dal31,?nullstr3))&#xD;
+    . LET(?strippedProp3 := replace(str(?Prop31),'http.*#',''))&#xD;
+    . LET(?strippedDal3 := str(?dal311)) #replace(str(?dal31),'http.*#',''))&#xD;
+&#xD;
+    . LET(?Prop := concat(?strippedProp1, concat(';',concat(?strippedProp2, concat(';',?strippedProp3)))))&#xD;
+    . LET(?DALx := concat(?strippedDal1,concat(';',concat(?strippedDal2,concat(';',?strippedDal3)))))&#xD;
+  }&#xD;
+}&#xD;
+}&#xD;
+} order by ?CompInst ?CAPEC ?ic ?ii ?ia ?ADP&#xD;
 </rdfs:isDefinedBy>
   </sadlimplicitmodel:NamedQuery>
 </rdf:RDF>

@@ -1,0 +1,41 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://research.ge.com/Acuity/defaults.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://research.ge.com/Acuity/defaults.owl">
+  <owl:Ontology rdf:about="">
+    <owl:versionInfo>$Id: defaults.owl,v 1.1 2014/01/23 21:52:26 crapo Exp $</owl:versionInfo>
+    <rdfs:comment>Copyright 2007, 2008, 2009 - General Electric Company, All Rights Reserved</rdfs:comment>
+  </owl:Ontology>
+  <owl:Class rdf:ID="ObjectDefault">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="DefaultValue"/>
+    </rdfs:subClassOf>
+    <rdfs:comment>This type of default has a value which is an Individual</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="DataDefault">
+    <rdfs:subClassOf rdf:resource="#DefaultValue"/>
+    <rdfs:comment>This type of default has a value which is a Literal</rdfs:comment>
+  </owl:Class>
+  <owl:DatatypeProperty rdf:ID="hasLevel">
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+    <rdfs:domain rdf:resource="#DataDefault"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:DatatypeProperty>
+  <owl:DatatypeProperty rdf:ID="hasDataDefault">
+    <rdfs:domain rdf:resource="#DataDefault"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:DatatypeProperty>
+  <owl:FunctionalProperty rdf:ID="hasObjectDefault">
+    <rdfs:domain rdf:resource="#ObjectDefault"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="appliesToProperty">
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:domain rdf:resource="#DefaultValue"/>
+    <rdfs:comment>The value of this Property is the Property to which the default value applies.</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+</rdf:RDF>

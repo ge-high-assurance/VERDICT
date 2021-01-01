@@ -640,7 +640,7 @@ public
 		subcomponents
 			ethernet : bus Ethernet; 
 			gnc: system GNC::GNC.Impl;
-			gnc1: system GNC::GNC.Impl;
+			--gnc1: system GNC::GNC.Impl;
 			
 			radio: system Radio
 			{

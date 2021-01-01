@@ -18,6 +18,7 @@
     <modules>
         <module>verdict</module>
         <module>verdict-back-ends</module>
+        <module>verdict-data-model</module>
     </modules>
 
     <!-- Set properties used by all modules -->
@@ -47,14 +48,9 @@
                 <version>0.0.13</version>
             </dependency>
             <dependency>
-                <groupId>com.ge.research.osate.verdict</groupId>
-                <artifactId>com.ge.research.osate.verdict.vdm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.ge.research.sadl</groupId>
                 <artifactId>reasoner-api</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.4.1-SNAPSHOT</version>
                 <!-- Deps shouldn't pick SLF4J backends; only apps should do that -->
                 <exclusions>
                     <exclusion>
@@ -66,17 +62,17 @@
             <dependency>
                 <groupId>com.ge.research.sadl</groupId>
                 <artifactId>reasoner-impl</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.4.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ge.research.sadl</groupId>
                 <artifactId>sadlserver-api</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.4.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ge.research.sadl</groupId>
                 <artifactId>sadlserver-impl</artifactId>
-                <version>3.3.0-SNAPSHOT</version>
+                <version>3.4.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ge.verdict</groupId>
@@ -91,6 +87,11 @@
             <dependency>
                 <groupId>com.ge.verdict</groupId>
                 <artifactId>verdict-attack-defense-collector</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ge.verdict</groupId>
+                <artifactId>verdict-data-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -131,7 +132,7 @@
             <dependency>
                 <groupId>com.github.davidmoten</groupId>
                 <artifactId>word-wrap</artifactId>
-                <version>0.1.6</version>
+                <version>0.1.8</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.activation</groupId>
@@ -171,7 +172,7 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-registry-graphite</artifactId>
-                <version>1.5.4</version>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
@@ -181,7 +182,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <version>4.13.1</version>
             </dependency>
             <dependency>
                 <groupId>net.htmlparser.jericho</groupId>
@@ -191,7 +192,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>10.1</version>
+                <version>10.2</version>
             </dependency>
             <dependency>
                 <groupId>org.antlr</groupId>
@@ -201,7 +202,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.10.8</version>
+                <version>1.10.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -216,7 +217,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.16.1</version>
+                <version>3.17.2</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.xtext</groupId>
@@ -249,7 +250,7 @@
             <dependency>
                 <groupId>org.logicng</groupId>
                 <artifactId>logicng</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -287,7 +288,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>1.31.0</version>
+                    <version>2.4.2</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.chrisdchristo</groupId>
@@ -336,14 +337,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M4</version>
-                    <configuration>
-                        <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>3.0.0-M1</version>
                 </plugin>
@@ -355,12 +348,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -370,7 +363,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M4</version>
+                    <version>3.0.0-M5</version>
                     <configuration>
                         <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
                     </configuration>
@@ -383,7 +376,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -393,7 +386,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.8.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.eclipse.tycho</groupId>
@@ -477,8 +470,8 @@
                 </executions>
                 <configuration>
                     <java>
+                        <!-- Uncomment to format verdict plugin <includes><include>src/**/*.java</include></includes> -->
                         <googleJavaFormat>
-                            <version>1.7</version>
                             <style>AOSP</style>
                         </googleJavaFormat>
                     </java>
@@ -493,12 +486,12 @@
                             <eclipseWtp>
                                 <type>XML</type>
                             </eclipseWtp>
+                            <trimTrailingWhitespace />
                             <endWithNewline />
                             <indent>
                                 <spaces>true</spaces>
                                 <spacesPerTab>4</spacesPerTab>
                             </indent>
-                            <trimTrailingWhitespace />
                         </format>
                     </formats>
                     <lineEndings>UNIX</lineEndings>
@@ -530,7 +523,7 @@
                 <configuration>
                     <rules>
                         <requireMavenVersion>
-                            <version>[3.5.0,)</version>
+                            <version>[3.6.3,)</version>
                         </requireMavenVersion>
                     </rules>
                 </configuration>

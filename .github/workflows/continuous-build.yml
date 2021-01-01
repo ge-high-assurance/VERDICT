@@ -5,18 +5,19 @@ name: Verdict continuous build
 on:
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
     strategy:
       matrix:
-        java-version: [ 8, 11 ]
+        java-version: [ 11 ]
         os: [ ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Check out source
+    - name: Check out VERDICT source
       uses: actions/checkout@v2
 
     - name: Set up GraphViz
@@ -35,6 +36,6 @@ jobs:
         restore-keys: ${{ matrix.os }}-m2
 
     - name: Run Maven build
-      run: mvn -B install -Dtycho.localArtifacts=ignore --file tools/pom.xml
+      run: mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
       env:
         GraphVizPath: /usr/bin
