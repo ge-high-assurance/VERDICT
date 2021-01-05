@@ -38,11 +38,6 @@
                 <version>1.4</version>
             </dependency>
             <dependency>
-                <groupId>co.paralleluniverse</groupId>
-                <artifactId>capsule</artifactId>
-                <version>1.0.3</version>
-            </dependency>
-            <dependency>
                 <groupId>com.amihaiemil.web</groupId>
                 <artifactId>docker-java-api</artifactId>
                 <version>0.0.13</version>
@@ -173,6 +168,11 @@
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-registry-graphite</artifactId>
                 <version>1.5.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.nextflow</groupId>
+                <artifactId>capsule</artifactId>
+                <version>1.1.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
