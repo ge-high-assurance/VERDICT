@@ -26,7 +26,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.nextflow</groupId>
+            <groupId>co.paralleluniverse</groupId>
             <artifactId>capsule</artifactId>
         </dependency>
     </dependencies>
