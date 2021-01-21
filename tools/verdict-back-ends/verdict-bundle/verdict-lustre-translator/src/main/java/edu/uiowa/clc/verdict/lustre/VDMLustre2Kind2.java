@@ -1,17 +1,17 @@
 package edu.uiowa.clc.verdict.lustre;
 
-import edu.uiowa.kind2.lustre.ComponentBuilder;
-import edu.uiowa.kind2.lustre.ContractBodyBuilder;
-import edu.uiowa.kind2.lustre.ContractBuilder;
-import edu.uiowa.kind2.lustre.Expr;
-import edu.uiowa.kind2.lustre.ExprUtil;
-import edu.uiowa.kind2.lustre.IdExpr;
-import edu.uiowa.kind2.lustre.ImportedComponentBuilder;
-import edu.uiowa.kind2.lustre.ModeBuilder;
-import edu.uiowa.kind2.lustre.Program;
-import edu.uiowa.kind2.lustre.ProgramBuilder;
-import edu.uiowa.kind2.lustre.Type;
-import edu.uiowa.kind2.lustre.TypeUtil;
+import edu.uiowa.cs.clc.kind2.lustre.ComponentBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.ContractBodyBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.ContractBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.Expr;
+import edu.uiowa.cs.clc.kind2.lustre.ExprUtil;
+import edu.uiowa.cs.clc.kind2.lustre.IdExpr;
+import edu.uiowa.cs.clc.kind2.lustre.ImportedComponentBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.ModeBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.Program;
+import edu.uiowa.cs.clc.kind2.lustre.ProgramBuilder;
+import edu.uiowa.cs.clc.kind2.lustre.Type;
+import edu.uiowa.cs.clc.kind2.lustre.TypeUtil;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -38,28 +38,36 @@ import verdict.vdm.vdm_model.Model;
 
 public class VDMLustre2Kind2 {
     /**
-     * Translate the VDM Model to Kind2 Lustre program.
+     * Translate the VDM model to Kind 2 Lustre program.
      *
-     * @param vdmModel the VDM Model
-     * @return the Kind2 Lustre program
+     * @param vdmModel the VDM model
+     * @return the Kind 2 Lustre program
      */
     public static Program translate(Model vdmModel) {
-        return visit(vdmModel.getDataflowCode());
+        return visit(vdmModel.getDataflowCode()).build();
     }
 
-    private static Program visit(LustreProgram modelProgram) {
+    /**
+     * Translate VDM model program to Kind 2 Lustre program.
+     *
+     * @param modelProgram the VDM model program
+     * @return the Kind 2 Lustre program builder
+     */
+    private static ProgramBuilder visit(LustreProgram modelProgram) {
         ProgramBuilder pb = new ProgramBuilder();
 
         for (TypeDeclaration modelTypeDecl : modelProgram.getTypeDeclaration()) {
-            pb.defineType(modelTypeDecl.getName(), visit(modelTypeDecl.getDefinition()));
+            if (modelTypeDecl.getDefinition() == null) {
+                pb.defineType(modelTypeDecl.getName());
+            } else {
+                pb.defineType(modelTypeDecl.getName(), visit(modelTypeDecl.getDefinition()));
+            }
         }
 
         for (ConstantDeclaration modelConstDecl : modelProgram.getConstantDeclaration()) {
             if (modelConstDecl.getDataType() != null) {
                 if (modelConstDecl.getDefinition() != null) {
-                    pb.createConst(
-                            modelConstDecl.getName(),
-                            visit(modelConstDecl.getDataType()),
+                    pb.createConst(modelConstDecl.getName(), visit(modelConstDecl.getDataType()),
                             visit(modelConstDecl.getDefinition()));
                 } else {
                     pb.createConst(modelConstDecl.getName(), visit(modelConstDecl.getDataType()));
@@ -95,45 +103,48 @@ public class VDMLustre2Kind2 {
             }
         }
 
-        return pb.build();
+        return pb;
     }
 
-    private static Type visit(DataType definition) {
-        if (definition.getPlainType() != null) {
-            return TypeUtil.named(definition.getPlainType().value());
+    /**
+     * Translate VDM model datatype to Kind 2 Lustre type.
+     *
+     * @param modelType the VDM model type
+     * @return the Kind 2 Lustre type
+     */
+    private static Type visit(DataType modelType) {
+        if (modelType.getPlainType() != null) {
+            return TypeUtil.named(modelType.getPlainType().value());
         }
 
-        if (definition.getUserDefinedType() != null) {
-            return TypeUtil.named(definition.getUserDefinedType());
+        if (modelType.getUserDefinedType() != null) {
+            return TypeUtil.named(modelType.getUserDefinedType());
         }
 
-        if (definition.getSubrangeType() != null) {
-            SubrangeType subrange = definition.getSubrangeType();
+        if (modelType.getSubrangeType() != null) {
+            SubrangeType subrange = modelType.getSubrangeType();
             return TypeUtil.intSubrange(subrange.getLowerBound(), subrange.getUpperBound());
         }
 
-        if (definition.getArrayType() != null) {
-            return TypeUtil.array(
-                    visit(definition.getArrayType().getDataType()),
-                    Integer.parseInt(definition.getArrayType().getDimension()));
+        if (modelType.getArrayType() != null) {
+            return TypeUtil.array(visit(modelType.getArrayType().getDataType()),
+                    Integer.parseInt(modelType.getArrayType().getDimension()));
         }
 
-        if (definition.getTupleType() != null) {
+        if (modelType.getTupleType() != null) {
             return TypeUtil.tuple(
-                    definition.getTupleType().getDataType().stream()
-                            .map(dt -> visit(dt))
-                            .collect(Collectors.toList()));
+                    modelType.getTupleType().getDataType().stream().map(dt -> visit(dt)).collect(Collectors.toList()));
         }
 
-        if (definition.getEnumType() != null) {
-            return TypeUtil.enumeration(definition.getEnumType().getEnumValue());
+        if (modelType.getEnumType() != null) {
+            return TypeUtil.enumeration(modelType.getEnumType().getEnumValue());
         }
 
-        if (definition.getRecordType() != null) {
+        if (modelType.getRecordType() != null) {
             // fields in the map have the same order as the RecordFields in the RecordField
             // list
             Map<String, Type> fields = new TreeMap<>((x, y) -> -1);
-            for (RecordField field : definition.getRecordType().getRecordField()) {
+            for (RecordField field : modelType.getRecordType().getRecordField()) {
                 fields.put(field.getName(), visit(field.getType()));
             }
             return TypeUtil.record(fields);
@@ -143,6 +154,12 @@ public class VDMLustre2Kind2 {
                 "Datatype should either be: plain, user-defined, subrange, array, tuple, enum, or record type.");
     }
 
+    /**
+     * Translate VDM model expression to Kind 2 Lustre expression.
+     *
+     * @param modelExpr the VDM model expression
+     * @return the Kind 2 Lustre expression
+     */
     private static Expr visit(Expression modelExpr) {
         if (modelExpr.getIdentifier() != null) {
             return ExprUtil.id(modelExpr.getIdentifier());
@@ -161,10 +178,8 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getExpressionList() != null) {
-            return ExprUtil.list(
-                    modelExpr.getExpressionList().getExpression().stream()
-                            .map(expr -> visit(expr))
-                            .collect(Collectors.toList()));
+            return ExprUtil.list(modelExpr.getExpressionList().getExpression().stream().map(expr -> visit(expr))
+                    .collect(Collectors.toList()));
         }
 
         if (modelExpr.getRecordLiteral() != null) {
@@ -178,19 +193,16 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getArrayExpression() != null) {
-            return ExprUtil.array(
-                    modelExpr.getArrayExpression().getExpression().stream()
-                            .map(expr -> visit(expr))
-                            .collect(Collectors.toList()));
+            return ExprUtil.array(modelExpr.getArrayExpression().getExpression().stream().map(expr -> visit(expr))
+                    .collect(Collectors.toList()));
         }
 
         if (modelExpr.getCartesianExpression() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Cartesian expressions are not supported!");
+            throw new UnsupportedOperationException("Error: Cartesian expressions are not supported!");
         }
 
         if (modelExpr.getTupleExpression() != null) {
-            // return
+            throw new UnsupportedOperationException("Error: Tuple expressions are not supported!");
         }
 
         if (modelExpr.getNegative() != null) {
@@ -202,8 +214,7 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getCurrent() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: current expressions are not supported!");
+            throw new UnsupportedOperationException("Error: current expressions are not supported!");
         }
 
         if (modelExpr.getToInt() != null) {
@@ -219,38 +230,31 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getTimes() != null) {
-            return ExprUtil.multiply(
-                    visit(modelExpr.getTimes().getLhsOperand()),
+            return ExprUtil.multiply(visit(modelExpr.getTimes().getLhsOperand()),
                     visit(modelExpr.getTimes().getRhsOperand()));
         }
 
         if (modelExpr.getDiv() != null) {
-            return ExprUtil.divide(
-                    visit(modelExpr.getDiv().getLhsOperand()),
+            return ExprUtil.divide(visit(modelExpr.getDiv().getLhsOperand()),
                     visit(modelExpr.getDiv().getRhsOperand()));
         }
 
         if (modelExpr.getMod() != null) {
-            return ExprUtil.mod(
-                    visit(modelExpr.getMod().getLhsOperand()),
-                    visit(modelExpr.getMod().getRhsOperand()));
+            return ExprUtil.mod(visit(modelExpr.getMod().getLhsOperand()), visit(modelExpr.getMod().getRhsOperand()));
         }
 
         if (modelExpr.getIntDiv() != null) {
-            return ExprUtil.intDivide(
-                    visit(modelExpr.getIntDiv().getLhsOperand()),
+            return ExprUtil.intDivide(visit(modelExpr.getIntDiv().getLhsOperand()),
                     visit(modelExpr.getIntDiv().getRhsOperand()));
         }
 
         if (modelExpr.getPlus() != null) {
-            return ExprUtil.plus(
-                    visit(modelExpr.getPlus().getLhsOperand()),
+            return ExprUtil.plus(visit(modelExpr.getPlus().getLhsOperand()),
                     visit(modelExpr.getPlus().getRhsOperand()));
         }
 
         if (modelExpr.getMinus() != null) {
-            return ExprUtil.minus(
-                    visit(modelExpr.getMinus().getLhsOperand()),
+            return ExprUtil.minus(visit(modelExpr.getMinus().getLhsOperand()),
                     visit(modelExpr.getMinus().getRhsOperand()));
         }
 
@@ -259,73 +263,59 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getLessThan() != null) {
-            return ExprUtil.less(
-                    visit(modelExpr.getLessThan().getLhsOperand()),
+            return ExprUtil.less(visit(modelExpr.getLessThan().getLhsOperand()),
                     visit(modelExpr.getLessThan().getRhsOperand()));
         }
 
         if (modelExpr.getLessThanOrEqualTo() != null) {
-            return ExprUtil.lessEqual(
-                    visit(modelExpr.getLessThanOrEqualTo().getLhsOperand()),
+            return ExprUtil.lessEqual(visit(modelExpr.getLessThanOrEqualTo().getLhsOperand()),
                     visit(modelExpr.getLessThanOrEqualTo().getRhsOperand()));
         }
 
         if (modelExpr.getEqual() != null) {
-            return ExprUtil.equal(
-                    visit(modelExpr.getEqual().getLhsOperand()),
+            return ExprUtil.equal(visit(modelExpr.getEqual().getLhsOperand()),
                     visit(modelExpr.getEqual().getRhsOperand()));
         }
 
         if (modelExpr.getGreaterThanOrEqualTo() != null) {
-            return ExprUtil.greaterEqual(
-                    visit(modelExpr.getGreaterThanOrEqualTo().getLhsOperand()),
+            return ExprUtil.greaterEqual(visit(modelExpr.getGreaterThanOrEqualTo().getLhsOperand()),
                     visit(modelExpr.getGreaterThanOrEqualTo().getRhsOperand()));
         }
 
         if (modelExpr.getGreaterThan() != null) {
-            return ExprUtil.greater(
-                    visit(modelExpr.getGreaterThan().getLhsOperand()),
+            return ExprUtil.greater(visit(modelExpr.getGreaterThan().getLhsOperand()),
                     visit(modelExpr.getGreaterThan().getRhsOperand()));
         }
 
         if (modelExpr.getNotEqual() != null) {
-            return ExprUtil.notEqual(
-                    visit(modelExpr.getNotEqual().getLhsOperand()),
+            return ExprUtil.notEqual(visit(modelExpr.getNotEqual().getLhsOperand()),
                     visit(modelExpr.getNotEqual().getRhsOperand()));
         }
 
         if (modelExpr.getAnd() != null) {
-            return ExprUtil.and(
-                    visit(modelExpr.getAnd().getLhsOperand()),
-                    visit(modelExpr.getAnd().getRhsOperand()));
+            return ExprUtil.and(visit(modelExpr.getAnd().getLhsOperand()), visit(modelExpr.getAnd().getRhsOperand()));
         }
 
         if (modelExpr.getOr() != null) {
-            return ExprUtil.or(
-                    visit(modelExpr.getOr().getLhsOperand()),
-                    visit(modelExpr.getOr().getRhsOperand()));
+            return ExprUtil.or(visit(modelExpr.getOr().getLhsOperand()), visit(modelExpr.getOr().getRhsOperand()));
         }
 
         if (modelExpr.getXor() != null) {
-            return ExprUtil.xor(
-                    visit(modelExpr.getXor().getLhsOperand()),
-                    visit(modelExpr.getXor().getRhsOperand()));
+            return ExprUtil.xor(visit(modelExpr.getXor().getLhsOperand()), visit(modelExpr.getXor().getRhsOperand()));
         }
 
         if (modelExpr.getImplies() != null) {
-            return ExprUtil.implies(
-                    visit(modelExpr.getImplies().getLhsOperand()),
+            return ExprUtil.implies(visit(modelExpr.getImplies().getLhsOperand()),
                     visit(modelExpr.getImplies().getRhsOperand()));
         }
 
         if (modelExpr.getArrow() != null) {
-            return ExprUtil.arrow(
-                    visit(modelExpr.getArrow().getLhsOperand()),
+            return ExprUtil.arrow(visit(modelExpr.getArrow().getLhsOperand()),
                     visit(modelExpr.getArrow().getRhsOperand()));
         }
 
         if (modelExpr.getConcat() != null) {
-            // return
+            throw new UnsupportedOperationException("Error: Concat expressions are not supported!");
         }
 
         if (modelExpr.getDiese() != null) {
@@ -337,29 +327,23 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getConditionalExpression() != null) {
-            return ExprUtil.ite(
-                    visit(modelExpr.getConditionalExpression().getCondition()),
+            return ExprUtil.ite(visit(modelExpr.getConditionalExpression().getCondition()),
                     visit(modelExpr.getConditionalExpression().getThenBranch()),
                     visit(modelExpr.getConditionalExpression().getElseBranch()));
         }
 
         if (modelExpr.getCall() != null) {
-            return ExprUtil.nodeCall(
-                    ExprUtil.id(modelExpr.getCall().getNodeId()),
-                    modelExpr.getCall().getArgument().stream()
-                            .map(expr -> visit(expr))
-                            .collect(Collectors.toList()));
+            return ExprUtil.nodeCall(ExprUtil.id(modelExpr.getCall().getNodeId()),
+                    modelExpr.getCall().getArgument().stream().map(expr -> visit(expr)).collect(Collectors.toList()));
         }
 
         if (modelExpr.getRecordProjection() != null) {
-            return ExprUtil.recordAccess(
-                    visit(modelExpr.getRecordProjection().getRecordReference()),
+            return ExprUtil.recordAccess(visit(modelExpr.getRecordProjection().getRecordReference()),
                     modelExpr.getRecordProjection().getFieldId());
         }
 
         if (modelExpr.getArraySelection() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Array selection expressions are not supported!");
+            throw new UnsupportedOperationException("Error: Array selection expressions are not supported!");
         }
 
         if (modelExpr.getMerge() != null) {
@@ -367,13 +351,18 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getEvent() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Cannot convert Event expressions to Lustre!");
+            throw new UnsupportedOperationException("Error: Cannot convert Event expressions to Lustre!");
         }
 
-        throw new UnsupportedOperationException("Not implemented, yet.");
+        throw new UnsupportedOperationException("Error: Expression are not supported!");
     }
 
+    /**
+     * Translate VDM model contract to Kind 2 Lustre contract.
+     *
+     * @param modelContract the VDM model contract
+     * @return the Kind 2 Lustre contract builder
+     */
     private static ContractBuilder visit(Contract modelContract) {
         ContractBuilder cb = new ContractBuilder(modelContract.getName());
 
@@ -394,10 +383,16 @@ public class VDMLustre2Kind2 {
         return cb;
     }
 
-    private static ImportedComponentBuilder visitImportedComponent(Node node) {
-        ImportedComponentBuilder icb = new ImportedComponentBuilder(node.getName());
+    /**
+     * Translate VDM model node to Kind 2 Lustre imported component.
+     *
+     * @param modelNode the VDM model node
+     * @return the Kind 2 Lustre imported component builder
+     */
+    private static ImportedComponentBuilder visitImportedComponent(Node modelNode) {
+        ImportedComponentBuilder icb = new ImportedComponentBuilder(modelNode.getName());
 
-        for (NodeParameter input : node.getInputParameter()) {
+        for (NodeParameter input : modelNode.getInputParameter()) {
             if (input.isIsConstant() != null && input.isIsConstant()) {
                 icb.createConstInput(input.getName(), visit(input.getDataType()));
             } else {
@@ -405,21 +400,27 @@ public class VDMLustre2Kind2 {
             }
         }
 
-        for (NodeParameter output : node.getOutputParameter()) {
+        for (NodeParameter output : modelNode.getOutputParameter()) {
             icb.createVarOutput(output.getName(), visit(output.getDataType()));
         }
 
-        if (node.getContract() != null) {
-            icb.setContractBody(visit(node.getContract()));
+        if (modelNode.getContract() != null) {
+            icb.setContractBody(visit(modelNode.getContract()));
         }
 
         return icb;
     }
 
-    private static ComponentBuilder visitComponent(Node node) {
-        ComponentBuilder nb = new ComponentBuilder(node.getName());
+    /**
+     * Translate VDM model node to Kind 2 Lustre component.
+     *
+     * @param modelNode the VDM model node
+     * @return the Kind 2 Lustre component builder
+     */
+    private static ComponentBuilder visitComponent(Node modelNode) {
+        ComponentBuilder nb = new ComponentBuilder(modelNode.getName());
 
-        for (NodeParameter input : node.getInputParameter()) {
+        for (NodeParameter input : modelNode.getInputParameter()) {
             if (input.isIsConstant() != null && input.isIsConstant()) {
                 nb.createConstInput(input.getName(), visit(input.getDataType()));
             } else {
@@ -427,20 +428,18 @@ public class VDMLustre2Kind2 {
             }
         }
 
-        for (NodeParameter output : node.getOutputParameter()) {
+        for (NodeParameter output : modelNode.getOutputParameter()) {
             nb.createVarOutput(output.getName(), visit(output.getDataType()));
         }
 
-        if (node.getContract() != null) {
-            nb.setContractBody(visit(node.getContract()));
+        if (modelNode.getContract() != null) {
+            nb.setContractBody(visit(modelNode.getContract()));
         }
 
-        for (ConstantDeclaration constDecl : node.getBody().getConstantDeclaration()) {
+        for (ConstantDeclaration constDecl : modelNode.getBody().getConstantDeclaration()) {
             if (constDecl.getDataType() != null) {
                 if (constDecl.getDefinition() != null) {
-                    nb.createLocalConst(
-                            constDecl.getName(),
-                            visit(constDecl.getDataType()),
+                    nb.createLocalConst(constDecl.getName(), visit(constDecl.getDataType()),
                             visit(constDecl.getDefinition()));
                 } else {
                     nb.createLocalConst(constDecl.getName(), visit(constDecl.getDataType()));
@@ -450,50 +449,48 @@ public class VDMLustre2Kind2 {
             }
         }
 
-        for (VariableDeclaration varDecl : node.getBody().getVariableDeclaration()) {
+        for (VariableDeclaration varDecl : modelNode.getBody().getVariableDeclaration()) {
             nb.createLocalVar(varDecl.getName(), visit(varDecl.getDataType()));
         }
 
-        for (NodeEquation equation : node.getBody().getEquation()) {
-            nb.addEquation(
-                    equation.getLhs().getIdentifier().stream()
-                            .map(var -> ExprUtil.id(var))
-                            .collect(Collectors.toList()),
-                    visit(equation.getRhs()));
+        for (NodeEquation equation : modelNode.getBody().getEquation()) {
+            nb.addEquation(equation.getLhs().getIdentifier().stream().map(var -> ExprUtil.id(var))
+                    .collect(Collectors.toList()), visit(equation.getRhs()));
         }
 
-        for (Expression assertion : node.getBody().getAssertion()) {
+        for (Expression assertion : modelNode.getBody().getAssertion()) {
             nb.addAssertion(visit(assertion));
         }
 
-        for (NodeProperty property : node.getBody().getProperty()) {
+        for (NodeProperty property : modelNode.getBody().getProperty()) {
             nb.addProperty(property.getName(), visit(property.getExpression()));
         }
 
         return nb;
     }
 
-    private static ContractBodyBuilder visit(ContractSpec contractSpec) {
+    /**
+     * Translate VDM model contract specification to Kind 2 Lustre contract body.
+     *
+     * @param modelSpec the VDM model contract spec
+     * @return the Kind 2 Lustre contract body builder
+     */
+    private static ContractBodyBuilder visit(ContractSpec modelSpec) {
         ContractBodyBuilder cbb = new ContractBodyBuilder();
 
-        for (ContractImport contractImport : contractSpec.getImport()) {
-            cbb.importContract(
-                    contractImport.getContractId(),
-                    contractImport.getInputArgument().stream()
-                            .map(input -> (IdExpr) visit(input))
+        for (ContractImport contractImport : modelSpec.getImport()) {
+            cbb.importContract(contractImport.getContractId(),
+                    contractImport.getInputArgument().stream().map(input -> (IdExpr) visit(input))
                             .collect(Collectors.toList()),
-                    contractImport.getOutputArgument().stream()
-                            .map(output -> (IdExpr) visit(output))
+                    contractImport.getOutputArgument().stream().map(output -> (IdExpr) visit(output))
                             .collect(Collectors.toList()));
         }
 
-        for (SymbolDefinition symbol : contractSpec.getSymbol()) {
+        for (SymbolDefinition symbol : modelSpec.getSymbol()) {
             if (symbol.isIsConstant() != null && symbol.isIsConstant()) {
                 if (symbol.getDataType() != null) {
                     if (symbol.getDefinition() != null) {
-                        cbb.createConstant(
-                                symbol.getName(),
-                                visit(symbol.getDataType()),
+                        cbb.createConstant(symbol.getName(), visit(symbol.getDataType()),
                                 visit(symbol.getDefinition()));
                     } else {
                         cbb.createConstant(symbol.getName(), visit(symbol.getDataType()));
@@ -502,26 +499,23 @@ public class VDMLustre2Kind2 {
                     cbb.createConstant(symbol.getName(), visit(symbol.getDefinition()));
                 }
             } else {
-                cbb.createVarDef(
-                        symbol.getName(),
-                        visit(symbol.getDataType()),
-                        visit(symbol.getDefinition()));
+                cbb.createVarDef(symbol.getName(), visit(symbol.getDataType()), visit(symbol.getDefinition()));
             }
         }
 
-        for (ContractItem assumption : contractSpec.getWeaklyassume()) {
+        for (ContractItem assumption : modelSpec.getWeaklyassume()) {
             cbb.weaklyAssume(assumption.getName(), visit(assumption.getExpression()));
         }
 
-        for (ContractItem assumption : contractSpec.getAssume()) {
+        for (ContractItem assumption : modelSpec.getAssume()) {
             cbb.assume(assumption.getName(), visit(assumption.getExpression()));
         }
 
-        for (ContractItem guarantee : contractSpec.getGuarantee()) {
+        for (ContractItem guarantee : modelSpec.getGuarantee()) {
             cbb.guarantee(guarantee.getName(), visit(guarantee.getExpression()));
         }
 
-        for (ContractMode mode : contractSpec.getMode()) {
+        for (ContractMode mode : modelSpec.getMode()) {
             ModeBuilder mb = new ModeBuilder(mode.getName());
             for (ContractItem require : mode.getRequire()) {
                 mb.require(require.getName(), visit(require.getExpression()));

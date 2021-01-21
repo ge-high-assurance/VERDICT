@@ -1,25 +1,42 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.lustre;
 
-import com.ge.verdict.vdm.VdmTest;
 import java.io.File;
 import java.io.IOException;
+
+import com.ge.verdict.vdm.VdmTest;
+import com.ge.verdict.vdm.VdmTranslator;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+
 import verdict.vdm.vdm_model.Model;
 
 public class VerdictLustreTranslatorTest {
 
     @Test
-    public void testMarshalToLustre() throws IOException {
-        Model controlModel = VdmTest.createControlModel();
+    public void testMarshalToLustre1() throws IOException {
+        Model controlModel = VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input1.xml"));
 
         File testFile = File.createTempFile("vdm-model", ".lus");
         testFile.deleteOnExit();
         VerdictLustreTranslator.marshalToLustre(controlModel, testFile);
         Assertions.assertThat(testFile).exists();
 
-        File controlFile = new File("src/test/resources/vdm-model-output.lus");
+        File controlFile = new File("src/test/resources/lustre-output1.lus");
+        Assertions.assertThat(testFile).hasSameTextualContentAs(controlFile);
+    }
+
+    @Test
+    public void testMarshalToLustre2() throws IOException {
+        Model controlModel = VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input2.xml"));
+
+        File testFile = File.createTempFile("vdm-model", ".lus");
+        testFile.deleteOnExit();
+        VerdictLustreTranslator.marshalToLustre(controlModel, testFile);
+        Assertions.assertThat(testFile).exists();
+
+        File controlFile = new File("src/test/resources/lustre-output2.lus");
         Assertions.assertThat(testFile).hasSameTextualContentAs(controlFile);
     }
 

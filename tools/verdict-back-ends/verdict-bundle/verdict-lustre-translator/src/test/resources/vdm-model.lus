@@ -1,4 +1,4 @@
- type PLAIN_REAL = real;
+type PLAIN_REAL = real;
 type PLAIN_BOOL = bool;
 type SUBRANGE_INT = subrange [0, 1] of int;
 type PLAIN_INT = int;

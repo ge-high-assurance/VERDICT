@@ -1,0 +1,992 @@
+type Position;
+type DeliveryOrder;
+type DeliveryStatus = enum {NOT_STARTED, IN_PROGRESS, COMPLETED, FAILED};
+type Constellation = enum {Satellite0, Satellite1};
+type InputBus;
+type RadioResponse;
+type ProbeSafeLanding;
+type DeliveryPlannerState = enum {OFF, INIT, READY, LAUNCH, ABORT, FLYING_TO_DEST, MAKING_DELIVERY, RETURN_TO_TRUCK};
+type PackageDeliveryCommand = enum {NO_OPERATION, RELEASE_PACKAGE, ABORT_DELIVERY};
+type Position_dot_impl = struct {x : real; y : real};
+type DeliveryOrder_dot_impl = struct {item_value : real; target_picture : int; target_position : Position_dot_impl};
+type InputBus_dot_impl = struct {abort_cmd : bool; connected : bool; constellation : Constellation; init_criteria_satisfied : bool; launch_pos : Position_dot_impl; mission_store_release_sequence : bool; on_off : bool; order : DeliveryOrder_dot_impl; update_order : bool};
+type RadioResponse_dot_impl = struct {data_available : bool; target_confirmed : bool};
+type ProbeSafeLanding_dot_impl = struct {has_valid_marker : bool; is_target_clear : bool};
+
+const ITEM_VALUE_THRESHOLD : real = 100.000000;
+const WAITING_CONFIRMATION_THRESHOLD : int = 10;
+const MAXIMUM_NUMBER_OF_RETRIES : int = 3;
+const RELEASE_PACKAGE_CMD : PackageDeliveryCommand = RELEASE_PACKAGE;
+const ABORT_DELIVERY_CMD : PackageDeliveryCommand = ABORT_DELIVERY;
+const NO_OPERATION_CMD : PackageDeliveryCommand = NO_OPERATION;
+const NOT_STARTED_STATUS : DeliveryStatus = NOT_STARTED;
+const FAILED_STATUS : DeliveryStatus = FAILED;
+const COMPLETED_STATUS : DeliveryStatus = COMPLETED;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented : bool;
+const GNC_dot_Impl_imu_port_imu_health_status_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented : bool;
+const GNC_dot_Impl_gps_port_gps_pos_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_port_bus1_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented : bool;
+const GNC_dot_Impl_gps_port_gps_health_status_instrumented : bool;
+const GNC_dot_Impl_imu_port_imu_pos_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented : bool;
+const DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented : bool;
+
+node HasHappened (
+  X : bool
+) returns (
+  Y : bool
+);
+let
+  Y = (X) or ((false) -> (pre (Y)));
+tel
+
+node InitiallyX (
+  X : bool
+) returns (
+  Y : bool
+);
+let
+  Y = (X) -> (true);
+tel
+
+node FirstLocation (
+  X : Position_dot_impl
+) returns (
+  Y : Position_dot_impl
+);
+let
+  Y = (X) -> (pre (Y));
+tel
+
+node close_locations (
+  p1 : Position_dot_impl;
+  p2 : Position_dot_impl
+) returns (
+  are_close : bool
+);
+let
+  are_close = (p1) = (p2);
+tel
+
+node Duration (
+  p : bool
+) returns (
+  r : int
+);
+let
+  r = (if (p) then (1) else (0)) -> (if (p) then ((pre (r)) + (1)) else (0));
+tel
+
+node Sofar (
+  X : bool
+) returns (
+  Y : bool
+);
+let
+  Y = (X) -> ((X) and (pre (Y)));
+tel
+
+node Since (
+  X : bool;
+  Y : bool
+) returns (
+  Z : bool
+);
+let
+  Z = (X) or ((Y) and ((false) -> (pre (Z))));
+tel
+
+node ToInt (
+  b : bool
+) returns (
+  i : int
+);
+let
+  i = if (b) then (1) else (0);
+tel
+
+node InRestrictedArea (
+  p : Position_dot_impl
+) returns (
+  f : bool
+);
+let
+  f = (((30.000000) <= ((p).x)) and (((p).x) <= (50.000000))) and (((-(83.000000)) <= ((p).y)) and (((p).y) <= (-(63.000000))));
+tel
+
+node GNC_dot_Impl (
+  constellation : Constellation;
+  satellite0_pos : Position_dot_impl;
+  satellite1_pos : Position_dot_impl;
+  launch_pos : Position_dot_impl
+) returns (
+  gps_pos : Position_dot_impl;
+  gps_health_status : bool;
+  probe_constellation : Constellation;
+  imu_pos : Position_dot_impl;
+  imu_health_status : bool;
+  probe_launch_pos : Position_dot_impl
+);
+var
+  GNC_dot_Impl_gps_port_gps_pos : Position_dot_impl;
+  GNC_dot_Impl_gps_port_health_status : bool;
+  GNC_dot_Impl_gps_port_probe_constellation : Constellation;
+  GNC_dot_Impl_imu_port_imu_pos : Position_dot_impl;
+  GNC_dot_Impl_imu_port_health_status : bool;
+  GNC_dot_Impl_imu_port_probe_launch_pos : Position_dot_impl;
+  i5_port_gps_pos : Position_dot_impl;
+  i9_port_health_status : bool;
+  i6_port_health_status : bool;
+  i8_port_imu_pos : Position_dot_impl;
+let
+  GNC_dot_Impl_gps_port_gps_pos, GNC_dot_Impl_gps_port_health_status, GNC_dot_Impl_gps_port_probe_constellation = GPS(constellation, satellite0_pos, satellite1_pos);
+  GNC_dot_Impl_imu_port_imu_pos, GNC_dot_Impl_imu_port_health_status, GNC_dot_Impl_imu_port_probe_launch_pos = IMU(launch_pos);
+  i5_port_gps_pos = GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_pos_dot_Impl(GNC_dot_Impl_gps_port_gps_pos);
+  i9_port_health_status = GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_health_status_dot_Impl(GNC_dot_Impl_imu_port_health_status);
+  i6_port_health_status = GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_health_status_dot_Impl(GNC_dot_Impl_gps_port_health_status);
+  i8_port_imu_pos = GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_pos_dot_Impl(GNC_dot_Impl_imu_port_imu_pos);
+  probe_constellation = GNC_dot_Impl_gps_port_probe_constellation;
+  probe_launch_pos = GNC_dot_Impl_imu_port_probe_launch_pos;
+  gps_pos = i5_port_gps_pos;
+  imu_health_status = i9_port_health_status;
+  gps_health_status = i6_port_health_status;
+  imu_pos = i8_port_imu_pos;
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_cmd_in_dot_Impl (
+  delivery_cmd_in : PackageDeliveryCommand
+) returns (
+  delivery_cmd_instrumented : PackageDeliveryCommand
+);
+let
+  delivery_cmd_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_cmd_in(delivery_cmd_in)) else (delivery_cmd_in);
+tel
+
+node DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_imu_health_status_dot_Impl (
+  imu_health_status : bool
+) returns (
+  imu_health_status_instrumented : bool
+);
+let
+  imu_health_status_instrumented = if (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented) then (DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_imu_health_status(imu_health_status)) else (imu_health_status);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_cmd_dot_Impl (
+  cmd : bool
+) returns (
+  nav_cmd_instrumented : bool
+);
+let
+  nav_cmd_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_cmd(cmd)) else (cmd);
+tel
+
+node DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_imu_pos_dot_Impl (
+  imu_pos : Position_dot_impl
+) returns (
+  imu_pos_instrumented : Position_dot_impl
+);
+let
+  imu_pos_instrumented = if (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented) then (DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_imu_pos(imu_pos)) else (imu_pos);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_package_is_secure_dot_Impl (
+  package_is_secure : bool
+) returns (
+  package_is_secure_instrumented : bool
+);
+let
+  package_is_secure_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_package_is_secure(package_is_secure)) else (package_is_secure);
+tel
+
+node GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_pos_dot_Impl (
+  gps_pos : Position_dot_impl
+) returns (
+  gps_pos_instrumented : Position_dot_impl
+);
+let
+  gps_pos_instrumented = if (GNC_dot_Impl_gps_port_gps_pos_instrumented) then (GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_pos(gps_pos)) else (gps_pos);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_status_dot_Impl (
+  delivery_status : DeliveryStatus
+) returns (
+  delivery_status_out_instrumented : DeliveryStatus
+);
+let
+  delivery_status_out_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_status(delivery_status)) else (delivery_status);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_radio_port_radio_in_dot_Impl (
+  radio_in : bool
+) returns (
+  radio_cmd_instrumented : bool
+);
+let
+  radio_cmd_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_radio_port_radio_in(radio_in)) else (radio_in);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_port_bus2_dot_Impl (
+  bus2 : bool
+) returns (
+  bus_out_instrumented : bool
+);
+let
+  bus_out_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_port_bus2(bus2)) else (bus2);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_camera_port_camera_in_dot_Impl (
+  camera_in : bool
+) returns (
+  camera_instrumented : bool
+);
+let
+  camera_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_camera_port_camera_in(camera_in)) else (camera_in);
+tel
+
+node DeliveryDroneSystem_dot_Impl_Inst_DeliveryDroneSystem_dot_Impl_connector_port_bus_in_dot_Impl (
+  bus_in : InputBus_dot_impl
+) returns (
+  bus1_instrumented : InputBus_dot_impl
+);
+let
+  bus1_instrumented = if (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented) then (DeliveryDroneSystem_dot_Impl_Inst_DeliveryDroneSystem_dot_Impl_connector_port_bus_in(bus_in)) else (bus_in);
+tel
+
+node GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_health_status_dot_Impl (
+  imu_health_status : bool
+) returns (
+  health_status_instrumented : bool
+);
+let
+  health_status_instrumented = if (GNC_dot_Impl_imu_port_imu_health_status_instrumented) then (GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_health_status(imu_health_status)) else (imu_health_status);
+tel
+
+node GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_health_status_dot_Impl (
+  gps_health_status : bool
+) returns (
+  health_status_instrumented : bool
+);
+let
+  health_status_instrumented = if (GNC_dot_Impl_gps_port_gps_health_status_instrumented) then (GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_health_status(gps_health_status)) else (gps_health_status);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_launch_pos_dot_Impl (
+  launch_pos : Position_dot_impl
+) returns (
+  launch_pos_instrumented : Position_dot_impl
+);
+let
+  launch_pos_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_launch_pos(launch_pos)) else (launch_pos);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_dest_pos_dot_Impl (
+  dest_pos : Position_dot_impl
+) returns (
+  dest_location_instrumented : Position_dot_impl
+);
+let
+  dest_location_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_dest_pos(dest_pos)) else (dest_pos);
+tel
+
+node DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_constellation_dot_Impl (
+  constellation : Constellation
+) returns (
+  constellation_instrumented : Constellation
+);
+let
+  constellation_instrumented = if (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented) then (DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_constellation(constellation)) else (constellation);
+tel
+
+node DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_gps_pos_dot_Impl (
+  gps_pos : Position_dot_impl
+) returns (
+  gps_pos_instrumented : Position_dot_impl
+);
+let
+  gps_pos_instrumented = if (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented) then (DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_gps_pos(gps_pos)) else (gps_pos);
+tel
+
+node GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_pos_dot_Impl (
+  imu_pos : Position_dot_impl
+) returns (
+  imu_pos_instrumented : Position_dot_impl
+);
+let
+  imu_pos_instrumented = if (GNC_dot_Impl_imu_port_imu_pos_instrumented) then (GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_pos(imu_pos)) else (imu_pos);
+tel
+
+node DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_gps_health_status_dot_Impl (
+  gps_health_status : bool
+) returns (
+  gps_health_status_instrumented : bool
+);
+let
+  gps_health_status_instrumented = if (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented) then (DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_gps_health_status(gps_health_status)) else (gps_health_status);
+tel
+
+node DeliveryDroneSystem_dot_Impl_positionEstimator_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_est_pos_dot_Impl (
+  est_pos : Position_dot_impl
+) returns (
+  est_pos_instrumented : Position_dot_impl
+);
+let
+  est_pos_instrumented = if (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented) then (DeliveryDroneSystem_dot_Impl_positionEstimator_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_est_pos(est_pos)) else (est_pos);
+tel
+
+node imported GPS (
+  constellation : Constellation;
+  satellite0_pos : Position_dot_impl;
+  satellite1_pos : Position_dot_impl
+) returns (
+  gps_pos : Position_dot_impl;
+  health_status : bool;
+  probe_constellation : Constellation
+);
+(*@contract
+  var satellite0_selected : bool = (constellation) = (Satellite0);
+  var selected_satellite_pos : Position_dot_impl = if (satellite0_selected) then (satellite0_pos) else (satellite1_pos);
+  guarantee "Output: gps_pos" close_locations(gps_pos, selected_satellite_pos);
+  guarantee "Output: probe_constellation" (probe_constellation) = (constellation);
+*)
+
+node imported IMU (
+  launch_pos : Position_dot_impl
+) returns (
+  imu_pos : Position_dot_impl;
+  health_status : bool;
+  probe_launch_pos : Position_dot_impl
+);
+(*@contract
+  guarantee "Output: probe_launch_pos" (probe_launch_pos) = (launch_pos);
+*)
+
+node imported GNC (
+  constellation : Constellation;
+  satellite0_pos : Position_dot_impl;
+  satellite1_pos : Position_dot_impl;
+  launch_pos : Position_dot_impl
+) returns (
+  gps_pos : Position_dot_impl;
+  gps_health_status : bool;
+  probe_constellation : Constellation;
+  imu_pos : Position_dot_impl;
+  imu_health_status : bool;
+  probe_launch_pos : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported PositionEstimator (
+  gps_pos : Position_dot_impl;
+  imu_pos : Position_dot_impl;
+  pos_act_in : Position_dot_impl
+) returns (
+  est_pos : Position_dot_impl
+);
+(*@contract
+  guarantee "Output: est_pos" close_locations(est_pos, gps_pos);
+*)
+
+node imported Navigation (
+  est_pos : Position_dot_impl;
+  dest_pos : Position_dot_impl;
+  cmd : bool;
+  flight_control_state : bool
+) returns (
+  move : bool;
+  cur_pos : Position_dot_impl;
+  pos_act_out : Position_dot_impl;
+  probe_dest_pos : Position_dot_impl
+);
+(*@contract
+  guarantee "Output: cur_pos | Current location is computed
+                        from Estimated Position" close_locations(cur_pos, est_pos);
+  guarantee "Output: move" (move) = (cmd);
+  guarantee "Output: probe_dest_pos" (probe_dest_pos) = (dest_pos);
+*)
+
+node imported FlightControl (
+  actuation_response : bool;
+  move : bool
+) returns (
+  motor_cmd : bool;
+  fc_state : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported Actuation (
+  motor_cmd : bool
+) returns (
+  response : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryPlanner (
+  bus_in : InputBus_dot_impl;
+  cur_pos : Position_dot_impl;
+  delivery_status : DeliveryStatus;
+  radio_response : RadioResponse_dot_impl;
+  camera_result : int;
+  gps_health_status : bool;
+  imu_health_status : bool;
+  rdo_health_status : bool;
+  cam_health_status : bool;
+  package_is_secure : bool
+) returns (
+  radio_cmd : bool;
+  delivery_cmd : PackageDeliveryCommand;
+  dest_location : Position_dot_impl;
+  bus_out : bool;
+  nav_cmd : bool;
+  camera : bool;
+  probe_safe_landing : ProbeSafeLanding_dot_impl;
+  constellation : Constellation;
+  launch_pos : Position_dot_impl;
+  probe_init_mode : bool;
+  probe_abort_mode : bool;
+  target_clear : bool;
+  valid_marker : bool
+);
+(*@contract
+  var recent_order : DeliveryOrder_dot_impl = if (init_mode) then ((bus_in).order) else (((bus_in).order) -> (pre (recent_order)));
+  var truck_position : Position_dot_impl = FirstLocation(cur_pos);
+  var dest_position : Position_dot_impl = dest_location;
+  var expensive_item : bool = ((recent_order).item_value) >= (ITEM_VALUE_THRESHOLD);
+  var confirmation : bool = ((radio_response).target_confirmed) and ((radio_response).data_available);
+  var confirmation_timeout : bool = (Duration(not (confirmation))) > (WAITING_CONFIRMATION_THRESHOLD);
+  var get_clearance_timeout : bool = (Duration(no_clearance)) >= (MAXIMUM_NUMBER_OF_RETRIES);
+  var delivery_failed : bool = (delivery_status) = (FAILED_STATUS);
+  var delivery_completed : bool = (delivery_status) = (COMPLETED_STATUS);
+  var is_safe_landing : bool = (target_clear) and (valid_marker);
+  var on_off : bool = (bus_in).on_off;
+  var init_criteria_succeed : bool = ((bus_in).init_criteria_satisfied) and (not (internal_error_detected));
+  var init_criteria_failed : bool = not (init_criteria_succeed);
+  var abort_cmd : bool = (bus_in).abort_cmd;
+  var mission_store_release_sequence : bool = (bus_in).mission_store_release_sequence;
+  var okay_to_launch : bool = not (internal_error_detected);
+  var separation : bool = not (connected);
+  var destination_location_reached : bool = close_locations(cur_pos, dest_position);
+  var no_clearance : bool = not (is_safe_landing);
+  var successfull_delivery : bool = ((delivery_completed) and (destination_location_reached)) and (not (no_clearance));
+  var exhaustive_retries : bool = (get_clearance_timeout) or (confirmation_timeout);
+  var internal_error_detected : bool = (((not (gps_health_status)) or (not (imu_health_status))) or (not (rdo_health_status))) or (not (cam_health_status));
+  var truck_location_reached : bool = close_locations(cur_pos, truck_position);
+  var connected : bool = (bus_in).connected;
+  var off_mode : bool = (true) -> (((((pre (off_mode)) and (not ((on_off) and (connected)))) or (((pre (init_mode)) and (on_off)) and (connected))) or (((pre (ready_mode)) and (on_off)) and (connected))) or (((pre (abort_mode)) and (on_off)) and (connected)));
+  var init_mode : bool = (false) -> (((((((pre (init_mode)) and (not ((on_off) and (connected)))) and (not ((init_criteria_succeed) and (connected)))) and (not ((abort_cmd) and (connected)))) or (((pre (off_mode)) and (on_off)) and (connected))) or (((pre (ready_mode)) and (init_criteria_failed)) and (connected))) or (((pre (return_to_truck_mode)) and (truck_location_reached)) and (connected)));
+  var ready_mode : bool = (false) -> ((((((pre (ready_mode)) and (not ((init_criteria_failed) and (connected)))) and (not ((on_off) and (connected)))) and (not ((abort_cmd) and (connected)))) and (not ((mission_store_release_sequence) and (connected)))) or (((pre (init_mode)) and (init_criteria_succeed)) and (connected)));
+  var launch_mode : bool = (false) -> ((((pre (launch_mode)) and (not ((abort_cmd) and (connected)))) and (not (((package_is_secure) and (okay_to_launch)) and (separation)))) or (((pre (ready_mode)) and (mission_store_release_sequence)) and (connected)));
+  var abort_mode : bool = (false) -> (((((pre (abort_mode)) and (not ((on_off) and (connected)))) or (((pre (init_mode)) and (abort_cmd)) and (connected))) or (((pre (ready_mode)) and (abort_cmd)) and (connected))) or (((pre (launch_mode)) and (abort_cmd)) and (connected)));
+  var flying_to_dest_mode : bool = (false) -> (((pre (flying_to_dest_mode)) and (not (destination_location_reached))) or ((((pre (launch_mode)) and (package_is_secure)) and (okay_to_launch)) and (separation)));
+  var making_delivery_mode : bool = (false) -> (((pre (making_delivery_mode)) and (not ((((successfull_delivery) or (exhaustive_retries)) or (delivery_failed)) or (internal_error_detected)))) or ((pre (flying_to_dest_mode)) and (destination_location_reached)));
+  var return_to_truck_mode : bool = (false) -> (((pre (return_to_truck_mode)) and (not ((truck_location_reached) and (connected)))) or ((pre (making_delivery_mode)) and ((((successfull_delivery) or (exhaustive_retries)) or (delivery_failed)) or (internal_error_detected))));
+  guarantee "Output: probe_safe_landing" (probe_safe_landing) = (ProbeSafeLanding_dot_impl {has_valid_marker = valid_marker; is_target_clear = target_clear});
+  guarantee "Output: delivery_cmd" (delivery_cmd) = (if (((making_delivery_mode) and (not (no_clearance))) and ((expensive_item) => (confirmation))) then (RELEASE_PACKAGE_CMD) else (if ((return_to_truck_mode) and (internal_error_detected)) then (ABORT_DELIVERY_CMD) else (NO_OPERATION_CMD)));
+  guarantee "Output: constellation" (constellation) = (if (init_mode) then ((bus_in).constellation) else (((bus_in).constellation) -> (pre (constellation))));
+  guarantee "Output: dest_location" (dest_location) = (if (init_mode) then (((bus_in).order).target_position) else ((((bus_in).order).target_position) -> (pre (dest_location))));
+  guarantee "Output: launch_pos" (launch_pos) = (if (init_mode) then ((bus_in).launch_pos) else (((bus_in).launch_pos) -> (pre (launch_pos))));
+  guarantee "Output: radio_cmd" (radio_cmd) = ((making_delivery_mode) and (expensive_item));
+  guarantee "Output: probe_init_mode" (probe_init_mode) = (init_mode);
+  guarantee "Output: probe_abort_mode" (probe_abort_mode) = (abort_mode);
+  guarantee "Output: nav_cmd | it sends signal to navigation
+                        only if it's in flying modes'" (nav_cmd) = (((flying_to_dest_mode) or (making_delivery_mode)) or (return_to_truck_mode));
+  guarantee "Modes are mutually exclusive" ((((((((ToInt(off_mode)) + (ToInt(init_mode))) + (ToInt(ready_mode))) + (ToInt(launch_mode))) + (ToInt(abort_mode))) + (ToInt(flying_to_dest_mode))) + (ToInt(making_delivery_mode))) + (ToInt(return_to_truck_mode))) = (1);
+*)
+
+node imported Radio (
+  comm_in : RadioResponse_dot_impl;
+  radio_in : bool
+) returns (
+  comm_out : bool;
+  radio_out : RadioResponse_dot_impl;
+  health_status : bool
+);
+(*@contract
+  guarantee "Radio receives data from remote communication
+                        channel if there is a request" (radio_in) => ((((radio_out).data_available) = ((comm_in).data_available)) and (((comm_in).target_confirmed) = ((radio_out).target_confirmed)));
+  guarantee "Without a request, no radio data is available" (not (radio_in)) => (not ((radio_out).data_available));
+*)
+
+node imported DeliveryItemMechanism (
+  delivery_cmd_in : PackageDeliveryCommand
+) returns (
+  delivery_status_out : DeliveryStatus;
+  package_is_secure : bool
+);
+(*@contract
+  var release_cmd : bool = (delivery_cmd_in) = (RELEASE_PACKAGE_CMD);
+  var abort_cmd : bool = (delivery_cmd_in) = (ABORT_DELIVERY_CMD);
+  var no_op_cmd : bool = (delivery_cmd_in) = (NO_OPERATION_CMD);
+  guarantee "Initially, delivery status is NOT_STARTED" InitiallyX((delivery_status_out) = (NOT_STARTED_STATUS));
+  guarantee "if no op or abort command have received then
+                        delivery status gets re-started" (true) -> (((no_op_cmd) or (abort_cmd)) => ((delivery_status_out) = (NOT_STARTED_STATUS)));
+  guarantee "If delivery command is issued, delivery status is
+                        different from NOT_STARTED" (true) -> ((release_cmd) => ((delivery_status_out) <> (NOT_STARTED_STATUS)));
+*)
+
+node imported Camera (
+  camera_in : bool
+) returns (
+  camera_out : int;
+  health_status : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported Connector (
+  bus_in : InputBus_dot_impl
+) returns (
+  bus_out : InputBus_dot_impl
+);
+(*@contract
+  guarantee "Output: bus_out" (bus_out) = (bus_in);
+*)
+
+node imported DeliveryDroneSystem (
+  satellite0_sig_pos : Position_dot_impl;
+  satellite1_sig_pos : Position_dot_impl;
+  bus1 : InputBus_dot_impl;
+  comm1 : RadioResponse_dot_impl
+) returns (
+  comm2 : bool;
+  bus2 : bool;
+  radio_cmd : bool;
+  radio_response : RadioResponse_dot_impl;
+  delivery_status : DeliveryStatus;
+  actuation_out : bool;
+  probe_init_mode : bool;
+  probe_abort_mode : bool;
+  probe_delivery_cmd : PackageDeliveryCommand;
+  probe_constellation : Constellation;
+  probe_launch_location : Position_dot_impl;
+  probe_delivery_location : Position_dot_impl;
+  probe_fly_cmd : bool
+);
+(*@contract
+  var delivery_started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
+  var confirmation_requested : bool = HasHappened(radio_cmd);
+  var acknowledge_received : bool = ((comm1).data_available) and ((comm1).target_confirmed);
+  var target_confirmed : bool = HasHappened((confirmation_requested) and (acknowledge_received));
+  var valuable_package : bool = ((most_recent_order).item_value) >= (ITEM_VALUE_THRESHOLD);
+  var power_signal : bool = ((bus1).on_off) and ((bus1).connected);
+  var isOn : bool = (false) -> (if (power_signal) then (not (pre (isOn))) else (pre (isOn)));
+  var most_recent_constellation : Constellation = if (probe_init_mode) then ((bus1).constellation) else (((bus1).constellation) -> (pre (most_recent_constellation)));
+  var most_recent_launch_location : Position_dot_impl = if (probe_init_mode) then ((bus1).launch_pos) else (((bus1).launch_pos) -> (pre (most_recent_launch_location)));
+  var most_recent_order : DeliveryOrder_dot_impl = if (probe_init_mode) then ((bus1).order) else (((bus1).order) -> (pre (most_recent_order)));
+  var most_recent_delivery_location : Position_dot_impl = (most_recent_order).target_position;
+  var release_cmd : bool = (probe_delivery_cmd) = (RELEASE_PACKAGE_CMD);
+  var started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos is
+                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
+  weakly assume "GNC_dot_Impl_imu_port_imu_health_status is not
+                        instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos is
+                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
+  weakly assume "GNC_dot_Impl_gps_port_gps_pos is not instrumented" not (GNC_dot_Impl_gps_port_gps_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_port_bus1 is not
+                        instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
+  weakly assume "GNC_dot_Impl_gps_port_gps_health_status is not
+                        instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
+  weakly assume "GNC_dot_Impl_imu_port_imu_pos is not instrumented" not (GNC_dot_Impl_imu_port_imu_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
+  assume "Delivery locations set through bus1 are never
+                        off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
+  guarantee "P7: The drone never initiates packet release to an
+                        off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_cmd_in (
+  delivery_cmd_in : PackageDeliveryCommand
+) returns (
+  delivery_cmd_instrumented : PackageDeliveryCommand
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_imu_health_status (
+  imu_health_status : bool
+) returns (
+  imu_health_status_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_cmd (
+  cmd : bool
+) returns (
+  nav_cmd_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_imu_pos (
+  imu_pos : Position_dot_impl
+) returns (
+  imu_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_package_is_secure (
+  package_is_secure : bool
+) returns (
+  package_is_secure_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_pos (
+  gps_pos : Position_dot_impl
+) returns (
+  gps_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_status (
+  delivery_status : DeliveryStatus
+) returns (
+  delivery_status_out_instrumented : DeliveryStatus
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_radio_port_radio_in (
+  radio_in : bool
+) returns (
+  radio_cmd_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_port_bus2 (
+  bus2 : bool
+) returns (
+  bus_out_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_camera_port_camera_in (
+  camera_in : bool
+) returns (
+  camera_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_Inst_DeliveryDroneSystem_dot_Impl_connector_port_bus_in (
+  bus_in : InputBus_dot_impl
+) returns (
+  bus1_instrumented : InputBus_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_health_status (
+  imu_health_status : bool
+) returns (
+  health_status_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported GNC_dot_Impl_gps_Inst_GNC_dot_Impl_port_gps_health_status (
+  gps_health_status : bool
+) returns (
+  health_status_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_launch_pos (
+  launch_pos : Position_dot_impl
+) returns (
+  launch_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_dest_pos (
+  dest_pos : Position_dot_impl
+) returns (
+  dest_location_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_constellation (
+  constellation : Constellation
+) returns (
+  constellation_instrumented : Constellation
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_gps_pos (
+  gps_pos : Position_dot_impl
+) returns (
+  gps_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported GNC_dot_Impl_imu_Inst_GNC_dot_Impl_port_imu_pos (
+  imu_pos : Position_dot_impl
+) returns (
+  imu_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_gps_health_status (
+  gps_health_status : bool
+) returns (
+  gps_health_status_instrumented : bool
+);
+(*@contract
+  guarantee true;
+*)
+
+node imported DeliveryDroneSystem_dot_Impl_positionEstimator_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_est_pos (
+  est_pos : Position_dot_impl
+) returns (
+  est_pos_instrumented : Position_dot_impl
+);
+(*@contract
+  guarantee true;
+*)
+
+
+node DeliveryDroneSystem_dot_Impl (
+  satellite0_sig_pos : Position_dot_impl;
+  satellite1_sig_pos : Position_dot_impl;
+  bus1 : InputBus_dot_impl;
+  comm1 : RadioResponse_dot_impl
+) returns (
+  comm2 : bool;
+  bus2 : bool;
+  radio_cmd : bool;
+  radio_response : RadioResponse_dot_impl;
+  delivery_status : DeliveryStatus;
+  actuation_out : bool;
+  probe_init_mode : bool;
+  probe_abort_mode : bool;
+  probe_delivery_cmd : PackageDeliveryCommand;
+  probe_constellation : Constellation;
+  probe_launch_location : Position_dot_impl;
+  probe_delivery_location : Position_dot_impl;
+  probe_fly_cmd : bool
+);
+(*@contract
+  var delivery_started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
+  var confirmation_requested : bool = HasHappened(radio_cmd);
+  var acknowledge_received : bool = ((comm1).data_available) and ((comm1).target_confirmed);
+  var target_confirmed : bool = HasHappened((confirmation_requested) and (acknowledge_received));
+  var valuable_package : bool = ((most_recent_order).item_value) >= (ITEM_VALUE_THRESHOLD);
+  var power_signal : bool = ((bus1).on_off) and ((bus1).connected);
+  var isOn : bool = (false) -> (if (power_signal) then (not (pre (isOn))) else (pre (isOn)));
+  var most_recent_constellation : Constellation = if (probe_init_mode) then ((bus1).constellation) else (((bus1).constellation) -> (pre (most_recent_constellation)));
+  var most_recent_launch_location : Position_dot_impl = if (probe_init_mode) then ((bus1).launch_pos) else (((bus1).launch_pos) -> (pre (most_recent_launch_location)));
+  var most_recent_order : DeliveryOrder_dot_impl = if (probe_init_mode) then ((bus1).order) else (((bus1).order) -> (pre (most_recent_order)));
+  var most_recent_delivery_location : Position_dot_impl = (most_recent_order).target_position;
+  var release_cmd : bool = (probe_delivery_cmd) = (RELEASE_PACKAGE_CMD);
+  var started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos is
+                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
+  weakly assume "GNC_dot_Impl_imu_port_imu_health_status is not
+                        instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos is
+                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
+  weakly assume "GNC_dot_Impl_gps_port_gps_pos is not instrumented" not (GNC_dot_Impl_gps_port_gps_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_port_bus1 is not
+                        instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
+  weakly assume "GNC_dot_Impl_gps_port_gps_health_status is not
+                        instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
+  weakly assume "GNC_dot_Impl_imu_port_imu_pos is not instrumented" not (GNC_dot_Impl_imu_port_imu_pos_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
+  weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd
+                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
+  assume "Delivery locations set through bus1 are never
+                        off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
+  guarantee "P7: The drone never initiates packet release to an
+                        off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
+*)
+var
+  DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status : bool;
+  DeliveryDroneSystem_dot_Impl_gnc_port_probe_constellation : Constellation;
+  DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status : bool;
+  DeliveryDroneSystem_dot_Impl_gnc_port_probe_launch_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_radio_port_comm_out : bool;
+  DeliveryDroneSystem_dot_Impl_radio_port_radio_out : RadioResponse_dot_impl;
+  DeliveryDroneSystem_dot_Impl_radio_port_health_status : bool;
+  DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_navigation_port_move : bool;
+  DeliveryDroneSystem_dot_Impl_navigation_port_cur_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_navigation_port_pos_act_out : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_navigation_port_probe_dest_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_fc_port_motor_cmd : bool;
+  DeliveryDroneSystem_dot_Impl_fc_port_fc_state : bool;
+  DeliveryDroneSystem_dot_Impl_actuation_port_response : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd : PackageDeliveryCommand;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus_out : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_safe_landing : ProbeSafeLanding_dot_impl;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation : Constellation;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos : Position_dot_impl;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_init_mode : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_abort_mode : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_target_clear : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_valid_marker : bool;
+  DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out : DeliveryStatus;
+  DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure : bool;
+  DeliveryDroneSystem_dot_Impl_camera_port_camera_out : int;
+  DeliveryDroneSystem_dot_Impl_camera_port_health_status : bool;
+  DeliveryDroneSystem_dot_Impl_connector_port_bus_out : InputBus_dot_impl;
+  c25_port_delivery_cmd : PackageDeliveryCommand;
+  c35_port_imu_health_status : bool;
+  c26_port_nav_cmd : bool;
+  c18a_port_imu_pos : Position_dot_impl;
+  c42_port_package_is_secure : bool;
+  c7_port_delivery_status_out : DeliveryStatus;
+  c10_port_radio_cmd : bool;
+  c15_port_bus_out : bool;
+  c27_port_camera : bool;
+  c14a_port_bus1 : InputBus_dot_impl;
+  c1b_port_launch_pos : Position_dot_impl;
+  c4_port_dest_location : Position_dot_impl;
+  c33_port_constellation : Constellation;
+  c12_port_gps_pos : Position_dot_impl;
+  c34_port_gps_health_status : bool;
+  c1_port_est_pos : Position_dot_impl;
+let
+  DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos, DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status, DeliveryDroneSystem_dot_Impl_gnc_port_probe_constellation, DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos, DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status, DeliveryDroneSystem_dot_Impl_gnc_port_probe_launch_pos = GNC_dot_Impl(c33_port_constellation, satellite0_sig_pos, satellite1_sig_pos, c1b_port_launch_pos);
+  DeliveryDroneSystem_dot_Impl_radio_port_comm_out, DeliveryDroneSystem_dot_Impl_radio_port_radio_out, DeliveryDroneSystem_dot_Impl_radio_port_health_status = Radio(comm1, c10_port_radio_cmd);
+  DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos = PositionEstimator(c12_port_gps_pos, c18a_port_imu_pos, DeliveryDroneSystem_dot_Impl_navigation_port_pos_act_out);
+  DeliveryDroneSystem_dot_Impl_navigation_port_move, DeliveryDroneSystem_dot_Impl_navigation_port_cur_pos, DeliveryDroneSystem_dot_Impl_navigation_port_pos_act_out, DeliveryDroneSystem_dot_Impl_navigation_port_probe_dest_pos = Navigation(c1_port_est_pos, c4_port_dest_location, c26_port_nav_cmd, DeliveryDroneSystem_dot_Impl_fc_port_fc_state);
+  DeliveryDroneSystem_dot_Impl_fc_port_motor_cmd, DeliveryDroneSystem_dot_Impl_fc_port_fc_state = FlightControl(DeliveryDroneSystem_dot_Impl_actuation_port_response, DeliveryDroneSystem_dot_Impl_navigation_port_move);
+  DeliveryDroneSystem_dot_Impl_actuation_port_response = Actuation(DeliveryDroneSystem_dot_Impl_fc_port_motor_cmd);
+  DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus_out, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_safe_landing, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_init_mode, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_abort_mode, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_target_clear, DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_valid_marker = DeliveryPlanner(DeliveryDroneSystem_dot_Impl_connector_port_bus_out, DeliveryDroneSystem_dot_Impl_navigation_port_cur_pos, c7_port_delivery_status_out, DeliveryDroneSystem_dot_Impl_radio_port_radio_out, DeliveryDroneSystem_dot_Impl_camera_port_camera_out, c34_port_gps_health_status, c35_port_imu_health_status, DeliveryDroneSystem_dot_Impl_radio_port_health_status, DeliveryDroneSystem_dot_Impl_camera_port_health_status, c42_port_package_is_secure);
+  DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out, DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure = DeliveryItemMechanism(c25_port_delivery_cmd);
+  DeliveryDroneSystem_dot_Impl_camera_port_camera_out, DeliveryDroneSystem_dot_Impl_camera_port_health_status = Camera(c27_port_camera);
+  DeliveryDroneSystem_dot_Impl_connector_port_bus_out = Connector(c14a_port_bus1);
+  c25_port_delivery_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_cmd_in_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd);
+  c35_port_imu_health_status = DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_imu_health_status_dot_Impl(DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status);
+  c26_port_nav_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_cmd_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd);
+  c18a_port_imu_pos = DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_imu_pos_dot_Impl(DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos);
+  c42_port_package_is_secure = DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_package_is_secure_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure);
+  c7_port_delivery_status_out = DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_status_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out);
+  c10_port_radio_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_radio_port_radio_in_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd);
+  c15_port_bus_out = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_port_bus2_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus_out);
+  c27_port_camera = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_camera_port_camera_in_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera);
+  c14a_port_bus1 = DeliveryDroneSystem_dot_Impl_Inst_DeliveryDroneSystem_dot_Impl_connector_port_bus_in_dot_Impl(bus1);
+  c1b_port_launch_pos = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_launch_pos_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos);
+  c4_port_dest_location = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_dest_pos_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location);
+  c33_port_constellation = DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_gnc_port_constellation_dot_Impl(DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation);
+  c12_port_gps_pos = DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_positionEstimator_port_gps_pos_dot_Impl(DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos);
+  c34_port_gps_health_status = DeliveryDroneSystem_dot_Impl_gnc_Inst_DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_gps_health_status_dot_Impl(DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status);
+  c1_port_est_pos = DeliveryDroneSystem_dot_Impl_positionEstimator_Inst_DeliveryDroneSystem_dot_Impl_navigation_port_est_pos_dot_Impl(DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos);
+  comm2 = DeliveryDroneSystem_dot_Impl_radio_port_comm_out;
+  radio_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd;
+  radio_response = DeliveryDroneSystem_dot_Impl_radio_port_radio_out;
+  delivery_status = DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out;
+  probe_delivery_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd;
+  actuation_out = DeliveryDroneSystem_dot_Impl_actuation_port_response;
+  probe_constellation = DeliveryDroneSystem_dot_Impl_gnc_port_probe_constellation;
+  probe_init_mode = DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_init_mode;
+  probe_launch_location = DeliveryDroneSystem_dot_Impl_gnc_port_probe_launch_pos;
+  probe_delivery_location = DeliveryDroneSystem_dot_Impl_navigation_port_probe_dest_pos;
+  probe_fly_cmd = DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd;
+  probe_abort_mode = DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_probe_abort_mode;
+  bus2 = c15_port_bus_out;
+tel
+
