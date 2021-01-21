@@ -268,58 +268,44 @@ public
 				nav_cmd = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
 			
 			
-			eq off_mode: bool = true -> 
-								(pre(off_mode) and (not (on_off and connected))) or
-								(pre(init_mode) and on_off and connected) or
-								(pre(ready_mode) and on_off and connected) or 
-								(pre(abort_mode) and on_off and connected);
-			
-			eq init_mode: bool = false ->
-								 (pre(init_mode) and (not (on_off and connected)) 
-								 				 and (not (init_criteria_succeed and connected)) 
-								 				 and (not (abort_cmd and connected))) or
-								 (pre(off_mode) and on_off and connected) or
-								 (pre(ready_mode) and init_criteria_failed and connected) or
-								 (pre(return_to_truck_mode) and truck_location_reached and connected);
-			
-			eq mac_ok: bool = (mac_in=Agree_Nodes::ComputeMAC(bus_in.order.target_position));
-			
-			eq ready_mode: bool = false ->
-								  (pre(ready_mode) and (not (init_criteria_failed and connected)) 
-								  		           and (not (on_off and connected)) 
-								  		           and (not (abort_cmd and connected)) 
-								  		           and (not (mission_store_release_sequence and connected))) or
-								  (pre(init_mode) and init_criteria_succeed and connected and pre(mac_ok));
-			
-			eq launch_mode: bool = false ->
-								   (pre(launch_mode) and (not (abort_cmd and connected)) 
-								   					 and (not (package_is_secure and okay_to_launch and separation))) or
-								   (pre(ready_mode) and mission_store_release_sequence and connected);
-			
-			eq abort_mode: bool = false ->
-								  (pre(abort_mode) and (not (on_off and connected))) or
-								  (pre(init_mode) and abort_cmd and connected) or
-								  (pre(ready_mode) and abort_cmd and connected) or
-								  (pre(launch_mode) and abort_cmd and connected);
-			
-			eq flying_to_dest_mode: bool = false ->
-										   (pre(flying_to_dest_mode) and (not (destination_location_reached))) or
-										   (pre(launch_mode) and package_is_secure and okay_to_launch and separation);
-			
-			eq making_delivery_mode: bool = false ->
-											(pre(making_delivery_mode) and (not (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected))) or
-										    (pre(flying_to_dest_mode) and destination_location_reached);
-			
-			eq return_to_truck_mode: bool = false ->
-											(pre(return_to_truck_mode) and (not (truck_location_reached and connected))) or
-										    (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected));
-			
-			guarantee "Modes are mutually exclusive":
-				Agree_Nodes::ToInt(off_mode) + Agree_Nodes::ToInt(init_mode) + 
-				Agree_Nodes::ToInt(ready_mode) + Agree_Nodes::ToInt(launch_mode) +
-				Agree_Nodes::ToInt(abort_mode) + Agree_Nodes::ToInt(flying_to_dest_mode) +
-				Agree_Nodes::ToInt(making_delivery_mode) + Agree_Nodes::ToInt(return_to_truck_mode) = 1;
-    		
+			eq off_mode: bool = true ->
+		      (pre(off_mode) and not (on_off and connected)) or
+		      ((pre(init_mode) or pre(ready_mode) or pre(abort_mode)) and on_off and connected);
+		
+		    eq abort_mode: bool = false ->
+		      ((pre(init_mode) or pre(ready_mode)) and not off_mode and abort_cmd and connected) or
+		      (pre(launch_mode) and abort_cmd and connected) or
+		      (pre(abort_mode) and not (on_off and connected));
+		
+		    eq mac_ok: bool = (mac_in=Agree_Nodes::ComputeMAC(bus_in.order.target_position));
+		    
+		    eq move_to_ready: bool = false -> init_criteria_succeed and connected and pre(mac_ok);
+		
+		    eq init_mode: bool = false ->
+		      (pre(off_mode) and (on_off and connected)) or
+		      (pre(init_mode) and not off_mode and not abort_mode and not move_to_ready) or
+		      (pre(ready_mode) and not off_mode and not abort_mode and (init_criteria_failed and connected)) or
+		      (pre(return_to_truck_mode) and (truck_location_reached and connected));
+		  
+		    eq ready_mode: bool = false ->
+		      (pre(init_mode) and not off_mode and not abort_mode and move_to_ready) or
+		      (pre(ready_mode) and not off_mode and not abort_mode and not init_mode and not launch_mode);
+		
+		    eq launch_mode: bool = false ->
+		      (pre(ready_mode) and not off_mode and not abort_mode and not init_mode and (mission_store_release_sequence and connected)) or
+		      (pre(launch_mode) and not abort_mode and not flying_to_dest_mode);
+		
+		    eq flying_to_dest_mode: bool = false ->
+		      (pre(launch_mode) and not abort_mode and (package_is_secure and okay_to_launch and separation)) or
+		      (pre(flying_to_dest_mode) and not destination_location_reached);
+		
+		    eq making_delivery_mode: bool = false ->
+		      (pre(flying_to_dest_mode) and destination_location_reached) or
+		      (pre(making_delivery_mode) and not return_to_truck_mode);
+		    
+		    eq return_to_truck_mode: bool = false ->
+		      (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected)) or
+		      (pre(return_to_truck_mode) and not (truck_location_reached and connected));
 		**};
 					
 		annex verdict {**
