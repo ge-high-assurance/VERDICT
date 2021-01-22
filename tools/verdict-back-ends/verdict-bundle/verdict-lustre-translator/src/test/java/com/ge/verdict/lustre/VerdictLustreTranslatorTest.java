@@ -1,22 +1,20 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.lustre;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.ge.verdict.vdm.VdmTest;
 import com.ge.verdict.vdm.VdmTranslator;
-
+import java.io.File;
+import java.io.IOException;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
 import verdict.vdm.vdm_model.Model;
 
 public class VerdictLustreTranslatorTest {
 
     @Test
     public void testMarshalToLustre1() throws IOException {
-        Model controlModel = VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input1.xml"));
+        Model controlModel =
+                VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input1.xml"));
 
         File testFile = File.createTempFile("vdm-model", ".lus");
         testFile.deleteOnExit();
@@ -29,7 +27,8 @@ public class VerdictLustreTranslatorTest {
 
     @Test
     public void testMarshalToLustre2() throws IOException {
-        Model controlModel = VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input2.xml"));
+        Model controlModel =
+                VdmTranslator.unmarshalFromXml(new File("src/test/resources/vdm-input2.xml"));
 
         File testFile = File.createTempFile("vdm-model", ".lus");
         testFile.deleteOnExit();
