@@ -172,32 +172,35 @@ public
 			-- Guarantees			
 			guarantee "If filter is not enabled, just relay the desired speed":
 				not is_enabled => filtered_desired_speed = desired_speed;
-			
-			guarantee "If filter is enabled and incomming desired speed is within the expected range, then just relay it to outgoing filtered desired speed":
-				is_enabled => (desired_speed_is_valid => filtered_desired_speed = desired_speed);
-				
-			guarantee "If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range":
-				is_enabled => (desired_speed < MIN_FILTERED_SPEED => filtered_desired_speed = MIN_FILTERED_SPEED);
-			
-			guarantee "If filter is enabled but incomming desired speed is not within the expected range, then smooth the filtered desired speed into the expected range":
-				is_enabled => (desired_speed > MAX_FILTERED_SPEED => filtered_desired_speed = MAX_FILTERED_SPEED);
-			
-			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
-				is_enabled => true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) <= MAX_FILTERED_SPEED
-					          => filtered_desired_speed = (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE)
-				);
-			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
-				is_enabled => true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) > MAX_FILTERED_SPEED
+
+			guarantee "If filter is enabled and incomming desired speed is within the expected range while the difference of incomming desired speed and previous filtered speed is less than or equal 10, then just relay it to outgoing filtered desired speed":
+				is_enabled => (true -> ((desired_speed - pre(filtered_desired_speed)) <= FILTER_EXPECTED_DIFFERENCE and desired_speed_is_valid
+					          => filtered_desired_speed = desired_speed
+				));
+			guarantee "If filter is enabled but incomming desired speed is not within the expected range while the difference of incomming desired speed and previous filtered speed is less than or equal 10,, then smooth the filtered desired speed into the expected range":
+				is_enabled => (true -> ((desired_speed - pre(filtered_desired_speed)) <= FILTER_EXPECTED_DIFFERENCE and desired_speed > MAX_FILTERED_SPEED
 					          => filtered_desired_speed = MAX_FILTERED_SPEED
-				);	
-			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
-				is_enabled => true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) >= MIN_FILTERED_SPEED
-					          => filtered_desired_speed = (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE)
-				);
-			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
-				is_enabled => true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) < MIN_FILTERED_SPEED
+				));	
+			guarantee "If filter is enabled but incomming desired speed is not within the expected range while the difference of incomming desired speed and previous filtered speed is less than or equal 10, then smooth the filtered desired speed into the expected range":
+				is_enabled => (true -> ((pre(filtered_desired_speed) - desired_speed) <= FILTER_EXPECTED_DIFFERENCE and desired_speed < MIN_FILTERED_SPEED
 					          => filtered_desired_speed = MIN_FILTERED_SPEED
-				);
+				));
+      guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => (true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) <= MAX_FILTERED_SPEED
+					          => filtered_desired_speed = (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE)
+				));
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => (true -> ((desired_speed - pre(filtered_desired_speed)) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) + FILTER_EXPECTED_DIFFERENCE) > MAX_FILTERED_SPEED
+					          => filtered_desired_speed = MAX_FILTERED_SPEED
+				));	
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => (true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) >= MIN_FILTERED_SPEED
+					          => filtered_desired_speed = (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE)
+				));
+			guarantee "If filter is enabled but the difference of incomming desired speed and previous filtered speed is more than 10, then adjust it to the expected difference":
+				is_enabled => (true -> ((pre(filtered_desired_speed) - desired_speed) > FILTER_EXPECTED_DIFFERENCE and (pre(filtered_desired_speed) - FILTER_EXPECTED_DIFFERENCE) < MIN_FILTERED_SPEED
+					          => filtered_desired_speed = MIN_FILTERED_SPEED
+				));
 		**};
 			
 	end Filter;
@@ -236,8 +239,8 @@ public
 				    not filter_is_enabled;	 -- enable or disable the filter here
 				
 			-- Properties
-			guarantee "1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed":
-					   enabled => desired_speed >= MIN_SPEED and desired_speed <= MAX_SPEED;
+			-- guarantee "1. Cruise Controller System is enabled only if desired speed is within Cruise Controller minimum and maximun speed":
+			--  		  enabled => desired_speed >= MIN_SPEED and desired_speed <= MAX_SPEED;
 			
 			guarantee "2. Cruise Controller System with its filter is enabled only if desired speed is within Cruise Controller filtered minimum and maximun speed":
 					   enabled => desired_speed >= MIN_FILTERED_SPEED and desired_speed <= MAX_FILTERED_SPEED;
