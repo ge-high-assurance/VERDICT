@@ -1,0 +1,391 @@
+package GNC
+
+public
+	with Base_Types;
+	with Data_Types;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+
+	system GPS
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			gps_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{CASE_Consolidated_Properties::probe => true; };
+			
+		annex agree {**
+			 -- variables
+			 eq satellite0_selected: bool = (constellation = enum(Data_Types::Constellation, Satellite0));
+			 eq selected_satellite_pos: Data_Types::Position.impl = if satellite0_selected then 
+			 												  			satellite0_pos 
+			 												  		else satellite1_pos;
+			 
+			 -- high-level specification
+			 guarantee "Output: gps_pos": Agree_Nodes::close_locations(gps_pos, selected_satellite_pos);
+			 
+			 -- probe outputs
+			 guarantee "Output: probe_constellation": probe_constellation = constellation;
+		**};
+		
+		annex verdict {**
+			CyberRel "gps_out_I" => gps_pos:I;
+			CyberRel "gps_out_A" => gps_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-9
+				comment = "loss of availability of the GPS"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-8
+				comment = "undetected erroneous data of the GPS"
+				description = "UED"
+			}
+			SafetyRel "gps_out_LOA" = happens("loa_event") => gps_pos:A;
+			SafetyRel "gps_out_UED" = happens("ued_event") => gps_pos:I;
+		**};
+	end GPS;
+
+	system IMU
+		features
+			-- inputs
+			launch_pos: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			imu_pos: out data port Data_Types::Position.impl;
+			health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+		
+		annex agree {**
+			-- probe
+			guarantee "Output: probe_launch_pos": probe_launch_pos = launch_pos;
+		**};
+		
+		annex verdict {**
+			CyberRel "imu_out_I" => imu_pos:I;
+			CyberRel "imu_out_A" => imu_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the IMU"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-8
+				comment = "undetected erroneous data of the IMU"
+				description = "UED"
+			}
+			SafetyRel "imu_out_LOA" = happens("loa_event") => imu_pos:A;
+			SafetyRel "imu_out_UED" = happens("ued_event") => imu_pos:I;
+		**};
+	end IMU;
+		
+	system PositionEstimator 
+		features
+			-- inputs
+			gps_pos: in data port Data_Types::Position.impl;
+			imu_pos: in data port Data_Types::Position.impl;	
+			pos_act_in: in data port Data_Types::Position.impl;
+			
+			-- outputs
+			est_pos: out data port Data_Types::Position.impl;
+		
+		annex agree {**
+			-- high-level specification
+			guarantee "Output: est_pos": Agree_Nodes::close_locations(est_pos, gps_pos);	
+		**};
+		
+		annex verdict {**
+			CyberRel "pos_out_I" = imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
+			CyberRel "pos_out_A" = imu_pos:A or gps_pos:A or pos_act_in:A => est_pos:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the PositionEstimator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the PositionEstimator"
+				description = "UED"
+			}
+			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos:A or gps_pos:A) or pos_act_in:A => est_pos:A;
+--			SafetyRel "pos_out_LOA" = happens("loa_event") or (imu_pos:A and gps_pos:A) or pos_act_in:A => est_pos:A;
+			SafetyRel "pos_out_UED" = happens("ued_event") or imu_pos:I or gps_pos:I or pos_act_in:I => est_pos:I;
+		**};
+	end PositionEstimator;
+
+	system Navigation
+		features
+			-- inputs
+			est_pos: in data port Data_Types::Position.impl; 
+			dest_pos: in data port Data_Types::Position.impl;
+			cmd: in data port Base_Types::Boolean;
+			flight_control_state: in data port Base_Types::Boolean;
+			
+			-- outputs
+			move: out data port Base_Types::Boolean;				
+			cur_pos: out data port Data_Types::Position.impl;
+			pos_act_out: out data port Data_Types::Position.impl;
+			probe_dest_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			
+		annex agree {**
+			-- high-level specification
+					
+			guarantee "Output: cur_pos | Current location is computed from Estimated Position":
+				Agree_Nodes::close_locations(cur_pos, est_pos);
+			
+			guarantee "Output: move":
+				move = cmd;
+			
+			-- probe outputs
+			guarantee "Output: probe_dest_pos": probe_dest_pos = dest_pos;
+		**};
+		
+		annex verdict {**
+			CyberRel "move_out_I"         = est_pos:I or cmd:I or flight_control_state:I => move:I;
+			CyberRel "move_out_A"         = est_pos:A or cmd:A or flight_control_state:A => move:A;
+			CyberRel "nav_location_out_I" = est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
+			CyberRel "nav_location_out_A" = est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
+			CyberRel "pos_act_out_I"      = est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
+			CyberRel "pos_act_out_A"      = est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the Navigator"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the Navigator"
+				description = "UED"
+			}
+			SafetyRel "move_out_LOA"         = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => move:A;
+			SafetyRel "move_out_UED"         = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => move:I;
+			SafetyRel "nav_location_out_LOA" = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => cur_pos:A;
+			SafetyRel "nav_location_out_UED" = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => cur_pos:I;
+			SafetyRel "pos_act_out_LOA"      = happens("loa_event") or est_pos:A or cmd:A or flight_control_state:A => pos_act_out:A;
+			SafetyRel "pos_act_out_UED"      = happens("ued_event") or est_pos:I or cmd:I or flight_control_state:I => pos_act_out:I;
+		**};
+	end Navigation;
+	
+	system FlightControl
+		features
+			-- inputs
+			actuation_response: in data port Base_Types::Boolean;
+			move: in data port Base_Types::Boolean;
+			
+			-- outputs
+			motor_cmd: out data port Base_Types::Boolean;
+			fc_state: out data port Base_Types::Boolean;
+		
+		annex verdict {**
+			CyberRel "state_out_I"  = move:I or actuation_response:I => fc_state:I;
+			CyberRel "state_out_A"  = move:A or actuation_response:A => fc_state:A;
+			CyberRel "fc_cmd_out_I" = move:I or actuation_response:I => motor_cmd:I;
+			CyberRel "fc_cmd_out_A" = move:A or actuation_response:A => motor_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the FlightControl"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the FlightControl"
+				description = "UED"
+			}
+			SafetyRel "motor_out_LOA" = happens("loa_event") or actuation_response:A or move:A => motor_cmd:A;
+			SafetyRel "motor_out_UED" = happens("ued_event") or actuation_response:I or move:I => motor_cmd:I;
+		**};
+	end FlightControl;
+	
+	system GNC
+		features
+			-- inputs
+			constellation: in data port Data_Types::Constellation;
+			satellite0_pos: in data port Data_Types::Position.impl;
+			satellite1_pos: in data port Data_Types::Position.impl;
+			launch_pos: in data port Data_Types::Position.impl;
+			navigation_cmd: in data port Base_Types::Boolean;
+			navigation_dest_pos: in data port Data_Types::Position.impl;
+			fc_actuation_response: in data port Base_Types::Boolean;
+			
+			-- outputs
+--			gps_pos: out data port Data_Types::Position.impl;
+			gps_health_status: out data port Base_Types::Boolean;
+			probe_constellation: out data port Data_Types::Constellation
+			{CASE_Consolidated_Properties::probe => true; };
+--			imu_pos: out data port Data_Types::Position.impl;
+			imu_health_status: out data port Base_Types::Boolean;
+			probe_launch_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			navigation_cur_pos: out data port Data_Types::Position.impl;
+			navigation_probe_dest_pos: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			fc_motor_cmd: out data port Base_Types::Boolean;
+			
+	end GNC;
+	
+	system implementation GNC.Impl
+		subcomponents
+			gps: system GPS
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::pedigree => COTS; 
+			};
+			
+			imu: system IMU
+			{ 
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hybrid; -- this is default value
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;				
+
+--				-- VERDICT Component Properties
+--				CASE_Consolidated_Properties::componentType => Hybrid;
+--				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+--				CASE_Consolidated_Properties::pedigree => Sourced;
+--				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				
+				-- VERDICT Cyber Defenses & DAL Mitigations
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::remoteAttestation=>7;
+			};
+					positionEstimator: system PositionEstimator
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => COTS; 
+
+		
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+				--CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 7; -- Fix for Logic Bomb
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::failsafe =>7;
+				CASE_Consolidated_Properties::heterogeneity =>7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::logging =>7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::RemoteAttestation => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+
+				
+			};
+			navigation: system Navigation
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::remoteAttestation =>7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+
+			};
+			fc: system FlightControl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::remoteAttestation =>7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+
+			};
+		connections
+			i1: port constellation -> gps.constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i2: port satellite0_pos -> gps.satellite0_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::deviceAuthentication =>7;
+			CASE_Consolidated_Properties::sessionAuthenticity =>7;};
+			i3: port satellite1_pos -> gps.satellite1_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::deviceAuthentication =>7;
+			CASE_Consolidated_Properties::sessionAuthenticity =>7;};
+			i4: port launch_pos -> imu.launch_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i5: port gps.gps_pos -> positionEstimator.gps_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i6: port gps.health_status -> gps_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i7: port gps.probe_constellation -> probe_constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i8: port imu.imu_pos -> positionEstimator.imu_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i9: port imu.health_status -> imu_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			i10: port imu.probe_launch_pos -> probe_launch_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			c1: port positionEstimator.est_pos -> navigation.est_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;
+			CASE_Consolidated_Properties::encryptedTransmission => 6;
+			};
+			c2: port navigation.move -> fc.move
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			c3: port fc.fc_state -> navigation.flight_control_state
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			c24: port navigation.pos_act_out -> positionEstimator.pos_act_in
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			cc1: port navigation.cur_pos -> navigation_cur_pos;
+			cc2: port navigation_cmd -> navigation.cmd ;
+			cc3: port navigation_dest_pos -> navigation.dest_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			cc4: port navigation.probe_dest_pos -> navigation_probe_dest_pos;
+			cc5: port fc.motor_cmd -> fc_motor_cmd;
+			cc6: port fc_actuation_response -> fc.actuation_response;			
+			
+	end GNC.Impl;
+end GNC;
