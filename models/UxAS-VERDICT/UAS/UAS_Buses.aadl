@@ -1,0 +1,36 @@
+package UAS_Buses
+public
+	with CASE_Properties;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	-- The RF bus for the UAS
+	bus RF_Bus
+	end RF_Bus;
+
+	bus implementation RF_Bus.Impl
+	end RF_Bus.Impl;
+	
+	-- UAV on-board serial bus
+	bus Serial_Bus
+		properties
+			CASE_Properties::COMM_MODALITY => SERIAL;
+	end Serial_Bus;
+	
+	bus implementation Serial_Bus.Impl
+	end Serial_Bus.Impl;
+	
+	-- UAV on-board wifi bus
+	bus Wifi_Bus
+		properties
+			CASE_Properties::COMM_MODALITY => WIFI;
+	end Wifi_Bus;
+	
+	bus implementation Wifi_Bus.Impl
+	end Wifi_Bus.Impl;
+	
+end UAS_Buses;

@@ -1,0 +1,223 @@
+----------------------------------------------------------------------------------------------------
+-- This package contains message definitions that were created by the Intelligent Multi-UAV Planner
+-- Collaborative/Control Technologies (IMPACT) program. The messages defined data relevant to 
+-- flexible, automation-assisted play calling.
+----------------------------------------------------------------------------------------------------
+package IMPACT
+public
+	with Base_Types;
+	with CMASI;
+	with Common_Data; renames Common_Data::all;
+	with Data_Model;	
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	-- Data structure for associating a vehicle to a particular altitude and speed
+	data SpeedAltPair
+	end SpeedAltPair;
+	
+	data implementation SpeedAltPair.i
+	    subcomponents
+	        --ID of vehicle for which altitude and speed is attached
+	        VehicleID: data int64.i;
+	        --The speed attached to this vehicle
+	        Speed: data real32.i;
+	        --Altitude attached to this vehicle
+	        Altitude: data real32.i;
+	        --Altitude type for specified altitude
+	        AltitudeType: data CMASI::AltitudeType.i;
+	end SpeedAltPair.i;
+	
+	--Summary information that describes a particular way to carry out the
+	--task. In general, multiple task summaries for each task will be sent
+	--corresponding to each eligible vehicle completing the task. In the
+	--case where a task is completed by multiple vehicles simultaneously,
+	--then each TaskSummary will include the set of vehicles that would be
+	--used to complete the task.
+	data TaskSummary
+	end TaskSummary;
+
+	data implementation TaskSummary.i
+	    subcomponents
+	        --ID of task in consideration
+	        TaskID: data int64.i;
+	        --Summary of information for each vehicle used simultaneously to
+	        --complete this task. If there are zero performing vehicles, then
+	        --'TaskID' cannot be completed with any set of available vehicles in the
+	        --system.
+	        PerformingVehicles: data VehicleSummary.i {Data_Model::Data_Representation => Array;};
+	        --Task cannot be completed as specified and is using best effort.
+	        --Estimated percent achieved while using best effort strategy.
+	        BestEffort: data real32.i;
+	end TaskSummary.i;
+
+	-- Single vehicle-to-task summary information
+	data VehicleSummary
+	end VehicleSummary;
+	
+	data implementation VehicleSummary.i
+	    subcomponents
+	        --ID of vehicle considered to complete 'DestinationTaskID'
+	        VehicleID: data int64.i;
+	        --ID of task for which 'VehicleID' is considered to perform
+	        DestinationTaskID: data int64.i;
+	        --ID of task from which 'VehicleID' is considered leave from. If zero,
+	        --from current position of vehicle
+	        InitialTaskID: data int64.i;
+	        --Percentage along initial task that vehicle should plan from
+	        InitialTaskPercentage: data real32.i;
+	        --Estimated time from start of task to task-percentage location
+	        EstimateTimeToTaskPercentage: data int64.i;
+	        --Travel time from the current vehicle location to the start of the
+	        --task.
+	        TimeToArrive: data int64.i;
+	        --Time for this task to be completed by the specified vehicle
+	        TimeOnTask: data int64.i;
+	        --Energy remaining for vehicle after task has been completed,
+	        --expressed in terms of the percentage of maximum capacity
+	        EnergyRemaining: data real32.i;
+	        --Flag for indicating that the vehicle will leave communication range
+	        --either enroute or during the task
+	        BeyondCommRange: data bool.i;
+	end VehicleSummary.i;
+
+	-- Automation request specific to IMPACT (includes 'sandbox' feature and play/soln IDs)
+	data ImpactAutomationRequest		
+	end ImpactAutomationRequest;
+	
+	data implementation ImpactAutomationRequest.i
+    	subcomponents
+	        --Request ID for correlating with response
+	        RequestID: data int64.i;
+	        --Standard CMASI Automation request
+	        TrialRequest: data CMASI::AutomationRequest.i;
+	        --Override nominal speed/alt. If a vehicle is not in list, its nominal
+	        --speed/alt is used
+	        OverridePlanningConditions: data SpeedAltPair.i {Data_Model::Data_Representation => Array;};
+	        --Associated play ID
+	        PlayID: data int64.i;
+	        --Associated solution ID
+	        SolutionID: data int64.i;
+	        --Flag indicating 'sandbox', i.e. not to be implemented
+	        Sandbox: data bool.i;
+	end ImpactAutomationRequest.i;
+
+	--Automation response with specific IMPACT supporting fields
+	data ImpactAutomationResponse		
+	end ImpactAutomationResponse;
+	
+	data implementation ImpactAutomationResponse.i
+	    subcomponents
+	        --Response ID matching request from ({@link ImpactAutomationRequest})
+	        ResponseID: data int64.i;
+	        --Automation response from the request
+	        TrialResponse: data CMASI::AutomationResponse.i;
+	        --Associated play ID
+	        PlayID: data int64.i;
+	        --Associated solution ID
+	        SolutionID: data int64.i;
+	        --Flag indicating 'sandbox', i.e. not to be implemented
+	        Sandbox: data bool.i;
+	        --Set of vehicle-to-task summaries that will be implemented by this
+	        --automation response. Including timing, communication, and remaining
+	        --energy
+	        Summaries: data TaskSummary.i {Data_Model::Data_Representation => Array;};
+	end ImpactAutomationResponse.i;
+
+
+	--Area of interest
+	data AreaOfInterest		
+	end AreaOfInterest;
+	
+	data implementation AreaOfInterest.i
+	    subcomponents
+	        --ID for area of interest
+	        AreaID: data int64.i;
+	        --Geometry describing the area
+	        Area: data CMASI::AbstractGeometry.i;
+	end AreaOfInterest.i;
+
+	--Line of interest
+	data LineOfInterest		
+	end LineOfInterest;
+	
+	data implementation LineOfInterest.i
+	    subcomponents
+	        --ID for lines of interest
+	        LineID: data int64.i;
+	        --List of points to search
+	        Line: data CMASI::Location3D.i {Data_Model::Data_Representation => Array;};
+	end LineOfInterest.i;
+
+	--Point of interest
+	data PointOfInterest		
+	end PointOfInterest;
+	
+	data implementation PointOfInterest.i
+	    subcomponents
+	        --ID for points of interest
+	        PointID: data int64.i;
+	        --Point of interest location
+	        Location: data CMASI::Location3D.i;
+	end PointOfInterest.i;
+	
+	-------------------------------------------------------------------------------
+	-- Basic type definitions that are used in forming IMPACT message definitions.
+	-------------------------------------------------------------------------------
+	data AreaSearchPattern extends Base_Types::Integer
+    properties
+        Data_Model::Enumerators => (
+            "Spiral",
+            "Sector",
+            "Sweep");
+	end AreaSearchPattern;
+
+	data implementation AreaSearchPattern.i
+	end AreaSearchPattern.i;
+	
+	data PowerPlant extends Base_Types::Integer
+    properties
+        Data_Model::Enumerators => (
+            "Gasoline",
+            "JP5",
+            "JP8",
+            "FuelCell",
+            "Hybrid");
+	end PowerPlant;
+
+	data implementation PowerPlant.i
+	end PowerPlant.i;
+
+	data ImpactPayloadType extends Base_Types::Integer
+	    properties
+	        Data_Model::Enumerators => (
+	            "Unknown",
+	            "EO",
+	            "FLIR",
+	            "MWIR",
+	            "LFIR",
+	            "Track",
+	            "Tag",
+	            "Megaphone",
+	            "Siren",
+	            "SearchLight",
+	            "FiftyCal",
+	            "M240B",
+	            "Flashbang",
+	            "TearGas",
+	            "Taser",
+	            "HeatBeam",
+	            "SEGM",
+	            "CommRelay",
+	            "GMTI",
+	            "LaserDesignator");
+	end ImpactPayloadType;
+	
+	data implementation ImpactPayloadType.i
+	end ImpactPayloadType.i;
+
+end IMPACT;

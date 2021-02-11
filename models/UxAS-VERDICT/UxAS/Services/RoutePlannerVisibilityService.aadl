@@ -1,0 +1,55 @@
+package RoutePlannerVisibilityService_Pkg
+public
+	with CMASI;
+	with ROUTE;
+	with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	---------------------------------------------------------------------------------------------------------
+	-- A component that constructs plans/costs to be used for assignments.
+	--	1) Receive KeepInZones/KeepOutZones/Tasks/RoutePlanRequests
+ 	-- 	2) Build/Maintain Base Visibility Graph (Euclidean) from KeepInZones/KeepOutZones
+	--	3) Construct, and send out, a RoutePlanResponse which includes minimum path lengths from each 
+	--     vehicle to each task and from each task to every other task.
+	-- 	4) Construct, and send out, a response which includes minimum waypoint paths for each plan request.
+ 	---------------------------------------------------------------------------------------------------------
+	thread RoutePlannerVisibilityService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages 
+			KeepOutZone : in event data port CMASI::KeepOutZone.i;
+			KeepInZone : in event data port CMASI::KeepInZone.i;
+			OperatingRegion : in event data port CMASI::OperatingRegion.i;
+			AirVehicleConfiguration : in event data port CMASI::AirVehicleConfiguration.i;
+--			GroundVehicleConfiguration : in event data port VEHICLES::GroundVehicleConfiguration.i;
+--			SurfaceVehicleConfiguration : in event data port VEHICLES::SurfaceVehicleConfiguration.i;
+
+            -- EGM: split into two ports to fix multiple fan-in
+			RoutePlanRequest_task : in event data port ROUTE::RoutePlanRequest.i;
+			RoutePlanRequest_ragg : in event data port ROUTE::RoutePlanRequest.i;
+    
+			-- AircraftPathPlanner?? 
+			-- see https://github.com/afrl-rq/OpenUxAS/blob/develop/src/Services/RoutePlannerVisibilityService.h
+			AirVehicleState : in event data port CMASI::AirVehicleState.i;
+--			GroundVehicleState : in event data port VEHICLES::GroundVehicleState.i;
+--			SurfaceVehicleState : in event data port VEHICLES::SurfaceVehicleState.i;
+--			RouteRequest : in event data port ROUTE::RouteRequest.i;
+			
+			-- Sent Messages
+			RoutePlanResponse : out event data port ROUTE::RoutePlanResponse.i;
+			
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/RoutePlannerVisibilityService.h", "src/Services/RoutePlannerVisibilityService.cpp");
+            Dispatch_Protocol => Sporadic;
+            
+	end RoutePlannerVisibilityService;
+	
+	thread implementation RoutePlannerVisibilityService.i
+	end RoutePlannerVisibilityService.i;
+	
+end RoutePlannerVisibilityService_Pkg;

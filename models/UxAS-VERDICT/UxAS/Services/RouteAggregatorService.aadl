@@ -1,0 +1,50 @@
+package RouteAggregatorService_Pkg
+public
+	with CMASI;
+	with ROUTE;
+	with UXTASK;
+	with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	------------------------------------------------------------------------
+	-- A component that incrementally queries the route planner to build
+ 	-- matrix of plans between all tasks and entity initial points.
+ 	------------------------------------------------------------------------
+	thread RouteAggregatorService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages
+			AirVehicleState : in event data port CMASI::AirVehicleState.i;
+--			GroundVehicleState : in event data port VEHICLES::GroundVehicleState.i;
+--			SurfaceVehicleState : in event data port VEHICLES::SurfaceVehicleState.i;
+			AirVehicleConfiguration : in event data port CMASI::AirVehicleConfiguration.i;
+--			GroundVehicleConfiguration : in event data port VEHICLES::GroundVehicleConfiguration.i;
+--			SurfaceVehicleConfiguration : in event data port VEHICLES::SurfaceVehicleConfiguration.i;
+			UniqueAutomationResquest : in event data port UXTASK::UniqueAutomationRequest.i;
+			TaskPlanOptions : in event data port UXTASK::TaskPlanOptions.i;
+--			RouteRequest : in event data port ROUTE::RouteRequest.i;
+			RoutePlanResponse : in event data port ROUTE::RoutePlanResponse.i;			
+			
+			--Sent Messages
+ 			RoutePlanRequest : out event data port ROUTE::RoutePlanRequest.i;
+ 			-- see https://github.com/afrl-rq/OpenUxAS/blob/develop/src/Services/RouteAggregatorService.h
+ 			-- GroundPathPlanner
+            -- AircraftPathPlanner
+--			RouteResponse : out event data port ROUTE::RouteResponse.i;
+			AssignmentCostMatrix : out event data port UXTASK::AssignmentCostMatrix.i;
+--			ServiceStatus : out event data port CMASI::ServiceStatus.i;
+			
+		properties	
+		    -- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/RouteAggregatorService.h", "src/Services/RouteAggregatorService.cpp");		
+            Dispatch_Protocol => Sporadic;
+	end RouteAggregatorService;
+	
+	thread implementation RouteAggregatorService.i	    
+	end RouteAggregatorService.i;
+
+end RouteAggregatorService_Pkg;

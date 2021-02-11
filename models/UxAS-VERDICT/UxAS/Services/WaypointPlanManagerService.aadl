@@ -1,0 +1,46 @@
+package WaypointPlanManagerService_Pkg
+public
+	with CMASI;
+	with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	---------------------------------------------------------------------------------------------------------------------
+	-- A service that serves plans to a vehicle interface.
+    -- 	1) Receive AutomationResponse/MissionCommand/VehicalActionCommand
+	-- 	2) Find MissionCommand or VehicalActionCommand for configured ID 
+	-- 	3a) Either:
+	-- 		Re/Initialize waypoint manager, send Mission commands based on AirVehicleState
+	-- 	3b) Or:
+	-- 		If VehicalActionCommand commands a change in the vehicle's course, then suspend serving waypoints.
+	-- 		Send VehicalActionCommand command
+	-- 	4) On command, resume serving waypoints
+	---------------------------------------------------------------------------------------------------------------------
+	thread WaypointPlanManagerService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages
+			AutomationResponse: in event data port CMASI::AutomationResponse.i;
+			AirVehicleState: in event data port CMASI::AirVehicleState.i;
+--			IncrementWaypoint : in event data port UXNATIVE::IncrementWaypoint.i;
+--			MissionCommand_in: in event data port CMASI::MissionCommand.i;
+			
+			-- Sent Messages
+			MissionCommand : out event data port CMASI::MissionCommand.i;
+						
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/WaypointPlanManagerService.h", "src/Services/WaypointPlanManagerService.cpp");
+			Classifier_Substitution_Rule => Type_Extension;
+			Dispatch_Protocol => Periodic;
+			Period => 500ms;
+			Compute_Execution_Time => 20ms .. 20ms;
+	end WaypointPlanManagerService;
+	
+	thread implementation WaypointPlanManagerService.i
+	end WaypointPlanManagerService.i;
+	
+end WaypointPlanManagerService_Pkg;

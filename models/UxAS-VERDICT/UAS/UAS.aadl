@@ -1,0 +1,82 @@
+package UAS
+--AM This project started with the project on https://github.com/loonwerks/CASE.  
+--AM Have added in properties and cyber relationship annotations as well as
+--AM cyber and mission requirements to exercise the VERDICT tool chain.
+public
+	with GS;
+	with UAV;
+	with UAS_Buses;
+	
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;	
+
+	-- UAS
+	system UAS
+		features
+			radio_send: out event data port;
+			fc_uart_send: out event data port;			
+			sw_uxas_out: out event data port;
+				
+		annex verdict{**
+			CyberReq {
+			id = "CyberReq01"
+			description = "The CIA of radio_send and fc_uart_send should be maintained." 
+			condition = radio_send:C or radio_send:I or radio_send:A or 
+						fc_uart_send:C or fc_uart_send:I or fc_uart_send:A 
+			cia = I
+			severity = Hazardous
+		    }; 	
+			CyberReq {
+			id = "CyberReq01AM1"
+			description = "The CIA of radio_send should be maintained." 
+			condition = radio_send:C or radio_send:I or radio_send:A  
+			cia = I
+			severity = Hazardous
+		    };
+
+			CyberReq {
+			id = "CyberReq01AM2"
+			description = "The CIA of fc_uart_send should be maintained." 
+			condition = fc_uart_send:C or fc_uart_send:I or fc_uart_send:A 
+			cia = I
+			severity = Hazardous
+		    };
+		    		    	    
+		    CyberReq {
+			id = "CyberReq02"
+			description = "The CIA of sw_uxas_out should be maintained." 
+			condition = sw_uxas_out:C or sw_uxas_out:I or sw_uxas_out:A
+			cia = I
+			severity = Hazardous
+		    };
+		    
+		    MissionReq{
+		    	id = "MReq01"
+		    	description = "UAV Mission"
+		    	reqs = "CyberReq02" 
+		    };
+			
+		**};		
+	end UAS;
+
+	system implementation UAS.Impl
+		subcomponents
+			GND: system GS::GroundStation.Impl;
+			UAVAM: system UAV::UAV.Impl; --AM renamed
+			RFA: bus UAS_Buses::RF_Bus.Impl;
+		connections
+			c1: port GND.radio_send -> UAVAM.radio_recv;
+			c2: port UAVAM.radio_send -> GND.radio_recv;
+			bac1: bus access RFA <-> GND.RFA;
+			bac2: bus access RFA <-> UAVAM.RFA;
+			c3: port UAVAM.radio_send -> radio_send;
+			c4: port UAVAM.fc_uart_send -> fc_uart_send;			
+			c5: port UAVAM.sw_uxas_out -> sw_uxas_out;			
+		properties
+			Actual_Connection_Binding => (reference (RFA)) applies to c1, c2;
+	end UAS.Impl;
+
+end UAS;

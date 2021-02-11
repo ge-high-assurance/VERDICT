@@ -1,0 +1,40 @@
+property set CASE_Properties is
+
+	-- CASE MODEL TRANSFORMATION TYPE
+	Component_Type: enumeration (FILTER, ATTESTATION, MONITOR, VIRTUAL_MACHINE, COMM_DRIVER, SEL4, SWITCH) applies to (system, process, thread, thread group, device, abstract, processor, virtual processor);
+	-- Implementation language for this component (eg c, CakeML)
+	Component_Impl: aadlstring applies to (system, process, thread, thread group, abstract);
+	-- ID of the AGREE CONTRACT that specifies the behavior of this component
+	Component_Spec: list of aadlstring applies to (system, process, thread, abstract);
+	
+	-- Remote Attestation
+	Cache_Timeout: aadlinteger applies to (system, process, thread, thread group, device, abstract);
+	Cache_Size: aadlinteger applies to (system, process, thread, thread group, device, abstract);
+	
+	-- Communication Modality
+	Comm_Modality: enumeration (RF, WIFI, WIRED_ETHERNET, SERIAL, BT, NFC) applies to (bus);
+
+	-- Runtime
+	OS: aadlstring applies to (processor, virtual processor);
+	
+	-- Monitor
+	Monitor_Latched: aadlboolean applies to (system, process, thread, thread group, device, abstract);
+	
+	-- Trust level of a connection or component.
+	-- 0 <= Trust_Level <= 100.
+	-- 0 indicates "no trust", and 100 indicates "complete trust".
+	Trust_Level: aadlinteger 0 .. 100 applies to (feature, connection, classifier, subcomponent);
+	
+	-- Control level of a connection or component.
+	-- 0 <= Control_Level <= 100.
+	-- 0 indicates that a component cannot be altered in any way (i.e. "no control"),
+	-- and 100 indicates "complete complete".
+	-- Previously, the annotation UNCONTROLLED was used to denote Control_Level 0.
+	Control_Level: aadlinteger 0 .. 100 applies to (feature, connection, classifier, subcomponent);
+	
+	-- An annotation to indicate the sensitivity of data.
+	-- TODO: add detail to each
+	-- FOUO: For Official Use Only
+	Data_Classification : enumeration (TOP_SECRET, SECRET, CONFIDENTIAL, FOUO, TIME_SENSITIVE) applies to (feature, connection, subcomponent, classifier);
+
+end CASE_Properties;

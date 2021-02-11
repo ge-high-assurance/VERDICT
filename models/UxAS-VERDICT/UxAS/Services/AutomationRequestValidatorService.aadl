@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------------------------------------------------------
+-- Checks all elements of automation requests to make sure they are present before sending out a UniqueAutomationRequest.
+---------------------------------------------------------------------------------------------------------------------------
+package AutomationRequestValidatorService_Pkg
+
+public
+	with CMASI;
+	with UXTASK;
+	
+	with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+	
+	----------------------------------------------------------------------------------------------------
+    -- The objective of the Automation Request Validator service is to ensure that a request
+	-- can be fulfilled given the current state of received messages. For example, an
+	-- Automation Request that includes a task that has not yet been defined. In addition
+ 	-- to checking for appropriately formed requests, the Automation Request Validator will
+	-- abandon an attempt to fulfill a request if the system exceeds a pre-defined time threshold.
+    ----------------------------------------------------------------------------------------------------
+	thread AutomationRequestValidatorService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages
+			AutomationRequest : in event data port CMASI::AutomationRequest.i;
+--			ImpactAutomationRequest: in event data port IMPACT::ImpactAutomationRequest.i;
+			UniqueAutomationResponse: in event data port UXTASK::UniqueAutomationResponse.i;
+--			TaskAutomationRequest: in event data port UXTASK::TaskAutomationRequest.i;
+			AirVehicleConfiguration: in event data port CMASI::AirVehicleConfiguration.i;
+--			GroundVehicleConfiguration: in event data port VEHICLES::GroundVehicleConfiguration.i;
+--			SurfaceVehicleConfiguration: in event data port VEHICLES::SurfaceVehicleConfiguration.i;
+			AirVehicleState: in event data port CMASI::AirVehicleState.i;
+--			GroundVehicleState: in event data port VEHICLES::GroundVehicleState.i;
+--			SurfaceVehicleState: in event data port VEHICLES::SurfaceVehicleState.i;
+--			RemoveTasks: in event data port CMASI::RemoveTasks.i;
+--			TaskInitialized: in event data port UXTASK::TaskInitialized.i;
+			OperatingRegion: in event data port CMASI::OperatingRegion.i;
+			KeepInZone: in event data port CMASI::KeepInZone.i;
+			KeepOutZone: in event data port CMASI::KeepOutZone.i;
+			
+			-- Sent Messages 
+--			TaskAutomationResponse: out event data port UXTASK::TaskAutomationResponse.i;
+			AutomationResponse: out event data port CMASI::AutomationResponse.i;
+--			ImpactAutomationResponse: out event data port IMPACT::ImpactAutomationResponse.i;
+			UniqueAutomationRequest: out event data port UXTASK::UniqueAutomationRequest.i;
+--			ServiceStatus: out event data port CMASI::ServiceStatus.i;
+			
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/AutomationRequestValidatorService.h", "src/Services/AutomationRequestValidatorService.cpp");
+			Dispatch_Protocol => Sporadic;
+	end AutomationRequestValidatorService;
+	
+	thread implementation AutomationRequestValidatorService.i    
+	end AutomationRequestValidatorService.i;
+	
+end AutomationRequestValidatorService_Pkg;

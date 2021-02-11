@@ -1,0 +1,20 @@
+property set CASEConsts is
+	-- UAV maximum climb rate
+    MAX_UAV_CLIMB_RATE : constant aadlreal => 42.0;
+    
+    -- Ground Station
+    GS_ID : constant aadlinteger => 7;
+    
+    -- Flight Controller
+    FCTL_ID : constant aadlinteger => 12; 
+   
+    -- UAV ID
+    -- Flight Controller
+    UAV_ID : constant aadlinteger => 6; 
+    
+    -- Location3D bounds
+    LATITUDE_BOUND : constant aadlreal => 90.0;
+    LONGITUDE_BOUND : constant aadlreal => 180.0;
+    ALTITUDE_BOUND : constant aadlreal => 15000.0;
+    
+end CASEConsts;
