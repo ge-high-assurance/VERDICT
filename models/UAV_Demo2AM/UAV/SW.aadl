@@ -1,0 +1,151 @@
+package SW
+public
+	with Drivers;
+	with Waterways_UxAS;
+	with CASE_Model_Transformations;
+	--with CASEAgree;
+	with CASE_Properties;
+	with CMASI;
+	renames AGREE_PLTL::all;
+	with Base_Types;
+	with CASE_Consolidated_Properties;
+	
+
+	thread WaypointManager
+		features
+			ReturnHome: in event port;
+			AutomationResponse: in event data port CMASI::AutomationResponse.i;
+			AirVehicleState: in event data port CMASI::AirVehicleState.i;
+			MissionCommand: out event data port CMASI::MissionCommand.i;
+--		annex agree {**
+--			guarantee Req_WPM_Good_Mission_Command "The Waypoint Manager shall output valid mission commands" : CASEAgree::WELL_FORMED_MISSION_COMMAND(MissionCommand);
+--		**};
+		annex Verdict{**
+			CyberRel "MissionCommand_C" = AutomationResponse:C => MissionCommand:C;
+			CyberRel "MissionCommand_I" = AutomationResponse:I => MissionCommand:I;
+			CyberRel "MissionCommand_A" = AutomationResponse:A => MissionCommand:A;
+		
+		**};
+	
+
+	end WaypointManager;
+
+	thread implementation WaypointManager.Impl
+--		properties
+--			Dispatch_Protocol => Sporadic;
+	end WaypointManager.Impl;
+
+	thread FlyZones
+		-- The KeepInZoneDatabase is a collection of polygons that represent areas on a map that the UAV can traverse.
+		-- The database is populated at build-time and stored in memory.
+		features
+			KeepInZone: out data port CMASI::Polygon.i;
+			KeepOutZone: out data port CMASI::Polygon.i;
+	end FlyZones;
+
+	thread implementation FlyZones.Impl
+--		properties
+--			Dispatch_Protocol => Periodic;
+--			Period => 500ms;
+	end FlyZones.Impl;
+
+	process SW
+		features
+			uart_recv: in event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+			uart_send: out event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+			radio_recv: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			radio_send: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			
+			--For defining requirement here.
+			uxas_out: out event data port;
+
+--		annex agree {**
+--			assume "The radio receives well-formed messages" : CASEAgree::WellformedCASE_RF_Msg(radio_recv, CASEAgree::GS_ID, CASEAgree::UAV_ID);
+--			assume "The uart receives well-formed messages" : CASEAgree::WellformedCASE_UART_Msg(uart_recv);
+--			guarantee "The radio_send outputs only well formed CASE_RF_Msg.Impl types" : CASEAgree::WellformedCASE_RF_Msg(radio_send, CASEAgree::UAV_ID, CASEAgree::GS_ID);
+--			guarantee "The uart_send outputs only well formed CASE_RF_Msg.Impl types" : CASEAgree::WellformedCASE_UART_Msg(uart_send);
+--		**};
+
+	end SW;
+
+	process implementation SW.Impl
+		subcomponents
+			UART: thread Drivers::UARTDriver.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => false;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped; 
+			};			
+			Radio: thread Drivers::RadioDriver.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => false;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped; 
+			};			
+			UxAS: thread Waterways_UxAS::Waterways.i
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => false;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true; --AM made it to be inside trusted boundary
+				CASE_Consolidated_Properties::pedigree => COTS; 
+			};			
+			WaypointManager: thread WaypointManager.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped; 
+			};			
+		connections
+			------------------
+			-- Primary Inputs
+			------------------
+			c01: port uart_recv -> UART.recv_data;
+			c02: port radio_recv -> Radio.recv_data;
+
+			----------- 	           
+			-- FC_UART
+			-----------
+			c03: port UART.send_data -> uart_send {CASE_Consolidated_Properties::Trust_Level => 100;
+				CASE_Consolidated_Properties::Control_Level => 100;};
+			c04: port UART.AirVehicleState -> WaypointManager.AirVehicleState;
+
+			---------
+			-- RADIO
+			---------
+			c05: port Radio.send_data -> radio_send {CASE_Consolidated_Properties::Trust_Level => 100;
+				CASE_Consolidated_Properties::Control_Level => 100;};
+			c06: port Radio.AutomationRequest -> UxAS.AutomationRequest {CASE_Consolidated_Properties::Trust_Level => 0;
+				CASE_Consolidated_Properties::Control_Level => 0;};
+			c07: port Radio.OperatingRegion -> UxAS.OperatingRegion {CASE_Consolidated_Properties::Trust_Level => 0;
+				CASE_Consolidated_Properties::Control_Level => 0;};
+			c08: port Radio.LineSearchTask -> UxAS.LineSearchTask {CASE_Consolidated_Properties::Trust_Level => 0;
+				CASE_Consolidated_Properties::Control_Level => 0;};
+
+			--------
+			-- UXAS
+			--------
+			c09: port UxAS.AutomationResponse -> WaypointManager.AutomationResponse {CASE_Consolidated_Properties::Trust_Level => 0;
+				CASE_Consolidated_Properties::Control_Level => 100;};
+
+			-------
+			-- WPM
+			-------
+			c10: port WaypointManager.MissionCommand -> UART.MissionCommand;
+			
+			--## Added connection to route port to outermost system
+			c11: port UxAS.AutomationResponse -> uxas_out;
+
+	end SW.Impl;
+	
+end SW;

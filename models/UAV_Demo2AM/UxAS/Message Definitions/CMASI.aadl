@@ -1,0 +1,1386 @@
+---------------------------------------------------------------------------------------
+-- This package defines messages and supporting data definitions corresponding to the
+-- Common Mission Automation Services Interfaces (CMASI) data protocol.
+---------------------------------------------------------------------------------------	
+package CMASI
+public
+--	with Base_Types;
+--	renames Base_Types::all;
+--	with Data_Model;
+--	with CM_Property_Set;
+--	with HAMR;
+	
+	data AutomationResponse
+	end AutomationResponse;
+	
+	data implementation AutomationResponse.i
+	end AutomationResponse.i;
+
+	data AirVehicleState
+	end AirVehicleState;
+
+	data implementation AirVehicleState.i
+	end AirVehicleState.i;
+	
+	data MissionCommand
+	end MissionCommand;
+	
+	data implementation MissionCommand.i
+	end MissionCommand.i;
+	
+	data Polygon
+	end Polygon;
+	
+	data implementation Polygon.i
+	end Polygon.i;
+	
+	
+	data AutomationRequest
+	end AutomationRequest;
+
+	data implementation AutomationRequest.i
+	end AutomationRequest.i;
+
+	data OperatingRegion
+	end OperatingRegion;
+
+	data implementation OperatingRegion.i
+	end OperatingRegion.i;
+	
+	data LineSearchTask
+	end LineSearchTask;
+	
+	data implementation LineSearchTask.i
+	end LineSearchTask.i;
+	
+--	-- Container for message types
+--	data LMCPObject
+--		properties
+--			Data_Model::Data_Representation => Union;
+--	end LMCPObject;
+--	
+--	data implementation LMCPObject.i
+--		subcomponents
+--			AutomationRequest: data AutomationRequest.i;
+--			OperatingRegion: data OperatingRegion.i;
+--			LineSearchTask: data LineSearchTask.i;
+--			AutomationResponse: data AutomationResponse.i;
+--	end LMCPObject.i;
+--	
+--	data Address
+--	end Address;
+--	
+--	data implementation Address.i
+--		subcomponents
+--			value: data Integer[4];--Integer_8[4];
+--	end Address.i;
+--	
+--	data AddressArray
+--	end AddressArray;
+--	
+--	data implementation AddressArray.i
+--		subcomponents
+--			value: data Address.i[3];
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::Address_Array_Bit_Codec_Max_Size;
+--	end AddressArray.i;
+--		
+--	data AddressAttributedMessage
+--	end AddressAttributedMessage;
+--	
+--	data implementation AddressAttributedMessage.i
+--		subcomponents
+--			id: data Address.i;
+--			payload: data LMCPObject.i;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::AddressAttributedMessage_Bit_Codec_Max_Size;
+--	end AddressAttributedMessage.i;
+--	
+--	data AltitudeType -- extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--			Data_Model::Enumerators => (
+--						--Height above WGS84 ellipsoid, mean sea level
+--						"AGL",
+--						--Height above WGS84 ellipsoid, mean sea level
+--						"MSL");
+--	end AltitudeType;
+--
+--	data implementation AltitudeType.i
+--	end AltitudeType.i;
+--
+--	--Base class for geometry types
+--	data AbstractGeometry		
+--	end AbstractGeometry;
+--	
+--	data implementation AbstractGeometry.i
+--	end AbstractGeometry.i;
+--	
+--	data Location3DArray
+--	    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (Location3D.i));
+--            Data_Model::Dimension => (2);    
+--	end Location3DArray;
+--	
+--	data Polygon --extends AbstractGeometry
+--	end Polygon;
+--	
+--	data implementation Polygon.i --extends AbstractGeometry.i
+--		subcomponents
+--			BoundaryPointsList : data Location3DArray;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::Polygon_Bit_Codec_Max_Size;
+--	end Polygon.i;
+--	
+--    -- A container for key/value pairs. Keys and values can be any valid string.
+--	data KeyValuePair
+--	end KeyValuePair;
+--
+--	data implementation KeyValuePair.i
+--		subcomponents
+--			--A key (name) for the property
+--			Key: data Integer; --String;
+--			--A value for the property
+--			Value: data Integer; --String;
+--	end KeyValuePair.i;
+--		
+--	-- Location is defined as a point in the world using the WGS84
+--	-- specification for latitude and longitude.
+--	data Location3D
+--	end Location3D;
+--
+--	data implementation Location3D.i
+--		subcomponents
+--			Latitude: data Float;--Float_64;
+--			Longitude: data Float;--Float_64;
+--			Altitude: data Float;--Float_32;
+--			AltitudeType: data AltitudeType.i;
+--	end Location3D.i;
+--
+--	-- Base type for payloads
+--	data PayloadConfiguration
+--	end PayloadConfiguration;
+--
+--	data implementation PayloadConfiguration.i
+--		subcomponents
+--			--The unique id for this payload item.
+--			PayloadID: data Integer;--Integer_64;
+--			--A string uniquely identifying the kind of payload item (primarily to
+--			--be used for debugging purposes).
+----			PayloadKind: data String;
+--			--Optional parameters associated with payload configuration
+--			Parameters: data KeyValuePairArray;
+--	end PayloadConfiguration.i;
+--
+--    data GimbalConfiguration --extends PayloadConfiguration
+--    end GimbalConfiguration;
+-- 
+--    -- EGM TODO: for AGREE does not like Boolean, so changed to Base_Types::Boolean;
+--    data implementation GimbalConfiguration.i --extends PayloadConfiguration.i
+--    	subcomponents
+--    		--The unique id for this payload item.
+--			PayloadID: data Integer;--Integer_64;
+--			--A string uniquely identifying the kind of payload item (primarily to
+--			--be used for debugging purposes).
+----			PayloadKind: data String;
+--			--Optional parameters associated with payload configuration
+--			Parameters: data KeyValuePairArray;
+--            -- SupportedPointingModes (omitted)
+--    		MinAzimuth : data Float;--Float_32;
+--        	MaxAzimuth : data Float;--Float_32;
+--    		IsAzimuthClamped : data Base_Types::Boolean; 
+--    		MinElevation : data Float;--Float_32;
+--    		MaxElevation : data Float;--Float_32;
+--    		IsElevationClamped : data Base_Types::Boolean;
+--    		MinRotation : data Float;--Float_32;
+--    		MaxRotation : data Float;--Float_32;
+--    		IsRotationClamped : data Base_Types::Boolean;
+--    		MaxAzimuthSlewRate : data Float;--Float_32;
+--    		MaxElevationSlewRate : data Float;--Float_32;
+--    		MaxRotationRate : data Float;--Float_32;
+--    		--ContainedPayloadList (omitted)
+--    end GimbalConfiguration.i;
+--
+--    data KeyValuePairArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (KeyValuePair.i));
+--            Data_Model::Dimension => (1);    
+--    end KeyValuePairArray;
+--    
+--    data implementation KeyValuePairArray.i
+--    end KeyValuePairArray.i;
+--    
+--	--Describes the current state of a payload item (abstract).
+--	data PayloadState
+--	end PayloadState;
+--	
+--	data implementation PayloadState.i
+--	    subcomponents
+--	        --The unique id for this payload item.
+--	        PayloadID: data Integer;--Integer_64;
+--	        --Optional parameters associated with payload state
+--	        Parameters: data KeyValuePairArray;
+--	end PayloadState.i;
+--
+--	---------------------------------------------------------------------------
+--	-- This is the primary message for requesting action from the
+--	-- automation service. The automation service is to use the list of
+--	-- vehicles, tasks (with associated task relationships), keep-out zones,
+--	-- and keep-in zones to produce {@link MissionCommands} for the vehicles
+--	-- requested. The automation service should only produce commands for the
+--	-- vehicles requested, but is not required to produce plans for all
+--	-- vehicles. If multiple {@link AutomationRequest} messages are sent to
+--	-- the automation service, only the last message will be considered, i.e.
+--	-- a new plan request supersedes all previous ones.
+--	---------------------------------------------------------------------------
+--	data AutomationRequest
+--	end AutomationRequest;
+--	
+--	data Int64Array
+--		properties
+--			Data_Model::Data_Representation => Array;
+--			Data_Model::Base_Type => (classifier (Integer)); --Integer_64;
+--			Data_Model::Dimension => (1);
+--	end Int64Array;
+--	
+--	data implementation Int64Array.i	
+--	end Int64Array.i;
+--	
+--	data implementation AutomationRequest.i
+--		subcomponents
+--			--List of entities to consider when planning.
+--			-- EntityList: data Integer;--Integer_64 {Data_Model::Data_Representation => Array; Data_Model::Dimension => (1);};
+--			-- EntityList: data Int64Array;
+--			EntityList: data Integer[1];--Integer_64[1];
+--			
+--			-- List of task IDs (defined by {@link Task} messages) to be planned
+--			-- for by the automation service
+--			-- TaskList: data Integer;--Integer_64 {Data_Model::Data_Representation => Array; Data_Model::Dimension => (1);};
+--			-- TaskList: data Int64Array;
+--			TaskList: data Integer[1];--Integer_64[1];
+--								
+--			-- Size of the TaskList 	
+--			TaskListSize: data Integer;--Integer_64;
+--			
+--			-- String containing the relationship between requested tasks. If
+--			-- empty, all tasks are to be completed in any order. The format of the
+--			-- string is specific to the automation service. This relationship string
+--			-- is the mechanism for incorporating task precedence, priority, timing, etc.
+----			TaskRelationships: data String;
+--			
+--			-- Operating region ID to be considered during planning
+--			OperatingRegion: data Integer;--Integer_64;
+--			
+--			-- Denotes that that the planner should restart any tasks that have been
+--			-- performed or are currently being performed. This is useful in situations
+--			-- when a task request contains tasks that have been requested previously,
+--			-- and the operator wishes to restart the mission plans from the beginning.
+--			RedoAllTasks: data Boolean;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::AutomationRequest_Bit_Codec_Max_Size;
+--	end AutomationRequest.i;
+--	
+--	---------------------------------------------------------------------------------------	
+--	-- Encapsulates data from an automation service to a client. The automation service 
+--	-- may respond with MissionCommands, VehicleActionCommands, or no commands at all. 
+--	-- This type is meant to serve as a single container for commands that are a response 
+--	-- to {@link AutomationRequest}
+--	---------------------------------------------------------------------------------------	
+--	data MissionCommandArray
+--	properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (MissionCommand.i));
+--            Data_Model::Dimension => (1);    
+--	end MissionCommandArray;
+--	
+--	data VehicleActionCommandArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (VehicleActionCommand.i));
+--            Data_Model::Dimension => (1);    
+--    end VehicleActionCommandArray;
+--    
+--	data AutomationResponse
+--	end AutomationResponse;
+--
+--	data implementation AutomationResponse.i
+--		subcomponents
+--			--A list of MissionCommands issued by the automation service
+--			MissionCommandList: data MissionCommandArray;
+--			--A list of VehicleActionCommands issued by the automation service
+--			VehicleCommandList: data VehicleActionCommandArray;
+--			--Status from the automation service to the simulation regarding
+--			--errors or conditions.
+----			Info: data KeyValuePair.i {Data_Model::Data_Representation => Array;};
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::AutomationResponse_Bit_Codec_Max_Size;
+--	end AutomationResponse.i;
+--
+--	
+--	--A set of parameters describing the operations of a vehicle. This can
+--	--be used to set routing preferences for a particular vehicle. The
+--	--"Name" field can be used to describe a given condition, such as "cruise" or "climb".
+--	data FlightProfile
+--	end FlightProfile;
+--	
+--	data implementation FlightProfile.i
+--	    subcomponents
+--	        --The unique name for this configuration
+----	        Name: data String;
+--	        --True Airspeed
+--	        Airspeed: data Float;--Float_32;
+--	        --The pitch angle of the aircraft in this flight condition(assuming
+--	        --zero bank)
+--	        PitchAngle: data Float;--Float_32;
+--	        --Vertical speed (positive upwards) of the vehicle
+--	        VerticalSpeed: data Float;--Float_32;
+--	        --The maximum angle that this vehicle will bank
+--	        MaxBankAngle: data Float;--Float_32;
+--	        --The consumption rate of available energy, expressed in terms of the
+--	        --percentage of maximum capacity used per second.
+--	        EnergyRate: data Float;--Float_32;
+--	end FlightProfile.i;
+--
+--	-- Provides information regarding a vehicle's configuration items.
+--	data FlightProfileArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (FlightProfile.i));
+--            Data_Model::Dimension => (1);    
+--    end FlightProfileArray;
+--    
+--    data LoiterTypeArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (LoiterType.i));
+--            Data_Model::Dimension => (1);    
+--    end LoiterTypeArray;
+--    
+--    data TurnTypeArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (TurnType.i));
+--            Data_Model::Dimension => (1);    
+--    end TurnTypeArray;
+--    
+--	data AirVehicleConfiguration --extends EntityConfiguration
+--	end AirVehicleConfiguration;
+--    
+--	data implementation AirVehicleConfiguration.i --extends EntityConfiguration.i
+--		subcomponents
+--		--A unique id for this entity
+--	        ID: data Integer;--Integer_64;
+--	        --the team or "side" that an entity belongs to. This can be a name of
+--	        --a country, a "friend" or "foe" designation, or a team name (e.g. "red
+--	        --team").
+----	        Affiliation: data String;
+--	        --The type of this entity. The content of this field is dependent on
+--	        --the session. The value of this field is not specifically defined, so
+--	        --it is up to the simulation/session components to define a type system.
+--	        --For a common entity definition, see MIL STD 2525 or use DIS
+--	        --enumerations.
+----	        EntityType: data String;
+--	        --An optional text string for the vehicle. This is not necessarily
+--	        --unique, and is included for information only. ID should be used to
+--	        --uniquely identify entities.
+----	        Label: data String;
+--	        --The speed that is typically commanded for this entity
+--	        NominalSpeed: data Float;--Float_32;
+--	        --The altitude that is typically commanded for this entity
+--	        NominalAltitude: data Float;--Float_32;
+--	        --Altitude type for nominal altitude
+--	        NominalAltitudeType: data AltitudeType.i;
+--	        --A list of all payload configurations for this vehicle. Examples of
+--	        --payloads include: gimbaled sensors, SAR radars (not yet supported),
+--	        --air-launched UAVs (not yet supported), and weapons (not yet
+--	        --supported).
+--	        PayloadConfigurationList: data PayloadConfigurationArray;
+--	        --A list that maps keys to values for the inclusion of extra, custom
+--	        --information about this entity
+--	        Info: data KeyValuePairArray;
+--        --The minimum true airspeed that should be commanded for this aircraft
+--        MinimumSpeed: data Float;--Float_32;
+--        --The maximum true airspeed that should be commanded for this aircraft
+--        MaximumSpeed: data Float;--Float_32;
+--        --Describes the preferred operating mode for most planning purposes.
+--        --This can be a max range or endurance speed profile, or any other
+--        --operating point chosen by a user. This field may not be null.
+--        NominalFlightProfile: data FlightProfile.i;
+--        --A list of all flight configurations described for this vehicle. Each
+--        --flight configuration specifies a different mode of flight, for
+--        --instance: climb, cruise, dash, loiter. This list may be empty, and
+--        --does not necessarily contain the nominal flight configuration.
+--        AlternateFlightProfiles: data FlightProfileArray;
+--        --A list of available loiter types for this aircraft
+--        AvailableLoiterTypes: data LoiterTypeArray;
+--        --A list of available turning modes for this aircraft
+--        AvailableTurnTypes: data TurnTypeArray;
+--        --Minimum MSL altitude that this aircraft is allowed to fly. This
+--        --value should be treated as a regulatory or safety-of-flight parameter
+--        --and therefore takes precedence over other requests.
+--        MinimumAltitude: data Float;--Float_32;
+--        --Altitude type for min altitude
+--        MinAltitudeType: data AltitudeType.i;
+--        --Maximum MSL altitude that this aircraft is allowed to fly. This
+--        --value should be treated as a regulatory or safety-of-flight parameter
+--        --and therefore takes precedence over other requests.
+--        MaximumAltitude: data Float;--Float_32;
+--        --Altitude type for max altitude
+--        MaxAltitudeType: data AltitudeType.i;
+--	end AirVehicleConfiguration.i;
+--
+--	--Provides basic information regarding the vehicle state with regard
+--	--to its location and orientation in the world, and current velocity in
+--	--body axis. <br/> Provides basic state information regarding entity
+--	--position, orientation, velocity, and acceleration. The entity body
+--	--right-hand coordinate system is used, where X is out the nose, Y is
+--	--out the right side, and Z is downward. The order of rotation from
+--	--inertial to body coordinates is yaw-pitch-roll. <br/> The direction
+--	--cosine matrix (DCM) for conversion from body to inertial coordinates
+--	--is:<br/><br/> [cTheta*cPsi, cTheta*sPsi, -sTheta]<br/> [sPhi*sTheta
+--	--*cPsi-cPhi*sPsi, sPhi*sTheta*sPsi+cPhi*cPsi, sPhi*cTheta]<br/>
+--	--[cPhi*sTheta*cPsi+sPhi*sPsi, cPhi*sTheta*sPsi-sPhi*cPsi,
+--	--cPhi*cTheta]<br/><br/> where, c denotes cosine and s denotes sine.
+--	--<br/><br/> To convert from body to inertial velocities, use,<br/>
+--	--[North Vel, East Vel, Down Vel]' = DCM' * [Vx, Vy, Vz]' where [Vx, Vy,
+--	--Vz] is the body vel or accel.
+--	data AirVehicleState --extends EntityState		
+--	end AirVehicleState;
+--	
+--	data implementation AirVehicleState.i --extends EntityState.i
+--		subcomponents
+--			--A unique ID for this entity. IDs should be greater than zero
+--	        ID: data Integer;--Integer_64;
+--	        --Velocity in the body x-direction (postive out nose)
+--	        u: data Float;--Float_32;
+--	        --Velocity in the body y-direction (positive out right wing)
+--	        v: data Float;--Float_32;
+--	        --Velocity in the body z-direction (positve downward)
+--	        w: data Float;--Float_32;
+--	        --Acceleration in the body x-direction (postive out nose)
+--	        udot: data Float;--Float_32;
+--	        --Acceleration in the body y-direction (positive out right wing)
+--	        vdot: data Float;--Float_32;
+--	        --Acceleration in the body z-direction (positve downward)
+--	        wdot: data Float;--Float_32;
+--	        --Angle between true North and the projection of the body x-axis in
+--	        --the North-East plane.
+--	        Heading: data Float;--Float_32;
+--	        --Pitch of vehicle around body y-axis (positive upwards)
+--	        Pitch: data Float;--Float_32;
+--	        --Roll angle of the vehicle around body x-axis (positive right wing
+--	        --down)
+--	        Roll: data Float;--Float_32;
+--	        --roll-rate of vehicle (angular velocity around body x-axis). Positive
+--	        --right-wing down.
+--	        p: data Float;--Float_32;
+--	        --pitch rate of the vehicle (angular velocity around body y-axis).
+--	        --Positive nose-up.
+--	        q: data Float;--Float_32;
+--	        --yaw rate of the vehicle (angular velocity around body z-axis).
+--	        --Positive nose right.
+--	        r: data Float;--Float_32;
+--	        --Course/Groundtrack angle of the entity referenced to true North
+--	        Course: data Float;--Float_32;
+--	        --Current entity ground speed
+--	        Groundspeed: data Float;--Float_32;
+--	        --The perceived entity location
+--	        Location: data Location3D.i;
+--	        --The available energy remaining, expressed in terms of the percentage
+--	        --of maximum capacity
+--	        EnergyAvailable: data Float;--Float_32;
+--	        --The consumption rate of available energy, expressed in terms of the
+--	        --percentage of maximum capacity used per second.
+--	        ActualEnergyRate: data Float;--Float_32;
+--	        --A list of states for any onboard payloads
+--	        PayloadStateList: data PayloadStateArray;
+--	        --The ID of the current waypoint. Only valid if the vehicle is in
+--	        --waypoint following mode.
+--	        CurrentWaypoint: data Integer;--Integer_64;
+--	        --Current command (VehicleActionCommand or MissionCommand) being
+--	        --executed. A value of zero denotes no command being executed, or that a
+--	        --command without an set identifier (CommandID) is being executed.
+--	        CurrentCommand: data Integer;--Integer_64;
+--	        --The current mode for this vehicle.
+--	        FIXMEMode: data NavigationMode.i;
+--	        --Tasks that this entity is currently executing. An empty list
+--	        --indicates no associated tasks. The task number should coincide with
+--	        --the task number in the task request. For instance, if a waypoint is
+--	        --associated with a search task, then the task number associated with
+--	        --that search should be included in this list.
+--	        AssociatedTasks: data Int64Array;
+--	        --time stamp of this data. Time datum is defined by the application,
+--	        --but unless otherwise specified is milliseconds since 1 Jan 1970
+--	        Time: data Integer;--Integer_64;
+--	        --A list that maps keys to values for the inclusion of extra, custom
+--	        --information about this entity
+--        Info: data KeyValuePairArray;
+--	        --vehicle true airspeed
+--	        Airspeed: data Float;--Float_32;
+--	        --Vertical speed (positive upwards) of the vehicle in the inertial
+--	        --frame (rate of change of altitude)
+--	        VerticalSpeed: data Float;--Float_32;
+--	        --Wind speed as detected or computed by the vehicle
+--	        WindSpeed: data Float;--Float_32;
+--	        --Wind source direction (true) as detected or computed by the vehicle
+--	        WindDirection: data Float;--Float_32;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::AirVehicleState_Bit_Codec_Max_Size;
+--	end AirVehicleState.i;
+--
+--    data PayloadStateArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (PayloadState.i));
+--            Data_Model::Dimension => (1);    
+--    end PayloadStateArray;
+--    
+--	-- Reported state for an entity in the system
+--	data EntityState	
+--	end EntityState;
+--	
+--	data implementation EntityState.i
+--	    subcomponents
+--	        --A unique ID for this entity. IDs should be greater than zero
+--	        ID: data Integer;--Integer_64;
+--	        --Velocity in the body x-direction (postive out nose)
+--	        u: data Float;--Float_32;
+--	        --Velocity in the body y-direction (positive out right wing)
+--	        v: data Float;--Float_32;
+--	        --Velocity in the body z-direction (positve downward)
+--	        w: data Float;--Float_32;
+--	        --Acceleration in the body x-direction (postive out nose)
+--	        udot: data Float;--Float_32;
+--	        --Acceleration in the body y-direction (positive out right wing)
+--	        vdot: data Float;--Float_32;
+--	        --Acceleration in the body z-direction (positve downward)
+--	        wdot: data Float;--Float_32;
+--	        --Angle between true North and the projection of the body x-axis in
+--	        --the North-East plane.
+--	        Heading: data Float;--Float_32;
+--	        --Pitch of vehicle around body y-axis (positive upwards)
+--	        Pitch: data Float;--Float_32;
+--	        --Roll angle of the vehicle around body x-axis (positive right wing
+--	        --down)
+--	        Roll: data Float;--Float_32;
+--	        --roll-rate of vehicle (angular velocity around body x-axis). Positive
+--	        --right-wing down.
+--	        p: data Float;--Float_32;
+--	        --pitch rate of the vehicle (angular velocity around body y-axis).
+--	        --Positive nose-up.
+--	        q: data Float;--Float_32;
+--	        --yaw rate of the vehicle (angular velocity around body z-axis).
+--	        --Positive nose right.
+--	        r: data Float;--Float_32;
+--	        --Course/Groundtrack angle of the entity referenced to true North
+--	        Course: data Float;--Float_32;
+--	        --Current entity ground speed
+--	        Groundspeed: data Float;--Float_32;
+--	        --The perceived entity location
+--	        Location: data Location3D.i;
+--	        --The available energy remaining, expressed in terms of the percentage
+--	        --of maximum capacity
+--	        EnergyAvailable: data Float;--Float_32;
+--	        --The consumption rate of available energy, expressed in terms of the
+--	        --percentage of maximum capacity used per second.
+--	        ActualEnergyRate: data Float;--Float_32;
+--	        --A list of states for any onboard payloads
+--	        PayloadStateList: data PayloadStateArray;
+--	        --The ID of the current waypoint. Only valid if the vehicle is in
+--	        --waypoint following mode.
+--	        CurrentWaypoint: data Integer;--Integer_64;
+--	        --Current command (VehicleActionCommand or MissionCommand) being
+--	        --executed. A value of zero denotes no command being executed, or that a
+--	        --command without an set identifier (CommandID) is being executed.
+--	        CurrentCommand: data Integer;--Integer_64;
+--	        --The current mode for this vehicle.
+--	        FIXMEMode: data NavigationMode.i;
+--	        --Tasks that this entity is currently executing. An empty list
+--	        --indicates no associated tasks. The task number should coincide with
+--	        --the task number in the task request. For instance, if a waypoint is
+--	        --associated with a search task, then the task number associated with
+--	        --that search should be included in this list.
+--	        AssociatedTasks: data Int64Array;
+--	        --time stamp of this data. Time datum is defined by the application,
+--	        --but unless otherwise specified is milliseconds since 1 Jan 1970
+--	        Time: data Integer;--Integer_64;
+--	        --A list that maps keys to values for the inclusion of extra, custom
+--	        --information about this entity
+--        Info: data KeyValuePairArray;
+--	end EntityState.i;
+--	
+--	---------------------------------------------------------------------
+--	-- Provides information regarding a base entity configuration items.
+--	---------------------------------------------------------------------
+--	
+--	data PayloadConfigurationArray
+--    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (PayloadConfiguration.i));
+--            Data_Model::Dimension => (1);    
+--    end PayloadConfigurationArray;
+--    
+--	data EntityConfiguration	
+--	end EntityConfiguration;
+--		
+--	data implementation EntityConfiguration.i
+--	    subcomponents
+--	        --A unique id for this entity
+--	        ID: data Integer;--Integer_64;
+--	        --the team or "side" that an entity belongs to. This can be a name of
+--	        --a country, a "friend" or "foe" designation, or a team name (e.g. "red
+--	        --team").
+----	        Affiliation: data String;
+--	        --The type of this entity. The content of this field is dependent on
+--	        --the session. The value of this field is not specifically defined, so
+--	        --it is up to the simulation/session components to define a type system.
+--	        --For a common entity definition, see MIL STD 2525 or use DIS
+--	        --enumerations.
+----	        EntityType: data String;
+--	        --An optional text string for the vehicle. This is not necessarily
+--	        --unique, and is included for information only. ID should be used to
+--	        --uniquely identify entities.
+----	        Label: data String;
+--	        --The speed that is typically commanded for this entity
+--	        NominalSpeed: data Float;--Float_32;
+--	        --The altitude that is typically commanded for this entity
+--	        NominalAltitude: data Float;--Float_32;
+--	        --Altitude type for nominal altitude
+--	        NominalAltitudeType: data AltitudeType.i;
+--	        --A list of all payload configurations for this vehicle. Examples of
+--	        --payloads include: gimbaled sensors, SAR radars (not yet supported),
+--	        --air-launched UAVs (not yet supported), and weapons (not yet
+--	        --supported).
+--	        PayloadConfigurationList: data PayloadConfigurationArray;
+--	        --A list that maps keys to values for the inclusion of extra, custom
+--	        --information about this entity
+--	        Info: data KeyValuePairArray;
+--	end EntityConfiguration.i;
+--		
+--	-- Base Type for all zones (keep-in and keep-out zones).
+--	data AbstractZone
+--	end AbstractZone;
+--	
+--	data implementation AbstractZone.i
+--	    subcomponents
+--	        --A globally unique reference number for this zone
+--	        ZoneID: data Integer;--Integer_64;
+--	        --Lower altitude bound for the zone
+--	        MinAltitude: data Float;--Float_32;
+--	        --Altitude type for min altitude
+--	        MinAltitudeType: data AltitudeType.i;
+--	        --Maximum altitude for operations
+--	        MaxAltitude: data Float;--Float_32;
+--	        --Altitude type for max altitude
+--	        MaxAltitudeType: data AltitudeType.i;
+--	        --A list of aircraft IDs that this zone applies to. If the list is
+--	        --empty, then it is assumed that the boundary applies to all aircraft.
+--	        AffectedAircraft: data Integer;--Integer_64 {Data_Model::Data_Representation => Array;};
+--	        --Time at which this zone becomes active. Time datum is defined by the
+--	        --application, but unless otherwise specified is milliseconds since 1
+--	        --Jan 1970
+--	        StartTime: data Integer;--Integer_64;
+--	        --Time at which this zone becomes inactive. Time datum is defined by
+--	        --the application, but unless otherwise specified is milliseconds since
+--	        --1 Jan 1970
+--	        EndTime: data Integer;--Integer_64;
+--	        --Buffer to add/subtract around the border of the zone
+--	        Padding: data Float;--Float_32;
+--	        --Optional label for this zone
+----	        Label: data String;
+--	        --Geometry object describing the boundary. This boundary is
+--	        --2-dimensional. The zone boundary is defined as an extrusion of this
+--	        --boundary from MinAltitude to MaxAltitude.
+--	        Boundary: data AbstractGeometry.i;
+--	end AbstractZone.i;
+--
+--	--A command to follow a set of ground waypoints. This is analogous to
+--	--a {@link MissionCommand} for aircraft.
+--	data FollowPathCommand --extends VehicleActionCommand	
+--	end FollowPathCommand;
+--
+--	data implementation FollowPathCommand.i --extends VehicleActionCommand.i
+--		subcomponents
+--			--A unique id for this command. automation services should issue new
+--				--ids with every new command
+--			CommandID: data Integer;--Integer_64;
+--					--The id of the vehicle for this command.
+--			VehicleID: data Integer;--Integer_64;
+--					--a set of actions to be performed immediately by the vehicle.
+--			VehicleActionList: data VehicleActionArray;
+--					--Denotes the current execution status of this command.
+--			Status: data CommandStatusType.i;
+--	        --The first waypoint to follow. This should correspond to the number
+--	        --of a waypoint in the waypoint list. If this is zero, no waypoint will
+--	        --be followed.
+--	        FirstWaypoint: data Integer;--Integer_64;
+--	        --A list of waypoints to follow
+--	        WaypointList: data PathWaypoint.i {Data_Model::Data_Representation => Array;};
+--	        --Describes the start time for this action, in scenario time. If this
+--	        --field is zero, the action is completed immediately.
+--	        StartTime: data Integer;--Integer_64;
+--	        --Describes the end time for this action, in scenario time. If this
+--	        --field is zero, it should be ignored, otherwise The entity will travel
+--	        --until the stop time is reached.
+--	        StopTime: data Integer;--Integer_64;
+--	        --Describes how the entity should treat the end-of-path. Entities can
+--	        --complete the path once, or continuously.
+--	        RepeatMode: data TravelMode.i;
+--	end FollowPathCommand.i;		
+--
+--	--A waypoint that can be used as part of commanding entities' movement
+--	data PathWaypoint --extends Waypoint
+--	end PathWaypoint;
+--	
+--	data implementation PathWaypoint.i --extends Waypoint.i
+--		subcomponents
+--			-- from loc3d
+--			Latitude: data Float; --Float_64;
+--			Longitude: data Float; --Float_64;
+--			Altitude: data Float; --Float_32;
+--			AltitudeType: data AltitudeType.i;
+--			-- from loc3d
+--			
+--				--A unique waypoint number
+--			Number: data Integer; --Integer_64;
+--					--The index of the next waypoint in the list. Consecutively numbered
+--					--waypoints are <b>not</b> considered linked, the link must be
+--					--explicitly stated in this field.
+--			NextWaypoint: data Integer; --Integer_64;
+--					--Commanded speed for this waypoint. See SpeedType for defintion of
+--					--this field.
+--			Speed: data Float; --Float_32;
+--					--Type of commanded speed
+--			SpeedType: data SpeedType.i;
+--					--The commanded climb rate. Positive values upwards. For surface
+--					--(ground and sea) entities, this value is ignored.
+--			ClimbRate: data Float; --Float_32;
+--					--The type of turn to execute
+--			TurnType: data TurnType.i;
+--					--A list of actions to perform at this waypoint
+--			VehicleActionList: data VehicleActionArray;
+--					--A waypoint for contingency (e.g. lost-comm, alternate mission)
+--					--operations. A value of zero denotes that no contingency point is
+--					--specified.
+--			ContingencyWaypointA: data Integer; --Integer_64;
+--					--A waypoint for contingency (e.g. lost-comm, alternate mission)
+--					--operations. A value of zero denotes that no contingency point is
+--					--specified.
+--			ContingencyWaypointB: data Integer; --Integer_64;
+--					--A list of tasks that are associated with this waypoint. A length of
+--					--zero denotes no associated tasks. This field is for analysis purposes.
+--					--The automation service should associate a list of tasks with each
+--					--waypoint to enable analysis of the allocation of tasks to vehicles.
+--			AssociatedTasks: data Int64Array;
+--	        --The amount of time that an entity should pause before moving to the
+--	        --next waypoint.
+--	        PauseTime: data Integer;--Integer_64;
+--	end PathWaypoint.i;
+--
+--	--Describes the outer boundary of operations for the entire UAV team
+--	--or a subset of the vehicle team.
+--	data KeepInZone --extends AbstractZone
+--	end KeepInZone;
+--	
+--	data implementation KeepInZone.i --extends AbstractZone.i
+--		subcomponents
+--			--A globally unique reference number for this zone
+--	        ZoneID: data Integer;--Integer_64;
+--	        --Lower altitude bound for the zone
+--	        MinAltitude: data Float;--Float_32;
+--	        --Altitude type for min altitude
+--	        MinAltitudeType: data AltitudeType.i;
+--	        --Maximum altitude for operations
+--	        MaxAltitude: data Float;--Float_32;
+--	        --Altitude type for max altitude
+--	        MaxAltitudeType: data AltitudeType.i;
+--	        --A list of aircraft IDs that this zone applies to. If the list is
+--	        --empty, then it is assumed that the boundary applies to all aircraft.
+--	        AffectedAircraft: data Integer;--Integer_64 {Data_Model::Data_Representation => Array;};
+--	        --Time at which this zone becomes active. Time datum is defined by the
+--	        --application, but unless otherwise specified is milliseconds since 1
+--	        --Jan 1970
+--	        StartTime: data Integer;--Integer_64;
+--	        --Time at which this zone becomes inactive. Time datum is defined by
+--	        --the application, but unless otherwise specified is milliseconds since
+--	        --1 Jan 1970
+--	        EndTime: data Integer;--Integer_64;
+--	        --Buffer to add/subtract around the border of the zone
+--	        Padding: data Float;--Float_32;
+--	        --Optional label for this zone
+----	        Label: data String;
+--	        --Geometry object describing the boundary. This boundary is
+--	        --2-dimensional. The zone boundary is defined as an extrusion of this
+--	        --boundary from MinAltitude to MaxAltitude.
+--	        Boundary: data AbstractGeometry.i;
+--	end KeepInZone.i;
+--	
+--	--Defines a keep-out zone. This describes a volume where vehicles are
+--	--not allowed to fly. For standard zones, this Struct defines lateral
+--	--boundaries.
+--	data KeepOutZone --extends AbstractZone
+--	end KeepOutZone;
+--	
+--	data implementation KeepOutZone.i --extends AbstractZone.i
+--		subcomponents
+--			--A globally unique reference number for this zone
+--	        ZoneID: data Integer;--Integer_64;
+--	        --Lower altitude bound for the zone
+--	        MinAltitude: data Float;--Float_32;
+--	        --Altitude type for min altitude
+--	        MinAltitudeType: data AltitudeType.i;
+--	        --Maximum altitude for operations
+--	        MaxAltitude: data Float;--Float_32;
+--	        --Altitude type for max altitude
+--	        MaxAltitudeType: data AltitudeType.i;
+--	        --A list of aircraft IDs that this zone applies to. If the list is
+--	        --empty, then it is assumed that the boundary applies to all aircraft.
+--	        AffectedAircraft: data Integer;--Integer_64 {Data_Model::Data_Representation => Array;};
+--	        --Time at which this zone becomes active. Time datum is defined by the
+--	        --application, but unless otherwise specified is milliseconds since 1
+--	        --Jan 1970
+--	        StartTime: data Integer;--Integer_64;
+--	        --Time at which this zone becomes inactive. Time datum is defined by
+--	        --the application, but unless otherwise specified is milliseconds since
+--	        --1 Jan 1970
+--	        EndTime: data Integer;--Integer_64;
+--	        --Buffer to add/subtract around the border of the zone
+--	        Padding: data Float;--Float_32;
+--	        --Optional label for this zone
+----	        Label: data String;
+--	        --Geometry object describing the boundary. This boundary is
+--	        --2-dimensional. The zone boundary is defined as an extrusion of this
+--	        --boundary from MinAltitude to MaxAltitude.
+--	        Boundary: data AbstractGeometry.i;
+--	        --The type of zone <br/> Physical (physical boundary such as terrain
+--	        --or buildings) <br/> Regulatory (fire control, flight corridor) <br/>
+--	        --Acoustic Defines an area for acoustical avoidance <br/> Threat Defines
+--	        --an area where a threat is present.
+--	        ZoneType: data ZoneAvoidanceType.i;
+--	end KeepOutZone.i;
+--
+--	--Collection of extrusions/zones that define operating region
+--	data OperatingRegion
+--	end OperatingRegion;
+--			
+--	data implementation OperatingRegion.i
+--	    subcomponents
+--	        --Operating region ID
+--	        ID: data Integer;--Integer_64;
+--	        --Abstract Zone IDs in which the entity must remain during operation
+--	        -- KeepInAreas: data Integer;--Integer_64 {Data_Model::Data_Representation => Array;  Data_Model::Dimension => (1);};
+--	        KeepInAreas: data Int64Array;
+--	        --Keep Out Zone IDs that an entity must remain out of during operation
+--	        -- KeepOutAreas: data Integer;--Integer_64 {Data_Model::Data_Representation => Array; Data_Model::Dimension => (1);};
+--	        KeepOutAreas: data Int64Array;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::OperatingRegion_Bit_Codec_Max_Size;
+--	end OperatingRegion.i;
+--
+--	--Sent to denote that the target id numbers in the list are obsolete
+--	--and will not be requested again. This can occur when the user has
+--	--replaced an old task with a new one, or has deleted a task
+--	--permanently. This is an optional message that automation services can
+--	--ignore, depending on how they manage tasks.
+--	data RemoveTasks
+--	end RemoveTasks;
+--	
+--	data implementation RemoveTasks.i
+--	    subcomponents
+--		        TaskList: data Integer;--Integer_64 {Data_Model::Data_Representation => Array;};
+--	end RemoveTasks.i;
+--	
+--	--Provides information regarding automation service compuation percent
+--	--complete. The automation service should send this when the computation
+--	--of a mission plan may take more than a few seconds, or when an error
+--	--occurs (such as the inability to create one or more mission commands
+--	--given the task set)
+--	data ServiceStatus		
+--	end ServiceStatus;
+--		
+--	data implementation ServiceStatus.i
+--	    subcomponents
+--	        --The estimated percentage completed for an automation process.
+--	        PercentComplete: data Float;--Float_32;
+--	        --Status from the automation service to the simulation regarding
+--	        --errors or conditions.
+--	        Info: data KeyValuePair.i {Data_Model::Data_Representation => Array;};
+--	        --Describes the type of message conveyed. 
+--	        StatusType: data ServiceStatusType.i;
+--	end ServiceStatus.i;
+--
+--	 --The base class for all task requests passed to the automation
+--	--service. Task requests are not assigned to a specific vehicle, but
+--	--allow the automation service to determine the best vehicle to complete
+--	--the task.
+--	data Task
+--	end Task;
+--	
+--	data implementation Task.i
+--	    subcomponents
+--	        --A unique identifier for this task.
+--	        TaskID: data Integer;--Integer_64;
+--	        --An optional text string for the task. This is not necessarily unique,
+--	        --and is included for information only. TaskID should be used to
+--	        --uniquely identify tasks.
+----	        Label: data String;
+--	        --A list of entity IDs that are eligible to accomplish this task. If
+--	        --the list is empty, then it is assumed all entities are eligible.
+--	        EligibleEntities: data Int64Array.i;
+--	        --If a task is to be repeatedly done, this field indicates how often.
+--	        --A value of zero means the task is complete on the first pass.
+--	        RevisitRate: data Float;--Float_32;
+--	        --An optional text string for automation service task parameters.
+--	        Parameters: data KeyValuePairArray.i;
+--	        --The priority value for this task. Priority is a relative value of
+--	        --this task compared to other tasks in the scenario. This field should
+--	        --be limited to the range[0..100], 100 being the highest level of
+--	        --priority. The exact interpretation priority may vary depending on
+--	        --algorithm implementation.
+--	        Priority: data Integer;--Integer_8;
+--	        --Indicates whether this task must be executed as part of a mission plan.
+--	        Required: data Boolean;
+--	end Task.i;
+-- 
+--    -- Used to request a search task allocation from the automation service. -->
+--    data SearchTask --extends Task
+--    end SearchTask;
+--            
+--    data implementation SearchTask.i --extends Task.i
+--    	subcomponents
+--    		--A unique identifier for this task.
+--	        TaskID: data Integer;--Integer_64;
+--	        --An optional text string for the task. This is not necessarily unique,
+--	        --and is included for information only. TaskID should be used to
+--	        --uniquely identify tasks.
+----	        Label: data String;
+--	        --A list of entity IDs that are eligible to accomplish this task. If
+--	        --the list is empty, then it is assumed all entities are eligible.
+--	        EligibleEntities: data Int64Array.i;
+--	        --If a task is to be repeatedly done, this field indicates how often.
+--	        --A value of zero means the task is complete on the first pass.
+--	        RevisitRate: data Float;--Float_32;
+--	        --An optional text string for automation service task parameters.
+--	        Parameters: data KeyValuePairArray.i;
+--	        --The priority value for this task. Priority is a relative value of
+--	        --this task compared to other tasks in the scenario. This field should
+--	        --be limited to the range[0..100], 100 being the highest level of
+--	        --priority. The exact interpretation priority may vary depending on
+--	        --algorithm implementation.
+--	        Priority: data Integer;--Integer_8;
+--	        --Indicates whether this task must be executed as part of a mission plan.
+--	        Required: data Boolean;
+--            -- The wavelength bands that should be used to complete the task.   --
+--            DesiredWavelengthBands: data WavelengthBand;-- {Data_Model::Data_Representation => Array; Data_Model::Dimension => (8);};
+--            -- Minimum time that a sensor must look at any given point in this search task. --
+--            DwellTime: data Integer;--Integer_64;     
+--            -- Average ground sample distance for locations in search area --
+--            GroundSampleDistance: data Float;--Float_32;
+--    end SearchTask.i;
+--    
+--     
+--    -- Defines an angular range for use in setting constraints or desired approaches to tasks.  In most cases, wedges are
+--    -- defined in the inertial sense, where azimuth is the angle between North and the center of the wedge, elevation is the
+--    -- angle between the horizon and the center of the wedge (positive up).  In some instances, other coordinate systems are defined, such as
+--    -- angles relative to a line.
+--    data Wedge
+--    end Wedge;
+--    
+--    data implementation Wedge.i
+--    	subcomponents
+--            -- Azimuthal centerline of the wedge. --
+--            AzimuthCenterline: data Float;--Float_32;
+--            -- Vertical centerline of the wedge.  --
+--            VerticalCenterline: data Float;--Float_32;
+--            -- Azimuthal angular extent of the wedge.  The extent is centered around the centerline.
+--            -- A value of zero denotes that this wedge is defined as a single angle.
+--            AzimuthExtent: data Float;--Float_32;
+--            -- Vertical angular extent of the wedge.  The extent is centered around the centerline.
+--            -- A value of zero denotes that this wedge is defined as a single angle. 
+--            VerticalExtent: data Float;--Float_32;
+--    end Wedge.i;
+--        
+--    
+--    -- Defines a line search task.
+--    -- A line search is a list of points that forms a polyline.  The ViewAngleList determines
+--    -- from which direction the line may be viewed.  View angles are specified using the {@link Wedge} type. If the
+--    -- UseInertialViewAngles option is true, then wedges are defined in terms of North-East coordinates, otherwise
+--    -- wedges are defined relative to the line segment currently being viewed (a vector from point i through point i+1).
+--    -- To be a valid look angle, the line segment must be viewed from an angle within the bounds of the wedge.
+--    data LineSearchTask --extends SearchTask
+--    end LineSearchTask;
+--    
+--    data PointListArray
+--			properties
+--				Data_Model::Data_Representation => Array;
+--				Data_Model::Base_Type => (classifier (Location3D.i));
+--				Data_Model::Dimension => (4);--1024
+--    end PointListArray;
+--    
+--    data WedgeArray
+--			properties
+--				Data_Model::Data_Representation => Array;
+--				Data_Model::Base_Type => (classifier (Wedge.i));
+--				Data_Model::Dimension => (16);
+--    end WedgeArray;
+--    
+--    data implementation LineSearchTask.i --extends SearchTask.i
+--    	subcomponents
+--    		--A unique identifier for this task.
+--	        TaskID: data Integer;--Integer_64;
+--	        --An optional text string for the task. This is not necessarily unique,
+--	        --and is included for information only. TaskID should be used to
+--	        --uniquely identify tasks.
+----	        Label: data String;
+--	        --A list of entity IDs that are eligible to accomplish this task. If
+--	        --the list is empty, then it is assumed all entities are eligible.
+--	        EligibleEntities: data Int64Array.i;
+--	        --If a task is to be repeatedly done, this field indicates how often.
+--	        --A value of zero means the task is complete on the first pass.
+--	        RevisitRate: data Float;--Float_32;
+--	        --An optional text string for automation service task parameters.
+--	        Parameters: data KeyValuePairArray.i;
+--	        --The priority value for this task. Priority is a relative value of
+--	        --this task compared to other tasks in the scenario. This field should
+--	        --be limited to the range[0..100], 100 being the highest level of
+--	        --priority. The exact interpretation priority may vary depending on
+--	        --algorithm implementation.
+--	        Priority: data Integer;--Integer_8;
+--	        --Indicates whether this task must be executed as part of a mission plan.
+--	        Required: data Boolean;
+--            -- The wavelength bands that should be used to complete the task.   --
+--            DesiredWavelengthBands: data WavelengthBand;-- {Data_Model::Data_Representation => Array; Data_Model::Dimension => (8);};
+--            -- Minimum time that a sensor must look at any given point in this search task. --
+--            DwellTime: data Integer;--Integer_64;     
+--            -- Average ground sample distance for locations in search area --
+--            GroundSampleDistance: data Float;--Float_32;
+--    		-- Line to search
+--    		-- PointList: data Location3D.i {Data_Model::Data_Representation => Array; Data_Model::Dimension => (1024);};
+--    		PointList: data PointListArray;
+--    		
+--    		-- Defines a list of acceptable look-angles for this task.  See the documentation above for details. --
+--    		-- ViewAngleList: data Wedge.i {Data_Model::Data_Representation => Array; Data_Model::Dimension => (16);};
+--    		ViewAngleList: data WedgeArray;
+--    		
+--    		UseInertialViewAngles: data Boolean;
+--		properties
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::LineSearchTask_Bit_Codec_Max_Size;
+--    end LineSearchTask.i;
+--
+--    ------------------------------------------------------------------------
+--	-- Base class for an action to be taken by a vehicle. This is usually
+--	-- used as an object inside of {@link Waypoint} to describe the action
+--	-- that a vehicle is to take upon reaching a waypoint. This is used by
+--	-- child types to perform something meaningful.
+--	------------------------------------------------------------------------
+--	data VehicleAction
+--	end VehicleAction;
+--
+--	data implementation VehicleAction.i
+--		subcomponents
+--			--A list of tasks that are associated with this action. A length of
+--			--zero denotes no associated tasks. This field is for analysis purposes.
+--			--The automation service should associate a list of tasks with each
+--			--action to enable analysis of the allocation of tasks to vehicles.
+--			AssociatedTaskList: data Int64Array;
+--	end VehicleAction.i;
+--	
+--	-- An action for controlling a payload item (abstract). --
+--	data PayloadAction --extends VehicleAction
+--	end PayloadAction;
+--	
+--	data implementation PayloadAction.i --extends VehicleAction.i
+--		subcomponents
+--			--A list of tasks that are associated with this action. A length of
+--			--zero denotes no associated tasks. This field is for analysis purposes.
+--			--The automation service should associate a list of tasks with each
+--			--action to enable analysis of the allocation of tasks to vehicles.
+--			AssociatedTaskList: data Int64Array;
+--			PayloadID: data Integer;--Integer_64;
+--	end PayloadAction.i;
+--
+--    -- An action that commands a gimbal to make necessary rotations to allow mounted sensors to stare at the
+--    -- given location.Individual sensors on the gimbal are controlled via the {@link CameraAction} message.
+--    data GimbalStareAction --extends PayloadAction
+--    end GimbalStareAction;
+--    
+--    data implementation GimbalStareAction.i --extends PayloadAction.i
+--    	subcomponents
+--    		--A list of tasks that are associated with this action. A length of
+--			--zero denotes no associated tasks. This field is for analysis purposes.
+--			--The automation service should associate a list of tasks with each
+--			--action to enable analysis of the allocation of tasks to vehicles.
+--			AssociatedTaskList: data Int64Array;
+--			PayloadID: data Integer;--Integer_64;
+--    		Starepoint: data Location3D.i;
+--    		Duration: data Integer;--Integer_64;
+--    end GimbalStareAction.i;
+--
+--	---------------------------------------------------------------------------------------
+--	--A message that specifies actions that should be performed by the specified aircraft. 
+--	-- Actions can be navigational modes or payload actions.
+--	---------------------------------------------------------------------------------------	
+--	data VehicleActionArray
+--	    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (VehicleAction.i));
+--            Data_Model::Dimension => (1);
+--	end VehicleActionArray;
+--
+--	data VehicleActionCommand		
+--	end VehicleActionCommand;
+--	
+--	data implementation VehicleActionCommand.i
+--		subcomponents
+--				--A unique id for this command. automation services should issue new
+--				--ids with every new command
+--			CommandID: data Integer;--Integer_64;
+--					--The id of the vehicle for this command.
+--			VehicleID: data Integer;--Integer_64;
+--					--a set of actions to be performed immediately by the vehicle.
+--			VehicleActionList: data VehicleActionArray;
+--					--Denotes the current execution status of this command.
+--			Status: data CommandStatusType.i;
+--	end VehicleActionCommand.i;
+--	
+--    data Waypoint -- extends Location3D
+--	end Waypoint;
+--
+----A simple waypoint class for vehicle routing
+--	data implementation Waypoint.i -- extends Location3D.i
+--		subcomponents
+--			-- from loc3d
+--			Latitude: data Float; --Float_64;
+--			Longitude: data Float; --Float_64;
+--			Altitude: data Float; --Float_32;
+--			AltitudeType: data AltitudeType.i;
+--			-- from loc3d
+--			
+--				--A unique waypoint number
+--			Number: data Integer; --Integer_64;
+--					--The index of the next waypoint in the list. Consecutively numbered
+--					--waypoints are <b>not</b> considered linked, the link must be
+--					--explicitly stated in this field.
+--			NextWaypoint: data Integer; --Integer_64;
+--					--Commanded speed for this waypoint. See SpeedType for defintion of
+--					--this field.
+--			Speed: data Float; --Float_32;
+--					--Type of commanded speed
+--			SpeedType: data SpeedType.i;
+--					--The commanded climb rate. Positive values upwards. For surface
+--					--(ground and sea) entities, this value is ignored.
+--			ClimbRate: data Float; --Float_32;
+--					--The type of turn to execute
+--			TurnType: data TurnType.i;
+--					--A list of actions to perform at this waypoint
+--			VehicleActionList: data VehicleActionArray;
+--					--A waypoint for contingency (e.g. lost-comm, alternate mission)
+--					--operations. A value of zero denotes that no contingency point is
+--					--specified.
+--			ContingencyWaypointA: data Integer; --Integer_64;
+--					--A waypoint for contingency (e.g. lost-comm, alternate mission)
+--					--operations. A value of zero denotes that no contingency point is
+--					--specified.
+--			ContingencyWaypointB: data Integer; --Integer_64;
+--					--A list of tasks that are associated with this waypoint. A length of
+--					--zero denotes no associated tasks. This field is for analysis purposes.
+--					--The automation service should associate a list of tasks with each
+--					--waypoint to enable analysis of the allocation of tasks to vehicles.
+--			AssociatedTasks: data Int64Array;
+--	end Waypoint.i;
+--
+--	-------------------------------------------------------------------------------	
+--	-- A mission to be performed by a vehicle. This sends a new list of
+--	-- waypoints to an aircraft and commands the aircraft to start flying the
+--	-- mission starting at the specified "FirstWaypoint". A Mission command
+--	-- is made up of a linked list of waypoints. However, the waypoint list
+--	-- may contain other waypoints that are not linked to the main route path
+--	-- that begins with "FirstWaypoint". Note on end-of-mission behavior:
+--	-- The last waypoint in the linked route list should include some terminal 
+--	-- behavior. For instance, the last waypoint should be directed with itself as 
+--	-- the "Next Waypoint" or there should be an indefinite loiter assigned in the 
+--	-- last waypoint's "VehicleActionList". VehicleActionLists are performed 
+--	-- immediately when MissionCommand is received, e.g. camera pointed toward 
+--	-- first waypoint.
+--	-------------------------------------------------------------------------------
+--	data WaypointArray
+--	    properties
+--            Data_Model::Data_Representation => Array;
+--            Data_Model::Base_Type => (classifier (Waypoint.i));
+--            Data_Model::Dimension => (4);    --200
+--	end WaypointArray;
+--	
+----	data MissionCommand extends VehicleActionCommand	
+----	end MissionCommand;
+----	
+----	data implementation MissionCommand.i extends VehicleActionCommand.i
+----		subcomponents
+----			--The list of waypoints associated with this mission task. Waypoints
+----			--are linked, but the waypoint list may contain waypoints that are not
+----			--necessarily linked. Multiple linked routes may be sent in a single
+----			--waypoint list. Waypoints are not necessarily ordered in the list.
+----			WaypointList: data WaypointArray;
+----			
+----			--ID of the first waypoint to follow.
+----			FirstWaypoint: data Integer;--Integer_64;
+----		properties
+----			Classifier_Substitution_Rule => Type_Extension;
+----			HAMR::Bit_Codec_Max_Size => CM_Property_Set::MissionCommand_Bit_Codec_Max_Size;
+----	end MissionCommand.i;
+--	
+--	data MissionCommand
+--	end MissionCommand;
+--	
+--	data implementation MissionCommand.i
+--		subcomponents
+--			--A unique id for this command. automation services should issue new
+--			--ids with every new command
+--			CommandID: data Integer; --Integer_64;
+--					--The id of the vehicle for this command.
+--			VehicleID: data Integer; --Integer_64;
+--					--a set of actions to be performed immediately by the vehicle.
+--			VehicleActionList: data VehicleActionArray;
+--					--Denotes the current execution status of this command.
+--			Status: data CommandStatusType.i;
+--			
+--			--The list of waypoints associated with this mission task. Waypoints
+--			--are linked, but the waypoint list may contain waypoints that are not
+--			--necessarily linked. Multiple linked routes may be sent in a single
+--			--waypoint list. Waypoints are not necessarily ordered in the list.
+--			WaypointList: data WaypointArray;
+--			
+--			--ID of the first waypoint to follow.
+--			FirstWaypoint: data Integer; --Integer_64;
+--		properties
+----			Classifier_Substitution_Rule => Type_Extension;
+--			HAMR::Bit_Codec_Max_Size => CM_Property_Set::MissionCommand_Bit_Codec_Max_Size;
+--	end MissionCommand.i;
+--	
+--	data NavigationMode --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--	            "Waypoint",
+--		         "Loiter",
+--		         "FlightDirector",
+--	            "TargetTrack",
+--	            "FollowLeader",
+--	            "LostComm");
+--	end NavigationMode;
+--	
+--	data implementation NavigationMode.i
+--	end NavigationMode.i;
+--
+--	data SpeedType -- extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--			Data_Model::Enumerators => (
+--						"Airspeed",
+--						"Groundspeed");
+--	end SpeedType;
+--
+--	data implementation SpeedType.i
+--	end SpeedType.i;
+--
+--	data TurnType -- extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--			Data_Model::Enumerators => (
+--						"TurnShort",
+--						"FlyOver");
+--	end TurnType;
+--
+--	data implementation TurnType.i
+--	end TurnType.i;
+--	
+--	--zone defines an area that is sensitive to visual detection. The
+--	--threshold of visual detection is not defined by this standard.
+--	data ZoneAvoidanceType --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--	            "Physical",
+--	            "Regulatory",
+--	            "Acoustic",
+--	            "Threat",
+--	            "Visual");
+--	end ZoneAvoidanceType;
+--	
+--	data implementation ZoneAvoidanceType.i
+--	end ZoneAvoidanceType.i;
+--	
+--	data ServiceStatusType --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--	            "Information",
+--	            "Warning",
+--	            "Error");
+--	end ServiceStatusType;
+--	
+--	data implementation ServiceStatusType.i
+--	end ServiceStatusType.i;
+--
+--
+--	data LoiterType --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--	            "VehicleDefault",
+--	            "Circular",
+--	            "Racetrack",
+--	            "FigureEight",
+--	            "Hover");
+--	end LoiterType;
+--	
+--	data implementation LoiterType.i
+--	end LoiterType.i;
+--
+--	data CommandStatusType --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--			Data_Model::Enumerators => (
+--						--Cancelled by an operator, aircraft, or other entity
+--						"Pending",
+--						--Cancelled by an operator, aircraft, or other entity
+--						"Approved",
+--						--Cancelled by an operator, aircraft, or other entity
+--						"InProcess",
+--						--Cancelled by an operator, aircraft, or other entity
+--						"Executed",
+--						--Cancelled by an operator, aircraft, or other entity
+--						"Cancelled");
+--	end CommandStatusType;
+--
+--	data implementation CommandStatusType.i
+--	end CommandStatusType.i;
+--	
+--	data WavelengthBand --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--		         "AllAny",
+--	            "EO",
+--	            "LWIR",
+--	            "SWIR",
+--	            "MWIR",
+--	            "Other");
+--	end WavelengthBand;
+--	
+--	data TravelMode --extends Base_Types::Integer
+--		properties
+--			Data_Model::Data_Representation => Enum;
+--	        Data_Model::Enumerators => (
+--	            "SinglePass",
+--	            "ReverseCourse",
+--	            "Loop");
+--	end TravelMode;
+--	
+--	data implementation TravelMode.i
+--	end TravelMode.i;
+--	
+--	data implementation WavelengthBand.i
+--	end WavelengthBand.i;	
+end CMASI;

@@ -1,0 +1,93 @@
+package Drivers
+public
+	with CASE_Model_Transformations;
+	with CMASI;
+	--with CASEAgree;
+	with CASE_Properties;
+	with Base_Types;
+	with CASE_Consolidated_Properties;
+
+	thread RadioDriver
+		-- The RadioDriver is the software that enables other SW components to communicate to other systems over RF
+		features
+			recv_data: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			send_data: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			alert: in event data port Base_Types::Boolean;
+
+			AutomationRequest: out event data port CMASI::AutomationRequest.i; --CMASI::AddressAttributedMessage.i;
+			OperatingRegion: out event data port CMASI::OperatingRegion.i; --CMASI::AddressAttributedMessage.i;
+			LineSearchTask: out event data port CMASI::LineSearchTask.i; --CMASI::AddressAttributedMessage.i;
+		properties
+--			Dispatch_Protocol => Sporadic;
+			CASE_Properties::Component_Type => COMM_DRIVER;
+            CASE_Consolidated_Properties::Component_Type => COMM_DRIVER;
+			
+
+--		annex agree {**
+--			assume "The radio receives well-formed messages" : CASEAgree::WellformedCASE_RF_Msg(recv_data, CASEAgree::GS_ID, CASEAgree::UAV_ID);
+--			guarantee "The radio_send outputs only well formed CASE_RF_Msg.Impl types" : CASEAgree::WellformedCASE_RF_Msg(send_data, CASEAgree::UAV_ID, CASEAgree::GS_ID);
+--		**};
+
+		annex Verdict{**
+			-- There should not be a flow from recv_data to send data. Recv data is data received from GS. send_data is other data like alerts that is send back to GS. 
+			
+					
+			CyberRel "AutomationRequest_C" = recv_data:C => AutomationRequest:C;
+			CyberRel "AutomationRequest_I" = recv_data:I => AutomationRequest:I;
+			CyberRel "AutomationRequest_A" = recv_data:A => AutomationRequest:A;
+		
+			CyberRel "OperatingRegion_C" = recv_data:C => OperatingRegion:C;
+			CyberRel "OperatingRegion_I" = recv_data:I => OperatingRegion:I;
+			CyberRel "OperatingRegion_A" = recv_data:A => OperatingRegion:A;
+		
+			CyberRel "LineSearchTask_C" = recv_data:C => LineSearchTask:C;
+			CyberRel "LineSearchTask_I" = recv_data:I => LineSearchTask:I;
+			CyberRel "LineSearchTask_A" = recv_data:A => LineSearchTask:A;
+		
+		**};
+			
+
+	end RadioDriver;
+
+	thread implementation RadioDriver.Impl
+--		properties
+--			Dispatch_Protocol => Sporadic;
+	end RadioDriver.Impl;
+
+	thread UARTDriver
+		-- The UARTDriver is the software that enables other SW components to communicate to other systems over the serial connection
+		features
+			recv_data: in event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+			MissionCommand: in event data port CMASI::MissionCommand.i;
+
+			send_data: out event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+			AirVehicleState: out event data port CMASI::AirVehicleState.i;
+--		properties
+--			Dispatch_Protocol => Sporadic;
+--		annex agree {**
+--			assume Req001_UARTDriver "Assumes recv_data only gets well formed CASE_UART_Msg.Impl types" : 
+--								        CASEAgree::WellformedCASE_UART_Msg(recv_data);
+--			assume Req002_UARTDriver "The UART shall receive valid mission commands" : CASEAgree::WELL_FORMED_MISSION_COMMAND(MissionCommand);
+--			guarantee Req003_UARTDRiver "The send_data outputs only well formed CASE_UART_Msg.Impl types" : 
+--						                CASEAgree::WellformedCASE_UART_Msg(send_data);
+--			guarantee Req004_UARTDriver "The Waypoint Manager shall recieve well-formed air vehicle state messages" : CASEAgree::WELL_FORMED_AIR_VEHICLE_STATE(AirVehicleState);
+--		**};
+		annex Verdict{**
+			CyberRel "AirVehicleState_C" = recv_data:C => AirVehicleState:C;
+			CyberRel "AirVehicleState_I" = recv_data:I => AirVehicleState:I;
+			CyberRel "AirVehicleState_A" = recv_data:A => AirVehicleState:A;
+--AM 3/19/2021: replaced MissionCommand:C => send_data:C by MissionCommand:C or recv_data:C => send_data:C in the next line; and similar modification in 'I' and 'A' lines
+			CyberRel "send_data_C" = MissionCommand:C or recv_data:C => send_data:C; 
+			CyberRel "send_data_I" = MissionCommand:I or recv_data:I => send_data:I;
+			CyberRel "send_data_A" = MissionCommand:A or recv_data:A => send_data:A;
+		
+		**};
+
+	end UARTDriver;
+
+	thread implementation UARTDriver.Impl
+--		properties
+--			Dispatch_Protocol => Sporadic;
+	end UARTDriver.Impl;
+
+end Drivers;

@@ -1,0 +1,17 @@
+package SendMessagesService_Pkg
+public
+	with CMASI;
+    
+    thread SendMessagesServiceGS 
+        features
+            -- Sent Messages
+            OperatingRegion : out event data port CMASI::OperatingRegion.i;
+            LineSearchTask: out event data port CMASI::LineSearchTask.i;
+            AutomationRequest: out event data port CMASI::AutomationRequest.i;
+            
+    end SendMessagesServiceGS;
+    
+    thread implementation SendMessagesServiceGS.i
+    end SendMessagesServiceGS.i;
+    
+end SendMessagesService_Pkg;

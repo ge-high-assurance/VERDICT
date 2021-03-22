@@ -1,0 +1,66 @@
+package GS_SW_Pkg
+public
+    
+    with CASE_Properties;
+    with CASE_Model_Transformations;
+    with CMASI;
+    with SendMessagesService_Pkg;
+    with CASE_Consolidated_Properties;
+    
+    thread GSRadioDriver
+        features
+            recv_data: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+            send_data: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+            
+            AutomationRequest: in event data port CMASI::AutomationRequest.i;
+            OperatingRegion: in event data port CMASI::OperatingRegion.i;
+            LineSearchTask: in event data port CMASI::LineSearchTask.i;
+            
+        properties
+ --           Dispatch_Protocol => Sporadic;
+            CASE_Properties::Component_Type => COMM_DRIVER;
+            CASE_Consolidated_Properties::Component_Type => COMM_DRIVER;
+    end GSRadioDriver;
+    
+    thread implementation GSRadioDriver.i
+    end GSRadioDriver.i;
+      
+    -- Ground Station communication SW
+    process GS_SW
+        features
+            recv_data: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+            send_data: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+		annex Verdict{**
+			CyberRel "send_data_C" = recv_data:C => send_data:C;
+			CyberRel "send_data_I" = recv_data:I => send_data:I;
+			CyberRel "send_data_A" = recv_data:A => send_data:A;
+		
+		**};
+            
+    end GS_SW;
+    
+    process implementation GS_SW.Impl
+        subcomponents
+            RadioDriverAM: thread GSRadioDriver.i; --AM renamed
+            SendMessagesServiceGS: thread SendMessagesService_Pkg::SendMessagesServiceGS;
+    	connections
+    		------------------
+            -- Primary Inputs
+            ------------------
+            c_GS_2_RD: port recv_data -> RadioDriverAM.recv_data;
+            
+            ------------------
+            -- RadioDriver
+            ------------------
+            c_RD_2_GS: port RadioDriverAM.send_data -> send_data;
+            
+            -------------------------
+            -- SendMessageServiceGS
+            -------------------------
+            c_SMS_2_RD_01: port SendMessagesServiceGS.OperatingRegion -> RadioDriverAM.OperatingRegion;
+            c_SMS_2_RD_02: port SendMessagesServiceGS.LineSearchTask -> RadioDriverAM.LineSearchTask;
+            c_SMS_2_RD_03: port SendMessagesServiceGS.AutomationRequest -> RadioDriverAM.AutomationRequest;
+            
+    end GS_SW.Impl;
+    
+end GS_SW_Pkg;

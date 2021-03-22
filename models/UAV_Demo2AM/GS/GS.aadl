@@ -1,0 +1,115 @@
+package GS
+
+public
+	
+	with UAS_Buses;
+	with GS_SW_Pkg;
+	with CASE_Model_Transformations;
+	with CASE_Consolidated_Properties;
+	
+	-- Radio hardware on the Ground Station
+	device Radio
+		features
+			GSA: requires bus access GS_Bus.Impl;
+			RFA: requires bus access UAS_Buses::RF_Bus.Impl;
+			recv_data_in: in event data port;
+			recv_data_out: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			send_data_in: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			send_data_out: out event data port;
+			
+		flows
+			f1: flow path recv_data_in -> recv_data_out;
+			f2: flow path send_data_in -> send_data_out;
+		annex Verdict{**
+			CyberRel "recv_data_out_C" = recv_data_in:C => recv_data_out:C;
+			CyberRel "recv_data_out_I" = recv_data_in:I => recv_data_out:I;
+			CyberRel "recv_data_out_A" = recv_data_in:A => recv_data_out:A;
+		
+			CyberRel "send_data_out_C" = send_data_in:C => send_data_out:C;
+			CyberRel "send_data_out_I" = send_data_in:I => send_data_out:I;
+			CyberRel "send_data_out_A" = send_data_in:A => send_data_out:A;
+		
+		**};
+			
+	end Radio;
+	
+	device implementation Radio.Impl	
+	end Radio.Impl;
+	
+	
+	-- Processor for Ground Station communication system
+	processor GS_Proc
+		features
+			GSA: requires bus access GS_Bus.Impl;			
+	end GS_Proc;
+	
+	processor implementation GS_Proc.Impl
+	end GS_Proc.Impl;
+	
+	
+	-- Memory for Ground Station communication system
+	memory GS_Mem
+		features
+			GSA: requires bus access GS_Bus.Impl;		
+	end GS_Mem;
+	
+	memory implementation GS_Mem.Impl	
+	end GS_Mem.Impl;
+	
+	
+	-- Ground station communication system HW bus
+	bus GS_Bus
+	end GS_Bus;
+	
+	bus implementation GS_Bus.Impl	
+	end GS_Bus.Impl;
+	
+	-- The Ground Station communication system
+	system GroundStation
+		features
+			radio_recv: in event data port;
+			radio_send: out event data port;
+			RFA: requires bus access UAS_Buses::RF_Bus.Impl;
+	end GroundStation;
+	
+	system implementation GroundStation.Impl
+		subcomponents
+			RADIO_HW: device Radio.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::hasSensitiveInfo => false;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true; --AM made it to be inside trusted boundary
+				CASE_Consolidated_Properties::pedigree => COTS; 
+			};
+			
+			PROC_HW: processor GS_Proc.Impl;
+			MEM_HW: memory GS_Mem.Impl;
+			BUS_HW: bus GS_Bus.Impl;
+			PROC_SW: process GS_SW_Pkg::GS_SW.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true; --AM made it to be inside trusted boundary
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped; 
+			};
+			
+		connections
+--			bac1: bus access RADIO_HW.GSA <-> BUS_HW;
+--			bac3: bus access PROC_HW.GSA <-> BUS_HW;
+--			bac4: bus access MEM_HW.GSA <-> BUS_HW;
+--			bac6: bus access RADIO_HW.RFA <-> RFA;
+			c1: port PROC_SW.send_data -> RADIO_HW.send_data_in;
+			c2: port RADIO_HW.send_data_out -> radio_send;
+			c3: port radio_recv -> RADIO_HW.recv_data_in;
+			c4: port RADIO_HW.recv_data_out -> PROC_SW.recv_data;
+--		properties
+--			Actual_Processor_Binding => (reference (PROC_HW)) applies to PROC_SW;
+--			Actual_Memory_Binding => (reference (MEM_HW)) applies to PROC_SW;
+--			Actual_Connection_Binding => (reference (BUS_HW)) applies to c1, c4;
+	end GroundStation.Impl;
+	
+end GS;
