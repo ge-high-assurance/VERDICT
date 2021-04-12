@@ -45,12 +45,10 @@ public class Token {
             SymbolDeclaration sd = (SymbolDeclaration) s;
 
             if (sd instanceof SymbolDeclaration) {
-                sd = (SymbolDeclaration) sd;
                 ImlType imltype = sd.getType();
 
                 if (imltype instanceof SimpleTypeReference) {
-                    SimpleTypeReference si_ref = (SimpleTypeReference) imltype;
-                    NamedType nt = si_ref.getType();
+                    NamedType nt = ((SimpleTypeReference) imltype).getType();
                     this.type = Type.get(nt.getName());
                 } else if (imltype instanceof FunctionType) {
                     imltype = ((FunctionType) imltype).getRange();

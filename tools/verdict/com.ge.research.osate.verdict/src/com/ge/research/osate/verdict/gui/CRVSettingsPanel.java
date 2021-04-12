@@ -3,13 +3,11 @@ package com.ge.research.osate.verdict.gui;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -84,10 +82,6 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
 	public void bringToFront(Shell shell) {
 		shell.setActive();
-	}
-
-	private Image getIcon(String name) {
-		return ResourceLocator.imageDescriptorFromBundle("com.ge.research.osate.verdict", "icons/" + name).get().createImage();
 	}
 
 	@Override
