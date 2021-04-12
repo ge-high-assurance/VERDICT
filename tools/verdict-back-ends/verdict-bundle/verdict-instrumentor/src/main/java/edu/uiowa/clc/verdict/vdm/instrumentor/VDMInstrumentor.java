@@ -1760,7 +1760,7 @@ public class VDMInstrumentor {
         ContractItem true_guarantee_item = new ContractItem();
         // true_guarantee_item.setName("true");
         Expression true_expr = new Expression();
-        Boolean true_lit = Boolean.valueOf("true");
+        Boolean true_lit = Boolean.TRUE;
         true_expr.setBoolLiteral(true_lit);
         true_guarantee_item.setExpression(true_expr);
 

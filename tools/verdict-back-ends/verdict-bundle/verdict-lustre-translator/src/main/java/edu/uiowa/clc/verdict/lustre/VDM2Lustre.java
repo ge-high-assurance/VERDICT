@@ -248,7 +248,7 @@ public class VDM2Lustre {
             ContractItem true_guarantee_item = new ContractItem();
 
             Expression true_expr = new Expression();
-            Boolean true_lit = new Boolean("true");
+            Boolean true_lit = Boolean.TRUE;
             true_expr.setBoolLiteral(true_lit);
 
             true_guarantee_item.setExpression(true_expr);

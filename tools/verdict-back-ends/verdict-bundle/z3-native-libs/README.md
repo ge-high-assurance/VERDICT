@@ -33,81 +33,82 @@ call the com.microsoft.z3 Java API, the other to add the native libs
 to your capsule):
 
 ```xml
-        <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>z3-native-libs</artifactId>
-            <classifier>api</classifier>
-        </dependency>
-        <!-- Dependencies needed only by tests or capsule jar -->
-        <dependency>
-            <groupId>com.ge.verdict</groupId>
-            <artifactId>z3-native-libs</artifactId>
-            <scope>provided</scope>
-        </dependency>
+    <dependency>
+      <groupId>com.ge.verdict</groupId>
+      <artifactId>com.microsoft.z3</artifactId>
+    </dependency>
+    <!-- Dependencies needed only by tests or capsule jar -->
+    <dependency>
+      <groupId>com.ge.verdict</groupId>
+      <artifactId>z3-native-libs</artifactId>
+      <scope>provided</scope>
+    </dependency>
 ```
 
 Call maven-dependency-plugin in your pom to unpack the native libs in
 z3-native-libs into your target/native-libs directory:
 
 ```xml
-            <!-- Unpack z3-native-libs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-native-libs</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <excludeClassifiers>api</excludeClassifiers>
-                            <excludes>META-INF/</excludes>
-                            <includeArtifactIds>z3-native-libs</includeArtifactIds>
-                            <outputDirectory>${project.build.directory}/native-libs</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+      <!-- Unpack z3-native-libs -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <excludeClassifiers>api</excludeClassifiers>
+          <excludes>META-INF/</excludes>
+          <includeArtifactIds>z3-native-libs</includeArtifactIds>
+          <outputDirectory>${project.build.directory}/native-libs</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <?m2e ignore?>
+            <id>default-unpack-dependencies</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 ```
 
 Call maven-surefire-plugin in your pom to run unit tests with these
 native libs:
 
 ```xml
-            <!-- Run unit tests with native libs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <environmentVariables>
-                        <DYLD_LIBRARY_PATH>${project.build.directory}/native-libs</DYLD_LIBRARY_PATH>
-                        <LD_LIBRARY_PATH>${project.build.directory}/native-libs</LD_LIBRARY_PATH>
-                        <PATH>${project.build.directory}/native-libs${path.separator}${env.PATH}</PATH>
-                    </environmentVariables>
-                </configuration>
-            </plugin>
+      <!-- Run unit tests with native libs -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>"-Djava.library.path=${project.build.directory}/native-libs"</argLine>
+          <environmentVariables>
+            <DYLD_LIBRARY_PATH>${project.build.directory}/native-libs</DYLD_LIBRARY_PATH>
+            <LD_LIBRARY_PATH>${project.build.directory}/native-libs</LD_LIBRARY_PATH>
+            <PATH>${project.build.directory}/native-libs${path.separator}${env.PATH}</PATH>
+          </environmentVariables>
+          <workingDirectory>${project.build.directory}/native-libs</workingDirectory>
+        </configuration>
+      </plugin>
 ```
 
 Add the native libs to your capsule with these `<caplet>` and
 `<fileSets>` elements in your capsule-maven-plugin configuration:
 
 ```xml
-            <!-- Add native libs to capsule -->
-            <plugin>
-                <groupId>com.github.chrisdchristo</groupId>
-                <artifactId>capsule-maven-plugin</artifactId>
-                <configuration>
-                    <caplets>SharedLibraryPathCapsule</caplets>
-                    <fileSets>
-                        <fileSet>
-                            <directory>${project.build.directory}/native-libs</directory>
-                            <includes>
-                                <include>*</include>
-                            </includes>
-                        </fileSet>
-                    </fileSets>
+      <!-- Add native libs to capsule -->
+      <plugin>
+        <groupId>com.github.chrisdchristo</groupId>
+        <artifactId>capsule-maven-plugin</artifactId>
+        <configuration>
+          <caplets>SharedLibraryPathCapsule</caplets>
+          <fileSets>
+            <fileSet>
+              <directory>${project.build.directory}/native-libs</directory>
+              <includes>
+                <include>*</include>
+              </includes>
+            </fileSet>
+          </fileSets>
 ```
 
 That's it - now your application will be all set up to use the z3

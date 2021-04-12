@@ -8,12 +8,10 @@ FROM ubuntu:20.04
 
 # Install packages which are needed by verdict back-end tools
 # (kind2 requires libzmq5 and z3)
-# Temporarily downgrade default-jre-headless to 11.0.7+10-3ubuntu1
-# while the latest version remains 11.0.9.1+1-0ubuntu1~20.04 (it breaks Capsule)
 
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    openjdk-11-jre-headless=11.0.7+10-3ubuntu1 \
+    openjdk-11-jre-headless \
     graphviz \
     libzmq5 \
     z3 \
