@@ -65,6 +65,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
+              <checkSignature>true</checkSignature>
               <sha256>${z3-osx.sha256}</sha256>
               <unpack>true</unpack>
               <uri>${z3-download.uri}/z3-${z3.version}/z3-${z3.version}-x64-osx-${z3-osx.version}.zip</uri>
@@ -77,6 +78,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
+              <checkSignature>true</checkSignature>
               <sha256>${z3-ubuntu.sha256}</sha256>
               <unpack>true</unpack>
               <uri>${z3-download.uri}/z3-${z3.version}/z3-${z3.version}-x64-ubuntu-${z3-ubuntu.version}.zip</uri>
@@ -89,6 +91,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
+              <checkSignature>true</checkSignature>
               <sha256>${z3-win.sha256}</sha256>
               <unpack>true</unpack>
               <uri>${z3-download.uri}/z3-${z3.version}/z3-${z3.version}-x64-win.zip</uri>
