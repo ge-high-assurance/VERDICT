@@ -1,0 +1,25 @@
+package CASEAgree
+public
+	
+	with CASE_Model_Transformations;
+	renames CASE_Model_Transformations::all;
+	renames Base_Types::all;
+	with Common_Data; 
+	renames Common_Data::all;
+	
+annex agree {**
+              
+    fun WellformedCASE_RF_Msg(msg : CASE_RF_Msg.Impl, src : int64.i, dst : int64.i ) : bool = 
+       WellformedCASE_MsgHeader(msg.header, src, dst);
+       
+    fun WellformedCASE_MsgHeader(hdr : CASE_MsgHeader.Impl, src : int64.i, dst : int64.i ) : bool =
+       (hdr.src = src) and (hdr.dst = dst) and (hdr.trusted = true) and (hdr.HMAC = true);
+     
+    fun WellformedCASE_UART_Msg(msg : CASE_UART_Msg.Impl) : bool = 
+       msg.crc = true;
+         
+**};
+
+
+end CASEAgree;
+

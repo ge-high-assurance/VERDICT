@@ -1,0 +1,47 @@
+package TaskServiceBase_Pkg
+public
+	with CMASI;
+	with ROUTE;
+	with UXTASK;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	--------------------------------------------------------------------------------------
+	-- This is the base class for UxAS tasks. It aggregates functionality required to
+	-- implement task options.
+	--------------------------------------------------------------------------------------
+	abstract TaskServiceBase
+		features
+			-- Subscribed Messages
+--			EntityState : in event data port CMASI::EntityState;
+--			EntityConfiguration : in event data port CMASI::EntityConfiguration;
+			AirVehicleState : in event data port CMASI::AirVehicleState.i;
+			AirVehicleConfiguration : in event data port CMASI::AirVehicleConfiguration.i;
+--			GroundVehicleState : in event data port VEHICLES::GroundVehicleState;
+--			GroundVehicleConfiguration : in event data port VEHICLES::GroundVehicleConfiguration;
+--			SurfaceVehicleState : in event data port VEHICLES::SurfaceVehicleState;
+--			SurfaceVehicleConfiguration : in event data port VEHICLES::SurfaceVehicleConfiguration;
+			UniqueAutomationRequest : in event data port UXTASK::UniqueAutomationRequest.i;
+			UniqueAutomationResponse : in event data port UXTASK::UniqueAutomationResponse.i;
+			RoutePlanResponse : in event data port ROUTE::RoutePlanResponse.i;
+			TaskImplementationRequest : in event data port UXTASK::TaskImplementationRequest.i;
+			
+			-- Sent Messages
+--			TaskInitialized : out event data port UXTASK::TaskInitialized;
+--			TaskActive : out event data port UXTASK::TaskActive;
+--			TaskComplete : out event data port UXTASK::TaskComplete;
+			RoutePlanRequest : out event data port ROUTE::RoutePlanRequest.i;
+			TaskPlanOptions : out event data port UXTASK::TaskPlanOptions.i;
+			TaskImplementationResponse : out event data port UXTASK::TaskImplementationResponse.i; 
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Tasks/TaskServiceBase.h", "src/Tasks/TaskServiceBase.cpp");
+            Dispatch_Protocol => Sporadic;
+			
+	end TaskServiceBase;
+	
+end TaskServiceBase_Pkg;

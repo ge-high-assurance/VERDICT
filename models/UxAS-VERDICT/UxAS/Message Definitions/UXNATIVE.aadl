@@ -1,0 +1,110 @@
+----------------------------------------------------------------------
+-- This message set describes the native/internal messages for UxAS.
+----------------------------------------------------------------------
+package UXNATIVE
+public
+	with Common_Data; renames Common_Data::all;
+	with Data_Model;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	--Indicate to the waypoint manager to move to the next waypoint in the
+	--current list	
+	data IncrementWaypoint		
+	end IncrementWaypoint;
+	
+	data implementation IncrementWaypoint.i
+    subcomponents
+        --ID of vehicle which should move to the next waypoint in its list
+        VehicleID: data int64.i;
+	end IncrementWaypoint.i;
+	
+	data EntityJoin		
+	end EntityJoin;
+	
+	data implementation EntityJoin.i
+	    subcomponents
+	        --ID of entity joining network
+	        EntityID: data int64.i;
+	        --Label of entity joining network
+	        Label: data string.i;
+	end EntityJoin.i;
+
+	data EntityExit		
+	end EntityExit;
+	
+	data implementation EntityExit.i
+    subcomponents
+        --ID of entity exiting network
+        EntityID: data int64.i;
+        --Label of entity exiting network
+        Label: data string.i;
+	end EntityExit.i;
+
+	--Message to enable onboard processor to send commands to the
+	--autopilot, and the gimbal
+	data AutopilotKeepAlive		
+	end AutopilotKeepAlive;
+	
+	data implementation AutopilotKeepAlive.i
+	    subcomponents
+	        --Enable communications between UxAS and the autopilot
+	        AutopilotEnabled: data bool.i;
+	        --Enable communications between UxAS and the Gimbal. Note: this does
+	        --not effect the video stream.
+	        GimbalEnabled: data bool.i;
+	        --Time that this message was sent
+	        TimeSent: data int64.i;
+	end AutopilotKeepAlive.i;	
+
+	data OnboardStatusReport		
+	end OnboardStatusReport;
+	
+	--Message sent when all services have been started	
+	data StartupComplete		
+	end StartupComplete;
+	
+	data implementation StartupComplete.i
+	end StartupComplete.i;
+	
+	--Start/Stop recording
+	data VideoRecord
+	end VideoRecord;
+
+	data implementation VideoRecord.i
+	    subcomponents
+	        --Start [true] or stop [false] video recording
+	        FIXMERecord: data bool.i;
+	end VideoRecord.i;
+
+	--Remove an existing service from UxAS
+	data KillService		
+	end KillService;
+
+	data implementation KillService.i
+	    subcomponents
+	        --Globally unique ID for the service to be removed. If ServiceID == 0,
+	        --then no service will be killed. ServiceID == -1 causes all services to
+	        --be killed and UxAS to be shutdown.
+	        ServiceID: data int64.i;
+	end KillService.i;
+	
+	--Create a new service in UxAS	
+	data CreateNewService		
+	end CreateNewService;
+	
+	data implementation CreateNewService.i
+    subcomponents
+        --Globally unique ID for this service. Negative ServiceIDs are
+        --invalid. If ServiceID == 0, then a unique service ID will be
+        --generated.
+        ServiceID: data int64.i;
+        --XML configuration for this service
+        XmlConfiguration: data string.i {Data_Model::Data_Representation => Array;};
+	end CreateNewService.i;
+	
+end UXNATIVE;

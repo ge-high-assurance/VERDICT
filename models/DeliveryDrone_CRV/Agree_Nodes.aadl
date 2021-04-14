@@ -1,0 +1,51 @@
+package Agree_Nodes
+public
+	with Data_Types;
+	
+	annex agree {**
+			
+		-- HasHappened(X) is true iff X has been true at least once so far
+		node HasHappened(X : bool) returns (Y : bool);
+		let
+  			Y = X or (false -> pre (Y)) ;
+		tel;
+
+		-- Initially(X) is true iff X was true at the initial step
+		node InitiallyX(X: bool) returns (Y: bool);
+		let
+  			Y = X -> true;
+		tel;
+
+		-- FirstLocation(X) is the constant stream consisting of the first value of X
+		node FirstLocation( X : Data_Types::Position.impl ) returns ( Y : Data_Types::Position.impl );
+		let
+  			Y = X -> pre (Y);
+		tel;
+		
+		node close_locations(p1: Data_Types::Position.impl, p2: Data_Types::Position.impl) returns (are_close: bool);
+		let
+  			are_close = p1 = p2;
+		tel;
+		
+		node Duration(p: bool) returns (r: int) ;
+		let   
+			r = (if p then 1 else 0) -> (if p then pre(r) + 1 else 0) ;
+		tel;
+		
+		node Sofar(X : bool ) returns ( Y : bool );
+		let
+ 			Y = X -> (X and (pre(Y)));
+		tel;
+		
+		node Since(X: bool, Y : bool ) returns ( Z : bool );
+		let
+  			Z =  X or (Y and (false -> pre(Z)));
+		tel;
+		
+		node ToInt(b: bool) returns (i: int);
+		let
+			i = if b then 1 else 0;
+		tel;
+		
+	**};
+end Agree_Nodes;

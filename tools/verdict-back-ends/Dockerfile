@@ -11,7 +11,7 @@ FROM ubuntu:20.04
 
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    default-jre \
+    openjdk-11-jre-headless \
     graphviz \
     libzmq5 \
     z3 \

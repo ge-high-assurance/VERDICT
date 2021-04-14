@@ -1,0 +1,42 @@
+package PlanBuilderService_Pkg
+public
+	with CMASI;
+	with UXTASK;
+	with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	----------------------------------------------------------------------------------------------------------
+	-- A component that constructs plans from assignments. For each assigned task option, in order, request 
+	-- calculation of final waypoint plan. Construct resulting waypoint plans and send automation response.
+	----------------------------------------------------------------------------------------------------------
+	thread PlanBuilderService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages 
+			AirVehicleState : in event data port CMASI::AirVehicleState.i;
+--			GroundVehicleState : in event data port VEHICLES::GroundVehicleState.i;
+--			SurfaceVehicleState : in event data port VEHICLES::SurfaceVehicleState.i;
+			UniqueAutomationRequest : in event data port UXTASK::UniqueAutomationRequest.i;
+			TaskAssignmentSummary : in event data port UXTASK::TaskAssignmentSummary.i;
+			TaskImplementationResponse : in event data port UXTASK::TaskImplementationResponse.i;
+
+			-- Sent Messages
+-- 			ServiceStatus : out event data port CMASI::ServiceStatus.i;
+			TaskImplementationRequest : out event data port UXTASK::TaskImplementationRequest.i;
+			UniqueAutomationResponse : out event data port UXTASK::UniqueAutomationResponse.i;	
+					
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/PlanBuilderService.h","src/Services/PlanBuilderService.cpp");
+            Dispatch_Protocol => Sporadic;
+            
+	end PlanBuilderService;
+	
+	thread implementation PlanBuilderService.i
+	end PlanBuilderService.i;
+	
+end PlanBuilderService_Pkg;

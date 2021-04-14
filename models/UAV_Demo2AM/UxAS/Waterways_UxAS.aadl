@@ -1,0 +1,209 @@
+package Waterways_UxAS
+public
+	with CMASI;
+	-- Included Main Services
+--	with AssignmentTreeBranchBoundService_Pkg;
+--	with AutomationRequestValidatorService_Pkg;
+--	with PlanBuilderService_Pkg;
+--	with WaypointPlanManagerService_Pkg;
+--	with RouteAggregatorService_Pkg;
+--	with RoutePlannerVisibilityService_Pkg;
+--	with TaskManagerService_Pkg;
+--	with CmasiLineSearchTaskService_Pkg;
+--	with SendMessagesService_Pkg;
+--	with CASE_Properties;
+	
+	thread Waterways
+		features
+			AutomationRequest: in event data port CMASI::AutomationRequest.i;
+			OperatingRegion: in event data port CMASI::OperatingRegion.i;
+			LineSearchTask: in event data port CMASI::LineSearchTask.i;
+			AutomationResponse: out event data port CMASI::AutomationResponse.i;
+					
+		annex Verdict{**
+			CyberRel "AutomationResponse_C" = AutomationRequest:C or LineSearchTask:C or OperatingRegion:C => AutomationResponse:C;
+			CyberRel "AutomationResponse_I" = AutomationRequest:I or LineSearchTask:I or OperatingRegion:I  => AutomationResponse:I;
+			CyberRel "AutomationResponse_A" = AutomationRequest:A or LineSearchTask:A or OperatingRegion:A => AutomationResponse:A;
+		**};
+
+			
+			
+	end Waterways;
+
+	thread implementation Waterways.i
+--		properties
+--			Dispatch_Protocol => Sporadic;
+	end Waterways.i;
+
+--	thread group Waterways
+--		features
+--			AutomationRequest: in event data port CMASI::AutomationRequest.i;
+----			AirVehicleState: in event data port CMASI::AirVehicleState.i;
+--			OperatingRegion: in event data port CMASI::OperatingRegion.i;
+--			LineSearchTask: in event data port CMASI::LineSearchTask.i;
+--			AutomationResponse: out event data port CMASI::AutomationResponse.i;
+--	end Waterways;
+--
+--	thread group implementation Waterways.i
+--		subcomponents
+--
+--			-- https://github.com/afrl-rq/OpenUxAS/blob/develop/examples/02_Example_WaterwaySearch/cfg_WaterwaySearch.xml
+--			-- Removed: Test_SimulationTime
+--			TaskManagerService: thread TaskManagerService_Pkg::TaskManagerService.i;
+--			AutomationRequestValidatorService: thread AutomationRequestValidatorService_Pkg::AutomationRequestValidatorService.i;
+--			RoutePlannerVisibilityService: thread RoutePlannerVisibilityService_Pkg::RoutePlannerVisibilityService.i;
+--			RouteAggregatorService: thread RouteAggregatorService_Pkg::RouteAggregatorService.i;
+--			AssignmentTreeBranchBoundService: thread AssignmentTreeBranchBoundService_Pkg::AssignmentTreeBranchBoundService.i;
+--			PlanBuilderService: thread PlanBuilderService_Pkg::PlanBuilderService.i;
+--			WaypointPlanManagerService: thread WaypointPlanManagerService_Pkg::WaypointPlanManagerService.i;
+--			CmasiLineSearchTaskService: thread CmasiLineSearchTaskService_Pkg::CmasiLineSearchTaskService.i;
+--			SendMessagesServiceMemory: thread SendMessagesService_Pkg::SendMessagesServiceMemory.i;
+--			SendMessagesServiceInit: thread SendMessagesService_Pkg::SendMessagesServiceInit.i;
+--
+--		connections
+--
+--			------------------------------------------------------------------------------------------------------------------
+--			-- Connections between the ground station (or controller) and the UxAS instances, and connections between UxAS
+--			-- services. The connections reflect the message sequence flow defined for this example. The message sequence flow 
+--			-- has 4 states: Initialization, Assignment, Implementation, and Execution. The connections are group and labeled 
+--			-- based on the state(s) in which the messages occur.
+--			------------------------------------------------------------------------------------------------------------------
+--			------------------
+--			-- Primary Inputs
+--			------------------
+----			c_AVSt_06: port AirVehicleState -> WaypointPlanManagerService.AirVehicleState;
+----			c_AVSt_07: port AirVehicleState -> RoutePlannerVisibilityService.AirVehicleState;
+----			c_AVSt_08: port AirVehicleState -> PlanBuilderService.AirVehicleState;
+----			c_AVSt_09: port AirVehicleState -> TaskManagerService.AirVehicleState;
+----			c_AVSt_10: port AirVehicleState -> AutomationRequestValidatorService.AirVehicleState;
+----			c_AVSt_11: port AirVehicleState -> RouteAggregatorService.AirVehicleState;
+----			c_AVSt_12: port AirVehicleState -> CmasiLineSearchTaskService.AirVehicleState;
+--
+--			c_AReq_01: port AutomationRequest -> AutomationRequestValidatorService.AutomationRequest;
+--			-- {CASE_Properties::Trust_Level => 100; CASE_Properties::Control_Level => 100;};
+--
+--			c_LST_01: port LineSearchTask -> TaskManagerService.LineSearchTask;
+--			-- {CASE_Properties::Trust_Level => 100; CASE_Properties::Control_Level => 100;};
+--
+--			c_OR_01: port OperatingRegion -> AutomationRequestValidatorService.OperatingRegion;
+--			-- {CASE_Properties::Trust_Level => 100; CASE_Properties::Control_Level => 100;};
+----			c_OR_02: port OperatingRegion -> RoutePlannerVisibilityService.OperatingRegion;
+--
+--			-------------------------------------
+--			-- AutomationRequestValidatorService
+--			-------------------------------------
+--			c_UARsp_01: port AutomationRequestValidatorService.UniqueAutomationRequest -> RouteAggregatorService.UniqueAutomationResquest {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_UARsp_02: port AutomationRequestValidatorService.UniqueAutomationRequest -> AssignmentTreeBranchBoundService.UniqueAutomationRequest {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_UARsp_03: port AutomationRequestValidatorService.UniqueAutomationRequest -> PlanBuilderService.UniqueAutomationRequest {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_UARsp_04: port AutomationRequestValidatorService.UniqueAutomationRequest -> CmasiLineSearchTaskService.UniqueAutomationRequest {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			-- EGM: All the sequence charts in the UxAS docks show the below connection, but it is _not_ in the code.
+--			-- The TaskManagerService does _not_ subscribe to UniqueAutomationRequest though it does send that message.
+--			-- c_UAR_05 : port AutomationRequestValidatorService.UniqueAutomationRequest -> TaskManagerService.UniqueAutomationRequest;
+----			c_ARsp_01: port AutomationRequestValidatorService.AutomationResponse -> AutomationResponse {CASE_Properties::Trust_Level => 100;
+----				CASE_Properties::Control_Level => 100;};
+--			c_ARps_02: port AutomationRequestValidatorService.AutomationResponse -> WaypointPlanManagerService.AutomationResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			-----------------------
+--			-- CmasiLineSearchTask
+--			-----------------------
+--			c_TPOpts_01: port CmasiLineSearchTaskService.TaskPlanOptions -> RouteAggregatorService.TaskPlanOptions {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_TPOpts_02: port CmasiLineSearchTaskService.TaskPlanOptions -> AssignmentTreeBranchBoundService.TaskPlanOptions {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_TIRsp_01: port CmasiLineSearchTaskService.TaskImplementationResponse -> PlanBuilderService.TaskImplementationResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_CLST_RPReq_01: port CmasiLineSearchTaskService.RoutePlanRequest -> RoutePlannerVisibilityService.RoutePlanRequest_task {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			-------------------------
+--			-- RouteAggregatorService
+--			-------------------------
+--			c_RPReq_01: port RouteAggregatorService.RoutePlanRequest -> RoutePlannerVisibilityService.RoutePlanRequest_ragg {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_ACMtx_01: port RouteAggregatorService.AssignmentCostMatrix -> AssignmentTreeBranchBoundService.AssignmentCostMatrix {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			---------------------------------------
+--			-- AssignmentTreeBranchAndBoundService
+--			---------------------------------------
+--			c_TASum_01: port AssignmentTreeBranchBoundService.TaskAssignmentSummary -> PlanBuilderService.TaskAssignmentSummary {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			-------------------
+--			-- PlanBuilderService
+--			-------------------
+--			c_PBS_TIReq_01: port PlanBuilderService.TaskImplementationRequest -> CmasiLineSearchTaskService.TaskImplementationRequest {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_PBS_UARsp_01: port PlanBuilderService.UniqueAutomationResponse -> AutomationRequestValidatorService.UniqueAutomationResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_PBS_UARsp_02: port PlanBuilderService.UniqueAutomationResponse -> CmasiLineSearchTaskService.UniqueAutomationResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			---------------------------------
+--			-- RoutePlannerVisibilityService
+--			---------------------------------
+--			c_RPVS_RPR_01: port RoutePlannerVisibilityService.RoutePlanResponse -> CmasiLineSearchTaskService.RoutePlanResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_PRVS_RPR_02: port RoutePlannerVisibilityService.RoutePlanResponse -> RouteAggregatorService.RoutePlanResponse {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			--------------------------
+--			-- WaypointManagerService
+--			--------------------------
+----			c_MCmd_01: port WaypointPlanManagerService.MissionCommand -> MissionCommand;
+--
+--			----------------------
+--			-- TaskManagerService
+--			----------------------
+--			c_TMSrvc_CNT_01: port TaskManagerService.CreateNewService -> CmasiLineSearchTaskService.createNewService {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			----------------------------
+--			-- SendMessageServiceMemory
+--			----------------------------
+--			c_SMS_AVCfg_01: port SendMessagesServiceMemory.AirVehicleConfiguration -> RouteAggregatorService.AirVehicleConfiguration {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_AVCfg_02: port SendMessagesServiceMemory.AirVehicleConfiguration -> RoutePlannerVisibilityService.AirVehicleConfiguration {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_AVCfg_03: port SendMessagesServiceMemory.AirVehicleConfiguration -> TaskManagerService.AirVehicleConfiguration {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_AVCfg_04: port SendMessagesServiceMemory.AirVehicleConfiguration -> AutomationRequestValidatorService.AirVehicleConfiguration {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_AVCfg_05: port SendMessagesServiceMemory.AirVehicleConfiguration -> CmasiLineSearchTaskService.AirVehicleConfiguration {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_SMS_KIZ_01: port SendMessagesServiceMemory.KeepInZone -> AutomationRequestValidatorService.KeepInZone {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_KIZ_02: port SendMessagesServiceMemory.KeepInZone -> RoutePlannerVisibilityService.KeepInZone {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			c_SMS_KOZ_01: port SendMessagesServiceMemory.KeepOutZone -> AutomationRequestValidatorService.KeepOutZone {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--			c_SMS_KOZ_02: port SendMessagesServiceMemory.KeepOutZone -> RoutePlannerVisibilityService.KeepOutZone {CASE_Properties::Trust_Level => 100;
+--				CASE_Properties::Control_Level => 100;};
+--
+--			----------------------------
+--			-- SendMessageServiceInit
+--			----------------------------
+----			c_SMSI_MC_01: port SendMessagesServiceInit.MissionCommand -> MissionCommand;
+--
+----			c_SMSI_AVSt_01: port SendMessagesServiceInit.AirVehicleState -> WaypointPlanManagerService.AirVehicleState;
+----			c_SMSI_AVSt_02: port SendMessagesServiceInit.AirVehicleState -> RoutePlannerVisibilityService.AirVehicleState;
+----			c_SMSI_AVSt_03: port SendMessagesServiceInit.AirVehicleState -> PlanBuilderService.AirVehicleState;
+----			c_SMSI_AVSt_04: port SendMessagesServiceInit.AirVehicleState -> TaskManagerService.AirVehicleState;
+----			c_SMSI_AVSt_05: port SendMessagesServiceInit.AirVehicleState -> AutomationRequestValidatorService.AirVehicleState;
+----			c_SMSI_AVSt_06: port SendMessagesServiceInit.AirVehicleState -> RouteAggregatorService.AirVehicleState;
+----			c_SMSI_AVSt_07: port SendMessagesServiceInit.AirVehicleState -> CmasiLineSearchTaskService.AirVehicleState;
+--
+--	end Waterways.i;
+	
+end Waterways_UxAS;

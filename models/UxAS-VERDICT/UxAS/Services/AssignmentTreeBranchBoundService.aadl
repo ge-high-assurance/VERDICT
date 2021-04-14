@@ -1,0 +1,37 @@
+package AssignmentTreeBranchBoundService_Pkg
+public
+	with ServiceBase_Pkg;
+	with UXTASK;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	-----------------------------------------------------------------------------------
+	-- This service calculates assignments of vehicles to tasks based on cost inputs.
+	-----------------------------------------------------------------------------------
+	thread AssignmentTreeBranchBoundService extends ServiceBase_Pkg::ServiceBase
+		features
+			-- Subscribed Messages
+			UniqueAutomationRequest : in event data port UXTASK::UniqueAutomationRequest.i;
+			TaskPlanOptions : in event data port UXTASK::TaskPlanOptions.i;
+			AssignmentCostMatrix : in event data port UXTASK::AssignmentCostMatrix.i;
+			-- see https://github.com/afrl-rq/OpenUxAS/blob/develop/src/Services/AssignmentTreeBranchBoundService.h
+			-- PSIR_AssignmentType
+			
+			-- Sent Messages
+--			ServiceStatus : out event data port CMASI::ServiceStatus.i;
+			TaskAssignmentSummary : out event data port UXTASK::TaskAssignmentSummary.i;
+						
+         properties
+            -- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/AssignmentTreeBranchBoundBase.h","src/Services/AssignmentTreeBranchBoundBase.cpp","src/Services/AssignmentTreeBranchBoundService.h","src/Services/AssignmentTreeBranchBoundService.cpp");
+            Dispatch_Protocol => Sporadic;
+	end AssignmentTreeBranchBoundService;
+
+    thread implementation AssignmentTreeBranchBoundService.i
+    end AssignmentTreeBranchBoundService.i;
+    
+end AssignmentTreeBranchBoundService_Pkg;   

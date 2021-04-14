@@ -1,0 +1,47 @@
+package FC
+public
+	
+	with UAS_Buses;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;	
+		
+	-- GPS receiver hardware
+	-- We are not yet modeling incoming satellite signals here
+	device GPS_Receiver
+		features
+			position: out event data port;
+	end GPS_Receiver;
+	
+	device implementation GPS_Receiver.Impl
+	end GPS_Receiver.Impl;
+	
+	
+	-- Flight controller
+	system FlightController
+		features
+			uart_recv: in event data port;
+			uart_send: out event data port;
+			UART: requires bus access UAS_Buses::Serial_Bus.Impl;
+	end FlightController;
+	
+	
+	system implementation FlightController.Impl
+		subcomponents
+			GPS: device GPS_Receiver.Impl
+			{
+			-- VERDICT Component Properties
+			CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+			CASE_Consolidated_Properties::componentType => Hardware;
+			CASE_Consolidated_Properties::hasSensitiveInfo => true;
+			CASE_Consolidated_Properties::insideTrustedBoundary => true;
+			CASE_Consolidated_Properties::pedigree => COTS; 
+			};
+		connections
+			c1: port GPS.position -> uart_send;
+	end FlightController.Impl;
+	
+end FC;

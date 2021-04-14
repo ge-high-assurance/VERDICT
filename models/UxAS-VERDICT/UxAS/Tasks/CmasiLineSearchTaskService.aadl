@@ -1,0 +1,40 @@
+--------------------------------------------------------------------------------------------------------------
+-- This task provides the ability to match desired camera angle, automatically steer camera during execution.
+--------------------------------------------------------------------------------------------------------------
+package CmasiLineSearchTaskService_Pkg
+public
+	with UXNATIVE;
+	
+	with TaskServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+		
+	thread CmasiLineSearchTaskService extends TaskServiceBase_Pkg::TaskServiceBase
+		features
+			-- Subscribed Messages
+--			SensorFootprintResponse : in event data port UXTASK::SensorFootprintResponse;
+			
+			-- EGM: This port is _not_ a part of the line search task. I added it because
+			-- I don't know how to model the dynamic thread creation from the TaskManagerService
+			CreateNewService : in event data port UXNATIVE::CreateNewService.i;
+			
+			-- Sent Messages
+--			VehicleActionCommand : out event data port CMASI::VehicleActionCommand.i;
+--			SensorFootprintRequest : out event data port UXTASK::SensorFootprintRequests;
+--			VideoRecord : out event data port UXNATIVE::VideoRecord;
+			
+		properties
+			-- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Tasks/CmasiLineSearchTaskService.h", "src/Tasks/CmasiLineSearchTaskService.cpp");
+            Dispatch_Protocol => Sporadic;
+ 
+	end CmasiLineSearchTaskService;
+	
+	thread implementation CmasiLineSearchTaskService.i    
+	end CmasiLineSearchTaskService.i;
+	
+end CmasiLineSearchTaskService_Pkg;

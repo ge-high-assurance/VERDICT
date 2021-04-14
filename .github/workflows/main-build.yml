@@ -15,7 +15,7 @@ jobs:
   build:
     strategy:
       matrix:
-        java-version: [ 8 ]
+        java-version: [ 11 ]
         ocaml-version: [ 4.07.1 ]
         os: [ macos-10.15, ubuntu-20.04 ]
       # Still worth uploading one build even if the other build fails

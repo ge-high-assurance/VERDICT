@@ -1,0 +1,711 @@
+package DeliveryDrone
+
+public
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with Agree_Constants;
+	with CASE_Consolidated_Properties;
+	with GNC;
+
+	system Actuation
+		features
+			-- inputs
+			motor_cmd: in data port Base_Types::Boolean;
+			
+			-- outputs
+			response: out data port Base_Types::Boolean;
+			
+		annex verdict {**
+			CyberRel "response_out_I" = motor_cmd:I => response:I;
+			CyberRel "response_out_A" = motor_cmd:A => response:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the Actuation"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the Actuation"
+				description = "UED"
+			}
+			SafetyRel "response_out_LOA" = happens("loa_event") or motor_cmd:A => response:A;
+			SafetyRel "response_out_UED" = happens("ued_event") or motor_cmd:I => response:I;
+		**};
+	end Actuation;
+	
+	system DeliveryPlanner
+		features
+			-- inputs
+			bus_in: in data port Data_Types::InputBus.impl;
+			cur_pos: in data port Data_Types::Position.impl;
+			delivery_status: in data port Data_Types::DeliveryStatus;
+			radio_response: in data port Data_Types::RadioResponse.impl;
+			camera_result: in data port Base_Types::Integer;
+			gps_health_status: in data port Base_Types::Boolean; 
+			imu_health_status: in data port Base_Types::Boolean;
+			rdo_health_status: in data port Base_Types::Boolean;
+			cam_health_status: in data port Base_Types::Boolean;
+			package_is_secure: in data port Base_Types::Boolean; 
+			
+			-- outputs
+			radio_cmd: out data port Base_Types::Boolean;
+			delivery_cmd: out data port Data_Types::PackageDeliveryCommand;
+			dest_location: out data port Data_Types::Position.impl;
+			bus_out: out data port Base_Types::Boolean;
+	        nav_cmd: out data port Base_Types::Boolean;					
+			camera: out data port Base_Types::Boolean;
+			probe_safe_landing: out data port Data_Types::ProbeSafeLanding.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			constellation: out data port Data_Types::Constellation; 
+			launch_pos: out data port Data_Types::Position.impl;
+			probe_init_mode: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; }; 
+			probe_abort_mode: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; }; 
+			target_clear: out data port Base_Types::Boolean;
+			valid_marker: out data port Base_Types::Boolean;
+						
+		annex agree {**
+			-- variables
+			eq recent_order: Data_Types::DeliveryOrder.impl = if init_mode then 
+															  	bus_in.order
+															  else
+															  	bus_in.order -> pre(recent_order);
+			eq truck_position: Data_Types::Position.impl = Agree_Nodes::FirstLocation(cur_pos);	
+			eq dest_position: Data_Types::Position.impl = dest_location;
+			eq expensive_item: bool = recent_order.item_value >= Agree_Constants::ITEM_VALUE_THRESHOLD;
+			eq confirmation: bool = radio_response.target_confirmed and radio_response.data_available;
+			eq confirmation_timeout: bool = (Agree_Nodes::Duration(not confirmation) > Agree_Constants::WAITING_CONFIRMATION_THRESHOLD);
+			eq get_clearance_timeout: bool = (Agree_Nodes::Duration(no_clearance) >= Agree_Constants::MAXIMUM_NUMBER_OF_RETRIES);
+			eq delivery_failed: bool = (delivery_status = Agree_Constants::FAILED_STATUS);
+			eq delivery_completed: bool = (delivery_status = Agree_Constants::COMPLETED_STATUS);
+			eq is_safe_landing: bool = (target_clear and valid_marker);
+			
+			-- events
+			eq on_off: bool = bus_in.on_off;
+			eq init_criteria_succeed: bool = bus_in.init_criteria_satisfied and not internal_error_detected;
+			eq init_criteria_failed: bool = not init_criteria_succeed;
+			eq abort_cmd: bool = bus_in.abort_cmd;
+			eq mission_store_release_sequence: bool = bus_in.mission_store_release_sequence;
+			eq okay_to_launch: bool = not internal_error_detected;
+			eq separation: bool = not connected;
+			eq destination_location_reached: bool = Agree_Nodes::close_locations(cur_pos, dest_position);
+			eq no_clearance: bool = not is_safe_landing;
+			eq successfull_delivery: bool = delivery_completed and destination_location_reached and not no_clearance;
+			eq exhaustive_retries: bool =  get_clearance_timeout or confirmation_timeout;
+			eq internal_error_detected: bool = not gps_health_status or not imu_health_status or not rdo_health_status or not cam_health_status;
+			eq truck_location_reached: bool = Agree_Nodes::close_locations(cur_pos, truck_position);
+			eq connected: bool = bus_in.connected;
+			
+			-- probe
+			guarantee "Output: probe_safe_landing": probe_safe_landing = Data_Types::ProbeSafeLanding.impl {is_target_clear = target_clear; has_valid_marker = valid_marker};
+			
+			guarantee "Output: delivery_cmd":
+				delivery_cmd = if (making_delivery_mode and not no_clearance and (expensive_item => confirmation)) then
+							   		Agree_Constants::RELEASE_PACKAGE_CMD
+							   else if return_to_truck_mode and internal_error_detected then
+							   		Agree_Constants::ABORT_DELIVERY_CMD
+							   else 
+							   		Agree_Constants::NO_OPERATION_CMD;
+				
+			guarantee "Output: constellation":
+				constellation = if init_mode then 
+									bus_in.constellation
+								else 
+									bus_in.constellation -> pre(constellation);
+			
+			guarantee "Output: dest_location":
+				dest_location = if init_mode then 
+									bus_in.order.target_position
+								else 
+									bus_in.order.target_position -> pre(dest_location);
+				
+			guarantee "Output: launch_pos":
+				launch_pos = if init_mode then 
+									bus_in.launch_pos
+								 else 
+									bus_in.launch_pos -> pre(launch_pos);
+			
+			guarantee "Output: radio_cmd":
+				radio_cmd = (making_delivery_mode and expensive_item);
+			
+			guarantee "Output: probe_init_mode":
+				probe_init_mode = init_mode;
+				
+			guarantee "Output: probe_abort_mode":
+				probe_abort_mode = abort_mode;
+			
+			guarantee "Output: nav_cmd | it sends signal to navigation only if it's in flying modes'":
+				nav_cmd = (flying_to_dest_mode or making_delivery_mode or return_to_truck_mode);
+			
+			
+			eq off_mode: bool = true ->
+		      (pre(off_mode) and not (on_off and connected)) or
+		      ((pre(init_mode) or pre(ready_mode) or pre(abort_mode)) and on_off and connected);
+		
+		    eq abort_mode: bool = false ->
+		      ((pre(init_mode) or pre(ready_mode)) and not off_mode and abort_cmd and connected) or
+		      (pre(launch_mode) and abort_cmd and connected) or
+		      (pre(abort_mode) and not (on_off and connected));
+		
+		    eq init_mode: bool = false ->
+		      (pre(off_mode) and (on_off and connected)) or
+		      (pre(init_mode) and not off_mode and not abort_mode and not (init_criteria_succeed and connected)) or
+		      (pre(ready_mode) and not off_mode and not abort_mode and (init_criteria_failed and connected)) or
+		      (pre(return_to_truck_mode) and (truck_location_reached and connected));
+		  
+		    eq ready_mode: bool = false ->
+		      (pre(init_mode) and not off_mode and not abort_mode and (init_criteria_succeed and connected)) or
+		      (pre(ready_mode) and not off_mode and not abort_mode and not init_mode and not launch_mode);
+		
+		    eq launch_mode: bool = false ->
+		      (pre(ready_mode) and not off_mode and not abort_mode and not init_mode and (mission_store_release_sequence and connected)) or
+		      (pre(launch_mode) and not abort_mode and not flying_to_dest_mode);
+		
+		    eq flying_to_dest_mode: bool = false ->
+		      (pre(launch_mode) and not abort_mode and (package_is_secure and okay_to_launch and separation)) or
+		      (pre(flying_to_dest_mode) and not destination_location_reached);
+		
+		    eq making_delivery_mode: bool = false ->
+		      (pre(flying_to_dest_mode) and destination_location_reached) or
+		      (pre(making_delivery_mode) and not return_to_truck_mode);
+		    
+		    eq return_to_truck_mode: bool = false ->
+		      (pre(making_delivery_mode) and (successfull_delivery or exhaustive_retries or delivery_failed or internal_error_detected)) or
+		      (pre(return_to_truck_mode) and not (truck_location_reached and connected));
+		**};
+					
+		annex verdict {**
+			CyberRel "dp_bus_out_I"         = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			CyberRel "dp_bus_out_A"         = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			CyberRel "dp_cmd_out_I"         = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => nav_cmd:I;
+			CyberRel "dp_cmd_out_A"         = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => nav_cmd:A;
+			CyberRel "dp_delivery_status_I" = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd:I;
+			CyberRel "dp_delivery_status_A" = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd:A;
+			CyberRel "dp_camera_out_I"      = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => camera:I;
+			CyberRel "dp_camera_out_A"      = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => camera:A;
+			CyberRel "dp_radio_cmd_I"       = cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			CyberRel "dp_radio_cmd_A"       = cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the DeliveryPlanner"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the DeliveryPlanner"
+				description = "UED"
+			}
+			SafetyRel "dp_bus_out_UED"         = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => bus_out:I;
+			SafetyRel "dp_bus_out_LOA"         = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => bus_out:A;
+			SafetyRel "dp_cmd_out_UED"         = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => nav_cmd:I;
+			SafetyRel "dp_cmd_out_LOA"         = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => nav_cmd:A;
+			SafetyRel "dp_delivery_status_UED" = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => delivery_cmd:I;
+			SafetyRel "dp_delivery_status_LOA" = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => delivery_cmd:A;
+			SafetyRel "dp_camera_out_UED"      = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => camera:I;
+			SafetyRel "dp_camera_out_LOA"      = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => camera:A;
+			SafetyRel "dp_radio_cmd_UED"       = happens("ued_event") or cur_pos:I or delivery_status:I or camera_result:I or radio_response:I => radio_cmd:I;
+			SafetyRel "dp_radio_cmd_LOA"       = happens("loa_event") or cur_pos:A or delivery_status:A or camera_result:A or radio_response:A => radio_cmd:A;
+		**};
+	end DeliveryPlanner;
+	
+	system Radio
+		features
+			-- inputs
+			comm_in: in data port Data_Types::RadioResponse.impl;
+			radio_in: in data port Base_Types::Boolean;
+			
+			-- outputs
+			comm_out: out data port Base_Types::Boolean;
+			radio_out: out data port Data_Types::RadioResponse.impl;
+			health_status: out data port Base_Types::Boolean;
+			
+		annex agree {**
+     	 	guarantee "Radio receives data from remote communication channel if there is a request":
+     	 		radio_in => (radio_out.data_available = comm_in.data_available and
+     	 			         comm_in.target_confirmed = radio_out.target_confirmed);
+     	 	
+			guarantee "Without a request, no radio data is available":
+				not radio_in => not radio_out.data_available;
+		**};
+		
+		annex verdict {**
+			CyberRel "comm_out_I" = comm_in:I => comm_out:I;
+			CyberRel "comm_out_A" = comm_in:A => comm_out:A;
+			CyberRel "plan_out_I" = radio_in:I => radio_out:I;
+			CyberRel "plan_out_A" = radio_in:A => radio_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the Radio"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the Radio"
+				description = "UED"
+			}
+			SafetyRel "comm_out_UED" = happens("ued_event") or comm_in:I => comm_out:I;
+			SafetyRel "comm_out_LOA" = happens("loa_event") or comm_in:A => comm_out:A;
+			SafetyRel "plan_out_UED" = happens("ued_event") or radio_in:I => radio_out:I;
+			SafetyRel "plan_out_LOA" = happens("loa_event") or radio_in:A => radio_out:A;
+		**};
+	end Radio;
+	
+	system DeliveryItemMechanism
+		features
+			-- inputs
+			delivery_cmd_in : in data port Data_Types::PackageDeliveryCommand;
+			
+			-- outputs
+			delivery_status_out: out data port Data_Types::DeliveryStatus;
+			package_is_secure: out data port Base_Types::Boolean;
+			
+		annex agree {**
+			eq release_cmd: bool = (delivery_cmd_in = Agree_Constants::RELEASE_PACKAGE_CMD);
+			eq abort_cmd: bool = (delivery_cmd_in = Agree_Constants::ABORT_DELIVERY_CMD);
+			eq no_op_cmd: bool = (delivery_cmd_in = Agree_Constants::NO_OPERATION_CMD);
+			
+			guarantee "Initially, delivery status is NOT_STARTED":
+				Agree_Nodes::InitiallyX(delivery_status_out = Agree_Constants::NOT_STARTED_STATUS);
+				
+			guarantee "if no op or abort command have received then delivery status gets re-started":
+				true -> (no_op_cmd or abort_cmd => (delivery_status_out = Agree_Constants::NOT_STARTED_STATUS));
+			
+			guarantee "If delivery command is issued, delivery status is different from NOT_STARTED": 
+				true -> (release_cmd => delivery_status_out <> Agree_Constants::NOT_STARTED_STATUS);
+		**};
+			
+		annex verdict {**
+			CyberRel "delivery_status_out_I" = delivery_cmd_in:I => delivery_status_out:I;
+			CyberRel "delivery_status_out_A" = delivery_cmd_in:A => delivery_status_out:A;
+			Event {
+				id = "loa_event"
+				probability = 1.0e-8
+				comment = "loss of availability of the DeliveryItemMechanism"
+				description = "LOA"
+			}
+			Event {
+				id = "ued_event"
+				probability = 1.0e-9
+				comment = "undetected erroneous data of the DeliveryItemMechanism"
+				description = "UED"
+			}
+			SafetyRel "delivery_status_out_UED" = happens("ued_event") or delivery_cmd_in:I => delivery_status_out:I;
+			SafetyRel "delivery_status_out_LOA" = happens("loa_event") or delivery_cmd_in:A => delivery_status_out:A;
+		**};
+	end DeliveryItemMechanism;
+	
+	system Camera
+		features
+			camera_in: in data port Base_Types::Boolean;
+			camera_out: out data port Base_Types::Integer;
+			health_status: out data port Base_Types::Boolean;
+
+		annex verdict {**
+			CyberRel "camera_out_I" = camera_in:I => camera_out:I;
+			CyberRel "camera_out_A" = camera_in:A => camera_out:A;
+		**};		
+	end Camera;
+			
+	system Connector
+		features
+			-- inputs
+				bus_in: in data port Data_Types::InputBus.impl;
+					
+			-- outputs
+				bus_out: out data port Data_Types::InputBus.impl;
+			
+		annex agree {**
+			-- high-level specification
+			guarantee "Output: bus_out": bus_out = bus_in;
+		**};
+	annex verdict {**
+            CyberRel "bus_out_I" = bus_in:I => bus_out:I;
+            CyberRel "bus_out_A" = bus_in:A => bus_out:A;
+            Event {
+                   id = "loa_event"
+                   probability = 1.0e-8
+                   comment = "loss of availability of the connector"
+                   description = "LOA"
+                  }
+            Event {
+                   id = "ued_event"
+                   probability = 1.0e-9
+                   comment = "undetected erroneous data of the connector"
+                   description = "UED"
+                  }
+            SafetyRel "bus_out_LOA" = happens("loa_event") => bus_out:A;
+            SafetyRel "bus_out_UED" = happens("ued_event") => bus_out:I;
+        **};
+		
+	end Connector;
+	
+	system DeliveryDroneSystem
+		features
+			satellite0_sig_pos: in data port Data_Types::Position.impl;
+			satellite1_sig_pos: in data port Data_Types::Position.impl;
+			bus1: in data port Data_Types::InputBus.impl;
+			comm1: in data port Data_Types::RadioResponse.impl;
+			
+			comm2: out data port Base_Types::Boolean;
+			bus2: out data port Base_Types::Boolean;			
+			
+			radio_cmd: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; };
+			radio_response: out data port Data_Types::RadioResponse.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			delivery_status: out data port Data_Types::DeliveryStatus
+			{CASE_Consolidated_Properties::probe => true; };
+			
+			actuation_out: out data port Base_Types::Boolean;
+			probe_init_mode: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_abort_mode: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_delivery_cmd: out data port Data_Types::PackageDeliveryCommand
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_constellation: out data port Data_Types::Constellation
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_launch_location: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_delivery_location: out data port Data_Types::Position.impl
+			{CASE_Consolidated_Properties::probe => true; };
+			probe_fly_cmd: out data port Base_Types::Boolean
+			{CASE_Consolidated_Properties::probe => true; };
+			
+		annex agree {**			
+
+			eq delivery_started: bool = delivery_status <> Agree_Constants::NOT_STARTED_STATUS;
+      		
+      		eq confirmation_requested: bool = Agree_Nodes::HasHappened(radio_cmd); 
+			
+			eq acknowledge_received: bool = comm1.data_available and comm1.target_confirmed;
+			
+			eq target_confirmed: bool = Agree_Nodes::HasHappened(
+      			confirmation_requested and
+      			acknowledge_received
+      		);
+      		
+      		eq valuable_package: bool = most_recent_order.item_value >= Agree_Constants::ITEM_VALUE_THRESHOLD;
+      		
+      		eq power_signal: bool = bus1.on_off and bus1.connected;
+      		
+      		eq isOn: bool = false -> if power_signal then not pre(isOn)
+      								 else pre(isOn);
+      			
+      		
+      		eq most_recent_constellation: Data_Types::Constellation = if probe_init_mode then 
+      																  	bus1.constellation
+      																  else bus1.constellation -> pre(most_recent_constellation);
+      		
+      		eq most_recent_launch_location: Data_Types::Position.impl = if probe_init_mode then 
+      																  		bus1.launch_pos
+      																  	else bus1.launch_pos -> pre(most_recent_launch_location);
+      																  														  	
+      		eq most_recent_order: Data_Types::DeliveryOrder.impl = if probe_init_mode then 
+      															   		bus1.order
+      															   else bus1.order -> pre(most_recent_order);
+      		
+      		eq most_recent_delivery_location: Data_Types::Position.impl = most_recent_order.target_position;
+      		
+      		eq release_cmd: bool = (probe_delivery_cmd = Agree_Constants::RELEASE_PACKAGE_CMD);
+      		
+      		guarantee "P1: Constellation for GPS is initialized properly":
+      			isOn => (most_recent_constellation = probe_constellation);
+      		
+      		guarantee "P2: Launch location for IMU is initialized properly":
+      			isOn => most_recent_launch_location = probe_launch_location;
+      		
+      		guarantee "P3: Delivery location for navigation is initialized properly":
+      			isOn => most_recent_delivery_location = probe_delivery_location;
+
+      		guarantee "P4: A command to release a valuable package is issued only if drone has received confirmation from base":
+    			release_cmd and valuable_package => target_confirmed;
+
+  			guarantee "P5: The drone will always request a confirmation to base before starting delivery of a valuable package":
+    			delivery_started and valuable_package => confirmation_requested;
+
+    		guarantee "P6: The drone is flying only if since last initialization the mission was not aborted":
+      			probe_fly_cmd => Agree_Nodes::Since(probe_init_mode, not (probe_abort_mode));
+		**};
+			
+		annex verdict{**
+			CyberReq {
+			id = "CyberReq01"
+			description = "The drone shall be resilient to loss of ability to deliver a package to 
+			              the appropriate consumer location"
+			condition = actuation_out:I or actuation_out:A or delivery_status:I or delivery_status:A
+			cia = I
+			severity = Hazardous
+		    	};
+			CyberReq {
+			id = "CyberReq02"
+			description = "The drone shall be resilient to maliciously commanded improper delivery of a package"
+			condition = delivery_status:I 
+			cia = I
+			severity = Major
+			};
+	    	MissionReq {
+		    	id ="MReq01"
+		    	description = "Deliver a package to the intended location."
+		    	reqs = "CyberReq01","CyberReq02"
+	    	};
+		**};
+	end DeliveryDroneSystem;
+	
+	system implementation DeliveryDroneSystem.Impl
+		subcomponents
+			gnc: system GNC::GNC.Impl
+			{
+			 	-- VERDICT Component Properties
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Software;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true; --NOTE: this system may contain Waypoints
+				CASE_Consolidated_Properties::canReceiveSWUpdate => false;
+			};
+			radio: system Radio
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+								
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::failSafe =>7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::logging => 7;
+				CASE_Consolidated_Properties::memoryProtection => 5; --  Change to 7 to satisfy threat
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::remoteAttestation =>7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 0;
+				CASE_Consolidated_Properties::systemAccessControl => 7;	
+							
+			};
+			actuation: system Actuation
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+			};
+			deliveryPlanner: system DeliveryPlanner
+			{	
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::componentType => Hybrid; -- this is default value
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+
+--			 	-- VERDICT Component Properties
+--				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+--				CASE_Consolidated_Properties::componentType => Software;
+--				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+--				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+--				CASE_Consolidated_Properties::pedigree => Sourced;
+--				--CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb
+				
+	
+			
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::antiJamming => 7;
+				CASE_Consolidated_Properties::dosProtection => 7;
+				CASE_Consolidated_Properties::failSafe =>7;
+				CASE_Consolidated_Properties::Heterogeneity =>7;
+				CASE_Consolidated_Properties::inputValidation => 7;
+				CASE_Consolidated_Properties::logging => 7;
+				CASE_Consolidated_Properties::memoryProtection => 7;
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::RemoteAttestation => 7;
+				CASE_Consolidated_Properties::resourceAvailability => 7;
+				CASE_Consolidated_Properties::secureBoot => 7;
+				CASE_Consolidated_Properties::staticCodeAnalysis => 7;
+				CASE_Consolidated_Properties::strongCryptoAlgorithms => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				
+			};
+			deliveryItemMechanism: system DeliveryItemMechanism
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;
+				
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+				
+			};
+			camera: system Camera
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hardware;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => InternallyDeveloped;					
+				
+				-- VERDICT Cyber Defense and DAL Mitigations
+				CASE_Consolidated_Properties::physicalAccessControl => 7;
+				CASE_Consolidated_Properties::supplyChainSecurity => 7;
+				CASE_Consolidated_Properties::systemAccessControl => 7;
+			};
+			
+			connector: system Connector
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+			 	--CASE_Consolidated_Properties::pedigree => COTS;
+			 	CASE_Consolidated_Properties::pedigree => InternallyDeveloped; -- Fix for Logic Bomb / Hardware Trojan
+				CASE_Consolidated_Properties::logging => 7;
+				CASE_Consolidated_Properties::adversariallyTestedForTrojanOrLogicBomb => 0;
+			};
+
+		connections
+			c1b: port deliveryPlanner.launch_pos -> gnc.launch_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c4: port deliveryPlanner.dest_location -> gnc.navigation_dest_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c5: port gnc.navigation_cur_pos -> deliveryPlanner.cur_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			
+			c7: port deliveryItemMechanism.delivery_status_out -> deliveryPlanner.delivery_status			
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c9: port camera.camera_out -> deliveryPlanner.camera_result			
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c10: port deliveryPlanner.radio_cmd -> radio.radio_in
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c11: port radio.radio_out -> deliveryPlanner.radio_response
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c14a: port bus1 -> connector.bus_in
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c14b: port connector.bus_out -> DeliveryPlanner.bus_in
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c15: port deliveryPlanner.bus_out -> bus2
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c16: port comm1 -> radio.comm_in
+			{CASE_Consolidated_Properties::connectionType => Untrusted;
+			CASE_Consolidated_Properties::deviceAuthentication => 0;
+			CASE_Consolidated_Properties::encryptedTransmission => 0;
+			 --CASE_Consolidated_Properties::deviceAuthentication => 7; -- Fix for Network Injection
+			 --CASE_Consolidated_Properties::encryptedTransmission => 5; -- Fix for Network Injection
+			};
+			
+			c17: port radio.comm_out -> comm2
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+
+--			c18a: port gnc.imu_pos -> positionEstimator.imu_pos
+--			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c19: port gnc.fc_motor_cmd -> actuation.motor_cmd
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c20: port actuation.response -> gnc.fc_actuation_response
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+
+			c22: port satellite0_sig_pos -> gnc.satellite0_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c23: port satellite1_sig_pos -> gnc.satellite1_pos
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c25: port deliveryPlanner.delivery_cmd -> deliveryItemMechanism.delivery_cmd_in
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+
+			c26: port deliveryPlanner.nav_cmd -> gnc.navigation_cmd
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c27: port deliveryPlanner.camera -> camera.camera_in			
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c28: port deliveryPlanner.radio_cmd -> radio_cmd
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c29: port radio.radio_out -> radio_response
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c30: port deliveryItemMechanism.delivery_status_out -> delivery_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c31: port deliveryPlanner.delivery_cmd -> probe_delivery_cmd
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c32: port actuation.response -> actuation_out
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c33: port deliveryPlanner.constellation -> gnc.constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c34: port gnc.gps_health_status -> deliveryPlanner.gps_health_status
+			{
+			CASE_Consolidated_Properties::connectionType => Trusted;
+			--CASE_Consolidated_Properties::connectionType => Untrusted;
+			};
+			
+			c35: port gnc.imu_health_status -> deliveryPlanner.imu_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c36: port radio.health_status -> deliveryPlanner.rdo_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c37: port camera.health_status -> deliveryPlanner.cam_health_status
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c38: port gnc.probe_constellation -> probe_constellation
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c39: port deliveryPlanner.probe_init_mode -> probe_init_mode
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c40: port gnc.probe_launch_pos -> probe_launch_location
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c41: port gnc.navigation_probe_dest_pos -> probe_delivery_location
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c42: port deliveryItemMechanism.package_is_secure -> deliveryPlanner.package_is_secure
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c43: port deliveryPlanner.nav_cmd -> probe_fly_cmd
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+			
+			c44: port deliveryPlanner.probe_abort_mode -> probe_abort_mode
+			{CASE_Consolidated_Properties::connectionType => Trusted;};
+												
+	end DeliveryDroneSystem.impl;
+	
+end DeliveryDrone;

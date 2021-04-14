@@ -1,0 +1,73 @@
+package UAV
+public
+	
+	with MC;
+	with FC;
+	with UAS_Buses;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;		
+	
+	-- UAV
+	--AM added sw_uxas_out, fc_uart_send
+	system UAV
+		features
+			radio_recv: in event data port;
+			radio_send: out event data port;
+			RFA: requires bus access UAS_Buses::RF_Bus.Impl;
+			
+			sw_uxas_out: out event data port;
+			
+			--## Added outport so that a CyberRequirement can be specified
+			fc_uart_send: out event data port;			
+	end UAV;
+	
+	system implementation UAV.Impl
+		subcomponents
+			MCMP: system MC::MissionComputer.Impl
+			{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => Sourced; 
+			}
+            ;
+			FCTL: system FC::FlightController.Impl{
+				-- VERDICT Component Properties
+				CASE_Consolidated_Properties::canReceiveSWUpdate => true;
+				CASE_Consolidated_Properties::componentType => Hybrid;
+				CASE_Consolidated_Properties::hasSensitiveInfo => true;
+				CASE_Consolidated_Properties::insideTrustedBoundary => true;
+				CASE_Consolidated_Properties::pedigree => Sourced; 
+			};
+			FCTL_SBUS: bus UAS_Buses::Serial_Bus.Impl;
+		connections
+			
+			-- FC UART bus access
+			bac1: bus access FCTL_SBUS <-> MCMP.FC_UART;
+			bac2: bus access FCTL_SBUS <-> FCTL.UART;
+					
+			-- Radio bus access
+			bac5: bus access RFA -> MCMP.RFA;
+			
+			-- Radio
+			c1: port radio_recv -> MCMP.radio_recv;
+			c2: port MCMP.radio_send -> radio_send;
+			
+			-- FC UART
+			c3: port MCMP.fc_uart_send -> FCTL.uart_recv;
+			c4: port FCTL.uart_send -> MCMP.fc_uart_recv;
+			c5AM: port MCMP.fc_uart_send -> fc_uart_send; --AM added to route to outermost system 
+			c6AM: port MCMP.sw_uxas_out -> sw_uxas_out; --AM added to route to outermost system
+							
+		properties
+			Actual_Connection_Binding => (reference (FCTL_SBUS)) applies to c3, c4;
+			
+	end UAV.Impl;
+	
+end UAV;

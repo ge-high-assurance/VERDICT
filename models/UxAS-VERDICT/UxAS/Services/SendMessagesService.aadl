@@ -1,0 +1,62 @@
+package SendMessagesService_Pkg
+public
+	with CMASI;
+    with ServiceBase_Pkg;
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;
+	    
+    thread SendMessagesServiceInit extends ServiceBase_Pkg::ServiceBase
+        features
+            -- Sent Messages
+            AirVehicleState : out event data port CMASI::AirVehicleState.i;
+            MissionCommand: out event data port CMASI::MissionCommand.i;
+                    
+        properties
+            -- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/SendMessagesService.h", "src/Services/SendMessagesService.cpp");      
+            Dispatch_Protocol => Sporadic;
+            
+    end SendMessagesServiceInit;
+    
+    thread implementation SendMessagesServiceInit.i
+    end SendMessagesServiceInit.i;
+    
+     thread SendMessagesServiceMemory extends ServiceBase_Pkg::ServiceBase
+        features
+            -- Sent Messages
+            AirVehicleConfiguration : out event data port CMASI::AirVehicleConfiguration.i;
+            KeepInZone : out event data port CMASI::KeepInZone.i;
+            KeepOutZone : out event data port CMASI::KeepOutZone.i;
+                    
+        properties
+            -- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/SendMessagesService.h", "src/Services/SendMessagesService.cpp");             
+            Dispatch_Protocol => Sporadic;
+            
+    end SendMessagesServiceMemory;
+    
+    thread implementation SendMessagesServiceMemory.i
+    end SendMessagesServiceMemory.i;
+    
+    thread SendMessagesServiceGS extends ServiceBase_Pkg::ServiceBase
+        features
+            -- Sent Messages
+            OperatingRegion : out event data port CMASI::OperatingRegion.i;
+            LineSearchTask: out event data port CMASI::LineSearchTask.i;
+            AutomationRequest: out event data port CMASI::AutomationRequest.i;
+                    
+        properties
+            -- https://github.com/afrl-rq/OpenUxAS
+            Source_Text => ("src/Services/SendMessagesService.h", "src/Services/SendMessagesService.cpp");     
+            Dispatch_Protocol => Sporadic;
+            
+    end SendMessagesServiceGS;
+    
+    thread implementation SendMessagesServiceGS.i
+    end SendMessagesServiceGS.i;
+    
+end SendMessagesService_Pkg;

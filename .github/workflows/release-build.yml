@@ -100,7 +100,7 @@ jobs:
   release:
     strategy:
       matrix:
-        java-version: [ 8 ]
+        java-version: [ 11 ]
         os: [ ubuntu-20.04 ]
 
     needs: native-binaries

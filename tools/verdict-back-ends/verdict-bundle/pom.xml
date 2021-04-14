@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.ge.verdict</groupId>
-        <artifactId>verdict-back-ends</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <groupId>com.ge.verdict</groupId>
+    <artifactId>verdict-back-ends</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>verdict-bundle</artifactId>
-    <packaging>pom</packaging>
+  <artifactId>verdict-bundle</artifactId>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>iml-verdict-translator</module>
-        <module>verdict-assurance-case</module>
-        <module>verdict-attack-defense-collector</module>
-        <module>verdict-blame-assignment</module>
-        <module>verdict-bundle-app</module>
-        <module>verdict-crv</module>
-        <module>verdict-instrumentor</module>
-        <module>verdict-lustre-translator</module>
-        <module>verdict-mbas-translator</module>
-        <module>verdict-merit-assignment</module>
-        <module>verdict-stem-runner</module>
-        <module>verdict-synthesis</module>
-        <module>verdict-test-instrumentor</module>
-        <module>z3-native-libs</module>
-    </modules>
+  <modules>
+    <module>iml-verdict-translator</module>
+    <module>verdict-assurance-case</module>
+    <module>verdict-attack-defense-collector</module>
+    <module>verdict-blame-assignment</module>
+    <module>verdict-bundle-app</module>
+    <module>verdict-crv</module>
+    <module>verdict-instrumentor</module>
+    <module>verdict-lustre-translator</module>
+    <module>verdict-mbas-translator</module>
+    <module>verdict-merit-assignment</module>
+    <module>verdict-stem-runner</module>
+    <module>verdict-synthesis</module>
+    <module>verdict-test-instrumentor</module>
+    <module>z3-native-libs</module>
+  </modules>
 </project>

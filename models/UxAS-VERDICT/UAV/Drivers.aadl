@@ -1,0 +1,79 @@
+package Drivers
+public
+	with CASE_Model_Transformations;
+	with CMASI;
+    with CASEAgree;
+    
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;	    
+
+	thread RadioDriver
+		-- The RadioDriver is the software that enables other SW components to communicate to other systems over RF
+		features
+			recv_data: in event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			send_data: out event data port CASE_Model_Transformations::CASE_RF_Msg.Impl;
+			alert: in event data port Base_Types::Boolean; --AM added alert
+		
+			-- UxAS
+            AutomationResponse: in event data port CMASI::AutomationResponse.i;
+            AirVehicleState: in event data port CMASI::AirVehicleState.i;
+            
+            AutomationRequest: out event data port CMASI::AutomationRequest.i;
+            OperatingRegion: out event data port CMASI::OperatingRegion.i;
+            LineSearchTask: out event data port CMASI::LineSearchTask.i;
+            
+		properties
+            Dispatch_Protocol => Sporadic;
+
+--		annex agree {**
+--			assume "The radio receives well-formed messages" : CASEAgree::WellformedCASE_RF_Msg(recv_data, CASEAgree::GS_ID, CASEAgree::UAV_ID);
+--			guarantee "The radio_send outputs only well formed CASE_RF_Msg.Impl types" : CASEAgree::WellformedCASE_RF_Msg(send_data, CASEAgree::UAV_ID, CASEAgree::GS_ID);
+--		**};
+
+		annex Verdict{**
+			-- There should not be a flow from recv_data to send data. Recv data is data received from GS. send_data is other data like alerts that is send back to GS. 
+			
+					
+			CyberRel "AutomationRequest_C" = recv_data:C => AutomationRequest:C;
+			CyberRel "AutomationRequest_I" = recv_data:I => AutomationRequest:I;
+			CyberRel "AutomationRequest_A" = recv_data:A => AutomationRequest:A;
+		
+			CyberRel "OperatingRegion_C" = recv_data:C => OperatingRegion:C;
+			CyberRel "OperatingRegion_I" = recv_data:I => OperatingRegion:I;
+			CyberRel "OperatingRegion_A" = recv_data:A => OperatingRegion:A;
+		
+			CyberRel "LineSearchTask_C" = recv_data:C => LineSearchTask:C;
+			CyberRel "LineSearchTask_I" = recv_data:I => LineSearchTask:I;
+			CyberRel "LineSearchTask_A" = recv_data:A => LineSearchTask:A;
+		
+		**};            
+	end RadioDriver;
+
+	thread implementation RadioDriver.Impl
+	end RadioDriver.Impl;
+
+	thread UARTDriver
+		-- The UARTDriver is the software that enables other SW components to communicate to other systems over the serial connection
+		features
+			recv_data: in event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;
+            MissionCommand: in event data port CMASI::MissionCommand.i;
+        
+            send_data: out event data port CASE_Model_Transformations::CASE_UART_Msg.Impl;    
+			AirVehicleState: out event data port CMASI::AirVehicleState.i;
+		properties
+            Dispatch_Protocol => Sporadic;
+		annex agree {**     
+		    assume Req001_UARTDriver "Assumes recv_data only gets well formed CASE_UART_Msg.Impl types" : 
+		        CASEAgree::WellformedCASE_UART_Msg(recv_data);        
+		    guarantee Req003_UARTDRiver "The send_data outputs only well formed CASE_UART_Msg.Impl types" : 
+                CASEAgree::WellformedCASE_UART_Msg(send_data);
+		**};
+	end UARTDriver;
+
+	thread implementation UARTDriver.Impl
+	end UARTDriver.Impl;
+
+end Drivers;

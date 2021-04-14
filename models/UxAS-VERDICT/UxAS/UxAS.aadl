@@ -1,0 +1,18 @@
+package UxAS
+public
+
+	with Base_Types;
+	with Data_Types;
+	with Agree_Constants;
+	with Agree_Nodes;
+	with CASE_Consolidated_Properties;	
+	-----------------------------------------------------------------------------------------------------
+	-- UxAS is modeled as a process with threads representing the various tasks and services. For a 
+	-- desired mission or set of capabilities, a specific instance of UxAS is created that uses only
+	-- the tasks and services, and associated messages (data), required for that message. The abstract
+	-- UXAS is a generic representation of the UxAS software. 
+	----------------------------------------------------------------------------------------------------
+ 	thread group UxAS
+	end UxAS;
+	    
+end UxAS;
