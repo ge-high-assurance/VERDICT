@@ -30,33 +30,9 @@ requires research breakthroughs in:
 
 ## VERDICT Workflow
 
-The VERDICT tool is intended to perform analysis of a system at the
-architectural level.  Based on the typical workflow shown below, the
-VERDICT user will capture an architectural model using AADL that
-represents the high-level functional components of the system along
-with the data flow between them.  The VERDICT Model Based Architecture
-Synthesis (MBAS) back-end tool will analyze the architecture to
-identify cyber vulnerabilities and recommend defenses.  The defenses
-will typically be recommendations to improve the resiliency of
-components, such as control access to and encrypt communications
-links, or add components to reduce dependence on a specific source of
-information.  For example, add position sensors and voting logic
-rather than depend exclusively on a GPS signal to determine location.
-Once the architectural analysis is complete, VERDICT supports
-refinement of the architecture model with behavioral modeling
-information using AGREE.  The VERDICT Cyber Resiliency Verifier (CRV)
-back-end tool performs a formal analysis of the updated model with
-respect to formal cyber properties to identify vulnerabilities to
-cyber threat effects.  This valuable capability provides an additional
-depth of analysis of a model that includes behavioral details of the
-architectural component models which will help to catch design
-mistakes earlier in the development process.  Once the CRV analysis is
-complete, the developer will go off and create a detailed
-implementation.  The intent of VERDICT Automated Test Generation is to
-verify that the implementation is consistent with the architecture and
-behavioral models analyzed by VERDICT MBAS and CRV.
+VERDICT is a framework to perform analysis of a system at the architectural level. It consists of two major functionalities: Model Based Architecture Analysis and Synthesis (MBAAS) and Cyber Resiliency Verification (CRV). VERDICT user starts with capturing an architectural model using AADL that represents the high-level functional components of the system along with the data flow between them; and then annotate the model with VERDICT properties, relations and requirements for analysis. The VERDICT MBAA back-end tool will analyze the architecture to identify cyber vulnerabilities and recommend defenses. User may also use the VERDICT MBAS feature to synthesize a minimal set of defenses with respect to their implementation costs. VERDICT also supports refinement of the architecture model with behavioral modeling information using AGREE. The VERDICT CRV back-end tool performs a formal analysis of the updated model with respect to formal cyber properties to identify vulnerabilities to cyber threat effects. This valuable capability provides an additional depth of analysis of a model that includes behavioral details of the architectural component models which will help to catch design mistakes earlier in the development process.
 
-<img src="docs/images/VERDICT-Workflow-Diagram.png" alt="VERDICT Workflow Diagram" width="750"/>
+<!--- <img src="docs/images/VERDICT-Workflow-Diagram.png" alt="VERDICT Workflow Diagram" width="750"/> --->
 <!--- ![VERDICT Workflow Diagram](docs/images/VERDICT-Workflow-Diagram.png) --->
 
 ## Publications
