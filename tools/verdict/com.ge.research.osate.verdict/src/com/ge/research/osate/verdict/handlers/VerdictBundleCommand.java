@@ -57,6 +57,10 @@ public class VerdictBundleCommand {
         if (!isImage()) {
             if (bundleJar != null && !bundleJar.isEmpty()) {
                 args.add("java");
+                args.add("--add-opens");
+                args.add("java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED");
+                args.add("--add-opens");
+                args.add("java.base/java.lang=ALL-UNNAMED");
                 args.add("-jar");
                 args.add(bundleJar);
             } else {
