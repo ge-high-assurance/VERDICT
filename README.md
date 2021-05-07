@@ -63,7 +63,7 @@ DOI = {10.3390/systems9010018}
   organization={IEEE}
 }
 ```
-Please refer to the [Wiki page](https://github.com/ge-high-assurance/VERDICT/wiki/Publications) for a complete list of publications related to VERDICT. 
+For a complete list of publications related to VERDICT, please refer to the [Wiki page](https://github.com/ge-high-assurance/VERDICT/wiki/Publications) . 
 
 Distribution Statement A: Approved for Public Release, Distribution Unlimited
 
