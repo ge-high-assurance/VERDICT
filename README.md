@@ -25,7 +25,8 @@ requires research breakthroughs in:
 * techniques to scale and provide meaningful feedback from analysis
   tools that reside low in the development tool chain.
 
-![CASE Program Diagram](docs/images/CASE-Program-Diagram.png)
+<img src="docs/images/CASE-Program-Diagram.png" alt="CASE Program Diagram" width="750"/>
+<!--- ![CASE Program Diagram](docs/images/CASE-Program-Diagram.png) --->
 
 ## VERDICT Workflow
 
@@ -55,7 +56,8 @@ implementation.  The intent of VERDICT Automated Test Generation is to
 verify that the implementation is consistent with the architecture and
 behavioral models analyzed by VERDICT MBAS and CRV.
 
-![VERDICT Workflow Diagram](docs/images/VERDICT-Workflow-Diagram.png)
+<img src="docs/images/VERDICT-Workflow-Diagram.png" alt="VERDICT Workflow Diagram" width="750"/>
+<!--- ![VERDICT Workflow Diagram](docs/images/VERDICT-Workflow-Diagram.png) --->
 
 ## Publications
 
