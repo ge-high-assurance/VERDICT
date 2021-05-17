@@ -15,13 +15,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>edu.uiowa.cs.clc</groupId>
-      <artifactId>kind2-java-api</artifactId>
-      <version>0.2.2</version>
-    </dependency>
-    <dependency>
       <groupId>com.ge.verdict</groupId>
       <artifactId>verdict-data-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>edu.uiowa.cs.clc</groupId>
+      <artifactId>kind2-java-api</artifactId>
     </dependency>
     <!-- JAXB dependencies needed only under Java 9 or later -->
     <dependency>

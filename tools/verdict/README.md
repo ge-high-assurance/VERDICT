@@ -1,3 +1,5 @@
+<!-- markdownlint-disable line-length -->
+
 # VERDICT: Building the OSATE plugin
 
 ## About the OSATE plugin
@@ -21,17 +23,17 @@ URL.
 ## Set up your build environment
 
 You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 8 or 11) to build all of our Java program sources.  We have
-tried Java 11 LTS successfully, but OSATE itself is officially
-supported only on Java 8 LTS so we recommend using Java 8 LTS anyway.
+(version 11) to build all of our Java program sources.  We are using
+Java 11 even though OSATE says it is officially supported on Java 8
+(in practice, OSATE runs fine on Java 11 anyway).
 
 You also will need [Apache Maven](https://maven.apache.org) to build
-all of our Java program sources.  Your operating system may have a
-prebuilt Maven package available, but many developers would prefer to
-download the latest Maven release from Apache's website, unpack the
-Maven release someplace, and
-[add](https://maven.apache.org/install.html) the unpacked directory's
-bin directory to their PATH.
+all of our Java program sources.  Your operating system may have
+prebuilt Java and Maven packages available or you can install both
+Java and Maven using [SDKMAN!](https://sdkman.io/) if you prefer.
+SDKMAN! provides a convenient command line interface for listing,
+installing, switching between, and removing multiple versions of JDKs
+and SDKs.
 
 Some developers also will need to tell Maven to [use a
 proxy](https://maven.apache.org/guides/mini/guide-proxies.html) in
@@ -73,7 +75,9 @@ Tycho.  Unless you want to import and develop the OSATE plugin sources
 in your Eclipse IDE, we recommend that you build our OSATE plugin
 sources only with Maven from the command line in this directory:
 
-`$ mvn clean install -Dtycho.localArtifacts=ignore`
+```shell
+mvn clean install -Dtycho.localArtifacts=ignore
+```
 
 Including the `-Dtycho.localArtifacts=ignore` argument may prevent
 some build problems from happening.  You may not always need the
@@ -92,23 +96,23 @@ our OSATE plugin in an OSATE release as shown in the next section.  A
 successful build ends with the following output:
 
 ```text
-[INFO] --- tycho-p2-plugin:1.7.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
+[INFO] --- tycho-p2-plugin:2.3.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for verdict 1.0.0-SNAPSHOT:
 [INFO]
-[INFO] verdict ............................................ SUCCESS [  0.367 s]
-[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 38.026 s]
-[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.296 s]
-[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  1.160 s]
-[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  2.278 s]
-[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.298 s]
-[INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.066 s]
-[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  2.307 s]
+[INFO] verdict ............................................ SUCCESS [  0.372 s]
+[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 30.416 s]
+[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.085 s]
+[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  0.912 s]
+[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  1.262 s]
+[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.095 s]
+[INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.025 s]
+[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  1.369 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  02:14 min
-[INFO] Finished at: 2020-07-15T20:35:52-04:00
+[INFO] Total time:  45.481 s
+[INFO] Finished at: 2021-05-17T15:18:18-04:00
 [INFO] ------------------------------------------------------------------------
 ```
 
