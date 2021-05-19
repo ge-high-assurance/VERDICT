@@ -2,29 +2,18 @@
 package com.ge.verdict.lustre;
 
 import com.ge.verdict.vdm.VdmTranslator;
+import edu.uiowa.clc.verdict.lustre.VDMLustre2Kind2;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.util.JAXBSource;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import net.htmlparser.jericho.Source;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.ObjectFactory;
 
 /** Translate a Verdict data model to or from a Lustre file. */
 public class VerdictLustreTranslator extends VdmTranslator {
@@ -40,34 +29,10 @@ public class VerdictLustreTranslator extends VdmTranslator {
         if (canWrite(outputFile)) {
             // Open output stream to be written to
             try (OutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile))) {
-                // Set up model as source to read from
-                JAXBContext context = JAXBContext.newInstance(model.getClass());
-                ObjectFactory factory = new ObjectFactory();
-                JAXBElement<Model> element = factory.createModel(model);
-                JAXBSource source = new JAXBSource(context, element);
-
-                // Set up string in memory as result to write to
-                StringWriter html = new StringWriter();
-                Result result = new StreamResult(html);
-
-                // First, transform model to HTML using XSLT stylesheet and Saxon transformer
-                StreamSource stylesheet =
-                        new StreamSource(model.getClass().getResourceAsStream("/VdmToLustre.xslt"));
-                Transformer transformer =
-                        new net.sf.saxon.TransformerFactoryImpl().newTransformer(stylesheet);
-                transformer.transform(source, result);
-
-                // Second, convert HTML to text using Jericho HTML parser/renderer
-                Source jericho = new Source(html.getBuffer());
-                String text =
-                        jericho.getRenderer()
-                                .setMaxLineLength(0)
-                                .setTableCellSeparator("")
-                                .toString();
-
+                String text = VDMLustre2Kind2.translate(model).toString();
                 // Last, write text to output stream
                 output.write(text.getBytes(StandardCharsets.UTF_8));
-            } catch (IOException | JAXBException | TransformerException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

@@ -1,3 +1,5 @@
+<!-- markdownlint-disable line-length -->
+
 # VERDICT: Building the VERDICT back-end programs
 
 ## About the VERDICT back-end programs
@@ -11,14 +13,18 @@ sources are in the following subdirectories:
 
 - [STEM](STEM) models and queries a model's system architecture
 - [aadl2iml](aadl2iml) translates a model from AADL to IML
-- [soteria_pp](soteria_pp) analyzes the safety and security of a model's system architecture
-- [verdict-bundle](verdict-bundle) provides an executable jar which can call any of the back-end programs
+- [soteria_pp](soteria_pp) analyzes the safety and security of a
+  model's system architecture
+- [verdict-bundle](verdict-bundle) provides an executable jar which
+  can call any of the back-end programs
 
 We also use two prebuilt executables which come from other source
 repositories, not this repository:
 
-- [kind2](https://github.com/kind2-mc/kind2) checks the safety properties of a Lustre model
-- [z3](https://github.com/Z3Prover/z3) solves Satisfiability Modulo Theories
+- [kind2](https://github.com/kind2-mc/kind2) checks the safety
+  properties of a Lustre model
+- [z3](https://github.com/Z3Prover/z3) solves Satisfiability Modulo
+  Theories
 
 Our back-end programs are written in Java and OCaml.  You will need
 both Java and OCaml software development kits if you want to build all
@@ -34,33 +40,21 @@ OSATE plugin to run the back-end programs using the Docker image.
 
 ## Set up your build environment
 
-You will need both [Java](https://adoptopenjdk.net/) and [Apache
-Maven](https://maven.apache.org) to build our Java program sources.
-You can use either Java 8 LTS or Java LTS 11 even though OSATE is
-built with Java 8 LTS itself.  If OSATE switches to Java 11 LTS later
-and you don't want to run on Java 8 LTS anymore, you can replace the
-maven.compiler.source and maven.compiler.target properties in our
-parent [pom.xml](../../pom.xml) with maven.compiler.release and set
-the release number to 11, e.g.,
+You will need both [Java](https://adoptopenjdk.net/) (version 11) and
+[Apache Maven](https://maven.apache.org) to build our Java program
+sources.  We are building VERDICT with Java 11, installing VERDICT in
+OSATE, and running OSATE and VERDICT with Java 11 even though OSATE is
+built with Java 8 itself.
 
-```
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.release>11</maven.compiler.release>
-    </properties>
-```
-
-The usual way to install Maven is to download the latest Maven
+The traditional way to install Maven is to download the latest Maven
 distribution from Apache's website, unpack the Maven distribution
 someplace, and [add](https://maven.apache.org/install.html) the
 unpacked distribution's bin directory to your PATH.  If you don't want
-to install both Java and Maven manually or fiddle with prebuilt system
-packages yourself, you can use [SDKMAN!](https://sdkman.io/) to manage
-parallel versions of multiple software development kits on a Unix
-based system.  SDKMAN! provides a convenient command line interface
-for installing, switching, removing, and listing multiple versions of
-JDKs and SDKs.
+to install both Java and Maven manually, you can use
+[SDKMAN!](https://sdkman.io/) to manage parallel versions of multiple
+software development kits on a Unix based system.  SDKMAN! provides a
+convenient command line interface for listing, installing, switching
+between, and removing multiple versions of JDKs and SDKs.
 
 Some developers also will need to tell Maven to [use a
 proxy](https://maven.apache.org/guides/mini/guide-proxies.html) in
@@ -99,10 +93,10 @@ We have a repositories section inside verdict-stem-runner's pom.xml
 which tells Maven how to download these SADL libraries from the above
 git repository.
 
-However, you will have a problem if you have put a
+However, you will have a problem if you have put a line saying
 `<mirrorOf>*</mirrorOf>` in your .m2/settings.xml file.  Redirecting
 all Maven downloads to your chosen mirror will prevent Maven from
-being able to download any jars directly from
+being able to download any jars directly from our
 sadl-snapshot-repository.  You will have to replace `*` with `central`
 in that mirrorOf section before your build will finish successfully.
 
@@ -130,19 +124,19 @@ OCaml version 4.07.1, install some opam packages, run `opam exec make`
 in each directory, and configure the OSATE plugin to tell it where the
 executables are.
 
-Here are some commands that might successfully set up OCaml and build
+Here are some commands that may successfully set up OCaml and build
 each program if you have an Ubuntu 20.04 LTS system:
 
 ```shell
-$ sudo apt install build-essential m4 
-$ sudo apt update
-$ sudo apt install opam
-$ opam switch create ocaml 4.07.1
-$ opam install async core core_extended dune menhir ocamlbuild ocamlfind printbox xml-light
-$ cd tools/verdict-back-ends/aadl2iml
-$ opam exec make
-$ cd tools/verdict-back-ends/soteria_pp
-$ opam exec make
+sudo apt install build-essential m4
+sudo apt update
+sudo apt install opam
+opam switch create ocaml 4.07.1
+opam install async core core_extended dune menhir ocamlbuild ocamlfind printbox xml-light
+cd tools/verdict-back-ends/aadl2iml
+opam exec make
+cd tools/verdict-back-ends/soteria_pp
+opam exec make
 ```
 
 The STEM sources are written in [SADL](http://sadl.sourceforge.net/),
@@ -164,17 +158,15 @@ data files created by some of our other back-end programs.
 
 If you want to run graphviz, kind2, and z3 without using Docker, you
 will need to download or install prebuilt executables on your
-operating system too.  Here are some commands that might successfully
+operating system too.  Here are some commands that may successfully
 install some of these programs if you have an Ubuntu 20.04 LTS system:
 
 ```shell
-$ sudo apt install graphviz libzmq5 z3
+sudo apt install graphviz libzmq5 z3
 ```
 
 For kind2, though, you'll probably have to download a prebuilt kind2
-executable manually:
-
-<https://github.com/kind2-mc/kind2/releases>
+executable manually from <https://github.com/kind2-mc/kind2/releases>.
 
 ## Build the Docker image (optional)
 
@@ -185,7 +177,7 @@ first.  Then cd back into this directory and run the following
 command:
 
 ```shell
-$ docker build -t gehighassurance/verdict-dev .
+docker build -t gehighassurance/verdict-dev .
 ```
 
 Proxy environment variables won't affect Docker either, so if you need
@@ -196,5 +188,5 @@ arguments to pass your proxy environment variables to the Dockerfile's
 builder image as well:
 
 ```shell
-$ docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t gehighassurance/verdict-dev .
+docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t gehighassurance/verdict-dev .
 ```

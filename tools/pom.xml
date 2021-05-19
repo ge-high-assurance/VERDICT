@@ -176,6 +176,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>edu.uiowa.cs.clc</groupId>
+        <artifactId>kind2-java-api</artifactId>
+        <version>0.2.2</version>
+      </dependency>
+      <dependency>
         <groupId>guru.nidi</groupId>
         <artifactId>graphviz-java</artifactId>
         <version>0.18.1</version>
