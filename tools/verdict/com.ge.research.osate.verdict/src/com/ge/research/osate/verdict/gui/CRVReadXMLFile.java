@@ -2,7 +2,9 @@ package com.ge.research.osate.verdict.gui;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,6 +24,8 @@ import org.w3c.dom.NodeList;
 //this class extracts the contents of CRV .xml and stores in the data-structures
 public class CRVReadXMLFile {
 	List<CRVResultAttributes> results = new ArrayList<CRVResultAttributes>();
+	List<Set<IVCNode>> aIvcsList = new ArrayList<>();
+	List<Set<IVCNode>> mIvcsList = new ArrayList<>();
 	List<IVCNode> ivc = new ArrayList<IVCNode>();
 
 	public CRVReadXMLFile(String fileName1, String fileName2) {
@@ -69,13 +73,15 @@ public class CRVReadXMLFile {
 
 	protected void readIVC(Document doc) {
 		NodeList MESList = doc.getElementsByTagName("ModelElementSet");
-
+		
         for (int i = 0; i < MESList.getLength(); ++i) {
             Node MESNode = MESList.item(i);
 
             if (MESNode.getNodeType() != Node.ELEMENT_NODE) continue;
 
             Element MESElement = (Element) MESNode;
+            String approximate = MESElement.getAttribute("approximate");            
+            Set<IVCNode> ivcNodes = new HashSet<>();
             NodeList nList = MESElement.getElementsByTagName("Node");
 
             for (int j = 0; j < nList.getLength(); ++j) {
@@ -92,6 +98,7 @@ public class CRVReadXMLFile {
                 IVCNode ivcNode = new IVCNode();
                 ivcNode.setNodeName(element_name);
                 
+                // Guarantees 
                 NodeList eList = nodeElement.getElementsByTagName("Element");
 
                 for (int k = 0; k < eList.getLength(); ++k) {
@@ -108,8 +115,13 @@ public class CRVReadXMLFile {
                     
                     ivcNode.getNodeElements().add(ivcElement);
                 }
-                
+                ivcNodes.add(ivcNode);
                 ivc.add(ivcNode);
+            }
+            if(approximate.equals("false")) {
+            	mIvcsList.add(ivcNodes);
+            } else {
+            	aIvcsList.add(ivcNodes);
             }
         }
 	}

@@ -123,6 +123,15 @@ public class CRVHandler extends AbstractHandler {
 		}
 		if(CRVSettingsPanel.isMeritAssignment) {
 			command.arg("-MA");
+			if(CRVSettingsPanel.isOneIVC) {
+				command.arg("-OI");	
+			}			
+			if(CRVSettingsPanel.isOneMIVC) {
+				command.arg("-OC");	
+			}
+			if(CRVSettingsPanel.isAllMIVC) {
+				command.arg("-LC");	
+			}			
 		}
 		if (CRVSettingsPanel.testCaseGeneration) {
 			command.arg("-ATG");

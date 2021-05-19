@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
 *
@@ -18,11 +19,15 @@ public class CRVResultSummary {
 
 	private List<CRVSummaryRow> tableContents;
 	private List<IVCNode> ivc;
+	private List<Set<IVCNode>> mIvcsList;
+	private List<Set<IVCNode>> aIvcsList;
 
 	public CRVResultSummary(String fileName1, String fileName2) {
 		CRVReadXMLFile xmlReader = new CRVReadXMLFile(fileName1, fileName2);
 		tableContents = loadTableContents(xmlReader.getResults());
 		ivc = xmlReader.getIVC();
+		mIvcsList = xmlReader.mIvcsList;
+		aIvcsList = xmlReader.aIvcsList;
 	}
 
 	private List<CRVSummaryRow> loadTableContents(List<CRVResultAttributes> attributes) {
@@ -162,5 +167,13 @@ public class CRVResultSummary {
 	
 	public List<IVCNode> getIVC() {
 		return ivc;
+	}
+	
+	public List<Set<IVCNode>> getaIVCs() {
+		return aIvcsList;
+	}
+	
+	public List<Set<IVCNode>> getmIVCs() {
+		return mIvcsList;
 	}
 }

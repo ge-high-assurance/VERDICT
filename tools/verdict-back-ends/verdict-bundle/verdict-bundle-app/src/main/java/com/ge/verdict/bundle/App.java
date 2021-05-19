@@ -190,6 +190,9 @@ public class App {
         }
 
         options.addOption("MA", false, "Merit Assignment");
+        options.addOption("OI", false, "One IVC");
+        options.addOption("LC", false, "All MIVC");
+        options.addOption("OC", false, "One MIVC");
         options.addOption("BA", false, "Blame Assignment");
         options.addOption("C", false, "Component-level Blame Assignment");
         options.addOption("G", false, "Global Blame Assignment");
@@ -245,6 +248,9 @@ public class App {
         helpLine("      <kind2 bin> .......... Kind2 binary");
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
         helpLine("      -MA .................. merit assignment");
+        helpLine("      -OI .................. One IVC");
+        helpLine("      -LC .................. All MIVC");
+        helpLine("      -OC .................. One MIVC");
         helpLine("      -BA .................. blame assignment");
         helpLine(
                 "       -C ................... component-level blame assignment (default link-level)");
@@ -350,6 +356,9 @@ public class App {
             boolean blameAssignment = opts.hasOption("BA");
             boolean componentLevel = opts.hasOption("C");
             boolean globalOptimization = opts.hasOption("G");
+            boolean oneIVC = opts.hasOption("OI");
+            boolean allMIVC = opts.hasOption("LC");
+            boolean oneMIVC = opts.hasOption("OC");
             boolean atg = opts.hasOption("ATG");
 
             String[] crvOpts = opts.getOptionValues("crv");
@@ -368,6 +377,9 @@ public class App {
                     globalOptimization,
                     atg,
                     meritAssignment,
+                    oneIVC,
+                    allMIVC,
+                    oneMIVC,
                     outputPath,
                     outputBaPath,
                     debugDir,
@@ -818,6 +830,9 @@ public class App {
             boolean globalOptimization,
             boolean atg,
             boolean meritAssignment,
+            boolean oneIVC,
+            boolean allMIVC,
+            boolean oneMIVC,
             String outputPath,
             String outputBaPath,
             String debugDir,
@@ -956,6 +971,10 @@ public class App {
                         lustrePath,
                         "--ivc",
                         Boolean.toString(meritAssignment),
+                        "--ivc_approximate",
+                        Boolean.toString(oneIVC),
+                        "--ivc_all",
+                        Boolean.toString(allMIVC),
                         "--ivc_category",
                         "contracts");
             }

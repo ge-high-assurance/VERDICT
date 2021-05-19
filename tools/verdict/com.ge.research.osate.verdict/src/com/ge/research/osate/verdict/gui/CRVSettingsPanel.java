@@ -37,6 +37,9 @@ public class CRVSettingsPanel extends ApplicationWindow {
 	public static boolean componentLevel = false;
 	public static boolean isGlobal = false;
 	public static boolean isLocal = true;
+	public static boolean isOneMIVC = false;
+	public static boolean isOneIVC = false;
+	public static boolean isAllMIVC = false;
 	public static boolean blame = false;
 	public static boolean merit = false;
 	public static boolean isNone = true;
@@ -86,8 +89,8 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
+		Composite mainComposite = new Composite(parent, SWT.NONE);
+		mainComposite.setLayout(new GridLayout(1, false));
 
 //		Label atgLabel = new Label(composite, SWT.NONE);
 //		atgLabel.setText("Test Case Generation");
@@ -103,11 +106,11 @@ public class CRVSettingsPanel extends ApplicationWindow {
 //		atgCheckBox.setSelection(testCaseGeneration);
 
 		// The "Enabled Threat Models" section: all the threats
-		Label threatModelsLabel = new Label(composite, SWT.NONE);
+		Label threatModelsLabel = new Label(mainComposite, SWT.NONE);
 		threatModelsLabel.setText("Threat Models");
 		threatModelsLabel.setFont(boldFont);
 
-		Group selectionButtonGroup = new Group(composite, SWT.NONE);
+		Group selectionButtonGroup = new Group(mainComposite, SWT.NONE);
 		selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
 		Button lb = new Button(selectionButtonGroup, SWT.CHECK);
@@ -158,7 +161,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 			sv.setSelection(true);
 		}
 
-		Group selDeAllButtons = new Group(composite, SWT.NONE);
+		Group selDeAllButtons = new Group(mainComposite, SWT.NONE);
 		selDeAllButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		selDeAllButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
@@ -206,11 +209,11 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		});		
 
 		// The Post-Analysis options
-		Label postAnalysisLabel = new Label(composite, SWT.NONE);
+		Label postAnalysisLabel = new Label(mainComposite, SWT.NONE);
 		postAnalysisLabel.setText("Post-Analysis");
 		postAnalysisLabel.setFont(boldFont);		
 		
-		Group postAnalysisGroup = new Group(composite, SWT.NONE);
+		Group postAnalysisGroup = new Group(mainComposite, SWT.NONE);
 		postAnalysisGroup.setLayout(new GridLayout(1, false));
 		
 		Composite meritBlameGroup = new Composite(postAnalysisGroup, SWT.NONE);
@@ -221,14 +224,55 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		meritButton.setFont(font);
 		meritButton.setSelection(isMeritAssignment);
 		
+		//if merit assignment is selected load previously 
+		// selected merit assignment options if any
+		if(meritButton.getSelection()) {
+			Group oneAllGroup = new Group(mainComposite, SWT.NONE);
+			oneAllGroup.setText("Merit Assignment Options");
+			oneAllGroup.setLayout(new GridLayout(1, false));
+			
+			Composite oneAllComposite = new Composite(oneAllGroup, SWT.NONE);
+			oneAllComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+			oneAllComposite.setEnabled(isMeritAssignment);		
+			
+			Button oneIVCButton = new Button(oneAllComposite, SWT.RADIO);
+			oneIVCButton.setText("One IVC");
+			oneIVCButton.setFont(font);
+			oneIVCButton.setSelection(isOneIVC);
+			oneIVCButton.setEnabled(isMeritAssignment);			
+			
+			Button oneMIVCButton = new Button(oneAllComposite, SWT.RADIO);
+			oneMIVCButton.setText("One MIVC");
+			oneMIVCButton.setFont(font);
+			oneMIVCButton.setSelection(isOneMIVC);
+			oneMIVCButton.setEnabled(isMeritAssignment);
+
+			Button allMIVCButton = new Button(oneAllComposite, SWT.RADIO);
+			allMIVCButton.setText("All MIVC");
+			allMIVCButton.setFont(font);
+			allMIVCButton.setSelection(isAllMIVC);
+			allMIVCButton.setEnabled(isMeritAssignment);	
+			
+			oneAllGroup.setEnabled(meritButton.getSelection());
+			oneAllComposite.setEnabled(meritButton.getSelection());
+			oneIVCButton.setEnabled(meritButton.getSelection());
+			oneMIVCButton.setEnabled(meritButton.getSelection());
+			allMIVCButton.setEnabled(meritButton.getSelection());
+			
+			isOneIVC = oneIVCButton.getSelection();
+			isOneMIVC = oneMIVCButton.getSelection();
+			isAllMIVC = allMIVCButton.getSelection();
+		}		
+		
 		Button blameButton = new Button(meritBlameGroup, SWT.RADIO);
 		blameButton.setText("Blame Assignment");
 		blameButton.setFont(font);
-		blameButton.setSelection(isBlameAssignment);
+		blameButton.setSelection(isBlameAssignment);	
 		
-		//if blame assignment is selected load previously selected blame assignment options if any
+		//if blame assignment is selected load previously 
+		// selected blame assignment options if any
 		if(isBlameAssignment) {
-			Group baGroup = new Group(composite, SWT.NONE);
+			Group baGroup = new Group(mainComposite, SWT.NONE);
 			baGroup.setText("Blame Assignment Options");
 			baGroup.setLayout(new GridLayout(1, false));
 			
@@ -286,7 +330,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 		noneButton.setSelection(isNone);
 		
 		// save and close buttons
-		Composite closeButtons = new Composite(composite, SWT.NONE);
+		Composite closeButtons = new Composite(mainComposite, SWT.NONE);
 		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		closeButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
@@ -318,7 +362,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 			public void widgetSelected(SelectionEvent e) {				
 				if (blameButton.getSelection()) {
 					//create the group below only if the blame assignment button is selected
-					Group baGroup = new Group(composite, SWT.NONE);
+					Group baGroup = new Group(mainComposite, SWT.NONE);
 					baGroup.setText("Blame Assignment Options");
 					baGroup.setLayout(new GridLayout(1, false));
 					
@@ -372,7 +416,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				} else {
 					//remove the blame-assignments-options-group by iterating 
 					//through the parent's children i.e.the "composite" control's children
-					for(Control control: composite.getChildren()) {
+					for(Control control: mainComposite.getChildren()) {
 						if (control instanceof Group) {
 							Group group= (Group)control;
 							if(group.getText()== "Blame Assignment Options") {
@@ -386,11 +430,70 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				getShell().setSize(bestSize);
 			}
 		});
+		
+		meritButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {				
+				if (meritButton.getSelection()) {
+					//create the group below only if the blame assignment button is selected
+					Group oneAllGroup = new Group(mainComposite, SWT.NONE);
+					oneAllGroup.setText("Merit Assignment Options");
+					oneAllGroup.setLayout(new GridLayout(1, false));
+					
+					Composite oneAllComposite = new Composite(oneAllGroup, SWT.NONE);
+					oneAllComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+					oneAllComposite.setEnabled(isMeritAssignment);		
+
+					Button oneIVCButton = new Button(oneAllComposite, SWT.RADIO);
+					oneIVCButton.setText("One IVC");
+					oneIVCButton.setFont(font);
+					oneIVCButton.setSelection(isOneIVC);
+					
+					Button oneMIVCButton = new Button(oneAllComposite, SWT.RADIO);
+					oneMIVCButton.setText("One MIVC");
+					oneMIVCButton.setFont(font);
+					oneMIVCButton.setSelection(isOneMIVC);
+//					oneMIVCButton.setEnabled(isMeritAssignment);
+
+					Button allMIVCButton = new Button(oneAllComposite, SWT.RADIO);
+					allMIVCButton.setText("All MIVC");
+					allMIVCButton.setFont(font);
+					allMIVCButton.setSelection(isAllMIVC);
+//					allMIVCButton.setEnabled(isMeritAssignment);	
+
+					
+					oneAllGroup.setEnabled(meritButton.getSelection());
+					oneAllComposite.setEnabled(meritButton.getSelection());
+					oneIVCButton.setEnabled(meritButton.getSelection());
+					oneMIVCButton.setEnabled(meritButton.getSelection());
+					allMIVCButton.setEnabled(meritButton.getSelection());
+					
+					isOneIVC = oneIVCButton.getSelection();
+					isOneMIVC = oneMIVCButton.getSelection();
+					isAllMIVC = allMIVCButton.getSelection();
+					closeButtons.moveBelow(oneAllGroup);//move save and cancel buttons to the bottom
+				} else {
+					//remove the blame-assignments-options-group by iterating 
+					//through the parent's children i.e.the "composite" control's children
+					for(Control control: mainComposite.getChildren()) {
+						if (control instanceof Group) {
+							Group group= (Group)control;
+							if(group.getText()== "Merit Assignment Options") {
+								group.dispose();
+							}
+						}
+					}
+				}
+				// Set the preferred size
+				Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				getShell().setSize(bestSize);
+			}
+		});		
 
 		cancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				composite.getShell().close();
+				mainComposite.getShell().close();
 			}
 		});
 
@@ -443,10 +546,10 @@ public class CRVSettingsPanel extends ApplicationWindow {
 				isBlameAssignment = blameButton.getSelection();
 				isMeritAssignment = meritButton.getSelection();
 				isNone = noneButton.getSelection();
-				//if blame assignment radio is selected then iterate
+				//if blame/merit assignment radio is selected then iterate
 				//through the parent's children i.e.the "composite" control's children
-				//and get (remember) values of blame assignment options buttons
-				for(Control control: composite.getChildren()) {
+				//and get (remember) values of blame/merit assignment options buttons
+				for(Control control: mainComposite.getChildren()) {
 					if (control instanceof Group) {
 						Group group= (Group)control;
 						if(group.getText()== "Blame Assignment Options") {
@@ -467,7 +570,33 @@ public class CRVSettingsPanel extends ApplicationWindow {
 											    	componentLevel = button.getSelection();
 											    break;
 											    default:
-											    	System.out.println("Not local or global or component");
+											    	break;
+											}
+										}
+									}
+								}
+							}
+						}
+						
+						if(group.getText()== "Merit Assignment Options") {
+							for(Control groupChild: group.getChildren()) {
+								if (groupChild instanceof Composite) {
+									Composite subComposite= (Composite)groupChild;
+									for(Control subCompositeControl: subComposite.getChildren()) {
+										if (subCompositeControl instanceof Button) {
+											Button button= (Button)subCompositeControl;
+											switch (button.getText()) {
+												case "One IVC":
+													isOneIVC = button.getSelection();
+												break;
+												case "One MIVC":
+													isOneMIVC = button.getSelection();
+											    break;
+											    case "All MIVC":
+											    	isAllMIVC = button.getSelection();
+											    break;
+											    default:
+											    	break;
 											}
 										}
 									}
@@ -476,9 +605,9 @@ public class CRVSettingsPanel extends ApplicationWindow {
 						}
 					}
 				}
-				composite.getShell().close();
+				mainComposite.getShell().close();
 			}
 		});
-		return composite;
+		return mainComposite;
 	}
 }
