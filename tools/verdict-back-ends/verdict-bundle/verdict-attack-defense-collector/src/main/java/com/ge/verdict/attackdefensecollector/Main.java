@@ -10,6 +10,7 @@ public class Main {
     private static final String USAGE =
             "java -jar {attack-defense-collector.jar} --vdm {STEM output dir} {vdm file} [--inference] [--cut-set]";
 
+    @SuppressWarnings("deprecation")
     public static void main(String[] args) throws IOException, CSVFile.MalformedInputException {
         if (arrayContains(args, "--help")) {
             System.out.println("Usage: " + USAGE);

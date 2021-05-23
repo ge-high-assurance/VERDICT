@@ -98,6 +98,7 @@ public class AttackDefenseCollector {
      * @throws CSVFile.MalformedInputException if a CSV file is malformed
      * @deprecated use the VDM constructor instead
      */
+    @Deprecated
     public AttackDefenseCollector(String inputDir, boolean inference)
             throws IOException, CSVFile.MalformedInputException {
         /*
