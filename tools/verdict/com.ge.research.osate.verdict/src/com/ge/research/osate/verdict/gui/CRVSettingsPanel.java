@@ -38,7 +38,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 	public static boolean isGlobal = false;
 	public static boolean isLocal = true;
 	public static boolean isOneMIVC = false;
-	public static boolean isOneIVC = false;
+	public static boolean isOneIVC = true;
 	public static boolean isAllMIVC = false;
 	public static boolean blame = false;
 	public static boolean merit = false;
