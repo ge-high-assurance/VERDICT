@@ -48,41 +48,40 @@ public class MeritAssignmentView extends ViewPart {
 		
 		if(!mInvTreeContents.isEmpty()) {
 			for(int i = 0; i < mInvTreeContents.size(); ++i) {
-				TreeItem level0NodeItem = new TreeItem (tree, 0);
+				TreeItem topLevelNodeItem = new TreeItem (tree, 0);
 				
-				level0NodeItem.setText("Minimal Inductive Validity Core #" + (i+1));
+				topLevelNodeItem.setText("Minimal Inductive Validity Core #" + (i+1));
 				Set<IVCNode> mIvcs = mInvTreeContents.get(i);
-				
-				for(IVCNode mIvc : mIvcs) {
-					TreeItem level1NodeItem = new TreeItem (level0NodeItem, 0);
-					level1NodeItem.setText("Component '" + mIvc.getNodeName() + "'");
-					for (IVCElement e : mIvc.getNodeElements()) {
-						TreeItem eItem = new TreeItem (level1NodeItem, 0);
-						eItem.setText(e.getCategory().toString() + " '" + e.getName() + "'");
-					}
-				}
+				Map<Boolean, List<IVCNode>> partitioned = mIvcs.stream().collect(Collectors.partitioningBy(IVCNode::hasAssumption));
+				fillTree(topLevelNodeItem, partitioned.get(true));
+				fillTree(topLevelNodeItem, partitioned.get(false));			
 			}
 		}
 		
 		if(!aInvTreeContents.isEmpty()) {
 			for(int i = 0; i < aInvTreeContents.size(); ++i) {
-				TreeItem level0NodeItem = new TreeItem (tree, 0);
+				TreeItem topLevelNodeItem = new TreeItem (tree, 0);
 				
-				level0NodeItem.setText("Inductive Validity Core #" + (i+1));
+				topLevelNodeItem.setText("Inductive Validity Core #" + (i+1));
 				Set<IVCNode> aIvcs = aInvTreeContents.get(i);
-				
-				for(IVCNode aIvc : aIvcs) {
-					TreeItem level1NodeItem = new TreeItem (level0NodeItem, 0);
-					level1NodeItem.setText("Component '" + aIvc.getNodeName() + "'");
-					for (IVCElement e : aIvc.getNodeElements()) {
-						TreeItem eItem = new TreeItem (level1NodeItem, 0);
-						eItem.setText(e.getCategory().toString() + " '" + e.getName() + "'");
-					}
-				}
+				Map<Boolean, List<IVCNode>> partitioned = aIvcs.stream().collect(Collectors.partitioningBy(IVCNode::hasAssumption));
+				fillTree(topLevelNodeItem, partitioned.get(true));
+				fillTree(topLevelNodeItem, partitioned.get(false));							
 			}
 		}		
 		
 		tree.pack();
 		composite.pack();
+	}
+	
+	private void fillTree(TreeItem topLevel, List<IVCNode> nodes) {
+		for (IVCNode node : nodes) {
+			TreeItem nodeItem = new TreeItem (topLevel, 0);
+			nodeItem.setText("Component '" + node.getNodeName() + "'");
+			for (IVCElement e : node.getNodeElements()) {
+				TreeItem eItem = new TreeItem (nodeItem, 0);
+				eItem.setText(e.getCategory().toString() + " '" + e.getName() + "'");
+			}
+		}
 	}	
 }
