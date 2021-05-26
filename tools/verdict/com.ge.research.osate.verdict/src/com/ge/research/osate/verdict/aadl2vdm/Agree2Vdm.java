@@ -134,7 +134,6 @@ public class Agree2Vdm {
 	    //invoking this method from AADL2VDM translator to populate non-agree AADL objects
 	  	m = aadl2vdm.populateVDMFromAadlObjects(objectsFromAllFiles, objectsFromFilesInProjects, m);
 		m = populateVDMFromAadlAgreeObjects(objectsFromAllFiles, m);
-		VdmTranslator.marshalToXml(m, new File("/Users/212810885/Desktop/test.xml"));
 		return m;
 	}
 	/**
@@ -381,11 +380,7 @@ public class Agree2Vdm {
 		ConstantDeclaration vdmConstDeclaration = new ConstantDeclaration();
 		vdmConstDeclaration.setName(constStmtImpl.getName());
 		vdmConstDeclaration.setDefinition(getVdmExpressionFromAgreeExpression(constStmtImpl.getExpr(), dataTypeDecl, nodeDecl, model));
-		Type type = constStmtImpl.getType();
-		if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
-		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-		dtype.setUserDefinedType(getDataTypeName(type));
-		vdmConstDeclaration.setDataType(dtype);
+		vdmConstDeclaration.setDataType(getVdmTypeFromAgreeType(constStmtImpl.getType(),dataTypeDecl,model));
 		return vdmConstDeclaration;
 	}
 	private ContractItem translateAssumeStatement(AssumeStatement assumeStmt, HashSet<String> dataTypeDecl,
@@ -410,14 +405,7 @@ public class Agree2Vdm {
 		for(Arg lhsArg : lhsArgs) {//left side has the variable names along with their types
 			//set the id				
 			symbDef.setName(lhsArg.getName());
-			//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
-			Type type = lhsArg.getType();
-			//set just name of the type - but make sure you add the type declaration to the vdm model if not already added
-			if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
-			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-			dtype.setUserDefinedType(getDataTypeName(type));
-			//set type name
-			symbDef.setDataType(dtype);			
+			symbDef.setDataType(getVdmTypeFromAgreeType(lhsArg.getType(), dataTypeDecl,model));			
 			//set the expression as the value/definition for each variable on the left
 			symbDef.setDefinition(vdmExpression);
 		}
@@ -535,11 +523,13 @@ public class Agree2Vdm {
 	}
 	public verdict.vdm.vdm_data.DataType getVdmTypeFromAgreeType(Type type,HashSet<String> dataTypeDecl, Model model) {
 		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		//need to parse the type of the variable and should map to appropriate DataType value (plainType, subrangeType, arrayType, tupleType, enumType, recordType, userDefinedType) of the symbol
 		if(type instanceof PrimType) {
 			PrimType primType = (PrimType)type;
 			verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
 			dtype.setPlainType(plaintype);
 		} else {
+			//set just name of the type - but make sure you add the type declaration to the vdm model if not already added
 			translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);//this call is mainly to define the type if not already defined
 			dtype.setUserDefinedType(getDataTypeName(type));
 		}
@@ -638,12 +628,8 @@ public class Agree2Vdm {
 		for(Arg arg : nodeInpArgs) {
 			NodeParameter nodeParameter = new NodeParameter();
 			nodeParameter.setName(arg.getName());
-			//get types of each arg and define those types if needed
-			Type argType = arg.getType();
-			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-			if(!(argType instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(argType, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
-			dtype.setUserDefinedType(getDataTypeName(argType));
-			nodeParameter.setDataType(dtype);
+			//get types of each arg and define those types if needed -- will be done in getVdmTypeFromAgreeType()
+			nodeParameter.setDataType(getVdmTypeFromAgreeType(arg.getType(), dataTypeDecl, model));
 			vdmNode.getInputParameter().add(nodeParameter);
 		}
 		//SETTING NODE OUTPUT PARAMETERS
@@ -652,12 +638,8 @@ public class Agree2Vdm {
 		for(Arg arg : nodeReturnArgs) {
 			NodeParameter nodeParameter = new NodeParameter();
 			nodeParameter.setName(arg.getName());
-			//get types of each arg and define those types if needed
-			Type argType = arg.getType();
-			verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-			if(!(argType instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(argType, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
-			dtype.setUserDefinedType(getDataTypeName(argType));
-			nodeParameter.setDataType(dtype);
+			//get types of each arg and define those types if needed -- will be done in getVdmTypeFromAgreeType()
+			nodeParameter.setDataType(getVdmTypeFromAgreeType(arg.getType(), dataTypeDecl, model));
 			vdmNode.getOutputParameter().add(nodeParameter);
 		}
 		//SETTING NODE BODY
@@ -761,11 +743,7 @@ public class Agree2Vdm {
 					ConstantDeclaration vdmConstDeclaration = new ConstantDeclaration();
 					vdmConstDeclaration.setName(nmElmConstStatementName);
 					vdmConstDeclaration.setDefinition(getVdmExpressionFromAgreeExpression(nmElmConstStatement.getExpr(), dataTypeDecl, nodeDecl, model));
-					Type type = nmElmConstStatement.getType();
-					if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
-					verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
-					dtype.setUserDefinedType(getDataTypeName(type));
-					vdmConstDeclaration.setDataType(dtype);
+					vdmConstDeclaration.setDataType(getVdmTypeFromAgreeType(nmElmConstStatement.getType(), dataTypeDecl, model));
 					LustreProgram lustreProgram = model.getDataflowCode();
 					lustreProgram.getConstantDeclaration().add(vdmConstDeclaration);
 					model.setDataflowCode(lustreProgram);

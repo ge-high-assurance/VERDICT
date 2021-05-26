@@ -3092,6 +3092,7 @@ public class Aadl2Vdm {
 
 				//adding packSubComp to packBlockImpl
                 packBlockImpl.getSubcomponent().add(packSubComp);
+                packCompImpl.setBlockImpl(packBlockImpl);
 			}//End of adding all subcomponents
 		
 			//adding all connections to "connections" field of packBlockImpl
@@ -3386,11 +3387,12 @@ public class Aadl2Vdm {
 
 					//add packConn to packBlockImpl
 					packBlockImpl.getConnection().add(packConn);
+					packCompImpl.setBlockImpl(packBlockImpl);
 				}
 			}//End of adding all connections
 
 			//setting "blackImpl" field of packCompImpl
-			packCompImpl.setBlockImpl(packBlockImpl);
+			//packCompImpl.setBlockImpl(packBlockImpl);
 		}//End of Getting the reference
 
 		//return populated Model
