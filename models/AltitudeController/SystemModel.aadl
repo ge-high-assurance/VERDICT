@@ -1,0 +1,145 @@
+package SystemModel
+public
+	with Base_Types;
+
+
+	annex agree {**
+					
+		node abs(n: real) returns (r: real);
+        let
+          r = if 0.0<=n then n else -n;
+        tel;
+		
+		node min(a: real, b: real) returns (c: real);
+        let
+          c = if a<=b then a else b;
+        tel;
+	**};
+
+
+	system Controller
+		features
+			TH: in data port Base_Types::Float;
+			UB: in data port Base_Types::Float;
+			ERR: in data port Base_Types::Float;
+			alt: in data port Base_Types::Float;
+			
+			pitch: out data port Base_Types::Float;
+			
+		annex agree {**
+			--eq LIMIT: real = TH - (UB + ERR);
+			eq LIMIT: real = TH - (UB + 2.0*ERR);
+			
+			guarantee "L1": alt > LIMIT => pitch < 0.0;
+		**};
+	end Controller;
+
+
+	system Environment
+		features
+			UB: in data port Base_Types::Float;
+			pitch: in data port Base_Types::Float;
+			
+			alt: out data port Base_Types::Float;
+			
+		annex agree {**
+				
+			guarantee "E1": (alt = 0.0) -> true;
+  			guarantee "E2": alt >= 0.0;
+  			
+  			guarantee "E3": true -> (pitch < 0.0 => alt <= pre(alt));
+  			guarantee "E4": true -> (pitch < 0.0 => alt >= pre(alt) - UB);
+  			
+  			guarantee "E5": true -> (pitch > 0.0 => alt >= pre(alt));
+  			guarantee "E6": true -> (pitch > 0.0 => alt <= pre(alt) + UB);
+  			
+  			guarantee "E7": true -> (pitch = 0.0 => alt = pre(alt));
+						
+		**};
+		
+	end Environment;
+
+	system TriplexVoter
+		features
+			alt1: in data port Base_Types::Float;
+			alt2: in data port Base_Types::Float;
+			alt3: in data port Base_Types::Float;
+			
+			r: out data port Base_Types::Float;
+	end TriplexVoter;
+	
+	
+	system implementation TriplexVoter.Impl
+		annex agree {**
+			
+			eq ad12: real = abs(alt1 - alt2);
+			eq ad13: real = abs(alt1 - alt3);
+			eq ad23: real = abs(alt2 - alt3);
+			
+			eq m: real = min(ad12, min(ad13, ad23));
+			
+			eq avg12: real = (alt1 + alt2) / 2.0;
+			eq avg13: real = (alt1 + alt3) / 2.0;
+			eq avg23: real = (alt2 + alt3) / 2.0;
+			
+			assign r = if m = ad12 then avg12 else if m = ad13 then avg13 else avg23;
+			
+		**};
+	end TriplexVoter.Impl;
+
+
+	system Observer
+		features
+			-- Model parameters (modelled as inputs to make them symbolic)
+			TH: in data port Base_Types::Float;
+			UB: in data port Base_Types::Float;
+			ERR: in data port Base_Types::Float;
+			
+			-- Altimeter sensors readings
+			alt1: in data port Base_Types::Float;
+			alt2: in data port Base_Types::Float;
+			alt3: in data port Base_Types::Float;
+			
+			-- Actual Altitude
+			act_alt: out data port Base_Types::Float;
+			
+		annex agree {**
+				
+			assume "C1": TH > 0.0 and (true -> TH=pre(TH));
+			assume "C2": UB > 0.0 and (true -> UB=pre(UB));
+			assume "C3": ERR >= 0.0 and (true -> ERR=pre(ERR));
+			
+			assume "S1": abs(0.0 -> pre(act_alt) - alt1) <= ERR;
+            assume "S2": abs(0.0 -> pre(act_alt) - alt2) <= ERR;
+            assume "S3": abs(0.0 -> pre(act_alt) - alt3) <= ERR;
+            
+            guarantee "R1": act_alt <= TH;
+				
+		**};
+		
+	end Observer;
+	
+	system implementation Observer.Impl
+		subcomponents
+			voter: system TriplexVoter.Impl;
+			contr: system Controller;
+			env: system Environment;
+			
+		connections
+			c1: port alt1 -> voter.alt1;
+			c2: port alt2 -> voter.alt2;
+			c3: port alt3 -> voter.alt3;
+			
+			c4: port TH -> contr.TH;
+			c5: port UB -> contr.UB;
+			c6: port ERR -> contr.ERR;
+			c7: port voter.r -> contr.alt;
+			
+			c8: port UB -> env.UB;
+			c9: port contr.pitch -> env.pitch;
+			
+			c10: port env.alt -> act_alt; 
+			
+	end Observer.Impl;
+	
+end SystemModel;
