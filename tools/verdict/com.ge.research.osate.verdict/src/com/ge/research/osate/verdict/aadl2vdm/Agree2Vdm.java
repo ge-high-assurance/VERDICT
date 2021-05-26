@@ -36,6 +36,7 @@ import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
 import org.osate.aadl2.impl.DataImplementationImpl;
 import org.osate.aadl2.impl.DataPortImpl;
@@ -69,6 +70,8 @@ import verdict.vdm.vdm_lustre.NodeParameter;
 import verdict.vdm.vdm_lustre.RecordLiteral;
 import verdict.vdm.vdm_lustre.RecordProjection;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
+import verdict.vdm.vdm_lustre.VariableDeclaration;
+import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
 import com.rockwellcollins.atc.agree.agree.Arg;
@@ -80,6 +83,7 @@ import com.rockwellcollins.atc.agree.agree.ConstStatement;
 import com.rockwellcollins.atc.agree.agree.DoubleDotRef;
 import com.rockwellcollins.atc.agree.agree.EnumLitExpr;
 import com.rockwellcollins.atc.agree.agree.AgreeContractSubclause;
+import com.ge.verdict.vdm.VdmTranslator;
 import com.google.inject.Injector;
 import com.rockwellcollins.atc.agree.agree.AgreeContract;
 import com.rockwellcollins.atc.agree.agree.EqStatement;
@@ -103,6 +107,10 @@ import com.rockwellcollins.atc.agree.agree.SpecStatement;
 import com.rockwellcollins.atc.agree.agree.Type;
 import com.rockwellcollins.atc.agree.agree.UnaryExpr;
 import com.rockwellcollins.atc.agree.agree.impl.ArgImpl;
+import com.rockwellcollins.atc.agree.agree.impl.AssertStatementImpl;
+import com.rockwellcollins.atc.agree.agree.impl.AssignStatementImpl;
+import com.rockwellcollins.atc.agree.agree.impl.ConstStatementImpl;
+import com.rockwellcollins.atc.agree.agree.impl.EqStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
 /**
 *
@@ -126,6 +134,7 @@ public class Agree2Vdm {
 	    //invoking this method from AADL2VDM translator to populate non-agree AADL objects
 	  	m = aadl2vdm.populateVDMFromAadlObjects(objectsFromAllFiles, objectsFromFilesInProjects, m);
 		m = populateVDMFromAadlAgreeObjects(objectsFromAllFiles, m);
+		VdmTranslator.marshalToXml(m, new File("/Users/212810885/Desktop/test.xml"));
 		return m;
 	}
 	/**
@@ -198,15 +207,18 @@ public class Agree2Vdm {
 		HashSet<String> nodeDecl = new HashSet<String>();
 		// variables for extracting data from the AADL object
 		List<SystemType> systemTypes = new ArrayList<>();
+		List<SystemImplementation> systemImplementations = new ArrayList<>();
 		// extracting data from the AADLObject
 		for(EObject obj : objects) {
 			if (obj instanceof SystemType) {
 				//obtaining system Types
 				systemTypes.add((SystemType) obj);
+			} else if (obj instanceof SystemImplementation){
+				systemImplementations.add((SystemImplementation) obj);
 			}
 		} // end of extracting data from the AADLObjec
 		/* Translating agree annex in System Types */
-		model = translateAgreeAnnex(systemTypes, model, dataTypeDecl, nodeDecl);
+		model = translateAgreeAnnex(systemTypes, systemImplementations, model, dataTypeDecl, nodeDecl);
 		//return the final model
 		return model;
 	}
@@ -219,7 +231,7 @@ public class Agree2Vdm {
 		}
 		return dataTypeDecl;
 	}
-	private Model translateAgreeAnnex(List<SystemType> systemTypes, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
+	private Model translateAgreeAnnex(List<SystemType> systemTypes, List<SystemImplementation> systemImpls, Model model, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl) {
 		LustreProgram lustreProgram = new LustreProgram();
 		model.setDataflowCode(lustreProgram);//Initializing the lustre program in the VDM
 //		System.out.println("Processing "+systemTypes.size()+" SystemTypes for agree annexes");
@@ -258,23 +270,123 @@ public class Agree2Vdm {
 								ContractItem contractItem = translateAssumeStatement(assumeStmt, dataTypeDecl, nodeDecl, model);
 								contractSpec.getAssume().add(contractItem);
 							} else {
+								if(!(specStatement instanceof ConstStatementImpl)) {
+									System.out.println("Element not recognizable"+clause.eContents().toString());
+								}
+							}
+						}
+					}
+					if(contractSpec!= null) {
+						List<ComponentType> vdmComponentTypes = model.getComponentType();
+						for(ComponentType vdmComponentType: vdmComponentTypes) {
+							//populating agree contract details in the corresponding componentType instance in vdm
+							if (vdmComponentType.getName().equalsIgnoreCase(sysType.getName())) {
+								vdmComponentType.setContract(contractSpec);
+							}
+						}
+						//populating agree contract details in the componentType instance in vdm
+						//packComponent.setContract(contractSpec);
+					}
+				}
+			}// End of unpacking sysType
+		}
+		for(SystemImplementation sysImpl : systemImpls) {
+			// unpacking sysType
+			for(AnnexSubclause annex : sysImpl.getOwnedAnnexSubclauses()) {				
+				if(annex.getName().equalsIgnoreCase("agree")) {
+					//annex is of type DefaultAnnexSubclause
+					DefaultAnnexSubclause ddASC=(DefaultAnnexSubclause)annex;
+					//AnnexSubclause aSC = ddASC.getParsedAnnexSubclause();
+					AgreeContractSubclause agreeAnnex= (AgreeContractSubclause)ddASC.getParsedAnnexSubclause();
+					//populating agree contracts in the vdm node body for component implementation type
+					verdict.vdm.vdm_lustre.NodeBody nodeBody= new verdict.vdm.vdm_lustre.NodeBody();;
+					EList<EObject> annexContents= agreeAnnex.eContents();
+					if(annexContents.isEmpty()) {
+						System.out.println("Empty Agree Annex.");
+					}
+					for(EObject clause : annexContents) {
+						//mapping to AgreeContractclause
+						AgreeContract agreeContract = (AgreeContract)clause;						
+						//getting specStatements
+						EList<SpecStatement> specStatements = agreeContract.getSpecs();
+						for(SpecStatement specStatement : specStatements) {
+							if (specStatement instanceof ConstStatementImpl) {
+								ConstStatementImpl constStmtImpl = (ConstStatementImpl)specStatement;
+								ConstantDeclaration constDecl = translateConstStatementImpl(constStmtImpl, dataTypeDecl, nodeDecl, model);
+								nodeBody.getConstantDeclaration().add(constDecl);
+							} else if (specStatement instanceof EqStatementImpl) {
+								EqStatementImpl eqStmtImpl = (EqStatementImpl)specStatement;
+								nodeBody = translateEqStatementImpl(eqStmtImpl, dataTypeDecl, nodeDecl, model,nodeBody);
+							} else if (specStatement instanceof AssignStatementImpl) {
+								AssignStatementImpl assignStmtImpl = (AssignStatementImpl)specStatement;
+								NodeEquation nodeEquation = translateAssignStatementImpl(assignStmtImpl, dataTypeDecl, nodeDecl, model);
+								nodeBody.getEquation().add(nodeEquation);
+							} else if (specStatement instanceof AssertStatementImpl) {
+								AssertStatementImpl assertStmtImpl = (AssertStatementImpl)specStatement;
+								Expression assertion = translateAssertStatementImpl(assertStmtImpl, dataTypeDecl, nodeDecl, model);
+								nodeBody.getAssertion().add(assertion);
+							} else {
 								System.out.println("Element not recognizable"+clause.eContents().toString());
 							}
 						}
 					}
-					List<ComponentType> vdmComponentTypes = model.getComponentType();
-					for(ComponentType vdmComponentType: vdmComponentTypes) {
-						//populating agree contract details in the corresponding componentType instance in vdm
-						if (vdmComponentType.getName().equalsIgnoreCase(sysType.getName())) {
-							vdmComponentType.setContract(contractSpec);
+					List<ComponentImpl> vdmComponentImpls = model.getComponentImpl();
+					for(ComponentImpl vdmComponentImpl: vdmComponentImpls) {
+						//populating agree contract details in the corresponding componentImplType instance in vdm
+						if (vdmComponentImpl.getName().equalsIgnoreCase(sysImpl.getName())) {
+							vdmComponentImpl.setDataflowImpl(nodeBody);
 						}
 					}
-					//populating agree contract details in the componentType instance in vdm
-					//packComponent.setContract(contractSpec);
 				}
-			}// End of unpacking sysType
+			}
 		}
 		return model;
+	}
+	private NodeEquation translateAssignStatementImpl(AssignStatementImpl assignStmtImpl, HashSet<String> dataTypeDecl,
+			HashSet<String> nodeDecl, Model model) {
+		//get all LHS identifiers in the statement and add it to the vdm node equation LHS
+		NodeEquation vdmNodeEquation = new NodeEquation();
+		NodeEquationLHS vdmNodeEquationLHS = new NodeEquationLHS();//this type is just a list of strings
+		vdmNodeEquationLHS.getIdentifier().add(assignStmtImpl.getId().getName());
+		vdmNodeEquation.setLhs(vdmNodeEquationLHS);
+		//get the RHS i.e.expr of the agree NodeEq and set it as the vdm node equation's RHS
+		vdmNodeEquation.setRhs(getVdmExpressionFromAgreeExpression(assignStmtImpl.getExpr(), dataTypeDecl, nodeDecl, model));
+		return vdmNodeEquation;
+	}
+	private Expression translateAssertStatementImpl(AssertStatementImpl assertStmtImpl, HashSet<String> dataTypeDecl,
+			HashSet<String> nodeDecl, Model model) {
+		return getVdmExpressionFromAgreeExpression(assertStmtImpl.getExpr(),dataTypeDecl,nodeDecl,model);
+	}
+	private NodeBody translateEqStatementImpl(EqStatementImpl eqStmtImpl, HashSet<String> dataTypeDecl,
+			HashSet<String> nodeDecl, Model model, NodeBody nodebody) {
+		//get all LHS identifiers in the statement and add it to the vdm node equation LHS
+		NodeEquation vdmNodeEquation = new NodeEquation();
+		EList<Arg> agreeLHSArgs = eqStmtImpl.getLhs();
+		NodeEquationLHS vdmNodeEquationLHS = new NodeEquationLHS();//this type is just a list of strings
+		VariableDeclaration varDecl = new VariableDeclaration();
+		for(Arg agreeLHSArg: agreeLHSArgs) {
+			vdmNodeEquationLHS.getIdentifier().add(agreeLHSArg.getName());
+			varDecl.setName(agreeLHSArg.getName());
+			varDecl.setDataType(getVdmTypeFromAgreeType(agreeLHSArg.getType(),dataTypeDecl,model));
+			nodebody.getVariableDeclaration().add(varDecl);
+		}
+		vdmNodeEquation.setLhs(vdmNodeEquationLHS);
+		//get the RHS i.e.expr of the agree NodeEq and set it as the vdm node equation's RHS
+		vdmNodeEquation.setRhs(getVdmExpressionFromAgreeExpression(eqStmtImpl.getExpr(), dataTypeDecl, nodeDecl, model));
+		nodebody.getEquation().add(vdmNodeEquation);
+		return nodebody;
+	}
+	private ConstantDeclaration translateConstStatementImpl(ConstStatementImpl constStmtImpl,
+			HashSet<String> dataTypeDecl, HashSet<String> nodeDecl, Model model) {
+		ConstantDeclaration vdmConstDeclaration = new ConstantDeclaration();
+		vdmConstDeclaration.setName(constStmtImpl.getName());
+		vdmConstDeclaration.setDefinition(getVdmExpressionFromAgreeExpression(constStmtImpl.getExpr(), dataTypeDecl, nodeDecl, model));
+		Type type = constStmtImpl.getType();
+		if(!(type instanceof PrimType)) {translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);}//this call is mainly to define the type if not already defined
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		dtype.setUserDefinedType(getDataTypeName(type));
+		vdmConstDeclaration.setDataType(dtype);
+		return vdmConstDeclaration;
 	}
 	private ContractItem translateAssumeStatement(AssumeStatement assumeStmt, HashSet<String> dataTypeDecl,
 			HashSet<String> nodeDecl, Model model) {
@@ -418,6 +530,18 @@ public class Agree2Vdm {
 			dtype.setUserDefinedType(aadlDataType.getName());
 		} else {
 			dtype.setUserDefinedType(aadlDataType.getName());
+		}
+		return dtype;
+	}
+	public verdict.vdm.vdm_data.DataType getVdmTypeFromAgreeType(Type type,HashSet<String> dataTypeDecl, Model model) {
+		verdict.vdm.vdm_data.DataType dtype = new verdict.vdm.vdm_data.DataType();
+		if(type instanceof PrimType) {
+			PrimType primType = (PrimType)type;
+			verdict.vdm.vdm_data.PlainType plaintype = verdict.vdm.vdm_data.PlainType.fromValue(primType.getName());
+			dtype.setPlainType(plaintype);
+		} else {
+			translateAgreeDataTypeToVdmDataType(type, dataTypeDecl, model);//this call is mainly to define the type if not already defined
+			dtype.setUserDefinedType(getDataTypeName(type));
 		}
 		return dtype;
 	}
