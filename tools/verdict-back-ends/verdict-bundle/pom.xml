@@ -21,6 +21,7 @@
     <module>verdict-crv</module>
     <module>verdict-instrumentor</module>
     <module>verdict-lustre-translator</module>
+    <module>verdict-mbaas-synthesis</module>
     <module>verdict-mbas-translator</module>
     <module>verdict-merit-assignment</module>
     <module>verdict-stem-runner</module>
