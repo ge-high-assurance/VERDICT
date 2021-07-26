@@ -391,7 +391,10 @@ public class Vdm2Csv {
 		HashMap<String,String> connAttrMap = compInstAttributesMap.get(compInst.getId());
 		for(String propName: propToCompInsts.keySet()) {
 			//check if the connection has that property - add it to csv if it does
-			if (connAttrMap.containsKey(propName)) {
+			if (synthesis && DefenseProperties.MBAA_COMP_DEFENSE_PROPERTIES_SET.contains(propName)) {
+				// this fools stem - --code synonymous to code by William in the previous aadl2csvtranslator
+				scnCompPropsTable.addValue("9");
+			} else if (connAttrMap.containsKey(propName)) {
 				scnCompPropsTable.addValue(connAttrMap.get(propName));//connection property
 			} else {
 				scnCompPropsTable.addValue("");
