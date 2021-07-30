@@ -95,10 +95,17 @@ public class Defense extends ADTree {
         for (List<DefenseLeaf> term : defenseDnf) {
             Prob termTotal = Prob.impossible();
             for (DefenseLeaf leaf : term) {
-                Prob prob =
-                        leaf.right.isPresent()
-                                ? Prob.fromDal(leaf.right.get().right)
-                                : Prob.certain();
+                Prob prob;
+                if (leaf.right.isPresent()) {
+                    /*if(leaf.right.get().left == "userAuthentication")
+                    	//prob = Prob.certain();
+                    //else if(leaf.right.get().left == "physicalAccessControl")
+                    	//prob = Prob.certain();
+                    else*/
+                    prob = Prob.fromDal(leaf.right.get().right);
+                } else {
+                    prob = Prob.certain();
+                }
                 termTotal = Prob.or(termTotal, prob);
             }
             total = Prob.and(total, termTotal);

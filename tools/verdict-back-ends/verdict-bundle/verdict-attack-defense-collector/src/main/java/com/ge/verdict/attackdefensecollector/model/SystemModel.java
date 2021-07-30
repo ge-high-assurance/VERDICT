@@ -319,17 +319,21 @@ public class SystemModel {
             // Only allow matching CIA attacks
             if (attack.getCia().equals(concern.getCia())) {
                 if (attackToDefense.containsKey(attack)) {
-                    // There is a defense associated
+                    // There is an associated defense
                     Optional<ADTree> dependentRules =
                             DependentRules.getComponentDependence(this, attack.getName());
+                    //If the applicable attack is dependent on some defense
                     if (dependentRules.isPresent()) {
                         children.add(
                                 new ADAnd(
-                                        new ADNot(attackToDefense.get(attack)),
-                                        attack,
-                                        dependentRules.get()));
+                                        new ADNot(attackToDefense.get(attack)), //Negation of defense tree corresponding to the attack
+                                        attack,									//The dependent attack
+                                        dependentRules.get()));					//The ADTree for the 
                     } else {
-                        children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
+                        children.add(
+                        		new ADAnd(
+                        				new ADNot(attackToDefense.get(attack)), //Negation of defense tree corresponding to the attack
+                        				attack));								//The attack
                     }
                 } else {
                     // There is no defense, just a raw attack
