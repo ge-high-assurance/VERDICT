@@ -39,6 +39,7 @@
 
   <build>
     <plugins>
+      <!-- Build capsule jar -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
@@ -48,4 +49,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

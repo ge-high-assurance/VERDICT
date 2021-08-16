@@ -89,7 +89,7 @@
 
   <build>
     <plugins>
-      <!-- Add native libs to capsule -->
+      <!-- Build capsule jar and include native libs -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
@@ -106,7 +106,7 @@
           </fileSets>
         </configuration>
       </plugin>
-      <!-- Unpack z3-native-libs -->
+      <!-- Unpack native libs -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -123,9 +123,11 @@
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

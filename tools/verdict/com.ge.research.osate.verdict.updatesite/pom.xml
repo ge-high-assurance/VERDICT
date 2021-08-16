@@ -11,4 +11,5 @@
 
   <artifactId>com.ge.research.osate.verdict.updatesite</artifactId>
   <packaging>eclipse-repository</packaging>
+
 </project>

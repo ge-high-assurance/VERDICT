@@ -11,4 +11,5 @@
 
   <artifactId>com.ge.research.osate.verdict.feature</artifactId>
   <packaging>eclipse-feature</packaging>
+
 </project>

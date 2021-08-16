@@ -15,47 +15,7 @@
   <build>
     <sourceDirectory>${project.basedir}/src</sourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets combine.children="append">
-            <fileset>
-              <directory>${project.basedir}</directory>
-              <includes>
-                <include>plugin.xml_gen</include>
-              </includes>
-            </fileset>
-            <fileset>
-              <directory>${project.basedir}/model</directory>
-            </fileset>
-            <fileset>
-              <directory>${project.basedir}/src-gen</directory>
-              <excludes>
-                <exclude>README.md</exclude>
-              </excludes>
-            </fileset>
-            <fileset>
-              <directory>${project.basedir}/xtend-gen</directory>
-              <excludes>
-                <exclude>README.rst</exclude>
-              </excludes>
-            </fileset>
-            <fileset>
-              <directory>${project.basedir}/../com.ge.research.osate.verdict.dsl.ui</directory>
-              <includes>
-                <include>plugin.xml_gen</include>
-              </includes>
-            </fileset>
-            <fileset>
-              <directory>${project.basedir}/../com.ge.research.osate.verdict.dsl.ui/src-gen</directory>
-              <excludes>
-                <exclude>README.md</exclude>
-              </excludes>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
+      <!-- Copy xtend files to classes first -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
@@ -80,6 +40,7 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Generate additional files -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -94,39 +55,13 @@
           <classpathScope>compile</classpathScope>
           <workingDirectory>${project.basedir}</workingDirectory>
         </configuration>
-        <executions>
-          <execution>
-            <?m2e ignore?>
-            <id>default-exec</id>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <phase>generate-sources</phase>
-          </execution>
-        </executions>
       </plugin>
+      <!-- Compile Xtend sources -->
       <plugin>
         <groupId>org.eclipse.xtend</groupId>
         <artifactId>xtend-maven-plugin</artifactId>
-        <configuration>
-          <outputDirectory>${project.basedir}/xtend-gen</outputDirectory>
-          <xtendAsPrimaryDebugSource>true</xtendAsPrimaryDebugSource>
-        </configuration>
-        <executions>
-          <execution>
-            <id>default-compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-xtend-install-debug-info</id>
-            <goals>
-              <goal>xtend-install-debug-info</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

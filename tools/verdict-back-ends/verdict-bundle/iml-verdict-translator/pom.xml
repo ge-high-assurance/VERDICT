@@ -58,6 +58,7 @@
 
   <build>
     <plugins>
+      <!-- Build capsule jar -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
@@ -81,4 +82,5 @@
       <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
     </repository>
   </repositories>
+
 </project>

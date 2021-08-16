@@ -12,6 +12,7 @@
   <artifactId>com.ge.research.osate.verdict</artifactId>
   <packaging>eclipse-plugin</packaging>
 
+  <!-- Needed by maven-dependency-plugin -->
   <dependencies>
     <dependency>
       <groupId>com.amihaiemil.web</groupId>
@@ -44,19 +45,7 @@
 
   <build>
     <plugins>
-      <!-- Remove lib directory when cleaning -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${project.basedir}/lib</directory>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-      <!-- Copy dependencies into lib directory -->
+      <!-- Copy dependencies to lib directory -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -75,9 +64,11 @@
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

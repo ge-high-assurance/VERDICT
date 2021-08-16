@@ -58,8 +58,7 @@
   </dependencies>
 
   <build>
-    <!-- Let's use the STEM project above us rather than copying it into
-            src/test/resources -->
+    <!-- Use STEM project directly, no need to copy it to src/test/resources -->
     <testResources>
       <testResource>
         <directory>${basedir}/../..</directory>
@@ -69,6 +68,7 @@
       </testResource>
     </testResources>
     <plugins>
+      <!-- Build capsule jar -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
@@ -92,4 +92,5 @@
       <url>https://raw.github.com/ge-high-assurance/sadl-snapshot-repository/master/repository</url>
     </repository>
   </repositories>
+
 </project>

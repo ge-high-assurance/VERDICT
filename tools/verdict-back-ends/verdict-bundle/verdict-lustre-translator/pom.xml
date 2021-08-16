@@ -68,6 +68,7 @@
 
   <build>
     <plugins>
+      <!-- Build capsule jar -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
@@ -75,6 +76,7 @@
           <appClass>com.ge.verdict.lustre.App</appClass>
         </configuration>
       </plugin>
+      <!-- Generate and build antlr parser code -->
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
@@ -91,7 +93,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>3.0.0-M5</version>
+            <version>${version.surefire}</version>
             <configuration>
               <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
             </configuration>
@@ -108,4 +110,5 @@
       </build>
     </profile>
   </profiles>
+
 </project>
