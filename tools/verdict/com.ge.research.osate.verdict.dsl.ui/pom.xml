@@ -11,4 +11,5 @@
 
   <artifactId>com.ge.research.osate.verdict.dsl.ui</artifactId>
   <packaging>eclipse-plugin</packaging>
+
 </project>

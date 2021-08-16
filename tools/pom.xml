@@ -3,18 +3,20 @@
      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Define ourselves -->
   <groupId>com.ge.verdict</groupId>
   <artifactId>tools</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <!-- Build ourselves -->
   <modules>
     <module>verdict</module>
     <module>verdict-back-ends</module>
     <module>verdict-data-model</module>
   </modules>
 
-  <!-- Set properties for all modules -->
+  <!-- Set all properties in one place -->
   <properties>
     <maven.compiler.release>11</maven.compiler.release>
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -27,12 +29,14 @@
     <version.jaxb2-namespace-prefix>1.3</version.jaxb2-namespace-prefix>
     <version.jaxb2-rich-contract-plugin>2.1.0</version.jaxb2-rich-contract-plugin>
     <version.sadl>3.4.1-SNAPSHOT</version.sadl>
-    <version.tycho>2.3.0</version.tycho>
+    <version.slf4j>1.7.32</version.slf4j>
+    <version.surefire>3.0.0-M5</version.surefire>
+    <version.tycho>2.4.0</version.tycho>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
     <version.xtext>2.20.0</version.xtext>
   </properties>
 
-  <!-- Set dependencies for all modules -->
+  <!-- Set all dependency versions in one place -->
   <dependencyManagement>
     <dependencies>
       <!-- Import Xtext dependencies from Xtext BOM -->
@@ -140,6 +144,7 @@
         <artifactId>word-wrap</artifactId>
         <version>0.1.9</version>
       </dependency>
+      <!-- Version needed by SADL's reasoner/sadlserver -->
       <dependency>
         <groupId>com.sun.activation</groupId>
         <artifactId>javax.activation</artifactId>
@@ -233,7 +238,7 @@
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>3.19.0</version>
+        <version>3.20.2</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.xtext</groupId>
@@ -263,12 +268,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.30</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.30</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>org.xmlunit</groupId>
@@ -291,7 +296,7 @@
   </dependencyManagement>
 
   <build>
-    <!-- Lock down plugins for consistent builds -->
+    <!-- Set all plugin versions in one place -->
     <pluginManagement>
       <plugins>
         <plugin>
@@ -407,6 +412,35 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.1.0</version>
+          <!-- Clean extra files created by build -->
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${project.basedir}</directory>
+                <includes>
+                  <include>plugin.xml_gen</include>
+                </includes>
+              </fileset>
+              <fileset>
+                <directory>${project.basedir}/lib</directory>
+              </fileset>
+              <fileset>
+                <directory>${project.basedir}/model</directory>
+              </fileset>
+              <fileset>
+                <directory>${project.basedir}/src-gen</directory>
+                <excludes>
+                  <exclude>README.md</exclude>
+                </excludes>
+              </fileset>
+              <fileset>
+                <directory>${project.basedir}/xtend-gen</directory>
+                <excludes>
+                  <exclude>README.rst</exclude>
+                </excludes>
+              </fileset>
+            </filesets>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -421,7 +455,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -431,7 +465,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M3</version>
+          <version>3.0.0</version>
           <configuration>
             <rules>
               <requireMavenVersion>
@@ -451,7 +485,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.0.0-M5</version>
+          <version>${version.surefire}</version>
           <configuration>
             <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
           </configuration>
@@ -492,27 +526,34 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M5</version>
+          <version>${version.surefire}</version>
           <configuration>
             <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-        <plugin>
+          <?m2e ignore?>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.0.0</version>
+          <executions>
+            <execution>
+              <id>default-exec</id>
+              <goals>
+                <goal>exec</goal>
+              </goals>
+              <phase>generate-sources</phase>
+            </execution>
+          </executions>
         </plugin>
+        <!-- Goals: mvn -N versions:display-{dependency,plugin,property}-updates -->
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
           <version>2.8.1</version>
         </plugin>
         <plugin>
+          <?m2e ignore?>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>target-platform-configuration</artifactId>
           <version>${version.tycho}</version>
@@ -555,11 +596,26 @@
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-maven-plugin</artifactId>
           <version>${version.tycho}</version>
+          <extensions>true</extensions>
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-director-plugin</artifactId>
           <version>${version.tycho}</version>
+          <executions>
+            <execution>
+              <id>default-materialize-products</id>
+              <goals>
+                <goal>materialize-products</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>default-archive-products</id>
+              <goals>
+                <goal>archive-products</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
@@ -575,6 +631,9 @@
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-repository-plugin</artifactId>
           <version>${version.tycho}</version>
+          <configuration>
+            <includeAllDependencies>true</includeAllDependencies>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
@@ -594,6 +653,9 @@
             </execution>
           </executions>
         </plugin>
+        <!-- To skip running (and compiling) tests, use: -Dmaven.test.skip
+             To skip tests, but still compile them, use: -DskipTests
+             To run all tests but only fail at end, use: -fae -->
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -606,6 +668,24 @@
           <groupId>org.eclipse.xtend</groupId>
           <artifactId>xtend-maven-plugin</artifactId>
           <version>${version.xtext}</version>
+          <configuration>
+            <outputDirectory>${project.basedir}/xtend-gen</outputDirectory>
+            <xtendAsPrimaryDebugSource>true</xtendAsPrimaryDebugSource>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default-compile</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>default-xtend-install-debug-info</id>
+              <goals>
+                <goal>xtend-install-debug-info</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -672,4 +752,5 @@
     <name>GE Global Research</name>
     <url>www.geglobalresearch.com</url>
   </organization>
+
 </project>

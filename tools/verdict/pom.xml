@@ -25,16 +25,17 @@
 
   <build>
     <plugins>
+      <!-- Define our Eclipse target platform -->
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
       </plugin>
-      <!-- Use Tycho to build our Eclipse plugin code -->
+      <!-- Build Eclipse bundles with Tycho -->
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>
-        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>
+
 </project>

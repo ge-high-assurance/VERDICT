@@ -11,4 +11,5 @@
 
   <artifactId>com.ge.research.osate.verdict.targetplatform</artifactId>
   <packaging>eclipse-target-definition</packaging>
+
 </project>

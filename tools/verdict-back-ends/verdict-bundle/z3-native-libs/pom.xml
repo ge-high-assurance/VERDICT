@@ -103,6 +103,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <file>${project.build.directory}/z3-${z3.version}-x64-win/bin/com.microsoft.z3.jar</file>
+          <artifactId>com.microsoft.z3</artifactId>
+          <generatePom>true</generatePom>
+          <groupId>com.ge.verdict</groupId>
+          <packaging>jar</packaging>
+          <version>${project.version}</version>
+        </configuration>
         <executions>
           <execution>
             <id>default-install-file</id>
@@ -110,14 +118,6 @@
               <goal>install-file</goal>
             </goals>
             <phase>install</phase>
-            <configuration>
-              <file>${project.build.directory}/z3-${z3.version}-x64-win/bin/com.microsoft.z3.jar</file>
-              <artifactId>com.microsoft.z3</artifactId>
-              <generatePom>true</generatePom>
-              <groupId>com.ge.verdict</groupId>
-              <packaging>jar</packaging>
-              <version>${project.version}</version>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -131,4 +131,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

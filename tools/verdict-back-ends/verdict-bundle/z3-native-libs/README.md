@@ -49,7 +49,7 @@ Call maven-dependency-plugin in your pom to unpack the native libs in
 z3-native-libs into your target/native-libs directory:
 
 ```xml
-      <!-- Unpack z3-native-libs -->
+      <!-- Unpack native libs -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -66,6 +66,7 @@ z3-native-libs into your target/native-libs directory:
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
@@ -95,7 +96,7 @@ Add the native libs to your capsule with these `<caplet>` and
 `<fileSets>` elements in your capsule-maven-plugin configuration:
 
 ```xml
-      <!-- Add native libs to capsule -->
+      <!-- Build capsule jar and include native libs -->
       <plugin>
         <groupId>com.github.chrisdchristo</groupId>
         <artifactId>capsule-maven-plugin</artifactId>
