@@ -33,7 +33,7 @@
     <version.surefire>3.0.0-M5</version.surefire>
     <version.tycho>2.4.0</version.tycho>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
-    <version.xtext>2.20.0</version.xtext>
+    <version.xtext>2.25.0</version.xtext>
   </properties>
 
   <!-- Set all dependency versions in one place -->
