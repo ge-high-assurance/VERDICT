@@ -55,7 +55,7 @@ jobs:
         GraphVizPath: /usr/bin
 
     - name: Set up OCaml
-      uses: avsm/setup-ocaml@v2.0.0-beta3
+      uses: avsm/setup-ocaml@v2
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
