@@ -1,9 +1,7 @@
-# Builds Verdict developer artifacts on each push to master:
-# - Uploads native binaries as build artifacts (kind2 omitted to save time)
-# - Pushes verdict-dev Docker image to Docker Hub
-# - Updates verdict-dev update site
+name: VERDICT Main Workflow
 
-name: Verdict main build
+# Runs whenever the main branch has a change made to it (except for
+# tag-only pushes)
 
 on:
   push:
@@ -11,34 +9,57 @@ on:
     tags-ignore: [ '*' ]
   workflow_dispatch:
 
+# Runs a build job and uploads VERDICT build artifacts:
+# - Builds VERDICT source & runs unit tests
+# - Builds aadl2iml and soteria_pp native binaries
+# - Pushes verdict-dev image to Docker Hub
+# - Updates verdict-dev update site
+
 jobs:
   build:
     strategy:
-      matrix:
-        java-version: [ 11 ]
-        ocaml-version: [ 4.07.1 ]
-        os: [ macos-10.15, ubuntu-20.04 ]
-      # Still worth uploading one build even if the other build fails
       fail-fast: false
+      matrix:
+        distribution: [ temurin ]
+        java-version: [ 11 ]
+        ocaml-compiler: [ 4.07.1 ]
+        os: [ macos-10.15, ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Check out VERDICT source
-      uses: actions/checkout@v2
+    - name: Set up GraphViz
+      uses: ts-graphviz/setup-graphviz@v1.0.0
 
-    - name: Cache opam repository
-      uses: actions/cache@v2
+    - name: Set up Java
+      uses: actions/setup-java@v2.2.0
       with:
-        path: ~/.opam
-        key: ${{ matrix.os }}-opam-${{ matrix.ocaml-version }}
+        distribution: ${{ matrix.distribution }}
+        java-version: ${{ matrix.java-version }}
+
+    - name: Set up Maven cache
+      uses: actions/cache@v2.1.6
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven-
+
+    - name: Check out VERDICT source
+      uses: actions/checkout@v2.3.4
+
+    - name: Build VERDICT source
+      run: |
+        mvn -B install --file tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
+        mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
+      env:
+        GraphVizPath: /usr/bin
 
     - name: Set up OCaml
-      uses: avsm/setup-ocaml@v1
+      uses: avsm/setup-ocaml@v2.0.0-beta3
       with:
-        ocaml-version: ${{ matrix.ocaml-version }}
+        ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-    - name: Install opam packages
+    - name: Install OCaml packages
       run: |
         opam install --yes \
           async \
@@ -62,61 +83,39 @@ jobs:
         opam exec make
 
     - name: Upload aadl2iml
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/aadl2iml/bin/aadl2iml
 
     - name: Upload soteria_pp
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
 
-    - name: Set up GraphViz
-      uses: ts-graphviz/setup-graphviz@v1
-
-    - name: Set up Java
-      uses: actions/setup-java@v1
-      with:
-        java-version: ${{ matrix.java-version }}
-
-    - name: Cache Maven repository
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2/repository
-        key: ${{ matrix.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ matrix.os }}-m2
-
-    - name: Run Maven build
-      run: |
-        mvn -B install --file tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
-        mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
-      env:
-        GraphVizPath: /usr/bin
-
     - name: Upload verdict-bundle-app
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar
 
-    # Rest of steps can run on only Linux, other OS isn't needed
+    # Run rest of steps only on Linux - macOS isn't needed
 
     - name: Set up Docker Buildx
       if: runner.os == 'Linux'
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v1.5.1
 
     - name: Login to Docker Hub
       if: runner.os == 'Linux'
-      uses: docker/login-action@v1
+      uses: docker/login-action@v1.10.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push verdict-dev image
       if: runner.os == 'Linux'
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v2.6.1
       with:
         context: tools/verdict-back-ends
         file: tools/verdict-back-ends/Dockerfile
@@ -127,7 +126,7 @@ jobs:
 
     - name: Check out VERDICT-update-sites
       if: runner.os == 'Linux'
-      uses: actions/checkout@v2
+      uses: actions/checkout@v2.3.4
       with:
         repository: ge-high-assurance/VERDICT-update-sites
         token: ${{ secrets.CI_PAT }}
