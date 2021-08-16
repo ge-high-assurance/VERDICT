@@ -1,4 +1,4 @@
-name: VERDICT Continuous Integration Workflow
+name: VERDICT Integration Workflow
 
 # Runs whenever a pull request is created, reopened, or has a change
 # made to it
