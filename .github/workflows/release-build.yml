@@ -157,7 +157,7 @@ jobs:
         cp -a extern/nix/soteria_pp tools/verdict-back-ends/soteria_pp/bin
 
     - name: Upload extern.zip and README.md to GitHub release assets
-      uses: softprops/action-gh-release@v0.1.12
+      uses: softprops/action-gh-release@v1
       with:
         files: |
           extern.zip
