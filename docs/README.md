@@ -1,29 +1,40 @@
-# VERDICT: An OSATE plugin for architectural and behavioral analysis of AADL models
+# VERDICT: Tools for architectural and behavioral analysis of AADL models
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin to perform cyber resiliency analysis
-(CRV) and model based architecture analysis (MBAA).  The plugin has
-two ways to call the back-end programs; it can run an executable jar
-called verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar in a subprocess
-or it can run a Docker image called gehighassurance/verdict in a
-temporary container.
+tools consist of a VERDICT plugin for OSATE and a set of VERDICT
+back-end programs invoked by the plugin to perform cyber resiliency
+analysis (CRV) and model based architecture analysis (MBAA).  The
+plugin has two ways to call the back-end programs; it can run an
+executable jar called verdict-bundle-app-\<VERSION\>-capsule.jar in a
+subprocess or it can run a Docker image called gehighassurance/verdict
+in a temporary container.
 
-## 1. Install OSATE and the VERDICT front-end plugin
+## 1. Install OSATE and our VERDICT front-end plugin
 
 Front-end **prerequisites**
 
-- [Java 8](https://adoptopenjdk.net/)
+- [Java 11](https://adoptium.net/)
 - [OSATE 2](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
-- [AGREE plugin for OSATE 2](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2)
 
-If necessary, read OSATE's installation directions
-<https://osate.org/download-and-install.html> to install OSATE.  Also
-install the AGREE plugin in OSATE using its Install New Software
-wizard.
+You will need a [Java Development Kit](https://adoptium.net/) to run
+OSATE and our plugin.  We recommend Java 11 even though OSATE says it
+officially supports only Java 8.  In practice, OSATE runs fine on Java
+11 so please use Java 11 instead.
 
-To install our VERDICT plugin in OSATE:
+You will need an installed [OSATE](https://osate.org/about-osate.html)
+(Open Source AADL Tool Environment) in order to use our VERDICT
+plugin.  We have tested and verified our plugin works in OSATE 2.6.1,
+2.7.0, and 2.7.1; earlier and later OSATE versions may or may not work
+since we haven't tested our current plugin version in all of them.
+
+- Download the [OSATE
+  2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
+  product for your operating system.
+
+- If necessary, refer to these [installation
+  instructions](https://osate.org/download-and-install.html) to
+  install OSATE.
 
 - Start OSATE and open its Install New Software wizard using the
   pulldown menu (Help > Install New Software...).
@@ -34,10 +45,18 @@ To install our VERDICT plugin in OSATE:
 
   <https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest>
 
-- Click the Add button in the Add Repository dialog.
+  If you want to install VERDICT's most current development version
+  rather than VERDICT's latest release version, then use the following
+  URL instead:
+
+  <https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-dev>
 
 - Click the Finish button in the Install dialog and restart OSATE when
   prompted to do so.
+
+Note that installing our VERDICT plugin in OSATE will automatically
+install the AGREE feature as well since we include the AGREE feature
+in our VERDICT update site and VERDICT needs part of AGREE too.
 
 ## 2. Install the VERDICT back-end tool chain
 
@@ -54,8 +73,9 @@ Docker **prerequisites**
 - [Docker](https://docs.docker.com/get-docker/)
 - [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
 
-If you are running Docker on Windows, you will also have to do the
-following things to allow our plugin to communicate with Docker:
+Install Docker if you haven't installed it yet.  If you are running
+Docker on Windows, you will also have to do the following to allow our
+plugin to communicate with Docker:
 
 - Set an environment variable called DOCKER_HOST to the value
   "tcp://localhost:2375" to tell our plugin to connect to the daemon
@@ -72,30 +92,38 @@ following things to allow our plugin to communicate with Docker:
 - Click the "Apply & Restart" button at the bottom to restart Docker
   after these changes.
 
-Download the extern.zip archive and unpack it somewhere on your
-machine too.  You will need some files from the extern folder
-regardless of whether you use Docker or native binaries.  After
-unpacking extern.zip, please configure some VERDICT settings in OSATE:
+Once Docker is installed, you also need to pull a VERDICT Docker image
+from Docker Hub to your machine by running one of the following
+commands in your terminal depending on whether you want the latest
+release image or the most current development image::
+
+```shell
+docker pull gehighassurance/verdict:latest
+docker pull gehighassurance/verdict-dev:latest
+```
+
+Also download the extern.zip archive and unpack it somewhere on your
+machine.  You will need some files from the extern folder regardless
+of whether you use Docker or native binaries.  After unpacking
+extern.zip (make sure you remember the location of the unpacked extern
+folder), then configure some VERDICT settings in OSATE:
 
 - Launch OSATE, go to Window > Preferences > Verdict > Verdict
   Settings, and fill out the following fields.
-
-- Fill in the "VERDICT Properties Name:" field with the property set
-  name. In the DeliveryDrone model, we use the property set name
-  "CASE_Consolidated_Properties".
 
 - Click the Browse... button next to the "STEM Project PATH:" field,
   navigate to the "STEM" folder inside the "extern" folder, and make
   it the field's setting.
 
-- Click within the "Bundle Docker Image:" field, type
-  "gehighassurance/verdict" for our Docker image's name, and save your
-  changes by clicking the "Apply and Close" button.
+- Click within the "Bundle Docker Image:" field and type our Docker
+  image's name "gehighassurance/verdict" in that field.
 
-Finally, you will need to pull down the latest VERDICT Docker image to
-your machine by running the following command in your terminal:
+  If you want to use VERDICT's most current development image
+  rather than VERDICT's latest release image, then enter the
+  following name instead: "gehighassurance/verdict-dev".
 
-`docker pull gehighassurance/verdict:latest`
+- Click the "Apply and Close" button to save all the settings that you
+  just entered into the fields.
 
 ### b. Run the back-end binaries natively
 
@@ -104,18 +132,19 @@ MacOS Catalina 10.15.
 
 Native **prerequisites**
 
+- [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
 - [GraphViz](https://www.graphviz.org/download/): Graph Visualization Software
 - [Z3](https://github.com/Z3Prover/z3): The Z3 Theorem Prover
-- [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
 
 Make sure both graphviz and z3 are installed under your system path.
 On Ubuntu, you would say "sudo apt install graphviz z3".  On Mac, you
 would say "brew install graphviz z3".
 
 Download the extern.zip archive and unpack it somewhere on your
-machine too.  You will need some files from it regardless of whether
-you use Docker or native binaries.  After unpacking extern.zip, please
-configure some VERDICT settings in OSATE:
+machine.  You will need some files from the extern folder regardless
+of whether you use Docker or native binaries.  After unpacking
+extern.zip (make sure you remember the location of the unpacked extern
+folder), then configure some VERDICT settings in OSATE:
 
 - Launch OSATE, go to Window > Preferences > Verdict > Verdict
   Settings, and fill out the following fields.
@@ -128,8 +157,8 @@ configure some VERDICT settings in OSATE:
   the following steps instead.
 
 - Click the Browse... button next to the "Bundle Jar:" field, navigate
-  to the "verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar" file inside
-  the "extern" folder, and make it the field's setting.
+  to the "verdict-bundle-app-\<VERSION\>-capsule.jar" file inside the
+  "extern" folder, and make it the field's setting.
 
 - Click the Browse... button next to the "Kind2 Binary:" field,
   navigate to the appropriate "kind2" binary for your operating system
@@ -151,8 +180,8 @@ configure some VERDICT settings in OSATE:
 
 ## 3. Run VERDICT
 
-Now you are ready to run the VERDICT plugin on an AADL model.  You can
-use one of the example AADL models in the extern.zip file you unpacked
+Now you are ready to run our VERDICT plugin on an AADL model.  You can
+pick one of the example AADL models in the extern.zip file you unpacked
 (for example, "extern/examples/DeliveryDrone") and use OSATE's "File >
 Import... > General > Existing Projects into Workspace" wizard to
 import that model into your OSATE workspace.  You can open the model's
@@ -162,7 +191,16 @@ and VERDICT properties.
 You can invoke VERDICT's functionality from the Verdict pulldown menu.
 First click on a project's name in the AADL Navigator pane to make it
 the currently selected project, then pull down the Verdict menu and
-run the appropriate back-end tools (MBAA, MBAS, CRV, etc.).
+run the appropriate back-end tools (MBAA, MBAS, CRV, etc.).  Our
+plugin will use Docker Java API calls to pull the appropriate Docker
+image from Docker Hub (only if the image isn't already in your
+Docker's local cache), start a temporary Docker container to run the
+MBAA or CRV command, and then display any output from that command.
+If you use the executable jar instead of the Docker image, the plugin
+will run the executable jar in a subprocess directly on your system.
+Both the temporary container and the executable jar will run several
+VERDICT back-end tool chain programs in additional subprocesses inside
+the temporary container or directly on your system as well.
 
 For further information how to analyze a model's system architecture
 using our VERDICT tools, please read our VERDICT wiki's

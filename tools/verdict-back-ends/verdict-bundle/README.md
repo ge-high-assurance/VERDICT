@@ -4,10 +4,10 @@
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.  Our OSATE plugin sources are in the
-[(../verdict)](../verdict) directory and our Java back-end program
-sources are in the following subdirectories:
+tools consist of a VERDICT plugin for OSATE and a set of VERDICT
+back-end programs invoked by the plugin.  Our VERDICT plugin sources
+are in the [(../verdict)](../verdict) directory and our Java back-end
+program sources are in the following subdirectories:
 
 - [iml-verdict-translator](iml-verdict-translator) translates a model from IML to VDM
 - [soteria_pp](soteria_pp) analyzes the safety and security of a model's system architecture

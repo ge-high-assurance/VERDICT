@@ -1,6 +1,5 @@
 # Ignore everything in current directory except the files which we
 # need to copy to the image:
 *
-!aadl2iml/bin/aadl2iml
 !soteria_pp/bin/soteria_pp
 !verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar

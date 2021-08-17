@@ -6,11 +6,12 @@
       provider-name="GE">
 
    <description url="https://github.com/ge-high-assurance/VERDICT/blob/master/tools/README.md">
-The VERDICT feature consists of an OSATE plugin and a set of VERDICT
-back-end programs invoked by the plugin.  The plugin has two ways to
-call the back-end programs; it can run an executable jar
-(verdict-bundle-app-&lt;VERSION&gt;-capsule.jar) in a subprocess or it can
-run a Docker image (gehighassurance/verdict) in a temporary container.
+The VERDICT feature consists of a VERDICT plugin for OSATE and a set
+of VERDICT back-end programs invoked by the plugin.  The plugin has
+two ways to call the back-end programs; it can run an executable jar
+(verdict-bundle-app-&lt;VERSION&gt;-capsule.jar) in a subprocess or it
+can run a Docker image (gehighassurance/verdict) in a temporary
+container.
    </description>
 
    <copyright url="https://github.com/ge-high-assurance/VERDICT/blob/master/LICENSE">
@@ -77,7 +78,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          version="0.0.0"
          unpack="false"/>
 
-   <!-- OSATE product lacks this feature, so let's bundle it with our plugins -->
+   <!-- These features aren't in OSATE, so let's bundle them with our plugins -->
+   <includes
+         id="com.rockwellcollins.atc.agree.feature"
+         version="0.0.0"/>
+
    <includes
          id="de.itemis.xtext.antlr.sdk"
          version="0.0.0"/>

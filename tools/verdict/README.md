@@ -1,18 +1,20 @@
 <!-- markdownlint-disable line-length -->
 
-# VERDICT: Building the OSATE plugin
+# VERDICT: Building the VERDICT plugin
 
-## About the OSATE plugin
+## About the VERDICT plugin
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.  The OSATE plugin sources are in this
-directory and the back-end program sources are in another directory
+tools consist of a VERDICT plugin for OSATE and a set of VERDICT
+back-end programs invoked by the plugin to perform cyber resiliency
+analysis (CRV) and model based architecture analysis (MBAA).  The
+VERDICT plugin sources are in this directory and the back-end program
+sources are in another directory
 [(../verdict-back-ends)](../verdict-back-ends).
 
 Running Maven in this directory builds an update site (a directory,
-not a website) containing our OSATE plugin.  You can install the
+not a website) containing our VERDICT plugin.  You can install the
 directory
 `com.ge.research.osate.verdict.updatesite/target/repository/` directly
 into an OSATE release or copy that directory to a new directory in our
@@ -22,10 +24,10 @@ URL.
 
 ## Set up your build environment
 
-You will need a [Java Development Kit](https://adoptopenjdk.net/)
-(version 11) to build all of our Java program sources.  We are using
-Java 11 even though OSATE says it is officially supported on Java 8
-(in practice, OSATE runs fine on Java 11 anyway).
+You will need a [Java Development Kit](https://adoptium.net/) to build
+all of our Java program sources.  We build our sources with Java 11
+even though OSATE says it officially supports only Java 8 (in
+practice, OSATE runs fine on Java 11 so please use Java 11 instead).
 
 You also will need [Apache Maven](https://maven.apache.org) to build
 all of our Java program sources.  Your operating system may have
@@ -44,8 +46,8 @@ your site.
 
 ## Update our target definition file (if needed)
 
-Our OSATE plugin's target definition file tells Maven and Eclipse
-Tycho where to find the OSATE and other Eclipse APIs that our OSATE
+Our VERDICT plugin's target definition file tells Maven and Eclipse
+Tycho where to find the OSATE and other Eclipse APIs that our VERDICT
 plugin sources should be compiled against.  Generally speaking, you do
 not need to change the OSATE update site in our target definition file
 every time a stable OSATE release comes out.  The OSATE and other
@@ -67,20 +69,21 @@ file as a reference; make sure to copy the same update site urls OSATE
 itself uses for similar Eclipse features to our own target definition
 file.
 
-## Build our OSATE plugin sources
+## Build our VERDICT plugin sources
 
 This directory and its subdirectories have pom.xml files which will
-allow you to build our OSATE plugin sources with Maven and Eclipse
-Tycho.  Unless you want to import and develop the OSATE plugin sources
-in your Eclipse IDE, we recommend that you build our OSATE plugin
-sources only with Maven from the command line in this directory:
+allow you to build our VERDICT plugin sources with Maven and Eclipse
+Tycho.  Unless you want to import and develop the VERDICT plugin
+sources in your Eclipse IDE, we recommend that you build our VERDICT
+plugin sources with Maven from the command line in this directory:
 
 ```shell
-mvn clean install -Dtycho.localArtifacts=ignore
+mvn clean
+mvn install -Dtycho.localArtifacts=ignore
 ```
 
-Including the `-Dtycho.localArtifacts=ignore` argument may prevent
-some build problems from happening.  You may not always need the
+Using the `-Dtycho.localArtifacts=ignore` argument may prevent some
+build problems from happening.  You may not always need the
 `-Dtycho.localArtifacts=ignore` argument, but please change the
 argument or leave it out only if you are familiar with Tycho builds
 and want Tycho to use local artifacts that you have already built,
@@ -92,37 +95,36 @@ additional `-X` argument at the end to make Maven print very detailed
 debugging output.
 
 If the Maven build completes successfully, you will be able to install
-our OSATE plugin in an OSATE release as shown in the next section.  A
-successful build ends with the following output:
+our VERDICT plugin in an OSATE release as shown in the next section.
+A successful build ends with the following output:
 
 ```text
-[INFO] --- tycho-p2-plugin:2.3.0:update-local-index (default-update-local-index) @ com.ge.research.osate.verdict.updatesite ---
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for verdict 1.0.0-SNAPSHOT:
 [INFO]
-[INFO] verdict ............................................ SUCCESS [  0.372 s]
-[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 30.416 s]
-[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.085 s]
-[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  0.912 s]
-[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  1.262 s]
-[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.095 s]
-[INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.025 s]
-[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  1.369 s]
+[INFO] verdict ............................................ SUCCESS [  0.354 s]
+[INFO] com.ge.research.osate.verdict.dsl .................. SUCCESS [ 31.264 s]
+[INFO] com.ge.research.osate.verdict.dsl.ide .............. SUCCESS [  0.069 s]
+[INFO] com.ge.research.osate.verdict.dsl.ui ............... SUCCESS [  0.804 s]
+[INFO] com.ge.research.osate.verdict ...................... SUCCESS [  1.257 s]
+[INFO] com.ge.research.osate.verdict.feature .............. SUCCESS [  0.079 s]
+[INFO] com.ge.research.osate.verdict.targetplatform ....... SUCCESS [  0.011 s]
+[INFO] com.ge.research.osate.verdict.updatesite ........... SUCCESS [  5.863 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  45.481 s
-[INFO] Finished at: 2021-05-17T15:18:18-04:00
+[INFO] Total time:  49.735 s
+[INFO] Finished at: 2021-08-17T17:00:55-04:00
 [INFO] ------------------------------------------------------------------------
 ```
 
-The last directory built by Maven is an update site for the OSATE
+The last directory built by Maven is an update site for our VERDICT
 plugin which you can install into an OSATE release.  That update site
 is actually located inside the directory
 `com.ge.research.osate.verdict.updatesite/target/repository` and that
 directory can be installed directly into OSATE.
 
-## Install our OSATE plugin
+## Install our VERDICT plugin
 
 After you build our plugin sources, you can install our plugin into a
 stable OSATE release.  If you don't have a stable OSATE release
@@ -130,7 +132,7 @@ installed, you can follow these
 [instructions](https://osate.org/download-and-install.html) to
 download and install the latest stable OSATE release.  Once you have
 installed a stable OSATE release, you can follow these steps to
-install our OSATE plugin into it:
+install our VERDICT plugin into it:
 
 1. Start OSATE and open its Install New Software wizard using the
    pulldown menu (Help > Install New Software...).
@@ -148,18 +150,18 @@ install our OSATE plugin into it:
 6. Click the Finish button in the Install dialog and restart OSATE
    when prompted to do so.
 
-7. Finally, set up our OSATE plugin to run either our Docker image or
-   our back-end programs as specified in these [steps](../README.md).
-   Briefly speaking, you will have to download an "extern.zip" file
-   from our
+7. Finally, set up our VERDICT plugin to run either our Docker image
+   or our back-end programs as specified in these
+   [steps](../README.md).  Briefly speaking, you will have to download
+   an "extern.zip" file from our
    [Releases](https://github.com/ge-high-assurance/VERDICT/releases)
-   page, unpack it, and then set some Eclipse preferences to tell the
-   OSATE plugin how to find the STEM folder and either the Docker
+   page, unpack it, and then set some Eclipse preferences to tell our
+   VERDICT plugin how to find the STEM folder and either the Docker
    image or the back-end programs.
 
-## Import and develop our OSATE plugin sources
+## Import and develop our VERDICT plugin sources
 
-Follow these instructions if you want to import and develop the OSATE
+Follow these instructions if you want to import and develop our VERDICT
 plugin sources in your Eclipse IDE.  You will need to use an Eclipse
 IDE that has at least the Plugin Development Environment (PDE) feature
 installed.  Most Eclipse IDEs (Java, Modeling, etc.) already have this
@@ -167,7 +169,7 @@ PDE feature installed unless you are using a very specialized Eclipse
 IDE in which case you will have to install a standard Eclipse for Java
 developers IDE.
 
-We still recommend that you build our OSATE plugin sources from the
+We still recommend that you build our VERDICT plugin sources from the
 command line first as we showed earlier.  This will reduce the number
 of steps you need to perform in your Eclipse IDE to just the
 following:
@@ -184,8 +186,8 @@ following:
    set of pom.xml files listed under Projects.  Press the Finish
    button.
 
-4. Once your Eclipse IDE finishes importing the OSATE plugin sources,
-   these projects will have thousands of build errors in your
+4. Once your Eclipse IDE finishes importing our VERDICT plugin
+   sources, these projects will have thousands of build errors in your
    workspace.  This is normal since your Eclipse IDE will be missing
    some necessary OSATE and other Eclipse APIs so your Eclipse IDE
    doesn't know where to find these APIs yet.
@@ -204,11 +206,11 @@ following:
    Target Platform" in the upper right corner.  Eclipse will rebuild
    the VERDICT projects again and the build errors should go away.
    Please note that if you have other projects in your workspace
-   besides our OSATE plugin sources, you may have to close these
+   besides our VERDICT plugin sources, you may have to close these
    projects first in case they get some build errors because you will
    be changing the target platform they were built against before.
 
-Now you can start developing our OSATE plugin sources and making
+Now you can start developing our VERDICT plugin sources and making
 changes to them.  You can launch a runtime Eclipse instance directly
 from your Eclipse IDE whenever you want to run or debug our plugin.
 To do so, right click on the com.ge.research.osate.verdict project and
@@ -222,24 +224,24 @@ commands such as CRV and MBAS on the model, though.
 
 If you decide that you do want to set up a full-blown OSATE
 development instance capable of launching and debugging a complete
-runtime OSATE product along with the VERDICT plugin, you can follow
+runtime OSATE product along with our VERDICT plugin, you can follow
 the instructions in [Setting up an OSATE development
 environment](https://osate.org/setup-development.html).  Once you have
 launched your OSATE development IDE and waited for it to import the
-OSATE sources, you can import our OSATE plugin sources into it as
+OSATE sources, you can import our VERDICT plugin sources into it as
 well.  You will not need to change your OSATE development IDE's target
 platform to make some build errors go away; OSATE's target platform
-will be a superset of our OSATE plugin's target platform except for
+will be a superset of our VERDICT plugin's target platform except for
 one feature (de.itemis.xtext.antlr.sdk.feature.group) which you may
 have to install into your IDE from its own
 [update](http://download.itemis.com/updates/releases/2.1.1) site.
 
 # Additional notes
 
-Even though our OSATE plugin sources have pom files, we still need to
-keep the com.ge.research.osate.verdict.dsl/.project file under source
-control to ensure that it is present at all times.  If that .project
-file is missing, the Tycho build will not be able to call the
+Even though our VERDICT plugin sources have pom files, we still need
+to keep the com.ge.research.osate.verdict.dsl/.project file under
+source control to ensure that it is present at all times.  If that
+.project file is missing, the Tycho build will not be able to call the
 GenerateVerdict.mwe2 workflow successfully.  I've spent lots of time
 trying to ensure the GenerateVerdict.mwe2 workflow works in both Unix
 and Window environments no matter which directory you run Maven in.

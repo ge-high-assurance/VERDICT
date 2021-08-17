@@ -21,7 +21,6 @@ RUN apt-get update -qq \
 # Copy each verdict back-end tool into our image
 
 COPY --from=kind2/kind2:dev /kind2 /app/kind2
-COPY aadl2iml/bin/aadl2iml /app/aadl2iml
 COPY soteria_pp/bin/soteria_pp /app/soteria_pp
 COPY verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar /app/verdict.jar
 

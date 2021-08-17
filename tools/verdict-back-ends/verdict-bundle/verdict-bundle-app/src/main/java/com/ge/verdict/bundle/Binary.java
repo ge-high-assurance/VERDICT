@@ -17,7 +17,7 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
 import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
-/** Unpack and invoke binaries from the resources directory. Used for aadl2iml, kind2, etc. */
+/** Unpack and invoke binaries from the resources directory. Used for kind2, etc. */
 public class Binary {
     /** Thrown upon errors during unpacking/invocation of a binary. */
     public static class ExecutionException extends Exception {

@@ -4,8 +4,8 @@
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.
+tools consist of a VERDICT plugin for OSATE and a set of VERDICT
+back-end programs invoked by the plugin.
 
 This directory builds a program called verdict-stem-runner which runs
 STEM queries on CSV data.  This program is usually called from another
