@@ -77,17 +77,18 @@ verdict-stem-runner) depend on libraries which are not available in
 the Maven central repository.  For example, we use some SADL libraries
 (reasoner-api, reasoner-impl, sadlserver-api, and sadlserver-impl)
 which are part of the Semantic Application Design Language version 3
-([SADL](http://sadl.sourceforge.net/)).  GE has made SADL open source
-but has not deployed releases of these SADL libraries to the Maven
-central repository.  Since the Maven central repository distributes
-only releases of libraries, not snapshots, we have set up our own
-Maven snapshot repository to make these SADL libraries available when
-we build verdict-stem-runner.
+([SADL](https://github.com/SemanticApplicationDesignLanguage/sadl)).
+GE has made SADL open source but has not deployed releases of these
+SADL libraries to the Maven central repository.  Since the Maven
+central repository distributes only releases of libraries, not
+snapshots, we have set up our own Maven snapshot repository to make
+these SADL libraries available when we build verdict-stem-runner.
 
 The good news is that you will not need to clone SADL from its own git
-[repository](https://github.com/crapo/sadlos2) and build SADL before
-you can build our program sources.  We have already built the SADL
-libraries and put them into another git repository
+[repository](https://github.com/SemanticApplicationDesignLanguage/sadl)
+and build SADL before you can build our program sources.  We have
+already built the SADL libraries and put them into another git
+repository
 ([sadl-snapshot-repository](https://github.com/ge-high-assurance/sadl-snapshot-repository)).
 We have a repositories section inside verdict-stem-runner's pom.xml
 which tells Maven how to download these SADL libraries from the above
@@ -133,7 +134,7 @@ so you will have to read and follow the appropriate instructions for
 your operating system:
 
 - [Install Docker on
-  Mac](https://docs.docker.com/docker-for-mac/install/)
+  MacOS](https://docs.docker.com/docker-for-mac/install/)
 
 - [Install Docker on
   Windows](https://docs.docker.com/docker-for-windows/install/)
@@ -210,22 +211,24 @@ executable from <https://github.com/kind2-mc/kind2/releases>.
 
 ## Build the STEM files (optional)
 
-The STEM sources are written in [SADL](http://sadl.sourceforge.net/),
-the Semantic Application Design Language.  SADL is an English-like
+The STEM sources are written in
+[SADL](https://github.com/SemanticApplicationDesignLanguage/sadl), the
+Semantic Application Design Language.  SADL is an English-like
 language for building semantic models and authoring rules.  You can
 edit SADL files and translate them to OWL, the Web Ontology Language
 used by semantic reasoners and rule engines, with the SADL Integrated
 Development Environment (SADL IDE), an Eclipse plug-in packaged as a
-zip file that can be downloaded from the SADL
-[Releases](https://github.com/crapo/sadlos2/releases) page.  However,
-you won't need to set up your own SADL IDE unless you intend to change
-some STEM files since we already have translated the SADL files to OWL
-files and committed the translated OWL files as well as the SADL files
-to our git repository.  SADL also provides some libraries which help
-calling programs use the translated OWL files.  Our
-verdict-stem-runner program reads translated OWL files from a STEM
-project and runs STEM's rules on semantic model data loaded from CSV
-data files created by some of our other back-end programs.
+zip file that can be downloaded from SADL's
+[Releases](https://github.com/SemanticApplicationDesignLanguage/sadl/releases)
+page.  However, you won't need to use your own SADL IDE unless you
+intend to change some STEM files since we already have translated the
+STEM project's SADL files to OWL files and committed the translated
+OWL files as well as the SADL files to our git repository.  SADL also
+provides some libraries which help calling programs use the translated
+OWL files.  Our verdict-stem-runner program reads translated OWL files
+from a STEM project and runs STEM's rules on semantic model data
+loaded from CSV data files created by some of our other back-end
+programs.
 
 ## Build the Docker image (optional)
 

@@ -227,14 +227,16 @@ development instance capable of launching and debugging a complete
 runtime OSATE product along with our VERDICT plugin, you can follow
 the instructions in [Setting up an OSATE development
 environment](https://osate.org/setup-development.html).  Once you have
-launched your OSATE development IDE and waited for it to import the
+launched your OSATE development IDE and waited for it to import its
 OSATE sources, you can import our VERDICT plugin sources into it as
-well.  You will not need to change your OSATE development IDE's target
-platform to make some build errors go away; OSATE's target platform
-will be a superset of our VERDICT plugin's target platform except for
-one feature (de.itemis.xtext.antlr.sdk.feature.group) which you may
-have to install into your IDE from its own
-[update](http://download.itemis.com/updates/releases/2.1.1) site.
+well.  You will not need to use our VERDICT plugin's target platform
+to make some build errors go away; OSATE's target platform will be a
+superset of our target platform except for the following features
+which you will have to install into your OSATE development IDE from
+their own update sites:
+
+- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2)
+- [de.itemis.xtext.antlr.sdk](http://download.itemis.com/updates/releases/2.1.1)
 
 # Additional notes
 

@@ -15,7 +15,7 @@ in a temporary container.
 Front-end **prerequisites**
 
 - [Java 11](https://adoptium.net/)
-- [OSATE 2](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
+- [OSATE 2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
 
 You will need a [Java Development Kit](https://adoptium.net/) to run
 OSATE and our plugin.  We recommend Java 11 even though OSATE says it
@@ -56,14 +56,18 @@ since we haven't tested our current plugin version in all of them.
 
 Note that installing our VERDICT plugin in OSATE will automatically
 install the AGREE feature as well since we include the AGREE feature
-in our VERDICT update site and VERDICT needs part of AGREE too.
+in our VERDICT update site and VERDICT needs part of AGREE too.  AGREE
+is short for "Assume-Guarantee REasoning Environment" and can be found
+at <https://github.com/loonwerks/AGREE> although we bundle an older
+AGREE version (2.5.2) since newer AGREE versions don't work in OSATE
+2.7.1.
 
 ## 2. Install the VERDICT back-end tool chain
 
 We support two ways to run the VERDICT back-end programs: Docker image
 and native binaries.  Users may choose whichever approach they prefer.
-The native binaries work only on up to date Mac (Catalina 10.15) and
-Ubuntu (20.04) distributions.  The Docker image works on any other
+The native binaries work only on current OS X (Catalina 10.15) and
+Ubuntu (Focal 20.04) distributions.  The Docker image works on any
 platform which can run Docker.
 
 ### a. Run the back-end tool chain via Docker
@@ -128,17 +132,18 @@ folder), then configure some VERDICT settings in OSATE:
 ### b. Run the back-end binaries natively
 
 You can run the VERDICT back-end native binaries on Ubuntu 20.04 and
-MacOS Catalina 10.15.
+MacOS 10.15.
 
 Native **prerequisites**
 
-- [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
+- [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases):
+  VERDICT back-end programs
 - [GraphViz](https://www.graphviz.org/download/): Graph Visualization Software
 - [Z3](https://github.com/Z3Prover/z3): The Z3 Theorem Prover
 
 Make sure both graphviz and z3 are installed under your system path.
-On Ubuntu, you would say "sudo apt install graphviz z3".  On Mac, you
-would say "brew install graphviz z3".
+On Ubuntu, you would say "sudo apt install graphviz z3".  On MacOS,
+you would say "brew install graphviz z3".
 
 Download the extern.zip archive and unpack it somewhere on your
 machine.  You will need some files from the extern folder regardless
