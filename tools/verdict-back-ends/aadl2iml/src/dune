@@ -1,9 +1,0 @@
-(executable
-  (name main))
-
-(ocamllex AADLLexer AGREELexer AnnexLexer VerdictLexer)
-
-(menhir
- (infer false) 
- (flags --explain)
- (modules AADLParser AGREEParser VerdictParser))

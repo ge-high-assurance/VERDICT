@@ -11,7 +11,7 @@ on:
 
 # Runs a build job and uploads VERDICT build artifacts:
 # - Builds VERDICT source & runs unit tests
-# - Builds aadl2iml and soteria_pp native binaries
+# - Builds soteria_pp native binary
 # - Pushes verdict-dev image to Docker Hub
 # - Updates verdict-dev update site
 
@@ -65,28 +65,15 @@ jobs:
           async \
           core \
           core_extended \
-          dune \
-          menhir \
           ocamlbuild \
           ocamlfind \
           printbox \
           xml-light
 
-    - name: Build aadl2iml
-      run: |
-        cd tools/verdict-back-ends/aadl2iml
-        opam exec make
-
     - name: Build soteria_pp
       run: |
         cd tools/verdict-back-ends/soteria_pp
         opam exec make
-
-    - name: Upload aadl2iml
-      uses: actions/upload-artifact@v2.2.4
-      with:
-        name: ${{ matrix.os }}-binaries
-        path: tools/verdict-back-ends/aadl2iml/bin/aadl2iml
 
     - name: Upload soteria_pp
       uses: actions/upload-artifact@v2.2.4

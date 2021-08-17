@@ -1,4 +1,4 @@
-# VERDICT: An OSATE plugin for architectural and behavioral analysis of AADL models
+# VERDICT: Tools for architectural and behavioral analysis of AADL models
 
 ## DARPA Cyber Assured Systems Engineering (CASE) Program
 

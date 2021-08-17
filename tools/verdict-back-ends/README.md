@@ -6,14 +6,13 @@
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.  Our OSATE plugin sources are in
+tools consist of a VERDICT plugin and a set of VERDICT back-end
+programs invoked by the plugin.  Our VERDICT plugin sources are in
 the [(../verdict)](../verdict) directory and our back-end program
 sources are in the following subdirectories:
 
 - [STEM](STEM) models and queries a model's system architecture
-- [aadl2iml](aadl2iml) translates a model from AADL to IML
-- [soteria_pp](soteria_pp) analyzes the safety and security of a
+- [soteria\_pp](soteria_pp) analyzes the safety and security of a
   model's system architecture
 - [verdict-bundle](verdict-bundle) provides an executable jar which
   can call any of the back-end programs
@@ -35,16 +34,17 @@ request or push a commit to the main branch.  If you don't want to
 edit any of the OCaml code, you can build only the Java programs with
 Maven and let the CI workflow produce a Docker image which contains
 all of the back-end programs ready to be called when needed.  You will
-need to install both OSATE and Docker on your system and configure the
-OSATE plugin to run the back-end programs using the Docker image.
+need to install both OSATE and Docker on your system and configure our
+VERDICT plugin to run the back-end programs using the Docker image.
 
 ## Set up your build environment
 
-You will need both [Java](https://adoptopenjdk.net/) (version 11) and
+You will need both [Java](https://adoptium.net/) (version 11) and
 [Apache Maven](https://maven.apache.org) to build our Java program
 sources.  We are building VERDICT with Java 11, installing VERDICT in
 OSATE, and running OSATE and VERDICT with Java 11 even though OSATE is
-built with Java 8 itself.
+built with Java 8 itself.  In practice, OSATE runs fine on Java 11 so
+please use Java 11.
 
 The traditional way to install Maven is to download the latest Maven
 distribution from Apache's website, unpack the Maven distribution
@@ -77,17 +77,18 @@ verdict-stem-runner) depend on libraries which are not available in
 the Maven central repository.  For example, we use some SADL libraries
 (reasoner-api, reasoner-impl, sadlserver-api, and sadlserver-impl)
 which are part of the Semantic Application Design Language version 3
-([SADL](http://sadl.sourceforge.net/)).  GE has made SADL open source
-but has not deployed releases of these SADL libraries to the Maven
-central repository.  Since the Maven central repository distributes
-only releases of libraries, not snapshots, we have set up our own
-Maven snapshot repository to make these SADL libraries available when
-we build verdict-stem-runner.
+([SADL](https://github.com/SemanticApplicationDesignLanguage/sadl)).
+GE has made SADL open source but has not deployed releases of these
+SADL libraries to the Maven central repository.  Since the Maven
+central repository distributes only releases of libraries, not
+snapshots, we have set up our own Maven snapshot repository to make
+these SADL libraries available when we build verdict-stem-runner.
 
 The good news is that you will not need to clone SADL from its own git
-[repository](https://github.com/crapo/sadlos2) and build SADL before
-you can build our program sources.  We have already built the SADL
-libraries and put them into another git repository
+[repository](https://github.com/SemanticApplicationDesignLanguage/sadl)
+and build SADL before you can build our program sources.  We have
+already built the SADL libraries and put them into another git
+repository
 ([sadl-snapshot-repository](https://github.com/ge-high-assurance/sadl-snapshot-repository)).
 We have a repositories section inside verdict-stem-runner's pom.xml
 which tells Maven how to download these SADL libraries from the above
@@ -109,23 +110,82 @@ following Maven command:
 
 When the build completes, you will have an executable jar called
 verdict-bundle-app-\<VERSION\>-capsule.jar in the
-verdict-bundle/verdict-bundle-app/target directory.  The OSATE plugin
-can run this verdict-bundle-app jar directly on your system if you
-want although you also would need to build or install the OCaml and
-prebuilt back-end programs that the jar calls in subprocesses (see
+verdict-bundle/verdict-bundle-app/target directory.  Our VERDICT
+plugin can run this verdict-bundle-app jar directly on your system if
+you want although you also would need to build or install the OCaml
+and prebuilt back-end programs that the jar calls in subprocesses (see
 below).
 
-## Build the non-Java back-end programs (optional)
+## Install Docker (to run our back-end programs)
 
-The aadl2iml and soteria_pp sources are written in
+Our VERDICT plugin has two ways to call our back-end programs.  Our
+plugin can run an executable jar or it can run a Docker image in a
+temporary container.  The latter way (running a Docker container) is
+easier to use, but you need to install Docker on your operating system
+first.  Note that we have pushed our verdict image to Docker Hub in
+order to make the image available to anyone running both Docker and
+our VERDICT plugin.  You only have to tell our VERDICT plugin which
+Docker image you want to use; the plugin will look for the image in
+the local Docker cache and then tell Docker to pull the image from
+Docker Hub if necessary.
+
+The instructions for installing Docker are operating system specific,
+so you will have to read and follow the appropriate instructions for
+your operating system:
+
+- [Install Docker on
+  MacOS](https://docs.docker.com/docker-for-mac/install/)
+
+- [Install Docker on
+  Windows](https://docs.docker.com/docker-for-windows/install/)
+
+- [Install Docker on
+  Ubuntu](https://phoenixnap.com/kb/install-docker-on-ubuntu-20-04)
+
+- [Install Docker on other Linux operating
+  systems](https://docs.docker.com/install/)
+
+If you are running Docker on Windows, you will have to do the
+following things to allow our plugin to communicate with Docker:
+
+1. Set an environment variable called DOCKER_HOST to the value
+   "tcp://localhost:2375" to tell our plugin to connect to the daemon
+   using the daemon's TCP port instead of the daemon's Unix file
+   socket.
+
+2. Go into Settings in Docker Desktop and enable the checkbox
+   next to "Expose daemon on tcp://localhost:2375 without TLS".
+
+3. Click on Resources under Settings, click on FILE SHARING under
+   Resources, and add your drive letter to the list of directories
+   which Docker can bind mount into containers.
+
+4. Click the "Apply & Restart" button at the bottom to restart Docker
+   after these changes.
+
+If you want to check that Docker is installed and running correctly,
+run the following command to verify that it prints a "Hello from
+Docker!" message.
+
+`docker run hello-world`
+
+In addition, you can go into Docker's Settings panel and configure
+Docker to use more resources if you want the back-end programs to run
+more quickly.  Our back-end programs tend to be CPU-bound, not
+memory-bound, so increasing the number of CPUs probably will be more
+effective than increasing the memory.
+
+## Build the native back-end programs (optional)
+
+The native program sources are written in
 [OCaml](https://ocaml.org/learn/description.html).  If you want to
-build or debug the OCaml programs yourself, you will need to install
-OCaml version 4.07.1, install some opam packages, run `opam exec make`
-in each directory, and configure the OSATE plugin to tell it where the
-executables are.
+build or debug the native executables yourself, you will need to
+install OCaml version 4.07.1, install some opam packages, run `opam
+exec make` in the soteria\_pp subdirectory, and configure our VERDICT
+plugin to tell it where the native executables are.
 
 Here are some commands that may successfully set up OCaml and build
-each program if you have an Ubuntu 20.04 LTS system:
+the native executables if you have an Ubuntu 20.04 LTS system:
 
 ```shell
 sudo apt install build-essential m4
@@ -133,28 +193,9 @@ sudo apt update
 sudo apt install opam
 opam switch create ocaml 4.07.1
 opam install async core core_extended dune menhir ocamlbuild ocamlfind printbox xml-light
-cd tools/verdict-back-ends/aadl2iml
-opam exec make
 cd tools/verdict-back-ends/soteria_pp
 opam exec make
 ```
-
-The STEM sources are written in [SADL](http://sadl.sourceforge.net/),
-the Semantic Application Design Language.  SADL is an English-like
-language for building semantic models and authoring rules.  You can
-edit SADL files and translate them to OWL, the Web Ontology Language
-used by semantic reasoners and rule engines, with the SADL Integrated
-Development Environment (SADL IDE), an Eclipse plug-in packaged as a
-zip file that can be downloaded from the SADL
-[Releases](https://github.com/crapo/sadlos2/releases) page.  However,
-you won't need to set up your own SADL IDE unless you intend to change
-some STEM files since we already have translated the SADL files to OWL
-files and committed the translated OWL files as well as the SADL files
-to our git repository.  SADL also provides some libraries which help
-calling programs use the translated OWL files.  Our
-verdict-stem-runner program reads translated OWL files from a STEM
-project and runs STEM's rules on semantic model data loaded from CSV
-data files created by some of our other back-end programs.
 
 If you want to run graphviz, kind2, and z3 without using Docker, you
 will need to download or install prebuilt executables on your
@@ -166,7 +207,28 @@ sudo apt install graphviz libzmq5 z3
 ```
 
 For kind2, though, you'll probably have to download a prebuilt kind2
-executable manually from <https://github.com/kind2-mc/kind2/releases>.
+executable from <https://github.com/kind2-mc/kind2/releases>.
+
+## Build the STEM files (optional)
+
+The STEM sources are written in
+[SADL](https://github.com/SemanticApplicationDesignLanguage/sadl), the
+Semantic Application Design Language.  SADL is an English-like
+language for building semantic models and authoring rules.  You can
+edit SADL files and translate them to OWL, the Web Ontology Language
+used by semantic reasoners and rule engines, with the SADL Integrated
+Development Environment (SADL IDE), an Eclipse plug-in packaged as a
+zip file that can be downloaded from SADL's
+[Releases](https://github.com/SemanticApplicationDesignLanguage/sadl/releases)
+page.  However, you won't need to use your own SADL IDE unless you
+intend to change some STEM files since we already have translated the
+STEM project's SADL files to OWL files and committed the translated
+OWL files as well as the SADL files to our git repository.  SADL also
+provides some libraries which help calling programs use the translated
+OWL files.  Our verdict-stem-runner program reads translated OWL files
+from a STEM project and runs STEM's rules on semantic model data
+loaded from CSV data files created by some of our other back-end
+programs.
 
 ## Build the Docker image (optional)
 
@@ -190,3 +252,18 @@ builder image as well:
 ```shell
 docker build --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} -t gehighassurance/verdict-dev .
 ```
+
+If you prefer to let our CI workflow build a Docker image for you, you
+will need to pull that Docker image from Docker Hub to your machine by
+running one of the following commands in your terminal depending on
+whether you want the latest release image or the most current
+development image:
+
+```shell
+docker pull gehighassurance/verdict:latest
+docker pull gehighassurance/verdict-dev:latest
+```
+
+Make sure that you enter the same image name (either
+"gehighassurance/verdict" or "gehighassurance/verdict-dev") into our
+VERDICT plugin's settings in your OSATE's preferences as well.

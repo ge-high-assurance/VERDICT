@@ -4,8 +4,8 @@
 
 [OSATE](https://osate.org/about-osate.html) is an Open Source AADL
 Tool Environment based on the Eclipse Modeling Tools IDE.  The VERDICT
-tools consist of an OSATE plugin and a set of VERDICT back-end
-programs invoked by the plugin.
+tools consist of a VERDICT plugin for OSATE and a set of VERDICT
+back-end programs invoked by the plugin.
 
 This directory builds a program called verdict-stem-runner which runs
 STEM queries on CSV data.  This program is usually called from another
@@ -20,26 +20,27 @@ queries on the CSV data, and write the queries' output to CSV files in
 the STEM/Output directory and SVG graph files in the STEM/Graphs
 directory.
 
-The STEM queries are written in [SADL](http://sadl.sourceforge.net/),
-the Semantic Application Design Language.  SADL is an English-like
-language for building semantic models and authoring rules.  We can
+The STEM queries are written in
+[SADL](https://github.com/SemanticApplicationDesignLanguage/sadl), the
+Semantic Application Design Language.  SADL is an English-like
+language for building semantic models and authoring rules.  You can
 edit SADL files and translate them to OWL, the Web Ontology Language
 used by semantic reasoners and rule engines, with the SADL Integrated
 Development Environment (SADL IDE), an Eclipse plug-in packaged as a
-zip file that can be downloaded from the SADL
-[Releases](https://github.com/crapo/sadlos2/releases) page.  However,
-you won't need to use the SADL IDE yourself unless you intend to
-change some SADL files since we already have translated the STEM
-project's SADL files to OWL files in the STEM/OwlModels directory.
-Our verdict-stem-runner program loads all the semantic modeling and
-reasoning rules and queries it needs from that STEM/OwlModels
-directory and it calls some SADL libraries to do the same thing that
-opening the STEM/Run.sadl file in the SADL IDE and running the SADL
-IDE's "Test Model" command does: run the STEM queries and write their
-output to files.  The output files have only a few small differences;
-the SADL IDE writes quotes around numbers such as "1.0" in its output
-and leaves an empty line at the end of its output CSV files, neither
-of which the verdict-stem-runner program does.
+zip file that can be downloaded from SADL's
+[Releases](https://github.com/SemanticApplicationDesignLanguage/sadl/releases)
+page.  However, you won't need to use your own SADL IDE unless you
+intend to change some SADL files since we already have translated the
+STEM project's SADL files to OWL files in the STEM/OwlModels
+directory.  Our verdict-stem-runner program loads all the semantic
+modeling and reasoning rules and queries it needs from that
+STEM/OwlModels directory and it calls some SADL libraries to do the
+same thing that opening the STEM/Run.sadl file in the SADL IDE and
+running the SADL IDE's "Test Model" command does: run the STEM queries
+and write their output to files.  The output files have only a few
+small differences; the SADL IDE writes quotes around numbers such as
+"1.0" in its output and leaves an empty line at the end of its output
+CSV files, neither of which the verdict-stem-runner program does.
 
 ## Note the use of our Maven snapshot repository
 
