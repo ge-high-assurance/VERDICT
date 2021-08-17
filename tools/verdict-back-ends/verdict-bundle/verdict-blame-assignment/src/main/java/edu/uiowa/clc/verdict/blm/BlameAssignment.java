@@ -186,6 +186,9 @@ public class BlameAssignment {
                         }
                     }
 
+                    for (Component cmp : mina.getComponents()) {
+                        rename_component(cmp);
+                    }
                     // Renaming link to support better readability
                     for (Link link : mina.getLinks()) {
                         rename_link(link);
@@ -268,6 +271,15 @@ public class BlameAssignment {
         }
 
         return attacks;
+    }
+
+    private void rename_component(Component cmp) {
+
+        String cmp_id = cmp.getComponentID();
+
+        cmp_id = cmp_id.replace("_double_colon_", "::");
+
+        cmp.setComponentID(cmp_id);
     }
 
     private void rename_link(Link selected_link) {

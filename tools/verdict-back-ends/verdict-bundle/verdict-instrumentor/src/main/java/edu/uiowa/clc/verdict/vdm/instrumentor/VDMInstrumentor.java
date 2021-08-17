@@ -485,8 +485,9 @@ public class VDMInstrumentor {
             ContractSpec contractSpec = compImpl.getType().getContract();
 
             for (String key : components_map.keySet()) {
+                String id = key.replace("::", "_double_colon_");
                 Expression wk_expr = new Expression();
-                wk_expr.setIdentifier(key);
+                wk_expr.setIdentifier(id);
 
                 Expression not_wkexpr = new Expression();
                 not_wkexpr.setNot(wk_expr);
@@ -495,7 +496,7 @@ public class VDMInstrumentor {
 
                 ContractItem weakly_assume_item = new ContractItem();
 
-                weakly_assume_item.setName(key + " is not instrumented");
+                weakly_assume_item.setName(id + " is not instrumented");
                 weakly_assume_item.setExpression(not_wkexpr);
                 // Checking connection before adding assumption
                 HashSet<Connection> empty_connection_check = components_map.get(key);
@@ -805,7 +806,8 @@ public class VDMInstrumentor {
         for (String var : vars) {
             // Declaration global variables for instrumented links.
             List<String> connections = connection_comp_map.get(var);
-            SymbolDefinition var_dec = add_vars_assume(var, connections);
+            String id = var.replace("::", "_double_colon_");
+            SymbolDefinition var_dec = add_vars_assume(id, connections);
 
             if (!connections.isEmpty()) {
                 vars_dec.add(var_dec);
@@ -857,8 +859,8 @@ public class VDMInstrumentor {
         for (String var : vars) {
             // Declaration global variables for instrumented links.
             List<String> connections = connection_comp_map.get(var);
-
-            SymbolDefinition var_dec = add_vars_assume(var, connections);
+            String id = var.replace("::", "_double_colon_");
+            SymbolDefinition var_dec = add_vars_assume(id, connections);
             vars_dec.add(var_dec);
         }
 
