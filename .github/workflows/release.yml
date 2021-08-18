@@ -56,12 +56,14 @@ jobs:
       uses: actions/checkout@v2.3.4
 
     - name: Check out kind2 source
+      if: matrix.os == 'macos-10.15'
       uses: actions/checkout@v2.3.4
       with:
         repository: kind2-mc/kind2
         path: tools/verdict-back-ends/kind2
 
     - name: Build kind2
+      if: matrix.os == 'macos-10.15'
       run: |
         cd tools/verdict-back-ends/kind2
         opam exec make
@@ -71,11 +73,27 @@ jobs:
         cd tools/verdict-back-ends/soteria_pp
         opam exec make
 
-    - name: Upload kind2
+    - name: Upload kind2 macOS binary
+      if: matrix.os == 'macos-10.15'
       uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ matrix.os }}-binaries
         path: tools/verdict-back-ends/kind2/bin/kind2
+
+    - name: Extract kind 2 binary
+      if: matrix.os == 'ubuntu-20.04'
+      id: extract
+      uses: shrink/actions-docker-extract@v1
+      with:
+        image: kind2/kind2:dev
+        path: /kind2
+
+    - name: Upload kind2 linux binary
+      if: matrix.os == 'ubuntu-20.04'
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: ${{ matrix.os }}-binaries
+        path: ${{ steps.extract.outputs.destination }}
 
     - name: Upload soteria_pp
       uses: actions/upload-artifact@v2.2.4
