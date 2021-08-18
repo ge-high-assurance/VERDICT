@@ -31,15 +31,15 @@ jobs:
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java-version }}
 
+    - name: Check out VERDICT source
+      uses: actions/checkout@v2.3.4
+
     - name: Set up Maven cache
       uses: actions/cache@v2.1.6
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
-
-    - name: Check out VERDICT source
-      uses: actions/checkout@v2.3.4
 
     - name: Build VERDICT source
       run: |
