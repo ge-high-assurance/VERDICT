@@ -78,11 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          version="0.0.0"
          unpack="false"/>
 
-   <!-- These features aren't in OSATE, so let's bundle them with our plugins -->
-   <includes
-         id="com.rockwellcollins.atc.agree.feature"
-         version="0.0.0"/>
-
+   <!-- This feature isn't in OSATE, so let's include it in our update site -->
    <includes
          id="de.itemis.xtext.antlr.sdk"
          version="0.0.0"/>
