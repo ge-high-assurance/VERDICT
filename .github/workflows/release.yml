@@ -19,11 +19,6 @@ jobs:
       matrix:
         ocaml-compiler: [ 4.07.1 ]
         os: [ macos-10.15, ubuntu-20.04 ]
-        include:
-          - os: macos-10.15
-            zmq_install: brew install zmq
-          - os: ubuntu-20.04
-            zmq_install: sudo apt-get install -y libzmq3-dev
 
     runs-on: ${{ matrix.os }}
 
@@ -38,29 +33,15 @@ jobs:
         repository: kind2-mc/kind2
         path: tools/verdict-back-ends/kind2
 
-    - name: Install zmq library
-      run: ${{ matrix.zmq_install }}
+    - name: Install zmq macOS library
+      if: runner.os == 'macOS'
+      run: brew install zmq
 
     - name: Set up OCaml
       uses: avsm/setup-ocaml@v2.0.0-beta3
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
-
-    - name: Install OCaml packages
-      run: |
-        opam install --yes \
-          async \
-          core \
-          core_extended \
-          dune \
-          dune-build-info \
-          menhir \
-          ocamlbuild \
-          ocamlfind \
-          printbox \
-          xml-light \
-          yojson \
-          zmq
+        opam-local-packages: **/*.opam
 
     - name: Extract kind2 Linux binary
       if: runner.os == 'Linux'
@@ -81,6 +62,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         cd tools/verdict-back-ends/kind2
+        opam install -y . --deps-only
         opam exec make
 
     - name: Upload kind2 macOS binary
@@ -93,6 +75,7 @@ jobs:
     - name: Build soteria_pp
       run: |
         cd tools/verdict-back-ends/soteria_pp
+        opam install -y . --deps-only
         opam exec make
 
     - name: Upload soteria_pp

@@ -58,21 +58,12 @@ jobs:
       uses: avsm/setup-ocaml@v2.0.0-beta3
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
-
-    - name: Install OCaml packages
-      run: |
-        opam install --yes \
-          async \
-          core \
-          core_extended \
-          ocamlbuild \
-          ocamlfind \
-          printbox \
-          xml-light
+        opam-local-packages: **/*.opam
 
     - name: Build soteria_pp
       run: |
         cd tools/verdict-back-ends/soteria_pp
+        opam install -y . --deps-only
         opam exec make
 
     - name: Upload soteria_pp
