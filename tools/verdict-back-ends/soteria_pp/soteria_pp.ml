@@ -196,7 +196,7 @@ let execute input_dir output_dir infeCyber infeSafe saveDotML =
       let defense2nist_ch = In_channel.read_lines (Hashtbl.find_exn input_file_table "Defenses2NIST.csv") in
       let attack_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "CAPEC.csv") in
       let events_ch =  In_channel.read_lines (Hashtbl.find_exn input_file_table "Events.csv") in
-      let _ = do_arch_analysis ~save_dot_ml:saveDotML comp_dep_ch comp_saf_ch attack_ch events_ch scn_arch_ch mission_ch defense_ch defense2nist_ch output_dir_path infeCyber infeSafe in
+      let () = do_arch_analysis ~save_dot_ml:saveDotML comp_dep_ch comp_saf_ch attack_ch events_ch scn_arch_ch mission_ch defense_ch defense2nist_ch output_dir_path infeCyber infeSafe in
 
       Format.printf "Info: Done!@."
     )
