@@ -58,7 +58,6 @@ jobs:
       uses: ocaml/setup-ocaml@v2.0.0-beta3
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
-        opam-local-packages: **/*.opam
 
     - name: Build soteria_pp
       run: |
