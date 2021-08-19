@@ -1,0 +1,18 @@
+(lang dune 2.7)
+
+(name soteria_pp)
+
+(package
+ (name soteria_pp)
+ (maintainers "Kit Siu <siu@ge.com>")
+ (synopsis "Soteria ++")
+ (description "Soteria ++")
+ (depends
+   async
+   (core_extended (and (>= v0.12) (< v0.13)))
+   printbox
+   xml-light
+ )
+)
+
+(generate_opam_files true)

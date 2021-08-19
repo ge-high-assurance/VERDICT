@@ -1,0 +1,14 @@
+(executable
+ (public_name soteria_pp)
+ (libraries core printbox xml-light)
+ (preprocess (pps ppx_let))
+ (modules :standard \
+   qualitative-test quantitative-test treeSynthesis-test validation-tests
+ )
+)
+
+(env
+ (dev
+  (flags
+    -w A-4-8-33-40-41-42-43-34-44
+  )))
