@@ -22,6 +22,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    - name: Check out VERDICT source
+      uses: actions/checkout@v2.3.4
+
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
 
@@ -30,9 +33,6 @@ jobs:
       with:
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java-version }}
-
-    - name: Check out VERDICT source
-      uses: actions/checkout@v2.3.4
 
     - name: Set up Maven cache
       uses: actions/cache@v2.1.6
