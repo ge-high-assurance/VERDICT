@@ -18,7 +18,7 @@ public class BundlePreferences extends FieldEditorPreferencePage implements IWor
 	// preference keys
 	private static final String STEM_DIR = "STEM";
 	private static final String DOCKER_IMAGE = "verdict_bundle_image";
-	private static final int FIRST_NON_DOCKER_INDEX = 4; // index of first non-Docker field editor (including separator)
+	private static final int FIRST_NON_DOCKER_INDEX = 3; // index of first non-Docker field editor (including separator)
 	private static final String BUNDLE_JAR = "verdict_bundle_jar";
 	private static final String KIND2_BIN = "kind2_bin";
 	private static final String SOTERIA_PP_BIN = "soteria_pp_bin";
