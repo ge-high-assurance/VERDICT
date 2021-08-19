@@ -180,7 +180,7 @@ effective than increasing the memory.
 The native program sources are written in
 [OCaml](https://ocaml.org/learn/description.html).  If you want to
 build or debug the native executables yourself, you will need to
-install OCaml version 4.07.1, install some opam packages, run `opam
+install OCaml version 4.09.1, install some opam packages, run `opam
 exec make` in the soteria\_pp subdirectory, and configure our VERDICT
 plugin to tell it where the native executables are.
 
@@ -191,9 +191,9 @@ the native executables if you have an Ubuntu 20.04 LTS system:
 sudo apt install build-essential m4
 sudo apt update
 sudo apt install opam
-opam switch create ocaml 4.07.1
-opam install async core core_extended dune menhir ocamlbuild ocamlfind printbox xml-light
+opam switch create ocaml 4.09.1
 cd tools/verdict-back-ends/soteria_pp
+opam install --yes . --deps-only
 opam exec make
 ```
 

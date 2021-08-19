@@ -7,7 +7,7 @@ on:
     types: [ published ]
 
 # Runs a build job and uploads VERDICT build artifacts:
-# - Builds kind2 and soteria_pp native binaries
+# - Builds & uploads kind2 soteria_pp native binaries
 # - Builds VERDICT source & runs unit tests
 # - Uploads extern.zip and README.md to release assets
 # - Pushes verdict image to Docker Hub
@@ -17,7 +17,7 @@ jobs:
   native-binaries:
     strategy:
       matrix:
-        ocaml-compiler: [ 4.07.1 ]
+        ocaml-compiler: [ 4.09.1 ]
         os: [ macos-10.15, ubuntu-20.04 ]
 
     runs-on: ${{ matrix.os }}
@@ -61,7 +61,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         cd tools/verdict-back-ends/kind2
-        opam install -y . --deps-only
+        opam install --yes . --deps-only
         opam exec make
 
     - name: Upload kind2 macOS binary
@@ -141,7 +141,7 @@ jobs:
         chmod a+x extern/{mac,nix}/{kind2,soteria_pp}
         cp -a tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar extern
         zip -r extern.zip extern
-        mkdir tools/verdict-back-ends/{soteria_pp}/bin
+        mkdir tools/verdict-back-ends/soteria_pp/bin
         cp -a extern/nix/soteria_pp tools/verdict-back-ends/soteria_pp/bin
 
     - name: Upload extern.zip and README.md to GitHub release assets
