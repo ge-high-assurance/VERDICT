@@ -97,7 +97,7 @@ jobs:
 
     - name: Build and push verdict-dev image
       if: runner.os == 'Linux'
-      uses: docker/build-push-action@v2.6.1
+      uses: docker/build-push-action@v2.7.0
       with:
         context: tools/verdict-back-ends
         file: tools/verdict-back-ends/Dockerfile
