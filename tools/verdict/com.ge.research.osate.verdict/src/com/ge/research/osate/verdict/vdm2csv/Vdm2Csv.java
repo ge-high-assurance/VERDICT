@@ -632,7 +632,6 @@ public class Vdm2Csv {
 			throw new RuntimeException("Expression used as Safety Relation input is not supported.");
 		}
 	}
-	//Assuming that the sub-expression in the safety relation is AND over port-IA types
 	private void updateCompSafTableWithAndExpr(Table compSafTable, String qualNameComp, String packageName,
 			String compTypeName, SafetyRelExpr safetyRelExpr, IAPort outputIAPort) {		
 		//get input ports and input cia concatenated
@@ -653,11 +652,21 @@ public class Vdm2Csv {
 	private void getPortsAndIAsForCompSaf(SafetyRelExpr safetyRelExpr, String[] portsIAs) {
 		if(safetyRelExpr.getKind()==null) {
 			if (portsIAs[0].equalsIgnoreCase("")) {
-				portsIAs[0] = safetyRelExpr.getPort().getName();
-				portsIAs[1] = formatToSmall(safetyRelExpr.getPort().getIa().name());
+				if(safetyRelExpr.getPort()!=null) {
+					portsIAs[0] = safetyRelExpr.getPort().getName();
+					portsIAs[1] = formatToSmall(safetyRelExpr.getPort().getIa().name());
+				} else {//assuming it is an event if not a port
+					portsIAs[0] = safetyRelExpr.getFault().getEventName();
+					portsIAs[1] = formatToSmall(safetyRelExpr.getFault().getHappens().toString());
+				}
 			} else {
-				portsIAs[0] = portsIAs[0] + ";"+ safetyRelExpr.getPort().getName();
-				portsIAs[1] = portsIAs[1] + ";" + formatToSmall(safetyRelExpr.getPort().getIa().name());
+				if(safetyRelExpr.getPort()!=null) {
+					portsIAs[0] = portsIAs[0] + ";"+ safetyRelExpr.getPort().getName();
+					portsIAs[1] = portsIAs[1] + ";" + formatToSmall(safetyRelExpr.getPort().getIa().name());
+				} else {//assuming it is an event if not a port
+					portsIAs[0] = portsIAs[0] + ";"+ safetyRelExpr.getFault().getEventName();
+					portsIAs[1] = portsIAs[1] + ";" + formatToSmall(safetyRelExpr.getFault().getHappens().toString());
+				}
 			}
 		} else if (safetyRelExpr.getKind().toString().equalsIgnoreCase("And")){
 			List<SafetyRelExpr> subInpCyberList =safetyRelExpr.getAnd().getExpr();
