@@ -103,8 +103,8 @@ in that mirrorOf section before your build will finish successfully.
 
 ## Build the Java back-end programs
 
-To build the Java program sources on your system, simply run the
-following Maven command:
+To build the Java program sources on your system, run the following
+command in this directory:
 
 `mvn clean install`
 
