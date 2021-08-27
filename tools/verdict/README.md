@@ -17,17 +17,21 @@ Running Maven in this directory builds an update site (a directory,
 not a website) containing our VERDICT plugin.  You can install the
 directory
 `com.ge.research.osate.verdict.updatesite/target/repository/` directly
-into an OSATE release or copy that directory to a new directory in our
+into your OSATE to test your changes.  Once your changes are merged to
+our repository's main branch, our GitHub Actions CI workflow will copy
+that directory to a new directory in our
 [VERDICT-update-sites](https://github.com/ge-high-assurance/VERDICT-update-sites)
-repository, from where you can install our plugin via an update site
-URL.
+repository, allowing others and you to install the latest development
+plugin version via an update site URL.
 
 ## Set up your build environment
 
 You will need a [Java Development Kit](https://adoptium.net/) to build
-all of our Java program sources.  We build our sources with Java 11
-even though OSATE says it officially supports only Java 8 (in
-practice, OSATE runs fine on Java 11 so please use Java 11 instead).
+all of our Java program sources.  Please use Java 11 instead of Java 8
+to build our plugin source because recent versions of Maven's Eclipse
+Tycho build system require Java 11 and won't run on Java 8.  Even
+though you must build our plugin source with Java 11, our VERDICT
+plugin will run on both Java 8 and 11 once it is built.
 
 You also will need [Apache Maven](https://maven.apache.org) to build
 all of our Java program sources.  Your operating system may have
@@ -47,39 +51,48 @@ your site.
 ## Update our target definition file (if needed)
 
 Our VERDICT plugin's target definition file tells Maven and Eclipse
-Tycho where to find the OSATE and other Eclipse APIs that our VERDICT
-plugin sources should be compiled against.  Generally speaking, you do
-not need to change the OSATE update site in our target definition file
-every time a stable OSATE release comes out.  The OSATE and other
-Eclipse APIs used by our plugin tend to remain compatible across
-several stable OSATE releases.  We use "0.0.0" as API version numbers
-in our target definition file because we want our plugin to work in
-other OSATE releases besides the OSATE update site that happens to be
-in our file.
+Tycho where to find the OSATE, AGREE, and Eclipse APIs that our
+VERDICT plugin needs to call.  Ideally, we do not want to have to
+change the versions of the OSATE, AGREE, and Eclipse update sites in
+our target definition file every time a stable OSATE release comes
+out.  We use "0.0.0" for API version numbers in our target definition
+file because we want our VERDICT plugin to work with any other OSATE,
+AGREE, and Eclipse update sites besides the update sites put in our
+file.
+
+In practice, each AGREE version declares it is compatible with only
+one specific OSATE release even though the OSATE and Eclipse APIs tend
+to remain stable across multiple OSATE releases.  Unfortunately, a
+breaking change between AGREE 2.5.2 and later versions affects our
+VERDICT plugin so we're restricted to using AGREE 2.5.2 (and therefore
+OSATE 2.7.1) for now.
 
 If you still want to change our target
 [definition](com.ge.research.osate.verdict.targetplatform/com.ge.research.osate.verdict.targetplatform.target)
-file to use another stable OSATE release's update site, please go
-ahead and edit the file.  Our file also has some other Eclipse update
-sites that you may want to change in lockstep with the OSATE update
-site.  You can use the OSATE source repository's own corresponding
-target
+file to use more recent update sites, please go ahead and edit the
+file.  Note that you will have to bump every update site's version in
+lockstep with each other because only very specific combinations of
+OSATE, AGREE, and other Eclipse update site versions will work
+together.  To guide you which versions are compatible with each other,
+look at OSATE's own target
 [definition](https://github.com/osate/osate2/blob/2.7.1/core/org.osate.build.target/osate2-platform.target)
-file as a reference; make sure to copy the same update site urls OSATE
-itself uses for similar Eclipse features to our own target definition
-file.
+file in its source repository.  That file is for OSATE 2.7.1; once you
+find a more recent version of OSATE's target definition file that you
+want VERDICT to be compatible with, make sure to use the same versions
+as OSATE in VERDICT's target definition file.
 
 ## Build our VERDICT plugin sources
 
 This directory and its subdirectories have pom.xml files which will
 allow you to build our VERDICT plugin sources with Maven and Eclipse
-Tycho.  Unless you want to import and develop the VERDICT plugin
-sources in your Eclipse IDE, we recommend that you build our VERDICT
-plugin sources with Maven from the command line in this directory:
+Tycho.  We recommend that you build our VERDICT plugin sources with
+Maven from the command line in this directory or the directory above,
+making sure to call the clean and package goals separately (not in the
+same Maven command line):
 
 ```shell
 mvn clean
-mvn install -Dtycho.localArtifacts=ignore
+mvn package -Dtycho.localArtifacts=ignore
 ```
 
 Using the `-Dtycho.localArtifacts=ignore` argument may prevent some
@@ -118,11 +131,11 @@ A successful build ends with the following output:
 [INFO] ------------------------------------------------------------------------
 ```
 
-The last directory built by Maven is an update site for our VERDICT
-plugin which you can install into an OSATE release.  That update site
-is actually located inside the directory
-`com.ge.research.osate.verdict.updatesite/target/repository` and that
-directory can be installed directly into OSATE.
+The last module built by Maven is an update site for our VERDICT
+plugin which can be used to install VERDICT into a stable OSATE
+release.  That update site is actually located inside the directory
+`com.ge.research.osate.verdict.updatesite/target/repository` and you
+can use that directory's location to install VERDICT into OSATE.
 
 ## Install our VERDICT plugin
 
@@ -235,7 +248,7 @@ superset of our target platform except for the following features
 which you will have to install into your OSATE development IDE from
 their own update sites:
 
-- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2)
+- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master)
 - [de.itemis.xtext.antlr.sdk](http://download.itemis.com/updates/releases/2.1.1)
 
 # Additional notes

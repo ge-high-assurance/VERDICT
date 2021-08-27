@@ -28,7 +28,7 @@ all three subdirectories from this location with these Maven commands:
 
 ```shell
 mvn clean
-mvn install -Dtycho.localArtifacts=ignore
+mvn package -Dtycho.localArtifacts=ignore
 ```
 
 ## Install our VERDICT plugin

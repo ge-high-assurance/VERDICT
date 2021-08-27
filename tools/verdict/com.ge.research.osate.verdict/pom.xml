@@ -24,6 +24,11 @@
       <artifactId>verdict-data-model</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!-- Needed by docker-java-api -->
     <dependency>
       <groupId>org.glassfish</groupId>

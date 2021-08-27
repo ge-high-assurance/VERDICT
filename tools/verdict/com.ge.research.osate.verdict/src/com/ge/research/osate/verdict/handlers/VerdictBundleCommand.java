@@ -25,6 +25,8 @@ import com.amihaiemil.docker.Images;
 import com.amihaiemil.docker.TcpDocker;
 import com.amihaiemil.docker.UnexpectedResponseException;
 import com.amihaiemil.docker.UnixDocker;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 
 /** Collects all arguments and then runs verdict-bundle via java or docker. */
 public class VerdictBundleCommand {
@@ -57,10 +59,12 @@ public class VerdictBundleCommand {
         if (!isImage()) {
             if (bundleJar != null && !bundleJar.isEmpty()) {
                 args.add("java");
-                args.add("--add-opens");
-                args.add("java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED");
-                args.add("--add-opens");
-                args.add("java.base/java.lang=ALL-UNNAMED");
+                if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9)) {
+                    args.add("--add-opens");
+                    args.add("java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED");
+                    args.add("--add-opens");
+                    args.add("java.base/java.lang=ALL-UNNAMED");
+                }
                 args.add("-jar");
                 args.add(bundleJar);
             } else {
