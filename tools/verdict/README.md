@@ -87,12 +87,12 @@ This directory and its subdirectories have pom.xml files which will
 allow you to build our VERDICT plugin sources with Maven and Eclipse
 Tycho.  We recommend that you build our VERDICT plugin sources with
 Maven from the command line in this directory or the directory above,
-making sure to call the clean and package goals separately (not in the
+making sure to call the clean and install goals separately (not in the
 same Maven command line):
 
 ```shell
 mvn clean
-mvn package -Dtycho.localArtifacts=ignore
+mvn install -Dtycho.localArtifacts=ignore
 ```
 
 Using the `-Dtycho.localArtifacts=ignore` argument may prevent some
