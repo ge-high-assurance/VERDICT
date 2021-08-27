@@ -3,8 +3,8 @@
     xmlns:sadllistmodel="http://sadl.org/sadllistmodel#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-    xmlns:base="http://sadl.org/sadllistmodel"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+  xml:base="http://sadl.org/sadllistmodel">
   <owl:Ontology rdf:about="">
     <rdfs:comment xml:lang="en">Typed List model for SADL.</rdfs:comment>
   </owl:Ontology>

@@ -1,11 +1,11 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:base="http://sadl.org/STEM/BaseModel#"
-    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
-    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://sadl.org/STEM/BaseModel">
   <owl:Ontology rdf:about="">
@@ -19,8 +19,10 @@
       <rdfs:Datatype>
         <owl:withRestrictions rdf:parseType="Collection">
           <rdf:Description>
-            <xsd:maxInclusive>9</xsd:maxInclusive>
-            <xsd:minInclusive>0</xsd:minInclusive>
+            <xsd:maxInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >9</xsd:maxInclusive>
+            <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
+            >0</xsd:minInclusive>
           </rdf:Description>
         </owl:withRestrictions>
         <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
@@ -30,44 +32,9 @@
   <owl:Class rdf:ID="System">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="removeIdentifyingInformation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="physicalAccessControl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="inputValidation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Identity_Spoofing_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="Buffer_Attack"/>
         </owl:onProperty>
@@ -75,10 +42,101 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="dosProtection"/>
+          <owl:DatatypeProperty rdf:ID="Interception_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Identity_Spoofing_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:ID="ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="removeIdentifyingInformation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="strongCryptoAlgorithms"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Configuration_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Hardware_Integrity_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="systemAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="tamperProtection"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="heterogeneity"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -87,89 +145,23 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="tamperProtection"/>
+          <owl:ObjectProperty rdf:ID="dosProtection"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="antiFuzzing"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="dataReceivedIsUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="userAuthentication"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="staticCodeAnalysis"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="XphysicalAccessControl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="encryptedStorage"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="failSafe"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="resourceAvailability"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:ID="zeroize"/>
         </owl:onProperty>
@@ -177,134 +169,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="logging"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Interception_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Configuration_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="supplyChainSecurity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="canReceiveSWUpdate"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="antiJamming"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="memoryProtection"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="dataSentIsUntrusted"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="strongCryptoAlgorithms"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Excessive_Allocation_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="remoteAttestation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="pedigree"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="heterogeneity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Hardware_Integrity_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="hasSensitiveInfo"/>
         </owl:onProperty>
@@ -312,98 +179,11 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="resourceIsolation"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Brute_Force_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Supply_Chain_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Physical_Theft_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Flooding_Attack"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="systemAccessControl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="insideTrustedBoundary"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="antiFlooding"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="canReceiveConfigUpdate"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="secureBoot"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:ID="auditMessageResponses"/>
         </owl:onProperty>
@@ -411,17 +191,225 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:about="#physicalAccessControl"/>
+          <owl:ObjectProperty rdf:ID="secureBoot"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="memoryProtection"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="insideTrustedBoundary"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="remoteAttestation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="resourceAvailability"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="logging"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Flooding_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="canReceiveSWUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="resourceIsolation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Excessive_Allocation_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="supplyChainSecurity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Brute_Force_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="staticCodeAnalysis"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="physicalAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="failSafe"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="antiFuzzing"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="antiJamming"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="userAuthentication"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Fault_Injection_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="Sniffing_Attack"/>
         </owl:onProperty>
@@ -429,10 +417,121 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="Fault_Injection_Attack"/>
+          <owl:ObjectProperty rdf:ID="encryptedStorage"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Physical_Theft_Attack"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="dataReceivedIsUntrusted"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="dataSentIsUntrusted"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:ID="Pedigree"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="pedigree"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="inputValidation"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="antiFlooding"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="XphysicalAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="canReceiveConfigUpdate"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#ImplProperty"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:about="#physicalAccessControl"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="Supply_Chain_Attack"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -480,8 +579,9 @@
   <owl:Class rdf:ID="Mitigation">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="implProperty"/>
         </owl:onProperty>
@@ -491,8 +591,9 @@
   <owl:Class rdf:ID="CAPEC">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="likelihoodOfSuccess"/>
         </owl:onProperty>
@@ -500,8 +601,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#SecurityIssueLabel"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:ID="ciaIssue"/>
         </owl:onProperty>
@@ -509,8 +611,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="capecDesc"/>
         </owl:onProperty>
@@ -518,8 +621,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="id"/>
         </owl:onProperty>
@@ -551,11 +655,12 @@
       </owl:Class>
     </owl:equivalentClass>
   </owl:Class>
-  <owl:Class rdf:ID="ImplProperty">
+  <owl:Class rdf:about="#ImplProperty">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="#DAL"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="dal"/>
         </owl:onProperty>
@@ -563,8 +668,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="val"/>
         </owl:onProperty>
@@ -572,15 +678,16 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="name"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
   </owl:Class>
-  <owl:Class rdf:ID="Pedigree">
+  <owl:Class rdf:about="#Pedigree">
     <owl:equivalentClass>
       <owl:Class>
         <owl:oneOf rdf:parseType="Collection">
@@ -594,8 +701,9 @@
   <owl:Class rdf:ID="NISTControl">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="nistDesc"/>
         </owl:onProperty>
@@ -603,8 +711,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="nistId"/>
         </owl:onProperty>
@@ -617,19 +726,53 @@
   <owl:Class rdf:ID="Connection">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#ImplProperty"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompType"/>
+          <owl:ObjectProperty rdf:ID="deviceAuthentication"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#Thing"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="outPort"/>
+          <owl:ObjectProperty rdf:ID="srcCompType"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#ImplProperty"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="encryptedTransmission"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="connectionName"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#System"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="destCompImpl"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -638,89 +781,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="connectionName"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="connectionDestination"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcCompImpl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="binding"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcCompCategory"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="infoFlowSeverity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="sessionAuthenticity"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompImpl"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destCompCategory"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="inPort"/>
         </owl:onProperty>
@@ -728,26 +791,29 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#System"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:DatatypeProperty rdf:ID="XdeviceAuthentication"/>
+          <owl:ObjectProperty rdf:ID="srcCompCategory"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#System"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="srcCompType"/>
+          <owl:ObjectProperty rdf:ID="srcCompImpl"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="bindingVulnerability"/>
         </owl:onProperty>
@@ -755,35 +821,9 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="destPortType"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="encryptedTransmission"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
-        <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="connectionSource"/>
-        </owl:onProperty>
-      </owl:Restriction>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#PortType"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:ID="srcPortType"/>
         </owl:onProperty>
@@ -791,19 +831,117 @@
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass>
+          <owl:Class rdf:about="#Thing"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
-          <owl:ObjectProperty rdf:ID="deviceAuthentication"/>
+          <owl:ObjectProperty rdf:ID="connectionSource"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="XdeviceAuthentication"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#ImplProperty"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="sessionAuthenticity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#Thing"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="destCompType"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:DatatypeProperty rdf:ID="XencryptedTransmission"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#Bus"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="binding"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass>
+          <owl:Class rdf:about="#Thing"/>
+        </owl:onClass>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="connectionDestination"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="outPort"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:DatatypeProperty rdf:ID="infoFlowSeverity"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#System"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="destCompCategory"/>
+        </owl:onProperty>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onClass rdf:resource="#PortType"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
+        <owl:onProperty>
+          <owl:ObjectProperty rdf:ID="destPortType"/>
         </owl:onProperty>
       </owl:Restriction>
     </rdfs:subClassOf>
@@ -811,8 +949,9 @@
   <owl:Class rdf:about="#Thing">
     <rdfs:subClassOf>
       <owl:Restriction>
-        <owl:cardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#int"
-        >1</owl:cardinality>
+        <owl:onClass rdf:resource="#ComponentType"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#long"
+        >1</owl:qualifiedCardinality>
         <owl:onProperty>
           <owl:ObjectProperty rdf:about="#componentType"/>
         </owl:onProperty>
@@ -1250,29 +1389,23 @@
       <base:Mitigation rdf:ID="SystemAccessControl">
         <base:nistControl>
           <base:NISTControl rdf:ID="PE-3-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Information System Access Control</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >PE-3-1</base:nistId>
+            <base:nistDesc>Information System Access Control</base:nistDesc>
+            <base:nistId>PE-3-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="PE-3">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Physical Access Control</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >PE-3</base:nistId>
+            <base:nistDesc>Physical Access Control</base:nistDesc>
+            <base:nistId>PE-3</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >systemAccessControl</base:implProperty>
+        <base:implProperty>systemAccessControl</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Hardware Integrity Attack</base:capecDesc>
+    <base:capecDesc>Hardware Integrity Attack</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >440</base:id>
   </base:CAPEC>
@@ -1280,15 +1413,13 @@
     <base:mitigation>
       <base:Mitigation rdf:ID="PhysicalAccessControl">
         <base:nistControl rdf:resource="#PE-3"/>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >physicalAccessControl</base:implProperty>
+        <base:implProperty>physicalAccessControl</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
@@ -1297,29 +1428,23 @@
       <base:Mitigation rdf:ID="InputValidation">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-10-5">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Restrict Inputs to Trusted Sources and Approved Formats</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-10-5</base:nistId>
+            <base:nistDesc>Restrict Inputs to Trusted Sources and Approved Formats</base:nistDesc>
+            <base:nistId>SI-10-5</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-10">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Information Input Validation</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-10</base:nistId>
+            <base:nistDesc>Information Input Validation</base:nistDesc>
+            <base:nistId>SI-10</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >inputValidation</base:implProperty>
+        <base:implProperty>inputValidation</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fuzzing</base:capecDesc>
+    <base:capecDesc>Fuzzing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >28</base:id>
   </base:CAPEC>
@@ -1328,64 +1453,51 @@
       <base:Mitigation rdf:ID="Logging">
         <base:nistControl>
           <base:NISTControl rdf:ID="AU-9-3">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Cryptographic Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >AU-9-3</base:nistId>
+            <base:nistDesc>Cryptographic Protection</base:nistDesc>
+            <base:nistId>AU-9-3</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="AU-9">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Protection Of Audit Information</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >AU-9</base:nistId>
+            <base:nistDesc>Protection Of Audit Information</base:nistDesc>
+            <base:nistId>AU-9</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="AU-12-3">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Changes By Authorized Individuals</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >AU-12-3</base:nistId>
+            <base:nistDesc>Changes By Authorized Individuals</base:nistDesc>
+            <base:nistId>AU-12-3</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="AU-12-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >System-wide / Time-correlated Audit Trail</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >AU-12-1</base:nistId>
+            <base:nistDesc>System-wide / Time-correlated Audit Trail</base:nistDesc>
+            <base:nistId>AU-12-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="AU-12">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Audit Generation</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >AU-12</base:nistId>
+            <base:nistDesc>Audit Generation</base:nistDesc>
+            <base:nistId>AU-12</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >logging</base:implProperty>
+        <base:implProperty>logging</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Object Injection</base:capecDesc>
+    <base:capecDesc>Object Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >586</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-188C-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Reverse Engineering</base:capecDesc>
+    <base:capecDesc>Reverse Engineering</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >188</base:id>
   </base:CAPEC>
@@ -1394,21 +1506,17 @@
       <base:Mitigation rdf:ID="Heterogeneity">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-29">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Heterogeneity</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-29</base:nistId>
+            <base:nistDesc>Heterogeneity</base:nistDesc>
+            <base:nistId>SC-29</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >heterogeneity</base:implProperty>
+        <base:implProperty>heterogeneity</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Content Spoofing</base:capecDesc>
+    <base:capecDesc>Content Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >148</base:id>
   </base:CAPEC>
@@ -1417,32 +1525,27 @@
       <base:Mitigation rdf:ID="StaticCodeAnalysis">
         <base:nistControl>
           <base:NISTControl rdf:ID="SA-11-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Static Code Analysis</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SA-11-1</base:nistId>
+            <base:nistDesc>Static Code Analysis</base:nistDesc>
+            <base:nistId>SA-11-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >staticCodeAnalysis</base:implProperty>
+        <base:implProperty>staticCodeAnalysis</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Manipulating User State</base:capecDesc>
+    <base:capecDesc>Manipulating User State</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >74</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-115A-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Bypass</base:capecDesc>
+    <base:capecDesc>Authentication Bypass</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >115</base:id>
   </base:CAPEC>
@@ -1451,81 +1554,63 @@
       <base:Mitigation rdf:ID="RemoteAttestation">
         <base:nistControl>
           <base:NISTControl rdf:ID="IA-3-4">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Remote Attestation</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >IA-3-4</base:nistId>
+            <base:nistDesc>Remote Attestation</base:nistDesc>
+            <base:nistId>IA-3-4</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >remoteAttestation</base:implProperty>
+        <base:implProperty>remoteAttestation</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation>
       <base:Mitigation rdf:ID="MemoryProtection">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-16">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Memory Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-16</base:nistId>
+            <base:nistDesc>Memory Protection</base:nistDesc>
+            <base:nistId>SI-16</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >memoryProtection</base:implProperty>
+        <base:implProperty>memoryProtection</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation>
       <base:Mitigation rdf:ID="SecureBoot">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-7-15">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Code Authentication</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-7-15</base:nistId>
+            <base:nistDesc>Code Authentication</base:nistDesc>
+            <base:nistId>SI-7-15</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-7-9">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Verify Boot Process</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-7-9</base:nistId>
+            <base:nistDesc>Verify Boot Process</base:nistDesc>
+            <base:nistId>SI-7-9</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-7-6">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Cryptographic Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-7-6</base:nistId>
+            <base:nistDesc>Cryptographic Protection</base:nistDesc>
+            <base:nistId>SI-7-6</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-7-5">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Automated Response To Integrity Violations</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-7-5</base:nistId>
+            <base:nistDesc>Automated Response To Integrity Violations</base:nistDesc>
+            <base:nistId>SI-7-5</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-7-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Integrity Checks</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-7-1</base:nistId>
+            <base:nistDesc>Integrity Checks</base:nistDesc>
+            <base:nistId>SI-7-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >secureBoot</base:implProperty>
+        <base:implProperty>secureBoot</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Local Execution of Code</base:capecDesc>
+    <base:capecDesc>Local Execution of Code</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >549</base:id>
   </base:CAPEC>
@@ -1534,41 +1619,35 @@
       <base:Mitigation rdf:ID="EncryptedTransmission">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-8">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Transmission Integrity</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-8</base:nistId>
+            <base:nistDesc>Transmission Integrity</base:nistDesc>
+            <base:nistId>SC-8</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >encryptedTransmission</base:implProperty>
+        <base:implProperty>encryptedTransmission</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Interception</base:capecDesc>
+    <base:capecDesc>Interception</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >117</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-624I-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fault Injection</base:capecDesc>
+    <base:capecDesc>Fault Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >624</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-440I-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Hardware Integrity Attack</base:capecDesc>
+    <base:capecDesc>Hardware Integrity Attack</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >440</base:id>
   </base:CAPEC>
@@ -1577,29 +1656,23 @@
       <base:Mitigation rdf:ID="DeviceAuthentication">
         <base:nistControl>
           <base:NISTControl rdf:ID="IA-3-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Cryptographic Bidirectional Authentication</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >IA-3-1</base:nistId>
+            <base:nistDesc>Cryptographic Bidirectional Authentication</base:nistDesc>
+            <base:nistId>IA-3-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="IA-3">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Device Identification And Authentication</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >IA-3</base:nistId>
+            <base:nistDesc>Device Identification And Authentication</base:nistDesc>
+            <base:nistId>IA-3</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >deviceAuthentication</base:implProperty>
+        <base:implProperty>deviceAuthentication</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Parameter Injection</base:capecDesc>
+    <base:capecDesc>Parameter Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >137</base:id>
   </base:CAPEC>
@@ -1607,116 +1680,93 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Traffic Injection</base:capecDesc>
+    <base:capecDesc>Traffic Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >594</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-148I-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Content Spoofing</base:capecDesc>
+    <base:capecDesc>Content Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >148</base:id>
   </base:CAPEC>
   <base:Mitigation rdf:ID="UserAuthentication">
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-9">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Network Access to Non-Privileged Accounts - Replay Resistant</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-9</base:nistId>
+        <base:nistDesc>Network Access to Non-Privileged Accounts - Replay Resistant</base:nistDesc>
+        <base:nistId>IA-2-9</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-4">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Local Access to Non-Privileged Accounts</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-4</base:nistId>
+        <base:nistDesc>Local Access to Non-Privileged Accounts</base:nistDesc>
+        <base:nistId>IA-2-4</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-3">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Local Access to Privileged Accounts</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-3</base:nistId>
+        <base:nistDesc>Local Access to Privileged Accounts</base:nistDesc>
+        <base:nistId>IA-2-3</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-11">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Remote Access - Separate Device</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-11</base:nistId>
+        <base:nistDesc>Remote Access - Separate Device</base:nistDesc>
+        <base:nistId>IA-2-11</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-2">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Network Access to Non-Privileged Accounts</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-2</base:nistId>
+        <base:nistDesc>Network Access to Non-Privileged Accounts</base:nistDesc>
+        <base:nistId>IA-2-2</base:nistId>
       </base:NISTControl>
     </base:nistControl>
-    <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >userAuthentication</base:implProperty>
+    <base:implProperty>userAuthentication</base:implProperty>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-1">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Network Access to Privileged Accounts</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-1</base:nistId>
+        <base:nistDesc>Network Access to Privileged Accounts</base:nistDesc>
+        <base:nistId>IA-2-1</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Identification and Authentication (Organizational Users)</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2</base:nistId>
+        <base:nistDesc>Identification and Authentication (Organizational Users)</base:nistDesc>
+        <base:nistId>IA-2</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-8">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Network Access to Privileged Accounts - Replay Resistant</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-8</base:nistId>
+        <base:nistDesc>Network Access to Privileged Accounts - Replay Resistant</base:nistDesc>
+        <base:nistId>IA-2-8</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="IA-2-12">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Acceptance of PIV Credentials</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >IA-2-12</base:nistId>
+        <base:nistDesc>Acceptance of PIV Credentials</base:nistDesc>
+        <base:nistId>IA-2-12</base:nistId>
       </base:NISTControl>
     </base:nistControl>
   </base:Mitigation>
   <base:CAPEC rdf:ID="CAPEC-114A-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Abuse</base:capecDesc>
+    <base:capecDesc>Authentication Abuse</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >114</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-624I-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fault Injection</base:capecDesc>
+    <base:capecDesc>Fault Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >624</base:id>
   </base:CAPEC>
@@ -1724,10 +1774,9 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
@@ -1736,30 +1785,27 @@
     <base:mitigation rdf:resource="#MemoryProtection"/>
     <base:mitigation rdf:resource="#SecureBoot"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Local Execution of Code</base:capecDesc>
+    <base:capecDesc>Local Execution of Code</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >549</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-248A-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-148I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Content Spoofing</base:capecDesc>
+    <base:capecDesc>Content Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >148</base:id>
   </base:CAPEC>
@@ -1768,21 +1814,17 @@
       <base:Mitigation rdf:ID="StrongCryptoAlgorithms">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-13">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Cryptographic Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-13</base:nistId>
+            <base:nistDesc>Cryptographic Protection</base:nistDesc>
+            <base:nistId>SC-13</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >strongCryptoAlgorithms</base:implProperty>
+        <base:implProperty>strongCryptoAlgorithms</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Brute Force</base:capecDesc>
+    <base:capecDesc>Brute Force</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >112</base:id>
   </base:CAPEC>
@@ -1790,20 +1832,18 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-26C-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Leveraging Race Conditions</base:capecDesc>
+    <base:capecDesc>Leveraging Race Conditions</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >26</base:id>
   </base:CAPEC>
@@ -1812,65 +1852,55 @@
       <base:Mitigation rdf:ID="TamperProtection">
         <base:nistControl>
           <base:NISTControl rdf:ID="SA-18-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Tamper Resistance and Detection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SA-18-1</base:nistId>
+            <base:nistDesc>Tamper Resistance and Detection</base:nistDesc>
+            <base:nistId>SA-18-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >tamperProtection</base:implProperty>
+        <base:implProperty>tamperProtection</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation>
       <base:Mitigation rdf:ID="SupplyChainSecurity">
         <base:nistControl>
           <base:NISTControl rdf:ID="SA-12">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Supply Chain Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SA-12</base:nistId>
+            <base:nistDesc>Supply Chain Protection</base:nistDesc>
+            <base:nistId>SA-12</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >supplyChainSecurity</base:implProperty>
+        <base:implProperty>supplyChainSecurity</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Modification During Manufacture</base:capecDesc>
+    <base:capecDesc>Modification During Manufacture</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >438</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-242I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-123C-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Buffer Manipulation</base:capecDesc>
+    <base:capecDesc>Buffer Manipulation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >123</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-188C-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Reverse Engineering</base:capecDesc>
+    <base:capecDesc>Reverse Engineering</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >188</base:id>
   </base:CAPEC>
@@ -1879,49 +1909,41 @@
       <base:Mitigation rdf:ID="DosProtection">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-5-2">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Excess Capacity/Bandwidth/Redundancy</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-5-2</base:nistId>
+            <base:nistDesc>Excess Capacity/Bandwidth/Redundancy</base:nistDesc>
+            <base:nistId>SC-5-2</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-5">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Denial of Service Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-5</base:nistId>
+            <base:nistDesc>Denial of Service Protection</base:nistDesc>
+            <base:nistId>SC-5</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >dosProtection</base:implProperty>
+        <base:implProperty>dosProtection</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Flooding</base:capecDesc>
+    <base:capecDesc>Flooding</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >125</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-22I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Exploiting Trust in Client</base:capecDesc>
+    <base:capecDesc>Exploiting Trust in Client</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >22</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-248I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
@@ -1930,31 +1952,26 @@
       <base:Mitigation rdf:ID="RemoveIdentifyingInformation">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-15">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Information Output Handling</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-15</base:nistId>
+            <base:nistDesc>Information Output Handling</base:nistDesc>
+            <base:nistId>SI-15</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >removeIdentifyingInformation</base:implProperty>
+        <base:implProperty>removeIdentifyingInformation</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Excavation</base:capecDesc>
+    <base:capecDesc>Excavation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >116</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-26I-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Leveraging Race Conditions</base:capecDesc>
+    <base:capecDesc>Leveraging Race Conditions</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >26</base:id>
   </base:CAPEC>
@@ -1962,10 +1979,9 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
@@ -1974,10 +1990,9 @@
     <base:mitigation rdf:resource="#MemoryProtection"/>
     <base:mitigation rdf:resource="#SecureBoot"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Configuration/Environment Manipulation</base:capecDesc>
+    <base:capecDesc>Configuration/Environment Manipulation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >176</base:id>
   </base:CAPEC>
@@ -1986,30 +2001,27 @@
     <base:mitigation rdf:resource="#MemoryProtection"/>
     <base:mitigation rdf:resource="#SecureBoot"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Software Integrity Attack</base:capecDesc>
+    <base:capecDesc>Software Integrity Attack</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >184</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-242A-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-390A-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Bypassing Physical Security</base:capecDesc>
+    <base:capecDesc>Bypassing Physical Security</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >390</base:id>
   </base:CAPEC>
@@ -2017,20 +2029,18 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-507C-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
@@ -2039,51 +2049,44 @@
       <base:Mitigation rdf:ID="AuditMessageResponses">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-11">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Error Handling</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-11</base:nistId>
+            <base:nistDesc>Error Handling</base:nistDesc>
+            <base:nistId>SI-11</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >auditMessageResponses</base:implProperty>
+        <base:implProperty>auditMessageResponses</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fingerprinting</base:capecDesc>
+    <base:capecDesc>Fingerprinting</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >224</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-248C-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Command Injection</base:capecDesc>
+    <base:capecDesc>Command Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >248</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-624C-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fault Injection</base:capecDesc>
+    <base:capecDesc>Fault Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >624</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
@@ -2092,10 +2095,9 @@
     <base:mitigation rdf:resource="#MemoryProtection"/>
     <base:mitigation rdf:resource="#SecureBoot"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Local Execution of Code</base:capecDesc>
+    <base:capecDesc>Local Execution of Code</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >549</base:id>
   </base:CAPEC>
@@ -2103,10 +2105,9 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Inclusion</base:capecDesc>
+    <base:capecDesc>Code Inclusion</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >175</base:id>
   </base:CAPEC>
@@ -2115,53 +2116,43 @@
       <base:Mitigation rdf:ID="FailSafe">
         <base:nistControl>
           <base:NISTControl rdf:ID="SI-17">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Fail-Safe Procedures</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SI-17</base:nistId>
+            <base:nistDesc>Fail-Safe Procedures</base:nistDesc>
+            <base:nistId>SI-17</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >failSafe</base:implProperty>
+        <base:implProperty>failSafe</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:mitigation>
       <base:Mitigation rdf:ID="AntiJamming">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-40-1">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Electromagnetic Interference</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-40-1</base:nistId>
+            <base:nistDesc>Electromagnetic Interference</base:nistDesc>
+            <base:nistId>SC-40-1</base:nistId>
           </base:NISTControl>
         </base:nistControl>
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-40">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Wireless Link Protection</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-40</base:nistId>
+            <base:nistDesc>Wireless Link Protection</base:nistDesc>
+            <base:nistId>SC-40</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >antiJamming</base:implProperty>
+        <base:implProperty>antiJamming</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Obstruction</base:capecDesc>
+    <base:capecDesc>Obstruction</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >607</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-22C-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Exploiting Trust in Client</base:capecDesc>
+    <base:capecDesc>Exploiting Trust in Client</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >22</base:id>
   </base:CAPEC>
@@ -2170,81 +2161,71 @@
       <base:Mitigation rdf:ID="EncryptedStorage">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-28">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Protection Of Information At Rest</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-28</base:nistId>
+            <base:nistDesc>Protection Of Information At Rest</base:nistDesc>
+            <base:nistId>SC-28</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >encryptedStorage</base:implProperty>
+        <base:implProperty>encryptedStorage</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Reverse Engineering</base:capecDesc>
+    <base:capecDesc>Reverse Engineering</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >188</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151I-Heterogeneity">
     <base:mitigation rdf:resource="#Heterogeneity"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-624C-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fault Injection</base:capecDesc>
+    <base:capecDesc>Fault Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >624</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-507A-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151C-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-115C-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Bypass</base:capecDesc>
+    <base:capecDesc>Authentication Bypass</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >115</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-148I-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Content Spoofing</base:capecDesc>
+    <base:capecDesc>Content Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >148</base:id>
   </base:CAPEC>
@@ -2252,10 +2233,9 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Parameter Injection</base:capecDesc>
+    <base:capecDesc>Parameter Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >137</base:id>
   </base:CAPEC>
@@ -2264,91 +2244,80 @@
       <base:Mitigation rdf:ID="SessionAuthenticity">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-23">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Session Authenticity</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-23</base:nistId>
+            <base:nistDesc>Session Authenticity</base:nistDesc>
+            <base:nistId>SC-23</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >sessionAuthenticity</base:implProperty>
+        <base:implProperty>sessionAuthenticity</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Exploitation of Trusted Credentials</base:capecDesc>
+    <base:capecDesc>Exploitation of Trusted Credentials</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >21</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-507C-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-112I-StrongCryptoAlgorithms">
     <base:mitigation rdf:resource="#StrongCryptoAlgorithms"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Brute Force</base:capecDesc>
+    <base:capecDesc>Brute Force</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >112</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-114C-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Abuse</base:capecDesc>
+    <base:capecDesc>Authentication Abuse</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >114</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-586A-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Object Injection</base:capecDesc>
+    <base:capecDesc>Object Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >586</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-123I-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Buffer Manipulation</base:capecDesc>
+    <base:capecDesc>Buffer Manipulation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >123</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-440I-TamperProtection">
     <base:mitigation rdf:resource="#TamperProtection"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Hardware Integrity Attack</base:capecDesc>
+    <base:capecDesc>Hardware Integrity Attack</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >440</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-192C-EncryptedTransmission">
     <base:mitigation rdf:resource="#EncryptedTransmission"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Protocol Analysis</base:capecDesc>
+    <base:capecDesc>Protocol Analysis</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >192</base:id>
   </base:CAPEC>
@@ -2356,10 +2325,9 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Object Injection</base:capecDesc>
+    <base:capecDesc>Object Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >586</base:id>
   </base:CAPEC>
@@ -2368,21 +2336,17 @@
       <base:Mitigation rdf:ID="ResourceAvailability">
         <base:nistControl>
           <base:NISTControl rdf:ID="SC-6">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Resource Availability</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >SC-6</base:nistId>
+            <base:nistDesc>Resource Availability</base:nistDesc>
+            <base:nistId>SC-6</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >resourceAvailability</base:implProperty>
+        <base:implProperty>resourceAvailability</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Excessive Allocation</base:capecDesc>
+    <base:capecDesc>Excessive Allocation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >130</base:id>
   </base:CAPEC>
@@ -2390,67 +2354,59 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151C-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-192C-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Protocol Analysis</base:capecDesc>
+    <base:capecDesc>Protocol Analysis</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >192</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151C-Heterogeneity">
     <base:mitigation rdf:resource="#Heterogeneity"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-22A-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Exploiting Trust in Client</base:capecDesc>
+    <base:capecDesc>Exploiting Trust in Client</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >22</base:id>
   </base:CAPEC>
   <base:NISTControl rdf:ID="SC-7-16">
-    <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Prevent Discovery of Components/Devices</base:nistDesc>
-    <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >SC-7-16</base:nistId>
+    <base:nistDesc>Prevent Discovery of Components/Devices</base:nistDesc>
+    <base:nistId>SC-7-16</base:nistId>
   </base:NISTControl>
   <base:CAPEC rdf:ID="CAPEC-439I-SupplyChainSecurity-TamperProtection">
     <base:mitigation rdf:resource="#TamperProtection"/>
     <base:mitigation rdf:resource="#SupplyChainSecurity"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Manipulation During Distribution</base:capecDesc>
+    <base:capecDesc>Manipulation During Distribution</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >439</base:id>
   </base:CAPEC>
@@ -2458,70 +2414,63 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-123A-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Buffer Manipulation</base:capecDesc>
+    <base:capecDesc>Buffer Manipulation</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >123</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-390C-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Bypassing Physical Security</base:capecDesc>
+    <base:capecDesc>Bypassing Physical Security</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >390</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-507A-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-114I-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Abuse</base:capecDesc>
+    <base:capecDesc>Authentication Abuse</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >114</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-594I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Traffic Injection</base:capecDesc>
+    <base:capecDesc>Traffic Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >594</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-242C-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Injection</base:capecDesc>
+    <base:capecDesc>Code Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >242</base:id>
   </base:CAPEC>
@@ -2529,50 +2478,45 @@
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Manipulating User State</base:capecDesc>
+    <base:capecDesc>Manipulating User State</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >74</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-112C-StrongCryptoAlgorithms">
     <base:mitigation rdf:resource="#StrongCryptoAlgorithms"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Brute Force</base:capecDesc>
+    <base:capecDesc>Brute Force</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >112</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-169C-RemoveIdentifyingInformation">
     <base:mitigation rdf:resource="#RemoveIdentifyingInformation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Footprinting</base:capecDesc>
+    <base:capecDesc>Footprinting</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >169</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-28C-InputValidation">
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fuzzing</base:capecDesc>
+    <base:capecDesc>Fuzzing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >28</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-115I-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Authentication Bypass</base:capecDesc>
+    <base:capecDesc>Authentication Bypass</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >115</base:id>
   </base:CAPEC>
@@ -2581,37 +2525,30 @@
       <base:Mitigation rdf:ID="Zeroize">
         <base:nistControl>
           <base:NISTControl rdf:ID="MP-6-8">
-            <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >Wiping of Information</base:nistDesc>
-            <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-            >MP-6-8</base:nistId>
+            <base:nistDesc>Wiping of Information</base:nistDesc>
+            <base:nistId>MP-6-8</base:nistId>
           </base:NISTControl>
         </base:nistControl>
-        <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >zeroize</base:implProperty>
+        <base:implProperty>zeroize</base:implProperty>
       </base:Mitigation>
     </base:mitigation>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
   <base:NISTControl rdf:ID="PE-3-5">
-    <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Tamper Protection</base:nistDesc>
-    <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >PE-3-5</base:nistId>
+    <base:nistDesc>Tamper Protection</base:nistDesc>
+    <base:nistId>PE-3-5</base:nistId>
   </base:NISTControl>
   <base:CAPEC rdf:ID="CAPEC-390I-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Bypassing Physical Security</base:capecDesc>
+    <base:capecDesc>Bypassing Physical Security</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >390</base:id>
   </base:CAPEC>
@@ -2620,140 +2557,123 @@
     <base:mitigation rdf:resource="#Logging"/>
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Traffic Injection</base:capecDesc>
+    <base:capecDesc>Traffic Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >594</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-28I-InputValidation">
     <base:mitigation rdf:resource="#InputValidation"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Fuzzing</base:capecDesc>
+    <base:capecDesc>Fuzzing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >28</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-131A-ResourceAvailability">
     <base:mitigation rdf:resource="#ResourceAvailability"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Resource Leak Exposure</base:capecDesc>
+    <base:capecDesc>Resource Leak Exposure</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >131</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-151I-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Identity Spoofing</base:capecDesc>
+    <base:capecDesc>Identity Spoofing</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >151</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-175I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Code Inclusion</base:capecDesc>
+    <base:capecDesc>Code Inclusion</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >175</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-25A-StaticCodeAnalysis">
     <base:mitigation rdf:resource="#StaticCodeAnalysis"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Forced Deadlock</base:capecDesc>
+    <base:capecDesc>Forced Deadlock</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >25</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-586I-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Object Injection</base:capecDesc>
+    <base:capecDesc>Object Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >586</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-21I-SessionAuthenticity">
     <base:mitigation rdf:resource="#SessionAuthenticity"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Exploitation of Trusted Credentials</base:capecDesc>
+    <base:capecDesc>Exploitation of Trusted Credentials</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >21</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-507I-SystemAccessControl">
     <base:mitigation rdf:resource="#SystemAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Integrity"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Physical Theft</base:capecDesc>
+    <base:capecDesc>Physical Theft</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >507</base:id>
   </base:CAPEC>
   <base:Mitigation rdf:ID="ResourceIsolation">
     <base:nistControl>
       <base:NISTControl rdf:ID="SC-4-2">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Periods Processing</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >SC-4-2</base:nistId>
+        <base:nistDesc>Periods Processing</base:nistDesc>
+        <base:nistId>SC-4-2</base:nistId>
       </base:NISTControl>
     </base:nistControl>
     <base:nistControl>
       <base:NISTControl rdf:ID="SC-4">
-        <base:nistDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >Information in Shared Resources</base:nistDesc>
-        <base:nistId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-        >SC-4</base:nistId>
+        <base:nistDesc>Information in Shared Resources</base:nistDesc>
+        <base:nistId>SC-4</base:nistId>
       </base:NISTControl>
     </base:nistControl>
-    <base:implProperty rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >resourceIsolation</base:implProperty>
+    <base:implProperty>resourceIsolation</base:implProperty>
   </base:Mitigation>
   <base:CAPEC rdf:ID="CAPEC-594A-DeviceAuthentication">
     <base:mitigation rdf:resource="#DeviceAuthentication"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Availability"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Traffic Injection</base:capecDesc>
+    <base:capecDesc>Traffic Injection</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >594</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-188C-TamperProtection">
     <base:mitigation rdf:resource="#TamperProtection"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Reverse Engineering</base:capecDesc>
+    <base:capecDesc>Reverse Engineering</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >188</base:id>
   </base:CAPEC>
   <base:CAPEC rdf:ID="CAPEC-192C-PhysicalAccessControl">
     <base:mitigation rdf:resource="#PhysicalAccessControl"/>
     <base:likelihoodOfSuccess rdf:datatype="http://www.w3.org/2001/XMLSchema#float"
-    >1.0</base:likelihoodOfSuccess>
+    >1</base:likelihoodOfSuccess>
     <base:ciaIssue rdf:resource="#Confidentiality"/>
-    <base:capecDesc rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >Protocol Analysis</base:capecDesc>
+    <base:capecDesc>Protocol Analysis</base:capecDesc>
     <base:id rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"
     >192</base:id>
   </base:CAPEC>

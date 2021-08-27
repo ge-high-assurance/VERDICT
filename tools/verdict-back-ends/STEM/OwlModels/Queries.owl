@@ -1,13 +1,12 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel"
+    xmlns:builtinfunctions="http://sadl.org/builtinfunctions#"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
-    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel"
-    xmlns:builtinfunctions="http://sadl.org/builtinfunctions"
-    xmlns:stemr="http://sadl.org/STEM/STEMRules"
-    xmlns:j.0="http://sadl.org/sadlimplicitmodel#"
+    xmlns:stemr="http://sadl.org/STEM/STEMRules#"
+    xmlns:sadlimplicitmodel="http://sadl.org/sadlimplicitmodel#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:queries="http://sadl.org/STEM/Queries#"
+    xmlns:sadlbasemodel="http://sadl.org/sadlbasemodel#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
   xml:base="http://sadl.org/STEM/Queries">
   <owl:Ontology rdf:about="">
@@ -17,9 +16,8 @@
     <owl:imports rdf:resource="/sadlbasemodel"/>
     <rdfs:comment xml:lang="en">This ontology was created from a SADL file 'Queries.sadl' and should not be directly edited.</rdfs:comment>
   </owl:Ontology>
-  <j.0:NamedQuery rdf:ID="Defenses2NIST">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >
+  <sadlimplicitmodel:NamedQuery rdf:ID="Defenses2NIST">
+    <rdfs:isDefinedBy>
 select distinct (?m1 as ?DefenseProperty)
 (?ApplicableDefense1 as ?NISTProfile) (?DefenseDescription1 as ?DefenseDescription)
 where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://sadl.org/STEM/BaseModel#Mitigation&gt;
@@ -32,10 +30,9 @@ where {#?m1 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://s
    } group by ?m1}
 } order by ?m1 ?ApplicableDefense1
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="STEMgraph">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    > # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl
+  </sadlimplicitmodel:NamedQuery>
+  <sadlimplicitmodel:NamedQuery rdf:ID="STEMgraph">
+    <rdfs:isDefinedBy> # link color not taking effect inside OPTIONAL - seems to be a SPARQL issue; the OPTIONAL query is fine as Ask in Run.sadl
 # but link_style worked
 select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?link_style #?link_color 
 (?finallist as ?N1_tooltip) (?cfinallist as ?link_tooltip) where
@@ -132,10 +129,9 @@ select distinct ?N1 ?link ?N2 ?N1_style ?N1_fillcolor ?N2_style ?N2_fillcolor ?l
  . LET(?cfinallist := concat('Connection: ',concat(?strippedcname,concat('&amp;#10;',?cf13)))) # add connection name at top
 }
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="ConnDefenses">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    > # for connections, each capec has only a single mitigation
+  </sadlimplicitmodel:NamedQuery>
+  <sadlimplicitmodel:NamedQuery rdf:ID="ConnDefenses">
+    <rdfs:isDefinedBy> # for connections, each capec has only a single mitigation
 select ('Connection' as ?CompType) ?CompInst ?Src ?Dest ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability)
        (?m1 as ?ApplicableDefenseProperties) (?y2 as ?ImplProperties) ?DAL where
 {  ?conn &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?CompInst . ?conn &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?x
@@ -151,18 +147,16 @@ select ('Connection' as ?CompType) ?CompInst ?Src ?Dest ?CAPEC (?ic as ?Confiden
  . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?Src . ?conn &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?Dest
 }order by ?CompInst ?CAPEC 
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="ArchMitigation">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >
+  </sadlimplicitmodel:NamedQuery>
+  <sadlimplicitmodel:NamedQuery rdf:ID="ArchMitigation">
+    <rdfs:isDefinedBy>
 select distinct ?ConnectionName ?SrcCompInstance ?DestCompInstance ('Bind to different bus' as ?Mitigation) 
 where {?c &lt;http://sadl.org/STEM/BaseModel#bindingVulnerability&gt; true . ?c &lt;http://sadl.org/STEM/BaseModel#connectionName&gt; ?ConnectionName
 . ?c &lt;http://sadl.org/STEM/BaseModel#connectionSource&gt; ?SrcCompInstance . ?c &lt;http://sadl.org/STEM/BaseModel#connectionDestination&gt; ?DestCompInstance}
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="CAPEC">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >
+  </sadlimplicitmodel:NamedQuery>
+  <sadlimplicitmodel:NamedQuery rdf:ID="CAPEC">
+    <rdfs:isDefinedBy>
 select distinct ?CompType ?CompInst ?CAPEC ?CAPECDescription
 (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) ?LikelihoodOfSuccess
 where {?CompInst &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?x
@@ -177,10 +171,9 @@ where {?CompInst &lt;http://sadl.org/STEM/BaseModel#applicableCM&gt; ?x
 . OPTIONAL{?x &lt;http://sadl.org/STEM/BaseModel#ciaIssue&gt; ?ia . FILTER(regex(str(?ia),'Availability'))}
 } order by ?CompType ?CompInst ?CAPEC
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
-  <j.0:NamedQuery rdf:ID="Defenses">
-    <rdfs:isDefinedBy rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
-    >
+  </sadlimplicitmodel:NamedQuery>
+  <sadlimplicitmodel:NamedQuery rdf:ID="Defenses">
+    <rdfs:isDefinedBy>
 select ?CompType ?CompInst ?CAPEC (?ic as ?Confidentiality) (?ii as ?Integrity) (?ia as ?Availability) 
              (?ADP as ?ApplicableDefenseProperties) (?Prop as ?ImplProperties) (?DALx as ?DAL) where 
     {{{ select ?CompType ?CompInst ?CAPEC ?ii ?ia ?ic ?ADP ?x (count(*) as ?num) where 
@@ -331,5 +324,5 @@ UNION # now where there are 3 mitigations for a capec
   }
 } order by ?CompInst ?CAPEC ?ic ?ii ?ia ?ADP
 </rdfs:isDefinedBy>
-  </j.0:NamedQuery>
+  </sadlimplicitmodel:NamedQuery>
 </rdf:RDF>
