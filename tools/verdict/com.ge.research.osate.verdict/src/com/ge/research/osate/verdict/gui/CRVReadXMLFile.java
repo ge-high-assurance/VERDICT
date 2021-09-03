@@ -24,9 +24,10 @@ import org.w3c.dom.NodeList;
 //this class extracts the contents of CRV .xml and stores in the data-structures
 public class CRVReadXMLFile {
 	List<CRVResultAttributes> results = new ArrayList<CRVResultAttributes>();
-	List<Set<IVCNode>> aIvcsList = new ArrayList<>();
-	List<Set<IVCNode>> mIvcsList = new ArrayList<>();
-	List<IVCNode> ivc = new ArrayList<IVCNode>();
+	ModelSet mustSet = new ModelSet();
+	List<Set<ModelNode>> aIvcsList = new ArrayList<>();
+	List<Set<ModelNode>> mIvcsList = new ArrayList<>();
+	//List<IVCNode> ivc = new ArrayList<IVCNode>();
 
 	public CRVReadXMLFile(String fileName1, String fileName2) {
 		try {
@@ -63,7 +64,7 @@ public class CRVReadXMLFile {
 				}
 			}
 			
-			readIVC(doc);
+			readIVCsAndMUSTset(doc);
 			
 		} catch (Exception e) {
 			System.out.println("Error in loading .xml file");
@@ -71,7 +72,7 @@ public class CRVReadXMLFile {
 		}
 	}
 
-	protected void readIVC(Document doc) {
+	protected void readIVCsAndMUSTset(Document doc) {
 		NodeList MESList = doc.getElementsByTagName("ModelElementSet");
 		
         for (int i = 0; i < MESList.getLength(); ++i) {
@@ -80,8 +81,10 @@ public class CRVReadXMLFile {
             if (MESNode.getNodeType() != Node.ELEMENT_NODE) continue;
 
             Element MESElement = (Element) MESNode;
+            
+            String setClass = MESElement.getAttribute("class");
             String approximate = MESElement.getAttribute("approximate");            
-            Set<IVCNode> ivcNodes = new HashSet<>();
+            Set<ModelNode> nodes = new HashSet<>();
             NodeList nList = MESElement.getElementsByTagName("Node");
 
             for (int j = 0; j < nList.getLength(); ++j) {
@@ -95,7 +98,7 @@ public class CRVReadXMLFile {
                 element_name = element_name.replace("_dot_", ".");
                 element_name = element_name.replace("_double_colon_", "::");
                 
-                IVCNode ivcNode = new IVCNode();
+                ModelNode ivcNode = new ModelNode();
                 ivcNode.setNodeName(element_name);
                 
                 // Guarantees 
@@ -108,20 +111,25 @@ public class CRVReadXMLFile {
 
                     Element elementElement = (Element) eNode;
                     
-                    IVCElement ivcElement = new IVCElement();
+                    ModelElement ivcElement = new ModelElement();
                     String category = elementElement.getAttribute("category").toUpperCase();
-                    ivcElement.setCategory(IVCElement.Category.valueOf(category));
+                    ivcElement.setCategory(ModelElement.Category.valueOf(category));
                     ivcElement.setName(elementElement.getAttribute("name"));
                     
                     ivcNode.getNodeElements().add(ivcElement);
                 }
-                ivcNodes.add(ivcNode);
-                ivc.add(ivcNode);
+                nodes.add(ivcNode);
+                //ivc.add(ivcNode);
             }
-            if(approximate.equals("false")) {
-            	mIvcsList.add(ivcNodes);
+            if (setClass.equals("must")) {
+                mustSet.setNodes(nodes);
+                mustSet.setIsApprox(approximate.equals("true"));
             } else {
-            	aIvcsList.add(ivcNodes);
+	            if(approximate.equals("false")) {
+	            	mIvcsList.add(nodes);
+	            } else {
+	            	aIvcsList.add(nodes);
+	            }
             }
         }
 	}
@@ -264,7 +272,7 @@ public class CRVReadXMLFile {
 		return results;
 	}
 	
-	protected List<IVCNode> getIVC() {
-		return ivc;
-	}
+//	protected List<IVCNode> getIVC() {
+//		return ivc;
+//	}
 }

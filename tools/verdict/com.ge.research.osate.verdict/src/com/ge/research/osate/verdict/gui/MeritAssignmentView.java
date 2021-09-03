@@ -24,9 +24,10 @@ public class MeritAssignmentView extends ViewPart {
 
 	private Composite composite;
 	public static final String ID = "com.ge.research.osate.verdict.gui.meritAssignmentView";
-	public static List<IVCNode> treeContents = new ArrayList<IVCNode>();
-	public static List<Set<IVCNode>> mInvTreeContents = new ArrayList<>();
-	public static List<Set<IVCNode>> aInvTreeContents = new ArrayList<>();
+	//public static List<IVCNode> treeContents = new ArrayList<IVCNode>();
+	public static ModelSet mustSet = new ModelSet();
+	public static List<Set<ModelNode>> mInvTreeContents = new ArrayList<>();
+	public static List<Set<ModelNode>> aInvTreeContents = new ArrayList<>();
 		
 	@Override
 	public void setFocus() {
@@ -45,15 +46,18 @@ public class MeritAssignmentView extends ViewPart {
 		
 		Tree tree = new Tree (composite, SWT.BORDER);
 		
+		Set<ModelNode> mustSetNodes = mustSet.getNodes();
+		if(!mustSetNodes.isEmpty()) {
+			TreeItem topLevelNodeItem = new TreeItem (tree, 0);
+			processNodes(topLevelNodeItem, "MUST set", mustSetNodes);
+		}
+		
 		if(!mInvTreeContents.isEmpty()) {
 			for(int i = 0; i < mInvTreeContents.size(); ++i) {
 				TreeItem topLevelNodeItem = new TreeItem (tree, 0);
 				
-				topLevelNodeItem.setText("Minimal Inductive Validity Core #" + (i+1));
-				Set<IVCNode> mIvcs = mInvTreeContents.get(i);
-				Map<Boolean, List<IVCNode>> partitioned = mIvcs.stream().collect(Collectors.partitioningBy(IVCNode::hasAssumption));
-				fillTree(topLevelNodeItem, partitioned.get(true));
-				fillTree(topLevelNodeItem, partitioned.get(false));			
+				Set<ModelNode> mIvcs = mInvTreeContents.get(i);
+				processNodes(topLevelNodeItem, "Minimal Inductive Validity Core #" + (i+1), mIvcs);
 			}
 		}
 		
@@ -61,11 +65,8 @@ public class MeritAssignmentView extends ViewPart {
 			for(int i = 0; i < aInvTreeContents.size(); ++i) {
 				TreeItem topLevelNodeItem = new TreeItem (tree, 0);
 				
-				topLevelNodeItem.setText("Inductive Validity Core #" + (i+1));
-				Set<IVCNode> aIvcs = aInvTreeContents.get(i);
-				Map<Boolean, List<IVCNode>> partitioned = aIvcs.stream().collect(Collectors.partitioningBy(IVCNode::hasAssumption));
-				fillTree(topLevelNodeItem, partitioned.get(true));
-				fillTree(topLevelNodeItem, partitioned.get(false));							
+				Set<ModelNode> aIvcs = aInvTreeContents.get(i);
+				processNodes(topLevelNodeItem, "Inductive Validity Core #" + (i+1), aIvcs);
 			}
 		}		
 		
@@ -73,11 +74,18 @@ public class MeritAssignmentView extends ViewPart {
 		composite.pack();
 	}
 	
-	private void fillTree(TreeItem topLevel, List<IVCNode> nodes) {
-		for (IVCNode node : nodes) {
+	private void processNodes(TreeItem topLevel, String title, Set<ModelNode> nodes) {
+		topLevel.setText(title);
+		Map<Boolean, List<ModelNode>> partitioned = nodes.stream().collect(Collectors.partitioningBy(ModelNode::hasAssumption));
+		fillTree(topLevel, partitioned.get(true));
+		fillTree(topLevel, partitioned.get(false));
+	}
+	
+	private void fillTree(TreeItem topLevel, List<ModelNode> nodes) {
+		for (ModelNode node : nodes) {
 			TreeItem nodeItem = new TreeItem (topLevel, 0);
 			nodeItem.setText("Component '" + node.getNodeName() + "'");
-			for (IVCElement e : node.getNodeElements()) {
+			for (ModelElement e : node.getNodeElements()) {
 				TreeItem eItem = new TreeItem (nodeItem, 0);
 				eItem.setText(e.getCategory().toString() + " '" + e.getName() + "'");
 			}

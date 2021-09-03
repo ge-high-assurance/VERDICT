@@ -9,7 +9,7 @@ import java.io.Serializable;
 *
 */
 
-public class IVCElement implements Serializable, Cloneable {
+public class ModelElement implements Serializable, Cloneable {
 	
 	private static final long serialVersionUID = 1L;
 	private Category categ;

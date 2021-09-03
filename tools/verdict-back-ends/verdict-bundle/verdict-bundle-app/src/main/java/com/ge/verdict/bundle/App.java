@@ -943,6 +943,8 @@ public class App {
             }
         }
 
+        boolean mustSet = meritAssignment && (oneMIVC || allMIVC);
+
         Timer.Sample kind2Sample = Timer.start(Metrics.globalRegistry);
         try {
             ExecuteStreamHandler redirect =
@@ -980,7 +982,9 @@ public class App {
                         "--ivc_all",
                         Boolean.toString(allMIVC),
                         "--ivc_category",
-                        "contracts");
+                        "contracts",
+                        "--ivc_must_set",
+                        Boolean.toString(mustSet));
             }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes

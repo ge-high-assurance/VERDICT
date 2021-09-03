@@ -28,9 +28,11 @@ public class CRVReportGenerator implements Runnable {
 		ResultsPageUtil.closePages();
 		CRVResultSummary result = new CRVResultSummary(fileName1, fileName2);
 		tableContents = result.getTableContents();
-		MeritAssignmentView.treeContents = result.getIVC();
+		//MeritAssignmentView.treeContents = result.getIVC();
+		MeritAssignmentView.mustSet = result.getMustSet();
 		MeritAssignmentView.aInvTreeContents = result.getaIVCs();
 		MeritAssignmentView.mInvTreeContents = result.getmIVCs();
+		
 		showView(window);
 	}
 

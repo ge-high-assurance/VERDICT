@@ -11,11 +11,11 @@ import java.util.List;
 *
 */
 
-public class IVCNode implements Serializable, Cloneable {
+public class ModelNode implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 	private String nodeName;
-	private List<IVCElement> nodeElements = new ArrayList<IVCElement>();
+	private List<ModelElement> nodeElements = new ArrayList<ModelElement>();
 	
 	public void setNodeName(String name) {
 		nodeName = name;
@@ -25,15 +25,15 @@ public class IVCNode implements Serializable, Cloneable {
 		return nodeName;
 	}
 	
-	public void setNodeElements(List<IVCElement> els) {
+	public void setNodeElements(List<ModelElement> els) {
 		nodeElements = els;
 	}
 
-	public List<IVCElement> getNodeElements() {
+	public List<ModelElement> getNodeElements() {
 		return nodeElements;
 	}
 	
 	public boolean hasAssumption() {
-		return nodeElements.stream().anyMatch(IVCElement::isAssumption);
+		return nodeElements.stream().anyMatch(ModelElement::isAssumption);
 	}
 }

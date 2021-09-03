@@ -18,14 +18,16 @@ import java.util.Set;
 public class CRVResultSummary {
 
 	private List<CRVSummaryRow> tableContents;
-	private List<IVCNode> ivc;
-	private List<Set<IVCNode>> mIvcsList;
-	private List<Set<IVCNode>> aIvcsList;
+	//private List<IVCNode> ivc;
+	private ModelSet mustSet;
+	private List<Set<ModelNode>> mIvcsList;
+	private List<Set<ModelNode>> aIvcsList;
 
 	public CRVResultSummary(String fileName1, String fileName2) {
 		CRVReadXMLFile xmlReader = new CRVReadXMLFile(fileName1, fileName2);
 		tableContents = loadTableContents(xmlReader.getResults());
-		ivc = xmlReader.getIVC();
+		//ivc = xmlReader.getIVC();
+		mustSet = xmlReader.mustSet;
 		mIvcsList = xmlReader.mIvcsList;
 		aIvcsList = xmlReader.aIvcsList;
 	}
@@ -165,15 +167,19 @@ public class CRVResultSummary {
 		return tableContents;
 	}
 	
-	public List<IVCNode> getIVC() {
-		return ivc;
+//	public List<IVCNode> getIVC() {
+//		return ivc;
+//	}
+	
+	public ModelSet getMustSet() {
+		return mustSet;
 	}
 	
-	public List<Set<IVCNode>> getaIVCs() {
+	public List<Set<ModelNode>> getaIVCs() {
 		return aIvcsList;
 	}
 	
-	public List<Set<IVCNode>> getmIVCs() {
+	public List<Set<ModelNode>> getmIVCs() {
 		return mIvcsList;
 	}
 }
