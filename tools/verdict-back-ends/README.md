@@ -39,12 +39,10 @@ VERDICT plugin to run the back-end programs using the Docker image.
 
 ## Set up your build environment
 
-You will need both [Java](https://adoptium.net/) (version 11) and
-[Apache Maven](https://maven.apache.org) to build our Java program
-sources.  We are building VERDICT with Java 11, installing VERDICT in
-OSATE, and running OSATE and VERDICT with Java 11 even though OSATE is
-built with Java 8 itself.  In practice, OSATE runs fine on Java 11 so
-please use Java 11.
+You will need both [Java 11](https://adoptium.net/) and [Apache
+Maven](https://maven.apache.org) to build our Java program sources.
+You cannot build our plugin source code with Java 8; Java 8 is too old
+and no longer supported by Maven's Eclipse Tycho build system.
 
 The traditional way to install Maven is to download the latest Maven
 distribution from Apache's website, unpack the Maven distribution
@@ -191,7 +189,7 @@ the native executables if you have an Ubuntu 20.04 LTS system:
 sudo apt install build-essential m4
 sudo apt update
 sudo apt install opam
-opam switch create ocaml 4.09.1
+opam switch create 4.09.1
 cd tools/verdict-back-ends/soteria_pp
 opam install --yes . --deps-only
 opam exec make

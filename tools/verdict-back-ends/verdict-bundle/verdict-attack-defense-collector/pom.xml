@@ -25,7 +25,7 @@
     <!-- Dependencies needed only by tests or capsule jar -->
     <dependency>
       <groupId>com.sun.activation</groupId>
-      <artifactId>javax.activation</artifactId>
+      <artifactId>jakarta.activation</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

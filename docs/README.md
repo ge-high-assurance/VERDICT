@@ -17,12 +17,11 @@ Front-end **prerequisites**
 - [Java 11](https://adoptium.net/)
 - [OSATE 2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
 
-You will need a [Java Development Kit](https://adoptium.net/) to run
-OSATE and our plugin.  You can use either Java 8 or 11.  We recommend
-Java 11 if you have to choose a version.  OSATE runs fine on Java 11
-even though its documentation says it officially supports only Java 8.
-If you have to build our plugin source code, you will need Java 11
-although both OSATE and our plugin run fine on both Java 8 and 11.
+You will need [Java 11](https://adoptium.net/) to run OSATE and our
+plugin.  OSATE runs fine on Java 11 even though its documentation says
+it officially supports only Java 8.  You cannot build our plugin
+source code with Java 8; Java 8 is too old and no longer supported by
+Maven's Eclipse Tycho build system.
 
 You will need [OSATE](https://osate.org/about-osate.html) (Open Source
 AADL Tool Environment) in order to use our VERDICT plugin:
