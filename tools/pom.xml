@@ -26,7 +26,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <version.antlr>4.8-1</version.antlr>
-    <version.asm>7.2</version.asm>
+    <version.asm>9.2</version.asm>
     <version.jaxb2-namespace-prefix>1.3</version.jaxb2-namespace-prefix>
     <version.jaxb2-rich-contract-plugin>2.1.0</version.jaxb2-rich-contract-plugin>
     <version.sadl>3.5.0-SNAPSHOT</version.sadl>
