@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - name: Check out VERDICT source
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v2.3.5
 
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
