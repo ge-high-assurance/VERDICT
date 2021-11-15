@@ -62,7 +62,7 @@ jobs:
       run: |
         cd tools/verdict-back-ends/kind2
         opam install --yes . --deps-only
-        opam exec make
+        opam exec make static
 
     - name: Upload kind2 macOS binary
       if: runner.os == 'macOS'
