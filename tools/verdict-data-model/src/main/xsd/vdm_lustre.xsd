@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="verdict::vdm::vdm_lustre"
-    elementFormDefault="qualified" attributeFormDefault="qualified"
-    xmlns="http://www.w3.org/2001/XMLSchema"
+<schema
+    attributeFormDefault="qualified"
+    elementFormDefault="qualified"
+    targetNamespace="verdict::vdm::vdm_lustre"
     xmlns:vdm_data="verdict::vdm::vdm_data"
-    xmlns:vdm_lustre="verdict::vdm::vdm_lustre">
+    xmlns:vdm_lustre="verdict::vdm::vdm_lustre"
+    xmlns="http://www.w3.org/2001/XMLSchema">
 
     <import schemaLocation="vdm_data.xsd"
         namespace="verdict::vdm::vdm_data"></import>

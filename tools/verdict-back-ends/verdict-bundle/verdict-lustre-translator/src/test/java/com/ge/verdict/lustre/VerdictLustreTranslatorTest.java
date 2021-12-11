@@ -6,6 +6,7 @@ import com.ge.verdict.vdm.VdmTranslator;
 import java.io.File;
 import java.io.IOException;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import verdict.vdm.vdm_model.Model;
 
@@ -39,6 +40,7 @@ public class VerdictLustreTranslatorTest {
         Assertions.assertThat(testFile).hasSameTextualContentAs(controlFile);
     }
 
+    @Ignore
     @Test
     public void testUnmarshalFromLustre() throws IOException {
         File testFile = new File("src/test/resources/vdm-model.lus");
@@ -49,6 +51,7 @@ public class VerdictLustreTranslatorTest {
         Assertions.assertThat(testModel).usingRecursiveComparison().isEqualTo(controlModel);
     }
 
+    @Ignore
     @Test
     public void testUnmarshalFromInclude() throws IOException {
         File testFile = new File("src/test/resources/include-vdm-model.lus");

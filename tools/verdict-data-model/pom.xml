@@ -50,8 +50,10 @@
     <plugins>
       <!-- Generate JAXB code from our XML schemas -->
       <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
+        <!-- Fork of org.codehaus.mojo:jaxb2-maven-plugin. Switch back
+             to it when a 3.x version is published on Maven central -->
+        <groupId>com.evolvedbinary.maven.mojohaus</groupId>
+        <artifactId>jaxb-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

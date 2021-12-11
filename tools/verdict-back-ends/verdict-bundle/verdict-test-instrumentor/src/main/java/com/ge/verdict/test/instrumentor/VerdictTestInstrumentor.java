@@ -82,14 +82,16 @@ public class VerdictTestInstrumentor {
             String name = guarantee.getName();
 
             // Build negated expression
-            Expression negExpr = Expression.builder().withNot(guarantee.getExpression()).build();
+            Expression negExpr = new Expression();
+            negExpr.setNot(guarantee.getExpression());
 
-            ContractItem pos = ContractItem.copyOf(guarantee).withName("pos_" + name).build();
-            ContractItem neg =
-                    ContractItem.copyOf(guarantee)
-                            .withName("neg_" + name)
-                            .withExpression(negExpr)
-                            .build();
+            ContractItem pos = new ContractItem();
+            pos.setExpression(guarantee.getExpression());
+            pos.setName("pos_" + name);
+
+            ContractItem neg = new ContractItem();
+            neg.setExpression(negExpr);
+            neg.setName("neg_" + name);
 
             replaceWith.add(pos);
             replaceWith.add(neg);

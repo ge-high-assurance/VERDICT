@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<xs:schema
+    attributeFormDefault="unqualified"
+    elementFormDefault="unqualified"
     targetNamespace="verdict::vdm::vdm_kind2"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns="verdict::vdm::vdm_kind2">
 
     <!-- |===| Simple types. -->

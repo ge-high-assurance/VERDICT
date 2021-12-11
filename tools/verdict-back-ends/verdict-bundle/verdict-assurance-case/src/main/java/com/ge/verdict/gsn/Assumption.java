@@ -1,6 +1,6 @@
 package com.ge.verdict.gsn;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 /** @author Saswata Paul */
 public class Assumption {
