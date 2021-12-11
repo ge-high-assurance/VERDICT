@@ -34,7 +34,7 @@
     <version.surefire>3.0.0-M5</version.surefire>
     <version.tycho>2.5.0</version.tycho>
     <version.verdict>${project.version}</version.verdict>
-    <version.xml.bind-api>2.3.3</version.xml.bind-api>
+    <version.xml.bind-api>3.0.1</version.xml.bind-api>
     <version.xtext>2.20.0</version.xtext>
   </properties>
 
@@ -367,6 +367,21 @@
             </execution>
           </executions>
         </plugin>
+        <!-- Fork of org.codehaus.mojo:jaxb2-maven-plugin. Switch back
+             to it when a 3.x version is published on Maven central -->
+        <plugin>
+          <groupId>com.evolvedbinary.maven.mojohaus</groupId>
+          <artifactId>jaxb-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <id>default-xjc</id>
+              <goals>
+                <goal>xjc</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>com.github.chrisdchristo</groupId>
           <artifactId>capsule-maven-plugin</artifactId>
@@ -695,39 +710,6 @@
               <id>default-xtend-install-debug-info</id>
               <goals>
                 <goal>xtend-install-debug-info</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.jvnet.jaxb2.maven2</groupId>
-          <artifactId>maven-jaxb2-plugin</artifactId>
-          <version>0.14.0</version>
-          <configuration>
-            <extension>true</extension>
-            <removeOldOutput>true</removeOldOutput>
-            <args>
-              <arg>-Xfluent-builder</arg>
-              <arg>-Xnamespace-prefix</arg>
-            </args>
-            <plugins>
-              <plugin>
-                <groupId>net.codesup.util</groupId>
-                <artifactId>jaxb2-rich-contract-plugin</artifactId>
-                <version>${version.jaxb2-rich-contract-plugin}</version>
-              </plugin>
-              <plugin>
-                <groupId>org.jvnet.jaxb2_commons</groupId>
-                <artifactId>jaxb2-namespace-prefix</artifactId>
-                <version>${version.jaxb2-namespace-prefix}</version>
-              </plugin>
-            </plugins>
-          </configuration>
-          <executions>
-            <execution>
-              <id>default-generate</id>
-              <goals>
-                <goal>generate</goal>
               </goals>
             </execution>
           </executions>

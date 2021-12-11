@@ -15,7 +15,7 @@
 // Generated on: 2019.08.04 at 09:31:01 PM CDT
 //
 
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlSchema(
         namespace = "http://www.example.org/BlameAssignment",
-        elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+        elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package edu.uiowa.clc.verdict.blm;
