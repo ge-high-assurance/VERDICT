@@ -27,8 +27,6 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <version.antlr>4.9.3</version.antlr>
     <version.asm>9.2</version.asm>
-    <version.jaxb2-namespace-prefix>2.0</version.jaxb2-namespace-prefix>
-    <version.jaxb2-rich-contract-plugin>2.1.0</version.jaxb2-rich-contract-plugin>
     <version.sadl>3.5.0-SNAPSHOT</version.sadl>
     <version.slf4j>1.7.32</version.slf4j>
     <version.surefire>3.0.0-M5</version.surefire>
@@ -339,9 +337,9 @@
             <formats>
               <format>
                 <includes>
-                  <include>src/**/resources/**/*.xjb</include>
-                  <include>src/**/resources/**/*.xml</include>
-                  <include>src/**/resources/**/*.xsd</include>
+                  <include>src/**/*.xjb</include>
+                  <include>src/**/*.xml</include>
+                  <include>src/**/*.xsd</include>
                 </includes>
                 <eclipseWtp>
                   <type>XML</type>
@@ -367,8 +365,8 @@
             </execution>
           </executions>
         </plugin>
-        <!-- Fork of org.codehaus.mojo:jaxb2-maven-plugin. Switch back
-             to it when a 3.x version is published on Maven central -->
+        <!-- Right now this is the only plugin that works with version 3.0.1
+                    of xml.bind-api -->
         <plugin>
           <groupId>com.evolvedbinary.maven.mojohaus</groupId>
           <artifactId>jaxb-maven-plugin</artifactId>
@@ -587,6 +585,20 @@
             </execution>
           </executions>
         </plugin>
+        <!-- Obsolete now, but want to be alerted if version gets bumped -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>jaxb2-maven-plugin</artifactId>
+          <version>2.5.0</version>
+          <executions>
+            <execution>
+              <id>default-xjc</id>
+              <goals>
+                <goal>xjc</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <!-- Goals: mvn -N versions:display-{dependency,plugin,property}-updates -->
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -680,9 +692,9 @@
             </execution>
           </executions>
         </plugin>
-        <!-- To skip running (and compiling) tests, use: -Dmaven.test.skip
-             To skip tests, but still compile them, use: -DskipTests
-             To run all tests but only fail at end, use: -fae -->
+        <!-- To skip running (and compiling) tests, use: -Dmaven.test.skip To
+                    skip tests, but still compile them, use: -DskipTests To run all tests but
+                    only fail at end, use: -fae -->
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -710,6 +722,40 @@
               <id>default-xtend-install-debug-info</id>
               <goals>
                 <goal>xtend-install-debug-info</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Obsolete now, but want to be alerted if version gets bumped -->
+        <plugin>
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb2-plugin</artifactId>
+          <version>0.14.0</version>
+          <configuration>
+            <extension>true</extension>
+            <removeOldOutput>true</removeOldOutput>
+            <args>
+              <arg>-Xfluent-builder</arg>
+              <arg>-Xnamespace-prefix</arg>
+            </args>
+            <plugins>
+              <plugin>
+                <groupId>net.codesup.util</groupId>
+                <artifactId>jaxb2-rich-contract-plugin</artifactId>
+                <version>2.1.0</version>
+              </plugin>
+              <plugin>
+                <groupId>org.jvnet.jaxb2_commons</groupId>
+                <artifactId>jaxb2-namespace-prefix</artifactId>
+                <version>2.0</version>
+              </plugin>
+            </plugins>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default-generate</id>
+              <goals>
+                <goal>generate</goal>
               </goals>
             </execution>
           </executions>

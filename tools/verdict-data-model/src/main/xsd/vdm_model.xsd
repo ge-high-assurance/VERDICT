@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema
-    attributeFormDefault="unqualified"
+<schema attributeFormDefault="unqualified"
     elementFormDefault="unqualified"
     targetNamespace="verdict::vdm::vdm_model"
     xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"

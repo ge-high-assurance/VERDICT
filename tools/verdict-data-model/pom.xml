@@ -50,8 +50,8 @@
     <plugins>
       <!-- Generate JAXB code from our XML schemas -->
       <plugin>
-        <!-- Fork of org.codehaus.mojo:jaxb2-maven-plugin. Switch back
-             to it when a 3.x version is published on Maven central -->
+        <!-- Right now this is the only plugin that works with version 3.0.1
+                    of xml.bind-api -->
         <groupId>com.evolvedbinary.maven.mojohaus</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
       </plugin>

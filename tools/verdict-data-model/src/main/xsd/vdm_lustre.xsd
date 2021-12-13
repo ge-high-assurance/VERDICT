@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema
-    attributeFormDefault="qualified"
+<schema attributeFormDefault="qualified"
     elementFormDefault="qualified"
     targetNamespace="verdict::vdm::vdm_lustre"
     xmlns:vdm_data="verdict::vdm::vdm_data"
