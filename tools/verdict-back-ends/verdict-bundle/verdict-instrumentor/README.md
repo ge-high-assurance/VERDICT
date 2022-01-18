@@ -26,6 +26,4 @@ usage: VERDICT-Instrumentor
  -BN,--Benign                               Benign (Default)
 
 Example Run:
-#java -jar verdict-vdm2iml-instrumentor-1.0.jar -i <input model(*.xml)> -o <instrumented model(.xml)> -<Choosen attack?>
-
-
+#java -jar verdict-instrumentor-1.0.0-SNAPSHOT.jar -i <input model(*.xml)> -o <instrumented model(.xml)> -<Choosen attack?>

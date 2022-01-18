@@ -82,17 +82,13 @@ public class App {
             Model vdm_model = null;
 
             if (fileExt.equals("iml")) {
-                // Use IML model
-                // vdm_model = ResourceTest.setup(InputFile);
-
-                // Store VDM in a temporary file
-                //                VerdictLustreTranslator.marshalToXml(vdm_model, new File(InputFile
-                // + ".xml"));
+                // Cannot use IML model
+                LOGGY.warn("IML model has been disabled");
+                System.exit(-1);
             } else if (fileExt.equals("xml")) {
                 // Use VDM model
                 vdm_model = VerdictLustreTranslator.unmarshalFromXml(vdmFile);
             } else {
-
                 LOGGY.warn("Invalid Model Input File: " + fileExt);
                 System.exit(-1);
             }
