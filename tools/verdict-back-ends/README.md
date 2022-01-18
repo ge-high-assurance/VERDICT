@@ -70,11 +70,11 @@ on Linux).
 
 ## Note the use of our Maven snapshot repository
 
-Two of our Java back-end programs (iml-verdict-translator and
-verdict-stem-runner) depend on libraries which are not available in
-the Maven central repository.  For example, we use some SADL libraries
-(reasoner-api, reasoner-impl, sadlserver-api, and sadlserver-impl)
-which are part of the Semantic Application Design Language version 3
+One of our Java back-end programs (verdict-stem-runner) depends on
+libraries which are not available in the Maven central repository.  It
+uses some SADL libraries (reasoner-api, reasoner-impl, sadlserver-api,
+and sadlserver-impl) which are part of the Semantic Application Design
+Language version 3
 ([SADL](https://github.com/SemanticApplicationDesignLanguage/sadl)).
 GE has made SADL open source but has not deployed releases of these
 SADL libraries to the Maven central repository.  Since the Maven

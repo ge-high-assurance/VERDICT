@@ -63,10 +63,6 @@
       <artifactId>verdict-crv</artifactId>
     </dependency>
     <dependency>
-      <groupId>edu.uiowa.clc.verdict.vdm</groupId>
-      <artifactId>iml-verdict-translator</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-graphite</artifactId>
     </dependency>

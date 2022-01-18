@@ -9,7 +9,6 @@ back-end programs invoked by the plugin.  Our VERDICT plugin sources
 are in the [(../verdict)](../verdict) directory and our Java back-end
 program sources are in the following subdirectories:
 
-- [iml-verdict-translator](iml-verdict-translator) translates a model from IML to VDM
 - [verdict-assurance-case](verdict-assurance-case) builds an assurance case
 - [verdict-attack-defense-collector](verdict-attack-defense-collector) collects some attack defenses
 - [verdict-blame-assignment](verdict-blame-assignment) prepares some blame assignments
