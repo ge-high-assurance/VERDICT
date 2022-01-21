@@ -29,13 +29,13 @@
       <artifactId>commons-lang3</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- Needed by docker-java-api -->
+    <!-- javax.json needed by docker-java-api and VerdictBundleCommand.java -->
     <dependency>
       <groupId>org.glassfish</groupId>
-      <artifactId>jakarta.json</artifactId>
+      <artifactId>javax.json</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- Needed by zt-exec -->
+    <!-- org.slf4j needed by zt-exec -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>

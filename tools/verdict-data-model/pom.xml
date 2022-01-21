@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <dependencies>
-    <!-- JAXB dependency needed only under Java 9 or later -->
+    <!-- JAXB api needed only under Java 9 or later -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
@@ -22,7 +22,7 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math3</artifactId>
     </dependency>
-    <!-- JAXB dependency needed only under Java 9 or later -->
+    <!-- JAXB implementation needed only under Java 9 or later -->
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
@@ -50,8 +50,7 @@
     <plugins>
       <!-- Generate JAXB code from our XML schemas -->
       <plugin>
-        <!-- Right now this is the only plugin that works with version 3.0.1
-                    of xml.bind-api -->
+        <!-- Only JAXB plugin which works with JAXB api 3.0.1 now -->
         <groupId>com.evolvedbinary.maven.mojohaus</groupId>
         <artifactId>jaxb-maven-plugin</artifactId>
       </plugin>
