@@ -32,13 +32,20 @@
     <version.surefire>3.0.0-M5</version.surefire>
     <version.tycho>2.6.0</version.tycho>
     <version.verdict>${project.version}</version.verdict>
-    <version.xml.bind-api>3.0.1</version.xml.bind-api>
     <version.xtext>2.25.0</version.xtext>
   </properties>
 
   <!-- Set all dependency versions in one place -->
   <dependencyManagement>
     <dependencies>
+      <!-- JAXB implementation needed by VERDICT build -->
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-bom</artifactId>
+        <version>3.0.2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>co.paralleluniverse</groupId>
         <artifactId>capsule</artifactId>
@@ -129,7 +136,7 @@
         <artifactId>word-wrap</artifactId>
         <version>0.1.9</version>
       </dependency>
-      <!-- Version needed by SADL's reasoner/sadlserver -->
+      <!-- com.sun.activation implementation needed by SADL's reasoner/sadlserver -->
       <dependency>
         <groupId>com.sun.activation</groupId>
         <artifactId>jakarta.activation</artifactId>
@@ -178,11 +185,6 @@
         <version>1.8.2</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>${version.xml.bind-api}</version>
-      </dependency>
-      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.13.2</version>
@@ -227,15 +229,11 @@
         <artifactId>assertj-core</artifactId>
         <version>3.22.0</version>
       </dependency>
+      <!-- javax.json needed by docker-java-api and VerdictBundleCommand.java -->
       <dependency>
         <groupId>org.glassfish</groupId>
-        <artifactId>jakarta.json</artifactId>
-        <version>1.1.6</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jaxb</groupId>
-        <artifactId>jaxb-runtime</artifactId>
-        <version>${version.xml.bind-api}</version>
+        <artifactId>javax.json</artifactId>
+        <version>1.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.logicng</groupId>
@@ -281,13 +279,6 @@
         <groupId>org.xmlunit</groupId>
         <artifactId>xmlunit-assertj</artifactId>
         <version>2.8.4</version>
-        <!-- Exclude to avoid duplicating jars -->
-        <exclusions>
-          <exclusion>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.zeroturnaround</groupId>
@@ -343,8 +334,7 @@
             </execution>
           </executions>
         </plugin>
-        <!-- Right now this is the only plugin that works with version 3.0.1
-                    of xml.bind-api -->
+        <!-- Only JAXB plugin which works with JAXB api 3.0.1 now -->
         <plugin>
           <groupId>com.evolvedbinary.maven.mojohaus</groupId>
           <artifactId>jaxb-maven-plugin</artifactId>
