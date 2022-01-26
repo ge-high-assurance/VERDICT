@@ -7,7 +7,7 @@ depends: [
   "dune" {>= "2.7"}
   "async"
   "core_extended" {>= "v0.12" & < "v0.13"}
-  "printbox"
+  "printbox" {>= "0.5" & < "0.6"}
   "xml-light"
   "odoc" {with-doc}
 ]
