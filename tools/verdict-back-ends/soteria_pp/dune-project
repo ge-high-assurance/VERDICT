@@ -10,7 +10,7 @@
  (depends
    async
    (core_extended (and (>= v0.12) (< v0.13)))
-   printbox
+   (printbox (and (>= 0.5) (< 0.6)))
    xml-light
  )
 )
