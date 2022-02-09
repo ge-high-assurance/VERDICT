@@ -21,16 +21,17 @@ subdirectories:
 - [verdict-back-ends](verdict-back-ends): VERDICT back-end program sources
 - [verdict-data-model](verdict-data-model): common library used by both sources
 
-Please read the development instructions in these subdirectories'
-README.md files for further details.  Note that you can descend into
-each subdirectory and build it with Maven separately or you can build
-all three subdirectories from this location with these two commands,
-making sure to call the clean and install goals separately (not in the
-same Maven command line):
+Please read the development instructions in the first two
+subdirectories' README.md files for further details.  Note that you
+can descend into each subdirectory and build it with Maven separately
+or you can build all three subdirectories from this location with
+these Maven commands, making sure to call the clean, install, and
+package goals separately (not on the same Maven command line):
 
 ```shell
 mvn clean
-mvn install -Dtycho.localArtifacts=ignore
+mvn install --file verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
+mvn package -Dtycho.localArtifacts=ignore
 ```
 
 ## Install our VERDICT plugin
