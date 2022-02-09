@@ -84,20 +84,22 @@ This directory and its subdirectories have pom.xml files which will
 allow you to build our VERDICT plugin sources with Maven and Eclipse
 Tycho.  We recommend that you build our VERDICT plugin sources with
 Maven from the command line in this directory or the directory above,
-making sure to call the clean and install goals separately (not in the
+making sure to call the clean and package goals separately (not in the
 same Maven command line):
 
 ```shell
 mvn clean
-mvn install -Dtycho.localArtifacts=ignore
+mvn package -Dtycho.localArtifacts=ignore
 ```
 
 Using the `-Dtycho.localArtifacts=ignore` argument may prevent some
-build problems from happening.  You may not always need the
-`-Dtycho.localArtifacts=ignore` argument, but please change the
-argument or leave it out only if you are familiar with Tycho builds
-and want Tycho to use local artifacts that you have already built,
-such as if you are running Maven in a subdirectory.
+build problems from happening.  Please change or leave out the
+`-Dtycho.localArtifacts=ignore` argument only if you are familiar with
+Tycho builds and want Tycho to use local artifacts that you have
+installed into your Maven cache (maybe because you want to run Maven
+in a module's subdirectory instead of this directory, in which case
+you also need to first run "mvn install" instead of "mvn package" in
+this directory as well).
 
 If Maven encounters a problem and you need to see more information to
 diagnose what caused the problem, rerun the command line with an
@@ -190,35 +192,46 @@ following:
 2. Expand Maven in the list of import wizards and select the Maven ->
    Existing Maven Projects wizard.  Press the Next button.
 
-3. Enter this directory's path as the Root Directory or click the
-   Browse... button and navigate to this directory using a file
-   chooser dialog.  If done correctly, you should see this directory's
-   set of pom.xml files listed under Projects.  Press the Finish
-   button.
+3. Click the Browse... button and use the file chooser dialog to
+   navigate to either this directory or the tools directory (depending
+   on whether you want to import just the VERDICT plugin's modules or
+   all VERDICT modules).  If done correctly, you should see this
+   directory's set of pom.xml files listed under Projects.  Press the
+   Finish button.
 
 4. Once your Eclipse IDE finishes importing our VERDICT plugin
    sources, these projects will have thousands of build errors in your
    workspace.  This is normal since your Eclipse IDE will be missing
    some necessary OSATE and other Eclipse APIs so your Eclipse IDE
-   doesn't know where to find these APIs yet.
+   doesn't know where to find these APIs yet.  To make these build
+   errors go away, you will need to open our target definition file in
+   Eclipse and set it as your Eclipse IDE's current target platform.
 
-5. To make these build errors go away, you need to open our target
-   definition file in Eclipse and set it as your Eclipse IDE's current
-   target platform.  In the Package Explorer pane, expand the verdict
-   working set, expand the
-   com.ge.research.osate.verdict.targetplatform project, and double
-   click the com.ge.research.osate.verdict.targetplatform.target file
-   to open it in the Eclipse editor window.
+5. In the Package Explorer pane, expand the verdict working set,
+   expand the com.ge.research.osate.verdict.targetplatform project,
+   and double click the
+   com.ge.research.osate.verdict.targetplatform.target file to open it
+   in the Eclipse editor window.
 
-6. Eclipse will need to spend some time resolving the target
-   definition file and downloading the OSATE and other Eclipse APIs
-   from update sites.  Wait for it to finish, then click on "Set as
-   Target Platform" in the upper right corner.  Eclipse will rebuild
-   the VERDICT projects again and the build errors should go away.
+6. Click on "Set as Target Platform" in the upper right corner.
+   Eclipse will spend some time resolving the target definition file
+   and downloading the OSATE and other Eclipse APIs from update sites.
    Please note that if you have other projects in your workspace
-   besides our VERDICT plugin sources, you may have to close these
-   projects first in case they get some build errors because you will
-   be changing the target platform they were built against before.
+   besides our VERDICT plugin sources, you may want to close these
+   projects first because you will be changing the target platform
+   they were built against before and they may get some build errors
+   due to incompatible API versions.
+
+7. Just setting the target platform isn't always enough to make all
+   the build errors go away.  To force Eclipse to delete all the build
+   errors and rebuild the VERDICT projects again using the new target
+   platform, select all the VERDICT projects in the Package Explorer
+   pane, right click on one of the VERDICT projects, and select Maven
+   -> Update Project... from the popup menu.  Click the OK button in
+   the Update Maven Project dialog to start the rebuild, and then all
+   the errors in the Problems tab should be gone after the rebuid
+   finishes.  Some warnings will be left, but that's expected since we
+   haven't fixed all warnings in either Maven or Eclipse.
 
 Now you can start developing our VERDICT plugin sources and making
 changes to them.  You can launch a runtime Eclipse instance directly
@@ -242,10 +255,10 @@ OSATE sources, you can import our VERDICT plugin sources into it as
 well.  You will not need to use our VERDICT plugin's target platform
 to make some build errors go away; OSATE's target platform will be a
 superset of our target platform except for the following features
-which you will have to install into your OSATE development IDE from
-their own update sites:
+(AGREE 2.5.2 and Xtext Antlr SDK) which you will have to install into
+your OSATE development IDE from their own update sites:
 
-- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master)
+- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2)
 - [de.itemis.xtext.antlr.sdk](http://download.itemis.com/updates/releases/2.1.1)
 
 # Additional notes

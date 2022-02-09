@@ -102,9 +102,14 @@ in that mirrorOf section before your build will finish successfully.
 ## Build the Java back-end programs
 
 To build the Java program sources on your system, run the following
-command in this directory:
+commands in this directory (note that you usually need to install
+z3-native-libs in your Maven local cache only the first time, not
+every time).
 
-`mvn clean install`
+```
+mvn install --file verdict-bundle/z3-native-libs/pom.xml
+mvn clean package
+```
 
 When the build completes, you will have an executable jar called
 verdict-bundle-app-\<VERSION\>-capsule.jar in the
