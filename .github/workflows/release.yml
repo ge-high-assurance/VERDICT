@@ -115,13 +115,13 @@ jobs:
         GraphVizPath: /usr/bin
 
     - name: Download macOS binaries
-      uses: actions/download-artifact@v2.1.0
+      uses: actions/download-artifact@v3.0.0
       with:
         name: macOS-binaries
         path: extern/mac
 
     - name: Download Linux binaries
-      uses: actions/download-artifact@v2.1.0
+      uses: actions/download-artifact@v3.0.0
       with:
         name: Linux-binaries
         path: extern/nix
