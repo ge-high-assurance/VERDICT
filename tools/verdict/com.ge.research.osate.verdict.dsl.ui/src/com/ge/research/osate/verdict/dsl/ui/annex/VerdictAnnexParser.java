@@ -12,6 +12,7 @@ import com.ge.research.osate.verdict.dsl.ui.VerdictUiModule;
 import com.ge.research.osate.verdict.dsl.ui.internal.VerdictActivator;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractLibrary;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 /**
@@ -22,33 +23,31 @@ import com.google.inject.Injector;
  * An annex subclause is inside of a system and contains cyber properties.
  */
 public class VerdictAnnexParser implements AnnexParser {
-	final private Injector injector = VerdictActivator.getInstance()
-			.getInjector(VerdictUiModule.INJECTOR_NAME);
 
+	@Inject
 	private VerdictParser parser;
 
-	protected VerdictParser getParser() {
-		if (parser == null) {
-			parser = injector.getInstance(VerdictParser.class);
-		}
-		return parser;
+	public VerdictAnnexParser() {
+		Injector injector = VerdictActivator.getInstance()
+			.getInjector(VerdictUiModule.INJECTOR_NAME);
+		injector.injectMembers(this);
 	}
 
 	protected VerdictGrammarAccess getGrammarAccess() {
-		return getParser().getGrammarAccess();
+		return parser.getGrammarAccess();
 	}
 
 	@Override
-	public AnnexLibrary parseAnnexLibrary(String name, String source, String filename, int line, int column,
+	public AnnexLibrary parseAnnexLibrary(String annexName, String source, String filename, int line, int column,
 			ParseErrorReporter errReporter) {
-		return (VerdictContractLibrary) AnnexParseUtil.parse(getParser(), source,
+		return (VerdictContractLibrary) AnnexParseUtil.parse(parser, source,
 				getGrammarAccess().getAnnexLibraryRule(), filename, line, column, errReporter);
 	}
 
 	@Override
-	public AnnexSubclause parseAnnexSubclause(String name, String source, String filename, int line, int column,
+	public AnnexSubclause parseAnnexSubclause(String annexName, String source, String filename, int line, int column,
 			ParseErrorReporter errReporter) {
-		return (VerdictContractSubclause) AnnexParseUtil.parse(getParser(), source,
+		return (VerdictContractSubclause) AnnexParseUtil.parse(parser, source,
 				getGrammarAccess().getAnnexSubclauseRule(), filename, line, column, errReporter);
 	}
 }
