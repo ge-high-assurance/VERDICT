@@ -8,12 +8,13 @@ import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.parser.IParseResult;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.annexsupport.AnnexHighlighter;
 import org.osate.annexsupport.AnnexHighlighterPositionAcceptor;
-import org.osate.annexsupport.AnnexParseUtil;
 import org.osate.annexsupport.AnnexUtil;
+import org.osate.annexsupport.ParseResultHolder;
 
 /**
  * Perform syntax highlighting/coloring; Osate extension point.
@@ -154,8 +155,9 @@ public class VerdictAnnexHighlighter implements AnnexHighlighter {
 		EObject saved = AnnexUtil.getParsedAnnex(annex);
 		if (annex != null && saved != null) {
 			int offset = AnnexUtil.getAnnexOffset(annex);
-			if (AnnexParseUtil.getParseResult(saved) != null) {
-				highlight(AnnexParseUtil.getParseResult(saved).getRootNode(), acceptor, offset, styles);
+			IParseResult parseResult = ParseResultHolder.Factory.INSTANCE.adapt(saved).getParseResult();
+			if (parseResult != null) {
+				highlight(parseResult.getRootNode(), acceptor, offset, styles);
 			}
 		}
 	}
