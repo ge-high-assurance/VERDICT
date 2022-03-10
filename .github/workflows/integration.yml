@@ -8,11 +8,11 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
-# Runs a build job as a CI check:
+# Runs integration workflow as a CI check:
 # - Builds VERDICT source & runs unit tests
 
 jobs:
-  build:
+  integration:
     strategy:
       matrix:
         distribution: [ temurin ]

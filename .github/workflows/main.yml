@@ -9,14 +9,14 @@ on:
     tags-ignore: [ '*' ]
   workflow_dispatch:
 
-# Runs a build job and uploads VERDICT build artifacts:
+# Runs main workflow and uploads build artifacts:
 # - Builds & uploads soteria_pp native binary
 # - Builds VERDICT source & runs unit tests
 # - Pushes verdict-dev image to Docker Hub
 # - Updates verdict-dev update site
 
 jobs:
-  build:
+  main:
     strategy:
       fail-fast: false
       matrix:

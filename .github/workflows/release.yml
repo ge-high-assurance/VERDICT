@@ -6,10 +6,10 @@ on:
   release:
     types: [ published ]
 
-# Runs a build job and uploads VERDICT build artifacts:
-# - Builds & uploads kind2 soteria_pp native binaries
+# Runs release workflow and uploads build artifacts:
+# - Builds & uploads kind2 & soteria_pp native binaries
 # - Builds VERDICT source & runs unit tests
-# - Uploads extern.zip and README.md to release assets
+# - Uploads extern.zip and README.md to release workflow
 # - Pushes verdict image to Docker Hub
 # - Updates verdict-latest update site
 
