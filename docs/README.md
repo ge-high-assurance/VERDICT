@@ -104,8 +104,14 @@ plugin to communicate with Docker:
 - Go into Settings in Docker Desktop and enable the checkbox next to
   "Expose daemon on tcp://localhost:2375 without TLS".
 
+- Click the "Apply & Restart" button at the bottom to restart Docker
+  after these changes.
+
+If you are running Docker on macOS, you will also have to 
+configure the following:
+
 - Click on Resources under Settings, click on FILE SHARING under
-  Resources, and add your drive letter to the list of directories
+  Resources, and add your workspace directory to the list of directories 
   which Docker can bind mount into containers.
 
 - Click the "Apply & Restart" button at the bottom to restart Docker
@@ -127,7 +133,7 @@ of whether you use Docker or native binaries.  After unpacking
 extern.zip (make sure you remember the location of the unpacked extern
 folder), then configure some VERDICT settings in OSATE:
 
-- Launch OSATE, go to Window > Preferences > Verdict > Verdict
+- Launch OSATE, go to Window (OSATE for macOS) > Preferences > Verdict > Verdict
   Settings, and fill out the following fields.
 
 - Click the Browse... button next to the "STEM Project PATH:" field,
@@ -166,7 +172,7 @@ of whether you use Docker or native binaries.  After unpacking
 extern.zip (make sure you remember the location of the unpacked extern
 folder), then configure some VERDICT settings in OSATE:
 
-- Launch OSATE, go to Window > Preferences > Verdict > Verdict
+- Launch OSATE, go to Window (OSATE for macOS) > Preferences > Verdict > Verdict
   Settings, and fill out the following fields.
 
 - Click the Browse... button next to the "STEM Project PATH:" field,
@@ -208,11 +214,13 @@ import that model into your OSATE workspace.  You can open the model's
 AADL files to see how that model uses AGREE annexes, VERDICT annexes,
 and VERDICT properties.
 
-You can invoke VERDICT's functionality from the Verdict pulldown menu.
-First click on a project's name in the AADL Navigator pane to make it
-the currently selected project, then pull down the Verdict menu and
-run the appropriate back-end tools (MBAA, MBAS, CRV, etc.).  Our
-plugin will use Docker Java API calls to pull the appropriate Docker
+You can invoke VERDICT's functionality from the Verdict pulldown menu 
+(in the OSATE application toolbar). First click on a project's name in 
+the AADL Navigator pane to make it the currently selected project, then 
+pull down the Verdict menu and run the appropriate back-end tools 
+(MBAA, MBAS, CRV, etc.). 
+
+Our plugin will use Docker Java API calls to pull the appropriate Docker
 image from Docker Hub (only if the image isn't already in your
 Docker's local cache), start a temporary Docker container to run the
 MBAA or CRV command, and then display any output from that command.

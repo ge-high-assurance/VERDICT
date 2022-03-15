@@ -157,13 +157,19 @@ following things to allow our plugin to communicate with Docker:
    socket.
 
 2. Go into Settings in Docker Desktop and enable the checkbox
-   next to "Expose daemon on tcp://localhost:2375 without TLS".
+   next to "Expose daemon on tcp://localhost:2375 without TLS". 
 
-3. Click on Resources under Settings, click on FILE SHARING under
-   Resources, and add your drive letter to the list of directories
+3. Click the "Apply & Restart" button at the bottom to restart Docker
+   after these changes.
+
+If you are running Docker on macOS, you will also have to 
+configure the following:
+
+1. Click on Resources under Settings, click on FILE SHARING under 
+   Resources, and add your workspace directory to the list of directories
    which Docker can bind mount into containers.
 
-4. Click the "Apply & Restart" button at the bottom to restart Docker
+2. Click the "Apply & Restart" button at the bottom to restart Docker
    after these changes.
 
 If you want to check that Docker is installed and running correctly,

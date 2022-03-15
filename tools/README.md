@@ -63,20 +63,21 @@ OSATE asks you whether to convert the project to an Xtext project
 after you open an AADL file, answer yes since the project must have a
 Xtext nature to enable our VERDICT plugin's functionality.
 
-You can invoke our VERDICT plugin's functionality from the Verdict
-pulldown menu.  First click on a project's name in the AADL Navigator
-pane to make it the currently selected project, then pull down the
-Verdict menu and run the appropriate back-end tools (MBAA, MBAS, CRV,
-etc.).  Our plugin will use Docker Java API calls to pull down the
-appropriate Docker image from Docker Hub (only if the image isn't
-already in your Docker's local cache), start a temporary Docker
-container to run the MBAA or CRV command, and then display any output
-from that command.  If you use the executable jar instead of the
-Docker image, the plugin will run the executable jar in a subprocess
-directly on your system.  Both the temporary container and the
-executable jar will run several VERDICT back-end tool chain programs
-in additional subprocesses inside the temporary container or directly
-on your system as well.
+You can invoke VERDICT's functionality from the Verdict pulldown menu
+(in the OSATE application toolbar). First click on a project's name in
+the AADL Navigator pane to make it the currently selected project, then
+pull down the Verdict menu and run the appropriate back-end tools
+(MBAA, MBAS, CRV, etc.).
+
+Our plugin will use Docker Java API calls to pull the appropriate Docker
+image from Docker Hub (only if the image isn't already in your
+Docker's local cache), start a temporary Docker container to run the
+MBAA or CRV command, and then display any output from that command.
+If you use the executable jar instead of the Docker image, the plugin
+will run the executable jar in a subprocess directly on your system.
+Both the temporary container and the executable jar will run several
+VERDICT back-end tool chain programs in additional subprocesses inside
+the temporary container or directly on your system as well.
 
 For further information how to analyze a model's system architecture
 using our VERDICT tools, please read our VERDICT wiki's
