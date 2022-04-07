@@ -149,6 +149,14 @@ public class Agree2Vdm {
 		final Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
 		final XtextResourceSet rs = injector.getInstance(XtextResourceSet.class);
 		rs.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
+		
+		EcorePlugin.ExtensionProcessor.process(null);
+		//getting aadl imported files
+		final List<URI> contributed = PluginSupportUtil.getContributedAadl();
+		for (final URI uri : contributed) {
+			rs.getResource(uri, true);
+		}		
+		
 		List<String> aadlFileNames = new ArrayList<>();
 		// Obtain all AADL files contents in the project
 		List<EObject> objects = new ArrayList<>();
@@ -164,12 +172,7 @@ public class Agree2Vdm {
 		for (int i = 0; i < aadlFileNames.size(); i++) {
 			rs.getResource(URI.createFileURI(aadlFileNames.get(i)), true);
 		}
-		EcorePlugin.ExtensionProcessor.process(null);
-		//getting aadl imported files
-		final List<URI> contributed = PluginSupportUtil.getContributedAadl();
-		for (final URI uri : contributed) {
-			rs.getResource(uri, true);
-		}
+		
 		// Load the resources
 		Map<String,Boolean> options = new HashMap<String,Boolean>();
 	    options.put(XtextResource.OPTION_RESOLVE_ALL, Boolean.TRUE);
@@ -178,7 +181,7 @@ public class Agree2Vdm {
 				resource.load(options);
 				IResourceValidator validator = ((XtextResource) resource).getResourceServiceProvider()
 				        .getResourceValidator();
-				List<Issue> issues = validator.validate(resource, CheckMode.ALL, CancelIndicator.NullImpl);
+				List<Issue> issues = validator.validate(resource, CheckMode.FAST_ONLY, CancelIndicator.NullImpl);
 				for (Issue issue : issues) {
 				    System.out.println(issue.getMessage());
 				}
