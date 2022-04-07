@@ -183,7 +183,7 @@ public class Agree2Vdm {
 				        .getResourceValidator();
 				List<Issue> issues = validator.validate(resource, CheckMode.FAST_ONLY, CancelIndicator.NullImpl);
 				for (Issue issue : issues) {
-				    System.out.println(issue.getMessage());
+ 				    // System.out.println(issue.getMessage());
 				}
 			} catch (final IOException e) {
 				System.err.println("ERROR LOADING RESOURCE: " + e.getMessage());
