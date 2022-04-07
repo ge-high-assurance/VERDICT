@@ -148,8 +148,10 @@ your operating system:
 - [Install Docker on other Linux operating
   systems](https://docs.docker.com/install/)
 
-If you are running Docker on Windows, you will have to do the
-following things to allow our plugin to communicate with Docker:
+Make sure you run the latest Docker version available for your
+operating system.  If you are running Docker on Windows, you will have
+to do the following things to allow our plugin to communicate with
+Docker:
 
 1. Set an environment variable called DOCKER_HOST to the value
    "tcp://localhost:2375" to tell our plugin to connect to the daemon

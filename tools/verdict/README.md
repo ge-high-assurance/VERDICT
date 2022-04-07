@@ -60,24 +60,25 @@ file.
 In practice, each AGREE version declares it is compatible with only
 one specific OSATE release even though the OSATE and Eclipse APIs tend
 to remain stable across multiple OSATE releases.  Therefore, the AGREE
-version we bundle with VERDICT in our update site only allows VERDICT
-to be installed in OSATE 2.10.2 (although you may be able to use other
-OSATE versions if you install a matching AGREE version in it before
-you install VERDICT from our update site).
+version we bundle with VERDICT in our update site works only in OSATE
+2.10.2 although you can install VERDICT in other OSATE versions by
+installing a matching AGREE version in that OSATE version before you
+install VERDICT from our update site.
 
 If you do need to change our target
 [definition](com.ge.research.osate.verdict.targetplatform/com.ge.research.osate.verdict.targetplatform.target)
-file to use more recent update sites, please go ahead and edit the
-file.  Note that you will have to bump every update site's version in
-lockstep with each other because only very specific combinations of
-OSATE, AGREE, and other Eclipse update site versions will work
-together.  To guide you which versions are compatible with each other,
-look at OSATE's own target
+file to use different versions of OSATE's and AGREE's update sites,
+please go ahead and edit the file.  Note that you will have to bump
+certain update sites' versions in lockstep with other update sites'
+versions because only certain versions of OSATE, AGREE, and other
+Eclipse update site versions will work together.  To guide you which
+versions of which update sites are compatible with each other, look at
+OSATE's own target
 [definition](https://github.com/osate/osate2/blob/2.10.2/core/org.osate.build.target/osate2-platform.target)
 file in its source repository.  That file is for OSATE 2.10.2; once
-you find a more recent version of OSATE's target definition file that
-you want VERDICT to be compatible with, make sure to use the same
-versions as OSATE in VERDICT's target definition file.
+you find a more recent version of OSATE's target definition file, make
+sure you use the same versions of that OSATE's update sites in
+VERDICT's target definition file.
 
 ## Build our VERDICT plugin sources
 

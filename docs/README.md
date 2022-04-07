@@ -39,39 +39,47 @@ AADL Tool Environment) in order to use our VERDICT plugin:
 
 - Click the Add... button in the Install dialog.
 
-- Paste the following URL in the Location field:
+- Paste the following URL in the Location field to install VERDICT's
+  latest stable version:
 
   <https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-latest>
 
-  If you want to install VERDICT's most current development version
-  rather than VERDICT's latest stable version, then use the following
-  URL instead:
+  If you would rather install VERDICT's most current development
+  version, then paste the following URL instead:
 
   <https://raw.githubusercontent.com/ge-high-assurance/VERDICT-update-sites/master/verdict-dev>
 
 - Click the Finish button in the Install dialog and restart OSATE when
   prompted to do so.
 
-Our VERDICT plugin also uses another OSATE plugin called
-[AGREE](https://github.com/loonwerks/AGREE-updates).  AGREE is short
-for "Assume-Guarantee REasoning Environment" and you can learn more
-about it at <https://github.com/loonwerks/AGREE>.  We bundle the
-specific parts we need from the AGREE 2.9.1 plugin in our VERDICT
-update site so you can install only VERDICT in OSATE 2.10.2 without
-your having to install AGREE as well.  If you want to use all of
-AGREE's functionality or install VERDICT in earlier or later OSATE
-versions, you also will have to install AGREE using the following URL
-in OSATE's "Install New Software..."  dialog:
+Our VERDICT plugin also requires another OSATE plugin called
+[AGREE](https://github.com/loonwerks/AGREE-updates) to be installed in
+OSATE.  AGREE is short for "Assume-Guarantee REasoning Environment"
+and you can learn more about it at
+<https://github.com/loonwerks/AGREE>.  OSATE does not come with AGREE
+already installed, so we bundle only the specific parts we need from
+the AGREE 2.9.1 plugin in our VERDICT update site to allow you to
+install VERDICT in OSATE without having to install AGREE as well.
+These bundled AGREE parts work only in OSATE 2.10.2, however.  To be
+safer, you can install AGREE in OSATE first before installing VERDICT
+by applying the following URL in OSATE's "Install New Software..."
+dialog:
 
 <https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master>
 
-The above URL will install the matching AGREE version in your OSATE
-automatically, although you may find that some OSATE versions do not
-have not any matching AGREE versions.  Each AGREE version works only
-with a specific OSATE version while our VERDICT plugin tries to work
-with any OSATE and AGREE version.  We have not tested all
-combinations, but we have tested that the current combination of OSATE
-2.10.2, AGREE 2.9.1, and VERDICT works together.
+The above URL will install an AGREE plugin matching your OSATE version
+automatically, allowing you to use all of AGREE's functionality or
+install VERDICT in earlier or later OSATE versions than OSATE 2.10.2.
+We have not tested all combinations, but we have tested that the
+current combination of OSATE 2.10.2, AGREE 2.9.1, and VERDICT works
+together as well as the previous combination of OSATE 2.7.1, AGREE
+2.5.2, and VERDICT.
+
+Note that every released AGREE version works only with one specific
+OSATE version and you may find some OSATE versions lack a matching
+AGREE version, making these OSATE versions unusable for VERDICT even
+though we try to make our VERDICT plugin work with any OSATE and AGREE
+version.
 
 ## 2. Install the VERDICT back-end tool chain
 
@@ -88,9 +96,10 @@ Docker **prerequisites**
 - [Docker](https://docs.docker.com/get-docker/)
 - [extern.zip](https://github.com/ge-high-assurance/VERDICT/releases)
 
-Install Docker if you haven't installed it yet.  If you are running
-Docker on Windows, you will also have to do the following to allow our
-plugin to communicate with Docker:
+Install Docker if you haven't installed it yet.  If Docker is already
+installed, make sure it is the latest version available for that
+platform.  If you are running Docker on Windows, you will also have to
+do the following to allow our plugin to communicate with Docker:
 
 - Set an environment variable called DOCKER_HOST to the value
   "tcp://localhost:2375" to tell our plugin to connect to the daemon
