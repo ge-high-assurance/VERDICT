@@ -15,7 +15,7 @@ in a temporary container.
 Front-end **prerequisites**
 
 - [Java 11](https://adoptium.net/)
-- [OSATE 2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
+- [OSATE 2.10.2](https://osate-build.sei.cmu.edu/download/osate/stable/2.10.2-vfinal/products/)
 
 You will need [Java 11](https://adoptium.net/) to run OSATE and our
 plugin.  OSATE runs fine on Java 11 even though its documentation says
@@ -27,7 +27,7 @@ You will need [OSATE](https://osate.org/about-osate.html) (Open Source
 AADL Tool Environment) in order to use our VERDICT plugin:
 
 - Download the [OSATE
-  2.7.1](https://osate-build.sei.cmu.edu/download/osate/stable/2.7.1-vfinal/products/)
+  2.10.2](https://osate-build.sei.cmu.edu/download/osate/stable/2.10.2-vfinal/products/)
   product for your operating system.
 
 - If necessary, refer to these [installation
@@ -56,8 +56,8 @@ Our VERDICT plugin also uses another OSATE plugin called
 [AGREE](https://github.com/loonwerks/AGREE-updates).  AGREE is short
 for "Assume-Guarantee REasoning Environment" and you can learn more
 about it at <https://github.com/loonwerks/AGREE>.  We bundle the
-specific parts we need from the AGREE 2.5.2 plugin in our VERDICT
-update site so you can install only VERDICT in OSATE 2.7.1 without
+specific parts we need from the AGREE 2.9.1 plugin in our VERDICT
+update site so you can install only VERDICT in OSATE 2.10.2 without
 your having to install AGREE as well.  If you want to use all of
 AGREE's functionality or install VERDICT in earlier or later OSATE
 versions, you also will have to install AGREE using the following URL
@@ -69,13 +69,9 @@ The above URL will install the matching AGREE version in your OSATE
 automatically, although you may find that some OSATE versions do not
 have not any matching AGREE versions.  Each AGREE version works only
 with a specific OSATE version while our VERDICT plugin tries to work
-with any OSATE and AGREE version.  We have tested and verified that
-the combination of OSATE 2.7.1, AGREE 2.5.2, and VERDICT works fine
-together.  Our VERDICT plugin will work with earlier OSATE and AGREE
-versions but we need to do some work on the translators to accommodate
-later AGREE versions that changed their API calls' behavior before we
-can guarantee that our VERDICT plugin will work with later OSATE and
-AGREE versions.
+with any OSATE and AGREE version.  We have not tested all
+combinations, but we have tested that the current combination of OSATE
+2.10.2, AGREE 2.9.1, and VERDICT works together.
 
 ## 2. Install the VERDICT back-end tool chain
 
