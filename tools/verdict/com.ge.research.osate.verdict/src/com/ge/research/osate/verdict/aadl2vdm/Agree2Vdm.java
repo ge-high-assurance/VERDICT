@@ -795,7 +795,8 @@ public class Agree2Vdm {
 			vdmExpr.setRecordProjection(vdmRecordProj);
 		} else if (agreeExpr instanceof BinaryExpr) {
 			BinaryExpr binExpr = (BinaryExpr)agreeExpr;
-			BinaryOperation binoper = new BinaryOperation();//for vdm
+			
+			eration binoper = new BinaryOperation();//for vdm
 			//set left operand
 			Expression leftOperand = getVdmExpressionFromAgreeExpression(binExpr.getLeft(), dataTypeDecl, nodeDecl, model);
 			binoper.setLhsOperand(leftOperand);
@@ -831,6 +832,8 @@ public class Agree2Vdm {
 			} else if(operator.equalsIgnoreCase("/")) {
 				vdmExpr.setDiv(binoper);
 			} else if(operator.equalsIgnoreCase("*")) {
+				vdmExpr.setTimes(binoper);
+			} else if(operator.equalsIgnoreCase("mod")) {
 				vdmExpr.setTimes(binoper);
 			} else {
 				System.out.println("Unmapped binary operator: "+operator);
