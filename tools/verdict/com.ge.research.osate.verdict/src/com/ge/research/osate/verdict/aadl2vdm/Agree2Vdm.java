@@ -796,7 +796,7 @@ public class Agree2Vdm {
 		} else if (agreeExpr instanceof BinaryExpr) {
 			BinaryExpr binExpr = (BinaryExpr)agreeExpr;
 			
-			eration binoper = new BinaryOperation();//for vdm
+			BinaryOperation binoper = new BinaryOperation();//for vdm
 			//set left operand
 			Expression leftOperand = getVdmExpressionFromAgreeExpression(binExpr.getLeft(), dataTypeDecl, nodeDecl, model);
 			binoper.setLhsOperand(leftOperand);
