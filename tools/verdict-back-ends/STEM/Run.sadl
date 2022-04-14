@@ -12,6 +12,9 @@ uri "http://sadl.org/STEM/Run" alias run.
 import "http://sadl.org/STEM/STEMRules".
 import "http://sadl.org/STEM/Queries".
 
+//AM 04-04-2022: Search for "//AM 04-04-2022" to see all changes made in going from NIST rev 4 to NIST rev 5.
+//AM 04-04-2022: This only affected BaseModel.sadl.
+
 // For debugging csv file importing, uncomment the line that writes out the log file in each of the template files.
 //		In VM would need to also replace c:/tmp/ by /home/soteria/tmp/
 

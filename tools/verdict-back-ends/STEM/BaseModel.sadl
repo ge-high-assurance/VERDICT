@@ -9,6 +9,8 @@
 
 uri "http://sadl.org/STEM/BaseModel" alias base.
 
+//AM 04-04-2022: Search for "//AM 04-04-2022" to see all changes made in going from NIST rev 4 to NIST rev 5.
+
 DAL (note "Design Assurance Level") is a type of int [0,9]. // default value is 0 indicating that the implementation property is false
 ComponentType is a class, must be one of {Software, Hardware, Hybrid, Human, SwHwHybrid, SwHumanHybrid, HwHumanHybrid}.
 Pedigree is a class, must be one of {InternallyDeveloped, COTS, Sourced}.
@@ -816,7 +818,7 @@ CAPEC-624C-SystemAccessControl is a CAPEC
 // Generated NIST Control Declarations
 AU-12 is a NISTControl
    with nistId "AU-12"
-   with nistDesc "Audit Generation".
+   with nistDesc "Audit Record Generation". //AM 04-04-2022: was "Audit Generation"
 AU-12-1 is a NISTControl
    with nistId "AU-12-1"
    with nistDesc "System-wide / Time-correlated Audit Trail".
@@ -834,10 +836,10 @@ IA-2 is a NISTControl
    with nistDesc "Identification and Authentication (Organizational Users)".
 IA-2-1 is a NISTControl
    with nistId "IA-2-1"
-   with nistDesc "Network Access to Privileged Accounts".
+   with nistDesc "Multi-Factor Authentication to Privileged Accounts". //AM 04-04-2022: was "Network Access to Privileged Accounts"
 IA-2-2 is a NISTControl
    with nistId "IA-2-2"
-   with nistDesc "Network Access to Non-Privileged Accounts".
+   with nistDesc "Multi-Factor Authentication to Non-Privileged Accounts". //AM 04-04-2022: was "Network Access to Non-Privileged Accounts"
 IA-2-3 is a NISTControl
    with nistId "IA-2-3"
    with nistDesc "Local Access to Privileged Accounts".
@@ -846,7 +848,7 @@ IA-2-4 is a NISTControl
    with nistDesc "Local Access to Non-Privileged Accounts".
 IA-2-8 is a NISTControl
    with nistId "IA-2-8"
-   with nistDesc "Network Access to Privileged Accounts - Replay Resistant".
+   with nistDesc "Access to Accounts - Replay Resistant". //AM 04-04-2022: was "Network Access to Privileged Accounts - Replay Resistant"
 IA-2-9 is a NISTControl
    with nistId "IA-2-9"
    with nistDesc "Network Access to Non-Privileged Accounts - Replay Resistant".
@@ -864,28 +866,38 @@ IA-3-1 is a NISTControl
    with nistDesc "Cryptographic Bidirectional Authentication".
 IA-3-4 is a NISTControl
    with nistId "IA-3-4"
-   with nistDesc "Remote Attestation".
+   with nistDesc "Device Attestation". //AM 04-04-2022: was "Remote Attestation"
 MP-6-8 is a NISTControl
    with nistId "MP-6-8"
-   with nistDesc "Wiping of Information".
+   with nistDesc "Remote Purging or Wiping of Information". //AM 04-04-2022: was "Wiping of Information"
 PE-3 is a NISTControl
    with nistId "PE-3"
    with nistDesc "Physical Access Control".
 PE-3-1 is a NISTControl
    with nistId "PE-3-1"
-   with nistDesc "Information System Access Control".
+   with nistDesc "System Access". //AM 04-04-2022: was "Information System Access Control"
 PE-3-5 is a NISTControl
    with nistId "PE-3-5"
    with nistDesc "Tamper Protection".
 SA-11-1 is a NISTControl
    with nistId "SA-11-1"
    with nistDesc "Static Code Analysis".
-SA-12 is a NISTControl
-   with nistId "SA-12"
-   with nistDesc "Supply Chain Protection".
-SA-18-1 is a NISTControl
-   with nistId "SA-18-1"
-   with nistDesc "Tamper Resistance and Detection".
+//AM 04-04-2022: SA-12 in NIST rev 4 is moved to SR-3 in NIST rev5
+//SA-12 is a NISTControl
+//   with nistId "SA-12"
+//   with nistDesc "Supply Chain Protection".
+SR-3 is a NISTControl
+   with nistId "SR-3"
+   with nistDesc "Supply Chain Controls and Processes". //AM 04-04-2022: was "Supply Chain Protection"
+//AM 04-04-2022: SA-18-1 in NIST rev 4 is moved to SR-9-1 in NIST rev5
+//SA-18-1 is a NISTControl
+//   with nistId "SA-18-1"
+//   with nistDesc "Tamper Resistance and Detection".//AM 04-04-2022: It should have been "Tamper Resistance and Detection - Multiple Phases of SDLC" 
+//AM 04-04-2022: It should have been "Tamper Resistance and Detection - Multiple Phases of SDLC"
+//AM 04-04-2022: because SA-18 is "Tamper Resistance and Detection" and we did not use SA-18 in VERDICT
+SR-9-1 is a NISTControl
+   with nistId "SR-9-1"
+   with nistDesc "Tamper Resistance and Detection - Multiple Stages of System Development Life Cycle". //AM 04-04-2022: with SA-18-1 and SR-9-1, it should be "Tamper Resistance and Detection - Multiple Stages of System Development Life Cycle"   
 SC-13 is a NISTControl
    with nistId "SC-13"
    with nistDesc "Cryptographic Protection".
@@ -903,7 +915,7 @@ SC-4 is a NISTControl
    with nistDesc "Information in Shared Resources".
 SC-4-2 is a NISTControl
    with nistId "SC-4-2"
-   with nistDesc "Periods Processing".
+   with nistDesc "Multilevel or Periods Processing". //AM 04-04-2022: was "Periods Processing"
 SC-40 is a NISTControl
    with nistId "SC-40"
    with nistDesc "Wireless Link Protection".
@@ -915,7 +927,7 @@ SC-5 is a NISTControl
    with nistDesc "Denial of Service Protection".
 SC-5-2 is a NISTControl
    with nistId "SC-5-2"
-   with nistDesc "Excess Capacity/Bandwidth/Redundancy".
+   with nistDesc "Capacity, Bandwidth, and Redundancy". //AM 04-04-2022: was "Excess Capacity/Bandwidth/Redundancy"
 SC-6 is a NISTControl
    with nistId "SC-6"
    with nistDesc "Resource Availability".
@@ -924,7 +936,7 @@ SC-7-16 is a NISTControl
    with nistDesc "Prevent Discovery of Components/Devices".
 SC-8 is a NISTControl
    with nistId "SC-8"
-   with nistDesc "Transmission Integrity".
+   with nistDesc "Transmission Confidentiality and Integrity". //AM 04-04-2022: was "Transmission Integrity"
 SI-10 is a NISTControl
    with nistId "SI-10"
    with nistDesc "Information Input Validation".
@@ -1035,14 +1047,14 @@ StrongCryptoAlgorithms is a Mitigation
    with nistControl SC-13.
 SupplyChainSecurity is a Mitigation
    with implProperty "supplyChainSecurity"
-   with nistControl SA-12.
+   with nistControl SR-3.
 SystemAccessControl is a Mitigation
    with implProperty "systemAccessControl"
    with nistControl PE-3
    with nistControl PE-3-1.
 TamperProtection is a Mitigation
    with implProperty "tamperProtection"
-   with nistControl SA-18-1.
+   with nistControl SR-9-1.
 UserAuthentication is a Mitigation
    with implProperty "userAuthentication"
    with nistControl IA-2
