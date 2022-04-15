@@ -24,11 +24,11 @@ jobs:
 
     steps:
     - name: Check out VERDICT source
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.1
 
     - name: Check out kind2 source
       if: runner.os == 'macOS'
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.1
       with:
         repository: kind2-mc/kind2
         path: tools/verdict-back-ends/kind2
@@ -95,7 +95,7 @@ jobs:
 
     steps:
     - name: Check out VERDICT source
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.1
 
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
@@ -167,7 +167,7 @@ jobs:
           gehighassurance/verdict:${{ github.event.release.tag_name }}
 
     - name: Check out VERDICT-update-sites
-      uses: actions/checkout@v3.0.0
+      uses: actions/checkout@v3.0.1
       with:
         repository: ge-high-assurance/VERDICT-update-sites
         token: ${{ secrets.CI_PAT }}
