@@ -8,7 +8,7 @@ Date: 2017-12-15
 
 Updates: 5/10/2018, Kit Siu, added severityCalc and supporting measures for ADT
          7/23/2018, Kit Siu, added likelihood calculations (formerly severityCalc)
-
+         5/23/2022, Chris Alexander, Multi-Rule cutset likelihoods to include unimplemented defenses
 *)
 
 (**
@@ -311,8 +311,8 @@ let rec likelihoodCutSOP sop la =
   match sop with
     | [] -> []
     | hd::tl -> let prod = match hd with
-                             | AVar e       -> List.Assoc.find_exn la e ~equal:(=)
-                             | ANot (AVar e)-> List.Assoc.find_exn la e ~equal:(=)
+                             | AVar (a,d,_)         -> List.Assoc.find_exn la (a,d) ~equal:(=)
+                             | ANot ( AVar (a,d,_)) -> List.Assoc.find_exn la (a,d) ~equal:(=)
                              | APro le      -> gMin (likelihoodCutSOP le la)
                              | DPro le      -> gMin (likelihoodCutSOP le la) (* min on d-AND gate b/c assoc list is in terms of likelihood *)
                              | DSum le      -> gMax (likelihoodCutSOP le la) (* allow SOP to include defense Sum gates *)
@@ -325,8 +325,8 @@ let rec likelihoodCutSOP sop la =
 *)
 let likelihoodCutCalc cs la =
   match cs with
-    | AVar v         -> let a = (List.Assoc.find_exn la v ~equal:(=)) in a
-    | ANot ( AVar v )-> let a = (List.Assoc.find_exn la v ~equal:(=)) in a
+    | AVar (a,d,_)          -> let a = (List.Assoc.find_exn la (a,d) ~equal:(=)) in a
+    | ANot ( AVar (a,d,_))  -> let a = (List.Assoc.find_exn la (a,d) ~equal:(=)) in a
     | ASum s         -> let l = (likelihoodCutSOP s la) in (gMax l)
     | APro p         -> gMin (likelihoodCutSOP p la) 
     | DSum s         -> let l = (likelihoodCutSOP s la) in (gMax l)  (* max on d-OR gate b/c assoc list is in terms of likelihood *)
@@ -353,11 +353,11 @@ let likelihoodCut t =
   let cutset = cutsets_ad t in
   likelihoodCutC t cutset ;;
 
-(** A function that given an attack-defense tree and cutsets, computes importance measures. 
-*)
+(** A function that given an attack-defense tree and cutsets, computes importance measures. *)
 let likelihoodCutCImp t cutset =
-  let likeAlist = eventLikelihoods t in
-  let a = likelihoodCutCalc cutset likeAlist in
+
+  let likeAlist = eventLikelihoods t in (* list of cutset likelihoods *)
+  let a = likelihoodCutCalc cutset likeAlist in (* summed likelihood of all cutsets *)
   let cs = match cutset with
              | AVar _ -> [cutset]
              | AFALSE -> [AFALSE]
@@ -365,22 +365,19 @@ let likelihoodCutCImp t cutset =
              | ASum s -> s
              | APro s -> s  (* for the case where the cutset contains C(a,d) *)
              | _ -> raise (Error "likelihoodCutCImp exception") 
-             in 
-      let clikeli = List.map cs ~f:(fun x -> likelihoodCutCalc x likeAlist) 
-      in
-          let c = List.map2_exn cs clikeli ~f:(fun x y -> let a1 = y 
-          in
-		      let imp = a1 /. a 
-		      in 
-		          (x, a1, imp))
-                  in
-                  List.sort ~compare:(fun x y -> let (_, _, xi) = x in
-			      let (_, _, yi) = y in
-			      -(compare xi yi))
-    c ;;
+             in
 
-(** A function that given an attack-defense tree, computes importance measures. 
-*)
+  let clikeli = List.map cs ~f:(fun x -> likelihoodCutCalc x likeAlist) in (* list of likelihoods *)
+
+  let c = List.map2_exn cs clikeli ~f:(fun x y ->
+            let a1 = y in
+            let imp = a1 /. a in
+            (x, a1, imp)) in
+
+  List.sort ~compare:(fun x y -> (* sort cutsets by likelihood *)
+            let (_, _, xi) = x in let (_, _, yi) = y in -(compare xi yi)) c;;
+
+(** A function that given an attack-defense tree, computes importance measures. *)
 let likelihoodCutImp t =
   let cutset = cutsets_ad t in
   likelihoodCutCImp t cutset ;;

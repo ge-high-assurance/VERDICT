@@ -1,94 +1,83 @@
-# Instructions to build the SOTERIA++ tool
+# SOTERIA++ build and run instructions
 
--------------------
-** Prerequisites **
--------------------
+## Installation
 
-OCaml version 4.07.0 is required, installed using opam version
-2.0.0. The following OCaml packages are required: async, core,
-core_extended, ocamlbuild, ocamlfind, printbox, and xml-light. These
-can be installed using the following command:
+Follow the [Build the native back-end programs](../README.md) installation instructions to install the soteria++ 
+application and dependencies. 
 
+## Debug Prerequisites
 
-```
-$ opam install async core core_extended ocamlbuild ocamlfind printbox xml-light
-```
-
-Edit your ~/.ocamlinit file by adding the following lines:
+The oCaml core package is required to bundle soteria++:
 
 ```
-#use "topfind" ;;
-#thread ;;
-#load "stdlib.cma" ;;
-#require "async" ;;
-#require "core_extended" ;;
-open Core ;;
+$ opam install core && eval $(opam config env)
 ```
 
-
-Graphviz is also required, which can be installed using MacPorts with the following command: 
-
-
-```
-$ port install graphviz
-```
-
--------------------
-**     Build     **
--------------------
+## Build
 
 The tool is built using the following command:
-
 
 ```
 $ corebuild -pkg printbox -pkg xml-light soteria_pp.byte 
 ```
 
-or
+or for the native executable:
 
 ```
 $ corebuild -pkg printbox -pkg xml-light soteria_pp.native 
 ```
 
-Note that you can clean a build with the following command. (If you do, you have
+You can clean a build with the following command. (If you do, you have
 to rebuild the tool with the command above)
 
 ```
 $ corebuild -clean
 ```
 
--------------------
-**      Run      **
--------------------
+## Run
 
-Run the tool by executing the following command. The following files are expected in the input_path: CAPEC.csv, CompDep.csv, ScnArch.csv, Mission.csv, and Defenses.csv.
-
+Soteria++ builds can be configured to [run in OSATE](../README.md) or run form the CLI. The input_path should include 
+STEM files: CAPEC.csv, CompDep.csv, ScnArch.csv, Mission.csv, and Defenses.csv. Run the VERDICT OSATE once to 
+initialize these files (in ~/workspace/extern/STEM/Output/).
 
 ```
 $ ./soteria_pp.byte -o output_path input_path 
 ```
-
-Alternatively, the output path can be left out.
-
+The output path may be omitted with:
 ```
 $ ./soteria_pp.byte input_path 
 ```
 
+## OCaml Debugger
 
+The [oCaml debugger](https://ocaml.org/manual/debugger.html) provides a CLI to set breakpoints and easily inspect 
+variable values. Refer to oCaml debugger manual's [Running the Program](https://ocaml.org/manual/debugger.html#s%3Adebugger-commands) for debug 
+commands. After building the soteria++ .byte bundle run the debugger with: 
 
--------------------
-**   OCaml Top   **
--------------------
+```
+cd ./soteria_pp/_build/
+ocamldebug soteria_pp.byte input_path
+```
 
-If you want to run using OCaml top-level, cd to /examples, then call ocaml. From OCaml top, load top.ml,
-then load your example file. For instance:
+The input_path should include STEM files: CAPEC.csv, CompDep.csv, ScnArch.csv, Mission.csv, and Defenses.csv. Run VERDICT 
+in OSATE once to initialize these files (in ~/workspace/extern/STEM/Output/). After the debugger initializes set a breakpoint, 
+run the application and inspect a variable. For example:
 
+```
+(ocd) set print_length 10000
+(ocd) break @ translator 1309
+(ocd) run
+(ocd) print l_librariesThreats
+```
 
+## OCaml Top (and Running Tests)
 
-$ cd examples
+If you want to run using OCaml top-level, build the project then call ocaml. From the OCaml top CLI load top.ml and 
+then your example or test file. For instance:
 
-$ ocaml
-
-\# \#use "top.ml";;
-
-\# \#use "your_file_name.ml";;
+```
+$ ocaml -I ./_build
+# #use "examples/top.ml";;
+# #use "examples/your_example_file.ml";;
+# #use "qualitative-test.ml";;
+```

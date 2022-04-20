@@ -46,44 +46,59 @@ test_sumofprod_ad ();;
 
 (* testing with some AD trees *)
 let test_cutsets_ad () =
-	let a = ALeaf("a", 1.) 
-	and b = DLeaf("b", 5)
-	and c = ALeaf("c", 1.) in
+	let a = ALeaf(("a_atk","a_def"), 1.)
+	and b = DLeaf(("b_atk","b_def"), 5)
+	and c = ALeaf(("c_atk","c_def"), 1.) in
 	let t1 = C(a, b) in
     let t2 = ASUM [ c; t1 ]
     and t3 = APRO [ c; t1 ]
     and t4 = ASUM [ a; t1 ] in
-    assert( cutsets_ad t1 = APro [ AVar "a"; ANot (AVar "b") ] );
-    assert( cutsets_ad t2 = ASum [ AVar "c"; APro [AVar "a"; ANot (AVar "b")]] );
-    assert( cutsets_ad t3 = APro [ AVar "a"; AVar "c"; ANot (AVar "b") ] );
-    assert( cutsets_ad t4 = AVar "a" );
+    assert( cutsets_ad t1 = APro [ AVar ("a_atk","a_def",""); ANot (AVar ("b_atk","b_def","5")) ] );
+    assert( cutsets_ad t2 = ASum [ AVar ("c_atk","c_def",""); APro [AVar ("a_atk","a_def",""); ANot (AVar ("b_atk","b_def","5"))]] );
+    assert( cutsets_ad t3 = APro [ AVar ("a_atk","a_def",""); AVar ("c_atk","c_def",""); ANot (AVar ("b_atk","b_def","5")) ] );
+    assert( cutsets_ad t4 = AVar ("a_atk","a_def","") );
     true;;
     
 test_cutsets_ad ();;
 
 (* test cutsets_ad algo again with different combinations of PoS's and SoP's *)
 let test_cutsets_ad () =
-    let sss = C( ALeaf("i", 1.0), DSUM[ DSUM[ DLeaf("a", 5); DLeaf("b", 5) ]; DSUM[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)
-    and spp = C( ALeaf("i", 1.0), DSUM[ DPRO[ DLeaf("a", 5); DLeaf("b", 5) ]; DPRO[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)
-    and ssp = C( ALeaf("i", 1.0), DSUM[ DSUM[ DLeaf("a", 5); DLeaf("b", 5) ]; DPRO[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)
-    and sps = C( ALeaf("i", 1.0), DSUM[ DPRO[ DLeaf("a", 5); DLeaf("b", 5) ]; DSUM[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)
-    and ppp = C( ALeaf("i", 1.0), DPRO[ DPRO[ DLeaf("a", 5); DLeaf("b", 5) ]; DPRO[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)
-    and p   = C( ALeaf("i", 1.0), DPRO[ DSUM[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *) 
-    and pss = C( ALeaf("i", 1.0), DPRO[ DSUM[ DLeaf("a", 5); DLeaf("b", 5) ]; DSUM[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* working *)        
-    and psp = C( ALeaf("i", 1.0), DPRO[ DSUM[ DLeaf("a", 5); DLeaf("b", 5) ]; DPRO[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* was ANot working, now working *) 
-    and pps = C( ALeaf("i", 1.0), DPRO[ DPRO[ DLeaf("a", 5); DLeaf("b", 5) ]; DSUM[ DLeaf("c", 5); DLeaf("d", 5) ]; ] )(* was ANot working, now working *)
+
+    let i_leaf = ("i_atk","i_def")
+    and a_leaf = ("a_atk","a_def")
+    and b_leaf = ("b_atk","b_def")
+    and c_leaf = ("c_atk","c_def")
+    and d_leaf = ("d_atk","d_def")
+    in
+
+    let sss = C( ALeaf(i_leaf, 1.0), DSUM[ DSUM[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
+    and spp = C( ALeaf(i_leaf, 1.0), DSUM[ DPRO[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DPRO[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
+    and ssp = C( ALeaf(i_leaf, 1.0), DSUM[ DSUM[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DPRO[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
+    and sps = C( ALeaf(i_leaf, 1.0), DSUM[ DPRO[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
+    and ppp = C( ALeaf(i_leaf, 1.0), DPRO[ DPRO[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DPRO[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
+    and p   = C( ALeaf(i_leaf, 1.0), DPRO[ DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *) 
+    and pss = C( ALeaf(i_leaf, 1.0), DPRO[ DSUM[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)        
+    and psp = C( ALeaf(i_leaf, 1.0), DPRO[ DSUM[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DPRO[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* was ANot working, now working *) 
+    and pps = C( ALeaf(i_leaf, 1.0), DPRO[ DPRO[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* was ANot working, now working *)
      
     in
-    
-    assert( cutsets_ad sss = APro[ AVar "i"; DPro [ANot (AVar "a"); ANot (AVar "b"); ANot (AVar "c"); ANot (AVar "d")] ] );
-    assert( cutsets_ad spp = APro[ AVar "i"; DPro [DSum [ANot (AVar "a"); ANot (AVar "b")]; DSum [ANot (AVar "c"); ANot (AVar "d")]] ]);
-    assert( cutsets_ad ssp = APro[ AVar "i"; DPro [ANot (AVar "a"); ANot (AVar "b"); DSum [ANot (AVar "c"); ANot (AVar "d")]] ]);
-    assert( cutsets_ad sps = APro[ AVar "i"; DPro [ANot (AVar "c"); ANot (AVar "d"); DSum [ANot (AVar "a"); ANot (AVar "b")]] ]);
-    assert( cutsets_ad ppp = APro[ AVar "i"; DSum [ANot (AVar "a"); ANot (AVar "b"); ANot (AVar "c"); ANot (AVar "d")] ]);
-    assert( cutsets_ad p   = APro[ AVar "i"; DPro [ANot (AVar "c"); ANot (AVar "d")] ]);
-    assert( cutsets_ad pss = APro[ AVar "i"; DSum [DPro [ANot (AVar "a"); ANot (AVar "b")]; DPro [ANot (AVar "c"); ANot (AVar "d")];] ]);
-    assert( cutsets_ad psp = APro[ AVar "i"; DSum [ANot (AVar "c"); ANot (AVar "d"); DPro [ANot (AVar "a"); ANot (AVar "b");] ] ]);
-    assert( cutsets_ad pps = APro[ AVar "i"; DSum [ANot (AVar "a"); ANot (AVar "b"); DPro [ANot (AVar "c"); ANot (AVar "d") ] ] ]);
+
+    let i_cut = ("i_atk","i_def","")
+    and a_cut = ("a_atk","a_def","5")
+    and b_cut = ("b_atk","b_def","5")
+    and c_cut = ("c_atk","c_def","5")
+    and d_cut = ("d_atk","d_def","5")
+    in
+
+    assert( cutsets_ad sss = APro[ AVar i_cut; DPro [ANot (AVar a_cut); ANot (AVar b_cut); ANot (AVar c_cut); ANot (AVar d_cut)] ] );
+    assert( cutsets_ad spp = APro[ AVar i_cut; DPro [DSum [ANot (AVar a_cut); ANot (AVar b_cut)]; DSum [ANot (AVar c_cut); ANot (AVar d_cut)]] ]);
+    assert( cutsets_ad ssp = APro[ AVar i_cut; DPro [ANot (AVar a_cut); ANot (AVar b_cut); DSum [ANot (AVar c_cut); ANot (AVar d_cut)]] ]);
+    assert( cutsets_ad sps = APro[ AVar i_cut; DPro [ANot (AVar c_cut); ANot (AVar d_cut); DSum [ANot (AVar a_cut); ANot (AVar b_cut)]] ]);
+    assert( cutsets_ad ppp = APro[ AVar i_cut; DSum [ANot (AVar a_cut); ANot (AVar b_cut); ANot (AVar c_cut); ANot (AVar d_cut)] ]);
+    assert( cutsets_ad p   = APro[ AVar i_cut; DPro [ANot (AVar c_cut); ANot (AVar d_cut)] ]);
+    assert( cutsets_ad pss = APro[ AVar i_cut; DSum [DPro [ANot (AVar a_cut); ANot (AVar b_cut)]; DPro [ANot (AVar c_cut); ANot (AVar d_cut)];] ]);
+    assert( cutsets_ad psp = APro[ AVar i_cut; DSum [ANot (AVar c_cut); ANot (AVar d_cut); DPro [ANot (AVar a_cut); ANot (AVar b_cut);] ] ]);
+    assert( cutsets_ad pps = APro[ AVar i_cut; DSum [ANot (AVar a_cut); ANot (AVar b_cut); DPro [ANot (AVar c_cut); ANot (AVar d_cut) ] ] ]);
     
     true;;
     

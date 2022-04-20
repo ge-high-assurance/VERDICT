@@ -9,10 +9,10 @@ Updates:
 
 *)
 
-let myDtree_and = DPRO [ DLeaf ("d1", 7); DLeaf ("d2", 9); DLeaf ("d3", 7) ];;
-let myDtree_or = DSUM [ DLeaf ("d1", 7); DLeaf ("d2", 9); DLeaf ("d3", 7) ];;
-let myADtree_wDtree_and = C ( ALeaf ("a1", 1.0), myDtree_and );;
-let myADtree_wDtree_or = C ( ALeaf ("a1", 1.0), myDtree_or );;
+let myDtree_and = DPRO [ DLeaf (("a1","d1"), 7); DLeaf (("a2","d2"), 9); DLeaf (("a3","d3"), 7) ];;
+let myDtree_or = DSUM [ DLeaf (("a1","d1"), 7); DLeaf (("a2","d2"), 9); DLeaf (("a3","d3"), 7) ];;
+let myADtree_wDtree_and = C ( ALeaf (("a1","d1"), 1.0), myDtree_and );;
+let myADtree_wDtree_or = C ( ALeaf (("a1","d1"), 1.0), myDtree_or );;
 
 
 (* assuranceCalcApprox *)
@@ -40,8 +40,8 @@ test_likelihoodCalcApprox ();;
 (* eventLikelihoodsAuxDt *)
 
 let test_eventLikelihoodsAuxDt () =
-  assert( eventLikelihoodsAuxDt myDtree_and = [("d1", 1e-07); ("d2", 1e-09); ("d3", 1e-07)] );
-  assert( eventLikelihoodsAuxDt myDtree_or = [("d1", 1e-07); ("d2", 1e-09); ("d3", 1e-07)] );
+  assert( eventLikelihoodsAuxDt myDtree_and = [(("a1","d1"), 1e-07); (("a2","d2"), 1e-09); (("a3","d3"), 1e-07)] );
+  assert( eventLikelihoodsAuxDt myDtree_or = [(("a1","d1"), 1e-07); (("a2","d2"), 1e-09); (("a3","d3"), 1e-07)] );
   true
 ;;
 
@@ -51,8 +51,8 @@ test_eventLikelihoodsAuxDt ();;
 (* eventLikelihoodsAux *)
 
 let test_eventLikelihoodsAux () =
-  assert( eventLikelihoodsAux myADtree_wDtree_and = [("a1", 1.); ("d1", 1e-07); ("d2", 1e-09); ("d3", 1e-07)] );
-  assert( eventLikelihoodsAux myADtree_wDtree_or = [("a1", 1.); ("d1", 1e-07); ("d2", 1e-09); ("d3", 1e-07)] );
+  assert( eventLikelihoodsAux myADtree_wDtree_and = [(("a1","d1"), 1.); (("a1","d1"), 1e-07); (("a2","d2"), 1e-09); (("a3","d3"), 1e-07)] );
+  assert( eventLikelihoodsAux myADtree_wDtree_or = [(("a1","d1"), 1.); (("a1","d1"), 1e-07); (("a2","d2"), 1e-09); (("a3","d3"), 1e-07)] );
   true
 ;;
 
@@ -68,7 +68,7 @@ let test_likelihoodCutSOP () =
 
    (* test the Dtree with ANDed defenses -- expect higher likelihood of success 
       because if you need all the defenses, then pick out the weakest link *)
-   assert( likelihoodCutSOP [(sop_ad (formulaOfADTree myADtree_wDtree_and))] (eventLikelihoodsAux myADtree_wDtree_and) = [1e-07] );
+   assert( likelihoodCutSOP [(sop_ad (formulaOfADTree myADtree_wDtree_and))] (eventLikelihoodsAux myADtree_wDtree_and) = [1.] );
    true
 ;;
 

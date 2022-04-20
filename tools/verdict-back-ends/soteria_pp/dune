@@ -3,7 +3,7 @@
  (libraries core printbox xml-light)
  (preprocess (pps ppx_let))
  (modules :standard \
-   qualitative-test quantitative-test treeSynthesis-test validation-tests
+            qualitative-test quantitative-test treeSynthesis-test validation-tests
  )
 )
 

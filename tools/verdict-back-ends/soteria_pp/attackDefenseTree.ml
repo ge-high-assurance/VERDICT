@@ -36,7 +36,7 @@ type 'a adtree =
 type 'a adexp = 
   | ATRUE
   | AFALSE
-  | AVar of 'a 
+  | AVar of 'a (* attackStr, defenseStr, dal *)
   | ANot of 'a adexp
   | ASum of 'a adexp list
   | APro of 'a adexp list
