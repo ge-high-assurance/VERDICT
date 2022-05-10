@@ -2981,7 +2981,7 @@ public class Aadl2Vdm {
 			//update map (connection-name -> bus-Instance-Name)
 			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
 				if(!(propAssoc.getProperty().getName().equalsIgnoreCase("Actual_Connection_Binding"))) {
-					System.out.println("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
+					//System.out.println("System Implementation contains property "+propAssoc.getProperty().getName()+" which is not currently handled.");
 					continue;
 				}
 				if(propAssoc.getOwnedValues().size() != 1) {
