@@ -66,7 +66,9 @@ public class Defense extends ADTree {
         defenseDnf.add(clause);
     }
 
-    /** @return the attack defended by this defense */
+    /**
+     * @return the attack defended by this defense
+     */
     public Attack getAttack() {
         return attack;
     }

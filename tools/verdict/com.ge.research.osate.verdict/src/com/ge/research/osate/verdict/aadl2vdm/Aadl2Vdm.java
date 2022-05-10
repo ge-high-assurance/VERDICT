@@ -130,8 +130,8 @@ import verdict.vdm.vdm_model.Port;
 * @author Saswata Paul
 *
 */
-public class Aadl2Vdm {
-
+public class Aadl2Vdm {	
+	Map<String, Map<String, String>> compQnameToPropVal = new HashMap<>();
 	/**
 	 * The execute() method
 	 * creates a new Model object and
@@ -386,7 +386,7 @@ public class Aadl2Vdm {
 
 		/* Translating all Component Types */
 		if(systemTypes.size()>0) {
-			model = translateSystemTypeObjects(systemTypes, model, dataTypeDecl);
+			model = translateSystemTypeObjects(systemTypes, model, dataTypeDecl, componentPropertyToName);
 		}
 		if(busTypes.size()>0) {
 			model = translateBusTypeObjects(busTypes, model, dataTypeDecl);
@@ -449,7 +449,7 @@ public class Aadl2Vdm {
 	 * @param m1
 	 * @return
 	 */
-	public Model translateSystemTypeObjects(List<SystemType> systemTypes, Model m1, HashSet<String> dataTypeDecl) {
+	public Model translateSystemTypeObjects(List<SystemType> systemTypes, Model m1, HashSet<String> dataTypeDecl, Map<Property, String> componentPropertyToName) {
 		for(SystemType sysType : systemTypes) {
 			// variables for unpacking sysType
 			List<Event> events = new ArrayList<>();
@@ -496,20 +496,32 @@ public class Aadl2Vdm {
 			if(true) { //No Filter-- do for all System Types
 
 				//to pack the sysType as a VDM component
-				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();
+				verdict.vdm.vdm_model.ComponentType packComponent = new verdict.vdm.vdm_model.ComponentType();			
 
-				//Note: Not populating "contract" for now
+				//Note: Not populating "contract" for now 
 
-//ISSUE: There is no getId() function for systemType
+				//ISSUE: There is no getId() function for systemType
 				packComponent.setId(sysType.getQualifiedName());
-
 				//populating "name"
 				packComponent.setName(sysType.getName());
-
-
 				//populating "compCateg"
 				packComponent.setCompCateg(sysType.getCategory().getName());
 
+				// Populate only the CASE_Consolidated_properties of this component type
+				Map<String, String> compPropNameToVal = new HashMap<>();
+				for(PropertyAssociation propAssoc : sysType.getOwnedPropertyAssociations()) {
+					Property prop = propAssoc.getProperty();
+					if(!componentPropertyToName.containsKey(prop)) {
+						continue;
+					}
+					
+					PropertyAcc propAcc = sysType.getPropertyValue(prop);
+					
+					if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+						compPropNameToVal.put(prop.getName(), getStrRepofPropVal(sysType.getPropertyValue(prop)));
+					}
+				}
+				compQnameToPropVal.put(sysType.getQualifiedName(), compPropNameToVal);
 				
 				//get all bus accesses and store them as ports
 				List<BusAccess> busAccesses = sysType.getOwnedBusAccesses();
@@ -2940,12 +2952,25 @@ public class Aadl2Vdm {
 
 			//setting "name" field of packCompImpl, will need later
 			packCompImpl.setName(aSystemImpl.getName());
-
-
 			//Note: Will skip "Nodebody" field for now
-
 			//ISSUE: No "id" field in Component implementations
 			packCompImpl.setId(aSystemImpl.getQualifiedName());
+						
+			// Populate the CASE_Consolidated_properties of this component implementation
+			Map<String, String> implPropNameToVal = new HashMap<>();
+			for(PropertyAssociation propAssoc : aSystemImpl.getOwnedPropertyAssociations()) {
+				Property prop = propAssoc.getProperty();
+				if(!componentPropertyToName.containsKey(prop)) {
+					continue;
+				}
+				
+				PropertyAcc propAcc = aSystemImpl.getPropertyValue(prop);
+				
+				if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
+					implPropNameToVal.put(prop.getName(), getStrRepofPropVal(aSystemImpl.getPropertyValue(prop)));
+				}
+			}
+			compQnameToPropVal.put(aSystemImpl.getQualifiedName(), implPropNameToVal);
 
 			//adding object to "componentImpl" field of m2
 			m2.getComponentImpl().add(packCompImpl);
@@ -3012,7 +3037,8 @@ public class Aadl2Vdm {
 
 			//adding all subcomponents to "subcomponent" field of packBlockImpl
 			for (Subcomponent aSubComp : aCompImpl.getOwnedSubcomponents()) {
-
+				Map<String, String> compTypePropNameToVal = new HashMap<>();
+				Map<String, String> compImplPropNameToVal = new HashMap<>();
 				//to pack all information of a subcomponent
 				verdict.vdm.vdm_model.ComponentInstance packSubComp = new verdict.vdm.vdm_model.ComponentInstance();
 
@@ -3024,9 +3050,11 @@ public class Aadl2Vdm {
 
 				//setting "specification" field of packSubComp
 				for(verdict.vdm.vdm_model.ComponentType cType : m2.getComponentType()) {
-					if(aSubComp.getComponentType().getName().equals(cType.getName())){
+					if(aSubComp.getComponentType().getQualifiedName().equals(cType.getId())){
 						packSubComp.setSpecification(cType);
-
+						if(compQnameToPropVal.containsKey(cType.getId())) {
+							compTypePropNameToVal = compQnameToPropVal.get(cType.getId());
+						}
 					}
 				}
 
@@ -3035,7 +3063,9 @@ public class Aadl2Vdm {
 					//if(aSubComp.getSubcomponentType().getName().equals(cImpl.getName())){
 					if(aSubComp.getSubcomponentType().getQualifiedName().equals(cImpl.getId())){	
 						packSubComp.setImplementation(cImpl);
-
+						if(compQnameToPropVal.containsKey(cImpl.getId())) {
+							compImplPropNameToVal = compQnameToPropVal.get(cImpl.getId());
+						}
 					}
 				}
 
@@ -3048,20 +3078,24 @@ public class Aadl2Vdm {
 						//create a GenericAttribute object to pack the property
 						verdict.vdm.vdm_data.GenericAttribute anAttribute = new verdict.vdm.vdm_data.GenericAttribute();
 
-						String value = "";
+						String propVal = "";
 						PropertyAcc propAcc = aSubComp.getPropertyValue(prop);
 						PropertyExpression defPropExpr = prop.getDefaultValue();
 
 						if(propAcc != null && !propAcc.getAssociations().isEmpty()) {
-							value = getStrRepofPropVal(aSubComp.getPropertyValue(prop));
+							propVal = getStrRepofPropVal(aSubComp.getPropertyValue(prop));
+						} else if(compImplPropNameToVal.containsKey(prop.getName())) {
+							propVal = compImplPropNameToVal.get(prop.getName());
+						} else if(compTypePropNameToVal.containsKey(prop.getName())) {
+							propVal = compTypePropNameToVal.get(prop.getName());
 						} else if(defPropExpr != null) {
-							value = getStrRepofExpr(defPropExpr)[0];
+							propVal = getStrRepofExpr(defPropExpr)[0];
 						}
 
-						if (!value.equals("")){
+						if (!propVal.equals("")){
 							//setting the "name" and "value" field of anAttribute
 							anAttribute.setName(componentPropertyToName.get(prop));
-							anAttribute.setValue(value);
+							anAttribute.setValue(propVal);
 
 							//get the property type
 							PropertyType propType = prop.getPropertyType();
@@ -3079,8 +3113,6 @@ public class Aadl2Vdm {
 							}
 							//parse propertyType fetched using prop.getOwnedPropertyType() and map it to "Bool", "Int", or "String"
 							anAttribute.setType(type);
-
-
 
 							//adding asAttribute to packSubComp
 							packSubComp.getAttribute().add(anAttribute);
@@ -4932,8 +4964,14 @@ public class Aadl2Vdm {
 
 		if(propAcc != null) {
 			List<PropertyAssociation> propAssocs = propAcc.getAssociations();
-
-			if(!propAssocs.isEmpty() && propAssocs.size() == 1) {
+			// It seems like propAssocs is a list of property associations.
+			// The list seems to be in the order that the first element is 
+			// the immediate property association, i.e., if it is a subcomponent, 
+			// then the first element is the subcomponent, and the second element
+			// is its immediate parent (either its type or implementation), 
+			// and so on.
+			// For the moment, we only care about its immediate property association.
+			if(!propAssocs.isEmpty()) {
 				PropertyAssociation propAssoc = propAssocs.get(0);
 
 				// We assume that each property only has only 1 non-list value for now
@@ -4944,9 +4982,7 @@ public class Aadl2Vdm {
 				} else {
 					throw new RuntimeException("Unexpected: property is a list of values with size = : " + propAssoc.getOwnedValues().size());
 				}
-			} else {
-//				throw new RuntimeException("Unexpected property association size: " + propAssocs.size());
-			}
+			} 
 		}
 		return value;
 	}

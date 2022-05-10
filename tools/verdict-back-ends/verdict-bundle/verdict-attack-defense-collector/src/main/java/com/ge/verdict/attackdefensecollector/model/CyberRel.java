@@ -82,12 +82,16 @@ public class CyberRel {
         return name;
     }
 
-    /** @return the optional input expression */
+    /**
+     * @return the optional input expression
+     */
     public Optional<CyberExpr> getInput() {
         return input;
     }
 
-    /** @return the output port concern */
+    /**
+     * @return the output port concern
+     */
     public PortConcern getOutput() {
         return output;
     }

@@ -45,22 +45,30 @@ public class Attack extends ADTree {
         this.cia = cia;
     }
 
-    /** @return the name of the attack */
+    /**
+     * @return the name of the attack
+     */
     public String getName() {
         return attackName;
     }
 
-    /** @return the attackable to which the attack applies */
+    /**
+     * @return the attackable to which the attack applies
+     */
     public Attackable getAttackable() {
         return attackable;
     }
 
-    /** @return the description of the attack */
+    /**
+     * @return the description of the attack
+     */
     public String getDescription() {
         return attackDescription;
     }
 
-    /** @return the CIA concern of the attack */
+    /**
+     * @return the CIA concern of the attack
+     */
     public CIA getCia() {
         return cia;
     }

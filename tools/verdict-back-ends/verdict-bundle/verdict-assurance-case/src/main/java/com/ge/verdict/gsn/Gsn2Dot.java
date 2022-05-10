@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.davidmoten.text.utils.WordWrap;
 
-/** @author Saswata Paul */
+/**
+ * @author Saswata Paul
+ */
 public class Gsn2Dot {
 
     // To store all the nodes in the GSN Fragment

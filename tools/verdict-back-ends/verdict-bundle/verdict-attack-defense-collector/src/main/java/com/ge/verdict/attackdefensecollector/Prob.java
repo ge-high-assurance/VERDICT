@@ -124,12 +124,16 @@ public class Prob {
         return fromDal(dalOfSeverity(severity));
     }
 
-    /** @return the probability of zero (impossibility). */
+    /**
+     * @return the probability of zero (impossibility).
+     */
     public static Prob impossible() {
         return new Prob(BigDecimal.ZERO.setScale(SCALE));
     }
 
-    /** @return the probability of one (certainty). */
+    /**
+     * @return the probability of one (certainty).
+     */
     public static Prob certain() {
         return new Prob(BigDecimal.ONE.setScale(SCALE));
     }

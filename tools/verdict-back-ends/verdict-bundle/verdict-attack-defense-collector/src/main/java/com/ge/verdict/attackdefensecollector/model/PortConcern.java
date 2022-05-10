@@ -26,12 +26,16 @@ public class PortConcern extends CyberExpr {
         this.cia = cia;
     }
 
-    /** @return the name of the port */
+    /**
+     * @return the name of the port
+     */
     public String getPortName() {
         return portName;
     }
 
-    /** @return the CIA concern for the port */
+    /**
+     * @return the CIA concern for the port
+     */
     public CIA getCia() {
         return cia;
     }

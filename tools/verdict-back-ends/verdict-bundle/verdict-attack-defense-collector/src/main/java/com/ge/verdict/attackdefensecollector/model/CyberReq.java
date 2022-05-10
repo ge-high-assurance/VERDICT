@@ -75,27 +75,37 @@ public class CyberReq {
         }
     }
 
-    /** @return the name of this cyber requirement */
+    /**
+     * @return the name of this cyber requirement
+     */
     public String getName() {
         return name;
     }
 
-    /** @return the name of the mission to which this cyber requirement belongs */
+    /**
+     * @return the name of the mission to which this cyber requirement belongs
+     */
     public String getMission() {
         return mission;
     }
 
-    /** @return the severity (probability target) of this cyber requirement */
+    /**
+     * @return the severity (probability target) of this cyber requirement
+     */
     public Prob getSeverity() {
         return Prob.fromDal(severityDal);
     }
 
-    /** @return the severity DAL (target DAL) of this cyber requirement */
+    /**
+     * @return the severity DAL (target DAL) of this cyber requirement
+     */
     public int getSeverityDal() {
         return severityDal;
     }
 
-    /** @return the condition cyber expression under which this cyber requirement is triggered */
+    /**
+     * @return the condition cyber expression under which this cyber requirement is triggered
+     */
     public CyberExpr getCondition() {
         return condition;
     }

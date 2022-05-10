@@ -32,7 +32,9 @@ public class Table {
 
     private boolean replaceDots;
 
-    /** @return the number of columns in this table */
+    /**
+     * @return the number of columns in this table
+     */
     public int getColumns() {
         return columns;
     }

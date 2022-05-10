@@ -5,7 +5,9 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import java.io.File;
 
-/** @author Saswata Paul */
+/**
+ * @author Saswata Paul
+ */
 public class Gsn2Xml {
 
     /**

@@ -10,7 +10,9 @@ import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.Mission;
 import verdict.vdm.vdm_model.Model;
 
-/** @author Saswata Paul */
+/**
+ * @author Saswata Paul
+ */
 public class GSNInterface {
     static final String SEP = File.separator;
 

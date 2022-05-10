@@ -57,7 +57,9 @@ public class Binary {
         this.name = name;
     }
 
-    /** @return the directory where unpacked binaries are stored */
+    /**
+     * @return the directory where unpacked binaries are stored
+     */
     private static File getBinaryDir() {
         // /tmp/ on Unix
         return new File(System.getProperty("java.io.tmpdir"));
@@ -88,7 +90,9 @@ public class Binary {
         }
     }
 
-    /** @return the file that the binary is unpacked to */
+    /**
+     * @return the file that the binary is unpacked to
+     */
     private File getFile() {
         return new File(getBinaryDir(), name);
     }

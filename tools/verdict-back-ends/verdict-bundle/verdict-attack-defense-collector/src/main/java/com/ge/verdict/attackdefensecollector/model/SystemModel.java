@@ -71,7 +71,9 @@ public class SystemModel {
         attributes = new LinkedHashMap<>();
     }
 
-    /** @return the name of the system */
+    /**
+     * @return the name of the system
+     */
     public String getName() {
         return name;
     }
@@ -253,7 +255,9 @@ public class SystemModel {
         }
     }
 
-    /** @return true iff concretize() has already been called */
+    /**
+     * @return true iff concretize() has already been called
+     */
     public boolean isConcretized() {
         return outputConcernToCyberRel != null;
     }

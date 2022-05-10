@@ -282,12 +282,16 @@ public class CSVFile {
         }
     }
 
-    /** @return the number of rows present in this CSV file */
+    /**
+     * @return the number of rows present in this CSV file
+     */
     public int getRowCount() {
         return rows.size();
     }
 
-    /** @return the list of rows, as a string array */
+    /**
+     * @return the list of rows, as a string array
+     */
     public List<String[]> getRows() {
         return rows;
     }
@@ -300,7 +304,9 @@ public class CSVFile {
         return rows.get(i);
     }
 
-    /** @return the list of rows, as RowData */
+    /**
+     * @return the list of rows, as RowData
+     */
     public List<RowData> getRowDatas() {
         return rows.stream().map(RowData::new).collect(Collectors.toList());
     }

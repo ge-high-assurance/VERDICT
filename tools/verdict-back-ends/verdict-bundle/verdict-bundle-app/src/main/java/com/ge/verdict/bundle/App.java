@@ -201,7 +201,9 @@ public class App {
         return options;
     }
 
-    /** @return the name of the JAR file that was run to invoke the Verdict bundle */
+    /**
+     * @return the name of the JAR file that was run to invoke the Verdict bundle
+     */
     private static String getJarName() {
         return new File(App.class.getProtectionDomain().getCodeSource().getLocation().getPath())
                 .getName();

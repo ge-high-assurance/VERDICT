@@ -9,7 +9,9 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import verdict.vdm.vdm_model.*;
 
-/** @author Saswata Paul */
+/**
+ * @author Saswata Paul
+ */
 public class CreateGSN {
     static final String SEP = File.separator;
     // For naming the nodes uniformly

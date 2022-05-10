@@ -56,6 +56,9 @@
                 minOccurs="0" maxOccurs="unbounded"></element>
             <element name="event" type="vdm_model:Event" minOccurs="0"
                 maxOccurs="unbounded"></element>
+            <element name="attribute" type="vdm_data:GenericAttribute"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
         </sequence>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="name" type="vdm_data:Identifier"></attribute>
@@ -66,6 +69,9 @@
         <choice>
             <element name="blockImpl" type="vdm_model:BlockImpl"></element>
             <element name="dataflowImpl" type="vdm_lustre:NodeBody"></element>
+            <element name="attribute" type="vdm_data:GenericAttribute"
+                minOccurs="0" maxOccurs="unbounded">
+            </element>
         </choice>
         <attribute name="id" type="ID" use="required"></attribute>
         <attribute name="type" type="IDREF" use="required">

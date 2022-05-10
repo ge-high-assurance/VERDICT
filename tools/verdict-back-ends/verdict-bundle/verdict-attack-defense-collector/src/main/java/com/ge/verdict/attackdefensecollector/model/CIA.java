@@ -14,7 +14,9 @@ public enum CIA {
         this.fullName = fullName;
     }
 
-    /** @return the full name (e.g. "Integrity" instead of just "I"). */
+    /**
+     * @return the full name (e.g. "Integrity" instead of just "I").
+     */
     public String getFullName() {
         return fullName;
     }

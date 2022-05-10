@@ -4,7 +4,9 @@ import java.io.*;
 import javax.xml.parsers.*;
 import org.xml.sax.SAXException;
 
-/** @author Saswata Paul */
+/**
+ * @author Saswata Paul
+ */
 public class App {
 
     /**

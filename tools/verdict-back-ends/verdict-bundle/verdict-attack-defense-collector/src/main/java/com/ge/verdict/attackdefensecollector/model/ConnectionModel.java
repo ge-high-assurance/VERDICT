@@ -54,27 +54,37 @@ public class ConnectionModel {
         attributes = new LinkedHashMap<>();
     }
 
-    /** @return the name of the connection */
+    /**
+     * @return the name of the connection
+     */
     public String getName() {
         return name;
     }
 
-    /** @return the source system model */
+    /**
+     * @return the source system model
+     */
     public SystemModel getSource() {
         return source;
     }
 
-    /** @return the destination system model */
+    /**
+     * @return the destination system model
+     */
     public SystemModel getDestination() {
         return dest;
     }
 
-    /** @return the name of the source port */
+    /**
+     * @return the name of the source port
+     */
     public String getSourcePortName() {
         return sourcePort;
     }
 
-    /** @return the name of the destination port */
+    /**
+     * @return the name of the destination port
+     */
     public String getDestinationPortName() {
         return destPort;
     }

@@ -18,6 +18,7 @@ import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.MBASReportGenerator;
 import com.ge.research.osate.verdict.gui.MBASSettingsPanel;
 import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
+import com.ge.verdict.vdm.VdmTranslator;
 
 import verdict.vdm.vdm_model.Model;
 
@@ -142,6 +143,7 @@ public class MBASHandler extends AbstractHandler {
 	public static void runAadl2Csv(File dir, String stemOutputDir, String soteriaOutputDir) {
 		Agree2Vdm agree2vdm = new Agree2Vdm();
 		Model model = agree2vdm.execute(dir);
+		VdmTranslator.marshalToXml(model, new File(stemOutputDir+"/aadl_in_vdm.xml"));
 		Vdm2Csv vdm2csv = new Vdm2Csv();
 		vdm2csv.execute(model, stemOutputDir, soteriaOutputDir, dir.getName());
 	}

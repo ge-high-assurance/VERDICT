@@ -180,7 +180,9 @@ public class DLeaf implements DTree {
             return val;
         }
 
-        /** @return the name used for encoding this component-defense pair into SMT */
+        /**
+         * @return the name used for encoding this component-defense pair into SMT
+         */
         private String smtName() {
             return "d" + id;
         }
