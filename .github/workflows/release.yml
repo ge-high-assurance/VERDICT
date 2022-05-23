@@ -52,7 +52,7 @@ jobs:
 
     - name: Upload kind2 Linux binary
       if: runner.os == 'Linux'
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ runner.os }}-binaries
         path: ${{ steps.extract.outputs.destination }}
@@ -66,7 +66,7 @@ jobs:
 
     - name: Upload kind2 macOS binary
       if: runner.os == 'macOS'
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ runner.os }}-binaries
         path: tools/verdict-back-ends/kind2/bin/kind2
@@ -78,7 +78,7 @@ jobs:
         opam exec make
 
     - name: Upload soteria_pp
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ runner.os }}-binaries
         path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
