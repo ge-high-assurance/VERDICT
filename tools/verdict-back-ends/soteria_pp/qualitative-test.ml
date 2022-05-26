@@ -46,17 +46,17 @@ test_sumofprod_ad ();;
 
 (* testing with some AD trees *)
 let test_cutsets_ad () =
-	let a = ALeaf(("a_atk","a_def"), 1.)
-	and b = DLeaf(("b_atk","b_def"), 5)
-	and c = ALeaf(("c_atk","c_def"), 1.) in
+	let a = ALeaf(("defCompA","defEventA"), 1.)
+	and b = DLeaf(("defCompB","defEventB"), 5)
+	and c = ALeaf(("defCompC","defEventC"), 1.) in
 	let t1 = C(a, b) in
     let t2 = ASUM [ c; t1 ]
     and t3 = APRO [ c; t1 ]
     and t4 = ASUM [ a; t1 ] in
-    assert( cutsets_ad t1 = APro [ AVar ("a_atk","a_def",""); ANot (AVar ("b_atk","b_def","5")) ] );
-    assert( cutsets_ad t2 = ASum [ AVar ("c_atk","c_def",""); APro [AVar ("a_atk","a_def",""); ANot (AVar ("b_atk","b_def","5"))]] );
-    assert( cutsets_ad t3 = APro [ AVar ("a_atk","a_def",""); AVar ("c_atk","c_def",""); ANot (AVar ("b_atk","b_def","5")) ] );
-    assert( cutsets_ad t4 = AVar ("a_atk","a_def","") );
+    assert( cutsets_ad t1 = APro [ AVar ("defCompA","defEventA",""); ANot (AVar ("defCompB","defEventB","5")) ] );
+    assert( cutsets_ad t2 = ASum [ AVar ("defCompC","defEventC",""); APro [AVar ("defCompA","defEventA",""); ANot (AVar ("defCompB","defEventB","5"))]] );
+    assert( cutsets_ad t3 = APro [ AVar ("defCompA","defEventA",""); AVar ("defCompC","defEventC",""); ANot (AVar ("defCompB","defEventB","5")) ] );
+    assert( cutsets_ad t4 = AVar ("defCompA","defEventA","") );
     true;;
     
 test_cutsets_ad ();;
@@ -64,11 +64,11 @@ test_cutsets_ad ();;
 (* test cutsets_ad algo again with different combinations of PoS's and SoP's *)
 let test_cutsets_ad () =
 
-    let i_leaf = ("i_atk","i_def")
-    and a_leaf = ("a_atk","a_def")
-    and b_leaf = ("b_atk","b_def")
-    and c_leaf = ("c_atk","c_def")
-    and d_leaf = ("d_atk","d_def")
+    let i_leaf = ("atkComp","atkEvent")
+    and a_leaf = ("defCompA","defEventA")
+    and b_leaf = ("defCompB","defEventB")
+    and c_leaf = ("defCompC","defEventC")
+    and d_leaf = ("defCompD","defEventD")
     in
 
     let sss = C( ALeaf(i_leaf, 1.0), DSUM[ DSUM[ DLeaf(a_leaf, 5); DLeaf(b_leaf, 5) ]; DSUM[ DLeaf(c_leaf, 5); DLeaf(d_leaf, 5) ]; ] )(* working *)
@@ -83,11 +83,11 @@ let test_cutsets_ad () =
      
     in
 
-    let i_cut = ("i_atk","i_def","")
-    and a_cut = ("a_atk","a_def","5")
-    and b_cut = ("b_atk","b_def","5")
-    and c_cut = ("c_atk","c_def","5")
-    and d_cut = ("d_atk","d_def","5")
+    let i_cut = ("atkComp","atkEvent","")
+    and a_cut = ("defCompA","defEventA","5")
+    and b_cut = ("defCompB","defEventB","5")
+    and c_cut = ("defCompC","defEventC","5")
+    and d_cut = ("defCompD","defEventD","5")
     in
 
     assert( cutsets_ad sss = APro[ AVar i_cut; DPro [ANot (AVar a_cut); ANot (AVar b_cut); ANot (AVar c_cut); ANot (AVar d_cut)] ] );

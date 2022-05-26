@@ -168,7 +168,7 @@ let rec adtree_dot ?(acc = (0, [], [])) f =
       (cnt+1, (cnt, "TRUE")::nodes, edges)
     | AFALSE ->
       (cnt+1, (cnt, "FALSE")::nodes, edges)
-    | AVar (x, y, d) ->
+    | AVar (x, y, _) ->
       (cnt+1, (cnt, (String.concat ~sep:": " [x; y]))::nodes, edges)
     | ASum x ->
       let (l,(cnt2, nodes2, edges2)) = adtree_dot_l ~acc x in
@@ -974,29 +974,29 @@ let rec print_each_csImp l ch =
 
 
 (* This function generates a string representation of the defense profiles *)
-let rec sprint_defenseProfile adexp add_dal_suffix=
+let rec sprint_defenseProfile adexp addDalSuffix=
    let andStr = " ^ \n" 
    and orStr = " v " in
    match adexp with
-   | AVar(comp, event, dal) -> let suffix = if add_dal_suffix then ":" ^ dal else "" in comp ^ ":" ^ event ^ suffix
+   | AVar(comp, event, dal) -> let suffix = if addDalSuffix then ":" ^ dal else "" in comp ^ ":" ^ event ^ suffix
    | DPro l -> 
      (match l with 
      | hd::tl -> 
-       if List.length tl = 0 then sprint_defenseProfile hd add_dal_suffix
-       else sprint_defenseProfile hd add_dal_suffix ^ andStr ^ sprint_defenseProfile (DPro tl) add_dal_suffix
+       if List.length tl = 0 then sprint_defenseProfile hd addDalSuffix
+       else sprint_defenseProfile hd addDalSuffix ^ andStr ^ sprint_defenseProfile (DPro tl) addDalSuffix
      | []  -> "")
    | DSum l -> 
      (match l with 
      | hd::tl -> 
-       if List.length tl = 0 then sprint_defenseProfile hd add_dal_suffix
-       else sprint_defenseProfile hd add_dal_suffix ^ orStr ^ sprint_defenseProfile (DSum tl) add_dal_suffix
+       if List.length tl = 0 then sprint_defenseProfile hd addDalSuffix
+       else sprint_defenseProfile hd addDalSuffix ^ orStr ^ sprint_defenseProfile (DSum tl) addDalSuffix
      | []  -> "")
-   | ANot form -> "Not(" ^ sprint_defenseProfile form add_dal_suffix ^ ")"
+   | ANot form -> "Not(" ^ sprint_defenseProfile form addDalSuffix ^ ")"
    | _ -> "" ;; 
 
 
 (* This function generates 2 strings: attackStr, defenseStr *)
-let rec sprint_AProAVar2 adexp str add_dal_suffix =
+let rec sprint_AProAVar2 adexp str addDalSuffix =
    let andStr = " ^ \n" 
    and orStr = " v " 
    and (attackStr, defenseStr) = str in
@@ -1007,29 +1007,29 @@ let rec sprint_AProAVar2 adexp str add_dal_suffix =
         | hd::tl -> 
            (match hd with
               | AVar(comp, event, dal) ->
-                    let dal_suffix = if add_dal_suffix then ":" ^ dal else "" in
+                    let dal_suffix = if addDalSuffix then ":" ^ dal else "" in
               		let aStr = (if attackStr = "" then (comp ^ ":" ^ event ^ dal_suffix) else (attackStr ^ andStr ^ comp ^ ":" ^ event ^ dal_suffix)) in
-              		sprint_AProAVar2 (APro tl) (aStr, defenseStr ) add_dal_suffix
+              		sprint_AProAVar2 (APro tl) (aStr, defenseStr ) addDalSuffix
               | DSum l -> 
-                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DSum l) add_dal_suffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DSum l) add_dal_suffix))) in
-                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) add_dal_suffix
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DSum l) addDalSuffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DSum l) addDalSuffix))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) addDalSuffix
               | DPro l -> 
-                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DPro l) add_dal_suffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DPro l) add_dal_suffix))) in
-                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) add_dal_suffix
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (DPro l) addDalSuffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (DPro l) addDalSuffix))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) addDalSuffix
               | ANot x -> 
-                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (ANot x) add_dal_suffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (ANot x) add_dal_suffix))) in
-                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) add_dal_suffix
+                    let dStr = (if defenseStr = "" then (sprint_defenseProfile (ANot x) addDalSuffix) else (defenseStr ^ andStr ^ (sprint_defenseProfile (ANot x) addDalSuffix))) in
+                    sprint_AProAVar2 (APro tl) (attackStr, dStr ) addDalSuffix
               | _ -> str)
         | [] -> (attackStr, defenseStr))
    | _ -> str;;
 
 (* Given the list of cutset from likelihoodCutImp, generates an output to use with PrintBox *)
-let rec sprint_each_csImp l_csImp csArray add_dal_suffix =
+let rec sprint_each_csImp l_csImp csArray addDalSuffix =
    match l_csImp with
    | hd::tl -> 
       (let (adexp_APro, likelihood, _) = hd in 
-      let (attackStr, defenseStr) = sprint_AProAVar2 adexp_APro ("","") add_dal_suffix in
-      sprint_each_csImp tl (Array.append csArray [| [| (string_of_float likelihood); attackStr; defenseStr |] |] ) add_dal_suffix)
+      let (attackStr, defenseStr) = sprint_AProAVar2 adexp_APro ("","") addDalSuffix in
+      sprint_each_csImp tl (Array.append csArray [| [| (string_of_float likelihood); attackStr; defenseStr |] |] ) addDalSuffix)
    | [] -> csArray ;; 
 
 (* This function generates a string of failure events *)
@@ -1067,7 +1067,7 @@ let rec sprint_each_safety_csImp l_csImp csArray =
 
 (** This function generates a report with the top-level likelihood, the likelihood of 
     each cutset, and the cutset list. The cutset list is printed in a frame. *)
-let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtree add_dal_suffix =
+let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file adtree addDalSuffix =
    if (Sys.file_exists file = `Yes) then Sys.command_exn("rm " ^ file);
    (* if header file is specified, then copy it as the cutset file *)
    if (not(String.is_empty h) && (Sys.file_exists h = `Yes )) then Sys.command_exn("cp " ^ h ^ " " ^ file);
@@ -1076,7 +1076,7 @@ let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file ad
    and likelihood = likelihoodCut adtree 
    and targetString = (if (String.is_empty r) then "\n" else ("Acceptable level of risk must be less than or equal to " ^ r))
    in
-   let myArray = sprint_each_csImp csImp [| [|"Cutset\nlikelihood: "; "CAPEC: "; "Defense Profile: "|] |] add_dal_suffix in
+   let myArray = sprint_each_csImp csImp [| [|"Cutset\nlikelihood: "; "CAPEC: "; "Defense Profile: "|] |] addDalSuffix in
    let box = PrintBox.(hlist [ text ("Cyber\nReqID: \n" ^ cid); grid_text myArray ]) |> PrintBox.frame
    in
    (Out_channel.output_string ch ("\n");

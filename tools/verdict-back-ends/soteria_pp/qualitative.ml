@@ -60,14 +60,14 @@ let rec formulaOfTree t =
 (** Code for translating an attack-defense tree into a formula *)
 let rec formulaOfDTree dt =
   match dt with
-    | DLeaf (var, dal) -> let (attackStr, defenseStr) = var in AVar ((attackStr, defenseStr, string_of_int dal))
+    | DLeaf (var, dal) -> let (component, event) = var in AVar ((component, event, string_of_int dal))
     | DSUM (tree) -> DSum(List.map tree ~f:formulaOfDTree)
     | DPRO (tree) -> DPro(List.map tree ~f:formulaOfDTree) 
 ;;
 
 let rec formulaOfADTree adt =
   match adt with
-    | ALeaf (var, _) -> let (attackStr, defenseStr) = var in AVar ((attackStr, defenseStr, ""))
+    | ALeaf (var, probability) -> let (component, event) = var in AVar ((component, event, ""))
     | ASUM (tree) -> ASum(List.map tree ~f:formulaOfADTree)
     | APRO (tree) -> APro(List.map tree ~f:formulaOfADTree)
     | C (at, dt) -> APro([formulaOfADTree at; ANot(formulaOfDTree dt)])
