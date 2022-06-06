@@ -1355,28 +1355,6 @@ let rec merge_cutset_probabilities cyberXmlNode ?(hashAcc="") probList =
                 Xml.Element(tag, probAttribs, children)
         | _ -> cyberXmlNode ;;
 
-(* assigns acceptable_p to computed_p on all requirement nodes and to all cutset sub-element likelihoods 
-    in an applicable mission list xml *)    
-let rec post_process_applicable_mission ?(acceptProb = None) applXmlNode = 
-
-    let (tag, comp, children) = ((Xml.tag applXmlNode),(Xml.attribs applXmlNode),(Xml.children applXmlNode)) in
-
-    match Xml.tag applXmlNode with
-        | "Results" | "Mission" ->
-                Xml.Element(tag, comp, List.map children post_process_applicable_mission)
-        | "Requirement" ->                
-                let acceptable = Xml.attrib applXmlNode "acceptable_p" in
-                Xml.Element(tag, (merge_attribute_lists comp [("computed_p", acceptable)]), 
-                        List.map children ~f:(fun c -> 
-                                post_process_applicable_mission ~acceptProb:(Option.some acceptable) c))
-        | "Cutset" ->
-                let probability = match acceptProb with 
-                        Some p -> (merge_attribute_lists comp [("likelihood", p)]) 
-                        | None -> comp in
-                        
-                Xml.Element(tag, probability, children)
-        | _ -> applXmlNode ;;
-
 (* Analyze function - Calls model_to_adtree and model_to_ftree. Generates the artifacts *)
 let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
   
@@ -1444,7 +1422,7 @@ let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch even
 
     (* save the base applicable mission list as .xml *)
     let applCyberXml = as_base_mission_xml applicableCyberThreats "cyber" in
-    save_base_mission_xml applProps_D (post_process_applicable_mission applCyberXml);
+    save_base_mission_xml applProps_D applCyberXml;
     let applSafetyXml = as_base_mission_xml applicableSafetyThreats "safety" in
     save_base_mission_xml applProps_D ~suffix:"-safety" applSafetyXml;
 
