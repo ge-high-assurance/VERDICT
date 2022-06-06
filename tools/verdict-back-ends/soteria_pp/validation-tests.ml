@@ -354,7 +354,7 @@ let test_checkLibrary_listsAreConsistentLengths () =
   assert( checkLibrary_listsAreConsistentLengths library_bad2 = Error "Faults and fault formulas lists are of inconsistent lengths in component Sensor");
   assert( checkLibrary_listsAreConsistentLengths library_bad3 = Error "Attack events and attack info are of inconsistent lengths in component Sensor");
   assert( checkLibrary_listsAreConsistentLengths library_bad4 = Error "Attacks and attack formulas lists are of inconsistent lengths in component Sensor");
-  assert( checkLibrary_listsAreConsistentLengths library_bad5 = Error "Defense events and defense info are of inconsistent lengths in component Sensor");
+  assert( checkLibrary_listsAreConsistentLengths library_bad5 = Error "Defense events and defense rigors are of inconsistent lengths in component Sensor");
   true;;
 
 test_checkLibrary_listsAreConsistentLengths ();;
