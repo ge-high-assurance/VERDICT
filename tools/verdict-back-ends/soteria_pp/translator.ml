@@ -15,7 +15,9 @@ Updates: 4/18/2019, Kit Siu, added function to generate cutset report using Prin
          5/26/2020, Heber Herencia-Zapana,  safety/cyber Availability dependes on availability only
          8/4/2020, Kit Siu, defense properties on connections generates new components to 
                             represent the connection, with relevant CAPECs and defenses 
-                            moved from the vulnerable component to the new connection component          
+                            moved from the vulnerable component to the new connection component 
+         6/5/2022, Chris Alexander, unimplemented defenses are factored into implemented cutset likelihoods
+
 *)
 
 (**
@@ -973,19 +975,19 @@ let all_not l =
  
 let get_defense l = 
    match l with 
-   ANot(AVar (_,b))->b
+   ANot(AVar (_,b,_))->b
    |_->"";;
      
 let takeAvar aVar = 
    match aVar with
-       AVar (a,b) -> [("comp",a);("attack",b)]
+       AVar (a,b,_) -> [("comp",a);("attack",b)]
      | _          -> [("comp","");("attack","")];;
 
 let takeDefenseAnd l = 
   let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) in
   let clean x =  List.dedup_and_sort ~compare:compare x in 
    match l with 
-   |ANot (AVar (_,b))->[b]
+   |ANot (AVar (_,b,_))->[b]
    |DSum l -> clean( List.map l ~f:(fun x->"("^(concat_And_Or "and" (List.map l ~f:(fun x->get_defense x)))^")" ))
    |_->["No support"] ;;  
 
@@ -993,7 +995,7 @@ let takeDefenseAndOr l =
   let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) in
   let clean x =  List.dedup_and_sort ~compare:compare x in 
    match l with 
-   |ANot (AVar (_,b))->[[b]]
+   |ANot (AVar (_,b,_))->[[b]]
    |DPro l ->  List.map l ~f:(fun x-> takeDefenseAnd x)
    |DSum l -> clean( List.map l ~f:(fun x->["("^(concat_And_Or "and" (List.map l ~f:(fun x->get_defense x)))^")" ]))
    |_->[["No support"]] ;;  
@@ -1021,12 +1023,12 @@ let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun 
 let rec attacksToView cOpe = 
       match cOpe with 
       | APro (h::tl) -> List.append (attacksToView h) (attacksToView (APro tl))
-      | AVar (c,a) -> [[("comp",c);("capec",a)]]
+      | AVar (c,a,_) -> [[("comp",c);("capec",a)]]
       | _ -> [] ;;
 
 let rec defenseCompToView cOpe = 
       match cOpe with 
-      | ANot( AVar (c,_) ) -> c
+      | ANot( AVar (c,_,_) ) -> c
       | DSum l -> defenseCompToView (List.hd_exn l)
       | DPro l -> defenseCompToView (List.hd_exn l)
       | _ -> "" ;;
@@ -1040,15 +1042,15 @@ let convertProp2Profile_single dp l_defense2nist =
 
 let propCut2nistCut cOpe defense2nist = 
       match cOpe with 
-      | ANot( AVar (c,d) ) -> 
+      | ANot( AVar (c,d,_) ) -> 
          let dNISTlist = String.split_on_chars (convertProp2Profile_single d defense2nist) ~on:[';']
-         in List.map dNISTlist ~f:(fun x -> ANot( AVar (c, x) ))       
+         in List.map dNISTlist ~f:(fun x -> ANot( AVar (c, x, "") )) (* empty dal to enable de-duping empty nists *)    
       | _ -> [] ;;
 
 let rec defenseToView cOpe = 
       match cOpe with 
       | APro (h::tl) -> List.append (defenseToView h) (defenseToView (APro tl))
-      | ANot( AVar (c,d) ) -> 
+      | ANot( AVar (c,d,_) ) -> 
             [[("comp",c);
               ("suggested",d);]]
       | DSum l -> 
@@ -1061,7 +1063,7 @@ let rec defenseToView cOpe =
 
 let rec defenseProfileTranslator cOpe l_defense2nist =
       match cOpe with
-      | ANot( AVar (c,d) ) -> DSum (propCut2nistCut (ANot( AVar (c,d) )) l_defense2nist ) (* <-- same as DSum because it's the DeMorgan of the a product of NISTs *)
+      | ANot( AVar (c,d,dal) ) -> DSum (propCut2nistCut (ANot( AVar (c,d,dal) )) l_defense2nist ) (* <-- same as DSum because it's the DeMorgan of the a product of NISTs *)
       | DSum l -> DSum (List.map l ~f:(fun x -> defenseProfileTranslator x l_defense2nist) ) 
       | DPro l -> DPro (List.map l ~f:(fun x -> defenseProfileTranslator x l_defense2nist) ) 
       | _ -> AFALSE ;;
@@ -1069,10 +1071,10 @@ let rec defenseProfileTranslator cOpe l_defense2nist =
 let rec defenseToView2 cOpe l_defense2nist = 
       match cOpe with 
       | APro (h::tl) -> List.append (defenseToView2 h l_defense2nist) (defenseToView2 (APro tl) l_defense2nist)
-      | ANot( AVar (c,d) ) -> 
+      | ANot( AVar (c,d,dal) ) -> 
             [[("comp",c);
               ("suggested",d);
-              ("profile", takeDefense2 (ssfc_ad (defenseProfileTranslator (ANot(AVar(c,d))) l_defense2nist))) ]]
+              ("profile", takeDefense2 (ssfc_ad (defenseProfileTranslator (ANot(AVar(c,d,dal))) l_defense2nist))) ]]
       | DSum l -> 
             [[("comp",(defenseCompToView (DSum l))); 
               ("suggested", takeDefense2 (DSum l));
@@ -1263,96 +1265,173 @@ let renameConnectionName l_arch =
       let newConnName = connName ^ impl ^ comp in
       (connName_Arc, newConnName)::(List.filter aL ~f:(fun (tag, _) -> tag<>connName_Arc)) );;
        
+(* translate mission threats to attack-defense tree, generate cutsets, and save visualizations to file *)
+let save_ad_mission_cutsets mission missionList filePath saveDotML ?(wDalSuffix=false) defType =
+    let ((reqIDStr, _), (lib, mdl)) = mission in
+    (* attack-defense tree calculates min/max likelihood using NOT gates *)
+    let attackDefenseTree = model_to_adtree lib mdl
+    and (modelVersion, _, risk) = get_CyberReqText_Risk missionList reqIDStr in
+    let fileName = filePath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defType in
+    (* -- save .ml file of the lib and mdl, for debugging purposes -- *)
+    if saveDotML then saveLibraryAndModelToFile (fileName ^ ".ml") lib mdl;
+    (* -- cutset metric file, in printbox format -- *)
+    saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fileName ^ ".txt") attackDefenseTree wDalSuffix;
+    (* -- save .svg tree visualizations -- *)
+    dot_gen_show_adtree_file fileName attackDefenseTree ;;
+
+(* translate mission threats to fault tree, generate cutsets, and save visualizations to file *)
+let save_f_mission_cutsets mission missionList filePath saveDotML defType =
+    let ((reqIDStr, _), (lib, mdl)) = mission in
+    (* fault tree - calculates probability using + * operators *)
+    let faultTree = model_to_ftree lib mdl
+    and (modelVersion, _, risk) = get_CyberReqText_Risk missionList reqIDStr in
+    let fileName = filePath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defType in
+    (* -- save .ml file of the lib and mdl, for debugging purposes -- *)
+    if saveDotML then saveLibraryAndModelToFile (fileName ^ "-safety.ml") lib mdl;
+    (* -- cutset metric file, in printbox format -- *)
+    saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fileName ^ "-safety.txt") faultTree ;
+    (* -- save .svg tree visualizations -- *)
+    dot_gen_show_tree_file fileName faultTree ;;
+
+(* returns a hash (component & capec) for an xml cyber cutset *)
+let rec get_cutset_hash xmlNode =
+    match Xml.tag xmlNode with
+         | "Cutset" | "Attack" ->
+                 List.find_exn (List.map (Xml.children xmlNode) get_cutset_hash) ~f:(fun n -> n <> "")
+         | "Component" ->
+                 List.fold (Xml.attribs xmlNode) ~init:"" ~f:(fun acc (c,d) -> acc ^ ";" ^ c ^ ":" ^ d)
+         | _ -> "" ;;
+
+(* flattens an xml mission list to [(hash, probability attributes)] for each mission & cutset (probability) element *)
+let rec flatten_probability_xml_node ?(hashAcc="") xmlNode =
+    match Xml.tag xmlNode with
+         | "Results" ->
+                 List.fold (Xml.children xmlNode) ~init:[] ~f:(fun acc mission -> 
+                        List.append acc (flatten_probability_xml_node mission ~hashAcc:hashAcc))
+         | "Mission" ->
+                 let newHash = hashAcc^(Xml.attrib xmlNode "label") in
+                 List.fold (Xml.children xmlNode) ~init:[] ~f:(fun acc cutset -> 
+                                         List.append acc (flatten_probability_xml_node cutset ~hashAcc:newHash))
+         | "Requirement" ->
+                 let probAttrbs = List.filter (Xml.attribs xmlNode) ~f:(fun (k,_) -> k <> "defenseType")
+                 and newHash = hashAcc^(Xml.attrib xmlNode "label") in
+                 List.fold (Xml.children xmlNode) ~init:[] ~f:(fun acc req ->  
+                                         List.append 
+                                                 (List.append acc [(newHash,probAttrbs)]) 
+                                                 (flatten_probability_xml_node req ~hashAcc:newHash))
+         | "Cutset" ->
+                 let probAttrbs = Xml.attribs xmlNode
+                 and cutsetHash = hashAcc^(get_cutset_hash xmlNode) in
+                 [(cutsetHash, probAttrbs)]
+         | _ -> [] ;;
+
+(* overwrites values of k,v tuples from listA with listB's, matches only on existing k(s) *)
+let merge_attribute_lists attrListA attrListB = 
+    List.map attrListA ~f:(fun (k,v) -> 
+            match List.findi attrListB ~f:(fun _ (kb, _) -> k = kb) 
+                    with | Some (_,n) -> n | None -> (k,v) );;
+
+(* return the first xml mission list with a probabilities from a [(hash, probability attributes)] *)
+let rec merge_cutset_probabilities cyberXmlNode ?(hashAcc="") probList =
+    
+    let (tag, comp, children) = ((Xml.tag cyberXmlNode),(Xml.attribs cyberXmlNode),(Xml.children cyberXmlNode)) in
+    
+    match Xml.tag cyberXmlNode with
+        | "Results" ->
+                Xml.Element(tag, comp, 
+                        List.map children ~f:(fun c -> merge_cutset_probabilities c probList ~hashAcc:hashAcc))
+        | "Mission" ->
+                let hash = hashAcc^(Xml.attrib cyberXmlNode "label") in
+                Xml.Element(tag, comp, 
+                        List.map children ~f:(fun c -> merge_cutset_probabilities c probList ~hashAcc:hash))
+        | "Requirement" ->                
+                let hash = hashAcc^(Xml.attrib cyberXmlNode "label") in
+                let (_, probAttribs) = List.find_exn probList ~f:(fun (h,_) -> h = hash) in
+                Xml.Element(tag, (merge_attribute_lists comp probAttribs), 
+                        List.map children ~f:(fun c -> merge_cutset_probabilities c probList ~hashAcc:hash))
+        | "Cutset" ->
+                let hash = hashAcc^(get_cutset_hash cyberXmlNode) in
+                let (_, probAttribs) = List.find_exn probList ~f:(fun (h,_) -> h = hash) in
+                Xml.Element(tag, probAttribs, children)
+        | _ -> cyberXmlNode ;;
 
 (* Analyze function - Calls model_to_adtree and model_to_ftree. Generates the artifacts *)
 let do_arch_analysis ?(save_dot_ml=false) comp_dep_ch comp_saf_ch attack_ch events_ch arch_ch mission_ch defense_ch defense2nist_ch fpath infeCyber infeSafe =
-   let compDepen    = mainListtag comp_dep_ch  
-   and compSafe     = mainListtag comp_saf_ch
-   and attack       = mainListtag attack_ch    
-   and events       = mainListtag events_ch 
-   and arch         = renameConnectionName (mainListtag arch_ch) (* <-- rename the "ConnectionName" so that it is a concatenation of <ConnectionName><Impl><Comp> *)
-   and mission      = mainListtag mission_ch 
-   and defense      = mainListtag defense_ch 
-   and defense2nist = mainListtag defense2nist_ch in
-   
-   (* iterate through the following: ApplicableDefenseProperties and ImplProperties*)
-   List.iter [applProps_D; implProps_D] ~f:(fun deftype ->
-   
-     (* check if there's anything to analyze *)
-     if List.is_empty mission 
-     then Format.printf 
-          "Info: mission.csv is empty. No requirements to analyze@." ;   
-     let l_librariesThreats = libraries_threatConditions deftype compDepen compSafe attack events arch mission defense defense2nist infeCyber infeSafe
   
-     in
-     
-     (* separate into lists based on Cyber reqs and Safety reqs, because they will be handled differently *)
-     let l_librariesThreats_Cyber = 
-        removeMissionsWithNoReq (
-        List.map l_librariesThreats ~f:(fun mID -> let (missionReqIdStr, l_libmdl) = mID in
-              (missionReqIdStr, extractCyberReq l_libmdl mission) ) )
-     and l_librariesThreats_Safety = 
-        removeMissionsWithNoReq (
-        List.map l_librariesThreats ~f:(fun mID -> let (missionReqIdStr, l_libmdl) = mID in
-              (missionReqIdStr, extractSafetyReq l_libmdl mission) ) )
+    let compDepen    = mainListtag comp_dep_ch  (* List of components to input/output ports *)
+    and compSafe     = mainListtag comp_saf_ch (* List of event to components *)
+    and attack       = mainListtag attack_ch (* List of components to capec attack likelihood *)
+    and events       = mainListtag events_ch (* List of events to event probabilities *)
+    and arch         = renameConnectionName (mainListtag arch_ch) (* List of architecture configurations between components *)
+    and missionList  = mainListtag mission_ch (* List of missions including model, severity and request type *)
+    and defense      = mainListtag defense_ch (* List of component capec defense development assurance level *)
+    and defense2nist = mainListtag defense2nist_ch in (* List of defense to National Institute of Standards and Technology (NIST) profile *)
 
-     in
-  
-     (* [CYBER] iterate through the list of Cyber reqs *)
-     (* start the xml formatted results file *)
-     List.iter l_librariesThreats_Cyber ~f:(fun mID -> 
-        let (missionReqIdStr, l_libmdl) = mID in
-        (* iterate through the list of Cyber requirements under each mission ID *)
-        List.iter l_libmdl ~f:(fun x -> 
-           (let ((reqIDStr, defenseTypeStr), (lib, mdl)) = x in
-              let t = model_to_adtree lib mdl 
-              (* -- extract some text info -- *)
-              and (modelVersion, cyberReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
-              (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              if save_dot_ml then saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
-              (* -- cutset metric file, in printbox format -- *)    
-              saveADCutSetsToFile ~cyberReqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".txt") t ;
-              (* -- save .svg tree visualizations -- *)    
-              dot_gen_show_adtree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
-           )
-        );
-     );
-     (* fill xml datastruct, print datastruct to an xml file, and close the xml file  *)
-     let ds_MissionList = xmlBuilder_MissionList "cyber" l_librariesThreats_Cyber mission defense2nist in
-     let ds = Xml.Element("Results",[("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance")], ds_MissionList) in
-     let xml_str = Xml.to_string_fmt ds in
-     let xml_oc = Out_channel.create (fpath^deftype^".xml") in
-     fprintf xml_oc "<?xml version=\"1.0\"?>\n";
-     fprintf xml_oc "%s" xml_str;
-     Out_channel.close xml_oc; 
-        
+    if List.is_empty missionList
+        then Format.printf "Info: mission.csv is empty. No requirements to analyze@." ;
 
-     (* [SAFETY] iterate through the list of Safety reqs *)
-     List.iter l_librariesThreats_Safety ~f:(fun mID -> 
-        let (missionReqIdStr, l_libmdl) = mID in
-        (* iterate through the list of Safety requirements under each mission ID *)
-        List.iter l_libmdl ~f:(fun x -> 
-           (let ((reqIDStr, defenseTypeStr), (lib, mdl)) = x in
-              let t = model_to_ftree lib mdl
-              (* -- extract some text info -- *)
-              and (modelVersion, safetyReqText, risk) = get_CyberReqText_Risk mission reqIDStr in  
-              (* -- save .ml file of the lib and mdl, for debugging purposes -- *)    
-              if save_dot_ml then saveLibraryAndModelToFile (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ ".ml") lib mdl ;
-              (* -- cutset metric file, in printbox format -- *)    
-              saveCutSetsToFile ~reqID:(reqIDStr) ~risk:(risk) ~header:("header.txt") (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr ^ "-safety.txt") t ;
-              (* -- save .svg tree visualizations -- *)    
-              dot_gen_show_tree_file (fpath ^ modelVersion ^ "-" ^ reqIDStr ^ "-" ^ defenseTypeStr) t ;
-           )
-        )
-     );
-     (* fill xml datastruct, print datastruct to an xml file, and close the xml file  *)
-     let ds_MissionList = xmlBuilder_MissionList "safety" l_librariesThreats_Safety mission defense2nist in
-     let ds = Xml.Element("Results",[("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance")], ds_MissionList) in
-     let xml_str = Xml.to_string_fmt ds in
-     let xml_safety_oc = Out_channel.create (fpath^deftype^"-safety.xml") in
-     fprintf xml_safety_oc "<?xml version=\"1.0\"?>\n";
-     fprintf xml_safety_oc "%s" xml_str;
-     Out_channel.close xml_safety_oc; 
+    (* generates the attack defense trees for applicable defenses *)
+    let lApplicableThreats = libraries_threatConditions
+        applProps_D compDepen compSafe attack events arch missionList defense defense2nist infeCyber infeSafe
 
-  )
+    (* generates the attack defense trees for implemented defenses *)
+    and lImplementedThreats = libraries_threatConditions
+        implProps_D compDepen compSafe attack events arch missionList defense defense2nist infeCyber infeSafe in
+
+    (* extracts a list of non-empty mission threat tuples based on an cyber/safety extractor function *)
+    let get_mission_threats lThreatLibrary fThreatExtraction = removeMissionsWithNoReq (
+        List.map lThreatLibrary ~f:(fun mID -> let (missionReqIdStr, l_libmdl) = mID in
+        (missionReqIdStr, fThreatExtraction l_libmdl missionList))) in
+
+    (* complete set of all applicable mission threats *)
+    let applicableCyberThreats = get_mission_threats lApplicableThreats extractCyberReq
+    and applicableSafetyThreats = get_mission_threats lApplicableThreats extractSafetyReq
+
+    (* mission threats using implemented defenses only ( include DAL > 0) *)
+    and implementedCyberThreats = get_mission_threats lImplementedThreats extractCyberReq
+    and implementedSafetyThreats = get_mission_threats lImplementedThreats extractSafetyReq
+
+    and save_cyber_mission missions ?(wDalSuffix = false) defType = List.iter missions 
+        ~f:(fun (mission) -> save_ad_mission_cutsets mission missionList fpath save_dot_ml ~wDalSuffix:wDalSuffix defType)
+
+    and save_safety_mission missions defType = List.iter missions
+        ~f:(fun (mission) -> save_f_mission_cutsets mission missionList fpath save_dot_ml defType) in
+
+    (* save the applicable cyber & safety mission cutset visualizations *)
+    List.iter applicableCyberThreats ~f:(fun (_,x) -> save_cyber_mission x applProps_D);
+    List.iter applicableSafetyThreats ~f:(fun (_,x) -> save_safety_mission x applProps_D);
+
+    (* save the implemented cyber & safety mission cutset visualizations *)
+    (* refer to appl. for impl. to include defense DAL < 1 in likelihood calculations *)
+    List.iter applicableCyberThreats ~f:(fun (_,x) -> save_cyber_mission x ~wDalSuffix:true implProps_D);
+    List.iter implementedSafetyThreats ~f:(fun (_,x) -> save_safety_mission x implProps_D);
+
+    (* re-generates an adtree/ftree for all missions to be saved in single xml file *)
+    let as_base_mission_xml missionThreats reqType =
+        let ds_MissionList = xmlBuilder_MissionList reqType missionThreats missionList defense2nist in
+        Xml.Element("Results",[("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance")], ds_MissionList);
+    in
+    
+    let save_base_mission_xml defType ?(suffix = "") mission_xml =
+        let xml_str = Xml.to_string_fmt mission_xml
+        and xml_oc = Out_channel.create (fpath^defType^suffix^".xml") in
+        fprintf xml_oc "<?xml version=\"1.0\"?>\n";
+        fprintf xml_oc "%s" xml_str;
+        Out_channel.close xml_oc;
+    in
+
+    (* save the base applicable mission list as .xml *)
+    let applCyberXml = as_base_mission_xml applicableCyberThreats "cyber" in
+    save_base_mission_xml applProps_D applCyberXml;
+    let applSafetyXml = as_base_mission_xml applicableSafetyThreats "safety" in
+    save_base_mission_xml applProps_D ~suffix:"-safety" applSafetyXml;
+
+    (* merge probabilities from applicable which includes unimplemented defense likelihoods *)
+    let implCyberXml = as_base_mission_xml implementedCyberThreats "cyber" in
+    let flattened = flatten_probability_xml_node applCyberXml in
+    let merged = merge_cutset_probabilities implCyberXml flattened in
+    save_base_mission_xml implProps_D merged;
+
+    let implSafetyXml = as_base_mission_xml implementedSafetyThreats "safety" in
+    save_base_mission_xml implProps_D ~suffix:"-safety" implSafetyXml;
 ;;

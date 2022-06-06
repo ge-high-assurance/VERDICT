@@ -9,7 +9,8 @@ Date: 2017-12-15
 Updates: 5/9/2018, Kit Siu, added formulaOfADTree
          7/23/2018, Kit Siu, added cutsets_ad
          1/9/2019, Kit Siu, added capability for DSum and DPro, which are operators for defenses
-         
+         6/5/2022, Christopher Alexander, extended ADT defense leaf model with DAL
+
 *)
 
 (**
@@ -58,14 +59,14 @@ let rec formulaOfTree t =
 (** Code for translating an attack-defense tree into a formula *)
 let rec formulaOfDTree dt =
   match dt with
-    | DLeaf (var, _) -> AVar (var)
+    | DLeaf (var, dal) -> let (component, event) = var in AVar ((component, event, string_of_int dal)) (* defense-leaf *)
     | DSUM (tree) -> DSum(List.map tree ~f:formulaOfDTree)
     | DPRO (tree) -> DPro(List.map tree ~f:formulaOfDTree) 
 ;;
 
 let rec formulaOfADTree adt =
   match adt with
-    | ALeaf (var, _) -> AVar (var) 
+    | ALeaf (var, probability) -> let (component, event) = var in AVar ((component, event, "")) (* attack-leaf *)
     | ASUM (tree) -> ASum(List.map tree ~f:formulaOfADTree)
     | APRO (tree) -> APro(List.map tree ~f:formulaOfADTree)
     | C (at, dt) -> APro([formulaOfADTree at; ANot(formulaOfDTree dt)])

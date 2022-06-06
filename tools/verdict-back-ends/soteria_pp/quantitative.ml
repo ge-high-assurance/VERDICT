@@ -8,7 +8,7 @@ Date: 2017-12-15
 
 Updates: 5/10/2018, Kit Siu, added severityCalc and supporting measures for ADT
          7/23/2018, Kit Siu, added likelihood calculations (formerly severityCalc)
-
+         6/5/2022, Chris Alexander, updated likelihood calculator to reflect AVar model changes 
 *)
 
 (**
@@ -311,8 +311,8 @@ let rec likelihoodCutSOP sop la =
   match sop with
     | [] -> []
     | hd::tl -> let prod = match hd with
-                             | AVar e       -> List.Assoc.find_exn la e ~equal:(=)
-                             | ANot (AVar e)-> List.Assoc.find_exn la e ~equal:(=)
+                             | AVar (a,d,_)        -> List.Assoc.find_exn la (a,d) ~equal:(=)
+                             | ANot (AVar (a,d,_)) -> List.Assoc.find_exn la (a,d) ~equal:(=)
                              | APro le      -> gMin (likelihoodCutSOP le la)
                              | DPro le      -> gMin (likelihoodCutSOP le la) (* min on d-AND gate b/c assoc list is in terms of likelihood *)
                              | DSum le      -> gMax (likelihoodCutSOP le la) (* allow SOP to include defense Sum gates *)
@@ -325,8 +325,8 @@ let rec likelihoodCutSOP sop la =
 *)
 let likelihoodCutCalc cs la =
   match cs with
-    | AVar v         -> let a = (List.Assoc.find_exn la v ~equal:(=)) in a
-    | ANot ( AVar v )-> let a = (List.Assoc.find_exn la v ~equal:(=)) in a
+    | AVar (a,d,_)          -> let a = (List.Assoc.find_exn la (a,d) ~equal:(=)) in a
+    | ANot (AVar (a,d,_))  -> let a = (List.Assoc.find_exn la (a,d) ~equal:(=)) in a
     | ASum s         -> let l = (likelihoodCutSOP s la) in (gMax l)
     | APro p         -> gMin (likelihoodCutSOP p la) 
     | DSum s         -> let l = (likelihoodCutSOP s la) in (gMax l)  (* max on d-OR gate b/c assoc list is in terms of likelihood *)

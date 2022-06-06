@@ -124,7 +124,7 @@ let cycle_cutset = cutsets_ad cycle_adtree        (* <-- AVar ("a", "a_atck") *)
 in
 
 assert( cycle_adtree = ASUM [ALeaf (("a", "a_atck"), 1.); ASUM [ALeaf (("a", "a_atck"), 1.)]] );
-assert( cycle_cutset = AVar ("a", "a_atck") );
+assert( cycle_cutset = AVar ("a", "a_atck", "") );
 
 true
 ;;
@@ -186,7 +186,7 @@ let cycle_cutset = cutsets_ad cycle_adtree       (* <-- AVar ("b", "b_atck") *)
 in
 
 assert( cycle_adtree = ASUM [ALeaf (("b", "b_atck"), 1.)]);
-assert( cycle_cutset = AVar ("b", "b_atck"););
+assert( cycle_cutset = AVar ("b", "b_atck", ""););
 
 true
 ;;
@@ -268,7 +268,7 @@ let cycle_cutset = cutsets_ad cycle_adtree (* <-- AVar ("b2", "b_atck") *)
 in
 
 assert( cycle_adtree = ASUM [ASUM [ALeaf (("b2", "b_atck"), 1.)]] );
-assert( cycle_cutset = AVar ("b2", "b_atck")  );
+assert( cycle_cutset = AVar ("b2", "b_atck", "")  );
 
 true
 
@@ -357,7 +357,7 @@ assert( cycle_adtree =
    [ALeaf (("c", "c_atck"), 1.);
     ASUM [ALeaf (("c", "c_atck"), 1.); ASUM [ALeaf (("c", "c_atck"), 1.)]];
     ASUM [ALeaf (("c", "c_atck"), 1.); ASUM [ALeaf (("c", "c_atck"), 1.)]]] );
-assert( cycle_cutset = AVar ("c", "c_atck") );
+assert( cycle_cutset = AVar ("c", "c_atck", "") );
 
 true 
 ;;
@@ -443,7 +443,7 @@ let cycle_cutset = cutsets_ad cycle_adtree       (* <-- AVar ("c", "c_atck") *)
 in
 
 assert( cycle_adtree = ASUM [ALeaf (("c", "c_atck"), 1.)] );
-assert( cycle_cutset = AVar ("c", "c_atck") );
+assert( cycle_cutset = AVar ("c", "c_atck", "") );
 
 true
 ;;
