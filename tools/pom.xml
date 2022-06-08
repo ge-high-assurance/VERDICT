@@ -165,7 +165,7 @@
       <dependency>
         <groupId>edu.uiowa.cs.clc</groupId>
         <artifactId>kind2-java-api</artifactId>
-        <version>0.2.2</version>
+        <version>0.3.0</version>
         <!-- Exclude to avoid vulnerabilities -->
         <exclusions>
           <exclusion>
