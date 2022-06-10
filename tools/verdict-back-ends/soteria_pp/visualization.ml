@@ -98,7 +98,6 @@ open TreeSynthesis;;
    unflatten_exe and dot_exe are strings that should be set to the 
    fullpaths of the "unflatten" and "dot" utilities from graphviz. 
 *)
-
 let whereIs_dot = 
    let stringOption = In_channel.input_line( Unix.open_process_in "which dot" ) in
    match stringOption with
@@ -113,6 +112,8 @@ let whereIs_unflatten =
 
 let unflatten_exe = whereIs_unflatten ;;
 let dot_exe = whereIs_dot ;;
+
+let exp_string_of_float (likelihood:float) = Printf.sprintf "%.0e" likelihood;;
 
 (* Below is code for generating a fault tree diagram using graphviz. Actually it
    generates diagrams for formulas, so you have to convert a fault tree to a
@@ -967,7 +968,7 @@ let rec print_each_csImp l ch =
    match l with
    | hd::tl -> 
       (let (adexp, likelihood, _) = hd in 
-       Out_channel.output_string ch ((string_of_float likelihood) ^ "\t\t");
+       Out_channel.output_string ch ((exp_string_of_float likelihood) ^ "\t\t");
        print_each_cs adexp ch ; 
        Out_channel.output_char ch '\n';
        print_each_csImp tl ch );
@@ -1026,12 +1027,11 @@ let rec sprint_AProAVar2 adexp str wDALSuffix =
 
 (* Given the list of cutset from likelihoodCutImp, generates an output to use with PrintBox *)
 let rec sprint_each_csImp l_csImp csArray wDALSuffix =
-   let mantissa_string_of_float f = match f with 1. -> "1." | _ -> Printf.sprintf "%.0e" f in
    match l_csImp with
    | hd::tl -> 
       (let (adexp_APro, likelihood, _) = hd in 
       let (attackStr, defenseStr) = sprint_AProAVar2 adexp_APro ("","") wDALSuffix in
-      sprint_each_csImp tl (Array.append csArray [| [| (mantissa_string_of_float likelihood); attackStr; defenseStr |] |] ) wDALSuffix)
+      sprint_each_csImp tl (Array.append csArray [| [| (exp_string_of_float likelihood); attackStr; defenseStr |] |] ) wDALSuffix)
    | [] -> csArray ;; 
 
 (* This function generates a string of failure events *)
@@ -1062,7 +1062,7 @@ let rec sprint_each_safety_csImp l_csImp csArray =
    match l_csImp with
    | hd::tl -> 
       (let (pexp, probability, _) = hd in 
-      sprint_each_safety_csImp tl (Array.append csArray [| [| (string_of_float probability); (sprint_Events pexp)|] |] ) )
+      sprint_each_safety_csImp tl (Array.append csArray [| [| (exp_string_of_float probability); (sprint_Events pexp)|] |] ) )
    | [] -> csArray ;; 
      
 (**/**)
@@ -1082,7 +1082,7 @@ let saveADCutSetsToFile ?cyberReqID:(cid="") ?risk:(r="") ?header:(h="") file ad
    let box = PrintBox.(hlist [ text ("Cyber\nReqID: \n" ^ cid); grid_text myArray ]) |> PrintBox.frame
    in
    (Out_channel.output_string ch ("\n");
-    Out_channel.output_string ch ("Calculated likelihood of successful attack = " ^ (string_of_float likelihood) ^ "\n");
+    Out_channel.output_string ch ("Calculated likelihood of successful attack = " ^ (exp_string_of_float likelihood) ^ "\n");
     Out_channel.output_string ch (targetString);
     Out_channel.output_string ch ("\n");
     PrintBox_text.output ch box;
@@ -1105,7 +1105,7 @@ let saveCutSetsToFile ?reqID:(cid="") ?risk:(r="") ?header:(h="") file ftree =
    let box = PrintBox.(hlist [ text ("Safety\nReqID: \n" ^ cid); grid_text myArray ]) |> PrintBox.frame
    in
    (Out_channel.output_string ch ("\n");
-    Out_channel.output_string ch ("Calculated probability of failure = " ^ (string_of_float probability) ^ "\n");
+    Out_channel.output_string ch ("Calculated probability of failure = " ^ (exp_string_of_float probability) ^ "\n");
     Out_channel.output_string ch (targetString);
     Out_channel.output_string ch ("\n");
     PrintBox_text.output ch box;
