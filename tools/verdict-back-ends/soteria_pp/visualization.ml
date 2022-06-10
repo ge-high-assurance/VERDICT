@@ -979,7 +979,7 @@ let rec sprint_defenseProfile adexp wDALSuffix =
    let andStr = " ^ \n" 
    and orStr = " v " in
    match adexp with
-   | AVar(comp, event, dal) -> comp ^ ":" ^ event ^ (if wDALSuffix then ":" ^ dal else "")
+   | AVar(comp, event, dal) -> comp ^ ":" ^ event ^ (if wDALSuffix && dal <> "" then ":" ^ dal else "")
    | DPro l -> 
      (match l with 
      | hd::tl -> 
@@ -1008,7 +1008,7 @@ let rec sprint_AProAVar2 adexp str wDALSuffix =
         | hd::tl -> 
            (match hd with
               | AVar(comp, event, dal) -> 
-                    let suffix = if wDALSuffix then ":" ^ dal else "" in
+                    let suffix = if wDALSuffix && dal <> "" then ":" ^ dal else "" in
                     let aStr = (if attackStr = "" then (comp ^ ":" ^ event ^ suffix) else (attackStr ^ andStr ^ comp ^ ":" ^ event ^ suffix)) in
                     sprint_AProAVar2 (APro tl) (aStr, defenseStr ) wDALSuffix
               | DSum l -> 
@@ -1026,11 +1026,12 @@ let rec sprint_AProAVar2 adexp str wDALSuffix =
 
 (* Given the list of cutset from likelihoodCutImp, generates an output to use with PrintBox *)
 let rec sprint_each_csImp l_csImp csArray wDALSuffix =
+   let mantissa_string_of_float f = match f with 1. -> "1." | _ -> Printf.sprintf "%.0e" f in
    match l_csImp with
    | hd::tl -> 
       (let (adexp_APro, likelihood, _) = hd in 
       let (attackStr, defenseStr) = sprint_AProAVar2 adexp_APro ("","") wDALSuffix in
-      sprint_each_csImp tl (Array.append csArray [| [| (string_of_float likelihood); attackStr; defenseStr |] |] ) wDALSuffix)
+      sprint_each_csImp tl (Array.append csArray [| [| (mantissa_string_of_float likelihood); attackStr; defenseStr |] |] ) wDALSuffix)
    | [] -> csArray ;; 
 
 (* This function generates a string of failure events *)
