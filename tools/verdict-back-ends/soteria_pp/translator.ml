@@ -1016,7 +1016,7 @@ let cutSets cutSet =
       | AVar avar -> List.append (takeAvar (AVar avar)) ["defense", ""]
       | _ -> List.append (takeAvar AFALSE) ["defense",""] in
     let (cut,pro1,_) = cutSet in
-    List.append [("prob",(string_of_float pro1))] (cutSetToView cut);;
+    List.append [("prob",(exp_string_of_float pro1))] (cutSetToView cut);;
 
 let concat_And_Or op l =List.fold (List.tl_exn l) ~init:(List.hd_exn l) ~f:(fun x y -> x^" "^ op^" " ^y) ;;
 
@@ -1087,7 +1087,7 @@ let rec defenseToView2 cOpe l_defense2nist =
       
 let make_cutSetTuples cs l_defense2nist =     
    let (cut,pro1,_) = cs in
-   ( ("prob",(string_of_float pro1) ), 
+   ( ("prob",(exp_string_of_float pro1) ), 
       ("attacks", attacksToView cut),
       ("defense", defenseToView2 cut l_defense2nist )
    );;
@@ -1102,7 +1102,7 @@ let rec cutSetsSafetyToView cOpe =
 
 let cutSetsSafety cutSet =     
     let (cut,pro1,_) = cutSet in
-    (("prob",(string_of_float pro1)), (cutSetsSafetyToView cut));;
+    (("prob",(exp_string_of_float pro1)), (cutSetsSafetyToView cut));;
 
 let cutSetsSafetyList cutSetList = List.map cutSetList ~f:(fun x-> cutSetsSafety x);;
 
@@ -1136,7 +1136,7 @@ let xmlBuilder_Requirement reqIDStr defenseTypeStr tc_adtree l_mission l_defense
    in
    Xml.Element ("Requirement",[("label",reqIDStr);
                                ("defenseType",defenseTypeStr);
-                               ("computed_p",(string_of_float likely));
+                               ("computed_p", (exp_string_of_float likely));
                                ("acceptable_p", (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission)))], ds_Cutset) ;;
 
 let xmlBuilder_Event event = 
@@ -1165,7 +1165,7 @@ let xmlBuilder_Requirement_safety reqIDStr defenseTypeStr tc_ftree l_mission =
    in
    Xml.Element ("Requirement",[("label",reqIDStr);
                                ("defenseType",defenseTypeStr);
-                               ("computed_p",(string_of_float pr));
+                               ("computed_p", (exp_string_of_float pr));
                                ("acceptable_p", (getSafety_Of_cybReq reqIDStr l_mission))], ds_Cutset) ;;
 
 let xmlBuilder_RequirementList cyberORsafety l_libmdl mission l_defense2nist =
@@ -1197,7 +1197,7 @@ let xml_gen filename_ch reqIDStr defenseTypeStr tc_adtree l_mission l_defense2ni
    let getSeverity_Of_cybReq req l_mission = getval (cybReq_Severity l_mission) req 
    in
    fprintf filename_ch "defenseType=\"%s\" computed_p=\"%s\" acceptable_p =\"%s\" >\n" 
-                        (defenseTypeStr) (string_of_float likely) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
+                        (defenseTypeStr) (exp_string_of_float likely) (severity2risk(getSeverity_Of_cybReq reqIDStr l_mission));
    List.iter infoList ~f:(fun ((_,p),(_,aL),(_,dL)) -> fprintf_cutSet filename_ch p aL dL);
 ;;
 
@@ -1211,7 +1211,7 @@ let xml_gen_safety filename_ch reqIDStr defenseTypeStr tc_ftree l_mission =
    let getSafety_Of_cybReq req l_mission = getval (cybReq_Safety l_mission) req 
    in
    fprintf filename_ch "defenseType=\"%s\" computed_p=\"%s\" acceptable_p =\"%s\" >\n" 
-                       (defenseTypeStr) (string_of_float pr) (getSafety_Of_cybReq reqIDStr l_mission);
+                       (defenseTypeStr) (exp_string_of_float pr) (getSafety_Of_cybReq reqIDStr l_mission);
    List.iter infoList ~f:(fun ((_,p),l) -> fprintf_cutSetSafety filename_ch p l );
 ;;
    
