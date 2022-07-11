@@ -532,28 +532,35 @@ public class VDM2Lustre {
 
             String user_defined_type = dataType.getUserDefinedType();
 
-            user_defined_type = user_defined_type.replace(".", "_dot_");
-            user_defined_type = user_defined_type.replace("::", "_double_colon_");
+            String typeName = null;
+            if (user_defined_type != null) {
+                user_defined_type = user_defined_type.replace(".", "_dot_");
+                user_defined_type = user_defined_type.replace("::", "_double_colon_");
 
-            boolean implemented_type = typeDeclarations.containsKey(user_defined_type);
+                TypeDeclaration decl = typeDeclarations.get(user_defined_type);
 
-            if (implemented_type) {
+                boolean implemented_type = decl != null;
 
-                TypeDeclaration baseType = typeDeclarations.get(user_defined_type);
-
-                user_defined_type = baseType.getName();
-
-                String definedType = user_defined_type.replace("_dot_", "Event_");
-
-                eventTypeDeclaration.setName(definedType);
-
-                DataType eventDefinition = new DataType();
-                RecordType eventRecord = getEventrecord(user_defined_type);
-                eventDefinition.setRecordType(eventRecord);
-
-                eventTypeDeclaration.setDefinition(eventDefinition);
-                eventTypeDeclaration.setName(definedType);
+                if (implemented_type) {
+                    dataType.setUserDefinedType(user_defined_type);
+                    typeName = decl.getName().replace("_dot_", "Event_");
+                } else {
+                } // Is this case possible?
+            } else if (dataType.getPlainType() != null) {
+                typeName = dataType.getPlainType().value().toUpperCase() + "_EventType";
+            } else {
+                throw new IllegalArgumentException(
+                        "Datatype should either be: plain or user-defined");
             }
+
+            eventTypeDeclaration.setName(typeName);
+
+            DataType eventDefinition = new DataType();
+            RecordType eventRecord = getEventRecord(dataType);
+            eventDefinition.setRecordType(eventRecord);
+
+            eventTypeDeclaration.setDefinition(eventDefinition);
+            eventTypeDeclaration.setName(typeName);
 
         } else {
             // None DataType
@@ -562,7 +569,7 @@ public class VDM2Lustre {
             eventTypeDeclaration.setName(definedType);
 
             DataType eventDefinition = new DataType();
-            RecordType eventRecord = getEventrecord(null);
+            RecordType eventRecord = getEventRecord(null);
             eventDefinition.setRecordType(eventRecord);
 
             eventTypeDeclaration.setDefinition(eventDefinition);
@@ -572,7 +579,7 @@ public class VDM2Lustre {
         return eventTypeDeclaration;
     }
 
-    protected RecordType getEventrecord(String userDefineType) {
+    protected RecordType getEventRecord(DataType dataType) {
 
         // Define a Record
         RecordType eventRecord = new RecordType();
@@ -588,14 +595,11 @@ public class VDM2Lustre {
         eventRecord.getRecordField().add(eventField);
 
         // value: UserDefined
-        if (userDefineType != null) {
+        if (dataType != null) {
             RecordField eventValue = new RecordField();
 
-            DataType valueType = new DataType();
-            valueType.setUserDefinedType(userDefineType);
-
             eventValue.setName("value");
-            eventValue.setType(valueType);
+            eventValue.setType(dataType);
             eventRecord.getRecordField().add(eventValue);
         }
 
