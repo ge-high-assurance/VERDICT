@@ -409,7 +409,7 @@ public class Aadl2Vdm {
 		if(processTypes.size()>0) {
 			model = translateProcessTypeObjects(processTypes, model, dataTypeDecl);
 		}
-		if(processTypes.size()>0) {
+		if(processorTypes.size()>0) {
 			model = translateProcessorTypeObjects(processorTypes, model, dataTypeDecl);
 		}
 		if(threadGroupTypes.size()>0) {
