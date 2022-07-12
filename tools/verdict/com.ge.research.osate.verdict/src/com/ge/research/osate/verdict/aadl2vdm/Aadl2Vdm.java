@@ -4486,7 +4486,7 @@ public class Aadl2Vdm {
 			dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 		} else {
 			dtype = null;
-			System.out.println("Unresolved/unexpected Named Element for a data port: " + dataPort);
+			System.out.println("Warning: No data type is declared for a data port: " + dataPort);
 		}
 		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
 		newPort.setProbe(false);
@@ -4550,7 +4550,7 @@ public class Aadl2Vdm {
 				dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 			} else {
 				dtype = null;
-				System.out.println("Unresolved/unexpected Named Element for an event data port: " + dataPort);
+				System.out.println("Warning: No data type is declared for an event data port: " + dataPort);
 			}
 			if(dtype != null) {
 				newPort.setType(dtype);	
