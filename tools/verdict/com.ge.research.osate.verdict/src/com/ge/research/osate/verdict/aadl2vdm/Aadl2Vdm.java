@@ -4465,7 +4465,11 @@ public class Aadl2Vdm {
      */
 	private Port createVdmPort(DataPort dataPort,Model model, HashSet<String> dataTypeDecl) {
 		String modeString = "in";
-		if(dataPort.isIn()) {
+		if(dataPort.isIn() && dataPort.isOut()) {
+			System.out.println("Error: unsupported in and out data port " + dataPort.getName());
+			throw new RuntimeException("The VERDICT tool does not support a port is declared as both an in and out port! "
+					+ "Please use two separate ports to represent this in and out port!");
+		} else if(dataPort.isIn()) {
 			modeString = "in";
 		}
 		else if(dataPort.isOut()) {
@@ -4481,7 +4485,8 @@ public class Aadl2Vdm {
 			org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
 			dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 		} else {
-			System.out.println("Unresolved/unexpected Named Element.");
+			dtype = null;
+			System.out.println("Unresolved/unexpected Named Element for a data port: " + dataPort);
 		}
 		verdict.vdm.vdm_model.Port newPort = new verdict.vdm.vdm_model.Port();
 		newPort.setProbe(false);
@@ -4505,7 +4510,11 @@ public class Aadl2Vdm {
 		newPort.setId(dataPort.getQualifiedName());
 		newPort.setName(dataPort.getName());
 		newPort.setMode(convertToVdmPortMode(modeString));
-		newPort.setType(dtype);
+		if(dtype != null) {
+			newPort.setType(dtype);	
+		} else {
+			newPort.setType(null);
+		}
 		return newPort;
 	}
     /**
@@ -4517,6 +4526,11 @@ public class Aadl2Vdm {
      */
 	private Port createVdmPort(EventDataPort dataPort, Model model, HashSet<String> dataTypeDecl) {
 		String modeString = "in";
+		if(dataPort.isIn() && dataPort.isOut()) {
+			System.out.println("Error: unsupported in and out event data port " + dataPort.getName());
+			throw new RuntimeException("The VERDICT tool does not support a port is declared as both an in and out port! "
+					+ "Please use two separate ports to encode it!");
+		} 		
 		if(dataPort.isIn()) {
 			modeString = "in";
 		}
@@ -4535,9 +4549,14 @@ public class Aadl2Vdm {
 				org.osate.aadl2.DataImplementation aadlDImpl = (org.osate.aadl2.DataImplementation)dSubCompType;
 				dtype = resolveAADLDataImplementationType(aadlDImpl, model, dataTypeDecl);
 			} else {
-				System.out.println("Unresolved/unexpected Named Element.");
+				dtype = null;
+				System.out.println("Unresolved/unexpected Named Element for an event data port: " + dataPort);
 			}
-			newPort.setType(dtype);
+			if(dtype != null) {
+				newPort.setType(dtype);	
+			} else {
+				newPort.setType(null);
+			}
 		}
 		newPort.setProbe(false);
 		newPort.setId(dataPort.getQualifiedName());
