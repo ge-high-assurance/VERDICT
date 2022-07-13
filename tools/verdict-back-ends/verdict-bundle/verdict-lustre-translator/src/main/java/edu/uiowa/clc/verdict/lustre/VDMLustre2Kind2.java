@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import verdict.vdm.vdm_data.DataType;
+import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.SubrangeType;
 import verdict.vdm.vdm_data.TypeDeclaration;
@@ -97,7 +98,9 @@ public class VDMLustre2Kind2 {
                 if (node.isIsImported() != null && node.isIsImported()) {
                     pb.importNode(visitImportedComponent(node));
                 } else {
-                    if (node.getBody().isIsMain() != null && node.getBody().isIsMain()) {
+                    if (node.getBody() != null
+                            && node.getBody().isIsMain() != null
+                            && node.getBody().isIsMain()) {
                         pb.setMain(node.getName());
                     }
                     pb.addNode(visitComponent(node));
@@ -115,37 +118,30 @@ public class VDMLustre2Kind2 {
      * @return the Kind 2 Lustre type
      */
     private static Type visit(DataType modelType) {
+        if (modelType == null) {
+            // Change Null DataType to Integer Type
+            modelType = new DataType();
+            modelType.setPlainType(PlainType.INT);
+        }
         if (modelType.getPlainType() != null) {
             return TypeUtil.named(modelType.getPlainType().value());
-        }
-
-        if (modelType.getUserDefinedType() != null) {
+        } else if (modelType.getUserDefinedType() != null) {
             return TypeUtil.named(modelType.getUserDefinedType());
-        }
-
-        if (modelType.getSubrangeType() != null) {
+        } else if (modelType.getSubrangeType() != null) {
             SubrangeType subrange = modelType.getSubrangeType();
             return TypeUtil.intSubrange(subrange.getLowerBound(), subrange.getUpperBound());
-        }
-
-        if (modelType.getArrayType() != null) {
+        } else if (modelType.getArrayType() != null) {
             return TypeUtil.array(
                     visit(modelType.getArrayType().getDataType()),
                     Integer.parseInt(modelType.getArrayType().getDimension()));
-        }
-
-        if (modelType.getTupleType() != null) {
+        } else if (modelType.getTupleType() != null) {
             return TypeUtil.tuple(
                     modelType.getTupleType().getDataType().stream()
                             .map(dt -> visit(dt))
                             .collect(Collectors.toList()));
-        }
-
-        if (modelType.getEnumType() != null) {
+        } else if (modelType.getEnumType() != null) {
             return TypeUtil.enumeration(modelType.getEnumType().getEnumValue());
-        }
-
-        if (modelType.getRecordType() != null) {
+        } else if (modelType.getRecordType() != null) {
             // fields in the map have the same order as the RecordFields in the RecordField
             // list
             Map<String, Type> fields = new TreeMap<>((x, y) -> -1);
@@ -153,10 +149,14 @@ public class VDMLustre2Kind2 {
                 fields.put(field.getName(), visit(field.getType()));
             }
             return TypeUtil.record(fields);
+        } else {
+            System.out.println("Warning: Bogus DataType detected! Replaced with Integer type");
+            modelType.setPlainType(PlainType.INT);
+            return TypeUtil.named(modelType.getPlainType().value());
         }
-
-        throw new IllegalArgumentException(
-                "Datatype should either be: plain, user-defined, subrange, array, tuple, enum, or record type.");
+        // throw new IllegalArgumentException(
+        //        "Datatype should either be: plain, user-defined, subrange, array, tuple, enum, or
+        // record type.");
     }
 
     /**
@@ -475,39 +475,41 @@ public class VDMLustre2Kind2 {
             nb.setContractBody(visit(modelNode.getContract()));
         }
 
-        for (ConstantDeclaration constDecl : modelNode.getBody().getConstantDeclaration()) {
-            if (constDecl.getDataType() != null) {
-                if (constDecl.getDefinition() != null) {
-                    nb.createLocalConst(
-                            constDecl.getName(),
-                            visit(constDecl.getDataType()),
-                            visit(constDecl.getDefinition()));
+        if (modelNode.getBody() != null) {
+            for (ConstantDeclaration constDecl : modelNode.getBody().getConstantDeclaration()) {
+                if (constDecl.getDataType() != null) {
+                    if (constDecl.getDefinition() != null) {
+                        nb.createLocalConst(
+                                constDecl.getName(),
+                                visit(constDecl.getDataType()),
+                                visit(constDecl.getDefinition()));
+                    } else {
+                        nb.createLocalConst(constDecl.getName(), visit(constDecl.getDataType()));
+                    }
                 } else {
-                    nb.createLocalConst(constDecl.getName(), visit(constDecl.getDataType()));
+                    nb.createLocalConst(constDecl.getName(), visit(constDecl.getDefinition()));
                 }
-            } else {
-                nb.createLocalConst(constDecl.getName(), visit(constDecl.getDefinition()));
             }
-        }
 
-        for (VariableDeclaration varDecl : modelNode.getBody().getVariableDeclaration()) {
-            nb.createLocalVar(varDecl.getName(), visit(varDecl.getDataType()));
-        }
+            for (VariableDeclaration varDecl : modelNode.getBody().getVariableDeclaration()) {
+                nb.createLocalVar(varDecl.getName(), visit(varDecl.getDataType()));
+            }
 
-        for (NodeEquation equation : modelNode.getBody().getEquation()) {
-            nb.addEquation(
-                    equation.getLhs().getIdentifier().stream()
-                            .map(var -> ExprUtil.id(var))
-                            .collect(Collectors.toList()),
-                    visit(equation.getRhs()));
-        }
+            for (NodeEquation equation : modelNode.getBody().getEquation()) {
+                nb.addEquation(
+                        equation.getLhs().getIdentifier().stream()
+                                .map(var -> ExprUtil.id(var))
+                                .collect(Collectors.toList()),
+                        visit(equation.getRhs()));
+            }
 
-        for (Expression assertion : modelNode.getBody().getAssertion()) {
-            nb.addAssertion(visit(assertion));
-        }
+            for (Expression assertion : modelNode.getBody().getAssertion()) {
+                nb.addAssertion(visit(assertion));
+            }
 
-        for (NodeProperty property : modelNode.getBody().getProperty()) {
-            nb.addProperty(property.getName(), visit(property.getExpression()));
+            for (NodeProperty property : modelNode.getBody().getProperty()) {
+                nb.addProperty(property.getName(), visit(property.getExpression()));
+            }
         }
 
         return nb;

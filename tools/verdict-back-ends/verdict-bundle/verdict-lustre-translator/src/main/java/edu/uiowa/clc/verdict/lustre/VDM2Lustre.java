@@ -628,7 +628,8 @@ public class VDM2Lustre {
 
         // Change Null DataType to Integer Default Type
         if (dataType == null) {
-            port.setType(defaultType());
+            dataType = defaultType();
+            port.setType(dataType);
         }
 
         node_parameter.setDataType(dataType);
