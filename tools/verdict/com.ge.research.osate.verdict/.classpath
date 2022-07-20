@@ -7,6 +7,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/"/>
+	<classpathentry exported="true" kind="lib" path="lib/angus-activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-analysis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-commons.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-tree.jar"/>
@@ -20,7 +21,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/httpclient.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpcore.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/istack-commons-runtime.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta.activation.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.activation-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.xml.bind-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.json.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-core.jar"/>
