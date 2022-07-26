@@ -12,7 +12,7 @@
   <artifactId>com.ge.research.osate.verdict</artifactId>
   <packaging>eclipse-plugin</packaging>
 
-  <!-- Needed by maven-dependency-plugin -->
+  <!-- Dependencies to be copied to lib directory -->
   <dependencies>
     <dependency>
       <groupId>com.amihaiemil.web</groupId>
@@ -57,7 +57,7 @@
         <configuration>
           <excludeGroupIds>com.ge.research.osate.verdict</excludeGroupIds>
           <includeScope>provided</includeScope>
-          <outputDirectory>${project.basedir}/lib/</outputDirectory>
+          <outputDirectory>${project.basedir}/lib</outputDirectory>
           <overWriteReleases>true</overWriteReleases>
           <overWriteSnapshots>true</overWriteSnapshots>
           <stripVersion>true</stripVersion>
