@@ -20,68 +20,52 @@ import java.util.Optional;
  * the predicate.
  */
 public class DependentRules {
-    public static Optional<ADTree> getComponentDependence(
-            SystemModel component, String attackName) {
+    public static Optional<ADTree> getComponentDependence(SystemModel component, String attackName) {
         List<ADTree> paths = new ArrayList<>();
         switch (attackName) {
             case "CAPEC-21":
                 for (ConnectionModel connection : component.getIncomingConnections()) {
                     if ("Untrusted".equals(connection.getAttributes().get("connectionType"))) {
                         // Vul-CAPEC-21-1
-                        paths.add(
-                                new DefenseCondition(
-                                        connection.getAttackable(), "deviceAuthentication", 1));
+                        paths.add(new DefenseCondition(connection.getAttackable(), "deviceAuthentication", 1));
                     }
                 }
                 for (ConnectionModel connection : component.getOutgoingConnections()) {
                     if ("Untrusted".equals(connection.getAttributes().get("connectionType"))) {
                         // Vul-CAPEC-21-2
-                        paths.add(
-                                new DefenseCondition(
-                                        connection.getAttackable(), "deviceAuthentication", 1));
+                        paths.add(new DefenseCondition(connection.getAttackable(), "deviceAuthentication", 1));
                     }
                 }
                 return mkRet(component.getAttackable(), attackName, paths);
             case "CAPEC-112":
                 for (ConnectionModel connection : component.getIncomingConnections()) {
                     // Vul-CAPEC-112-1, Vul-CAPEC-112-3, Vul-CAPEC-112-5
-                    paths.add(
-                            new DefenseCondition(
-                                    connection.getAttackable(), "deviceAuthentication", 1));
+                    paths.add(new DefenseCondition(connection.getAttackable(), "deviceAuthentication", 1));
                     // Vul-CAPEC-112-2, Vul-CAPEC-112-4, Vul-CAPEC-112-6
-                    paths.add(
-                            new DefenseCondition(
-                                    connection.getAttackable(), "encryptedTransmission", 1));
+                    paths.add(new DefenseCondition(connection.getAttackable(), "encryptedTransmission", 1));
                 }
                 return mkRet(component.getAttackable(), attackName, paths);
             case "CAPEC-114":
                 for (ConnectionModel connection : component.getIncomingConnections()) {
                     // Vul-CAPEC-114-1, Vul-CAPEC-114-2, Vul-CAPEC-114-3
-                    paths.add(
-                            new DefenseCondition(
-                                    connection.getAttackable(), "deviceAuthentication", 1));
+                    paths.add(new DefenseCondition(connection.getAttackable(), "deviceAuthentication", 1));
                 }
                 return mkRet(component.getAttackable(), attackName, paths);
             case "CAPEC-115":
                 for (ConnectionModel connection : component.getIncomingConnections()) {
                     // Vul-CAPEC-115-1, Vul-CAPEC-115-2, Vul-CAPEC-115-3
-                    paths.add(
-                            new DefenseCondition(
-                                    connection.getAttackable(), "deviceAuthentication", 1));
+                    paths.add(new DefenseCondition(connection.getAttackable(), "deviceAuthentication", 1));
                 }
                 return mkRet(component.getAttackable(), attackName, paths);
             case "CAPEC-390":
-                paths.add(
-                        new DefenseCondition(
-                                component.getAttackable(), "physicalAccessControl", 1));
+                paths.add(new DefenseCondition(component.getAttackable(), "physicalAccessControl", 1));
                 return mkRet(component.getAttackable(), attackName, paths);
             default:
                 return Optional.empty();
         }
     }
 
-    public static Optional<ADTree> getConnectionDependence(
-            ConnectionModel connection, String attackName) {
+    public static Optional<ADTree> getConnectionDependence(ConnectionModel connection, String attackName) {
         List<ADTree> paths = new ArrayList<>();
         // There are currently no such rules
         switch (attackName) {
@@ -98,14 +82,12 @@ public class DependentRules {
      * @param paths
      * @return
      */
-    private static Optional<ADTree> mkRet(
-            Attackable attackable, String attackName, List<ADTree> paths) {
+    private static Optional<ADTree> mkRet(Attackable attackable, String attackName, List<ADTree> paths) {
         if (paths.isEmpty()) {
-            System.err.println(
-                    "Strange. Did not find a possible defense dependency for attack "
-                            + attackName
-                            + " on component/connection "
-                            + attackable.getParentName());
+            System.err.println("Strange. Did not find a possible defense dependency for attack "
+                    + attackName
+                    + " on component/connection "
+                    + attackable.getParentName());
             return Optional.empty();
         } else {
             return Optional.of(new ADOr(paths));

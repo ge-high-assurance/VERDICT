@@ -104,8 +104,7 @@ public class Binary {
      * @param dest destination file
      * @throws ExecutionException
      */
-    public static void copyResource(String resPath, File dest, boolean executable)
-            throws ExecutionException {
+    public static void copyResource(String resPath, File dest, boolean executable) throws ExecutionException {
         URL url = null;
 
         /*
@@ -169,8 +168,7 @@ public class Binary {
      * @param args
      * @throws ExecutionException
      */
-    public static void invokeBin(
-            String binPath, String wd, ExecuteStreamHandler streamHandler, String... args)
+    public static void invokeBin(String binPath, String wd, ExecuteStreamHandler streamHandler, String... args)
             throws ExecutionException {
         List<String> argsList = new ArrayList<>();
         argsList.add(binPath);
@@ -186,9 +184,7 @@ public class Binary {
                 break;
             default:
                 throw new ExecutionException(
-                        "We don't have binaries for OS "
-                                + os
-                                + ", please run our Docker image instead");
+                        "We don't have binaries for OS " + os + ", please run our Docker image instead");
         }
 
         Execute executor = new Execute(streamHandler);
@@ -234,8 +230,7 @@ public class Binary {
      * @param args
      * @throws ExecutionException
      */
-    public void invoke(String wd, ExecuteStreamHandler streamHandler, String... args)
-            throws ExecutionException {
+    public void invoke(String wd, ExecuteStreamHandler streamHandler, String... args) throws ExecutionException {
         File file = getFile();
 
         // We can just unpack every time

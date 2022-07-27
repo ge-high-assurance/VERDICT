@@ -55,8 +55,7 @@ public class CutSetGenerator {
         Formula minimal = (new DNFFactorization()).apply(formula, false);
 
         // for comparing approaches
-        System.out.println(
-                "converted to DNF in " + (System.currentTimeMillis() - startTime) + " ms");
+        System.out.println("converted to DNF in " + (System.currentTimeMillis() - startTime) + " ms");
 
         return extract(minimal, cache);
     }

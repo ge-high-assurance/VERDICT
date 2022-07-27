@@ -306,11 +306,9 @@ public class VDM2Lustre {
                 // Option Check)
 
                 if (componentType == null && subcomponentImpl == null) {
-                    System.out.println(
-                            componentInstance.getName()
-                                    + " subcomponent is missing both a specification and an implemention.");
-                    System.out.println(
-                            "Please provide some specification or an implementation to continue.");
+                    System.out.println(componentInstance.getName()
+                            + " subcomponent is missing both a specification and an implemention.");
+                    System.out.println("Please provide some specification or an implementation to continue.");
                     System.exit(-1);
                 }
 
@@ -397,11 +395,7 @@ public class VDM2Lustre {
         return false;
     }
 
-    public void visit(
-            ComponentType componentType,
-            NodeBody nodeBody,
-            String componentInstanceID,
-            boolean impl_type) {
+    public void visit(ComponentType componentType, NodeBody nodeBody, String componentInstanceID, boolean impl_type) {
 
         // Rename componentType
         String cmpName = componentType.getName();
@@ -549,8 +543,7 @@ public class VDM2Lustre {
             } else if (dataType.getPlainType() != null) {
                 typeName = dataType.getPlainType().value().toUpperCase() + "_EventType";
             } else {
-                throw new IllegalArgumentException(
-                        "Datatype should either be: plain or user-defined");
+                throw new IllegalArgumentException("Datatype should either be: plain or user-defined");
             }
 
             eventTypeDeclaration.setName(typeName);
@@ -1385,8 +1378,7 @@ public class VDM2Lustre {
                         if (node_called != null) {
                             if (node_called.getNodeId().equals(called_node_ID)) {
                                 for (Expression arg_expr : node_called.getArgument()) {
-                                    if (arg_expr.getIdentifier()
-                                            .equals(dest_component_port.getName())) {
+                                    if (arg_expr.getIdentifier().equals(dest_component_port.getName())) {
                                         arg_expr.setIdentifier(arg_value);
                                     } else if (node_called.getArgument().size() == 1) {
                                         arg_expr.setIdentifier(arg_value);
@@ -1519,8 +1511,7 @@ public class VDM2Lustre {
                             if (node_called.getNodeId().equals(called_node_ID)) {
                                 for (Expression a_expr : node_called.getArgument()) {
 
-                                    if (a_expr.getIdentifier()
-                                            .equals(dest_component_port.getName())) {
+                                    if (a_expr.getIdentifier().equals(dest_component_port.getName())) {
                                         a_expr.setIdentifier(arg_expr.getIdentifier());
                                     } else if (node_called.getArgument().size() == 1) {
                                         a_expr.setIdentifier(arg_expr.getIdentifier());

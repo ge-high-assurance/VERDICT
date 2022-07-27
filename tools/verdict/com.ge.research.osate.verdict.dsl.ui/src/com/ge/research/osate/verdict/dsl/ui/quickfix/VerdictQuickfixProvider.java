@@ -9,5 +9,5 @@ package com.ge.research.osate.verdict.dsl.ui.quickfix;
  * See https://www.eclipse.org/Xtext/documentation/310_eclipse_support.html#quick-fixes
  */
 public class VerdictQuickfixProvider extends org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider {
-	// Not currently used
+    // Not currently used
 }

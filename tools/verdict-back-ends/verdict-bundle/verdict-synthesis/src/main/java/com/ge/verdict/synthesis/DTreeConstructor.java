@@ -44,22 +44,18 @@ public class DTreeConstructor {
             boolean meritAssignment,
             DLeaf.Factory factory) {
         if (meritAssignment && !usePartialSolution) {
-            throw new RuntimeException(
-                    "Cannot enable merit assignment without also enabling partial solutions!");
+            throw new RuntimeException("Cannot enable merit assignment without also enabling partial solutions!");
         }
         // essentially, construct one dtree for each requirement and AND them together
-        return new DAnd(
-                results.stream()
-                        .map(
-                                result ->
-                                        construct(
-                                                result.adtree,
-                                                costModel,
-                                                result.cyberReq.getSeverityDal(),
-                                                usePartialSolution,
-                                                meritAssignment,
-                                                factory))
-                        .collect(Collectors.toList()));
+        return new DAnd(results.stream()
+                .map(result -> construct(
+                        result.adtree,
+                        costModel,
+                        result.cyberReq.getSeverityDal(),
+                        usePartialSolution,
+                        meritAssignment,
+                        factory))
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -80,8 +76,7 @@ public class DTreeConstructor {
             boolean usePartialSolution,
             boolean meritAssignment,
             DLeaf.Factory factory) {
-        return (new DTreeConstructor(
-                        costModel, targetDal, usePartialSolution, meritAssignment, factory))
+        return (new DTreeConstructor(costModel, targetDal, usePartialSolution, meritAssignment, factory))
                 .perform(adtree);
     }
 
@@ -107,11 +102,7 @@ public class DTreeConstructor {
     private final List<DCondition> dconditions;
 
     private DTreeConstructor(
-            CostModel costModel,
-            int dal,
-            boolean usePartialSolution,
-            boolean meritAssignment,
-            DLeaf.Factory factory) {
+            CostModel costModel, int dal, boolean usePartialSolution, boolean meritAssignment, DLeaf.Factory factory) {
         this.costModel = costModel;
         this.factory = factory;
         this.targetDal = dal;
@@ -140,9 +131,8 @@ public class DTreeConstructor {
             // remove raw attack leaves that are covered by a defense
             for (Defense defense : defenses) {
                 if (!attackALeafMap.containsKey(defense.getAttack())) {
-                    throw new RuntimeException(
-                            "defense references undefined attack: "
-                                    + defense.getAttack().getName());
+                    throw new RuntimeException("defense references undefined attack: "
+                            + defense.getAttack().getName());
                 }
                 // set each defended attack leaf to mitigated so that
                 // it isn't included in the final tree
@@ -164,15 +154,14 @@ public class DTreeConstructor {
             // it is probably a problem if this happens because STEM doesn't output
             // raw attacks without corresponding defenses
             for (ALeaf aleaf : unmitigated) {
-                System.out.println("Warning: Unmitigated attack: " + aleaf.getAttack().toString());
+                System.out.println(
+                        "Warning: Unmitigated attack: " + aleaf.getAttack().toString());
             }
 
             // connect the defense condition to its corresponding dleaf
             for (DCondition dcond : dconditions) {
-                Optional<DLeaf.ComponentDefense> compDef =
-                        factory.lookup(
-                                dcond.defenseCond.getAttackable().getParentName(),
-                                dcond.defenseCond.getDefenseProperty());
+                Optional<DLeaf.ComponentDefense> compDef = factory.lookup(
+                        dcond.defenseCond.getAttackable().getParentName(), dcond.defenseCond.getDefenseProperty());
                 if (compDef.isPresent()) {
                     dcond.setCompDef(compDef.get());
                 } else {
@@ -181,17 +170,16 @@ public class DTreeConstructor {
                     // for it so that the DAL can get forced down to zero if necessary
 
                     // TODO this doesn't actually work. This is the screwy case that we need to fix.
-                    DLeaf dleaf =
-                            new DLeaf(
-                                    dcond.defenseCond.getAttackable().getParentName(),
-                                    dcond.defenseCond.getDefenseProperty(),
-                                    "",
-                                    dcond.defenseCond.getImplDal(),
-                                    0,
-                                    costModel,
-                                    factory,
-                                    usePartialSolution,
-                                    meritAssignment);
+                    DLeaf dleaf = new DLeaf(
+                            dcond.defenseCond.getAttackable().getParentName(),
+                            dcond.defenseCond.getDefenseProperty(),
+                            "",
+                            dcond.defenseCond.getImplDal(),
+                            0,
+                            costModel,
+                            factory,
+                            usePartialSolution,
+                            meritAssignment);
                     dcond.setCompDef(dleaf.componentDefense);
                 }
             }
@@ -231,29 +219,17 @@ public class DTreeConstructor {
         } else if (adtree instanceof ADAnd) {
             ADAnd adand = (ADAnd) adtree;
             // Transpose and/or
-            return Optional.of(
-                    new DOr(
-                            adand.children().stream()
-                                    .map(this::constructInternal)
-                                    .flatMap(
-                                            elem ->
-                                                    elem.isPresent()
-                                                            ? Stream.of(elem.get())
-                                                            : Stream.empty())
-                                    .collect(Collectors.toList())));
+            return Optional.of(new DOr(adand.children().stream()
+                    .map(this::constructInternal)
+                    .flatMap(elem -> elem.isPresent() ? Stream.of(elem.get()) : Stream.empty())
+                    .collect(Collectors.toList())));
         } else if (adtree instanceof ADOr) {
             ADOr ador = (ADOr) adtree;
             // Transpose and/or
-            return Optional.of(
-                    new DAnd(
-                            ador.children().stream()
-                                    .map(this::constructInternal)
-                                    .flatMap(
-                                            elem ->
-                                                    elem.isPresent()
-                                                            ? Stream.of(elem.get())
-                                                            : Stream.empty())
-                                    .collect(Collectors.toList())));
+            return Optional.of(new DAnd(ador.children().stream()
+                    .map(this::constructInternal)
+                    .flatMap(elem -> elem.isPresent() ? Stream.of(elem.get()) : Stream.empty())
+                    .collect(Collectors.toList())));
         } else if (adtree instanceof ADNot) {
             ADNot adnot = (ADNot) adtree;
             return constructInternal(adnot.child()).map(DNot::new);
@@ -275,15 +251,10 @@ public class DTreeConstructor {
      * @return
      */
     private DTree constructDefenseTree(Defense defense) {
-        return new DOr(
-                defense.getDefenseDnf().stream()
-                        .map(
-                                term ->
-                                        new DAnd(
-                                                term.stream()
-                                                        .map(leaf -> constructDLeaf(defense, leaf))
-                                                        .collect(Collectors.toList())))
-                        .collect(Collectors.toList()));
+        return new DOr(defense.getDefenseDnf().stream()
+                .map(term -> new DAnd(
+                        term.stream().map(leaf -> constructDLeaf(defense, leaf)).collect(Collectors.toList())))
+                .collect(Collectors.toList()));
     }
 
     /**

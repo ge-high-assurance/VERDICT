@@ -67,24 +67,20 @@ public class ADAnd extends ADTree {
         List<ADTree> crushed = adtrees.stream().map(ADTree::crush).collect(Collectors.toList());
 
         // Conjunction is commutative
-        Stream<ADTree> combinedAnds =
-                crushed.stream()
-                        .filter(adtree -> adtree instanceof ADAnd)
-                        .map(and -> (ADAnd) and)
-                        .flatMap(and -> and.adtrees.stream());
+        Stream<ADTree> combinedAnds = crushed.stream()
+                .filter(adtree -> adtree instanceof ADAnd)
+                .map(and -> (ADAnd) and)
+                .flatMap(and -> and.adtrees.stream());
         Stream<ADTree> others = crushed.stream().filter(adtree -> !(adtree instanceof ADAnd));
 
-        return new ADAnd(
-                Stream.concat(combinedAnds, others).distinct().collect(Collectors.toList()));
+        return new ADAnd(Stream.concat(combinedAnds, others).distinct().collect(Collectors.toList()));
     }
 
     @Override
     public Prob compute() {
         // Fold across children with AND operator as follows:
         // 1 AND child_1 AND child_2 AND ... AND child_n
-        return adtrees.stream()
-                .map(ADTree::compute)
-                .reduce(Prob.certain(), (a, b) -> Prob.and(a, b));
+        return adtrees.stream().map(ADTree::compute).reduce(Prob.certain(), (a, b) -> Prob.and(a, b));
     }
 
     @Override
@@ -103,9 +99,7 @@ public class ADAnd extends ADTree {
     @Override
     public Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
         return factory.and(
-                adtrees.stream()
-                        .map(adtree -> adtree.toLogicNg(factory, cache))
-                        .collect(Collectors.toList()));
+                adtrees.stream().map(adtree -> adtree.toLogicNg(factory, cache)).collect(Collectors.toList()));
     }
 
     @Override

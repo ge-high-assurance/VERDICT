@@ -50,13 +50,12 @@ public class DefenseCondition extends ADTree {
             try {
                 return Integer.parseInt(dalStr);
             } catch (NumberFormatException e) {
-                throw new RuntimeException(
-                        "invalid DAL: "
-                                + dalStr
-                                + " for defense property "
-                                + defenseProperty
-                                + " on component/connection "
-                                + attackable.getParentName());
+                throw new RuntimeException("invalid DAL: "
+                        + dalStr
+                        + " for defense property "
+                        + defenseProperty
+                        + " on component/connection "
+                        + attackable.getParentName());
             }
         } else {
             // if it's not in the attributes list, then it must be unimplemented
@@ -94,7 +93,9 @@ public class DefenseCondition extends ADTree {
     public boolean equals(Object other) {
         if (other instanceof DefenseCondition) {
             DefenseCondition otherDefCond = (DefenseCondition) other;
-            return attackable.getParentName().equals(otherDefCond.getAttackable().getParentName())
+            return attackable
+                            .getParentName()
+                            .equals(otherDefCond.getAttackable().getParentName())
                     && defenseProperty.equals(otherDefCond.getDefenseProperty())
                     && minImplDal == otherDefCond.getMinImplDal();
         }

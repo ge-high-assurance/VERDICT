@@ -135,10 +135,9 @@ public class VDMLustre2Kind2 {
                     visit(modelType.getArrayType().getDataType()),
                     Integer.parseInt(modelType.getArrayType().getDimension()));
         } else if (modelType.getTupleType() != null) {
-            return TypeUtil.tuple(
-                    modelType.getTupleType().getDataType().stream()
-                            .map(dt -> visit(dt))
-                            .collect(Collectors.toList()));
+            return TypeUtil.tuple(modelType.getTupleType().getDataType().stream()
+                    .map(dt -> visit(dt))
+                    .collect(Collectors.toList()));
         } else if (modelType.getEnumType() != null) {
             return TypeUtil.enumeration(modelType.getEnumType().getEnumValue());
         } else if (modelType.getRecordType() != null) {
@@ -183,10 +182,9 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getExpressionList() != null) {
-            return ExprUtil.list(
-                    modelExpr.getExpressionList().getExpression().stream()
-                            .map(expr -> visit(expr))
-                            .collect(Collectors.toList()));
+            return ExprUtil.list(modelExpr.getExpressionList().getExpression().stream()
+                    .map(expr -> visit(expr))
+                    .collect(Collectors.toList()));
         }
 
         if (modelExpr.getRecordLiteral() != null) {
@@ -200,15 +198,13 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getArrayExpression() != null) {
-            return ExprUtil.array(
-                    modelExpr.getArrayExpression().getExpression().stream()
-                            .map(expr -> visit(expr))
-                            .collect(Collectors.toList()));
+            return ExprUtil.array(modelExpr.getArrayExpression().getExpression().stream()
+                    .map(expr -> visit(expr))
+                    .collect(Collectors.toList()));
         }
 
         if (modelExpr.getCartesianExpression() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Cartesian expressions are not supported!");
+            throw new UnsupportedOperationException("Error: Cartesian expressions are not supported!");
         }
 
         if (modelExpr.getTupleExpression() != null) {
@@ -224,8 +220,7 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getCurrent() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: current expressions are not supported!");
+            throw new UnsupportedOperationException("Error: current expressions are not supported!");
         }
 
         if (modelExpr.getToInt() != null) {
@@ -380,8 +375,7 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getArraySelection() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Array selection expressions are not supported!");
+            throw new UnsupportedOperationException("Error: Array selection expressions are not supported!");
         }
 
         if (modelExpr.getMerge() != null) {
@@ -389,8 +383,7 @@ public class VDMLustre2Kind2 {
         }
 
         if (modelExpr.getEvent() != null) {
-            throw new UnsupportedOperationException(
-                    "Error: Cannot convert Event expressions to Lustre!");
+            throw new UnsupportedOperationException("Error: Cannot convert Event expressions to Lustre!");
         }
 
         throw new UnsupportedOperationException("Error: Expression are not supported!");
@@ -480,9 +473,7 @@ public class VDMLustre2Kind2 {
                 if (constDecl.getDataType() != null) {
                     if (constDecl.getDefinition() != null) {
                         nb.createLocalConst(
-                                constDecl.getName(),
-                                visit(constDecl.getDataType()),
-                                visit(constDecl.getDefinition()));
+                                constDecl.getName(), visit(constDecl.getDataType()), visit(constDecl.getDefinition()));
                     } else {
                         nb.createLocalConst(constDecl.getName(), visit(constDecl.getDataType()));
                     }
@@ -540,9 +531,7 @@ public class VDMLustre2Kind2 {
                 if (symbol.getDataType() != null) {
                     if (symbol.getDefinition() != null) {
                         cbb.createConstant(
-                                symbol.getName(),
-                                visit(symbol.getDataType()),
-                                visit(symbol.getDefinition()));
+                                symbol.getName(), visit(symbol.getDataType()), visit(symbol.getDefinition()));
                     } else {
                         cbb.createConstant(symbol.getName(), visit(symbol.getDataType()));
                     }
@@ -550,10 +539,7 @@ public class VDMLustre2Kind2 {
                     cbb.createConstant(symbol.getName(), visit(symbol.getDefinition()));
                 }
             } else {
-                cbb.createVarDef(
-                        symbol.getName(),
-                        visit(symbol.getDataType()),
-                        visit(symbol.getDefinition()));
+                cbb.createVarDef(symbol.getName(), visit(symbol.getDataType()), visit(symbol.getDefinition()));
             }
         }
 

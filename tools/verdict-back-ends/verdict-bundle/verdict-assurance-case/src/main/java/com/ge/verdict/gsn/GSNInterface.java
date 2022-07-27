@@ -72,15 +72,14 @@ public class GSNInterface {
         for (String rootGoalId : forIds) {
             // create the GSN fragment
             CreateGSN objCreateGSN = new CreateGSN();
-            GsnNode gsnFragment =
-                    objCreateGSN.gsnCreator(
-                            xmlModel,
-                            cyberOutput,
-                            safetyOutput,
-                            modelAadlPath,
-                            rootGoalId,
-                            soteriaOutputLinkPathPrefix,
-                            hostSTEMDir);
+            GsnNode gsnFragment = objCreateGSN.gsnCreator(
+                    xmlModel,
+                    cyberOutput,
+                    safetyOutput,
+                    modelAadlPath,
+                    rootGoalId,
+                    soteriaOutputLinkPathPrefix,
+                    hostSTEMDir);
             System.out.println("Info: Created GSN fragment for " + rootGoalId);
 
             // Filenames
@@ -93,11 +92,7 @@ public class GSNInterface {
                 File gsnXmlFile = new File(gsnOutputDir, xmlFilename);
                 Gsn2Xml objGsn2Xml = new Gsn2Xml();
                 objGsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
-                System.out.println(
-                        "Info: Written GSN to xml for "
-                                + rootGoalId
-                                + ": "
-                                + gsnXmlFile.getAbsolutePath());
+                System.out.println("Info: Written GSN to xml for " + rootGoalId + ": " + gsnXmlFile.getAbsolutePath());
             }
 
             // Create a file and print the dot
@@ -116,8 +111,7 @@ public class GSNInterface {
 
             Dot2GraphViz objDot2GraphViz = new Dot2GraphViz();
             objDot2GraphViz.generateGraph(dotFileSource, graphDestination);
-            System.out.println(
-                    "Info: Written GSN to svg for " + rootGoalId + ": " + graphDestination);
+            System.out.println("Info: Written GSN to svg for " + rootGoalId + ": " + graphDestination);
         }
     }
 }

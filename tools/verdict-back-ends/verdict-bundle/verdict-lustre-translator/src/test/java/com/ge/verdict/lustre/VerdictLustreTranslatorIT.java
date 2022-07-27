@@ -61,9 +61,7 @@ public class VerdictLustreTranslatorIT {
             Model anotherModel = VerdictLustreTranslator.unmarshalFromLustre(tempFile);
             anotherModel.setName(originalModel.getName());
             try {
-                Assertions.assertThat(anotherModel)
-                        .usingRecursiveComparison()
-                        .isEqualTo(originalModel);
+                Assertions.assertThat(anotherModel).usingRecursiveComparison().isEqualTo(originalModel);
             } catch (AssertionError e) {
                 System.err.println("Found non-fidelity of translation in " + path);
                 // Save both temporary Lustre and temporary XML files for easier debugging

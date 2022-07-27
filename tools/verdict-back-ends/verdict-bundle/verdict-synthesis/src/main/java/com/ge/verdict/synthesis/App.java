@@ -35,24 +35,19 @@ public class App {
         boolean dumpSmtLib = arrayContains(args, "--dump-smtlib");
 
         if (dumpSmtLib) {
-            System.out.println(
-                    "Will dump SMT-LIB format to verdict-synthesis-dump.smtlib for debugging");
+            System.out.println("Will dump SMT-LIB format to verdict-synthesis-dump.smtlib for debugging");
             System.out.println("Parent directory: " + System.getProperty("user.dir"));
         }
 
-        final CostModel costModel =
-                timed("Load cost model", () -> new CostModel(new File(costModelXml)));
+        final CostModel costModel = timed("Load cost model", () -> new CostModel(new File(costModelXml)));
 
-        AttackDefenseCollector collector =
-                timed(
-                        "Load CSV",
-                        () -> {
-                            try {
-                                return new AttackDefenseCollector(stemOutDir, inference);
-                            } catch (IOException | MalformedInputException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+        AttackDefenseCollector collector = timed("Load CSV", () -> {
+            try {
+                return new AttackDefenseCollector(stemOutDir, inference);
+            } catch (IOException | MalformedInputException e) {
+                throw new RuntimeException(e);
+            }
+        });
         List<Result> results = timed("Build attack-defense tree", () -> collector.perform());
 
         // This part is for the single cyber requirement version
@@ -93,28 +88,13 @@ public class App {
 
         {
             DLeaf.Factory factory = new DLeaf.Factory();
-            DTree dtree =
-                    timed(
-                            "Construct defense tree",
-                            () ->
-                                    DTreeConstructor.construct(
-                                            results,
-                                            costModel,
-                                            partialSolution,
-                                            meritAssignment,
-                                            factory));
-            Optional<ResultsInstance> selected =
-                    timed(
-                            "Perform synthesis",
-                            () ->
-                                    VerdictSynthesis.performSynthesisMultiple(
-                                            dtree,
-                                            factory,
-                                            costModel,
-                                            partialSolution,
-                                            true,
-                                            meritAssignment,
-                                            dumpSmtLib));
+            DTree dtree = timed(
+                    "Construct defense tree",
+                    () -> DTreeConstructor.construct(results, costModel, partialSolution, meritAssignment, factory));
+            Optional<ResultsInstance> selected = timed(
+                    "Perform synthesis",
+                    () -> VerdictSynthesis.performSynthesisMultiple(
+                            dtree, factory, costModel, partialSolution, true, meritAssignment, dumpSmtLib));
             if (selected.isPresent()) {
                 selected.get().toStreamXml(System.out);
             } else {
@@ -122,19 +102,13 @@ public class App {
             }
         }
 
-        System.out.println(
-                " == Total time: " + (System.currentTimeMillis() - startTime) + " milliseconds");
+        System.out.println(" == Total time: " + (System.currentTimeMillis() - startTime) + " milliseconds");
     }
 
     public static <T> T timed(String title, Supplier<T> function) {
         long startTime = System.currentTimeMillis();
         T ret = function.get();
-        System.out.println(
-                " == "
-                        + title
-                        + ", time: "
-                        + (System.currentTimeMillis() - startTime)
-                        + " milliseconds");
+        System.out.println(" == " + title + ", time: " + (System.currentTimeMillis() - startTime) + " milliseconds");
         return ret;
     }
 

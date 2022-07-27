@@ -6,6 +6,4 @@ import org.osate.xtext.aadl2.properties.naming.PropertiesQualifiedNameProvider;
  * Note: This is not currently being used at all because it causes Osate to crash.
  * It is disabled in the ui project's plugin.xml.
  */
-public class VerdictQualifiedNameProvider extends PropertiesQualifiedNameProvider {
-
-}
+public class VerdictQualifiedNameProvider extends PropertiesQualifiedNameProvider {}

@@ -60,9 +60,8 @@ public class MeritAssignment {
 
                         System.out.print("  ");
 
-                        String category =
-                                StringUtils.capitalize(elementElement.getAttribute("category"))
-                                        .replace('_', ' ');
+                        String category = StringUtils.capitalize(elementElement.getAttribute("category"))
+                                .replace('_', ' ');
 
                         System.out.print(category);
 

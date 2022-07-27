@@ -90,8 +90,7 @@ public class CostModel {
                 throw new RuntimeException("invalid costs");
             }
             for (int dal = 0; dal < 10; dal++) {
-                compDefDalModel.put(
-                        new Triple<>(triple.left, triple.middle, dal), triple.right[dal]);
+                compDefDalModel.put(new Triple<>(triple.left, triple.middle, dal), triple.right[dal]);
             }
         }
     }
@@ -142,44 +141,27 @@ public class CostModel {
 
     /** Print the cost function. Used for diagnostic purposes. */
     public void printMap() {
-        for (Entry<Triple<String, String, Integer>, Fraction> mapping :
-                compDefDalModel.entrySet()) {
-            System.out.println(
-                    "map "
-                            + mapping.getKey().left
-                            + ", "
-                            + mapping.getKey().middle
-                            + ", "
-                            + mapping.getKey().right
-                            + " to "
-                            + mapping.getValue());
+        for (Entry<Triple<String, String, Integer>, Fraction> mapping : compDefDalModel.entrySet()) {
+            System.out.println("map "
+                    + mapping.getKey().left
+                    + ", "
+                    + mapping.getKey().middle
+                    + ", "
+                    + mapping.getKey().right
+                    + " to "
+                    + mapping.getValue());
         }
         for (Entry<Pair<String, String>, Fraction> mapping : compDefModel.entrySet()) {
             System.out.println(
-                    "map "
-                            + mapping.getKey().left
-                            + ", "
-                            + mapping.getKey().right
-                            + " to "
-                            + mapping.getValue());
+                    "map " + mapping.getKey().left + ", " + mapping.getKey().right + " to " + mapping.getValue());
         }
         for (Entry<Pair<String, Integer>, Fraction> mapping : compDalModel.entrySet()) {
             System.out.println(
-                    "map "
-                            + mapping.getKey().left
-                            + ", "
-                            + mapping.getKey().right
-                            + " to "
-                            + mapping.getValue());
+                    "map " + mapping.getKey().left + ", " + mapping.getKey().right + " to " + mapping.getValue());
         }
         for (Entry<Pair<String, Integer>, Fraction> mapping : defDalModel.entrySet()) {
             System.out.println(
-                    "map "
-                            + mapping.getKey().left
-                            + ", "
-                            + mapping.getKey().right
-                            + " to "
-                            + mapping.getValue());
+                    "map " + mapping.getKey().left + ", " + mapping.getKey().right + " to " + mapping.getValue());
         }
         for (Entry<String, Fraction> mapping : compModel.entrySet()) {
             System.out.println("map " + mapping.getKey() + " to " + mapping.getValue());
@@ -217,17 +199,14 @@ public class CostModel {
                     String[] parts = component.split(":::");
                     if (parts.length != 2) {
                         throw new RuntimeException(
-                                "invalid number of parts in qualified component name (should be 2): "
-                                        + component);
+                                "invalid number of parts in qualified component name (should be 2): " + component);
                     }
                     component = parts[1];
                 }
 
                 for (int i = 0; i < rule.getAttributes().getLength(); i++) {
                     String name = rule.getAttributes().item(i).getNodeName();
-                    if (!name.equals("component")
-                            && !name.equals("defense")
-                            && !name.equals("dal")) {
+                    if (!name.equals("component") && !name.equals("defense") && !name.equals("dal")) {
                         throw new ParseException("Unrecognized tag: " + name);
                     }
                 }

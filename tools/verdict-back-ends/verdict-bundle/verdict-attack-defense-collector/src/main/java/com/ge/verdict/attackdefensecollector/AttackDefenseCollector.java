@@ -126,50 +126,42 @@ public class AttackDefenseCollector {
         compDefenseToImplDal = null;
 
         // Load all the files as CSV
-        CSVFile compDepCsv =
-                new CSVFile(
-                        new File(inputDir, "CompDep.csv"),
-                        "Comp",
-                        "InputPort",
-                        "InputCIA",
-                        "OutputPort",
-                        "OutputCIA");
-        CSVFile missionCsv =
-                new CSVFile(
-                        new File(inputDir, "Mission.csv"),
-                        "ModelVersion",
-                        "MissionReqId",
-                        "MissionReq",
-                        "ReqId",
-                        "Req",
-                        "MissionImpactCIA",
-                        "Effect",
-                        "Severity",
-                        "CompInstanceDependency",
-                        "CompOutputDependency",
-                        "DependentCompOutputCIA",
-                        "ReqType");
-        CSVFile scnConnectionsCsv =
-                new CSVFile(
-                        new File(inputDir, "ScnConnections.csv"),
-                        "Scenario",
-                        "Comp",
-                        "Impl",
-                        "ConnectionName",
-                        "SrcComp",
-                        "SrcImpl",
-                        "SrcCompInstance",
-                        "SrcCompCategory",
-                        "SrcPortName",
-                        "SrcPortType",
-                        "DestComp",
-                        "DestImpl",
-                        "DestCompInstance",
-                        "DestCompCategory",
-                        "DestPortName",
-                        "Trust_Level",
-                        "Control_Level",
-                        "Data_Classification");
+        CSVFile compDepCsv = new CSVFile(
+                new File(inputDir, "CompDep.csv"), "Comp", "InputPort", "InputCIA", "OutputPort", "OutputCIA");
+        CSVFile missionCsv = new CSVFile(
+                new File(inputDir, "Mission.csv"),
+                "ModelVersion",
+                "MissionReqId",
+                "MissionReq",
+                "ReqId",
+                "Req",
+                "MissionImpactCIA",
+                "Effect",
+                "Severity",
+                "CompInstanceDependency",
+                "CompOutputDependency",
+                "DependentCompOutputCIA",
+                "ReqType");
+        CSVFile scnConnectionsCsv = new CSVFile(
+                new File(inputDir, "ScnConnections.csv"),
+                "Scenario",
+                "Comp",
+                "Impl",
+                "ConnectionName",
+                "SrcComp",
+                "SrcImpl",
+                "SrcCompInstance",
+                "SrcCompCategory",
+                "SrcPortName",
+                "SrcPortType",
+                "DestComp",
+                "DestImpl",
+                "DestCompInstance",
+                "DestCompCategory",
+                "DestPortName",
+                "Trust_Level",
+                "Control_Level",
+                "Data_Classification");
 
         // Keep track of component instances associated with each component type
         Map<String, Set<SystemModel>> compTypeToSystem = new HashMap<>();
@@ -177,8 +169,7 @@ public class AttackDefenseCollector {
         Map<String, Set<SystemModel>> compImplToSystem = new HashMap<>();
         // Keep track of outgoing internal connections for use in correctly mapping cyber
         // requirements
-        Map<Pair<SystemModel, String>, Pair<SystemModel, String>> outgoingConnectionMap =
-                new HashMap<>();
+        Map<Pair<SystemModel, String>, Pair<SystemModel, String>> outgoingConnectionMap = new HashMap<>();
         // For some reason the connection names in CAPEC.csv and Defenses.csv are confusing, so make
         // a map
         // from the confusing names to the correct names
@@ -248,28 +239,23 @@ public class AttackDefenseCollector {
             boolean internalIncoming = sourceInstName.length() == 0;
             boolean internalOutgoing = destInstName.length() == 0;
 
-            Collection<SystemModel> sources =
-                    internalIncoming
-                            ? compImplToSystem.get(sourceImplName)
-                            : Collections.singleton(getSystem(sourceInstName));
-            Collection<SystemModel> dests =
-                    internalOutgoing
-                            ? compImplToSystem.get(destImplName)
-                            : Collections.singleton(getSystem(destInstName));
+            Collection<SystemModel> sources = internalIncoming
+                    ? compImplToSystem.get(sourceImplName)
+                    : Collections.singleton(getSystem(sourceInstName));
+            Collection<SystemModel> dests = internalOutgoing
+                    ? compImplToSystem.get(destImplName)
+                    : Collections.singleton(getSystem(destInstName));
 
             if (sources == null) {
-                throw new RuntimeException(
-                        "Could not find component implementation: " + sourceImplName);
+                throw new RuntimeException("Could not find component implementation: " + sourceImplName);
             } else if (dests == null) {
-                throw new RuntimeException(
-                        "Could not find component implementation: " + destImplName);
+                throw new RuntimeException("Could not find component implementation: " + destImplName);
             }
 
             // this isn't actually quadratic because only one of the lists has more than one element
             for (SystemModel source : sources) {
                 for (SystemModel dest : dests) {
-                    ConnectionModel connection =
-                            new ConnectionModel(name, source, dest, sourcePort, destPort);
+                    ConnectionModel connection = new ConnectionModel(name, source, dest, sourcePort, destPort);
 
                     /*
                      * Logger.println("loaded connection: " + name + " from (" + sourceTypeName + ", " + sourceImplName
@@ -287,8 +273,7 @@ public class AttackDefenseCollector {
                     } else if (internalOutgoing) {
                         source.addOutgoingConnection(connection);
                         dest.addOutgoingInternalConnection(connection);
-                        outgoingConnectionMap.put(
-                                new Pair<>(source, sourcePort), new Pair<>(dest, destPort));
+                        outgoingConnectionMap.put(new Pair<>(source, sourcePort), new Pair<>(dest, destPort));
                     } else {
                         source.addOutgoingConnection(connection);
                         dest.addIncomingConnection(connection);
@@ -345,11 +330,10 @@ public class AttackDefenseCollector {
                 if (outgoingConnectionMap.containsKey(internal)) {
                     systemPort = outgoingConnectionMap.get(internal);
                 } else {
-                    Logger.showWarning(
-                            "Could not find outgoing internal connection from system: "
-                                    + systemInternal.getName()
-                                    + ", port: "
-                                    + portNameInternal);
+                    Logger.showWarning("Could not find outgoing internal connection from system: "
+                            + systemInternal.getName()
+                            + ", port: "
+                            + portNameInternal);
                     // We could proceed by analyzing the internal port, which is technically not
                     // wrong.
                     // But this connection should be present, and its ommission is an error.
@@ -365,8 +349,7 @@ public class AttackDefenseCollector {
                     opt.get().addDisjunct(new PortConcern(systemPort.right, portCia));
                 } else {
                     systemPort.left.addCyberReq(
-                            new CyberReq(
-                                    cyberReqId, missionId, severityDal, systemPort.right, portCia));
+                            new CyberReq(cyberReqId, missionId, severityDal, systemPort.right, portCia));
                 }
             }
         }
@@ -392,31 +375,29 @@ public class AttackDefenseCollector {
     private void loadAttacksDefensesFromCsv(String inputDir, Map<String, String> connectionNameMap)
             throws CSVFile.MalformedInputException, IOException {
         // Load all the files as CSV
-        CSVFile capecCsv =
-                new CSVFile(
-                        new File(inputDir, "CAPEC.csv"),
-                        true,
-                        "CompType",
-                        "CompInst",
-                        "CAPEC",
-                        "CAPECDescription",
-                        "Confidentiality",
-                        "Integrity",
-                        "Availability",
-                        "LikelihoodOfSuccess");
-        CSVFile defensesCsv =
-                new CSVFile(
-                        new File(inputDir, "Defenses.csv"),
-                        true,
-                        "CompType",
-                        "CompInst",
-                        "CAPEC",
-                        "Confidentiality",
-                        "Integrity",
-                        "Availability",
-                        "ApplicableDefenseProperties",
-                        "ImplProperties",
-                        "DAL");
+        CSVFile capecCsv = new CSVFile(
+                new File(inputDir, "CAPEC.csv"),
+                true,
+                "CompType",
+                "CompInst",
+                "CAPEC",
+                "CAPECDescription",
+                "Confidentiality",
+                "Integrity",
+                "Availability",
+                "LikelihoodOfSuccess");
+        CSVFile defensesCsv = new CSVFile(
+                new File(inputDir, "Defenses.csv"),
+                true,
+                "CompType",
+                "CompInst",
+                "CAPEC",
+                "Confidentiality",
+                "Integrity",
+                "Availability",
+                "ApplicableDefenseProperties",
+                "ImplProperties",
+                "DAL");
 
         // Load attacks
         for (CSVFile.RowData row : capecCsv.getRowDatas()) {
@@ -427,36 +408,20 @@ public class AttackDefenseCollector {
             String attackDesc = row.getCell("CAPECDescription");
             Prob likelihood = Prob.certain();
             // Look at all three columns to figure out which one is being used
-            CIA cia =
-                    CIA.fromStrings(
-                            row.getCell("Confidentiality"),
-                            row.getCell("Integrity"),
-                            row.getCell("Availability"));
+            CIA cia = CIA.fromStrings(
+                    row.getCell("Confidentiality"), row.getCell("Integrity"), row.getCell("Availability"));
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection :
-                        connNameToConnectionModelMap.get(connectionName)) {
+                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
                     connection
                             .getAttackable()
-                            .addAttack(
-                                    new Attack(
-                                            connection.getAttackable(),
-                                            attackName,
-                                            attackDesc,
-                                            likelihood,
-                                            cia));
+                            .addAttack(new Attack(connection.getAttackable(), attackName, attackDesc, likelihood, cia));
                 }
             } else {
                 SystemModel system = getSystem(systemInstName);
                 system.getAttackable()
-                        .addAttack(
-                                new Attack(
-                                        system.getAttackable(),
-                                        attackName,
-                                        attackDesc,
-                                        likelihood,
-                                        cia));
+                        .addAttack(new Attack(system.getAttackable(), attackName, attackDesc, likelihood, cia));
             }
         }
 
@@ -467,26 +432,19 @@ public class AttackDefenseCollector {
             String systemInstName = row.getCell("CompInst");
 
             String attackName = row.getCell("CAPEC");
-            CIA cia =
-                    CIA.fromStrings(
-                            row.getCell("Confidentiality"),
-                            row.getCell("Integrity"),
-                            row.getCell("Availability"));
-            List<String> defenseNames =
-                    Arrays.asList(row.getCell("ApplicableDefenseProperties").split(";")).stream()
-                            .map(
-                                    name ->
-                                            name.length() > 0
-                                                    ? Character.toString(name.charAt(0))
-                                                                    .toLowerCase()
-                                                            + name.substring(1)
-                                                    : "")
-                            .collect(Collectors.toList());
+            CIA cia = CIA.fromStrings(
+                    row.getCell("Confidentiality"), row.getCell("Integrity"), row.getCell("Availability"));
+            List<String> defenseNames = Arrays.asList(
+                            row.getCell("ApplicableDefenseProperties").split(";"))
+                    .stream()
+                    .map(name -> name.length() > 0
+                            ? Character.toString(name.charAt(0)).toLowerCase() + name.substring(1)
+                            : "")
+                    .collect(Collectors.toList());
             List<String> implProps = Arrays.asList(row.getCell("ImplProperties").split(";"));
             List<String> likelihoodStrings = Arrays.asList(row.getCell("DAL").split(";"));
 
-            if (defenseNames.size() != implProps.size()
-                    || defenseNames.size() != likelihoodStrings.size()) {
+            if (defenseNames.size() != implProps.size() || defenseNames.size() != likelihoodStrings.size()) {
                 throw new RuntimeException(
                         "ApplicableDefenseProperties, ImplProperties, and DAL must have same cardinality");
             }
@@ -496,16 +454,12 @@ public class AttackDefenseCollector {
 
             if ("Connection".equals(systemTypeName)) {
                 String connectionName = connectionNameMap.get(systemInstName);
-                for (ConnectionModel connection :
-                        connNameToConnectionModelMap.get(connectionName)) {
-                    Defense defense =
-                            connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
+                for (ConnectionModel connection : connNameToConnectionModelMap.get(connectionName)) {
+                    Defense defense = connection.getAttackable().getDefenseByAttackAndCia(attackName, cia);
                     if (defense == null) {
-                        Attack attack =
-                                connection.getAttackable().getAttackByNameAndCia(attackName, cia);
+                        Attack attack = connection.getAttackable().getAttackByNameAndCia(attackName, cia);
                         if (attack == null) {
-                            throw new RuntimeException(
-                                    "could not find attack: " + attackName + ", " + cia);
+                            throw new RuntimeException("could not find attack: " + attackName + ", " + cia);
                         }
                         defense = new Defense(attack);
                         connection.getAttackable().addDefense(defense);
@@ -519,8 +473,7 @@ public class AttackDefenseCollector {
                 if (defense == null) {
                     Attack attack = system.getAttackable().getAttackByNameAndCia(attackName, cia);
                     if (attack == null) {
-                        throw new RuntimeException(
-                                "could not find attack: " + attackName + ", " + cia);
+                        throw new RuntimeException("could not find attack: " + attackName + ", " + cia);
                     }
                     defense = new Defense(attack);
                     system.getAttackable().addDefense(defense);
@@ -532,9 +485,7 @@ public class AttackDefenseCollector {
 
             // Need to get correct name if connection
             String entityName =
-                    "Connection".equals(systemTypeName)
-                            ? connectionNameMap.get(systemInstName)
-                            : systemInstName;
+                    "Connection".equals(systemTypeName) ? connectionNameMap.get(systemInstName) : systemInstName;
 
             for (int i = 0; i < defenseNames.size(); i++) {
                 if (!"null".equals(defenseNames.get(i))) {
@@ -555,19 +506,11 @@ public class AttackDefenseCollector {
                     // but we have changed the capitalization so that they should be the same
                     Optional<Pair<String, Integer>> impl;
                     if (dal == -1) {
-                        impl =
-                                "null".equals(implProps.get(i))
-                                        ? Optional.empty()
-                                        : Optional.of(
-                                                new Pair<>(
-                                                        implProps.get(i),
-                                                        Integer.parseInt(
-                                                                likelihoodStrings.get(i))));
+                        impl = "null".equals(implProps.get(i))
+                                ? Optional.empty()
+                                : Optional.of(new Pair<>(implProps.get(i), Integer.parseInt(likelihoodStrings.get(i))));
                     } else {
-                        impl =
-                                dal == 0
-                                        ? Optional.empty()
-                                        : Optional.of(new Pair<>(defenseNames.get(i), dal));
+                        impl = dal == 0 ? Optional.empty() : Optional.of(new Pair<>(defenseNames.get(i), dal));
                     }
                     clause.add(new Defense.DefenseLeaf(defenseNames.get(i), impl));
                 }
@@ -602,37 +545,22 @@ public class AttackDefenseCollector {
                     if (!system.getIncomingConnections().isEmpty()) {
                         // For each of C, I, A, we have X -> X
                         for (CIA cia : CIA.values()) {
-                            CyberExpr condition =
-                                    new CyberOr(
-                                            system.getIncomingConnections().stream()
-                                                    .map(
-                                                            incoming ->
-                                                                    new PortConcern(
-                                                                            incoming
-                                                                                    .getDestinationPortName(),
-                                                                            cia))
-                                                    .collect(Collectors.toList()));
-                            system.addCyberRel(
-                                    new CyberRel(
-                                            "_inference" + (inferenceCounter++),
-                                            condition,
-                                            new PortConcern(outgoing.getSourcePortName(), cia)));
+                            CyberExpr condition = new CyberOr(system.getIncomingConnections().stream()
+                                    .map(incoming -> new PortConcern(incoming.getDestinationPortName(), cia))
+                                    .collect(Collectors.toList()));
+                            system.addCyberRel(new CyberRel(
+                                    "_inference" + (inferenceCounter++),
+                                    condition,
+                                    new PortConcern(outgoing.getSourcePortName(), cia)));
                         }
 
                         // We also have I -> A
-                        system.addCyberRel(
-                                new CyberRel(
-                                        "_inference" + (inferenceCounter++),
-                                        new CyberOr(
-                                                system.getIncomingConnections().stream()
-                                                        .map(
-                                                                incoming ->
-                                                                        new PortConcern(
-                                                                                incoming
-                                                                                        .getDestinationPortName(),
-                                                                                CIA.I))
-                                                        .collect(Collectors.toList())),
-                                        new PortConcern(outgoing.getSourcePortName(), CIA.A)));
+                        system.addCyberRel(new CyberRel(
+                                "_inference" + (inferenceCounter++),
+                                new CyberOr(system.getIncomingConnections().stream()
+                                        .map(incoming -> new PortConcern(incoming.getDestinationPortName(), CIA.I))
+                                        .collect(Collectors.toList())),
+                                new PortConcern(outgoing.getSourcePortName(), CIA.A)));
                     }
                 }
             }
@@ -720,7 +648,10 @@ public class AttackDefenseCollector {
                         sourcePort = conn.getSource().getComponentPort().getName();
                     } else {
                         if (conn.getSource().getSubcomponentPort().getPort() != null) {
-                            sourcePort = conn.getSource().getSubcomponentPort().getPort().getName();
+                            sourcePort = conn.getSource()
+                                    .getSubcomponentPort()
+                                    .getPort()
+                                    .getName();
                         } else {
                             System.out.println("Null in port: " + conn.getName());
                             sourcePort = "null";
@@ -730,47 +661,37 @@ public class AttackDefenseCollector {
                         destPort = conn.getDestination().getComponentPort().getName();
                     } else {
                         if (conn.getDestination().getSubcomponentPort().getPort() != null) {
-                            destPort =
-                                    conn.getDestination().getSubcomponentPort().getPort().getName();
+                            destPort = conn.getDestination()
+                                    .getSubcomponentPort()
+                                    .getPort()
+                                    .getName();
                         } else {
                             System.out.println("Null out port: " + conn.getName());
                             destPort = "null";
                         }
                     }
 
-                    Collection<SystemModel> sources =
-                            internalIncoming
-                                    ? compImplToSystem.get(impl.getName())
-                                    : Collections.singleton(
-                                            getSystem(
-                                                    conn.getSource()
-                                                            .getSubcomponentPort()
-                                                            .getSubcomponent()
-                                                            .getName()));
-                    Collection<SystemModel> dests =
-                            internalOutgoing
-                                    ? compImplToSystem.get(impl.getName())
-                                    : Collections.singleton(
-                                            getSystem(
-                                                    conn.getDestination()
-                                                            .getSubcomponentPort()
-                                                            .getSubcomponent()
-                                                            .getName()));
+                    Collection<SystemModel> sources = internalIncoming
+                            ? compImplToSystem.get(impl.getName())
+                            : Collections.singleton(getSystem(conn.getSource()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()));
+                    Collection<SystemModel> dests = internalOutgoing
+                            ? compImplToSystem.get(impl.getName())
+                            : Collections.singleton(getSystem(conn.getDestination()
+                                    .getSubcomponentPort()
+                                    .getSubcomponent()
+                                    .getName()));
 
                     for (SystemModel srcSysModel : sources) {
                         for (SystemModel destSysModel : dests) {
-                            ConnectionModel connection =
-                                    new ConnectionModel(
-                                            conn.getName(),
-                                            srcSysModel,
-                                            destSysModel,
-                                            sourcePort,
-                                            destPort);
+                            ConnectionModel connection = new ConnectionModel(
+                                    conn.getName(), srcSysModel, destSysModel, sourcePort, destPort);
 
                             for (GenericAttribute attrib : conn.getAttribute()) {
                                 if (attrib.getValue() instanceof String) {
-                                    connection.addAttribute(
-                                            attrib.getName(), (String) attrib.getValue());
+                                    connection.addAttribute(attrib.getName(), (String) attrib.getValue());
                                 }
                             }
 
@@ -778,8 +699,7 @@ public class AttackDefenseCollector {
                             // + source.getName() + ":"
                             // + sourcePort + " to " + dest.getName() + ":" + destPort);
 
-                            Util.putSetMap(
-                                    connNameToConnectionModelMap, conn.getName(), connection);
+                            Util.putSetMap(connNameToConnectionModelMap, conn.getName(), connection);
 
                             // Store connection in a different place depending on internal/external
                             // and
@@ -800,8 +720,7 @@ public class AttackDefenseCollector {
                     // This is the way that connection names are stored in CAPEC.csv and
                     // Defenses.csv
                     connectionAttackNames.put(
-                            conn.getName() + impl.getName() + impl.getType().getName(),
-                            conn.getName());
+                            conn.getName() + impl.getName() + impl.getType().getName(), conn.getName());
                 }
             }
         }
@@ -811,15 +730,11 @@ public class AttackDefenseCollector {
             for (verdict.vdm.vdm_model.CyberRel rel : compType.getCyberRel()) {
                 for (SystemModel system : compTypeToSystem.get(compType.getName())) {
                     if (rel.getInputs() != null) {
-                        system.addCyberRel(
-                                new CyberRel(
-                                        rel.getId(),
-                                        convertCyberExpr(rel.getInputs()),
-                                        convertCIAPort(rel.getOutput())));
+                        system.addCyberRel(new CyberRel(
+                                rel.getId(), convertCyberExpr(rel.getInputs()), convertCIAPort(rel.getOutput())));
                     } else {
                         // no input
-                        system.addCyberRel(
-                                new CyberRel(rel.getId(), convertCIAPort(rel.getOutput())));
+                        system.addCyberRel(new CyberRel(rel.getId(), convertCIAPort(rel.getOutput())));
                     }
                 }
             }
@@ -845,23 +760,21 @@ public class AttackDefenseCollector {
                 if (cyberReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.CyberReq req = cyberReqMap.get(reqName);
                     for (SystemModel system : compTypeToSystem.get(req.getCompType())) {
-                        system.addCyberReq(
-                                new CyberReq(
-                                        req.getId(),
-                                        mission.getId(),
-                                        convertSeverity(req.getSeverity()),
-                                        convertCyberExpr(req.getCondition())));
+                        system.addCyberReq(new CyberReq(
+                                req.getId(),
+                                mission.getId(),
+                                convertSeverity(req.getSeverity()),
+                                convertCyberExpr(req.getCondition())));
                     }
                 } else if (safetyReqMap.containsKey(reqName)) {
                     verdict.vdm.vdm_model.SafetyReq req = safetyReqMap.get(reqName);
                     // TODO support safety reqs
                 } else {
-                    throw new RuntimeException(
-                            "Undefined cyber/safety requirement \""
-                                    + reqName
-                                    + "\" in mission \""
-                                    + mission.getName()
-                                    + "\"");
+                    throw new RuntimeException("Undefined cyber/safety requirement \""
+                            + reqName
+                            + "\" in mission \""
+                            + mission.getName()
+                            + "\"");
                 }
             }
         }
@@ -877,9 +790,7 @@ public class AttackDefenseCollector {
                             // chop qualifier (normally "CASE_Consolidated_Properties::")
                             int lastColon = attrib.getName().lastIndexOf(':');
                             String name =
-                                    lastColon != -1
-                                            ? attrib.getName().substring(lastColon + 1)
-                                            : attrib.getName();
+                                    lastColon != -1 ? attrib.getName().substring(lastColon + 1) : attrib.getName();
 
                             // only add property if it's a defense property, as opposed to, say,
                             // componentType
@@ -888,19 +799,17 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        compDefenseToImplDal.put(
-                                                new Pair<>(inst.getName(), name), dal);
+                                        compDefenseToImplDal.put(new Pair<>(inst.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
-                                    throw new RuntimeException(
-                                            "Invalid DAL for "
-                                                    + impl.getName()
-                                                    + " - "
-                                                    + inst.getName()
-                                                    + ":"
-                                                    + name
-                                                    + ", "
-                                                    + attrib.getValue());
+                                    throw new RuntimeException("Invalid DAL for "
+                                            + impl.getName()
+                                            + " - "
+                                            + inst.getName()
+                                            + ":"
+                                            + name
+                                            + ", "
+                                            + attrib.getValue());
                                 }
                             }
                         }
@@ -914,9 +823,7 @@ public class AttackDefenseCollector {
                             // chop qualifier (normally "CASE_Consolidated_Properties::")
                             int lastColon = attrib.getName().lastIndexOf(':');
                             String name =
-                                    lastColon != -1
-                                            ? attrib.getName().substring(lastColon + 1)
-                                            : attrib.getName();
+                                    lastColon != -1 ? attrib.getName().substring(lastColon + 1) : attrib.getName();
 
                             // only add property if it's a defense property, as opposed to, say,
                             // connectionType
@@ -925,19 +832,17 @@ public class AttackDefenseCollector {
                                     Integer dal = Integer.parseInt((String) attrib.getValue());
                                     // only implemented if greater than zero
                                     if (dal > 0) {
-                                        compDefenseToImplDal.put(
-                                                new Pair<>(conn.getName(), name), dal);
+                                        compDefenseToImplDal.put(new Pair<>(conn.getName(), name), dal);
                                     }
                                 } catch (NumberFormatException e) {
-                                    throw new RuntimeException(
-                                            "Invalid DAL for "
-                                                    + impl.getName()
-                                                    + " - "
-                                                    + conn.getName()
-                                                    + ":"
-                                                    + name
-                                                    + ", "
-                                                    + attrib.getValue());
+                                    throw new RuntimeException("Invalid DAL for "
+                                            + impl.getName()
+                                            + " - "
+                                            + conn.getName()
+                                            + ":"
+                                            + name
+                                            + ", "
+                                            + attrib.getValue());
                                 }
                             }
                         }
@@ -961,15 +866,13 @@ public class AttackDefenseCollector {
      */
     public static CyberExpr convertCyberExpr(verdict.vdm.vdm_model.CyberExpr expr) {
         if (expr.getAnd() != null) {
-            return new CyberAnd(
-                    expr.getAnd().getExpr().stream()
-                            .map(AttackDefenseCollector::convertCyberExpr)
-                            .collect(Collectors.toList()));
+            return new CyberAnd(expr.getAnd().getExpr().stream()
+                    .map(AttackDefenseCollector::convertCyberExpr)
+                    .collect(Collectors.toList()));
         } else if (expr.getOr() != null) {
-            return new CyberOr(
-                    expr.getOr().getExpr().stream()
-                            .map(AttackDefenseCollector::convertCyberExpr)
-                            .collect(Collectors.toList()));
+            return new CyberOr(expr.getOr().getExpr().stream()
+                    .map(AttackDefenseCollector::convertCyberExpr)
+                    .collect(Collectors.toList()));
         } else if (expr.getNot() != null) {
             return new CyberNot(convertCyberExpr(expr.getNot()));
         } else if (expr.getPort() != null) {
@@ -1046,10 +949,7 @@ public class AttackDefenseCollector {
             for (CyberReq cyberReq : system.getCyberReqs()) {
                 Optional<ADTree> treeOpt = system.trace(cyberReq.getCondition());
                 // Crush the tree to remove redundant nodes
-                ADTree crushed =
-                        treeOpt.isPresent()
-                                ? treeOpt.get().crush()
-                                : new ADOr(Collections.emptyList(), true);
+                ADTree crushed = treeOpt.isPresent() ? treeOpt.get().crush() : new ADOr(Collections.emptyList(), true);
 
                 // not enabling this for now because it is potentially inefficient
                 // ADTree adtree = CutSetGenerator.generate(crushed);
@@ -1074,8 +974,7 @@ public class AttackDefenseCollector {
      * @return a map from pairs (component, defense) to implemented DAL.
      */
     public Map<Pair<String, String>, Integer> getImplDal() {
-        return Collections.unmodifiableMap(
-                compDefenseToImplDal != null ? compDefenseToImplDal : new HashMap<>());
+        return Collections.unmodifiableMap(compDefenseToImplDal != null ? compDefenseToImplDal : new HashMap<>());
     }
 
     public static final class Result {

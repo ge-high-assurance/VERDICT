@@ -77,11 +77,10 @@ public class ADOr extends ADTree {
         List<ADTree> crushed = adtrees.stream().map(ADTree::crush).collect(Collectors.toList());
 
         // Disjunction is commutative
-        Stream<ADTree> combinedOrs =
-                crushed.stream()
-                        .filter(adtree -> adtree instanceof ADOr)
-                        .map(or -> (ADOr) or)
-                        .flatMap(or -> or.adtrees.stream());
+        Stream<ADTree> combinedOrs = crushed.stream()
+                .filter(adtree -> adtree instanceof ADOr)
+                .map(or -> (ADOr) or)
+                .flatMap(or -> or.adtrees.stream());
         Stream<ADTree> others = crushed.stream().filter(adtree -> !(adtree instanceof ADOr));
 
         return new ADOr(Stream.concat(combinedOrs, others).distinct().collect(Collectors.toList()));
@@ -91,9 +90,7 @@ public class ADOr extends ADTree {
     public Prob compute() {
         // Fold across children with OR operator as follows:
         // 0 OR child_1 OR child_2 OR ... OR child_n
-        return adtrees.stream()
-                .map(ADTree::compute)
-                .reduce(Prob.impossible(), (a, b) -> Prob.or(a, b));
+        return adtrees.stream().map(ADTree::compute).reduce(Prob.impossible(), (a, b) -> Prob.or(a, b));
     }
 
     @Override
@@ -122,9 +119,7 @@ public class ADOr extends ADTree {
     @Override
     public Formula toLogicNg(FormulaFactory factory, CutSetGenerator.Cache cache) {
         return factory.or(
-                adtrees.stream()
-                        .map(adtree -> adtree.toLogicNg(factory, cache))
-                        .collect(Collectors.toList()));
+                adtrees.stream().map(adtree -> adtree.toLogicNg(factory, cache)).collect(Collectors.toList()));
     }
 
     @Override

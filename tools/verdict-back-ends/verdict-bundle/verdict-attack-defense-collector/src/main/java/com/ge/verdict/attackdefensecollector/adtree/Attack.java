@@ -32,12 +32,7 @@ public class Attack extends ADTree {
      * @param prob the probability of attack success
      * @param cia the CIA concern affected by the attack
      */
-    public Attack(
-            Attackable attackable,
-            String attackName,
-            String attackDescription,
-            Prob prob,
-            CIA cia) {
+    public Attack(Attackable attackable, String attackName, String attackDescription, Prob prob, CIA cia) {
         this.attackable = attackable;
         this.attackName = attackName;
         this.attackDescription = attackDescription;
@@ -87,13 +82,7 @@ public class Attack extends ADTree {
     @Override
     public void prettyPrint(IndentedStringBuilder builder) {
         // systemName:cia:attackName
-        builder.append(
-                String.format(
-                        Locale.US,
-                        "%s:%s:%s",
-                        attackable.getParentName(),
-                        cia.toString(),
-                        attackName));
+        builder.append(String.format(Locale.US, "%s:%s:%s", attackable.getParentName(), cia.toString(), attackName));
     }
 
     @Override
@@ -118,8 +107,7 @@ public class Attack extends ADTree {
                     && otherAttack.attackName.equals(attackName)
                     && otherAttack.attackDescription.equals(attackDescription)
                     && otherAttack.prob.equals(prob)
-                    && ((otherAttack.cia == null && cia == null)
-                            || otherAttack.cia.equals(cia)); // can be bleached
+                    && ((otherAttack.cia == null && cia == null) || otherAttack.cia.equals(cia)); // can be bleached
         }
 
         return false;

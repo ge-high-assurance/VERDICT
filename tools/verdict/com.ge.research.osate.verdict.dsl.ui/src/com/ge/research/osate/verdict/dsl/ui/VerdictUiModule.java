@@ -3,23 +3,22 @@
  */
 package com.ge.research.osate.verdict.dsl.ui;
 
+import com.ge.research.osate.verdict.dsl.ui.contentassist.VerdictTemplateProposalProvider;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.ui.editor.contentassist.ITemplateProposalProvider;
-
-import com.ge.research.osate.verdict.dsl.ui.contentassist.VerdictTemplateProposalProvider;
 
 /**
  * Use this class to register components to be used within the IDE.
  */
 public class VerdictUiModule extends AbstractVerdictUiModule {
-	public static final String INJECTOR_NAME = "com.ge.research.osate.verdict.dsl.Verdict";
+    public static final String INJECTOR_NAME = "com.ge.research.osate.verdict.dsl.Verdict";
 
-	public VerdictUiModule(AbstractUIPlugin plugin) {
-		super(plugin);
-	}
+    public VerdictUiModule(AbstractUIPlugin plugin) {
+        super(plugin);
+    }
 
-	@Override
-	public Class<? extends ITemplateProposalProvider> bindITemplateProposalProvider() {
-		return VerdictTemplateProposalProvider.class;
-	}
+    @Override
+    public Class<? extends ITemplateProposalProvider> bindITemplateProposalProvider() {
+        return VerdictTemplateProposalProvider.class;
+    }
 }

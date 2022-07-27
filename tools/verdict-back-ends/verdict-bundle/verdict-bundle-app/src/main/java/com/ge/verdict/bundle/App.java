@@ -97,55 +97,50 @@ public class App {
     }
 
     private static Options buildOptions() {
-        Option csv =
-                Option.builder()
-                        .desc("CSV input")
-                        .longOpt("csv")
-                        .hasArg()
-                        .argName("Model name")
-                        .build();
+        Option csv = Option.builder()
+                .desc("CSV input")
+                .longOpt("csv")
+                .hasArg()
+                .argName("Model name")
+                .build();
 
-        Option vdm =
-                Option.builder()
-                        .desc("VDM input")
-                        .longOpt("vdm")
-                        .hasArg()
-                        .argName("VDM file")
-                        .build();
+        Option vdm = Option.builder()
+                .desc("VDM input")
+                .longOpt("vdm")
+                .hasArg()
+                .argName("VDM file")
+                .build();
 
         OptionGroup inputGroup = new OptionGroup();
         inputGroup.addOption(csv);
         inputGroup.addOption(vdm);
         inputGroup.setRequired(true);
 
-        Option mbas =
-                Option.builder()
-                        .desc("Run MBAS")
-                        .longOpt("mbas")
-                        .numberOfArgs(2)
-                        .argName("STEM project dir")
-                        .argName("Soteria++ binary")
-                        .build();
+        Option mbas = Option.builder()
+                .desc("Run MBAS")
+                .longOpt("mbas")
+                .numberOfArgs(2)
+                .argName("STEM project dir")
+                .argName("Soteria++ binary")
+                .build();
 
-        Option crv =
-                Option.builder()
-                        .desc("Run CRV")
-                        .longOpt("crv")
-                        .numberOfArgs(2)
-                        .argName("Kind2 output file (.xml or .json)")
-                        .argName("kind2 binary")
-                        .build();
+        Option crv = Option.builder()
+                .desc("Run CRV")
+                .longOpt("crv")
+                .numberOfArgs(2)
+                .argName("Kind2 output file (.xml or .json)")
+                .argName("kind2 binary")
+                .build();
 
-        Option gsn =
-                Option.builder()
-                        .longOpt("gsn")
-                        .numberOfArgs(5)
-                        .argName("Root Goal Id")
-                        .argName("GSN Output Directory")
-                        .argName("Soteria++ Output Directory")
-                        .argName("AADL Project Directory")
-                        .argName("Host STEM Directory")
-                        .build();
+        Option gsn = Option.builder()
+                .longOpt("gsn")
+                .numberOfArgs(5)
+                .argName("Root Goal Id")
+                .argName("GSN Output Directory")
+                .argName("Soteria++ Output Directory")
+                .argName("AADL Project Directory")
+                .argName("Host STEM Directory")
+                .build();
 
         OptionGroup group = new OptionGroup();
         group.addOption(mbas);
@@ -153,13 +148,12 @@ public class App {
         group.addOption(gsn);
         group.setRequired(true);
 
-        Option debug =
-                Option.builder("d")
-                        .desc("Produce debug output")
-                        .longOpt("debug")
-                        .hasArg()
-                        .argName("Intermediary XML output directory")
-                        .build();
+        Option debug = Option.builder("d")
+                .desc("Produce debug output")
+                .longOpt("debug")
+                .hasArg()
+                .argName("Intermediary XML output directory")
+                .build();
 
         Options options = new Options();
         options.addOptionGroup(inputGroup);
@@ -170,14 +164,13 @@ public class App {
         options.addOption("s", false, "Safety Relations Inference");
 
         // TODO don't have a good short option because "s" is already taken
-        Option synthesis =
-                Option.builder("y")
-                        .desc("Perform synthesis instead of Soteria++")
-                        .longOpt("synthesis")
-                        .numberOfArgs(2)
-                        .argName("vdm")
-                        .argName("costModel")
-                        .build();
+        Option synthesis = Option.builder("y")
+                .desc("Perform synthesis instead of Soteria++")
+                .longOpt("synthesis")
+                .numberOfArgs(2)
+                .argName("vdm")
+                .argName("costModel")
+                .build();
         options.addOption(synthesis);
         options.addOption("o", "synthesis-output", true, "Synthesis output XML file");
         options.addOption("p", false, "Use partial solutions in synthesis");
@@ -205,7 +198,11 @@ public class App {
      * @return the name of the JAR file that was run to invoke the Verdict bundle
      */
     private static String getJarName() {
-        return new File(App.class.getProtectionDomain().getCodeSource().getLocation().getPath())
+        return new File(App.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .getPath())
                 .getName();
     }
 
@@ -237,11 +234,9 @@ public class App {
         helpLine("      <soteria++ bin> ...... Soteria++ binary");
         helpLine("      -c ................... cyber relations inference");
         helpLine("      -s ................... safety relations inference");
-        helpLine(
-                "      --synthesis <vdm file> <cost model xml>"
-                        + "                             perform synthesis instead of Soteria++");
-        helpLine(
-                "       -o ................... synthesis output XML (required if synthesis enabled)");
+        helpLine("      --synthesis <vdm file> <cost model xml>"
+                + "                             perform synthesis instead of Soteria++");
+        helpLine("       -o ................... synthesis output XML (required if synthesis enabled)");
         helpLine("      -p ................... synthesis partial solutions");
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
@@ -254,24 +249,19 @@ public class App {
         helpLine("      -LC .................. All MIVC");
         helpLine("      -OC .................. One MIVC");
         helpLine("      -BA .................. blame assignment");
-        helpLine(
-                "       -C ................... component-level blame assignment (default link-level)");
+        helpLine("       -C ................... component-level blame assignment (default link-level)");
         helpLine("      -G ................... global blame assignment (default local)");
-        helpLine(
-                "      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
+        helpLine("      <threats> ............. any combination of: [-LS] [-NI] [-LB] [-IT] [-OT] [-RI] [-SV] [-HT]");
         helpLine();
         helpLine("Toolchain: Assurance Case Fragment Generator");
-        helpLine(
-                "  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> <host STEM dir> [-x] [-z]");
+        helpLine("  --gsn <root id> <gsn out dir> <soteria out dir> <aadl project dir> <host STEM dir> [-x] [-z]");
         helpLine("   <root id> ............... the root goal id for the assurance case fragment");
-        helpLine(
-                "    <gsn out dir> ........... the directory where the gsn fragments should be created");
+        helpLine("    <gsn out dir> ........... the directory where the gsn fragments should be created");
         helpLine("   <soteria out dir> ....... the directory where Soteria outputs are created");
         helpLine("   <aadl project dir> ...... the directory where the aadl files are present");
         helpLine("   <host STEM dir> ......... the host STEM directory address");
         helpLine("        -x ................. key to determine if xml should be created");
-        helpLine(
-                "         -z ................. key to determine if security assurance cases should be created");
+        helpLine("         -z ................. key to determine if security assurance cases should be created");
         helpLine();
         helpLine("-d, --debug <dir> .......... Produce debug output");
         helpLine("      <dir> ................ Intermediary XML output directory");
@@ -290,10 +280,9 @@ public class App {
             throw new VerdictRunException("Must specify CSV or VDM input");
         }
 
-        String modelName =
-                csvProjectName != null
-                        ? csvProjectName
-                        : new File(vdmPath).getName().replace(".xml", "");
+        String modelName = csvProjectName != null
+                ? csvProjectName
+                : new File(vdmPath).getName().replace(".xml", "");
 
         Timer.Sample sample = Timer.start(Metrics.globalRegistry);
         if (opts.hasOption("mbas")) {
@@ -331,28 +320,17 @@ public class App {
                         costModelPath,
                         output);
             } else {
-                runMbas(
-                        modelName,
-                        stemProjectDir,
-                        debugDir,
-                        soteriaPpBin,
-                        cyberInference,
-                        safetyInference);
+                runMbas(modelName, stemProjectDir, debugDir, soteriaPpBin, cyberInference, safetyInference);
             }
             sample.stop(Metrics.timer("Timer.mbas", "model", modelName));
 
         } else if (opts.hasOption("crv")) {
             String instrPath =
-                    new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml")
-                            .getAbsolutePath();
-            String lustrePath =
-                    new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.lus")
-                            .getAbsolutePath();
+                    new File(System.getProperty("java.io.tmpdir"), "VERDICT_output_instr.xml").getAbsolutePath();
+            String lustrePath = new File(System.getProperty("java.io.tmpdir"), "VERDICT_output.lus").getAbsolutePath();
 
             List<String> threats =
-                    crvThreats.stream()
-                            .filter(threat -> opts.hasOption(threat))
-                            .collect(Collectors.toList());
+                    crvThreats.stream().filter(threat -> opts.hasOption(threat)).collect(Collectors.toList());
 
             boolean meritAssignment = opts.hasOption("MA");
             boolean blameAssignment = opts.hasOption("BA");
@@ -417,17 +395,15 @@ public class App {
     }
 
     private static void printMetrics() {
-        Function<Timer, Integer> visitTimer =
-                timer -> {
-                    System.out.println(
-                            timer.getId().getName()
-                                    + " for "
-                                    + timer.getId().getTag("model")
-                                    + ": "
-                                    + timer.totalTime(TimeUnit.SECONDS)
-                                    + " secs");
-                    return 0;
-                };
+        Function<Timer, Integer> visitTimer = timer -> {
+            System.out.println(timer.getId().getName()
+                    + " for "
+                    + timer.getId().getTag("model")
+                    + ": "
+                    + timer.totalTime(TimeUnit.SECONDS)
+                    + " secs");
+            return 0;
+        };
         Metrics.globalRegistry.forEachMeter(
                 meter -> meter.match(null, null, visitTimer, null, null, null, null, null, null));
     }
@@ -441,9 +417,8 @@ public class App {
     }
 
     private static void logLine() {
-        System.out.println(
-                "******************************************************************"
-                        + "******************************************************");
+        System.out.println("******************************************************************"
+                + "******************************************************");
     }
 
     private static void logHeader(String header) {
@@ -569,8 +544,7 @@ public class App {
             try {
                 TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
-                throw new VerdictRunException(
-                        "Failed to create GSN fragments. Thread.sleep exception.", e);
+                throw new VerdictRunException("Failed to create GSN fragments. Thread.sleep exception.", e);
             }
         }
 
@@ -637,12 +611,8 @@ public class App {
 
         VerdictStem stemRunner = new VerdictStem();
         Metrics.timer("Timer.mbas.stem", "model", modelName)
-                .record(
-                        () ->
-                                stemRunner.runStem(
-                                        new File(stemProjectDir),
-                                        new File(stemOutputDir),
-                                        new File(stemGraphsDir)));
+                .record(() ->
+                        stemRunner.runStem(new File(stemProjectDir), new File(stemOutputDir), new File(stemGraphsDir)));
 
         log("STEM finished!");
 
@@ -667,10 +637,7 @@ public class App {
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             Binary.invokeBin(
-                    soteriaPpBin,
-                    soteriaPpOutputDir,
-                    new PumpStreamHandler(),
-                    args.toArray(new String[args.size()]));
+                    soteriaPpBin, soteriaPpOutputDir, new PumpStreamHandler(), args.toArray(new String[args.size()]));
             sample.stop(Metrics.timer("Timer.mbas.soteria_pp", "model", modelName));
         } catch (Binary.ExecutionException e) {
             throw new VerdictRunException("Failed to execute soteria_pp", e);
@@ -748,12 +715,8 @@ public class App {
 
         VerdictStem stemRunner = new VerdictStem();
         Metrics.timer("Timer.mbas.stem", "model", modelName)
-                .record(
-                        () ->
-                                stemRunner.runStem(
-                                        new File(stemProjectDir),
-                                        new File(stemOutputDir),
-                                        new File(stemGraphsDir)));
+                .record(() ->
+                        stemRunner.runStem(new File(stemProjectDir), new File(stemOutputDir), new File(stemGraphsDir)));
 
         log("STEM finished!");
 
@@ -765,35 +728,22 @@ public class App {
             CostModel costModel = new CostModel(new File(costModelPath));
 
             AttackDefenseCollector collector =
-                    new AttackDefenseCollector(
-                            new File(vdmPath), new File(stemOutputDir), cyberInference);
+                    new AttackDefenseCollector(new File(vdmPath), new File(stemOutputDir), cyberInference);
             List<AttackDefenseCollector.Result> results = collector.perform();
 
-            boolean sat =
-                    results.stream()
-                            .allMatch(
-                                    result -> Prob.lte(result.prob, result.cyberReq.getSeverity()));
+            boolean sat = results.stream().allMatch(result -> Prob.lte(result.prob, result.cyberReq.getSeverity()));
             boolean performMeritAssignment = partialSolution && sat;
 
             DLeaf.Factory factory = new DLeaf.Factory();
             DTree dtree =
-                    DTreeConstructor.construct(
-                            results, costModel, partialSolution, performMeritAssignment, factory);
-            Optional<ResultsInstance> selected =
-                    VerdictSynthesis.performSynthesisMultiple(
-                            dtree,
-                            factory,
-                            costModel,
-                            partialSolution,
-                            sat,
-                            performMeritAssignment,
-                            false);
+                    DTreeConstructor.construct(results, costModel, partialSolution, performMeritAssignment, factory);
+            Optional<ResultsInstance> selected = VerdictSynthesis.performSynthesisMultiple(
+                    dtree, factory, costModel, partialSolution, sat, performMeritAssignment, false);
 
             if (selected.isPresent()) {
                 if (performMeritAssignment) {
                     ResultsInstance withExtraDefProps =
-                            VerdictSynthesis.addExtraImplDefenses(
-                                    selected.get(), collector.getImplDal(), costModel);
+                            VerdictSynthesis.addExtraImplDefenses(selected.get(), collector.getImplDal(), costModel);
                     withExtraDefProps.toFileXml(new File(outputPath));
                 } else {
                     selected.get().toFileXml(new File(outputPath));
@@ -951,9 +901,7 @@ public class App {
         try {
             ExecuteStreamHandler redirect =
                     new PumpStreamHandler(new FileOutputStream(new File(outputPath)), System.err);
-            if (blameAssignment
-                    && instrumentor != null
-                    && instrumentor.emptyIntrumentation() == false) {
+            if (blameAssignment && instrumentor != null && instrumentor.emptyIntrumentation() == false) {
                 Binary.invokeBin(
                         kind2Bin,
                         null,
@@ -1049,9 +997,7 @@ public class App {
             try {
                 Timer.Sample sample = Timer.start(Metrics.globalRegistry);
                 BlameAssignment ba = new BlameAssignment();
-                ba =
-                        ba.compute_blame_assignment(
-                                new File(outputPath), instrumentor.getAttackMap(), componentLevel);
+                ba = ba.compute_blame_assignment(new File(outputPath), instrumentor.getAttackMap(), componentLevel);
                 XMLProcessor.dumpXML(ba, new File(outputBaPath));
                 sample.stop(Metrics.timer("Timer.crv.blameassignment", "model", modelName));
             } catch (FileNotFoundException e) {
@@ -1083,12 +1029,7 @@ public class App {
      *     assertions
      */
     private static void checkFile(
-            String path,
-            boolean exists,
-            boolean dir,
-            boolean write,
-            boolean execute,
-            String extension)
+            String path, boolean exists, boolean dir, boolean write, boolean execute, String extension)
             throws VerdictRunException {
 
         // If the file need not exist, then at least its parent should exist
@@ -1118,8 +1059,7 @@ public class App {
         }
 
         if (extension != null && !path.endsWith(extension)) {
-            throw new VerdictRunException(
-                    "File is missing extension \"" + extension + "\": " + path);
+            throw new VerdictRunException("File is missing extension \"" + extension + "\": " + path);
         }
     }
 
@@ -1140,8 +1080,7 @@ public class App {
      *
      * @param dirPath
      */
-    private static void deleteDirectoryContents(
-            String dirPath, Function<File, Boolean> deleteFunction) {
+    private static void deleteDirectoryContents(String dirPath, Function<File, Boolean> deleteFunction) {
         File file = new File(dirPath);
         if (file.exists() && file.isDirectory()) {
             for (File f : file.listFiles()) {

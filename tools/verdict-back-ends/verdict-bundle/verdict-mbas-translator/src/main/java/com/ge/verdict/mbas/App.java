@@ -54,8 +54,11 @@ public class App {
         // args[0]: input aadl file path, args[1]: output STEM inputs, args[2]: output Soteria++
         // inputs
         if (args.length != 3) {
-            File jarFile =
-                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File jarFile = new File(App.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
             LOGGER.error(
                     "Usage: java -jar {} <input file> <STEM output folder> <Soteria++ output folder>",
                     jarFile.getName());

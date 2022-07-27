@@ -32,8 +32,11 @@ public class App {
             VerdictStem stem = new VerdictStem();
             stem.runStem(projectDir, outputDir, graphsDir);
         } else {
-            File jarFile =
-                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File jarFile = new File(App.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
             LOGGER.error("Usage: java -jar {} <project dir>", jarFile.getName());
         }
     }

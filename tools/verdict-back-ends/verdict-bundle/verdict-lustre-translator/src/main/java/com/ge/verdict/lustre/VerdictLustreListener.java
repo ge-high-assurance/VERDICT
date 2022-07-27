@@ -90,8 +90,7 @@ public class VerdictLustreListener extends LustreBaseListener {
     /** Parse any included files in the parse tree. */
     @Override
     public void enterInclude(LustreParser.IncludeContext ctx) {
-        ctx.includeFile =
-                new File(source.getParent(), ctx.STRING().getText().replaceAll("^\"|\"$", ""));
+        ctx.includeFile = new File(source.getParent(), ctx.STRING().getText().replaceAll("^\"|\"$", ""));
         ctx.includeProgramContext = VerdictLustreTranslator.parseFromLustre(ctx.includeFile);
     }
 
@@ -99,8 +98,7 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitInclude(LustreParser.IncludeContext ctx) {
         VerdictLustreListener anotherExtractor =
-                new VerdictLustreListener(
-                        ctx.includeFile, model, typeDeclarations, constantDeclarations);
+                new VerdictLustreListener(ctx.includeFile, model, typeDeclarations, constantDeclarations);
         ParseTreeWalker.DEFAULT.walk(anotherExtractor, ctx.includeProgramContext);
     }
 
@@ -175,19 +173,15 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitRecordType(LustreParser.RecordTypeContext ctx) {
         RecordType recordType = new RecordType();
-        ctx.field()
-                .forEach(
-                        field -> {
-                            field.ID()
-                                    .forEach(
-                                            id -> {
-                                                RecordField recordField = new RecordField();
-                                                String name = id.getText();
-                                                recordField.setName(name);
-                                                recordField.setType(field.type().dataType);
-                                                recordType.getRecordField().add(recordField);
-                                            });
-                        });
+        ctx.field().forEach(field -> {
+            field.ID().forEach(id -> {
+                RecordField recordField = new RecordField();
+                String name = id.getText();
+                recordField.setName(name);
+                recordField.setType(field.type().dataType);
+                recordType.getRecordField().add(recordField);
+            });
+        });
         ctx.dataType = new DataType();
         ctx.dataType.setRecordType(recordType);
     }
@@ -470,18 +464,16 @@ public class VerdictLustreListener extends LustreBaseListener {
     public void exitMergeExpr(LustreParser.MergeExprContext ctx) {
         MergeOperation mergeOperation = new MergeOperation();
         mergeOperation.setClock(ctx.ID().getText());
-        ctx.mergeCase()
-                .forEach(
-                        m -> {
-                            MergeCase mergeCase = new MergeCase();
-                            if (m.identifier() != null) {
-                                mergeCase.setCase(m.identifier().getText());
-                            } else {
-                                mergeCase.setCase(m.BOOL().getText());
-                            }
-                            mergeCase.setExpr(m.expr().expression);
-                            mergeOperation.getMergeCase().add(mergeCase);
-                        });
+        ctx.mergeCase().forEach(m -> {
+            MergeCase mergeCase = new MergeCase();
+            if (m.identifier() != null) {
+                mergeCase.setCase(m.identifier().getText());
+            } else {
+                mergeCase.setCase(m.BOOL().getText());
+            }
+            mergeCase.setExpr(m.expr().expression);
+            mergeOperation.getMergeCase().add(mergeCase);
+        });
         ctx.expression = new Expression();
         ctx.expression.setMerge(mergeOperation);
     }
@@ -502,21 +494,19 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitOneConstDecl(LustreParser.OneConstDeclContext ctx) {
         LustreProgram program = model.getDataflowCode();
-        ctx.ID()
-                .forEach(
-                        id -> {
-                            ConstantDeclaration constantDeclaration = new ConstantDeclaration();
-                            if (ctx.type() != null) {
-                                constantDeclaration.setDataType(ctx.type().dataType);
-                            }
-                            if (ctx.expr() != null) {
-                                constantDeclaration.setDefinition(ctx.expr().expression);
-                            }
-                            String name = id.getText();
-                            constantDeclaration.setName(name);
-                            constantDeclarations.put(name, constantDeclaration);
-                            program.getConstantDeclaration().add(constantDeclaration);
-                        });
+        ctx.ID().forEach(id -> {
+            ConstantDeclaration constantDeclaration = new ConstantDeclaration();
+            if (ctx.type() != null) {
+                constantDeclaration.setDataType(ctx.type().dataType);
+            }
+            if (ctx.expr() != null) {
+                constantDeclaration.setDefinition(ctx.expr().expression);
+            }
+            String name = id.getText();
+            constantDeclaration.setName(name);
+            constantDeclarations.put(name, constantDeclaration);
+            program.getConstantDeclaration().add(constantDeclaration);
+        });
     }
 
     /** Extract a node declaration. */
@@ -544,8 +534,7 @@ public class VerdictLustreListener extends LustreBaseListener {
                 node.setContract(new ContractSpec());
             }
             final ContractSpec spec = node.getContract();
-            ctx.importedContract()
-                    .forEach(importedContract -> spec.getImport().add(importedContract.imprt));
+            ctx.importedContract().forEach(importedContract -> spec.getImport().add(importedContract.imprt));
         }
 
         LustreProgram program = model.getDataflowCode();
@@ -563,19 +552,17 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitParamGroup(LustreParser.ParamGroupContext ctx) {
         ctx.nodeParameters = new ArrayList<>();
-        ctx.ID()
-                .forEach(
-                        id -> {
-                            NodeParameter nodeParameter = new NodeParameter();
-                            nodeParameter.setName(id.getText());
-                            if (ctx.type() != null) {
-                                nodeParameter.setDataType(ctx.type().dataType);
-                            }
-                            if (ctx.isConst != null) {
-                                nodeParameter.setIsConstant(true);
-                            }
-                            ctx.nodeParameters.add(nodeParameter);
-                        });
+        ctx.ID().forEach(id -> {
+            NodeParameter nodeParameter = new NodeParameter();
+            nodeParameter.setName(id.getText());
+            if (ctx.type() != null) {
+                nodeParameter.setDataType(ctx.type().dataType);
+            }
+            if (ctx.isConst != null) {
+                nodeParameter.setIsConstant(true);
+            }
+            ctx.nodeParameters.add(nodeParameter);
+        });
     }
 
     /** Extract an inline contract spec. */
@@ -586,8 +573,7 @@ public class VerdictLustreListener extends LustreBaseListener {
         ctx.assume().forEach(assume -> ctx.spec.getAssume().add(assume.item));
         ctx.guarantee().forEach(guarantee -> ctx.spec.getGuarantee().add(guarantee.item));
         ctx.contractMode().forEach(contractMode -> ctx.spec.getMode().add(contractMode.mode));
-        ctx.contractImport()
-                .forEach(contractImport -> ctx.spec.getImport().add(contractImport.imprt));
+        ctx.contractImport().forEach(contractImport -> ctx.spec.getImport().add(contractImport.imprt));
     }
 
     /** Extract a symbol definition. */
@@ -628,18 +614,16 @@ public class VerdictLustreListener extends LustreBaseListener {
     public void exitContractMode(LustreParser.ContractModeContext ctx) {
         ctx.mode = new ContractMode();
         ctx.mode.setName(ctx.ID().getText());
-        ctx.require.forEach(
-                require -> {
-                    ContractItem contractItem = new ContractItem();
-                    contractItem.setExpression(require.expression);
-                    ctx.mode.getRequire().add(contractItem);
-                });
-        ctx.ensure.forEach(
-                ensure -> {
-                    ContractItem contractItem = new ContractItem();
-                    contractItem.setExpression(ensure.expression);
-                    ctx.mode.getEnsure().add(contractItem);
-                });
+        ctx.require.forEach(require -> {
+            ContractItem contractItem = new ContractItem();
+            contractItem.setExpression(require.expression);
+            ctx.mode.getRequire().add(contractItem);
+        });
+        ctx.ensure.forEach(ensure -> {
+            ContractItem contractItem = new ContractItem();
+            contractItem.setExpression(ensure.expression);
+            ctx.mode.getEnsure().add(contractItem);
+        });
     }
 
     /** Extract a contract import. */
@@ -664,30 +648,24 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitNodeBody(LustreParser.NodeBodyContext ctx) {
         ctx.body = new NodeBody();
-        ctx.localDecl()
-                .forEach(
-                        local -> {
-                            ctx.body.getConstantDeclaration().addAll(local.constantDeclarations);
-                            ctx.body.getVariableDeclaration().addAll(local.variableDeclarations);
-                        });
-        ctx.definition()
-                .forEach(
-                        definition -> {
-                            if (definition.equation() != null) {
-                                ctx.body.getEquation().add(definition.equation().equa);
-                            }
-                            if (definition.assertion() != null) {
-                                ctx.body
-                                        .getAssertion()
-                                        .add(definition.assertion().expr().expression);
-                            }
-                            if (definition.property() != null) {
-                                ctx.body.getProperty().add(definition.property().prop);
-                            }
-                            if (definition.main() != null) {
-                                ctx.body.setIsMain(true);
-                            }
-                        });
+        ctx.localDecl().forEach(local -> {
+            ctx.body.getConstantDeclaration().addAll(local.constantDeclarations);
+            ctx.body.getVariableDeclaration().addAll(local.variableDeclarations);
+        });
+        ctx.definition().forEach(definition -> {
+            if (definition.equation() != null) {
+                ctx.body.getEquation().add(definition.equation().equa);
+            }
+            if (definition.assertion() != null) {
+                ctx.body.getAssertion().add(definition.assertion().expr().expression);
+            }
+            if (definition.property() != null) {
+                ctx.body.getProperty().add(definition.property().prop);
+            }
+            if (definition.main() != null) {
+                ctx.body.setIsMain(true);
+            }
+        });
     }
 
     /** Extract local variable or constant declarations. */
@@ -696,12 +674,10 @@ public class VerdictLustreListener extends LustreBaseListener {
         ctx.variableDeclarations = new ArrayList<>();
         ctx.constantDeclarations = new ArrayList<>();
         if (ctx.localVarDeclList() != null) {
-            ctx.localVarDeclList()
-                    .forEach(local -> ctx.variableDeclarations.addAll(local.variableDeclarations));
+            ctx.localVarDeclList().forEach(local -> ctx.variableDeclarations.addAll(local.variableDeclarations));
         }
         if (ctx.localConstDecl() != null) {
-            ctx.localConstDecl()
-                    .forEach(local -> ctx.constantDeclarations.add(local.constantDeclaration));
+            ctx.localConstDecl().forEach(local -> ctx.constantDeclarations.add(local.constantDeclaration));
         }
     }
 
@@ -709,17 +685,15 @@ public class VerdictLustreListener extends LustreBaseListener {
     @Override
     public void exitLocalVarDeclList(LustreParser.LocalVarDeclListContext ctx) {
         ctx.variableDeclarations = new ArrayList<>();
-        ctx.ID()
-                .forEach(
-                        id -> {
-                            VariableDeclaration variableDeclaration = new VariableDeclaration();
-                            String name = id.getText();
-                            variableDeclaration.setName(name);
-                            if (ctx.type() != null) {
-                                variableDeclaration.setDataType(ctx.type().dataType);
-                            }
-                            ctx.variableDeclarations.add(variableDeclaration);
-                        });
+        ctx.ID().forEach(id -> {
+            VariableDeclaration variableDeclaration = new VariableDeclaration();
+            String name = id.getText();
+            variableDeclaration.setName(name);
+            if (ctx.type() != null) {
+                variableDeclaration.setDataType(ctx.type().dataType);
+            }
+            ctx.variableDeclarations.add(variableDeclaration);
+        });
     }
 
     /** Extract a local constant declaration. */
@@ -784,8 +758,7 @@ public class VerdictLustreListener extends LustreBaseListener {
         ctx.assume().forEach(assume -> ctx.spec.getAssume().add(assume.item));
         ctx.guarantee().forEach(guarantee -> ctx.spec.getGuarantee().add(guarantee.item));
         ctx.contractMode().forEach(contractMode -> ctx.spec.getMode().add(contractMode.mode));
-        ctx.contractImport()
-                .forEach(contractImport -> ctx.spec.getImport().add(contractImport.imprt));
+        ctx.contractImport().forEach(contractImport -> ctx.spec.getImport().add(contractImport.imprt));
     }
 
     /** Extract an equation. */

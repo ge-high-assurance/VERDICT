@@ -45,8 +45,7 @@ public class ALeaf implements DTree {
     @Override
     public BoolExpr toZ3(Context context) {
         if (isMitigated()) {
-            throw new RuntimeException(
-                    "mitigated ALeaf should not be present, did you call prepare?");
+            throw new RuntimeException("mitigated ALeaf should not be present, did you call prepare?");
         }
 
         // an unmitigated attack is a thorn in our side
@@ -61,8 +60,7 @@ public class ALeaf implements DTree {
     @Override
     public Formula toLogicNG(FormulaFactory factory) {
         if (isMitigated()) {
-            throw new RuntimeException(
-                    "mitigated ALeaf should not be present, did you call prepare?");
+            throw new RuntimeException("mitigated ALeaf should not be present, did you call prepare?");
         }
 
         // an unmitigated attack is a thorn in our side

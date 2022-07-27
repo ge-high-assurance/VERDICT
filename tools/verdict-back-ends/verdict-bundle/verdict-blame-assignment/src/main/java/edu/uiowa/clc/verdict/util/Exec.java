@@ -29,8 +29,7 @@ import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 public class Exec {
 
-    public static int run_kind2(
-            File lustureFile, File kind2ResultFile, boolean emptySelection, boolean meritAssignment)
+    public static int run_kind2(File lustureFile, File kind2ResultFile, boolean emptySelection, boolean meritAssignment)
             throws IOException {
 
         //        InputStream resultStream = null;
@@ -105,8 +104,7 @@ public class Exec {
         return exitCode;
     }
 
-    public static int exec2(String[] cmd_args, String[] envp, FileOutputStream stream)
-            throws IOException {
+    public static int exec2(String[] cmd_args, String[] envp, FileOutputStream stream) throws IOException {
 
         ExecuteStreamHandler streamHandler = new PumpStreamHandler(stream);
 
@@ -121,8 +119,7 @@ public class Exec {
         return resultCode;
     }
 
-    public static int exec(String[] cmd_args, String[] envp, File dir, FileOutputStream output)
-            throws IOException {
+    public static int exec(String[] cmd_args, String[] envp, File dir, FileOutputStream output) throws IOException {
 
         Process process = Runtime.getRuntime().exec(cmd_args, envp, dir);
         int exit_code = 0;

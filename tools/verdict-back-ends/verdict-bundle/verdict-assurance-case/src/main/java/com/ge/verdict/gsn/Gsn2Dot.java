@@ -194,28 +194,27 @@ public class Gsn2Dot {
             //                            + "\\n\\n"
             //                            + nodeText
             //                            + "\"];";
-            String nodeDeclareString =
-                    node.getNodeId()
-                            + " ["
-                            + "href=\""
-                            + url
-                            + "\", tooltip=\""
-                            + hoverDisplay
-                            + "\", margin=\""
-                            + margin
-                            + "\", style=\""
-                            + style
-                            + "\", color="
-                            + nodeColor
-                            + ", shape="
-                            + nodeShape
-                            + ", penwidth ="
-                            + penwidth
-                            + ", label=\""
-                            + node.getNodeId()
-                            + "\\n\\n"
-                            + nodeText
-                            + "\"];";
+            String nodeDeclareString = node.getNodeId()
+                    + " ["
+                    + "href=\""
+                    + url
+                    + "\", tooltip=\""
+                    + hoverDisplay
+                    + "\", margin=\""
+                    + margin
+                    + "\", style=\""
+                    + style
+                    + "\", color="
+                    + nodeColor
+                    + ", shape="
+                    + nodeShape
+                    + ", penwidth ="
+                    + penwidth
+                    + ", label=\""
+                    + node.getNodeId()
+                    + "\\n\\n"
+                    + nodeText
+                    + "\"];";
             bw.write(nodeDeclareString);
             bw.newLine();
         }
@@ -234,38 +233,34 @@ public class Gsn2Dot {
         for (GsnNode node : allNodes) {
             // supportedBy edges
             for (GsnNode support : node.getSupportedBy()) {
-                bw.write(
-                        node.getNodeId()
-                                + " -> "
-                                + support.getNodeId()
-                                + " [splines=curved, penwidth = 2.0, weight=3, arrowsize=2.0]");
+                bw.write(node.getNodeId()
+                        + " -> "
+                        + support.getNodeId()
+                        + " [splines=curved, penwidth = 2.0, weight=3, arrowsize=2.0]");
                 bw.newLine();
             }
             // inContextOf edges
             for (GsnNode context : node.getInContextOf()) {
-                bw.write(
-                        node.getNodeId()
-                                + " -> "
-                                + context.getNodeId()
-                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
+                bw.write(node.getNodeId()
+                        + " -> "
+                        + context.getNodeId()
+                        + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
             // justifiedBy edges
             for (GsnNode justification : node.getJustifiedBy()) {
-                bw.write(
-                        node.getNodeId()
-                                + " -> "
-                                + justification.getNodeId()
-                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
+                bw.write(node.getNodeId()
+                        + " -> "
+                        + justification.getNodeId()
+                        + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
             // hasAssumption edges
             for (GsnNode assumption : node.getHasAssumptions()) {
-                bw.write(
-                        node.getNodeId()
-                                + " -> "
-                                + assumption.getNodeId()
-                                + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
+                bw.write(node.getNodeId()
+                        + " -> "
+                        + assumption.getNodeId()
+                        + " [splines=curved, penwidth = 2.0, arrowhead=empty, arrowsize=1.5]");
                 bw.newLine();
             }
         }
@@ -281,11 +276,10 @@ public class Gsn2Dot {
     public String stringWrapper(String original) {
         // normalize spaces in the string
         String normal = original.replaceAll("\\s{2,}", " ").trim();
-        String wrapped =
-                WordWrap.from(normal)
-                        .maxWidth(50)
-                        .insertHyphens(true) // true is the default
-                        .wrap();
+        String wrapped = WordWrap.from(normal)
+                .maxWidth(50)
+                .insertHyphens(true) // true is the default
+                .wrap();
         return wrapped;
     }
 }

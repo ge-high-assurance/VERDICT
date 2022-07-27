@@ -83,9 +83,7 @@ public class BlameAssignment {
     }
 
     public BlameAssignment compute_blame_assignment(
-            File kind2ResultFile,
-            HashMap<String, HashSet<String>> intrumented_cmp_link,
-            boolean component_level)
+            File kind2ResultFile, HashMap<String, HashSet<String>> intrumented_cmp_link, boolean component_level)
             throws FileNotFoundException {
 
         Vector<VerdictProperty> property_result = SummaryProcessor.readResults(kind2ResultFile);
@@ -129,8 +127,7 @@ public class BlameAssignment {
                     for (Component cmp : mina.getComponents()) {
 
                         if (cmp.isCompromised()) {
-                            List<Attack> attacks =
-                                    applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
+                            List<Attack> attacks = applicableAttack(cmp.getComponentID(), intrumented_cmp_link);
                             //
                             // attack.setAttackDescription(attack.getAttackDescription());
                             //
@@ -162,8 +159,7 @@ public class BlameAssignment {
                         if (link.isCompromised()) {
 
                             List<Attack> attacks =
-                                    applicableAttack(
-                                            link_to_port(link.getLinkID()), intrumented_cmp_link);
+                                    applicableAttack(link_to_port(link.getLinkID()), intrumented_cmp_link);
                             //
                             // attack.setAttackDescription(attack.getAttackDescription());
                             //
@@ -240,8 +236,7 @@ public class BlameAssignment {
     }
 
     // AttackID, Component Set
-    private List<Attack> applicableAttack(
-            String cmp_link_id, HashMap<String, HashSet<String>> intrumented_cmp_link) {
+    private List<Attack> applicableAttack(String cmp_link_id, HashMap<String, HashSet<String>> intrumented_cmp_link) {
 
         List<Attack> attacks = new ArrayList<Attack>();
 

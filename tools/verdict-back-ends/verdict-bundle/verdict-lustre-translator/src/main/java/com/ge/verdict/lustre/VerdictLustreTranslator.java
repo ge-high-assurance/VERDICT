@@ -46,8 +46,7 @@ public class VerdictLustreTranslator extends VdmTranslator {
      */
     public static Model unmarshalFromLustre(File inputFile) {
         // Parse the Lustre file into a parse tree
-        LustreParser.ProgramContext programContext =
-                VerdictLustreTranslator.parseFromLustre(inputFile);
+        LustreParser.ProgramContext programContext = VerdictLustreTranslator.parseFromLustre(inputFile);
 
         // Extract any data from the parse tree with our listener
         VerdictLustreListener extractor = new VerdictLustreListener(inputFile);

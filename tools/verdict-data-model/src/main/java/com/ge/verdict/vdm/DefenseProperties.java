@@ -62,9 +62,7 @@ public final class DefenseProperties {
         "zeroize",
     };
 
-    private static final String[] connProps = {
-        "encryptedTransmission", "deviceAuthentication", "sessionAuthenticity"
-    };
+    private static final String[] connProps = {"encryptedTransmission", "deviceAuthentication", "sessionAuthenticity"};
 
     /**
      * This is a hard-coded list of defense properties. It is kind of disgusting, but it is the best

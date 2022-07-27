@@ -59,11 +59,13 @@ public class App {
                 // lustre_outputFile);
             }
         } else {
-            File jarFile =
-                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File jarFile = new File(App.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
             LOGGER.error(
-                    "Usage: java -jar {} <input file> <output file(1).xml> <output file(2).lus>",
-                    jarFile.getName());
+                    "Usage: java -jar {} <input file> <output file(1).xml> <output file(2).lus>", jarFile.getName());
         }
     }
 }

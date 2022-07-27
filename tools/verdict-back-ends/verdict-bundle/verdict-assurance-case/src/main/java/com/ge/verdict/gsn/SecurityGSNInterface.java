@@ -80,16 +80,15 @@ public class SecurityGSNInterface {
         for (String rootGoalId : forIds) {
             // create the GSN fragment
             CreateSecurityGSN objCreateGSN = new CreateSecurityGSN();
-            GsnNode gsnFragment =
-                    objCreateGSN.gsnCreator(
-                            xmlModel,
-                            cyberOutput,
-                            safetyOutput,
-                            modelAadlPath,
-                            rootGoalId,
-                            securityCaseFlag,
-                            soteriaOutputLinkPathPrefix,
-                            hostSTEMDir);
+            GsnNode gsnFragment = objCreateGSN.gsnCreator(
+                    xmlModel,
+                    cyberOutput,
+                    safetyOutput,
+                    modelAadlPath,
+                    rootGoalId,
+                    securityCaseFlag,
+                    soteriaOutputLinkPathPrefix,
+                    hostSTEMDir);
             System.out.println("Info: Created Security GSN fragments for " + rootGoalId);
 
             // creating artifacts
@@ -116,11 +115,7 @@ public class SecurityGSNInterface {
             File gsnXmlFile = new File(gsnOutputDirectory, xmlFilename);
             Gsn2Xml objGsn2Xml = new Gsn2Xml();
             objGsn2Xml.convertGsnToXML(gsnFragment, gsnXmlFile);
-            System.out.println(
-                    "Info: Written GSN to xml for "
-                            + rootGoalId
-                            + ": "
-                            + gsnXmlFile.getAbsolutePath());
+            System.out.println("Info: Written GSN to xml for " + rootGoalId + ": " + gsnXmlFile.getAbsolutePath());
         }
 
         // Create a file and print the dot

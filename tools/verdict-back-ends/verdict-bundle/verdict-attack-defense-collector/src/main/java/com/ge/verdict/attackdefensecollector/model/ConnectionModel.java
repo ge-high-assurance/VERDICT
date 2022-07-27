@@ -43,8 +43,7 @@ public class ConnectionModel {
      * @param sourcePort the name of the source port
      * @param destPort the name of the destination port
      */
-    public ConnectionModel(
-            String name, SystemModel source, SystemModel dest, String sourcePort, String destPort) {
+    public ConnectionModel(String name, SystemModel source, SystemModel dest, String sourcePort, String destPort) {
         this.name = name;
         this.source = source;
         this.dest = dest;
@@ -125,11 +124,10 @@ public class ConnectionModel {
         for (Defense defense : attackable.getDefenses()) {
             // Check that referenced attacks are added to this system
             if (!declaredAttacks.contains(defense.getAttack())) {
-                throw new RuntimeException(
-                        "Defense in system "
-                                + getName()
-                                + " refers to non-existant attack "
-                                + defense.getAttack().getName());
+                throw new RuntimeException("Defense in system "
+                        + getName()
+                        + " refers to non-existant attack "
+                        + defense.getAttack().getName());
             }
 
             attackToDefense.put(defense.getAttack(), defense);
@@ -140,15 +138,13 @@ public class ConnectionModel {
         return attackToDefense != null;
     }
 
-    private Optional<ADTree> traceInternal(
-            CIA cia, Set<Pair<ConnectionModel, CIA>> cyclePrevention) {
+    private Optional<ADTree> traceInternal(CIA cia, Set<Pair<ConnectionModel, CIA>> cyclePrevention) {
         if (!isConcretized()) {
             concretize();
         }
 
         List<ADTree> children = new ArrayList<>();
-        Optional<ADTree> traced =
-                getSource().trace(new PortConcern(getSourcePortName(), cia), cyclePrevention);
+        Optional<ADTree> traced = getSource().trace(new PortConcern(getSourcePortName(), cia), cyclePrevention);
         if (traced.isPresent()) {
             children.add(traced.get());
         }
@@ -158,14 +154,9 @@ public class ConnectionModel {
             if (attack.getCia().equals(cia)) {
                 if (attackToDefense.containsKey(attack)) {
                     // There is a defense associated
-                    Optional<ADTree> dependentRules =
-                            DependentRules.getConnectionDependence(this, attack.getName());
+                    Optional<ADTree> dependentRules = DependentRules.getConnectionDependence(this, attack.getName());
                     if (dependentRules.isPresent()) {
-                        children.add(
-                                new ADAnd(
-                                        new ADNot(attackToDefense.get(attack)),
-                                        attack,
-                                        dependentRules.get()));
+                        children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack, dependentRules.get()));
                     } else {
                         children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
                     }

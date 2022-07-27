@@ -11,11 +11,12 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
-*
-* @author Paul Meng
-*
-*/
+ *
+ * @author Paul Meng
+ *
+ */
 /** Construct tabular data and output to CSV. */
 public class Table {
     private static class Row {
@@ -129,8 +130,7 @@ public class Table {
      */
     public void addRow(String... vals) {
         if (vals.length != columns) {
-            throw new RuntimeException(
-                    "Attempt to add row with " + vals.length + " columns instead of " + columns);
+            throw new RuntimeException("Attempt to add row with " + vals.length + " columns instead of " + columns);
         }
         rows.add(new Row(vals));
     }
@@ -187,10 +187,7 @@ public class Table {
     public void capRow() {
         if (buildingRowIndex < columns) {
             throw new RuntimeException(
-                    "Attempt to cap row before all columns filled: "
-                            + buildingRowIndex
-                            + "/"
-                            + columns);
+                    "Attempt to cap row before all columns filled: " + buildingRowIndex + "/" + columns);
         }
         addRow(buildingRow);
         // Reset

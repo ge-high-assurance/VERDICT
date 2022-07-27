@@ -69,8 +69,7 @@ public class CSVFile {
      * @throws IOException
      * @throws MalformedInputException
      */
-    public CSVFile(String filename, boolean quoted, String... headers)
-            throws IOException, MalformedInputException {
+    public CSVFile(String filename, boolean quoted, String... headers) throws IOException, MalformedInputException {
         this(new File(filename), quoted, headers);
     }
 
@@ -95,8 +94,7 @@ public class CSVFile {
      * @throws IOException
      * @throws MalformedInputException
      */
-    public CSVFile(File file, boolean quoted, String... headers)
-            throws IOException, MalformedInputException {
+    public CSVFile(File file, boolean quoted, String... headers) throws IOException, MalformedInputException {
         this(file.getName(), new FileInputStream(file), quoted, headers);
     }
 
@@ -142,8 +140,7 @@ public class CSVFile {
 
             // Make sure reading won't cause problems
             if (!reader.ready()) {
-                throw new IOException(
-                        "Error parsing " + filename + ", end of file reached before headers");
+                throw new IOException("Error parsing " + filename + ", end of file reached before headers");
             }
 
             // Store header re-mappings
@@ -166,8 +163,7 @@ public class CSVFile {
                 if (csvPos == null) {
                     // There is a header specified by the user that's not present in file
                     throw new MalformedInputException(
-                            "Error parsing " + filename + ", missing expected header: " + header,
-                            0);
+                            "Error parsing " + filename + ", missing expected header: " + header, 0);
                 }
                 headerPos.put(header, pos);
                 indexPos[pos++] = csvPos;
@@ -256,8 +252,7 @@ public class CSVFile {
      * @return if quoted, the string with quotes stripped; otherwise, the original string
      * @throws MalformedInputException if quoted and exception, but str is not quoted
      */
-    private String stripQuotes(boolean quoted, String str, int line, boolean exception)
-            throws MalformedInputException {
+    private String stripQuotes(boolean quoted, String str, int line, boolean exception) throws MalformedInputException {
         if (quoted) {
             // Check for quotes
             if (!(str.length() > 2 && str.startsWith("\"") && str.endsWith("\""))) {
@@ -266,11 +261,7 @@ public class CSVFile {
                     return "";
                 } else if (exception) {
                     throw new MalformedInputException(
-                            "Expected quoted string on line #"
-                                    + line
-                                    + ", but got non-quoted: "
-                                    + str,
-                            line);
+                            "Expected quoted string on line #" + line + ", but got non-quoted: " + str, line);
                 } else {
                     return str;
                 }

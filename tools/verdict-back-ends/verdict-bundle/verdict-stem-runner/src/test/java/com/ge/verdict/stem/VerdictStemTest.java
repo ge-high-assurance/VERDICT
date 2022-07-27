@@ -25,17 +25,13 @@ public class VerdictStemTest {
         // Remove the output and graphs directories first
         if (Files.exists(testOutputDir)) {
             for (Path path :
-                    Files.walk(testOutputDir)
-                            .sorted(Comparator.reverseOrder())
-                            .collect(Collectors.toList())) {
+                    Files.walk(testOutputDir).sorted(Comparator.reverseOrder()).collect(Collectors.toList())) {
                 Files.delete(path);
             }
         }
         if (Files.exists(testGraphsDir)) {
             for (Path path :
-                    Files.walk(testGraphsDir)
-                            .sorted(Comparator.reverseOrder())
-                            .collect(Collectors.toList())) {
+                    Files.walk(testGraphsDir).sorted(Comparator.reverseOrder()).collect(Collectors.toList())) {
                 Files.delete(path);
             }
         }

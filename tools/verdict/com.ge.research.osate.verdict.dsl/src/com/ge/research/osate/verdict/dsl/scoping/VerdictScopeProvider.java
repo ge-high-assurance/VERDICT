@@ -12,7 +12,7 @@ import org.osate.xtext.aadl2.properties.scoping.PropertiesScopeProvider;
  * on how and when to use it.
  */
 public class VerdictScopeProvider extends PropertiesScopeProvider {
-	// This isn't working for some reason
-	// AGREE got it to work...
-	// But we can just use validation instead
+    // This isn't working for some reason
+    // AGREE got it to work...
+    // But we can just use validation instead
 }

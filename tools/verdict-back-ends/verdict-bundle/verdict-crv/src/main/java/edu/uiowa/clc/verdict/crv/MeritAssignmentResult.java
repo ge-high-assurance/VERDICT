@@ -52,7 +52,8 @@ public class MeritAssignmentResult {
 
                         System.out.print("  ");
 
-                        String category = elementElement.getAttribute("category").replace('_', ' ');
+                        String category =
+                                elementElement.getAttribute("category").replace('_', ' ');
 
                         System.out.print(category);
 

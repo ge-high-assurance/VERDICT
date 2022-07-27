@@ -18,7 +18,8 @@ public class DLeafTest {
         DLeaf leaf3 = new DLeaf("B", "A", "A", 0, 1, costs, factory);
 
         // should be aliases because the whole point is to uniquely identify instances
-        Assertions.assertThat(leaf1.componentDefense == leaf1Dup.componentDefense).isTrue();
+        Assertions.assertThat(leaf1.componentDefense == leaf1Dup.componentDefense)
+                .isTrue();
         Assertions.assertThat(leaf2.componentDefense == leaf1.componentDefense).isFalse();
         Assertions.assertThat(leaf3.componentDefense == leaf1.componentDefense).isFalse();
     }

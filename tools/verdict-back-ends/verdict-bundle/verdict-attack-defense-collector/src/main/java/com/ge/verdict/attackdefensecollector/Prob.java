@@ -58,8 +58,7 @@ public class Prob {
      */
     public static Prob fromDal(int dal) {
         if (dal < 0) {
-            throw new RuntimeException(
-                    "Impossible probability from DAL, cannot be negative: " + dal);
+            throw new RuntimeException("Impossible probability from DAL, cannot be negative: " + dal);
         }
         // Perform exponentiation
         return new Prob(BigDecimal.ONE.setScale(SCALE).scaleByPowerOfTen(-dal));

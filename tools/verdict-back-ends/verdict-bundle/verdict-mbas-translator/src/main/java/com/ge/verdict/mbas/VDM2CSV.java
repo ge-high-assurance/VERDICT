@@ -35,8 +35,7 @@ public class VDM2CSV extends VdmTranslator {
         String scenario = (new File(inputPath)).getName().replace(".xml", "");
 
         if (scenario.length() == 0) {
-            System.err.println(
-                    "Error: Input path is not in the correct format. Scenario name is empty.");
+            System.err.println("Error: Input path is not in the correct format. Scenario name is empty.");
         }
     }
 }

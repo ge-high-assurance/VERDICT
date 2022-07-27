@@ -17,8 +17,7 @@ public class IndentedStringBuilder {
 
     public IndentedStringBuilder(int spacesPerIndent) {
         if (spacesPerIndent < 0) {
-            throw new RuntimeException(
-                    "Cannot have negative spaces per indent: " + spacesPerIndent);
+            throw new RuntimeException("Cannot have negative spaces per indent: " + spacesPerIndent);
         }
 
         builder = new StringBuilder();
@@ -81,8 +80,7 @@ public class IndentedStringBuilder {
     @Override
     public String toString() {
         if (indent != 0) {
-            throw new RuntimeException(
-                    "IndentedStringBuilder: Leftover indentation in toString: " + indent);
+            throw new RuntimeException("IndentedStringBuilder: Leftover indentation in toString: " + indent);
         }
 
         return builder.toString();

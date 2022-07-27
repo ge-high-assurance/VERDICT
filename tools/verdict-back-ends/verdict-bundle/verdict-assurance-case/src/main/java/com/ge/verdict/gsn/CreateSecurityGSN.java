@@ -81,34 +81,23 @@ public class CreateSecurityGSN {
         // determine if rootGoalId is a mission, cyber, or safety requirement
         for (Mission aMission : xmlModel.getMission()) {
             if (aMission.getId().equalsIgnoreCase(rootGoalId)) {
-                returnFragment =
-                        populateMissionNode(
-                                aMission,
-                                xmlModel,
-                                nListCyber,
-                                nListSafety,
-                                aadlModelAddr,
-                                securityCaseFlag);
+                returnFragment = populateMissionNode(
+                        aMission, xmlModel, nListCyber, nListSafety, aadlModelAddr, securityCaseFlag);
             }
         }
         for (CyberReq aCyberReq : xmlModel.getCyberReq()) {
             if (aCyberReq.getId().equalsIgnoreCase(rootGoalId)) {
                 if (securityCaseFlag) {
                     returnFragment =
-                            populateCyberSecurityRequirementNode(
-                                    aCyberReq, xmlModel, nListCyber, aadlModelAddr);
+                            populateCyberSecurityRequirementNode(aCyberReq, xmlModel, nListCyber, aadlModelAddr);
                 } else {
-                    returnFragment =
-                            populateCyberRequirementNode(
-                                    aCyberReq, xmlModel, nListCyber, aadlModelAddr);
+                    returnFragment = populateCyberRequirementNode(aCyberReq, xmlModel, nListCyber, aadlModelAddr);
                 }
             }
         }
         for (SafetyReq aSafetyReq : xmlModel.getSafetyReq()) {
             if (aSafetyReq.getId().equalsIgnoreCase(rootGoalId)) {
-                returnFragment =
-                        populateSafetyRequirementNode(
-                                aSafetyReq, xmlModel, nListSafety, aadlModelAddr);
+                returnFragment = populateSafetyRequirementNode(aSafetyReq, xmlModel, nListSafety, aadlModelAddr);
             }
         }
 
@@ -172,15 +161,12 @@ public class CreateSecurityGSN {
                     if (securityCaseFlag) {
                         strategyNode
                                 .getSupportedBy()
-                                .add(
-                                        populateCyberSecurityRequirementNode(
-                                                cyberReq, model, cyberResults, aadlModelAddr));
+                                .add(populateCyberSecurityRequirementNode(
+                                        cyberReq, model, cyberResults, aadlModelAddr));
                     } else {
                         strategyNode
                                 .getSupportedBy()
-                                .add(
-                                        populateCyberRequirementNode(
-                                                cyberReq, model, cyberResults, aadlModelAddr));
+                                .add(populateCyberRequirementNode(cyberReq, model, cyberResults, aadlModelAddr));
                     }
                 } else continue;
             }
@@ -188,9 +174,7 @@ public class CreateSecurityGSN {
                 if (safetyReq.getId().equals(subReqId)) {
                     strategyNode
                             .getSupportedBy()
-                            .add(
-                                    populateSafetyRequirementNode(
-                                            safetyReq, model, safetyResults, aadlModelAddr));
+                            .add(populateSafetyRequirementNode(safetyReq, model, safetyResults, aadlModelAddr));
                 } else continue;
             }
         }
@@ -302,8 +286,7 @@ public class CreateSecurityGSN {
         strat.setDisplayText(strategyText);
 
         // add a solution to the supportedBy of strategy
-        GsnNode solutionNode =
-                populateRequirementSolutionNode(cyberReq.getId(), cyberResults, true);
+        GsnNode solutionNode = populateRequirementSolutionNode(cyberReq.getId(), cyberResults, true);
         strategyNode.getSupportedBy().add(solutionNode);
 
         // setting strategy status
@@ -321,12 +304,10 @@ public class CreateSecurityGSN {
         contextCounter++;
         strategyContextNode.setNodeId(strategyContextId);
         String strategyContextDisplayText = "A Condition and a Severity";
-        String strategyContextHoverText =
-                "Condition:= " + getCyberExprCondition(cyberReq.getCondition()) + "&#10;";
+        String strategyContextHoverText = "Condition:= " + getCyberExprCondition(cyberReq.getCondition()) + "&#10;";
         // strategyContextDisplayText =strategyContextDisplayText+"CIA:= " +
         // cyberReq.getCia().toString().charAt(0);
-        strategyContextHoverText =
-                strategyContextHoverText + "Severity:= " + cyberReq.getSeverity();
+        strategyContextHoverText = strategyContextHoverText + "Severity:= " + cyberReq.getSeverity();
         strategyContext.setDisplayText(strategyContextDisplayText);
         strategyContext.setExtraInfo(strategyContextHoverText);
         strategyContextNode.setContext(strategyContext);
@@ -405,8 +386,7 @@ public class CreateSecurityGSN {
         strat.setDisplayText(strategyText);
 
         // add a solution to the supportedBy of strategy
-        GsnNode solutionNode =
-                populateRequirementSolutionNode(safetyReq.getId(), safetyResults, false);
+        GsnNode solutionNode = populateRequirementSolutionNode(safetyReq.getId(), safetyResults, false);
         strategyNode.getSupportedBy().add(solutionNode);
 
         // setting strategy status
@@ -427,9 +407,7 @@ public class CreateSecurityGSN {
         String strategyContextHoverText =
                 "Condition:= " + getSafetyReqExprCondition(safetyReq.getCondition()) + "&#10;";
         strategyContextHoverText =
-                strategyContextHoverText
-                        + "Target Probability:= "
-                        + safetyReq.getTargetProbability();
+                strategyContextHoverText + "Target Probability:= " + safetyReq.getTargetProbability();
         strategyContext.setDisplayText(strategyContextDisplayText);
         strategyContext.setExtraInfo(strategyContextHoverText);
         strategyContextNode.setContext(strategyContext);
@@ -470,8 +448,7 @@ public class CreateSecurityGSN {
      * @param safetyResults
      * @return
      */
-    public GsnNode populateRequirementSolutionNode(
-            String reqId, NodeList results, boolean cyberFlag) {
+    public GsnNode populateRequirementSolutionNode(String reqId, NodeList results, boolean cyberFlag) {
         // GsnNode to pack solution
         GsnNode solutionNode = new GsnNode();
 
@@ -509,25 +486,16 @@ public class CreateSecurityGSN {
 
         // setting hovering info for solution node
         if (cyberFlag) {
-            String extraInfo =
-                    "Computed Likelihood = "
-                            + computed_p
-                            + "&#10;Acceptable Likelihood = "
-                            + acceptable_p;
+            String extraInfo = "Computed Likelihood = " + computed_p + "&#10;Acceptable Likelihood = " + acceptable_p;
             sol.setExtraInfo(extraInfo);
             String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties.txt";
             //            sol.setUrl(soteriaCyberOutputAddr);
             sol.setUrl(urlString);
             sol.setSoteriaOutputXml(soteriaCyberOutputAddr);
         } else {
-            String extraInfo =
-                    "Computed Probability = "
-                            + computed_p
-                            + "&#10;Acceptable Probability = "
-                            + acceptable_p;
+            String extraInfo = "Computed Probability = " + computed_p + "&#10;Acceptable Probability = " + acceptable_p;
             sol.setExtraInfo(extraInfo);
-            String urlString =
-                    soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
+            String urlString = soteriaOutputLinkPathPrefix + "-" + reqId + "-ImplProperties-safety.txt";
             //          sol.setUrl(soteriaSafetyOutputAddr);
             sol.setUrl(urlString);
             sol.setSoteriaOutputXml(soteriaSafetyOutputAddr);
@@ -550,8 +518,7 @@ public class CreateSecurityGSN {
      * @throws IOException
      */
     public GsnNode populateCyberSecurityRequirementNode(
-            CyberReq cyberReq, Model model, NodeList cyberResults, String aadlModelAddr)
-            throws IOException {
+            CyberReq cyberReq, Model model, NodeList cyberResults, String aadlModelAddr) throws IOException {
         // GsnNode to pack requirement rootnode
         GsnNode reqNode = new GsnNode();
 
@@ -598,9 +565,7 @@ public class CreateSecurityGSN {
         for (String componentId : components) {
             strategyNode
                     .getSupportedBy()
-                    .add(
-                            populateSubComponentSolutionNode(
-                                    componentId, reqCutsets, acceptableProb, cyberReq.getId()));
+                    .add(populateSubComponentSolutionNode(componentId, reqCutsets, acceptableProb, cyberReq.getId()));
         }
 
         // add strategy status
@@ -645,8 +610,7 @@ public class CreateSecurityGSN {
      * @throws IOException
      */
     public GsnNode populateSubComponentSolutionNode(
-            String subCompId, List<Cutset> cutsets, String acceptableProb, String cyberReqId)
-            throws IOException {
+            String subCompId, List<Cutset> cutsets, String acceptableProb, String cyberReqId) throws IOException {
         // GsnNode to pack solution
         GsnNode subCompSolNode = new GsnNode();
 
@@ -661,11 +625,9 @@ public class CreateSecurityGSN {
         sol.setDisplayText("Evidence that&#10;" + subCompId + "&#10;is secure");
 
         /** Create a GSN fragment that starts at this subcomponent and create artifacts for it */
-        GsnNode subCompFragment =
-                populateSubComponentFragment(subCompId, cutsets, acceptableProb, cyberReqId);
+        GsnNode subCompFragment = populateSubComponentFragment(subCompId, cutsets, acceptableProb, cyberReqId);
         SecurityGSNInterface interfaceObj = new SecurityGSNInterface();
-        String svgFileName =
-                interfaceObj.createArtifactFiles(subCompFragment, cyberReqId + "_" + subCompId);
+        String svgFileName = interfaceObj.createArtifactFiles(subCompFragment, cyberReqId + "_" + subCompId);
 
         String svgDestination = hostGSNDir + "/" + svgFileName;
 
@@ -721,9 +683,7 @@ public class CreateSecurityGSN {
         // Populate strategyNode supportedBy
         for (Cutset cutset : cutsets) {
             if (cutset.getComponent().equalsIgnoreCase(subCompId)) {
-                strategyNode
-                        .getSupportedBy()
-                        .add(populateThreatNode(subCompId, cutset, acceptableProb, cyberReqId));
+                strategyNode.getSupportedBy().add(populateThreatNode(subCompId, cutset, acceptableProb, cyberReqId));
                 // subCompNode.getSupportedBy().add(populateThreatNode(subCompId, cutset,
                 // acceptableProb));
             }
@@ -757,8 +717,7 @@ public class CreateSecurityGSN {
      * @param acceptableProb
      * @return
      */
-    public GsnNode populateThreatNode(
-            String componentId, Cutset cutset, String acceptableProb, String cyberReqId) {
+    public GsnNode populateThreatNode(String componentId, Cutset cutset, String acceptableProb, String cyberReqId) {
         // GsnNode to pack solution
         GsnNode threatNode = new GsnNode();
 
@@ -794,8 +753,7 @@ public class CreateSecurityGSN {
      * @param results
      * @return
      */
-    public GsnNode populateThreatSolutionNode(
-            Cutset cutset, String acceptableProb, String cyberReqId) {
+    public GsnNode populateThreatSolutionNode(Cutset cutset, String acceptableProb, String cyberReqId) {
         // GsnNode to pack solution
         GsnNode solutionNode = new GsnNode();
 
@@ -817,13 +775,12 @@ public class CreateSecurityGSN {
         }
 
         // setting hovering info for solution node
-        String extraInfo =
-                "Computed Likelihood = "
-                        + cutset.getLikelihood()
-                        + "&#10;Acceptable Likelihood = "
-                        + acceptableProb
-                        + "&#10;Implemented Defenses: "
-                        + cutset.getDefenses();
+        String extraInfo = "Computed Likelihood = "
+                + cutset.getLikelihood()
+                + "&#10;Acceptable Likelihood = "
+                + acceptableProb
+                + "&#10;Implemented Defenses: "
+                + cutset.getDefenses();
         sol.setExtraInfo(extraInfo);
         String urlString = soteriaOutputLinkPathPrefix + "-" + cyberReqId + "-ImplProperties.txt";
         //      sol.setUrl(soteriaCyberOutputAddr);
@@ -852,10 +809,7 @@ public class CreateSecurityGSN {
                 for (CyberExpr subExpr : cyberExpr.getOr().getExpr()) {
                     returnList.addAll(getCyberExprPorts(subExpr));
                 }
-            } else if (cyberExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("and")) { // if an and expression
+            } else if (cyberExpr.getKind().value().equalsIgnoreCase("and")) { // if an and expression
                 for (CyberExpr subExpr : cyberExpr.getAnd().getExpr()) {
                     returnList.addAll(getCyberExprPorts(subExpr));
                 }
@@ -883,17 +837,11 @@ public class CreateSecurityGSN {
                 for (SafetyReqExpr subExpr : safetyExpr.getOr().getExpr()) {
                     returnList.addAll(getSafetyReqExprPorts(subExpr));
                 }
-            } else if (safetyExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("and")) { // if an and expression
+            } else if (safetyExpr.getKind().value().equalsIgnoreCase("and")) { // if an and expression
                 for (SafetyReqExpr subExpr : safetyExpr.getAnd().getExpr()) {
                     returnList.addAll(getSafetyReqExprPorts(subExpr));
                 }
-            } else if (safetyExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("not")) { // if a not expression
+            } else if (safetyExpr.getKind().value().equalsIgnoreCase("not")) { // if a not expression
                 returnList.addAll(getSafetyReqExprPorts(safetyExpr.getNot()));
             }
         }
@@ -1008,12 +956,11 @@ public class CreateSecurityGSN {
         String returnString = "";
 
         if (!(cyberExpr.getPort() == null)) { // base case: if a port
-            returnString =
-                    returnString
-                            + " "
-                            + cyberExpr.getPort().getName()
-                            + ":"
-                            + cyberExpr.getPort().getCia().toString().charAt(0);
+            returnString = returnString
+                    + " "
+                    + cyberExpr.getPort().getName()
+                    + ":"
+                    + cyberExpr.getPort().getCia().toString().charAt(0);
         } else {
             if (cyberExpr.getKind().value().equalsIgnoreCase("or")) { // if an or expression
                 returnString = returnString + "or (";
@@ -1021,10 +968,7 @@ public class CreateSecurityGSN {
                     returnString = returnString + " " + getCyberExprCondition(subExpr);
                 }
                 returnString = returnString + " )";
-            } else if (cyberExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("and")) { // if an and expression
+            } else if (cyberExpr.getKind().value().equalsIgnoreCase("and")) { // if an and expression
                 returnString = returnString + "and (";
                 for (CyberExpr subExpr : cyberExpr.getAnd().getExpr()) {
                     returnString = returnString + " " + getCyberExprCondition(subExpr);
@@ -1050,12 +994,11 @@ public class CreateSecurityGSN {
         String returnString = "";
 
         if (!(safetyExpr.getPort() == null)) { // base case: if a port
-            returnString =
-                    returnString
-                            + " "
-                            + safetyExpr.getPort().getName()
-                            + ":"
-                            + safetyExpr.getPort().getIa().toString().charAt(0);
+            returnString = returnString
+                    + " "
+                    + safetyExpr.getPort().getName()
+                    + ":"
+                    + safetyExpr.getPort().getIa().toString().charAt(0);
         } else {
             if (safetyExpr.getKind().value().equalsIgnoreCase("or")) { // if an or expression
                 returnString = returnString + "or (";
@@ -1063,19 +1006,13 @@ public class CreateSecurityGSN {
                     returnString = returnString + " " + getSafetyReqExprCondition(subExpr);
                 }
                 returnString = returnString + " )";
-            } else if (safetyExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("and")) { // if an and expression
+            } else if (safetyExpr.getKind().value().equalsIgnoreCase("and")) { // if an and expression
                 returnString = returnString + "and (";
                 for (SafetyReqExpr subExpr : safetyExpr.getAnd().getExpr()) {
                     returnString = returnString + " " + getSafetyReqExprCondition(subExpr);
                 }
                 returnString = returnString + " )";
-            } else if (safetyExpr
-                    .getKind()
-                    .value()
-                    .equalsIgnoreCase("not")) { // if a not expression
+            } else if (safetyExpr.getKind().value().equalsIgnoreCase("not")) { // if a not expression
                 returnString = returnString + "not ";
                 returnString = returnString + " " + getSafetyReqExprCondition(safetyExpr.getNot());
             }

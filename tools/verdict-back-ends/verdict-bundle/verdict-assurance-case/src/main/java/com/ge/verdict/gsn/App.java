@@ -17,8 +17,7 @@ public class App {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    public static void main(String[] args)
-            throws IOException, ParserConfigurationException, SAXException {
+    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
 
         if (args.length != 6) {
             System.out.println("Argument Error: Invalid number of arguments provided.");

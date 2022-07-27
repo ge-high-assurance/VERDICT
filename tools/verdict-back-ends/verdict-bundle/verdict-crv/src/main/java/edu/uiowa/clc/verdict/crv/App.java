@@ -148,11 +148,7 @@ public class App {
             LOGGY.info("******************Executor***********************");
 
             int exitCode =
-                    Exec.run_kind2(
-                            lustreFile,
-                            kind2_resultFile,
-                            instrumentor.emptyIntrumentation(),
-                            meritAssignment);
+                    Exec.run_kind2(lustreFile, kind2_resultFile, instrumentor.emptyIntrumentation(), meritAssignment);
 
             //            LOGGY.info("Kind2 Exit Code:" + exitCode);
 
@@ -176,9 +172,7 @@ public class App {
                 LOGGY.info("*************Blame Assignment***********");
 
                 BlameAssignment bm = new BlameAssignment();
-                bm =
-                        bm.compute_blame_assignment(
-                                kind2_resultFile, instrumentor.getAttackMap(), component_level);
+                bm = bm.compute_blame_assignment(kind2_resultFile, instrumentor.getAttackMap(), component_level);
 
                 XMLProcessor.dumpXML(bm, bm_outputFile);
             }

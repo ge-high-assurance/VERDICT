@@ -39,8 +39,7 @@ public class VerdictTestInstrumentor {
                     } else if (comp.getImplementation() != null) {
                         subcomps.add(comp.getImplementation().getType());
                     } else {
-                        throw new RuntimeException(
-                                "ComponentInstance has neither specification nor implementation");
+                        throw new RuntimeException("ComponentInstance has neither specification nor implementation");
                     }
                 }
             }

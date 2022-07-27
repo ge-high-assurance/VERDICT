@@ -60,11 +60,17 @@ public class VerdictStem {
             srvr.setInstanceDataNamespace(instanceDataNamespace);
 
             srvr.loadCsvData(
-                    connCsv.toUri().toString(), csvIncludesHeader, connTemplate.toUri().toString());
+                    connCsv.toUri().toString(),
+                    csvIncludesHeader,
+                    connTemplate.toUri().toString());
             srvr.loadCsvData(
-                    compCsv.toUri().toString(), csvIncludesHeader, compTemplate.toUri().toString());
+                    compCsv.toUri().toString(),
+                    csvIncludesHeader,
+                    compTemplate.toUri().toString());
             srvr.loadCsvData(
-                    busCsv.toUri().toString(), csvIncludesHeader, busTemplate.toUri().toString());
+                    busCsv.toUri().toString(),
+                    csvIncludesHeader,
+                    busTemplate.toUri().toString());
 
             // Create output and graph directories
             outputDir.mkdirs();
@@ -75,48 +81,31 @@ public class VerdictStem {
             if (rs != null) {
                 Files.write(
                         defenses2NistCsv,
-                        rs.toString()
-                                .replaceAll(anyNamespace, "")
-                                .getBytes(StandardCharsets.UTF_8));
+                        rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
             }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#CAPEC");
             if (rs != null) {
-                Files.write(
-                        capecCsv,
-                        rs.toString()
-                                .replaceAll(anyNamespace, "")
-                                .getBytes(StandardCharsets.UTF_8));
+                Files.write(capecCsv, rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
             }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#Defenses");
             if (rs != null) {
                 Files.write(
-                        defensesCsv,
-                        rs.toString()
-                                .replaceAll(anyNamespace, "")
-                                .getBytes(StandardCharsets.UTF_8));
+                        defensesCsv, rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
             }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#ArchMitigation");
             if (rs != null) {
                 Files.write(
                         archMitigationCsv,
-                        rs.toString()
-                                .replaceAll(anyNamespace, "")
-                                .getBytes(StandardCharsets.UTF_8));
+                        rs.toString().replaceAll(anyNamespace, "").getBytes(StandardCharsets.UTF_8));
             }
 
             rs = srvr.query("http://sadl.org/STEM/Queries#STEMgraph");
             if (rs != null) {
                 GraphVizVisualizer visualizer = new GraphVizVisualizer();
-                visualizer.initialize(
-                        graphsDir.getPath(),
-                        graphName,
-                        graphName,
-                        null,
-                        Orientation.TD,
-                        "STEM (Graph)");
+                visualizer.initialize(graphsDir.getPath(), graphName, graphName, null, Orientation.TD, "STEM (Graph)");
                 visualizer.graphResultSetData(rs);
             }
         } catch (IOException

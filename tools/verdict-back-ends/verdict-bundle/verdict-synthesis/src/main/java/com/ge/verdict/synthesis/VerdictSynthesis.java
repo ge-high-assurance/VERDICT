@@ -58,13 +58,12 @@ public class VerdictSynthesis {
         Context context = new Context();
         Optimize optimizer = context.mkOptimize();
 
-        System.out.println(
-                "performSynthesisMultiple, configuration: partialSolution="
-                        + partialSolution
-                        + ", inputSat="
-                        + inputSat
-                        + ", meritAssignment="
-                        + meritAssignment);
+        System.out.println("performSynthesisMultiple, configuration: partialSolution="
+                + partialSolution
+                + ", inputSat="
+                + inputSat
+                + ", meritAssignment="
+                + meritAssignment);
 
         Collection<ComponentDefense> compDefPairs = factory.allComponentDefensePairs();
 
@@ -77,18 +76,11 @@ public class VerdictSynthesis {
         if (meritAssignment) {
             // set upper bounds at the current values, so that no upgrades are reported
             // Encode component_defense_var <= the the implemented DAL cost
-            optimizer.Assert(
-                    context.mkAnd(
-                            compDefPairs.stream()
-                                    .map(
-                                            pair ->
-                                                    context.mkLe(
-                                                            pair.toZ3Multi(context),
-                                                            DLeaf.fractionToZ3(
-                                                                    pair.dalToRawCost(pair.implDal),
-                                                                    context)))
-                                    .collect(Collectors.toList())
-                                    .toArray(new BoolExpr[] {})));
+            optimizer.Assert(context.mkAnd(compDefPairs.stream()
+                    .map(pair -> context.mkLe(
+                            pair.toZ3Multi(context), DLeaf.fractionToZ3(pair.dalToRawCost(pair.implDal), context)))
+                    .collect(Collectors.toList())
+                    .toArray(new BoolExpr[] {})));
         }
 
         // Make all component-defense var >= Cost(DAL(0));
@@ -97,28 +89,21 @@ public class VerdictSynthesis {
                 // the cost function is monotone with respect to DAL, which it should be.
                 // If for whatever reason we want to support non-monotone cost with respect
                 // to DAL, then this can be changed to the minimum of all costs.
-                context.mkAnd(
-                        compDefPairs.stream()
-                                .map(
-                                        pair ->
-                                                context.mkGe(
-                                                        pair.toZ3Multi(context),
-                                                        DLeaf.fractionToZ3(
-                                                                pair.dalToRawCost(0), context)))
-                                .collect(Collectors.toList())
-                                .toArray(new BoolExpr[] {})));
+                context.mkAnd(compDefPairs.stream()
+                        .map(pair -> context.mkGe(
+                                pair.toZ3Multi(context), DLeaf.fractionToZ3(pair.dalToRawCost(0), context)))
+                        .collect(Collectors.toList())
+                        .toArray(new BoolExpr[] {})));
 
         // we can't make an empty add
         // Encode objective function: the sum of all component-defense vars
         if (compDefPairs.isEmpty()) {
             optimizer.MkMinimize(context.mkInt(0));
         } else {
-            optimizer.MkMinimize(
-                    context.mkAdd(
-                            compDefPairs.stream()
-                                    .map(pair -> pair.toZ3Multi(context))
-                                    .collect(Collectors.toList())
-                                    .toArray(new ArithExpr[] {})));
+            optimizer.MkMinimize(context.mkAdd(compDefPairs.stream()
+                    .map(pair -> pair.toZ3Multi(context))
+                    .collect(Collectors.toList())
+                    .toArray(new ArithExpr[] {})));
         }
 
         if (dumpSmtLib) {
@@ -141,16 +126,15 @@ public class VerdictSynthesis {
             for (ComponentDefense pair : compDefPairs) {
                 // get the value in the model
                 RatNum expr = (RatNum) model.eval(pair.toZ3Multi(context), true);
-                Fraction rawCost =
-                        new Fraction(expr.getNumerator().getInt(), expr.getDenominator().getInt());
+                Fraction rawCost = new Fraction(
+                        expr.getNumerator().getInt(), expr.getDenominator().getInt());
                 // convert back to DAL (the value in the model is cost rather than DAL)
                 int dal = pair.rawCostToDal(rawCost);
 
                 // but we don't trust the cost obtained directly from the model.
                 // instead, we re-calculate using the cost model because it is less prone to failure
                 // The cost of implemented DAL
-                Fraction inputCost =
-                        costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
+                Fraction inputCost = costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
                 // The cost of output DAL from SMT
                 Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
 
@@ -158,26 +142,13 @@ public class VerdictSynthesis {
                 totalInputCost = totalInputCost.add(inputCost);
                 totalOutputCost = totalOutputCost.add(outputCost);
 
-                items.add(
-                        new ResultsInstance.Item(
-                                pair.component,
-                                pair.defenseProperty,
-                                pair.implDal,
-                                dal,
-                                inputCost,
-                                outputCost));
+                items.add(new ResultsInstance.Item(
+                        pair.component, pair.defenseProperty, pair.implDal, dal, inputCost, outputCost));
             }
-            return Optional.of(
-                    new ResultsInstance(
-                            partialSolution,
-                            meritAssignment,
-                            inputSat,
-                            totalInputCost,
-                            totalOutputCost,
-                            items));
+            return Optional.of(new ResultsInstance(
+                    partialSolution, meritAssignment, inputSat, totalInputCost, totalOutputCost, items));
         } else {
-            System.err.println(
-                    "Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
+            System.err.println("Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
             return Optional.empty();
         }
     }
@@ -238,16 +209,13 @@ public class VerdictSynthesis {
      */
     @Deprecated
     public static int normalizeCosts(Collection<ComponentDefense> pairs) {
-        int costLcd =
-                pairs.stream()
-                        .flatMap(
-                                (ComponentDefense pair) ->
-                                        IntStream.range(0, 10)
-                                                .map(dal -> pair.dalToRawCost(dal).getDenominator())
-                                                .mapToObj(x -> x)) // kind of dumb but need to go
-                        // from IntStream ->
-                        // Stream<Integer>
-                        .reduce(1, ArithmeticUtils::lcm);
+        int costLcd = pairs.stream()
+                .flatMap((ComponentDefense pair) -> IntStream.range(0, 10)
+                        .map(dal -> pair.dalToRawCost(dal).getDenominator())
+                        .mapToObj(x -> x)) // kind of dumb but need to go
+                // from IntStream ->
+                // Stream<Integer>
+                .reduce(1, ArithmeticUtils::lcm);
 
         for (ComponentDefense pair : pairs) {
             int[] normCosts = new int[10];
@@ -288,8 +256,7 @@ public class VerdictSynthesis {
 
             if (pair.dalToNormCost(targetDal) > 0) {
                 // this id ("cover") doesn't matter but we have to specify something
-                optimizer.AssertSoft(
-                        context.mkNot(pair.toZ3(context)), pair.dalToNormCost(targetDal), "cover");
+                optimizer.AssertSoft(context.mkNot(pair.toZ3(context)), pair.dalToNormCost(targetDal), "cover");
             }
         }
 
@@ -310,16 +277,13 @@ public class VerdictSynthesis {
                         break;
                     case Z3_L_UNDEF:
                     default:
-                        throw new RuntimeException(
-                                "Synthesis: Undefined variable in output model: "
-                                        + pair.toString());
+                        throw new RuntimeException("Synthesis: Undefined variable in output model: " + pair.toString());
                 }
             }
 
             return Optional.of(new Pair<>(output, ((double) totalNormalizedCost) / costLcd));
         } else {
-            System.err.println(
-                    "Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
+            System.err.println("Synthesis: SMT not satisfiable, perhaps there are unmitigatable attacks");
             return Optional.empty();
         }
     }
@@ -349,8 +313,7 @@ public class VerdictSynthesis {
             // System.out.println("LEAF: " + leaf + ", COST: " + leaf.cost + " [MaxSAT]");
 
             if (pair.dalToNormCost(targetDal) > 0) {
-                solver.addSoftFormula(
-                        factory.not(pair.toLogicNG(factory)), pair.dalToNormCost(targetDal));
+                solver.addSoftFormula(factory.not(pair.toLogicNG(factory)), pair.dalToNormCost(targetDal));
             }
         }
 
@@ -373,8 +336,7 @@ public class VerdictSynthesis {
                 System.err.println("Synthesis: SAT undefined, is input tree valid?");
                 return Optional.empty();
             case UNSATISFIABLE:
-                System.err.println(
-                        "Synthesis: SAT not satisfiable, perhaps there are unmitigatable attacks");
+                System.err.println("Synthesis: SAT not satisfiable, perhaps there are unmitigatable attacks");
                 return Optional.empty();
             default:
                 throw new RuntimeException("impossible");
@@ -392,8 +354,7 @@ public class VerdictSynthesis {
      */
     public static ResultsInstance addExtraImplDefenses(
             ResultsInstance results,
-            Map<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer>
-                    implCompDefPairs,
+            Map<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer> implCompDefPairs,
             CostModel costModel) {
 
         List<ResultsInstance.Item> items = new ArrayList<>(results.items);
@@ -401,13 +362,9 @@ public class VerdictSynthesis {
         Fraction outputCost = results.outputCost;
 
         // find all of the pairs already in the defense tree
-        Set<com.ge.verdict.attackdefensecollector.Pair<String, String>> accountedCompDefPairs =
-                results.items.stream()
-                        .map(
-                                item ->
-                                        new com.ge.verdict.attackdefensecollector.Pair<>(
-                                                item.component, item.defenseProperty))
-                        .collect(Collectors.toSet());
+        Set<com.ge.verdict.attackdefensecollector.Pair<String, String>> accountedCompDefPairs = results.items.stream()
+                .map(item -> new com.ge.verdict.attackdefensecollector.Pair<>(item.component, item.defenseProperty))
+                .collect(Collectors.toSet());
 
         for (Map.Entry<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer> entry :
                 implCompDefPairs.entrySet()) {
@@ -422,9 +379,7 @@ public class VerdictSynthesis {
                 Fraction pairOutputCost = costModel.cost(defProp, comp, 0);
 
                 // the item will be a removal, so from implDal -> 0 DAL
-                items.add(
-                        new ResultsInstance.Item(
-                                comp, defProp, implDal, 0, pairInputCost, pairOutputCost));
+                items.add(new ResultsInstance.Item(comp, defProp, implDal, 0, pairInputCost, pairOutputCost));
                 inputCost = inputCost.add(pairInputCost);
                 // this may seem silly, but in theory we can have a non-zero cost for DAL 0
                 outputCost = outputCost.add(pairOutputCost);
@@ -432,11 +387,6 @@ public class VerdictSynthesis {
         }
 
         return new ResultsInstance(
-                results.partialSolution,
-                results.meritAssignment,
-                results.inputSat,
-                inputCost,
-                outputCost,
-                items);
+                results.partialSolution, results.meritAssignment, results.inputSat, inputCost, outputCost, items);
     }
 }

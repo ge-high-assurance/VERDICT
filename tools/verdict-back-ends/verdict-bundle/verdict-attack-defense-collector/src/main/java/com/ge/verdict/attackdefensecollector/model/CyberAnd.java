@@ -43,11 +43,10 @@ public class CyberAnd extends CyberExpr {
     @Override
     public Optional<ADTree> toADTree(Function<PortConcern, Optional<ADTree>> tracer) {
         // Convert all children into attack-defense trees and AND them together
-        List<ADTree> adtrees =
-                cyberExprs.stream()
-                        .map(expr -> expr.toADTree(tracer))
-                        .flatMap(opt -> opt.isPresent() ? Stream.of(opt.get()) : Stream.empty())
-                        .collect(Collectors.toList());
+        List<ADTree> adtrees = cyberExprs.stream()
+                .map(expr -> expr.toADTree(tracer))
+                .flatMap(opt -> opt.isPresent() ? Stream.of(opt.get()) : Stream.empty())
+                .collect(Collectors.toList());
         // Only return an attack-defense tree if it has children
         if (adtrees.isEmpty()) {
             return Optional.empty();

@@ -63,12 +63,7 @@ public class DLeaf implements DTree {
         private Map<Integer, Integer> normCostToDal;
 
         private ComponentDefense(
-                String component,
-                String defenseProperty,
-                String attack,
-                int implDal,
-                int id,
-                Fraction[] costs) {
+                String component, String defenseProperty, String attack, int implDal, int id, Fraction[] costs) {
             this.component = component;
             this.defenseProperty = defenseProperty;
             this.attack = attack;
@@ -76,8 +71,7 @@ public class DLeaf implements DTree {
             this.id = id;
             this.costs = new Fraction[10];
             if (costs.length != 10) {
-                throw new RuntimeException(
-                        "invalid costs array, contains " + costs.length + " items instead of 10");
+                throw new RuntimeException("invalid costs array, contains " + costs.length + " items instead of 10");
             }
             rawCostToDal = new LinkedHashMap<>();
             /*
@@ -103,19 +97,16 @@ public class DLeaf implements DTree {
             normCostToDal = new LinkedHashMap<>();
             if (normalizedCosts.length != 10) {
                 throw new RuntimeException(
-                        "invalid normalized costs array, contains "
-                                + normalizedCosts.length
-                                + " items instead of 10");
+                        "invalid normalized costs array, contains " + normalizedCosts.length + " items instead of 10");
             }
             for (int dal = 0; dal < normalizedCosts.length; dal++) {
                 if (normalizedCosts[dal] < 0) {
-                    throw new RuntimeException(
-                            "trying to set negative normalized cost "
-                                    + normalizedCosts[dal]
-                                    + " for "
-                                    + toString()
-                                    + ", DAL "
-                                    + dal);
+                    throw new RuntimeException("trying to set negative normalized cost "
+                            + normalizedCosts[dal]
+                            + " for "
+                            + toString()
+                            + ", DAL "
+                            + dal);
                 }
                 dalToNormCost.put(dal, normalizedCosts[dal]);
                 normCostToDal.put(normalizedCosts[dal], dal);
@@ -174,8 +165,7 @@ public class DLeaf implements DTree {
                     valid.append(key);
                     valid.append(",");
                 }
-                throw new RuntimeException(
-                        "invalid normCost: " + normCost + ", valid: " + valid.toString());
+                throw new RuntimeException("invalid normCost: " + normCost + ", valid: " + valid.toString());
             }
             return val;
         }
@@ -233,24 +223,18 @@ public class DLeaf implements DTree {
      */
     public static final class Factory {
         /** the map from component/defense to constructed component-defense pairs */
-        private final Map<Pair<String, String>, ComponentDefense> componentDefenseMap =
-                new LinkedHashMap<>();
+        private final Map<Pair<String, String>, ComponentDefense> componentDefenseMap = new LinkedHashMap<>();
         /** use incremental IDs to produce unique SMT names */
         private int idCounter = 0;
         /** the map from IDs to constructed component-defense pairs */
         private final Map<Integer, ComponentDefense> idMap = new HashMap<>();
 
         private ComponentDefense createIfNeeded(
-                String component,
-                String defenseProperty,
-                String attack,
-                int implDal,
-                Fraction[] costs) {
+                String component, String defenseProperty, String attack, int implDal, Fraction[] costs) {
             Pair<String, String> key = new Pair<>(component, defenseProperty);
             if (!componentDefenseMap.containsKey(key)) {
                 ComponentDefense pair =
-                        new ComponentDefense(
-                                component, defenseProperty, attack, implDal, idCounter++, costs);
+                        new ComponentDefense(component, defenseProperty, attack, implDal, idCounter++, costs);
                 idMap.put(pair.id, pair);
                 componentDefenseMap.put(key, pair);
             }
@@ -298,8 +282,7 @@ public class DLeaf implements DTree {
             Fraction[] costs,
             Factory factory) {
 
-        componentDefense =
-                factory.createIfNeeded(component, defenseProperty, attack, implDal, costs);
+        componentDefense = factory.createIfNeeded(component, defenseProperty, attack, implDal, costs);
         this.targetDal = targetDal;
     }
 
@@ -349,8 +332,7 @@ public class DLeaf implements DTree {
             }
         }
 
-        componentDefense =
-                factory.createIfNeeded(component, defenseProperty, attack, implDal, costs);
+        componentDefense = factory.createIfNeeded(component, defenseProperty, attack, implDal, costs);
         this.targetDal = targetDal;
     }
 

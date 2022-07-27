@@ -97,10 +97,7 @@ public class Defense extends ADTree {
         for (List<DefenseLeaf> term : defenseDnf) {
             Prob termTotal = Prob.impossible();
             for (DefenseLeaf leaf : term) {
-                Prob prob =
-                        leaf.right.isPresent()
-                                ? Prob.fromDal(leaf.right.get().right)
-                                : Prob.certain();
+                Prob prob = leaf.right.isPresent() ? Prob.fromDal(leaf.right.get().right) : Prob.certain();
                 termTotal = Prob.or(termTotal, prob);
             }
             total = Prob.and(total, termTotal);

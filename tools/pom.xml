@@ -303,10 +303,10 @@
           <version>2.23.0</version>
           <configuration>
             <java>
-              <!-- Uncomment to format verdict plugin <includes><include>src/**/*.java</include></includes> -->
-              <googleJavaFormat>
-                <style>AOSP</style>
-              </googleJavaFormat>
+              <includes>
+                <include>src/**/*.java</include>
+              </includes>
+              <palantirJavaFormat></palantirJavaFormat>
             </java>
             <formats>
               <format>

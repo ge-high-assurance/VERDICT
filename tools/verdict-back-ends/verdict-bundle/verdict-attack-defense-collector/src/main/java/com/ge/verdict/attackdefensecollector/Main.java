@@ -26,8 +26,7 @@ public class Main {
         // If "--vdm" is present, we will use the vdm file;
         // otherwise, we will load csv files
         if (arrayContains(args, "--vdm")) {
-            attackDefenseCollector =
-                    new AttackDefenseCollector(new File(args[1]), new File(args[0]), inference);
+            attackDefenseCollector = new AttackDefenseCollector(new File(args[1]), new File(args[0]), inference);
         } else {
             attackDefenseCollector = new AttackDefenseCollector(args[0], inference);
         }
@@ -44,11 +43,7 @@ public class Main {
             Logger.println("Mission: " + result.cyberReq.getMission());
             Logger.println("Severity: " + result.cyberReq.getSeverity());
             Logger.println("Computed: " + result.prob);
-            Logger.println(
-                    "Successful: "
-                            + (Prob.lte(result.prob, result.cyberReq.getSeverity())
-                                    ? "Yes"
-                                    : "No"));
+            Logger.println("Successful: " + (Prob.lte(result.prob, result.cyberReq.getSeverity()) ? "Yes" : "No"));
         }
         Logger.println("Total time: " + (System.currentTimeMillis() - start) + " milliseconds");
     }

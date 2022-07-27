@@ -218,22 +218,15 @@ public class SystemModel {
         }
 
         for (ConnectionModel connection : getInternalOutgoingConnections()) {
-            Util.putListMap(
-                    destPortToOutgoingInternalConnection,
-                    connection.getDestinationPortName(),
-                    connection);
+            Util.putListMap(destPortToOutgoingInternalConnection, connection.getDestinationPortName(), connection);
         }
 
         for (ConnectionModel connection : getInternalIncomingConnections()) {
-            Util.putListMap(
-                    sourcePortToIncomingInternalConnection,
-                    connection.getSourcePortName(),
-                    connection);
+            Util.putListMap(sourcePortToIncomingInternalConnection, connection.getSourcePortName(), connection);
         }
 
         for (ConnectionModel connection : getIncomingConnections()) {
-            Util.putListMap(
-                    inputPortToIncomingConnection, connection.getDestinationPortName(), connection);
+            Util.putListMap(inputPortToIncomingConnection, connection.getDestinationPortName(), connection);
         }
 
         Set<Attack> declaredAttacks = new HashSet<>();
@@ -244,11 +237,10 @@ public class SystemModel {
         for (Defense defense : attackable.getDefenses()) {
             // Check that referenced attacks are added to this system
             if (!declaredAttacks.contains(defense.getAttack())) {
-                throw new RuntimeException(
-                        "Defense in system "
-                                + getName()
-                                + " refers to non-existant attack "
-                                + defense.getAttack().getName());
+                throw new RuntimeException("Defense in system "
+                        + getName()
+                        + " refers to non-existant attack "
+                        + defense.getAttack().getName());
             }
 
             attackToDefense.put(defense.getAttack(), defense);
@@ -303,8 +295,7 @@ public class SystemModel {
      *     cycles from causing infinite loops
      * @return the optional attack-defense tree constructed from tracing the port concern
      */
-    protected Optional<ADTree> trace(
-            PortConcern concern, Set<Pair<ConnectionModel, CIA>> cyclePrevention) {
+    protected Optional<ADTree> trace(PortConcern concern, Set<Pair<ConnectionModel, CIA>> cyclePrevention) {
         if (!isConcretized()) {
             concretize();
         }
@@ -324,14 +315,9 @@ public class SystemModel {
             if (attack.getCia().equals(concern.getCia())) {
                 if (attackToDefense.containsKey(attack)) {
                     // There is a defense associated
-                    Optional<ADTree> dependentRules =
-                            DependentRules.getComponentDependence(this, attack.getName());
+                    Optional<ADTree> dependentRules = DependentRules.getComponentDependence(this, attack.getName());
                     if (dependentRules.isPresent()) {
-                        children.add(
-                                new ADAnd(
-                                        new ADNot(attackToDefense.get(attack)),
-                                        attack,
-                                        dependentRules.get()));
+                        children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack, dependentRules.get()));
                     } else {
                         children.add(new ADAnd(new ADNot(attackToDefense.get(attack)), attack));
                     }
@@ -365,21 +351,14 @@ public class SystemModel {
         for (ConnectionModel internalConnection :
                 Util.guardedGet(sourcePortToIncomingInternalConnection, concern.getPortName())) {
             traceInputConcern(
-                            new PortConcern(
-                                    internalConnection.getSourcePortName(), concern.getCia()),
-                            cyclePrevention)
+                            new PortConcern(internalConnection.getSourcePortName(), concern.getCia()), cyclePrevention)
                     .map(children::add);
         }
 
         if (children.isEmpty()) {
             if (!hasCyberRel) {
                 Logger.showWarning(
-                        "Found no trace for "
-                                + getName()
-                                + " "
-                                + concern.getPortName()
-                                + ":"
-                                + concern.getCia());
+                        "Found no trace for " + getName() + " " + concern.getPortName() + ":" + concern.getCia());
             }
             return Optional.empty();
         } else {

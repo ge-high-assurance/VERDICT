@@ -41,10 +41,8 @@ public class DTreeConstructorTest {
         DTree dtree = new DNot(new DNot(leaf));
         Assertions.assertThat(dtree.prepare().get().prettyPrint()).isEqualTo(leaf.prettyPrint());
 
-        DTree dtree2 =
-                new DAnd(Collections.singletonList(new DOr(Collections.singletonList(dtree))));
-        DTree dtree3 =
-                new DAnd(Collections.singletonList(new DOr(Collections.singletonList(leaf))));
+        DTree dtree2 = new DAnd(Collections.singletonList(new DOr(Collections.singletonList(dtree))));
+        DTree dtree3 = new DAnd(Collections.singletonList(new DOr(Collections.singletonList(leaf))));
         Assertions.assertThat(dtree2.prepare().get().prettyPrint()).isEqualTo(dtree3.prettyPrint());
     }
 
@@ -58,34 +56,20 @@ public class DTreeConstructorTest {
 
         SystemModel system = new SystemModel("S1");
 
-        Attack attack1 =
-                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack1 = new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
         Defense defense1 = new Defense(attack1);
-        defense1.addDefenseClause(
-                Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
+        defense1.addDefenseClause(Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
 
         ADTree adtree = new ADOr(new ADAnd(new ADNot(defense1), attack1));
 
         Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
         DTree dtree =
-                new DAnd(
-                        Collections.singletonList(
-                                new DOr(
-                                        Collections.singletonList(
-                                                new DOr(
-                                                        Collections.singletonList(
-                                                                new DAnd(
-                                                                        Collections.singletonList(
-                                                                                new DLeaf(
-                                                                                        "S1", "D1",
-                                                                                        "A1", 0,
-                                                                                        dal, costs,
-                                                                                        factory)))))))));
+                new DAnd(Collections.singletonList(new DOr(Collections.singletonList(new DOr(Collections.singletonList(
+                        new DAnd(Collections.singletonList(new DLeaf("S1", "D1", "A1", 0, dal, costs, factory)))))))));
 
-        Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
-                                .prettyPrint())
+        Assertions.assertThat(DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
+                        .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 
@@ -99,14 +83,12 @@ public class DTreeConstructorTest {
 
         SystemModel system = new SystemModel("S1");
 
-        Attack attack1 =
-                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack1 = new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
 
         DTree dtree = new ALeaf(attack1);
 
-        Assertions.assertThat(
-                        DTreeConstructor.construct(attack1, dummyCosts, dal, false, false, factory)
-                                .prettyPrint())
+        Assertions.assertThat(DTreeConstructor.construct(attack1, dummyCosts, dal, false, false, factory)
+                        .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 
@@ -120,33 +102,22 @@ public class DTreeConstructorTest {
 
         SystemModel system = new SystemModel("S1");
 
-        Attack attack1 =
-                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
-        Attack attack2 =
-                new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.I);
+        Attack attack1 = new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack2 = new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.I);
         Defense defense1 = new Defense(attack1);
-        defense1.addDefenseClause(
-                Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
+        defense1.addDefenseClause(Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
 
         ADTree adtree = new ADOr(new ADNot(defense1), attack1, attack2);
 
         Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
-        DTree dtree =
-                new DAnd(
-                        Arrays.asList(
-                                new DOr(
-                                        Collections.singletonList(
-                                                new DAnd(
-                                                        Collections.singletonList(
-                                                                new DLeaf(
-                                                                        "S1", "D1", "A1", 0, dal,
-                                                                        costs, factory))))),
-                                new ALeaf(attack2)));
+        DTree dtree = new DAnd(Arrays.asList(
+                new DOr(Collections.singletonList(
+                        new DAnd(Collections.singletonList(new DLeaf("S1", "D1", "A1", 0, dal, costs, factory))))),
+                new ALeaf(attack2)));
 
-        Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
-                                .prettyPrint())
+        Assertions.assertThat(DTreeConstructor.construct(adtree, dummyCosts, dal, false, false, factory)
+                        .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 
@@ -160,32 +131,26 @@ public class DTreeConstructorTest {
 
         SystemModel system = new SystemModel("S1");
 
-        Attack attack1 =
-                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
-        Attack attack2 =
-                new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.A);
+        Attack attack1 = new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack2 = new Attack(system.getAttackable(), "A2", "An attack", Prob.certain(), CIA.A);
         Defense defense1 = new Defense(attack1);
         defense1.addDefenseClause(
-                Collections.singletonList(
-                        new Defense.DefenseLeaf("D1", Optional.of(new Pair<>("D1", 3)))));
+                Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.of(new Pair<>("D1", 3)))));
         Defense defense2 = new Defense(attack2);
-        defense2.addDefenseClause(
-                Collections.singletonList(new Defense.DefenseLeaf("D2", Optional.empty())));
+        defense2.addDefenseClause(Collections.singletonList(new Defense.DefenseLeaf("D2", Optional.empty())));
 
         ADTree adtree = new ADOr(new ADNot(defense1), attack1, new ADNot(defense2), attack2);
 
         Fraction[] costs = Util.fractionCosts(new double[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
 
-        DTree dtree =
-                new DAnd(
-                        new DOr(new DAnd(new DLeaf("S1", "D1", "A1", 3, dal, costs, factory))),
-                        new DOr(new DAnd(new DLeaf("S1", "D2", "A2", 0, dal, costs, factory))));
+        DTree dtree = new DAnd(
+                new DOr(new DAnd(new DLeaf("S1", "D1", "A1", 3, dal, costs, factory))),
+                new DOr(new DAnd(new DLeaf("S1", "D2", "A2", 0, dal, costs, factory))));
 
-        Assertions.assertThat(
-                        DTreeConstructor.construct(adtree, dummyCosts, dal, true, false, factory)
-                                .prepare()
-                                .get()
-                                .prettyPrint())
+        Assertions.assertThat(DTreeConstructor.construct(adtree, dummyCosts, dal, true, false, factory)
+                        .prepare()
+                        .get()
+                        .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 
@@ -198,59 +163,30 @@ public class DTreeConstructorTest {
 
         SystemModel system = new SystemModel("S1");
 
-        Attack attack1 =
-                new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
+        Attack attack1 = new Attack(system.getAttackable(), "A1", "An attack", Prob.certain(), CIA.I);
         Defense defense1 = new Defense(attack1);
-        defense1.addDefenseClause(
-                Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
+        defense1.addDefenseClause(Collections.singletonList(new Defense.DefenseLeaf("D1", Optional.empty())));
 
-        List<AttackDefenseCollector.Result> results =
-                Arrays.asList(
-                        new AttackDefenseCollector.Result(
-                                system,
-                                new CyberReq("req1", "mission1", 5, "port1", CIA.I),
-                                new ADAnd(new ADNot(defense1), attack1),
-                                Prob.certain()),
-                        new AttackDefenseCollector.Result(
-                                system,
-                                new CyberReq("req1", "mission1", 7, "port1", CIA.I),
-                                new ADAnd(new ADNot(defense1), attack1),
-                                Prob.certain()));
+        List<AttackDefenseCollector.Result> results = Arrays.asList(
+                new AttackDefenseCollector.Result(
+                        system,
+                        new CyberReq("req1", "mission1", 5, "port1", CIA.I),
+                        new ADAnd(new ADNot(defense1), attack1),
+                        Prob.certain()),
+                new AttackDefenseCollector.Result(
+                        system,
+                        new CyberReq("req1", "mission1", 7, "port1", CIA.I),
+                        new ADAnd(new ADNot(defense1), attack1),
+                        Prob.certain()));
 
-        DTree dtree =
-                new DAnd(
-                        new DOr(
-                                new DOr(
-                                        new DAnd(
-                                                new DLeaf(
-                                                        "S1",
-                                                        "D1",
-                                                        "A1",
-                                                        0,
-                                                        5,
-                                                        dummyCosts,
-                                                        factory,
-                                                        false,
-                                                        false)))),
-                        new DOr(
-                                new DOr(
-                                        new DAnd(
-                                                new DLeaf(
-                                                        "S1",
-                                                        "D1",
-                                                        "A1",
-                                                        0,
-                                                        7,
-                                                        dummyCosts,
-                                                        factory,
-                                                        false,
-                                                        false)))));
+        DTree dtree = new DAnd(
+                new DOr(new DOr(new DAnd(new DLeaf("S1", "D1", "A1", 0, 5, dummyCosts, factory, false, false)))),
+                new DOr(new DOr(new DAnd(new DLeaf("S1", "D1", "A1", 0, 7, dummyCosts, factory, false, false)))));
 
-        Assertions.assertThat(
-                        DTreeConstructor.construct(results, dummyCosts, false, false, factory)
-                                .prepare()
-                                .get()
-                                .prettyPrint())
+        Assertions.assertThat(DTreeConstructor.construct(results, dummyCosts, false, false, factory)
+                        .prepare()
+                        .get()
+                        .prettyPrint())
                 .isEqualTo(dtree.prettyPrint());
     }
 }

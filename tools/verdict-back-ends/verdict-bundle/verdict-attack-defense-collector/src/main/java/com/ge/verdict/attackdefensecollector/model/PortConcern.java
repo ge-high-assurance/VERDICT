@@ -52,8 +52,7 @@ public class PortConcern extends CyberExpr {
     public boolean equals(Object other) {
         if (other instanceof PortConcern) {
             PortConcern otherPortConcern = (PortConcern) other;
-            return this.portName.equals(otherPortConcern.portName)
-                    && this.cia.equals(otherPortConcern.cia);
+            return this.portName.equals(otherPortConcern.portName) && this.cia.equals(otherPortConcern.cia);
         }
 
         return false;

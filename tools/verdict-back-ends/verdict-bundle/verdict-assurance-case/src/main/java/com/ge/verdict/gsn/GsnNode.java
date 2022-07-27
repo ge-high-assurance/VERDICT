@@ -24,13 +24,23 @@ public class GsnNode {
     protected String nodeType;
 
     /** To store relevant information based on nodeType */
-    @XmlElement protected Goal goal;
+    @XmlElement
+    protected Goal goal;
 
-    @XmlElement protected Strategy strategy;
-    @XmlElement protected Solution solution;
-    @XmlElement protected Context context;
-    @XmlElement protected Justification justification;
-    @XmlElement protected Assumption assumption;
+    @XmlElement
+    protected Strategy strategy;
+
+    @XmlElement
+    protected Solution solution;
+
+    @XmlElement
+    protected Context context;
+
+    @XmlElement
+    protected Justification justification;
+
+    @XmlElement
+    protected Assumption assumption;
 
     @XmlElement
     /** List of nodes which support a node */

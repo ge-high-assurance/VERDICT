@@ -28,8 +28,7 @@ public class SummaryProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryProcessor.class);
 
-    public static Vector<VerdictProperty> readResults(File resultFile)
-            throws FileNotFoundException {
+    public static Vector<VerdictProperty> readResults(File resultFile) throws FileNotFoundException {
 
         FileInputStream resultStream = new FileInputStream(resultFile);
         return readResults(resultStream);
@@ -40,8 +39,7 @@ public class SummaryProcessor {
         XMLProcessor.parseLog(resultFile);
     }
 
-    public static Vector<VerdictProperty> readResults(InputStream inputStream)
-            throws FileNotFoundException {
+    public static Vector<VerdictProperty> readResults(InputStream inputStream) throws FileNotFoundException {
 
         //        File resultFile = new File("eg1_results.xml");
 
@@ -52,7 +50,9 @@ public class SummaryProcessor {
 
             LOGGY.info("Property: " + p.getId() + "  " + p.isSAT());
 
-            if (!p.isSAT() && p.getSource().equals("mcs") && p.getAllWeakAssumptions().size() > 0) {
+            if (!p.isSAT()
+                    && p.getSource().equals("mcs")
+                    && p.getAllWeakAssumptions().size() > 0) {
 
                 LOGGY.info("Weak Assumptions: ");
                 LOGGY.info("-----------------");

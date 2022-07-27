@@ -3,6 +3,4 @@
  */
 package com.ge.research.osate.verdict.dsl.serializer;
 
-
-public class VerdictSyntacticSequencer extends AbstractVerdictSyntacticSequencer {
-}
+public class VerdictSyntacticSequencer extends AbstractVerdictSyntacticSequencer {}

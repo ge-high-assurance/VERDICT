@@ -88,8 +88,7 @@ public class VdmTranslator {
             try {
                 outputFile.createNewFile();
             } catch (IOException e) {
-                System.out.println(
-                        "Error creating file " + outputFile.getAbsolutePath() + ": " + e);
+                System.out.println("Error creating file " + outputFile.getAbsolutePath() + ": " + e);
                 canWrite = false;
             }
         }

@@ -93,8 +93,7 @@ public class ResultsInstance {
 
         @Override
         public int hashCode() {
-            return Objects.hash(
-                    component, defenseProperty, inputDal, outputDal, inputCost, outputCost);
+            return Objects.hash(component, defenseProperty, inputDal, outputDal, inputCost, outputCost);
         }
 
         @Override
@@ -137,8 +136,7 @@ public class ResultsInstance {
      * @throws IOException
      * @throws ParserConfigurationException
      */
-    public static ResultsInstance fromFile(File file)
-            throws SAXException, IOException, ParserConfigurationException {
+    public static ResultsInstance fromFile(File file) throws SAXException, IOException, ParserConfigurationException {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
         Element root = doc.getDocumentElement();
 
@@ -149,14 +147,13 @@ public class ResultsInstance {
             Node node = nodes.item(i);
             if (node instanceof Element) {
                 Element elem = (Element) node;
-                items.add(
-                        new Item(
-                                elem.getAttribute(ITEM_COMPONENT),
-                                elem.getAttribute(ITEM_DEFENSE_PROPERTY),
-                                Integer.parseInt(elem.getAttribute(ITEM_INPUT_DAL)),
-                                Integer.parseInt(elem.getAttribute(ITEM_OUTPUT_DAL)),
-                                parseCost(elem.getAttribute(ITEM_INPUT_COST)),
-                                parseCost(elem.getAttribute(ITEM_OUTPUT_COST))));
+                items.add(new Item(
+                        elem.getAttribute(ITEM_COMPONENT),
+                        elem.getAttribute(ITEM_DEFENSE_PROPERTY),
+                        Integer.parseInt(elem.getAttribute(ITEM_INPUT_DAL)),
+                        Integer.parseInt(elem.getAttribute(ITEM_OUTPUT_DAL)),
+                        parseCost(elem.getAttribute(ITEM_INPUT_COST)),
+                        parseCost(elem.getAttribute(ITEM_OUTPUT_COST))));
             }
         }
 
@@ -176,7 +173,8 @@ public class ResultsInstance {
      */
     private void toStreamResult(StreamResult target) {
         try {
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Document doc =
+                    DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Element root = doc.createElement(ROOT_TAG);
             doc.appendChild(root);
 
@@ -231,53 +229,44 @@ public class ResultsInstance {
      * @param stream the print stream
      */
     public void prettyPrint(PrintStream stream) {
-        int maxLength =
-                Math.min(
-                        items.stream()
-                                .map(
-                                        item ->
-                                                item.component.length()
-                                                        + item.defenseProperty.length())
-                                .reduce(0, Math::max),
-                        50);
+        int maxLength = Math.min(
+                items.stream()
+                        .map(item -> item.component.length() + item.defenseProperty.length())
+                        .reduce(0, Math::max),
+                50);
 
         for (Item item : items) {
-            int extraSpaces =
-                    Math.max(
-                            maxLength - item.component.length() - item.defenseProperty.length(), 0);
-            stream.println(
-                    "("
-                            + item.component
-                            + ", "
-                            + item.defenseProperty
-                            + "): "
-                            + new String(new char[extraSpaces]).replace("\0", " ")
-                            + "DAL "
-                            + item.inputDal
-                            + " (cost "
-                            + item.inputCost
-                            + ") --> DAL "
-                            + item.outputDal
-                            + " (cost "
-                            + item.outputCost
-                            + ")");
+            int extraSpaces = Math.max(maxLength - item.component.length() - item.defenseProperty.length(), 0);
+            stream.println("("
+                    + item.component
+                    + ", "
+                    + item.defenseProperty
+                    + "): "
+                    + new String(new char[extraSpaces]).replace("\0", " ")
+                    + "DAL "
+                    + item.inputDal
+                    + " (cost "
+                    + item.inputCost
+                    + ") --> DAL "
+                    + item.outputDal
+                    + " (cost "
+                    + item.outputCost
+                    + ")");
         }
 
         stream.println();
-        stream.println(
-                "Input parameters - partialSolution: "
-                        + partialSolution
-                        + ", meritAssignment: "
-                        + meritAssignment
-                        + ", inputSat: "
-                        + inputSat);
+        stream.println("Input parameters - partialSolution: "
+                + partialSolution
+                + ", meritAssignment: "
+                + meritAssignment
+                + ", inputSat: "
+                + inputSat);
         stream.println("Total cost: " + inputCost + " --> " + outputCost);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                partialSolution, meritAssignment, inputSat, inputCost, outputCost, items);
+        return Objects.hash(partialSolution, meritAssignment, inputSat, inputCost, outputCost, items);
     }
 
     @Override

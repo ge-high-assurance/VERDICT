@@ -51,34 +51,20 @@ public class App {
         // + "9. BG = Benign (Default) \n");
 
         // Attack Library Options
-        Option ls_opt =
-                new Option(
-                        "LS",
-                        "Location Spoofing",
-                        false,
-                        "Location Spoofing attack Instrumentation");
-        Option ni_opt =
-                new Option("NI", "Network Injection", false, "Network Injection Instrumentation");
+        Option ls_opt = new Option("LS", "Location Spoofing", false, "Location Spoofing attack Instrumentation");
+        Option ni_opt = new Option("NI", "Network Injection", false, "Network Injection Instrumentation");
         Option lb_opt = new Option("LB", "Logic Bomb", false, "Logic Bomb Instrumentation");
-        Option ht_opt =
-                new Option("HT", "Harware Trojan", false, "Harware Trojans Instrumentation");
+        Option ht_opt = new Option("HT", "Harware Trojan", false, "Harware Trojans Instrumentation");
 
-        Option sv_opt =
-                new Option(
-                        "SV",
-                        "Software Virus/malware/worm/trojan",
-                        false,
-                        "Software Virus/malware/worm/trojan Instrumentation");
+        Option sv_opt = new Option(
+                "SV",
+                "Software Virus/malware/worm/trojan",
+                false,
+                "Software Virus/malware/worm/trojan Instrumentation");
 
-        Option ri_opt =
-                new Option(
-                        "RI",
-                        "Remotet Code Injection",
-                        false,
-                        "Remotet Code Injection Instrumentation");
+        Option ri_opt = new Option("RI", "Remotet Code Injection", false, "Remotet Code Injection Instrumentation");
 
-        Option ot_opt =
-                new Option("OT", "Outsider Threat", false, "Outsider Threat Instrumentation");
+        Option ot_opt = new Option("OT", "Outsider Threat", false, "Outsider Threat Instrumentation");
 
         Option it_opt = new Option("IT", "Insider Threat", false, "Insider Threat Instrumentation");
 
@@ -86,15 +72,9 @@ public class App {
 
         Option all_opt = new Option("AT", "ALL Threats", false, "Enable all attacks");
 
-        Option bm_opt =
-                new Option("B", "Blame Assignment", false, "Blame Assignment (Link Level) Default");
+        Option bm_opt = new Option("B", "Blame Assignment", false, "Blame Assignment (Link Level) Default");
 
-        Option bl_opt =
-                new Option(
-                        "C",
-                        "Blame Assignment (Component)",
-                        false,
-                        "Blame Assignment (Link Level)");
+        Option bl_opt = new Option("C", "Blame Assignment (Component)", false, "Blame Assignment (Link Level)");
 
         options.addOption(ls_opt);
         options.addOption(ni_opt);

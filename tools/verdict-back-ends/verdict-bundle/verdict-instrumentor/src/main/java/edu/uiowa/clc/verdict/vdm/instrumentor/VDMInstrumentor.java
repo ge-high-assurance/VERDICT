@@ -86,10 +86,9 @@ public class VDMInstrumentor {
         Model instrumented_model = null;
 
         String[] possibleThreats = {"LS", "LB", "NI", "SV", "RI", "OT", "IT", "HT", "BG"};
-        List<String> threats =
-                Arrays.asList(possibleThreats).stream()
-                        .filter(threat -> cmdLine.hasOption(threat))
-                        .collect(Collectors.toList());
+        List<String> threats = Arrays.asList(possibleThreats).stream()
+                .filter(threat -> cmdLine.hasOption(threat))
+                .collect(Collectors.toList());
         boolean blameAssignment = cmdLine.hasOption("B");
         boolean componentLevel = cmdLine.hasOption("C");
 
@@ -98,11 +97,7 @@ public class VDMInstrumentor {
         return instrumented_model;
     }
 
-    public Model instrument(
-            Model vdm_model,
-            List<String> threats,
-            boolean blameAssignment,
-            boolean componentLevel) {
+    public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment, boolean componentLevel) {
         Model instrumented_model = null;
 
         retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
@@ -114,8 +109,7 @@ public class VDMInstrumentor {
         return instrument(vdm_model, threats, blameAssignment, false);
     }
 
-    protected String getComponentID(
-            Map<String, HashSet<Connection>> components_map, Connection con) {
+    protected String getComponentID(Map<String, HashSet<Connection>> components_map, Connection con) {
 
         String ComponentID = null;
 
@@ -273,10 +267,7 @@ public class VDMInstrumentor {
     }
 
     protected void retrieve_component_and_channels(
-            Model vdm_model,
-            List<String> threats,
-            boolean blame_assignment,
-            boolean component_level) {
+            Model vdm_model, List<String> threats, boolean blame_assignment, boolean component_level) {
 
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
@@ -347,8 +338,7 @@ public class VDMInstrumentor {
             blockImpl = componentImpl.getBlockImpl();
         }
 
-        Map<String, HashSet<Connection>> components_map =
-                new HashMap<String, HashSet<Connection>>();
+        Map<String, HashSet<Connection>> components_map = new HashMap<String, HashSet<Connection>>();
 
         if (vdm_components.size() > 0) {
             //            System.out.println("Selected Components:");
@@ -460,8 +450,7 @@ public class VDMInstrumentor {
             // g_constants.add(global_comp_const);
         }
 
-        Map<String, List<String>> connection_gps_comp_map =
-                connection_gps_mapper(connections_map, components_map);
+        Map<String, List<String>> connection_gps_comp_map = connection_gps_mapper(connections_map, components_map);
 
         // Choosing Blame options
         if (threats.contains("LS") && component_level) {
@@ -473,8 +462,7 @@ public class VDMInstrumentor {
 
         if (blame_assignment && component_level) {
 
-            Map<String, List<String>> connection_comp_map =
-                    connection_mapper(connections_map, components_map);
+            Map<String, List<String>> connection_comp_map = connection_mapper(connections_map, components_map);
 
             ComponentImpl compImpl = retrieve_main_cmp_impl();
 
@@ -793,9 +781,7 @@ public class VDMInstrumentor {
      * Declare and Define weak assumptions for the blame assignment.
      */
     protected void dec_var_asmp_const(
-            Map<String, List<String>> connection_comp_map,
-            boolean blame_assignment,
-            boolean link_level) {
+            Map<String, List<String>> connection_comp_map, boolean blame_assignment, boolean link_level) {
 
         Set<String> vars = connection_comp_map.keySet();
         List<SymbolDefinition> vars_dec = new ArrayList<SymbolDefinition>();
@@ -1491,8 +1477,7 @@ public class VDMInstrumentor {
         return vdm_links;
     }
 
-    protected boolean retrieve_links(
-            ComponentType component, Connection connection, Port instrumented_port) {
+    protected boolean retrieve_links(ComponentType component, Connection connection, Port instrumented_port) {
 
         // Default Block Implementation
         ComponentImpl compImpl = retrieve_cmp_impl(component);
@@ -1671,12 +1656,11 @@ public class VDMInstrumentor {
             dest_port = compInstancePort.getPort();
         }
 
-        String instrument_cmp_Id =
-                src_componentInstance.getName()
-                        + "_Inst_"
-                        + dest_componentInstance.getName()
-                        + "_port_"
-                        + dest_port.getName();
+        String instrument_cmp_Id = src_componentInstance.getName()
+                + "_Inst_"
+                + dest_componentInstance.getName()
+                + "_port_"
+                + dest_port.getName();
 
         instrument_cmp_Id = instrument_cmp_Id.replace(".", "_dot_");
         // Setting Component IDs

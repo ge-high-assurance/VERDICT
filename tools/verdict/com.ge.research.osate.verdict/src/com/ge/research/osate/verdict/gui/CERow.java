@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-*
-* Author: Soumya Talukder
-* Date: Jul 18, 2019
-*
-*/
+ *
+ * Author: Soumya Talukder
+ * Date: Jul 18, 2019
+ *
+ */
 
-//this class stores content of a row in counter-example viewer-tab
+// this class stores content of a row in counter-example viewer-tab
 public class CERow {
-	private List<String> rowContents = new ArrayList<String>();
+    private List<String> rowContents = new ArrayList<String>();
 
-	public void addRow(String str) {
-		rowContents.add(str);
-	}
+    public void addRow(String str) {
+        rowContents.add(str);
+    }
 
-	public List<String> getRowContents() {
-		return rowContents;
-	}
+    public List<String> getRowContents() {
+        return rowContents;
+    }
 }

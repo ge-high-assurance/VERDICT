@@ -30,8 +30,7 @@ public class LustreErrorListener extends BaseErrorListener {
         System.err.println(sb.toString());
     }
 
-    private void addMessage(
-            StringBuilder sb, int line, int charPositionInLine, String msg, String source) {
+    private void addMessage(StringBuilder sb, int line, int charPositionInLine, String msg, String source) {
         sb.append(source)
                 .append(":")
                 .append(line)

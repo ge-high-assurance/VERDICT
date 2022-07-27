@@ -6,6 +6,4 @@ package com.ge.research.osate.verdict.dsl;
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
-public class VerdictRuntimeModule extends com.ge.research.osate.verdict.dsl.AbstractVerdictRuntimeModule {
-
-}
+public class VerdictRuntimeModule extends com.ge.research.osate.verdict.dsl.AbstractVerdictRuntimeModule {}

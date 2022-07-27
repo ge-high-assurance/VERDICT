@@ -17,8 +17,8 @@ public class CostModelTest {
 
     @Test
     public void testDefaults() {
-        CostModel costs =
-                new CostModel(new File(getClass().getResource("defaultCosts.xml").getPath()));
+        CostModel costs = new CostModel(
+                new File(getClass().getResource("defaultCosts.xml").getPath()));
         Assertions.assertThat(costs.cost("A", "A", 1)).isEqualTo(new Fraction(16));
         Assertions.assertThat(costs.cost("A", "B", 1)).isEqualTo(new Fraction(15));
         Assertions.assertThat(costs.cost("B", "A", 1)).isEqualTo(new Fraction(14));

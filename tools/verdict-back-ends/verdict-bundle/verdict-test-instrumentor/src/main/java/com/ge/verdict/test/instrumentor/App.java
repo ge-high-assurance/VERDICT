@@ -14,8 +14,11 @@ public class App {
 
     public static void main(String[] args) throws URISyntaxException {
         if (args.length != 2) {
-            File jarFile =
-                    new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File jarFile = new File(App.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
             LOGGER.error("Usage: java -jar {} <input file> <output file>", jarFile.getName());
         } else {
             // Get the input file
