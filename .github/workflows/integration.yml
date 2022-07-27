@@ -1,11 +1,11 @@
-name: VERDICT Integration Workflow
-
 # Runs whenever a pull request is created, reopened, or has a change
 # made to it
 
+name: VERDICT Integration Workflow
+
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened, synchronize]
   workflow_dispatch:
 
 # Runs integration workflow as a CI check:
@@ -13,13 +13,12 @@ on:
 
 jobs:
   integration:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         distribution: [ temurin ]
         java-version: [ 11 ]
         os: [ ubuntu-20.04 ]
-
-    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Check out VERDICT source
@@ -28,12 +27,12 @@ jobs:
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
 
-    - name: Set up Java
+    - name: Set up Java and Maven
       uses: actions/setup-java@v3.4.1
       with:
+        cache: maven
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java-version }}
-        cache: maven
 
     - name: Build VERDICT source
       run: |

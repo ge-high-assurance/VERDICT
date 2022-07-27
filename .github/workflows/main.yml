@@ -1,7 +1,7 @@
-name: VERDICT Main Workflow
-
 # Runs whenever the main branch has a change made to it (except for
 # tag-only pushes)
+
+name: VERDICT Main Workflow
 
 on:
   push:
@@ -9,23 +9,22 @@ on:
     tags-ignore: [ '*' ]
   workflow_dispatch:
 
-# Runs main workflow and uploads build artifacts:
-# - Builds & uploads soteria_pp native binary
+# Runs main workflow and builds most artifacts:
+# - Builds soteria_pp native binary
 # - Builds VERDICT source & runs unit tests
 # - Pushes verdict-dev image to Docker Hub
-# - Updates verdict-dev update site
+# - Updates verdict-dev in VERDICT-update-sites
 
 jobs:
   main:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         distribution: [ temurin ]
         java-version: [ 11 ]
         ocaml-compiler: [ 4.09.1 ]
-        os: [ macos-10.15, ubuntu-20.04 ]
-
-    runs-on: ${{ matrix.os }}
+        os: [ macos-12, ubuntu-20.04 ]
 
     steps:
     - name: Check out VERDICT source
@@ -54,13 +53,13 @@ jobs:
       if: runner.os == 'Linux'
       uses: ts-graphviz/setup-graphviz@v1
 
-    - name: Set up Java
+    - name: Set up Java and Maven
       if: runner.os == 'Linux'
       uses: actions/setup-java@v3.4.1
       with:
+        cache: maven
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java-version }}
-        cache: maven
 
     - name: Build VERDICT source
       if: runner.os == 'Linux'

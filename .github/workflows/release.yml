@@ -1,6 +1,6 @@
-name: VERDICT Release Workflow
-
 # Runs whenever a release is published on GitHub
+
+name: VERDICT Release Workflow
 
 on:
   release:
@@ -11,16 +11,15 @@ on:
 # - Builds VERDICT source & runs unit tests
 # - Uploads extern.zip and README.md to release workflow
 # - Pushes verdict image to Docker Hub
-# - Updates verdict-latest update site
+# - Updates verdict-latest in VERDICT-update-sites
 
 jobs:
   native-binaries:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         ocaml-compiler: [ 4.09.1 ]
-        os: [ macos-10.15, ubuntu-20.04 ]
-
-    runs-on: ${{ matrix.os }}
+        os: [ macos-12, ubuntu-20.04 ]
 
     steps:
     - name: Check out VERDICT source
@@ -84,14 +83,13 @@ jobs:
         path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
 
   release:
+    needs: native-binaries
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         distribution: [ temurin ]
         java-version: [ 11 ]
         os: [ ubuntu-20.04 ]
-
-    needs: native-binaries
-    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Check out VERDICT source
@@ -100,12 +98,12 @@ jobs:
     - name: Set up GraphViz
       uses: ts-graphviz/setup-graphviz@v1
 
-    - name: Set up Java
+    - name: Set up Java and Maven
       uses: actions/setup-java@v3.4.1
       with:
+        cache: maven
         distribution: ${{ matrix.distribution }}
         java-version: ${{ matrix.java-version }}
-        cache: maven
 
     - name: Build VERDICT source
       run: |
@@ -139,7 +137,7 @@ jobs:
         cp -a extern/nix/soteria_pp tools/verdict-back-ends/soteria_pp/bin
 
     - name: Upload extern.zip and README.md to GitHub release assets
-      uses: softprops/action-gh-release@v0.1.12
+      uses: softprops/action-gh-release@v0.1.14
       with:
         files: |
           extern.zip
