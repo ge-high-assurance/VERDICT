@@ -1,6 +1,6 @@
 package com.ge.verdict.synthesis.dtree;
 
-import com.ge.verdict.synthesis.CostModel;
+import com.ge.verdict.synthesis.ICostModel;
 import com.ge.verdict.synthesis.util.Pair;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
@@ -323,17 +323,17 @@ public class DLeaf implements DTree {
             String attack,
             int implDal,
             int targetDal,
-            CostModel costModel,
+            ICostModel costModel,
             Factory factory,
             boolean usePartialSolution,
             boolean meritAssignment) {
 
-        Fraction implCost = costModel.cost(defenseProperty, component, implDal);
+        Fraction implCost = costModel.getCost(defenseProperty, component, implDal);
 
         // construct each cost
         Fraction[] costs = new Fraction[10];
         for (int dal = 0; dal < costs.length; dal++) {
-            Fraction currentDALCost = costModel.cost(defenseProperty, component, dal);
+            Fraction currentDALCost = costModel.getCost(defenseProperty, component, dal);
             if (usePartialSolution && !meritAssignment) {
                 // in the partial solutions (but no merit assignment) case, we treat
                 // implemented defenses as a sunk cost

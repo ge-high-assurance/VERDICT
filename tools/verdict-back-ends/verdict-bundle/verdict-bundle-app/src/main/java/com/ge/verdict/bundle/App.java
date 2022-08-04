@@ -8,11 +8,12 @@ import com.ge.verdict.gsn.GSNInterface;
 import com.ge.verdict.gsn.SecurityGSNInterface;
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.stem.VerdictStem;
-import com.ge.verdict.synthesis.CostModel;
 import com.ge.verdict.synthesis.DTreeConstructor;
+import com.ge.verdict.synthesis.ICostModel;
 import com.ge.verdict.synthesis.VerdictSynthesis;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import com.ge.verdict.test.instrumentor.VerdictTestInstrumentor;
 import com.ge.verdict.vdm.VdmTranslator;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
@@ -762,7 +763,7 @@ public class App {
         try {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
 
-            CostModel costModel = new CostModel(new File(costModelPath));
+            final ICostModel costModel = MonotonicCostModelTree.load(new File(costModelPath));
 
             AttackDefenseCollector collector =
                     new AttackDefenseCollector(

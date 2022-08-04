@@ -5,6 +5,7 @@ import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import com.ge.verdict.attackdefensecollector.CSVFile.MalformedInputException;
 import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import java.io.File;
 import java.io.IOException;
@@ -40,8 +41,8 @@ public class App {
             System.out.println("Parent directory: " + System.getProperty("user.dir"));
         }
 
-        final CostModel costModel =
-                timed("Load cost model", () -> new CostModel(new File(costModelXml)));
+        final ICostModel costModel =
+                timed("Load cost model", () -> MonotonicCostModelTree.load(new File(costModelXml)));
 
         AttackDefenseCollector collector =
                 timed(

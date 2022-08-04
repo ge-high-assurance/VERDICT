@@ -1,5 +1,6 @@
-package com.ge.verdict.synthesis;
+package com.ge.verdict.synthesis.impl;
 
+import com.ge.verdict.synthesis.ICostModel;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
 import java.io.File;
@@ -20,10 +21,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Reprents a cost model loaded from XML. Allows for efficiently looking up the cost of any
+ * Represents a cost model loaded from XML. Allows for efficiently looking up the cost of any
  * component-defense-DAL triple.
  */
-public class CostModel {
+@Deprecated
+public class CostModel implements ICostModel {
     /** Thrown if parsing fails due to an invalid cost model XML. */
     public static class ParseException extends RuntimeException {
         private static final long serialVersionUID = 1L;
@@ -64,15 +66,13 @@ public class CostModel {
         dalModel = new LinkedHashMap<>();
         defaultModel = new Fraction(1);
 
-        load(costModelXml);
+        loadModel(costModelXml);
     }
 
     /**
      * Used for testing.
      *
-     * @param component
-     * @param defense
-     * @param costs
+     * @param costs (component, defense, costs) triples
      */
     @SafeVarargs
     public CostModel(Triple<String, String, Fraction[]>... costs) {
@@ -104,7 +104,7 @@ public class CostModel {
      * @param dal
      * @return
      */
-    public Fraction cost(String defense, String component, int dal) {
+    private Fraction cost(String defense, String component, int dal) {
         // If DAL is not specified, we default to using DAL to linearly scale cost
 
         // System.out.println("Loading cost: " + defense + ", " + component + ", " + dal);
@@ -202,7 +202,7 @@ public class CostModel {
      *
      * @param costModelXml
      */
-    private void load(File costModelXml) {
+    private void loadModel(File costModelXml) {
         try {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document xml = parser.parse(costModelXml);
@@ -300,5 +300,20 @@ public class CostModel {
         }
         // this precision should mitigate any floating point error
         return new Fraction(costDouble, 0.000001, 20);
+    }
+
+    public static ICostModel load(final File costModelXml) {
+        return new CostModel(costModelXml);
+    }
+
+    /**
+     * Calculate the cost for a specified defense at a specified design assurance level
+     *
+     * @deprecated This class is no longer acceptable to compute DAL costs
+     *     <p>Use {@link MonotonicCostModelTree#getCost(String, String, int)} instead.
+     */
+    @Override
+    public Fraction getCost(final String defense, final String component, int dal) {
+        return this.cost(defense, component, dal);
     }
 }

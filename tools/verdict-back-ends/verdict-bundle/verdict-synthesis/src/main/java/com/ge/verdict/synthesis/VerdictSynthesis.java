@@ -50,7 +50,7 @@ public class VerdictSynthesis {
     public static Optional<ResultsInstance> performSynthesisMultiple(
             DTree tree,
             DLeaf.Factory factory,
-            CostModel costModel,
+            ICostModel costModel,
             boolean partialSolution,
             boolean inputSat,
             boolean meritAssignment,
@@ -150,9 +150,9 @@ public class VerdictSynthesis {
                 // instead, we re-calculate using the cost model because it is less prone to failure
                 // The cost of implemented DAL
                 Fraction inputCost =
-                        costModel.cost(pair.defenseProperty, pair.component, pair.implDal);
+                        costModel.getCost(pair.defenseProperty, pair.component, pair.implDal);
                 // The cost of output DAL from SMT
-                Fraction outputCost = costModel.cost(pair.defenseProperty, pair.component, dal);
+                Fraction outputCost = costModel.getCost(pair.defenseProperty, pair.component, dal);
 
                 // keep track of total cost
                 totalInputCost = totalInputCost.add(inputCost);
@@ -394,7 +394,7 @@ public class VerdictSynthesis {
             ResultsInstance results,
             Map<com.ge.verdict.attackdefensecollector.Pair<String, String>, Integer>
                     implCompDefPairs,
-            CostModel costModel) {
+            ICostModel costModel) {
 
         List<ResultsInstance.Item> items = new ArrayList<>(results.items);
         Fraction inputCost = results.inputCost;
@@ -418,8 +418,8 @@ public class VerdictSynthesis {
                 int implDal = entry.getValue();
 
                 // compute cost of the implemented pair
-                Fraction pairInputCost = costModel.cost(defProp, comp, implDal);
-                Fraction pairOutputCost = costModel.cost(defProp, comp, 0);
+                Fraction pairInputCost = costModel.getCost(defProp, comp, implDal);
+                Fraction pairOutputCost = costModel.getCost(defProp, comp, 0);
 
                 // the item will be a removal, so from implDal -> 0 DAL
                 items.add(
