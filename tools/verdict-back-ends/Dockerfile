@@ -4,7 +4,7 @@ ARG BUILDKIT_INLINE_CACHE=1
 
 # Base our image on ubuntu:21.04 to be compatible with kind2's image
 
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 
 # Install packages which are needed by verdict back-end tools
 # (kind2 requires libzmq5 and z3)
