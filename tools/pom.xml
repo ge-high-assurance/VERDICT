@@ -32,7 +32,7 @@
     <version.surefire>3.0.0-M7</version.surefire>
     <version.tycho>2.7.4</version.tycho>
     <version.verdict>${project.version}</version.verdict>
-    <version.xtext>2.27.0</version.xtext>
+    <version.xtext>2.28.0</version.xtext>
   </properties>
 
   <!-- Set all dependency versions in one place -->
