@@ -18,6 +18,7 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,8 +53,10 @@ public class DTreeConstructorTest {
     public void testConstruct() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        CostModel dummyCosts =
-                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        final ICostModel dummyCosts =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("dummyCosts.xml").getPath()));
+
         int dal = 5;
 
         SystemModel system = new SystemModel("S1");
@@ -93,8 +96,10 @@ public class DTreeConstructorTest {
     public void testUnmitigated() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        CostModel dummyCosts =
-                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        final ICostModel dummyCosts =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("dummyCosts.xml").getPath()));
+
         int dal = 5;
 
         SystemModel system = new SystemModel("S1");
@@ -114,8 +119,10 @@ public class DTreeConstructorTest {
     public void testUnmitigatedMixed() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        CostModel dummyCosts =
-                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        final ICostModel dummyCosts =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("dummyCosts.xml").getPath()));
+
         int dal = 5;
 
         SystemModel system = new SystemModel("S1");
@@ -154,8 +161,10 @@ public class DTreeConstructorTest {
     public void partialSolutionTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        CostModel dummyCosts =
-                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        final ICostModel dummyCosts =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("dummyCosts.xml").getPath()));
+
         int dal = 5;
 
         SystemModel system = new SystemModel("S1");
@@ -193,8 +202,9 @@ public class DTreeConstructorTest {
     public void multipleRequirementsTest() {
         DLeaf.Factory factory = new DLeaf.Factory();
 
-        CostModel dummyCosts =
-                new CostModel(new File(getClass().getResource("dummyCosts.xml").getPath()));
+        final ICostModel dummyCosts =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("dummyCosts.xml").getPath()));
 
         SystemModel system = new SystemModel("S1");
 

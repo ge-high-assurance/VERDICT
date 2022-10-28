@@ -2,33 +2,21 @@ package com.ge.verdict.synthesis;
 
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector;
 import com.ge.verdict.attackdefensecollector.Prob;
-import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
-import com.ge.verdict.attackdefensecollector.adtree.ADNot;
-import com.ge.verdict.attackdefensecollector.adtree.ADOr;
-import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-import com.ge.verdict.attackdefensecollector.adtree.Attack;
-import com.ge.verdict.attackdefensecollector.adtree.Defense;
+import com.ge.verdict.attackdefensecollector.adtree.*;
 import com.ge.verdict.attackdefensecollector.model.CIA;
 import com.ge.verdict.attackdefensecollector.model.CyberReq;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.synthesis.VerdictSynthesis.Approach;
-import com.ge.verdict.synthesis.dtree.ALeaf;
-import com.ge.verdict.synthesis.dtree.DAnd;
-import com.ge.verdict.synthesis.dtree.DLeaf;
+import com.ge.verdict.synthesis.dtree.*;
 import com.ge.verdict.synthesis.dtree.DLeaf.ComponentDefense;
-import com.ge.verdict.synthesis.dtree.DOr;
-import com.ge.verdict.synthesis.dtree.DTree;
+import com.ge.verdict.synthesis.impl.CostModel;
+import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
@@ -112,8 +100,9 @@ public class VerdictSynthesisTest {
 
     @Test
     public void decimalCostsTest() {
-        CostModel costs =
-                new CostModel(new File(getClass().getResource("decimalCosts.xml").getPath()));
+        ICostModel costs =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("decimalCosts.xml").getPath()));
 
         DLeaf.Factory factory = new DLeaf.Factory();
 
@@ -189,9 +178,10 @@ public class VerdictSynthesisTest {
 
     @Test
     public void partialSolutionTest() {
-        CostModel costModel =
-                new CostModel(new File(getClass().getResource("partialCosts.xml").getPath()));
-        int dal = 2;
+        ICostModel costModel =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("partialCosts.xml").getPath()));
+        int dal = 3;
 
         SystemModel system = new SystemModel("C1");
 
@@ -293,8 +283,9 @@ public class VerdictSynthesisTest {
 
     @Test
     public void biggerMeritAssignmentTest() {
-        CostModel costModel =
-                new CostModel(new File(getClass().getResource("meritCosts.xml").getPath()));
+        ICostModel costModel =
+                MonotonicCostModelTree.load(
+                        new File(getClass().getResource("meritCosts.xml").getPath()));
 
         SystemModel system = new SystemModel("C1");
 

@@ -39,7 +39,7 @@ public class DTreeConstructor {
      */
     public static DTree construct(
             List<AttackDefenseCollector.Result> results,
-            CostModel costModel,
+            ICostModel costModel,
             boolean usePartialSolution,
             boolean meritAssignment,
             DLeaf.Factory factory) {
@@ -75,7 +75,7 @@ public class DTreeConstructor {
      */
     public static DTree construct(
             ADTree adtree,
-            CostModel costModel,
+            ICostModel costModel,
             int targetDal,
             boolean usePartialSolution,
             boolean meritAssignment,
@@ -86,7 +86,7 @@ public class DTreeConstructor {
     }
 
     /** the cost model */
-    private final CostModel costModel;
+    private final ICostModel costModel;
     /**
      * the dleaf factory, used to make sure there is only ever one instance of a given
      * component-defense pair
@@ -107,7 +107,7 @@ public class DTreeConstructor {
     private final List<DCondition> dconditions;
 
     private DTreeConstructor(
-            CostModel costModel,
+            ICostModel costModel,
             int dal,
             boolean usePartialSolution,
             boolean meritAssignment,

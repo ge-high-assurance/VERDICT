@@ -1,4 +1,5 @@
 <cost-model>
+    <cost>0</cost>
     <cost component="A" defense="A" dal="1">4.2</cost>
     <cost component="B" defense="B" dal="1">0.035</cost>
     <cost component="C" defense="C" dal="1">10.77</cost>
