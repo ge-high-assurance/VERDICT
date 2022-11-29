@@ -1,10 +1,10 @@
 <cost-model>
-    <cost>9</cost>
-    <cost component="A">10</cost>
-    <cost defense="A">11</cost>
-    <cost dal="1">12</cost>
-    <cost component="A" defense="A">13</cost>
-    <cost component="A" dal="1">14</cost>
-    <cost defense="A" dal="1">15</cost>
-    <cost component="A" defense="A" dal="1">16</cost>
+  <cost>9</cost>
+  <cost component="A">10</cost>
+  <cost defense="A">11</cost>
+  <cost dal="1">12</cost>
+  <cost component="A" defense="A">13</cost>
+  <cost component="A" dal="1">14</cost>
+  <cost defense="A" dal="1">15</cost>
+  <cost component="A" defense="A" dal="1">16</cost>
 </cost-model>

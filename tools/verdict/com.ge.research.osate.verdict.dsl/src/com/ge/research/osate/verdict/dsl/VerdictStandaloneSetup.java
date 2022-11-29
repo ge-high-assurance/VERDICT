@@ -3,14 +3,10 @@
  */
 package com.ge.research.osate.verdict.dsl;
 
-/**
- * Initialization support for running Xtext languages 
- * without equinox extension registry
- */
-public class VerdictStandaloneSetup extends VerdictStandaloneSetupGenerated{
+/** Initialization support for running Xtext languages without equinox extension registry */
+public class VerdictStandaloneSetup extends VerdictStandaloneSetupGenerated {
 
-	public static void doSetup() {
-		new VerdictStandaloneSetup().createInjectorAndDoEMFRegistration();
-	}
+    public static void doSetup() {
+        new VerdictStandaloneSetup().createInjectorAndDoEMFRegistration();
+    }
 }
-

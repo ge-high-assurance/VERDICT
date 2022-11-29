@@ -1,759 +1,759 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <vdm_model:Model xmlns:vdm_data="verdict::vdm::vdm_data"
-    xmlns:vdm_lustre="verdict::vdm::vdm_lustre"
-    xmlns:vdm_model="verdict::vdm::vdm_model">
-    <componentType id="Actuators" name="Actuators">
-        <port id="Actuators.cmd">
-            <name>cmd</name>
-            <mode>in</mode>
-        </port>
-        <port id="Actuators.payloadCmdFC">
-            <name>payloadCmdFC</name>
-            <mode>in</mode>
-        </port>
-        <port id="Actuators.mstate">
-            <name>mstate</name>
-            <mode>in</mode>
-        </port>
-        <port id="Actuators.payloadCmdRC">
-            <name>payloadCmdRC</name>
-            <mode>in</mode>
-        </port>
-        <port id="Actuators.battery_level">
-            <name>battery_level</name>
-            <mode>out</mode>
-        </port>
-        <port id="Actuators.payload_performed">
-            <name>payload_performed</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="BatteryHealthCheck"
-        name="BatteryHealthCheck">
-        <port id="BatteryHealthCheck.battery_level">
-            <name>battery_level</name>
-            <mode>in</mode>
-        </port>
-        <port id="BatteryHealthCheck.ATE7">
-            <name>ATE7</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="FlightController"
-        name="FlightController">
-        <port id="FlightController.dest_reached">
-            <name>dest_reached</name>
-            <mode>in</mode>
-        </port>
-        <port id="FlightController.payload_performed">
-            <name>payload_performed</name>
-            <mode>in</mode>
-        </port>
-        <port id="FlightController.tasks">
-            <name>tasks</name>
-            <mode>in</mode>
-        </port>
-        <port id="FlightController.mstate">
-            <name>mstate</name>
-            <mode>in</mode>
-        </port>
-        <port id="FlightController.payloadCmd">
-            <name>payloadCmd</name>
-            <mode>out</mode>
-        </port>
-        <port id="FlightController.waypoint">
-            <name>waypoint</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="GPS" name="GPS">
-        <port id="GPS.location_source_pos">
-            <name>location_source_pos</name>
-            <mode>in</mode>
-        </port>
-        <port id="GPS.location_source_dir">
-            <name>location_source_dir</name>
-            <mode>in</mode>
-        </port>
-        <port id="GPS.pos">
-            <name>pos</name>
-            <mode>out</mode>
-        </port>
-        <port id="GPS.dir">
-            <name>dir</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="MissionPlanner" name="MissionPlanner">
-        <port id="MissionPlanner.tasks">
-            <name>tasks</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="Mixer" name="Mixer">
-        <port id="Mixer.mstate">
-            <name>mstate</name>
-            <mode>in</mode>
-        </port>
-        <port id="Mixer.moveRC">
-            <name>moveRC</name>
-            <mode>in</mode>
-        </port>
-        <port id="Mixer.moveNav">
-            <name>moveNav</name>
-            <mode>in</mode>
-        </port>
-        <port id="Mixer.currentDir">
-            <name>currentDir</name>
-            <mode>in</mode>
-        </port>
-        <port id="Mixer.cmd">
-            <name>cmd</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="Navigator" name="Navigator">
-        <port id="Navigator.currentPos">
-            <name>currentPos</name>
-            <mode>in</mode>
-        </port>
-        <port id="Navigator.waypoint">
-            <name>waypoint</name>
-            <mode>in</mode>
-        </port>
-        <port id="Navigator.currentDir">
-            <name>currentDir</name>
-            <mode>in</mode>
-        </port>
-        <port id="Navigator.move">
-            <name>move</name>
-            <mode>out</mode>
-        </port>
-        <port id="Navigator.dest_reached">
-            <name>dest_reached</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="PositionEstimator"
-        name="PositionEstimator">
-        <port id="PositionEstimator.GPS_pos">
-            <name>GPS_pos</name>
-            <mode>in</mode>
-        </port>
-        <port id="PositionEstimator.GPS_dir">
-            <name>GPS_dir</name>
-            <mode>in</mode>
-        </port>
-        <port id="PositionEstimator.currentPos">
-            <name>currentPos</name>
-            <mode>out</mode>
-        </port>
-        <port id="PositionEstimator.currentDir">
-            <name>currentDir</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="RCReceiver" name="RCReceiver">
-        <port id="RCReceiver.rcv_payloadCMD">
-            <name>rcv_payloadCMD</name>
-            <mode>in</mode>
-        </port>
-        <port id="RCReceiver.rcv_move">
-            <name>rcv_move</name>
-            <mode>in</mode>
-        </port>
-        <port id="RCReceiver.rcv_uavMode">
-            <name>rcv_uavMode</name>
-            <mode>in</mode>
-        </port>
-        <port id="RCReceiver.normal">
-            <name>normal</name>
-            <mode>out</mode>
-        </port>
-        <port id="RCReceiver.payloadCMD">
-            <name>payloadCMD</name>
-            <mode>out</mode>
-        </port>
-        <port id="RCReceiver.move">
-            <name>move</name>
-            <mode>out</mode>
-        </port>
-        <port id="RCReceiver.uavMode">
-            <name>uavMode</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="RCReceiverHealthCheck"
-        name="RCReceiverHealthCheck">
-        <port id="RCReceiverHealthCheck.normal">
-            <name>normal</name>
-            <mode>in</mode>
-        </port>
-        <port id="RCReceiverHealthCheck.ATE6">
-            <name>ATE6</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="StateController"
-        name="StateController">
-        <port id="StateController.ATE6">
-            <name>ATE6</name>
-            <mode>in</mode>
-        </port>
-        <port id="StateController.ATE7">
-            <name>ATE7</name>
-            <mode>in</mode>
-        </port>
-        <port id="StateController.uavMode">
-            <name>uavMode</name>
-            <mode>in</mode>
-        </port>
-        <port id="StateController.mstate">
-            <name>mstate</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentType id="UAVSystem" name="UAVSystem">
-        <port id="UAVSystem.location_source_pos">
-            <name>location_source_pos</name>
-            <mode>in</mode>
-        </port>
-        <port id="UAVSystem.location_source_dir">
-            <name>location_source_dir</name>
-            <mode>in</mode>
-        </port>
-        <port id="UAVSystem.rcv_payloadCMD">
-            <name>rcv_payloadCMD</name>
-            <mode>in</mode>
-        </port>
-        <port id="UAVSystem.rcv_move">
-            <name>rcv_move</name>
-            <mode>in</mode>
-        </port>
-        <port id="UAVSystem.rcv_uavMode">
-            <name>rcv_uavMode</name>
-            <mode>in</mode>
-        </port>
-        <port id="UAVSystem.cmd">
-            <name>cmd</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.currentPos">
-            <name>currentPos</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.payloadCmdFC">
-            <name>payloadCmdFC</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.payloadCmdRC">
-            <name>payloadCmdRC</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.mstate">
-            <name>mstate</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.tasks">
-            <name>tasks</name>
-            <mode>out</mode>
-        </port>
-        <port id="UAVSystem.payload_performed">
-            <name>payload_performed</name>
-            <mode>out</mode>
-        </port>
-    </componentType>
-    <componentImpl id="ComponentImpl@14e3d439"
-        type="UAVSystem" name="UAVSystem.Impl">
-        <blockImpl>
-            <subcomponent id="UAVSystem.Impl.actuators"
-                name="actuators" insideTrustedBoundery="true">
-                <specification>Actuators</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.battery_health_check"
-                name="battery_health_check" insideTrustedBoundery="true">
-                <specification>BatteryHealthCheck</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.flight_controller"
-                name="flight_controller" insideTrustedBoundery="true">
-                <specification>FlightController</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.gps" name="gps"
-                insideTrustedBoundery="true" interactsWithOutseideTB="true">
-                <specification>GPS</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.mission_planner"
-                name="mission_planner" hasSensitiveInfo="true"
-                insideTrustedBoundery="true">
-                <specification>MissionPlanner</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.mixer" name="mixer"
-                insideTrustedBoundery="true">
-                <specification>Mixer</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.navigator"
-                name="navigator" insideTrustedBoundery="true">
-                <specification>Navigator</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.position_estimator"
-                name="position_estimator" insideTrustedBoundery="true">
-                <specification>PositionEstimator</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.RC_receiver"
-                name="RC_receiver" insideTrustedBoundery="true"
-                receivesDataFromOutsideTB="true">
-                <specification>RCReceiver</specification>
-            </subcomponent>
-            <subcomponent
-                id="UAVSystem.Impl.RC_receiver_health_check"
-                name="RC_receiver_health_check" insideTrustedBoundery="true">
-                <specification>RCReceiverHealthCheck</specification>
-            </subcomponent>
-            <subcomponent id="UAVSystem.Impl.state_controller"
-                name="state_controller" insideTrustedBoundery="true">
-                <specification>StateController</specification>
-            </subcomponent>
-            <connection name="wireless1" flow="Control">
-                <source>
-                    <componentPort>UAVSystem.rcv_payloadCMD</componentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.rcv_payloadCMD</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="wireless2" flow="Control">
-                <source>
-                    <componentPort>UAVSystem.rcv_move</componentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.rcv_move</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="wireless3" flow="Xdata">
-                <source>
-                    <componentPort>UAVSystem.rcv_uavMode</componentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.rcv_uavMode</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="wireless4" flow="Xdata">
-                <source>
-                    <componentPort>UAVSystem.location_source_pos</componentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.gps</subcomponent>
-                        <port>GPS.location_source_pos</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="wireless5" flow="Xdata">
-                <source>
-                    <componentPort>UAVSystem.location_source_dir</componentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.gps</subcomponent>
-                        <port>GPS.location_source_dir</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet1" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.gps</subcomponent>
-                        <port>GPS.pos</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.GPS_pos</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet2" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.gps</subcomponent>
-                        <port>GPS.dir</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.GPS_dir</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet3" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.currentPos</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.navigator</subcomponent>
-                        <port>Navigator.currentPos</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet4A" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.currentDir</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.navigator</subcomponent>
-                        <port>Navigator.currentDir</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet4B" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.currentDir</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.currentDir</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet5" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.navigator</subcomponent>
-                        <port>Navigator.dest_reached</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.dest_reached</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet6" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.navigator</subcomponent>
-                        <port>Navigator.move</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.moveNav</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet7" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.waypoint</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.navigator</subcomponent>
-                        <port>Navigator.waypoint</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet8" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.payloadCmd</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.payloadCmdFC</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet9" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mission_planner</subcomponent>
-                        <port>MissionPlanner.tasks</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.tasks</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet10" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.normal</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver_health_check</subcomponent>
-                        <port>RCReceiverHealthCheck.normal</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet11" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver_health_check</subcomponent>
-                        <port>RCReceiverHealthCheck.ATE6</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.ATE6</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet12" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.mstate</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.mstate</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet13" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.payload_performed</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.payload_performed</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet14" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.battery_level</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.battery_health_check</subcomponent>
-                        <port>BatteryHealthCheck.battery_level</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet15" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.battery_health_check</subcomponent>
-                        <port>BatteryHealthCheck.ATE7</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.ATE7</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet16" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.cmd</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.cmd</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet17" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.payloadCMD</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.payloadCmdRC</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet18" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.move</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.moveRC</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet19" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.uavMode</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.uavMode</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet20" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.mstate</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.mstate</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet21" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.mstate</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.mstate</port>
-                    </subcomponentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet22" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mixer</subcomponent>
-                        <port>Mixer.cmd</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.cmd</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet23" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
-                        <port>PositionEstimator.currentPos</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.currentPos</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet24" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
-                        <port>FlightController.payloadCmd</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.payloadCmdFC</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet25" flow="Control">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
-                        <port>RCReceiver.payloadCMD</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.payloadCmdRC</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet26" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
-                        <port>StateController.mstate</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.mstate</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet27" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.mission_planner</subcomponent>
-                        <port>MissionPlanner.tasks</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.tasks</componentPort>
-                </destination>
-            </connection>
-            <connection name="ethernet28" flow="Xdata">
-                <source>
-                    <subcomponentPort>
-                        <subcomponent>UAVSystem.Impl.actuators</subcomponent>
-                        <port>Actuators.payload_performed</port>
-                    </subcomponentPort>
-                </source>
-                <destination>
-                    <componentPort>UAVSystem.payload_performed</componentPort>
-                </destination>
-            </connection>
-        </blockImpl>
-    </componentImpl>
-    <dataflowCode />
+  xmlns:vdm_lustre="verdict::vdm::vdm_lustre"
+  xmlns:vdm_model="verdict::vdm::vdm_model">
+  <componentType id="Actuators" name="Actuators">
+    <port id="Actuators.cmd">
+      <name>cmd</name>
+      <mode>in</mode>
+    </port>
+    <port id="Actuators.payloadCmdFC">
+      <name>payloadCmdFC</name>
+      <mode>in</mode>
+    </port>
+    <port id="Actuators.mstate">
+      <name>mstate</name>
+      <mode>in</mode>
+    </port>
+    <port id="Actuators.payloadCmdRC">
+      <name>payloadCmdRC</name>
+      <mode>in</mode>
+    </port>
+    <port id="Actuators.battery_level">
+      <name>battery_level</name>
+      <mode>out</mode>
+    </port>
+    <port id="Actuators.payload_performed">
+      <name>payload_performed</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="BatteryHealthCheck"
+    name="BatteryHealthCheck">
+    <port id="BatteryHealthCheck.battery_level">
+      <name>battery_level</name>
+      <mode>in</mode>
+    </port>
+    <port id="BatteryHealthCheck.ATE7">
+      <name>ATE7</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="FlightController"
+    name="FlightController">
+    <port id="FlightController.dest_reached">
+      <name>dest_reached</name>
+      <mode>in</mode>
+    </port>
+    <port id="FlightController.payload_performed">
+      <name>payload_performed</name>
+      <mode>in</mode>
+    </port>
+    <port id="FlightController.tasks">
+      <name>tasks</name>
+      <mode>in</mode>
+    </port>
+    <port id="FlightController.mstate">
+      <name>mstate</name>
+      <mode>in</mode>
+    </port>
+    <port id="FlightController.payloadCmd">
+      <name>payloadCmd</name>
+      <mode>out</mode>
+    </port>
+    <port id="FlightController.waypoint">
+      <name>waypoint</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="GPS" name="GPS">
+    <port id="GPS.location_source_pos">
+      <name>location_source_pos</name>
+      <mode>in</mode>
+    </port>
+    <port id="GPS.location_source_dir">
+      <name>location_source_dir</name>
+      <mode>in</mode>
+    </port>
+    <port id="GPS.pos">
+      <name>pos</name>
+      <mode>out</mode>
+    </port>
+    <port id="GPS.dir">
+      <name>dir</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="MissionPlanner" name="MissionPlanner">
+    <port id="MissionPlanner.tasks">
+      <name>tasks</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="Mixer" name="Mixer">
+    <port id="Mixer.mstate">
+      <name>mstate</name>
+      <mode>in</mode>
+    </port>
+    <port id="Mixer.moveRC">
+      <name>moveRC</name>
+      <mode>in</mode>
+    </port>
+    <port id="Mixer.moveNav">
+      <name>moveNav</name>
+      <mode>in</mode>
+    </port>
+    <port id="Mixer.currentDir">
+      <name>currentDir</name>
+      <mode>in</mode>
+    </port>
+    <port id="Mixer.cmd">
+      <name>cmd</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="Navigator" name="Navigator">
+    <port id="Navigator.currentPos">
+      <name>currentPos</name>
+      <mode>in</mode>
+    </port>
+    <port id="Navigator.waypoint">
+      <name>waypoint</name>
+      <mode>in</mode>
+    </port>
+    <port id="Navigator.currentDir">
+      <name>currentDir</name>
+      <mode>in</mode>
+    </port>
+    <port id="Navigator.move">
+      <name>move</name>
+      <mode>out</mode>
+    </port>
+    <port id="Navigator.dest_reached">
+      <name>dest_reached</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="PositionEstimator"
+    name="PositionEstimator">
+    <port id="PositionEstimator.GPS_pos">
+      <name>GPS_pos</name>
+      <mode>in</mode>
+    </port>
+    <port id="PositionEstimator.GPS_dir">
+      <name>GPS_dir</name>
+      <mode>in</mode>
+    </port>
+    <port id="PositionEstimator.currentPos">
+      <name>currentPos</name>
+      <mode>out</mode>
+    </port>
+    <port id="PositionEstimator.currentDir">
+      <name>currentDir</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="RCReceiver" name="RCReceiver">
+    <port id="RCReceiver.rcv_payloadCMD">
+      <name>rcv_payloadCMD</name>
+      <mode>in</mode>
+    </port>
+    <port id="RCReceiver.rcv_move">
+      <name>rcv_move</name>
+      <mode>in</mode>
+    </port>
+    <port id="RCReceiver.rcv_uavMode">
+      <name>rcv_uavMode</name>
+      <mode>in</mode>
+    </port>
+    <port id="RCReceiver.normal">
+      <name>normal</name>
+      <mode>out</mode>
+    </port>
+    <port id="RCReceiver.payloadCMD">
+      <name>payloadCMD</name>
+      <mode>out</mode>
+    </port>
+    <port id="RCReceiver.move">
+      <name>move</name>
+      <mode>out</mode>
+    </port>
+    <port id="RCReceiver.uavMode">
+      <name>uavMode</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="RCReceiverHealthCheck"
+    name="RCReceiverHealthCheck">
+    <port id="RCReceiverHealthCheck.normal">
+      <name>normal</name>
+      <mode>in</mode>
+    </port>
+    <port id="RCReceiverHealthCheck.ATE6">
+      <name>ATE6</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="StateController"
+    name="StateController">
+    <port id="StateController.ATE6">
+      <name>ATE6</name>
+      <mode>in</mode>
+    </port>
+    <port id="StateController.ATE7">
+      <name>ATE7</name>
+      <mode>in</mode>
+    </port>
+    <port id="StateController.uavMode">
+      <name>uavMode</name>
+      <mode>in</mode>
+    </port>
+    <port id="StateController.mstate">
+      <name>mstate</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentType id="UAVSystem" name="UAVSystem">
+    <port id="UAVSystem.location_source_pos">
+      <name>location_source_pos</name>
+      <mode>in</mode>
+    </port>
+    <port id="UAVSystem.location_source_dir">
+      <name>location_source_dir</name>
+      <mode>in</mode>
+    </port>
+    <port id="UAVSystem.rcv_payloadCMD">
+      <name>rcv_payloadCMD</name>
+      <mode>in</mode>
+    </port>
+    <port id="UAVSystem.rcv_move">
+      <name>rcv_move</name>
+      <mode>in</mode>
+    </port>
+    <port id="UAVSystem.rcv_uavMode">
+      <name>rcv_uavMode</name>
+      <mode>in</mode>
+    </port>
+    <port id="UAVSystem.cmd">
+      <name>cmd</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.currentPos">
+      <name>currentPos</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.payloadCmdFC">
+      <name>payloadCmdFC</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.payloadCmdRC">
+      <name>payloadCmdRC</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.mstate">
+      <name>mstate</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.tasks">
+      <name>tasks</name>
+      <mode>out</mode>
+    </port>
+    <port id="UAVSystem.payload_performed">
+      <name>payload_performed</name>
+      <mode>out</mode>
+    </port>
+  </componentType>
+  <componentImpl id="ComponentImpl@14e3d439"
+    type="UAVSystem" name="UAVSystem.Impl">
+    <blockImpl>
+      <subcomponent id="UAVSystem.Impl.actuators"
+        name="actuators" insideTrustedBoundery="true">
+        <specification>Actuators</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.battery_health_check"
+        name="battery_health_check" insideTrustedBoundery="true">
+        <specification>BatteryHealthCheck</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.flight_controller"
+        name="flight_controller" insideTrustedBoundery="true">
+        <specification>FlightController</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.gps" name="gps"
+        insideTrustedBoundery="true" interactsWithOutseideTB="true">
+        <specification>GPS</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.mission_planner"
+        name="mission_planner" hasSensitiveInfo="true"
+        insideTrustedBoundery="true">
+        <specification>MissionPlanner</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.mixer" name="mixer"
+        insideTrustedBoundery="true">
+        <specification>Mixer</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.navigator"
+        name="navigator" insideTrustedBoundery="true">
+        <specification>Navigator</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.position_estimator"
+        name="position_estimator" insideTrustedBoundery="true">
+        <specification>PositionEstimator</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.RC_receiver"
+        name="RC_receiver" insideTrustedBoundery="true"
+        receivesDataFromOutsideTB="true">
+        <specification>RCReceiver</specification>
+      </subcomponent>
+      <subcomponent
+        id="UAVSystem.Impl.RC_receiver_health_check"
+        name="RC_receiver_health_check" insideTrustedBoundery="true">
+        <specification>RCReceiverHealthCheck</specification>
+      </subcomponent>
+      <subcomponent id="UAVSystem.Impl.state_controller"
+        name="state_controller" insideTrustedBoundery="true">
+        <specification>StateController</specification>
+      </subcomponent>
+      <connection name="wireless1" flow="Control">
+        <source>
+          <componentPort>UAVSystem.rcv_payloadCMD</componentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.rcv_payloadCMD</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="wireless2" flow="Control">
+        <source>
+          <componentPort>UAVSystem.rcv_move</componentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.rcv_move</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="wireless3" flow="Xdata">
+        <source>
+          <componentPort>UAVSystem.rcv_uavMode</componentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.rcv_uavMode</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="wireless4" flow="Xdata">
+        <source>
+          <componentPort>UAVSystem.location_source_pos</componentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.gps</subcomponent>
+            <port>GPS.location_source_pos</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="wireless5" flow="Xdata">
+        <source>
+          <componentPort>UAVSystem.location_source_dir</componentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.gps</subcomponent>
+            <port>GPS.location_source_dir</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet1" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.gps</subcomponent>
+            <port>GPS.pos</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.GPS_pos</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet2" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.gps</subcomponent>
+            <port>GPS.dir</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.GPS_dir</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet3" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.currentPos</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.navigator</subcomponent>
+            <port>Navigator.currentPos</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet4A" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.currentDir</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.navigator</subcomponent>
+            <port>Navigator.currentDir</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet4B" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.currentDir</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.currentDir</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet5" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.navigator</subcomponent>
+            <port>Navigator.dest_reached</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.dest_reached</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet6" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.navigator</subcomponent>
+            <port>Navigator.move</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.moveNav</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet7" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.waypoint</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.navigator</subcomponent>
+            <port>Navigator.waypoint</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet8" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.payloadCmd</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.payloadCmdFC</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet9" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mission_planner</subcomponent>
+            <port>MissionPlanner.tasks</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.tasks</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet10" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.normal</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver_health_check</subcomponent>
+            <port>RCReceiverHealthCheck.normal</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet11" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver_health_check</subcomponent>
+            <port>RCReceiverHealthCheck.ATE6</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.ATE6</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet12" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.mstate</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.mstate</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet13" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.payload_performed</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.payload_performed</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet14" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.battery_level</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.battery_health_check</subcomponent>
+            <port>BatteryHealthCheck.battery_level</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet15" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.battery_health_check</subcomponent>
+            <port>BatteryHealthCheck.ATE7</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.ATE7</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet16" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.cmd</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.cmd</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet17" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.payloadCMD</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.payloadCmdRC</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet18" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.move</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.moveRC</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet19" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.uavMode</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.uavMode</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet20" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.mstate</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.mstate</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet21" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.mstate</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.mstate</port>
+          </subcomponentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet22" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mixer</subcomponent>
+            <port>Mixer.cmd</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.cmd</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet23" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.position_estimator</subcomponent>
+            <port>PositionEstimator.currentPos</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.currentPos</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet24" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.flight_controller</subcomponent>
+            <port>FlightController.payloadCmd</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.payloadCmdFC</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet25" flow="Control">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.RC_receiver</subcomponent>
+            <port>RCReceiver.payloadCMD</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.payloadCmdRC</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet26" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.state_controller</subcomponent>
+            <port>StateController.mstate</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.mstate</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet27" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.mission_planner</subcomponent>
+            <port>MissionPlanner.tasks</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.tasks</componentPort>
+        </destination>
+      </connection>
+      <connection name="ethernet28" flow="Xdata">
+        <source>
+          <subcomponentPort>
+            <subcomponent>UAVSystem.Impl.actuators</subcomponent>
+            <port>Actuators.payload_performed</port>
+          </subcomponentPort>
+        </source>
+        <destination>
+          <componentPort>UAVSystem.payload_performed</componentPort>
+        </destination>
+      </connection>
+    </blockImpl>
+  </componentImpl>
+  <dataflowCode />
 </vdm_model:Model>

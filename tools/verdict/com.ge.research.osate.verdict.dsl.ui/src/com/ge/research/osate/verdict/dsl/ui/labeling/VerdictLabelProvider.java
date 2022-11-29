@@ -3,9 +3,6 @@
  */
 package com.ge.research.osate.verdict.dsl.ui.labeling;
 
-import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
-
 import com.ge.research.osate.verdict.dsl.verdict.LAnd;
 import com.ge.research.osate.verdict.dsl.verdict.LNot;
 import com.ge.research.osate.verdict.dsl.verdict.LOr;
@@ -13,43 +10,45 @@ import com.ge.research.osate.verdict.dsl.verdict.LPort;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.google.inject.Inject;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 
 /**
  * Provides labels for EObjects.
  *
- * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#label-provider
+ * <p>See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#label-provider
  *
- * These labels show up primarily in the outline view.
+ * <p>These labels show up primarily in the outline view.
  *
- * TODO For some reason, the labels for LAnd, LOr, etc. do not seem to be working.
+ * <p>TODO For some reason, the labels for LAnd, LOr, etc. do not seem to be working.
  */
 public class VerdictLabelProvider extends DefaultEObjectLabelProvider {
-	@Inject
-	public VerdictLabelProvider(AdapterFactoryLabelProvider delegate) {
-		super(delegate);
-	}
+    @Inject
+    public VerdictLabelProvider(AdapterFactoryLabelProvider delegate) {
+        super(delegate);
+    }
 
-	String text(VerdictContractSubclause verdict) {
-		return "Annex Verdict";
-	}
+    String text(VerdictContractSubclause verdict) {
+        return "Annex Verdict";
+    }
 
-	String text(Verdict verdict) {
-		return "Verdict";
-	}
+    String text(Verdict verdict) {
+        return "Verdict";
+    }
 
-	String text(LAnd and) {
-		return "and";
-	}
+    String text(LAnd and) {
+        return "and";
+    }
 
-	String text(LOr or) {
-		return "or";
-	}
+    String text(LOr or) {
+        return "or";
+    }
 
-	String text(LNot not) {
-		return "not";
-	}
+    String text(LNot not) {
+        return "not";
+    }
 
-	String text(LPort port) {
-		return port.getPort() + ":" + port.getCia().toString();
-	}
+    String text(LPort port) {
+        return port.getPort() + ":" + port.getCia().toString();
+    }
 }

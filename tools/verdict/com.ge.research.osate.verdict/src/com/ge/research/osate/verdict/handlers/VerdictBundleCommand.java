@@ -1,5 +1,12 @@
 package com.ge.research.osate.verdict.handlers;
 
+import com.amihaiemil.docker.Container;
+import com.amihaiemil.docker.Docker;
+import com.amihaiemil.docker.Image;
+import com.amihaiemil.docker.Images;
+import com.amihaiemil.docker.TcpDocker;
+import com.amihaiemil.docker.UnexpectedResponseException;
+import com.amihaiemil.docker.UnixDocker;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -11,22 +18,12 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import javax.json.Json;
 import javax.json.JsonObject;
-
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-
-import com.amihaiemil.docker.Container;
-import com.amihaiemil.docker.Docker;
-import com.amihaiemil.docker.Image;
-import com.amihaiemil.docker.Images;
-import com.amihaiemil.docker.TcpDocker;
-import com.amihaiemil.docker.UnexpectedResponseException;
-import com.amihaiemil.docker.UnixDocker;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
 /** Collects all arguments and then runs verdict-bundle via java or docker. */
 public class VerdictBundleCommand {
@@ -36,7 +33,7 @@ public class VerdictBundleCommand {
     private List<String> args = new ArrayList<>();
     private List<String> binds = new ArrayList<>();
     private Map<String, String> env = new HashMap<>();
-    
+
     // Stop container or cancel future if necessary
     private Container container = null;
     private Future<ProcessResult> future = null;
@@ -133,8 +130,8 @@ public class VerdictBundleCommand {
     }
 
     /**
-     * Defines an environment variable which should be defined when running the bundle jar.
-     * Not used when running the docker image.
+     * Defines an environment variable which should be defined when running the bundle jar. Not used
+     * when running the docker image.
      *
      * @param name Name of environment variable to define
      * @param value Value of environment variable to define
@@ -160,8 +157,8 @@ public class VerdictBundleCommand {
     }
 
     /**
-     * Stops any currently running execution.  Needs synchronization
-     * due to two threads accessing container and future fields.
+     * Stops any currently running execution. Needs synchronization due to two threads accessing
+     * container and future fields.
      */
     public synchronized void stop() {
         VerdictLogger.info("STOP button pushed");
@@ -178,7 +175,7 @@ public class VerdictBundleCommand {
             }
         }
     }
-    
+
     /** Needs synchronization due to two threads accessing container field. */
     private synchronized void setContainer(Container container) {
         this.container = container;
@@ -188,7 +185,7 @@ public class VerdictBundleCommand {
     private synchronized void setFuture(Future<ProcessResult> future) {
         this.future = future;
     }
-    
+
     /**
      * Runs verdict-bundle image with docker using the docker-client Java API.
      *
@@ -275,7 +272,10 @@ public class VerdictBundleCommand {
      */
     private int runWithJava() {
         if (OS.equals("win") || OS.equals("unknown")) {
-            VerdictLogger.severe("We don't have binaries for OS " + OS + ", please run our Docker image instead");
+            VerdictLogger.severe(
+                    "We don't have binaries for OS "
+                            + OS
+                            + ", please run our Docker image instead");
             return 1;
         }
 

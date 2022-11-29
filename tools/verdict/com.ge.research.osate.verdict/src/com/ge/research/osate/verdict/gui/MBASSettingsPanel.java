@@ -19,111 +19,111 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
-/**
-* Let user enable cyber or safety relations inference when running MBAA.
-*/
+/** Let user enable cyber or safety relations inference when running MBAA. */
 public class MBASSettingsPanel extends ApplicationWindow {
-	public static boolean openGraphs = true;
-	public static boolean cyberInference = false; // not shown in UI anymore
-	public static boolean safetyInference = false; // not shown in UI anymore
-	public static boolean synthesisCyberInference = false; // not shown in UI anymore
-	public static boolean synthesisPartialSolution = false;
+    public static boolean openGraphs = true;
+    public static boolean cyberInference = false; // not shown in UI anymore
+    public static boolean safetyInference = false; // not shown in UI anymore
+    public static boolean synthesisCyberInference = false; // not shown in UI anymore
+    public static boolean synthesisPartialSolution = false;
 
-	private Font font;
-	private Font boldFont;
+    private Font font;
+    private Font boldFont;
 
-	public MBASSettingsPanel() {
-		super(null);
+    public MBASSettingsPanel() {
+        super(null);
 
-		font = new Font(null, "Helvetica", 12, SWT.NORMAL);
-		boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
-	}
+        font = new Font(null, "Helvetica", 12, SWT.NORMAL);
+        boldFont = new Font(null, "Helvetica", 12, SWT.BOLD);
+    }
 
-	@Override
-	protected void configureShell(Shell shell) {
-		super.configureShell(shell);
-		Display display = shell.getDisplay();
-		Monitor primary = display.getPrimaryMonitor();
-		Rectangle bounds = primary.getBounds();
-		Rectangle rect = shell.getBounds();
+    @Override
+    protected void configureShell(Shell shell) {
+        super.configureShell(shell);
+        Display display = shell.getDisplay();
+        Monitor primary = display.getPrimaryMonitor();
+        Rectangle bounds = primary.getBounds();
+        Rectangle rect = shell.getBounds();
 
-		int x = bounds.x + (bounds.width - rect.width) / 2;
-		int y = bounds.y + (bounds.height - rect.height) / 2;
+        int x = bounds.x + (bounds.width - rect.width) / 2;
+        int y = bounds.y + (bounds.height - rect.height) / 2;
 
-		shell.setLocation(x, y);
-		shell.setText("MBAA/MBAS Settings");
-		shell.setFont(font);
-	}
+        shell.setLocation(x, y);
+        shell.setText("MBAA/MBAS Settings");
+        shell.setFont(font);
+    }
 
-	public void run() {
-		setBlockOnOpen(true);
-		open();
-	}
+    public void run() {
+        setBlockOnOpen(true);
+        open();
+    }
 
-	public void bringToFront(Shell shell) {
-		shell.setActive();
-	}
+    public void bringToFront(Shell shell) {
+        shell.setActive();
+    }
 
-	@Override
-	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
+    @Override
+    protected Control createContents(Composite parent) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout(1, false));
 
-		Label analysisLabel = new Label(composite, SWT.NONE);
-		analysisLabel.setText("Model Based Architecture Analysis");
-		analysisLabel.setFont(boldFont);
+        Label analysisLabel = new Label(composite, SWT.NONE);
+        analysisLabel.setText("Model Based Architecture Analysis");
+        analysisLabel.setFont(boldFont);
 
-		Group mbaaSelectionButtonGroup = new Group(composite, SWT.NONE);
-		mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
+        Group mbaaSelectionButtonGroup = new Group(composite, SWT.NONE);
+        mbaaSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
-		Button openGraphButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
-		openGraphButton.setText("Show Graphs in New Tabs");
-		openGraphButton.setFont(font);
-		openGraphButton.setSelection(openGraphs);		
-		
-		Label synthesisLabel = new Label(composite, SWT.NONE);
-		synthesisLabel.setText("Model Based Architecture Synthesis");
-		synthesisLabel.setFont(boldFont);
+        Button openGraphButton = new Button(mbaaSelectionButtonGroup, SWT.CHECK);
+        openGraphButton.setText("Show Graphs in New Tabs");
+        openGraphButton.setFont(font);
+        openGraphButton.setSelection(openGraphs);
 
-		Group mbasSelectionButtonGroup = new Group(composite, SWT.NONE);
-		mbasSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
+        Label synthesisLabel = new Label(composite, SWT.NONE);
+        synthesisLabel.setText("Model Based Architecture Synthesis");
+        synthesisLabel.setFont(boldFont);
 
-		Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
-		partialSolution.setText("Use Implemented Defenses");
-		partialSolution.setFont(font);
-		partialSolution.setSelection(synthesisPartialSolution);
+        Group mbasSelectionButtonGroup = new Group(composite, SWT.NONE);
+        mbasSelectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
-		Composite closeButtons = new Composite(composite, SWT.NONE);
-		closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
-		closeButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
+        Button partialSolution = new Button(mbasSelectionButtonGroup, SWT.CHECK);
+        partialSolution.setText("Use Implemented Defenses");
+        partialSolution.setFont(font);
+        partialSolution.setSelection(synthesisPartialSolution);
 
-		Button cancel = new Button(closeButtons, SWT.PUSH);
-		cancel.setText("Cancel");
-		cancel.setFont(font);
+        Composite closeButtons = new Composite(composite, SWT.NONE);
+        closeButtons.setLayout(new RowLayout(SWT.HORIZONTAL));
+        closeButtons.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, true, true, 1, 1));
 
-		Button save = new Button(closeButtons, SWT.PUSH);
-		save.setText("Save Settings");
-		save.setFont(font);
+        Button cancel = new Button(closeButtons, SWT.PUSH);
+        cancel.setText("Cancel");
+        cancel.setFont(font);
 
-		// Set the preferred size
-		Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		getShell().setSize(bestSize);
+        Button save = new Button(closeButtons, SWT.PUSH);
+        save.setText("Save Settings");
+        save.setFont(font);
 
-		cancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				composite.getShell().close();
-			}
-		});
+        // Set the preferred size
+        Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        getShell().setSize(bestSize);
 
-		save.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				openGraphs = openGraphButton.getSelection();
-				synthesisPartialSolution = partialSolution.getSelection();
-				composite.getShell().close();
-			}
-		});
-		return composite;
-	}
+        cancel.addSelectionListener(
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        composite.getShell().close();
+                    }
+                });
+
+        save.addSelectionListener(
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        openGraphs = openGraphButton.getSelection();
+                        synthesisPartialSolution = partialSolution.getSelection();
+                        composite.getShell().close();
+                    }
+                });
+        return composite;
+    }
 }

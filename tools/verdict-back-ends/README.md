@@ -186,7 +186,7 @@ more quickly.  Our back-end programs tend to be CPU-bound, not
 memory-bound, so increasing the number of CPUs probably will be more
 effective than increasing the memory.
 
-## Build the soteria++ back-end programs (optional)
+## Build the native back-end programs (optional)
 
 The native program sources are written in
 [OCaml](https://ocaml.org/learn/description.html).  If you want to
