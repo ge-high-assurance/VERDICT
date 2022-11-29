@@ -11,11 +11,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
-*
-* @author Paul Meng
-*
-*/
+ * @author Paul Meng
+ */
 /** Construct tabular data and output to CSV. */
 public class Table {
     private static class Row {
@@ -36,7 +35,9 @@ public class Table {
 
     private boolean replaceDots;
 
-    /** @return the number of columns in this table */
+    /**
+     * @return the number of columns in this table
+     */
     public int getColumns() {
         return columns;
     }

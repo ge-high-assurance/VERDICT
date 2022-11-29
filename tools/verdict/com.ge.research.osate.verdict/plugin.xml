@@ -1,361 +1,300 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-    <extension
-          point="org.eclipse.ui.handlers">
-       <handler
-             class="com.ge.research.osate.verdict.handlers.CRVHandler"
-             commandId="com.ge.research.osate.verdict.commands.runCrv">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.MBASHandler"
-             commandId="com.ge.research.osate.verdict.commands.runMbas">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.WzrdHandler"
-             commandId="com.ge.research.osate.verdict.commands.runWzrd">
-          <enabledWhen>
-             <reference
-                   definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">
-             </reference>
-          </enabledWhen>
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.MBASSynthesisHandler"
-             commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.StopHandler"
-             commandId="com.ge.research.osate.verdict.commands.stop">
-        </handler>
-        <handler
-             class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
-             commandId="com.ge.research.osate.verdict.commands.mbasSettings">
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.MBASCostModelSettingHandler"
-             commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings">
-           <enabledWhen>
-               <reference
-                   definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-               </reference>
-           </enabledWhen>
-       </handler>       
-       <handler
-             class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
-             commandId="com.ge.research.osate.verdict.commands.crvSettings">
-       </handler>
-       <handler
-             class="com.ge.research.osate.verdict.handlers.AssuranceCaseSettingsHandler"
-             commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
-       </handler>
-              <handler
-             class="com.ge.research.osate.verdict.handlers.GSNHandler"
-             commandId="com.ge.research.osate.verdict.commands.runGsn">
-	         <enabledWhen>
-	            <reference
-	                  definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	            </reference>
-	         </enabledWhen>               
-       </handler>
-    </extension>
+  <extension point="org.eclipse.ui.handlers">
+    <handler
+      class="com.ge.research.osate.verdict.handlers.CRVHandler"
+      commandId="com.ge.research.osate.verdict.commands.runCrv">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.MBASHandler"
+      commandId="com.ge.research.osate.verdict.commands.runMbas">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.WzrdHandler"
+      commandId="com.ge.research.osate.verdict.commands.runWzrd">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eCompSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.MBASSynthesisHandler"
+      commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.StopHandler"
+      commandId="com.ge.research.osate.verdict.commands.stop">
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.MBASSettingsHandler"
+      commandId="com.ge.research.osate.verdict.commands.mbasSettings">
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.MBASCostModelSettingHandler"
+      commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.CRVSettingsHandler"
+      commandId="com.ge.research.osate.verdict.commands.crvSettings">
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.AssuranceCaseSettingsHandler"
+      commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+    <handler
+      class="com.ge.research.osate.verdict.handlers.GSNHandler"
+      commandId="com.ge.research.osate.verdict.commands.runGsn">
+      <enabledWhen>
+        <reference
+          definitionId="com.ge.research.osate.verdict.expressions.eObjectSelected">
+        </reference>
+      </enabledWhen>
+    </handler>
+  </extension>
 
-    <extension 
-    	point="org.eclipse.ui.menus">
-       <menuContribution
-             allPopups="false"
-             locationURI="menu:org.eclipse.ui.main.menu">             
-		<menu id="VerdictMenu" label="Verdict" >
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.runMbas"
-	            label="&amp;Run Model Based Architecture Analysis (MBAA)"
-	            style="push"
-	            tooltip="Run MBAA">
-	      </command>
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis"
-	            label="&amp;Run Model Based Architecture Synthesis (MBAS)"
-	            style="push"
-	            tooltip="Run MBAS">
-	      </command>
-      	  <!--<command
-                commandId="com.ge.research.osate.verdict.commands.runWzrd"
-                label="&amp;Cyber Requirements/Relations Editor"
-                style="push"
-                tooltip="Select to lauch wizard for editing cyber formula/requirements">
-      	  </command>-->
-      	  <command
-      	        commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
-      	        label="&amp;Configure MBAS Cost Model"
-      	        style="push"
-      	        tooltip="Click to change MBAS Cost Model">
-      	  </command>
-      	  <command
-      	        commandId="com.ge.research.osate.verdict.commands.mbasSettings"
-      	        label="&amp;MBAA/MBAS Settings"
-      	        style="push"
-      	        tooltip="Click to change MBAA/MBAS Settings">
-      	  </command>
-      	  <separator name="separator1" visible="true">
-      	  </separator>
-          <command
-                commandId="com.ge.research.osate.verdict.commands.runCrv"
-                label="&amp;Run Cyber Resilience Verifier (CRV)"
-                style="push"
-                tooltip="Run CRV">
-          </command> 	
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.crvSettings"
-	            label="&amp;CRV Settings"
-	            style="push"
-	            tooltip="Click to change CRV Settings">
-	       </command>
-	       <separator name="separator2" visible="true">
-	       </separator>
-		   <command
-                commandId="com.ge.research.osate.verdict.commands.runGsn"
-                label="&amp;Create GSN Assurance Case Fragments"
-                style="push"
-                tooltip="Create GSN Fragment for selected requirement">
-          </command> 
-          <command
-                commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
-                label="&amp;Assurance Case Settings"
-                style="push"
-                tooltip="Click to change Assurance Case settings">
-          </command>
-         </menu>    
-       </menuContribution>
-       <!--<menuContribution
-             allPopups="false"
-             locationURI="popup:org.eclipse.ui.popup.any?after=additions">             			  
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.runWzrd"
-                label="&amp;Cyber Requirements/Relations Editor"
-                style="push"
-                tooltip="Select to launch wizard to edit cyber requirements/relations">        
-	      </command>
-	   </menuContribution> -->      
-       <menuContribution
-             locationURI="toolbar:org.eclipse.ui.console.ConsoleView">
-	      <command
-	            commandId="com.ge.research.osate.verdict.commands.stop"
-				icon="icons/stop.gif"
-                style="push"
-                tooltip="Stop MBAA/MBAS/CRV">
-	      </command>
-	   </menuContribution>       
-    </extension>
+  <extension point="org.eclipse.ui.menus">
+    <menuContribution allPopups="false"
+      locationURI="menu:org.eclipse.ui.main.menu">
+      <menu id="VerdictMenu" label="Verdict">
+        <command
+          commandId="com.ge.research.osate.verdict.commands.runMbas"
+          label="&amp;Run Model Based Architecture Analysis (MBAA)"
+          style="push" tooltip="Run MBAA">
+        </command>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+          label="&amp;Run Model Based Architecture Synthesis (MBAS)"
+          style="push" tooltip="Run MBAS">
+        </command>
+        <!--<command commandId="com.ge.research.osate.verdict.commands.runWzrd"
+          label="&amp;Cyber Requirements/Relations Editor" style="push" tooltip="Select
+          to lauch wizard for editing cyber formula/requirements"> </command> -->
+        <command
+          commandId="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+          label="&amp;Configure MBAS Cost Model" style="push"
+          tooltip="Click to change MBAS Cost Model">
+        </command>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.mbasSettings"
+          label="&amp;MBAA/MBAS Settings" style="push"
+          tooltip="Click to change MBAA/MBAS Settings">
+        </command>
+        <separator name="separator1" visible="true">
+        </separator>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.runCrv"
+          label="&amp;Run Cyber Resilience Verifier (CRV)" style="push"
+          tooltip="Run CRV">
+        </command>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.crvSettings"
+          label="&amp;CRV Settings" style="push"
+          tooltip="Click to change CRV Settings">
+        </command>
+        <separator name="separator2" visible="true">
+        </separator>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.runGsn"
+          label="&amp;Create GSN Assurance Case Fragments" style="push"
+          tooltip="Create GSN Fragment for selected requirement">
+        </command>
+        <command
+          commandId="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
+          label="&amp;Assurance Case Settings" style="push"
+          tooltip="Click to change Assurance Case settings">
+        </command>
+      </menu>
+    </menuContribution>
+    <!--<menuContribution allPopups="false" locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+      <command commandId="com.ge.research.osate.verdict.commands.runWzrd" label="&amp;Cyber
+      Requirements/Relations Editor" style="push" tooltip="Select to launch wizard
+      to edit cyber requirements/relations"> </command> </menuContribution> -->
+    <menuContribution
+      locationURI="toolbar:org.eclipse.ui.console.ConsoleView">
+      <command
+        commandId="com.ge.research.osate.verdict.commands.stop"
+        icon="icons/stop.gif" style="push" tooltip="Stop MBAA/MBAS/CRV">
+      </command>
+    </menuContribution>
+  </extension>
 
-    <extension
-          point="org.eclipse.ui.commands">
-       <category
-             id="com.ge.research.osate.verdict.commands"
-             name="Commands related to VERDICT">
-       </category>           
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.runMbas"
-             name="Run MBAA">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
-             name="Run MBAS">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.runCrv"
-             name="Run CRV">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.mbasSettings"
-             name="MBAA/MBAS Settings">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
-             name="Configure MBAS Cost Model">
-       </command>       
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.stop"
-             name="Stop MBAA/MBAS/CRV">
-       </command>
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.crvSettings"
-             name="CRV Settings">
-       </command>
-       <!--<command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.runWzrd"
-             name="Cyber Requirements/Relations Editor">
-       </command>-->
-       <command
-            categoryId="com.ge.research.osate.verdict.commands"
-            id="com.ge.research.osate.verdict.commands.runGsn"
-            name="Create GSN" >
-       </command> 
-       <command
-             categoryId="com.ge.research.osate.verdict.commands"
-             id="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
-             name="Assurance Case Settings">
-       </command>
-    </extension>
+  <extension point="org.eclipse.ui.commands">
+    <category id="com.ge.research.osate.verdict.commands"
+      name="Commands related to VERDICT">
+    </category>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.runMbas" name="Run MBAA">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.runMbasSynthesis"
+      name="Run MBAS">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.runCrv" name="Run CRV">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.mbasSettings"
+      name="MBAA/MBAS Settings">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.mbasCostModelSettings"
+      name="Configure MBAS Cost Model">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.stop"
+      name="Stop MBAA/MBAS/CRV">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.crvSettings"
+      name="CRV Settings">
+    </command>
+    <!--<command categoryId="com.ge.research.osate.verdict.commands" id="com.ge.research.osate.verdict.commands.runWzrd"
+      name="Cyber Requirements/Relations Editor"> </command> -->
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.runGsn" name="Create GSN">
+    </command>
+    <command categoryId="com.ge.research.osate.verdict.commands"
+      id="com.ge.research.osate.verdict.commands.assuranceCaseSettings"
+      name="Assurance Case Settings">
+    </command>
+  </extension>
 
-    <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="com.ge.research.osate.verdict.expressions.eObjectSelected">
-	         <with
-	               variable="selection">
-	            <and>
-	               <count
-	                     value="1">
-	               </count>
-	               <iterate
-	                     ifEmpty="false"
-	                     operator="and">
-	                  <or>
-		                  <instanceof
-		                        value="org.eclipse.core.resources.IProject">
-		                  </instanceof>
-		                  <instanceof
-		                        value="org.eclipse.core.resources.IFile">
-		                  </instanceof>
-		                  <instanceof
-		                        value="org.eclipse.core.resources.IFolder">
-		                  </instanceof>
-	                  </or>
-	               </iterate>
-	            </and>  
-	         </with>
-      </definition>
-    </extension>        
-    <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="com.ge.research.osate.verdict.expressions.eCompSelected">
-         <or>
-	         <with
-	               variable="selection">
-	            <and>
-	               <count
-	                     value="1">
-	               </count>
-	               <iterate
-	                     ifEmpty="false"
-	                     operator="or">
-	                  <instanceof
-	                        value="org.eclipse.xtext.ui.editor.outline.IOutlineNode">
-	                  </instanceof>
-	               </iterate>
-	            </and>
-	         </with>
-	         <with
-	               variable="selection">
-	            <and>
-	               <count
-	                     value="1">
-	               </count>
-	               <iterate
-	                     ifEmpty="false"
-	                     operator="and">
-	                  <instanceof
-	                        value="org.eclipse.core.resources.IFile">
-	                  </instanceof>
-	               </iterate>
-	            </and>
-	         </with>
-          <reference definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
-          </reference>
- 			<with
-                variable="selection">
-               <adapt
-                     type="org.osate.ge.BusinessObjectSelection">
-	               <count
-	                     value="1">
-	               </count>
-	               <iterate
-	                     ifEmpty="false"
-	                     operator="or">
-	                  <instanceof
-	                        value="org.eclipse.xtext.ui.editor.outline.IOutlineNode">
-	                  </instanceof>
-	               </iterate>
-               </adapt>
-          </with>
-         </or>
-      </definition>
-    </extension>  
-   
-   <!-- CRV & MBAS results tabs -->
-   <extension point="org.eclipse.ui.views">
-	<category 
-	   id="org.eclipse.ui.article"
-	   name="Article">
-	</category>
-	<view id="com.ge.research.osate.verdict.gui.crvResultsView"
-		name="CRV Result"
-		class="com.ge.research.osate.verdict.gui.CRVResultsView"
-		icon="icons/search.png"/>
-	<view id="com.ge.research.osate.verdict.gui.counterExampleView"
-		name="CRV Counter-example"
-		class="com.ge.research.osate.verdict.gui.CounterExampleView$CounterExample"
-		icon="icons/ce.png"/>
-	<view id="com.ge.research.osate.verdict.gui.meritAssignmentView"
-		name="CRV IVC"
-		class="com.ge.research.osate.verdict.gui.MeritAssignmentView"
-		icon="icons/crv.ico"/>
-	<view id="com.ge.research.osate.verdict.gui.testCaseView"
-		name="CRV Test Case"
-		class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"
-		icon="icons/atg.png"/>
-	<view id="com.ge.research.osate.verdict.gui.mbasResultsView"
-		name="MBAA Result"
-		class="com.ge.research.osate.verdict.gui.MBASResultsView"
-		icon="icons/search.png"/>
-	<view id="com.ge.research.osate.verdict.gui.capecDefenseView"
-		name="Security Failure Paths"
-		class="com.ge.research.osate.verdict.gui.CapecDefenseView"
-		icon="icons/danger.png"/>	
-	<view id="com.ge.research.osate.verdict.gui.safetyCutsetsView"
-		name="Safety Failure Paths"
-		class="com.ge.research.osate.verdict.gui.SafetyCutsetsView"
-		icon="icons/danger.png"/>
-	<view id="com.ge.research.osate.verdict.gui.mbasSynthesisResultsView"
-		name="MBAS Result"
-		class="com.ge.research.osate.verdict.gui.MBASSynthesisResultsView"
-		icon="icons/search.png"/>
-	</extension>
-	
-	<extension point="org.eclipse.ui.preferencePages">
-		<page id="com.ge.research.osate.verdict.bundle"
-			class="com.ge.research.osate.verdict.gui.BundlePreferences"
-			name="Verdict Settings"
-			category="com.ge.research.osate.verdict.dsl.Verdict"/>
-	</extension>
-      
+  <extension point="org.eclipse.core.expressions.definitions">
+    <definition
+      id="com.ge.research.osate.verdict.expressions.eObjectSelected">
+      <with variable="selection">
+        <and>
+          <count value="1">
+          </count>
+          <iterate ifEmpty="false" operator="and">
+            <or>
+              <instanceof
+                value="org.eclipse.core.resources.IProject">
+              </instanceof>
+              <instanceof value="org.eclipse.core.resources.IFile">
+              </instanceof>
+              <instanceof value="org.eclipse.core.resources.IFolder">
+              </instanceof>
+            </or>
+          </iterate>
+        </and>
+      </with>
+    </definition>
+  </extension>
+  <extension point="org.eclipse.core.expressions.definitions">
+    <definition
+      id="com.ge.research.osate.verdict.expressions.eCompSelected">
+      <or>
+        <with variable="selection">
+          <and>
+            <count value="1">
+            </count>
+            <iterate ifEmpty="false" operator="or">
+              <instanceof
+                value="org.eclipse.xtext.ui.editor.outline.IOutlineNode">
+              </instanceof>
+            </iterate>
+          </and>
+        </with>
+        <with variable="selection">
+          <and>
+            <count value="1">
+            </count>
+            <iterate ifEmpty="false" operator="and">
+              <instanceof value="org.eclipse.core.resources.IFile">
+              </instanceof>
+            </iterate>
+          </and>
+        </with>
+        <reference
+          definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
+        </reference>
+        <with variable="selection">
+          <adapt type="org.osate.ge.BusinessObjectSelection">
+            <count value="1">
+            </count>
+            <iterate ifEmpty="false" operator="or">
+              <instanceof
+                value="org.eclipse.xtext.ui.editor.outline.IOutlineNode">
+              </instanceof>
+            </iterate>
+          </adapt>
+        </with>
+      </or>
+    </definition>
+  </extension>
+
+  <!-- CRV & MBAS results tabs -->
+  <extension point="org.eclipse.ui.views">
+    <category id="org.eclipse.ui.article" name="Article">
+    </category>
+    <view id="com.ge.research.osate.verdict.gui.crvResultsView"
+      name="CRV Result"
+      class="com.ge.research.osate.verdict.gui.CRVResultsView"
+      icon="icons/search.png" />
+    <view id="com.ge.research.osate.verdict.gui.counterExampleView"
+      name="CRV Counter-example"
+      class="com.ge.research.osate.verdict.gui.CounterExampleView$CounterExample"
+      icon="icons/ce.png" />
+    <view id="com.ge.research.osate.verdict.gui.meritAssignmentView"
+      name="CRV IVC"
+      class="com.ge.research.osate.verdict.gui.MeritAssignmentView"
+      icon="icons/crv.ico" />
+    <view id="com.ge.research.osate.verdict.gui.testCaseView"
+      name="CRV Test Case"
+      class="com.ge.research.osate.verdict.gui.CounterExampleView$TestCase"
+      icon="icons/atg.png" />
+    <view id="com.ge.research.osate.verdict.gui.mbasResultsView"
+      name="MBAA Result"
+      class="com.ge.research.osate.verdict.gui.MBASResultsView"
+      icon="icons/search.png" />
+    <view id="com.ge.research.osate.verdict.gui.capecDefenseView"
+      name="Security Failure Paths"
+      class="com.ge.research.osate.verdict.gui.CapecDefenseView"
+      icon="icons/danger.png" />
+    <view id="com.ge.research.osate.verdict.gui.safetyCutsetsView"
+      name="Safety Failure Paths"
+      class="com.ge.research.osate.verdict.gui.SafetyCutsetsView"
+      icon="icons/danger.png" />
+    <view
+      id="com.ge.research.osate.verdict.gui.mbasSynthesisResultsView"
+      name="MBAS Result"
+      class="com.ge.research.osate.verdict.gui.MBASSynthesisResultsView"
+      icon="icons/search.png" />
+  </extension>
+
+  <extension point="org.eclipse.ui.preferencePages">
+    <page id="com.ge.research.osate.verdict.bundle"
+      class="com.ge.research.osate.verdict.gui.BundlePreferences"
+      name="Verdict Settings"
+      category="com.ge.research.osate.verdict.dsl.Verdict" />
+  </extension>
+
 </plugin>

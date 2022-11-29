@@ -413,7 +413,7 @@ node imported Navigation (
 );
 (*@contract
   guarantee "Output: cur_pos | Current location is computed
-                        from Estimated Position" close_locations(cur_pos, est_pos);
+            from Estimated Position" close_locations(cur_pos, est_pos);
   guarantee "Output: move" (move) = (cmd);
   guarantee "Output: probe_dest_pos" (probe_dest_pos) = (dest_pos);
 *)
@@ -506,7 +506,7 @@ node imported DeliveryPlanner (
   guarantee "Output: probe_init_mode" (probe_init_mode) = (init_mode);
   guarantee "Output: probe_abort_mode" (probe_abort_mode) = (abort_mode);
   guarantee "Output: nav_cmd | it sends signal to navigation
-                        only if it's in flying modes'" (nav_cmd) = (((flying_to_dest_mode) or (making_delivery_mode)) or (return_to_truck_mode));
+            only if it's in flying modes'" (nav_cmd) = (((flying_to_dest_mode) or (making_delivery_mode)) or (return_to_truck_mode));
   guarantee "Modes are mutually exclusive" ((((((((ToInt(off_mode)) + (ToInt(init_mode))) + (ToInt(ready_mode))) + (ToInt(launch_mode))) + (ToInt(abort_mode))) + (ToInt(flying_to_dest_mode))) + (ToInt(making_delivery_mode))) + (ToInt(return_to_truck_mode))) = (1);
 *)
 
@@ -520,7 +520,7 @@ node imported Radio (
 );
 (*@contract
   guarantee "Radio receives data from remote communication
-                        channel if there is a request" (radio_in) => ((((radio_out).data_available) = ((comm_in).data_available)) and (((comm_in).target_confirmed) = ((radio_out).target_confirmed)));
+            channel if there is a request" (radio_in) => ((((radio_out).data_available) = ((comm_in).data_available)) and (((comm_in).target_confirmed) = ((radio_out).target_confirmed)));
   guarantee "Without a request, no radio data is available" (not (radio_in)) => (not ((radio_out).data_available));
 *)
 
@@ -536,9 +536,9 @@ node imported DeliveryItemMechanism (
   var no_op_cmd : bool = (delivery_cmd_in) = (NO_OPERATION_CMD);
   guarantee "Initially, delivery status is NOT_STARTED" InitiallyX((delivery_status_out) = (NOT_STARTED_STATUS));
   guarantee "if no op or abort command have received then
-                        delivery status gets re-started" (true) -> (((no_op_cmd) or (abort_cmd)) => ((delivery_status_out) = (NOT_STARTED_STATUS)));
+            delivery status gets re-started" (true) -> (((no_op_cmd) or (abort_cmd)) => ((delivery_status_out) = (NOT_STARTED_STATUS)));
   guarantee "If delivery command is issued, delivery status is
-                        different from NOT_STARTED" (true) -> ((release_cmd) => ((delivery_status_out) <> (NOT_STARTED_STATUS)));
+            different from NOT_STARTED" (true) -> ((release_cmd) => ((delivery_status_out) <> (NOT_STARTED_STATUS)));
 *)
 
 node imported Camera (
@@ -595,47 +595,47 @@ node imported DeliveryDroneSystem (
   var release_cmd : bool = (probe_delivery_cmd) = (RELEASE_PACKAGE_CMD);
   var started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos is
-                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
+            not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
   weakly assume "GNC_dot_Impl_imu_port_imu_health_status is not
-                        instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
+            instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos is
-                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
+            not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
   weakly assume "GNC_dot_Impl_gps_port_gps_pos is not instrumented" not (GNC_dot_Impl_gps_port_gps_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_port_bus1 is not
-                        instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
+            instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
   weakly assume "GNC_dot_Impl_gps_port_gps_health_status is not
-                        instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
+            instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
   weakly assume "GNC_dot_Impl_imu_port_imu_pos is not instrumented" not (GNC_dot_Impl_imu_port_imu_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
   assume "Delivery locations set through bus1 are never
-                        off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
+            off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
   guarantee "P7: The drone never initiates packet release to an
-                        off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
+            off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
 *)
 
 node imported DeliveryDroneSystem_dot_Impl_deliveryPlanner_Inst_DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_cmd_in (
@@ -854,47 +854,47 @@ node DeliveryDroneSystem_dot_Impl (
   var release_cmd : bool = (probe_delivery_cmd) = (RELEASE_PACKAGE_CMD);
   var started : bool = (delivery_status) <> (NOT_STARTED_STATUS);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_radio_cmd_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos is
-                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
+            not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_gps_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_launch_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_package_is_secure_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryItemMechanism_port_delivery_status_out_instrumented);
   weakly assume "GNC_dot_Impl_imu_port_imu_health_status is not
-                        instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
+            instrumented" not (GNC_dot_Impl_imu_port_imu_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_constellation_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_camera_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_positionEstimator_port_est_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_health_status_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos is
-                        not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
+            not instrumented" not (DeliveryDroneSystem_dot_Impl_gnc_port_imu_pos_instrumented);
   weakly assume "GNC_dot_Impl_gps_port_gps_pos is not instrumented" not (GNC_dot_Impl_gps_port_gps_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_bus2_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_port_bus1 is not
-                        instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
+            instrumented" not (DeliveryDroneSystem_dot_Impl_port_bus1_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_dest_location_instrumented);
   weakly assume "GNC_dot_Impl_gps_port_gps_health_status is not
-                        instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
+            instrumented" not (GNC_dot_Impl_gps_port_gps_health_status_instrumented);
   weakly assume "GNC_dot_Impl_imu_port_imu_pos is not instrumented" not (GNC_dot_Impl_imu_port_imu_pos_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_delivery_cmd_instrumented);
   weakly assume "DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd
-                        is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
+            is not instrumented" not (DeliveryDroneSystem_dot_Impl_deliveryPlanner_port_nav_cmd_instrumented);
   assume "Delivery locations set through bus1 are never
-                        off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
+            off-limits locations" not (InRestrictedArea(((bus1).order).target_position));
   guarantee "P7: The drone never initiates packet release to an
-                        off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
+            off-limits location" (started) => (not (InRestrictedArea(probe_delivery_location)));
 *)
 var
   DeliveryDroneSystem_dot_Impl_gnc_port_gps_pos : Position_dot_impl;

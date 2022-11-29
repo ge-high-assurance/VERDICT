@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.example.org/BlameAssignment"
-    xmlns:tns="http://www.example.org/BlameAssignment"
-    elementFormDefault="qualified">
+  targetNamespace="http://www.example.org/BlameAssignment"
+  xmlns:tns="http://www.example.org/BlameAssignment"
+  elementFormDefault="qualified">
 
 
 
 
-    <complexType name="BlameAssignment">
-        <sequence>
-            <element name="ViolatedProperties"
-                type="tns:ViolatedProperty" minOccurs="0" maxOccurs="unbounded">
-            </element>
-        </sequence>
-    </complexType>
+  <complexType name="BlameAssignment">
+    <sequence>
+      <element name="ViolatedProperties"
+        type="tns:ViolatedProperty" minOccurs="0" maxOccurs="unbounded">
+      </element>
+    </sequence>
+  </complexType>
 
 
-    <complexType name="ViolatedProperty">
-        <sequence>
-            <element name="PropertyDescription" type="string"
-                minOccurs="0">
-            </element>
-            <element name="MinA" type="tns:MinA" minOccurs="1"
-                maxOccurs="1">
-            </element>
-            <element name="ApplicableThreats" type="tns:Attack"
-                minOccurs="1" maxOccurs="unbounded">
-            </element>
-        </sequence>
-        <attribute name="PropertyID" type="string"></attribute>
-        <attribute name="Status" type="boolean"></attribute>
-    </complexType>
+  <complexType name="ViolatedProperty">
+    <sequence>
+      <element name="PropertyDescription" type="string"
+        minOccurs="0">
+      </element>
+      <element name="MinA" type="tns:MinA" minOccurs="1"
+        maxOccurs="1">
+      </element>
+      <element name="ApplicableThreats" type="tns:Attack"
+        minOccurs="1" maxOccurs="unbounded">
+      </element>
+    </sequence>
+    <attribute name="PropertyID" type="string"></attribute>
+    <attribute name="Status" type="boolean"></attribute>
+  </complexType>
 
-    <complexType name="MinA">
-        <sequence>
-            <element name="Components" type="string" minOccurs="0"
-                maxOccurs="unbounded">
-            </element>
-            <element name="Links" type="string" minOccurs="0"
-                maxOccurs="unbounded"></element>
-        </sequence>
-    </complexType>
-
-
-    <complexType name="Attack">
-        <sequence>
-            <element name="AttackId" type="tns:AttackType"></element>
-            <element name="AttackDescription" type="string"></element>
-        </sequence>
-    </complexType>
+  <complexType name="MinA">
+    <sequence>
+      <element name="Components" type="string" minOccurs="0"
+        maxOccurs="unbounded">
+      </element>
+      <element name="Links" type="string" minOccurs="0"
+        maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
 
 
-    <simpleType name="AttackType">
-        <restriction base="string">
-            <enumeration value="NI"></enumeration>
-            <enumeration value="LG"></enumeration>
-            <enumeration value="LS"></enumeration>
-            <enumeration value="IT"></enumeration>
-            <enumeration value="OT"></enumeration>
-            <enumeration value="RI"></enumeration>
-            <enumeration value="SV"></enumeration>
-            <enumeration value="HT"></enumeration>
-            <enumeration value="LB"></enumeration>
-        </restriction>
-    </simpleType>
+  <complexType name="Attack">
+    <sequence>
+      <element name="AttackId" type="tns:AttackType"></element>
+      <element name="AttackDescription" type="string"></element>
+    </sequence>
+  </complexType>
+
+
+  <simpleType name="AttackType">
+    <restriction base="string">
+      <enumeration value="NI"></enumeration>
+      <enumeration value="LG"></enumeration>
+      <enumeration value="LS"></enumeration>
+      <enumeration value="IT"></enumeration>
+      <enumeration value="OT"></enumeration>
+      <enumeration value="RI"></enumeration>
+      <enumeration value="SV"></enumeration>
+      <enumeration value="HT"></enumeration>
+      <enumeration value="LB"></enumeration>
+    </restriction>
+  </simpleType>
 </schema>

@@ -30,14 +30,21 @@ import org.xml.sax.SAXException;
  * <p>Trees will always be in Component, Defense, DAL order but not necessarily perfect e.g.
  * component and defense may be on the same tree level if component is not provided e.g.
  *
- * <p>  default (cost:1) 
- * <p>      ├── Component A (cost:2) 
- * <p>      │        ├── Defense B (cost:4) 
- * <p>      │        │       └── DAL 2 (cost:8) 
- * <p>      │        └── DAL 2 (cost:6) 
- * <p>      ├── Defense G (cost:2) 
- * <p>      │        └── DAL 3 (cost:6) 
- * <p>      └── DAL 5 (cost:6)
+ * <p>default (cost:1)
+ *
+ * <p>├── Component A (cost:2)
+ *
+ * <p>│ ├── Defense B (cost:4)
+ *
+ * <p>│ │ └── DAL 2 (cost:8)
+ *
+ * <p>│ └── DAL 2 (cost:6)
+ *
+ * <p>├── Defense G (cost:2)
+ *
+ * <p>│ └── DAL 3 (cost:6)
+ *
+ * <p>└── DAL 5 (cost:6)
  */
 public class MonotonicCostModelTree implements ICostModel {
 
@@ -68,8 +75,9 @@ public class MonotonicCostModelTree implements ICostModel {
     private static final String MISSING_XML = "Missing Cost Model XML";
 
     private static final String NON_MONOTONIC = "Non-monotonic costs found: %s > %s";
-    
-    private static final String DAL_RANGE_ERROR = "DAL must be an odd integer between 1 and 10 but found %s";
+
+    private static final String DAL_RANGE_ERROR =
+            "DAL must be an odd integer between 1 and 10 but found %s";
 
     private static final String COST_ERROR =
             "Could not calculate cost for component, defense, dal: %s %s %s";
@@ -129,19 +137,21 @@ public class MonotonicCostModelTree implements ICostModel {
         // General DAL costs should not be greater than more specific
         mutTreeDals.forEach(
                 (key, value) -> {
-                    
-                    if(key > 0 && key % 2 == 0){
+                    if (key > 0 && key % 2 == 0) {
                         throw new MonotonicCostTreeException(
-                                String.format(DAL_RANGE_ERROR, value.getSource().orElse(DEFAULT_COST_SOURCE)));
+                                String.format(
+                                        DAL_RANGE_ERROR,
+                                        value.getSource().orElse(DEFAULT_COST_SOURCE)));
                     }
-                    
+
                     mutCostAcc.merge(
                             key,
                             value,
                             (v1, v2) -> {
-
-                                if (v1.getCost().orElse(Fraction.ZERO)
-                                        .compareTo( value.getCost().orElse(Fraction.ZERO)) > 0) {
+                                if (v1.getCost()
+                                                .orElse(Fraction.ZERO)
+                                                .compareTo(value.getCost().orElse(Fraction.ZERO))
+                                        > 0) {
 
                                     throw new MonotonicCostTreeException(
                                             String.format(NON_MONOTONIC, v1.source, value.source));
@@ -199,7 +209,9 @@ public class MonotonicCostModelTree implements ICostModel {
                 .ifPresent(
                         s -> {
                             // default costs can be overwritten
-                            if (getSource().filter(src -> !src.equals(DEFAULT_COST_SOURCE)).isPresent()) {
+                            if (getSource()
+                                    .filter(src -> !src.equals(DEFAULT_COST_SOURCE))
+                                    .isPresent()) {
                                 throw new MonotonicCostTreeException(
                                         String.format(DUPLICATE_MODEL, s, this.source));
                             }
@@ -236,8 +248,8 @@ public class MonotonicCostModelTree implements ICostModel {
     }
 
     /**
-     * Evaluate the cost for a defense definition at a provided design assurance level (DAL) using this
-     * cost model tree
+     * Evaluate the cost for a defense definition at a provided design assurance level (DAL) using
+     * this cost model tree
      *
      * <p>Cost evaluation order and cost value:
      *
@@ -251,7 +263,7 @@ public class MonotonicCostModelTree implements ICostModel {
      *   <li>7. dal : cost
      *   <li>8. none : cost * (default) dal
      * </ul>
-     * 
+     *
      * @param component the component identifier for a defense definition (can be empty)
      * @param defense the defense identifier for a defense definition (can be empty)
      * @param dal design assurance level to compute cost for (required)
@@ -259,20 +271,23 @@ public class MonotonicCostModelTree implements ICostModel {
      */
     public Fraction getCost(final String defense, final String component, final int dal) {
         /* Synthesis takes the greatest DAL with the least cost to meet a def. req.
-            Ceiling to the next odd DAL forces DLeaf synthesis to return a valid (odd) DAL */
+        Ceiling to the next odd DAL forces DLeaf synthesis to return a valid (odd) DAL */
         final int oddDal = dal % 2 == 1 || dal == 0 ? dal : dal + 1;
         return evaluateCost(component, defense, oddDal, new HashMap<>())
-                .orElseThrow(() ->
-                            new MonotonicCostTreeException(
-                                    String.format(COST_ERROR, component, defense, dal)));
+                .orElseThrow(
+                        () ->
+                                new MonotonicCostTreeException(
+                                        String.format(COST_ERROR, component, defense, dal)));
     }
 
     private Optional<Fraction> evaluateCost(
-            final String component, final String defense, final int dal, 
-            final Map<Integer,MonotonicCostModelTree> predecessorDALCostsAcc) {
-        
+            final String component,
+            final String defense,
+            final int dal,
+            final Map<Integer, MonotonicCostModelTree> predecessorDALCostsAcc) {
+
         predecessorDALCostsAcc.putAll(this.dals);
-        
+
         if (null != component && !component.isEmpty() && components.containsKey(component)) {
             return components
                     .get(component)
@@ -346,7 +361,7 @@ public class MonotonicCostModelTree implements ICostModel {
                                 .withCost(rule.getTextContent())
                                 .withSource(asString(rule, transformer))
                                 .build();
-                
+
                 tree.merge(node);
             }
             validate(tree, new HashMap<>());

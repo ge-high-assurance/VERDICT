@@ -1,86 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="com.ge.research.osate.verdict.feature"
-      label="DARPA CASE VERDICT Feature"
-      version="1.0.0.qualifier"
-      provider-name="GE">
+<feature id="com.ge.research.osate.verdict.feature"
+  label="DARPA CASE VERDICT Feature" version="1.0.0.qualifier"
+  provider-name="GE">
 
-   <description url="https://github.com/ge-high-assurance/VERDICT/blob/master/tools/README.md">
-The VERDICT feature consists of a VERDICT plugin for OSATE and a set
-of VERDICT back-end programs invoked by the plugin.  The plugin has
-two ways to call the back-end programs; it can run an executable jar
-(verdict-bundle-app-&lt;VERSION&gt;-capsule.jar) in a subprocess or it
-can run a Docker image (gehighassurance/verdict) in a temporary
-container.
-   </description>
+  <description
+    url="https://github.com/ge-high-assurance/VERDICT/blob/master/tools/README.md">
+    The VERDICT feature consists of a VERDICT plugin for OSATE and a set
+    of VERDICT back-end programs invoked by the plugin. The plugin has
+    two ways to call the back-end programs; it can run an executable jar
+    (verdict-bundle-app-&lt;VERSION&gt;-capsule.jar) in a subprocess or it
+    can run a Docker image (gehighassurance/verdict) in a temporary
+    container.
+  </description>
 
-   <copyright url="https://github.com/ge-high-assurance/VERDICT/blob/master/LICENSE">
-Copyright © 2020, General Electric Company, Board of Trustees of the University of Iowa
-   </copyright>
+  <copyright
+    url="https://github.com/ge-high-assurance/VERDICT/blob/master/LICENSE">
+    Copyright © 2020, General Electric Company, Board of Trustees of the
+    University of Iowa
+  </copyright>
 
-   <license url="https://github.com/ge-high-assurance/VERDICT/blob/master/LICENSE">
-BSD 3-Clause License
+  <license
+    url="https://github.com/ge-high-assurance/VERDICT/blob/master/LICENSE">
+    BSD 3-Clause License
 
-Copyright © 2020, General Electric Company, Board of Trustees of the University of Iowa
-All rights reserved.
+    Copyright © 2020, General Electric Company, Board of Trustees of the
+    University of Iowa. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+    1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+    2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
+    3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   </license>
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+    BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+    THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+    OF THE POSSIBILITY OF SUCH DAMAGE.
+  </license>
 
-   <plugin
-         id="com.ge.research.osate.verdict"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+  <plugin id="com.ge.research.osate.verdict" download-size="0"
+    install-size="0" version="0.0.0" unpack="false" />
 
-   <plugin
-         id="com.ge.research.osate.verdict.dsl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+  <plugin id="com.ge.research.osate.verdict.dsl" download-size="0"
+    install-size="0" version="0.0.0" unpack="false" />
 
-   <plugin
-         id="com.ge.research.osate.verdict.dsl.ide"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+  <plugin id="com.ge.research.osate.verdict.dsl.ide"
+    download-size="0" install-size="0" version="0.0.0" unpack="false" />
 
-   <plugin
-         id="com.ge.research.osate.verdict.dsl.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+  <plugin id="com.ge.research.osate.verdict.dsl.ui"
+    download-size="0" install-size="0" version="0.0.0" unpack="false" />
 
-   <!-- This feature isn't in OSATE, so let's include it in our update site -->
-   <includes
-         id="de.itemis.xtext.antlr.sdk"
-         version="0.0.0"/>
+  <!-- This feature isn't in OSATE, so let's include it in our update site -->
+  <includes id="de.itemis.xtext.antlr.sdk" version="0.0.0" />
 
 </feature>

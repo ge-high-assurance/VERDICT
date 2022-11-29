@@ -92,7 +92,7 @@ class MonotonicCostModelTreeBuilder {
             this.currentNode.source = componentNodeSource;
             return this;
         }
-        
+
         public MonotonicCostModelTree build() {
             return this.treeNode;
         }

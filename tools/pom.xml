@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Define ourselves -->
@@ -9,7 +9,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <!-- Build ourselves -->
+  <!-- Build all modules in one place -->
   <modules>
     <module>verdict</module>
     <module>verdict-back-ends</module>
@@ -18,15 +18,18 @@
 
   <!-- Set all properties in one place -->
   <properties>
-    <maven.compiler.release>8</maven.compiler.release>
+    <!-- Settings of Maven plugins -->
+    <maven.compiler.release>11</maven.compiler.release>
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Versions of dependencies -->
     <version.antlr>4.9.3</version.antlr>
     <version.asm>9.4</version.asm>
+    <version.micrometer>1.10.2</version.micrometer>
     <version.sadl>3.5.0-SNAPSHOT</version.sadl>
     <version.slf4j>2.0.5</version.slf4j>
     <version.surefire>3.0.0-M7</version.surefire>
@@ -38,7 +41,7 @@
   <!-- Set all dependency versions in one place -->
   <dependencyManagement>
     <dependencies>
-      <!-- JAXB implementation needed by VERDICT build -->
+      <!-- JAXB implementation needed by VERDICT -->
       <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-bom</artifactId>
@@ -181,8 +184,13 @@
       </dependency>
       <dependency>
         <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-core</artifactId>
+        <version>${version.micrometer}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.micrometer</groupId>
         <artifactId>micrometer-registry-graphite</artifactId>
-        <version>1.10.2</version>
+        <version>${version.micrometer}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -303,7 +311,9 @@
           <version>2.28.0</version>
           <configuration>
             <java>
-              <!-- Uncomment to format verdict plugin <includes><include>src/**/*.java</include></includes> -->
+              <includes>
+                <include>src/**/*.java</include>
+              </includes>
               <googleJavaFormat>
                 <style>AOSP</style>
               </googleJavaFormat>
@@ -311,6 +321,10 @@
             <formats>
               <format>
                 <includes>
+                  <include>category.xml</include>
+                  <include>feature.xml</include>
+                  <include>plugin.xml</include>
+                  <include>*.target</include>
                   <include>src/**/*.xjb</include>
                   <include>src/**/*.xml</include>
                   <include>src/**/*.xsd</include>
@@ -322,7 +336,7 @@
                 <endWithNewline></endWithNewline>
                 <indent>
                   <spaces>true</spaces>
-                  <spacesPerTab>4</spacesPerTab>
+                  <spacesPerTab>2</spacesPerTab>
                 </indent>
               </format>
             </formats>
@@ -665,9 +679,9 @@
             </execution>
           </executions>
         </plugin>
-        <!-- To skip running (and compiling) tests, use: -Dmaven.test.skip To
-                    skip tests, but still compile them, use: -DskipTests To run all tests but
-                    only fail at end, use: -fae -->
+        <!-- To skip running (and compiling) tests, use: -Dmaven.test.skip -->
+        <!-- To skip tests, but still compile them, use: -DskipTests -->
+        <!-- To run all tests but only fail at end, use: -fae -->
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
@@ -751,11 +765,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-      </plugin>
-      <!-- Build source jars too -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

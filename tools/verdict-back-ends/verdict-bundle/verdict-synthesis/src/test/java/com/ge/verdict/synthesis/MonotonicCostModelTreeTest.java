@@ -31,9 +31,9 @@ public class MonotonicCostModelTreeTest {
     private static String toXmlStr(final String[] attrs) {
         return "<cost"
                 + IntStream.range(0, attrs.length)
-                .filter(i -> null != attrs[i])
-                .mapToObj(i -> String.format(xmlAttrs[i], attrs[i]))
-                .collect(Collectors.joining());
+                        .filter(i -> null != attrs[i])
+                        .mapToObj(i -> String.format(xmlAttrs[i], attrs[i]))
+                        .collect(Collectors.joining());
     }
 
     private static File toXmlFile(final String[][] elements) {
@@ -41,8 +41,8 @@ public class MonotonicCostModelTreeTest {
             return getTempFile(
                     "<cost-model>"
                             + Arrays.stream(elements)
-                            .map(MonotonicCostModelTreeTest::toXmlStr)
-                            .collect(Collectors.joining())
+                                    .map(MonotonicCostModelTreeTest::toXmlStr)
+                                    .collect(Collectors.joining())
                             + "</cost-model>");
         } catch (final IOException e) {
             throw new RuntimeException(e);
@@ -51,50 +51,65 @@ public class MonotonicCostModelTreeTest {
 
     @Test
     public void testDefaultCosts() {
-        IntStream.range(1, 12).forEach(i -> {
-            final File payload = toXmlFile(new String[][] {{null, null, null, String.valueOf(i)}});
-            final ICostModel tree = MonotonicCostModelTree.load(payload);
-            Assertions.assertThat(tree.getCost("", "", 1).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost("", "", 5).intValue()).isEqualTo(i * 5);
-            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(i * 9);
-        });
+        IntStream.range(1, 12)
+                .forEach(
+                        i -> {
+                            final File payload =
+                                    toXmlFile(
+                                            new String[][] {{null, null, null, String.valueOf(i)}});
+                            final ICostModel tree = MonotonicCostModelTree.load(payload);
+                            Assertions.assertThat(tree.getCost("", "", 1).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost("", "", 5).intValue())
+                                    .isEqualTo(i * 5);
+                            Assertions.assertThat(tree.getCost("", "", 9).intValue())
+                                    .isEqualTo(i * 9);
+                        });
     }
 
     @Test
     public void testComponentCosts() {
-        IntStream.range(1, 10).filter(i -> i % 2 == 1).forEach(i -> {
-            final String v = String.valueOf(i);
-            final File payload = toXmlFile( new String[][] { {v, null, null, v} });
-            final ICostModel tree = MonotonicCostModelTree.load(payload);
-            Assertions.assertThat(tree.getCost( "", v,1).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost("", "", i).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
-        });
+        IntStream.range(1, 10)
+                .filter(i -> i % 2 == 1)
+                .forEach(
+                        i -> {
+                            final String v = String.valueOf(i);
+                            final File payload = toXmlFile(new String[][] {{v, null, null, v}});
+                            final ICostModel tree = MonotonicCostModelTree.load(payload);
+                            Assertions.assertThat(tree.getCost("", v, 1).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost("", "", i).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
+                        });
     }
 
     @Test
     public void testDefenseCosts() {
-        IntStream.range(1, 10).filter(i -> i % 2 == 1).forEach(i -> {
-            final String v = String.valueOf(i);
-            final File payload = toXmlFile( new String[][] { { v, v, null, v } });
-            final ICostModel tree = MonotonicCostModelTree.load(payload);
-            Assertions.assertThat(tree.getCost(v, v, 1).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost(v, "", i).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
-        });
+        IntStream.range(1, 10)
+                .filter(i -> i % 2 == 1)
+                .forEach(
+                        i -> {
+                            final String v = String.valueOf(i);
+                            final File payload = toXmlFile(new String[][] {{v, v, null, v}});
+                            final ICostModel tree = MonotonicCostModelTree.load(payload);
+                            Assertions.assertThat(tree.getCost(v, v, 1).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost(v, "", i).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
+                        });
     }
 
     @Test
     public void testDalCosts() {
-        IntStream.range(1, 10).filter(i -> i % 2 == 1).forEach(i -> {
-            final String v = String.valueOf(i);
-            final File payload = toXmlFile(new String[][] {{ v, v, v, v }});
-            final ICostModel tree = MonotonicCostModelTree.load(payload);
-            Assertions.assertThat(tree.getCost(v, v, 1).intValue()).isEqualTo(1);
-            Assertions.assertThat(tree.getCost(v, v, i).intValue()).isEqualTo(i);
-            Assertions.assertThat(tree.getCost(v, "", 5).intValue()).isEqualTo(5);
-            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
-        });
+        IntStream.range(1, 10)
+                .filter(i -> i % 2 == 1)
+                .forEach(
+                        i -> {
+                            final String v = String.valueOf(i);
+                            final File payload = toXmlFile(new String[][] {{v, v, v, v}});
+                            final ICostModel tree = MonotonicCostModelTree.load(payload);
+                            Assertions.assertThat(tree.getCost(v, v, 1).intValue()).isEqualTo(1);
+                            Assertions.assertThat(tree.getCost(v, v, i).intValue()).isEqualTo(i);
+                            Assertions.assertThat(tree.getCost(v, "", 5).intValue()).isEqualTo(5);
+                            Assertions.assertThat(tree.getCost("", "", 9).intValue()).isEqualTo(9);
+                        });
     }
 
     @Test
@@ -109,16 +124,16 @@ public class MonotonicCostModelTreeTest {
         final File payload =
                 toXmlFile(
                         new String[][] {
-                                {"COMP", "DEF", "9", "900"},
-                                {"COMP", "DEF", "3", "200"},
-                                {"COMP", "DEF", "", "100"},
-                                {"COMP", "", "7", "600"},
-                                {"COMP", "", "", "50"},
-                                {"", "DEF", "7", "300"},
-                                {"", "DEF", "3", "180"},
-                                {"", "DEF", "", "40"},
-                                {"", "", "7", "300"},
-                                {"", "", "", "20"}
+                            {"COMP", "DEF", "9", "900"},
+                            {"COMP", "DEF", "3", "200"},
+                            {"COMP", "DEF", "", "100"},
+                            {"COMP", "", "7", "600"},
+                            {"COMP", "", "", "50"},
+                            {"", "DEF", "7", "300"},
+                            {"", "DEF", "3", "180"},
+                            {"", "DEF", "", "40"},
+                            {"", "", "7", "300"},
+                            {"", "", "", "20"}
                         });
 
         final ICostModel tree = MonotonicCostModelTree.load(payload);
@@ -144,44 +159,54 @@ public class MonotonicCostModelTreeTest {
         Assertions.assertThat(tree.getCost("", "", 1).intValue()).isEqualTo(20);
     }
 
-
     @Test
     public void testEvenDALFailures() {
         final String EXP_STR_ERROR = "DAL must be an odd integer between 1 and 10 but found";
         IntStream.range(1, 10)
                 .filter(i -> i % 2 == 0)
-                .mapToObj(i -> {
-                    final String v = String.valueOf(i);
-                    return toXmlFile(new String[][] {{null, null, v, v}});
-                })
-                .forEach(payload -> Assertions.assertThatThrownBy(() ->
-                        MonotonicCostModelTree.load(payload)).hasMessageContaining(EXP_STR_ERROR));
+                .mapToObj(
+                        i -> {
+                            final String v = String.valueOf(i);
+                            return toXmlFile(new String[][] {{null, null, v, v}});
+                        })
+                .forEach(
+                        payload ->
+                                Assertions.assertThatThrownBy(
+                                                () -> MonotonicCostModelTree.load(payload))
+                                        .hasMessageContaining(EXP_STR_ERROR));
     }
 
     @Test
     public void testMonotonicFailures() {
         final String[][] payload =
                 new String[][] {
-                        {"", "", "7", "4"},
-                        {"", "DEF", "7", "3"},
-                        {"", "DEF", "3", "4"},
-                        {"", "", "", "5"},
-                        {"COMP", "", "", "4"},
-                        {"COMP", "", "7", "3"},
-                        {"COMP", "DEF", "", "4"},
-                        {"COMP", "DEF", "9", "3"}
+                    {"", "", "7", "4"},
+                    {"", "DEF", "7", "3"},
+                    {"", "DEF", "3", "4"},
+                    {"", "", "", "5"},
+                    {"COMP", "", "", "4"},
+                    {"COMP", "", "7", "3"},
+                    {"COMP", "DEF", "", "4"},
+                    {"COMP", "DEF", "9", "3"}
                 };
 
         final String ERR_STR = "Expected monotonic error between %s & %s but none thrown";
         // Any sequential pair of the above should throw an error
-        IntStream.range(1, payload.length).forEach(i -> {
-            final String[] hd = payload[i - 1];
-            final String[] tl = payload[i];
-            Assertions.assertThatThrownBy(() ->
-                                    MonotonicCostModelTree.load(toXmlFile(new String[][] { tl, hd })),
-                            String.format(ERR_STR,Arrays.toString(tl),Arrays.toString(hd)))
-                    .hasMessageContaining(NON_MONOTONIC_PREF);
-        });
+        IntStream.range(1, payload.length)
+                .forEach(
+                        i -> {
+                            final String[] hd = payload[i - 1];
+                            final String[] tl = payload[i];
+                            Assertions.assertThatThrownBy(
+                                            () ->
+                                                    MonotonicCostModelTree.load(
+                                                            toXmlFile(new String[][] {tl, hd})),
+                                            String.format(
+                                                    ERR_STR,
+                                                    Arrays.toString(tl),
+                                                    Arrays.toString(hd)))
+                                    .hasMessageContaining(NON_MONOTONIC_PREF);
+                        });
     }
 
     @Test
@@ -189,11 +214,11 @@ public class MonotonicCostModelTreeTest {
         final File payload =
                 toXmlFile(
                         new String[][] {
-                                {"COMP", "DEF", "", "300"},
-                                {"COMP", "DEF", "3", "300"},
-                                {"COMP", "DEF", "5", "300"},
-                                {"COMP", "DEF", "7", "300"},
-                                {"COMP", "DEF", "9", "300"},
+                            {"COMP", "DEF", "", "300"},
+                            {"COMP", "DEF", "3", "300"},
+                            {"COMP", "DEF", "5", "300"},
+                            {"COMP", "DEF", "7", "300"},
+                            {"COMP", "DEF", "9", "300"},
                         });
 
         final ICostModel tree = MonotonicCostModelTree.load(payload);
@@ -210,8 +235,8 @@ public class MonotonicCostModelTreeTest {
         final File payload =
                 toXmlFile(
                         new String[][] {
-                                {"", "", "", ".01"},
-                                {"COMP", "", "1", ".2"}
+                            {"", "", "", ".01"},
+                            {"COMP", "", "1", ".2"}
                         });
 
         final ICostModel tree = MonotonicCostModelTree.load(payload);
@@ -224,9 +249,9 @@ public class MonotonicCostModelTreeTest {
         final File payload =
                 toXmlFile(
                         new String[][] {
-                                {"", "", "", ".5"},
-                                {"COMP", "", "3", ".5"},
-                                {"COMP", "DEF", "7", "1"}
+                            {"", "", "", ".5"},
+                            {"COMP", "", "3", ".5"},
+                            {"COMP", "DEF", "7", "1"}
                         });
 
         final ICostModel tree = MonotonicCostModelTree.load(payload);

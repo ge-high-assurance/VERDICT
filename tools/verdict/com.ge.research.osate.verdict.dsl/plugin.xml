@@ -4,11 +4,11 @@
 <plugin>
 
   <extension point="org.eclipse.emf.ecore.generated_package">
-    <package 
-       uri = "http://www.ge.com/research/osate/verdict/dsl/Verdict" 
-       class = "com.ge.research.osate.verdict.dsl.verdict.VerdictPackage"
-       genModel = "model/generated/Verdict.genmodel" /> 
-	
+    <package
+      uri="http://www.ge.com/research/osate/verdict/dsl/Verdict"
+      class="com.ge.research.osate.verdict.dsl.verdict.VerdictPackage"
+      genModel="model/generated/Verdict.genmodel" />
+
   </extension>
 
 
