@@ -2,18 +2,18 @@
 
 ARG BUILDKIT_INLINE_CACHE=1
 
-# Base our image on ubuntu:21.04 to be compatible with kind2's image
+# Base our image on latest ubuntu LTS
 
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 
 # Install packages which are needed by verdict back-end tools
 # (kind2 requires libzmq5 and z3)
 
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    openjdk-11-jre-headless \
     graphviz \
     libzmq5 \
+    openjdk-11-jre-headless \
     z3 \
  && rm -rf /var/lib/apt/lists/* \
  && adduser --disabled-password --gecos VERDICT verdict
