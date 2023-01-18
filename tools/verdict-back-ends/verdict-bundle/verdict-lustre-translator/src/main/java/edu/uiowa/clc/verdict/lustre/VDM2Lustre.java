@@ -786,6 +786,20 @@ public class VDM2Lustre {
                         recordLiteral(arg);
                     }
                 }
+
+                IfThenElse cond_op = expr.getConditionalExpression();
+
+                if (cond_op != null) {
+
+                    Expression cond_expr = cond_op.getCondition();
+                    recordLiteral(cond_expr);
+
+                    Expression then_expr = cond_op.getThenBranch();
+                    recordLiteral(then_expr);
+
+                    Expression else_expr = cond_op.getElseBranch();
+                    recordLiteral(else_expr);
+                }
             }
         }
     }
