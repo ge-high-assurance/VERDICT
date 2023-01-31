@@ -1049,6 +1049,8 @@ public class Agree2Vdm {
                 vdmExpr.setTimes(binoper);
             } else if (operator.equalsIgnoreCase("mod")) {
                 vdmExpr.setMod(binoper);
+            } else if (operator.equalsIgnoreCase("div")) {
+                vdmExpr.setDiv(binoper);
             } else {
                 System.out.println("Unmapped binary operator: " + operator);
             }
