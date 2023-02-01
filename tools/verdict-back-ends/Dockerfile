@@ -4,7 +4,7 @@ ARG BUILDKIT_INLINE_CACHE=1
 
 # Base our image on latest ubuntu LTS
 
-FROM ubuntu:22.04
+FROM ubuntu:23.04
 
 # Install packages which are needed by verdict back-end tools
 # (kind2 requires libzmq5 and z3)
