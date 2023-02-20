@@ -27,7 +27,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- Versions of dependencies -->
-    <version.antlr>4.9.3</version.antlr>
+    <version.antlr>4.12.0</version.antlr>
     <version.asm>9.4</version.asm>
     <version.micrometer>1.10.4</version.micrometer>
     <version.sadl>3.5.0-SNAPSHOT</version.sadl>
