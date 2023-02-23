@@ -1,5 +1,4 @@
-# Runs whenever the main branch has a change made to it (except for
-# tag-only pushes)
+# Runs whenever the main branch is changed (except for tags)
 
 name: VERDICT Main Workflow
 
@@ -9,11 +8,10 @@ on:
     tags-ignore: [ '*' ]
   workflow_dispatch:
 
-# Runs main workflow and builds most artifacts:
-# - Builds soteria_pp native binary
-# - Builds VERDICT source & runs unit tests
-# - Pushes verdict-dev image to Docker Hub
-# - Updates verdict-dev in VERDICT-update-sites
+# Builds soteria_pp native binary
+# Builds VERDICT source with Java and Maven
+# Pushes verdict-dev image to Docker Hub
+# Updates verdict-dev in VERDICT-update-sites
 
 jobs:
   main:
@@ -24,7 +22,7 @@ jobs:
         distribution: [ temurin ]
         java-version: [ 11 ]
         ocaml-compiler: [ 4.09.1 ]
-        os: [ macos-12, ubuntu-20.04 ]
+        os: [ macos-12, ubuntu-22.04 ]
 
     steps:
     - name: Check out VERDICT source
@@ -40,12 +38,6 @@ jobs:
         cd tools/verdict-back-ends/soteria_pp
         opam install --yes . --deps-only
         opam exec make
-
-    - name: Upload soteria_pp
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: ${{ runner.os }}-binaries
-        path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
 
     # Run rest of steps only on Linux - macOS isn't needed
 
@@ -64,17 +56,10 @@ jobs:
     - name: Build VERDICT source
       if: runner.os == 'Linux'
       run: |
-        mvn -B install --file tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
-        mvn -B package -Dtycho.localArtifacts=ignore --file tools/pom.xml
+        mvn -B install -f tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
+        mvn -B package -f tools/pom.xml -Dtycho.localArtifacts=ignore
       env:
         GraphVizPath: /usr/bin
-
-    - name: Upload verdict-bundle-app
-      if: runner.os == 'Linux'
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: ${{ runner.os }}-binaries
-        path: tools/verdict-back-ends/verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-1.0.0-SNAPSHOT-capsule.jar
 
     - name: Set up Docker Buildx
       if: runner.os == 'Linux'
