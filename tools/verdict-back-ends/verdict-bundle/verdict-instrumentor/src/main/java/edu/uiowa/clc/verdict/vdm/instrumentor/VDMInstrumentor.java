@@ -1799,16 +1799,7 @@ public class VDMInstrumentor {
         Expression callExpr = new Expression();
         callExpr.setCall(nodeCall);
 
-        /*
-        ContractItem true_guarantee_item = new ContractItem();
-        // true_guarantee_item.setName("true");
-        Expression true_expr = new Expression();
-        Boolean true_lit = Boolean.TRUE;
-        true_expr.setBoolLiteral(true_lit);
-        true_guarantee_item.setExpression(true_expr);
-        */
-
-        // Replay attacker
+        // Bounded replay attacker
         if (boundedReplayAttacker) {
             ContractItem replay_guarantee_item = new ContractItem();
             ContractSpec contractSpec = new ContractSpec();
@@ -1833,7 +1824,7 @@ public class VDMInstrumentor {
             Expression pre_expr2 = new Expression();
             Expression pre_expr3 = new Expression();
 
-            // Set up basic replay attacker
+            // Set up bounded replay attacker
             // Input and output variables
             src_expr.setIdentifier(instrumented_port_src.getName() + "_instrumented");
             dest_expr.setIdentifier(instrumented_port_dest.getName());
@@ -1897,7 +1888,7 @@ public class VDMInstrumentor {
             pre_exprs[0].setPre(replay_exprs[0]);
             or_exprs[0] = or_expr;
 
-            // Add replay attacker memory
+            // Add bounded replay attacker memory
             for (int i = 1; i <= replayMemory; i++) {
                 // Add extra replay equation
                 // replayN = msg -> pre replayN-1

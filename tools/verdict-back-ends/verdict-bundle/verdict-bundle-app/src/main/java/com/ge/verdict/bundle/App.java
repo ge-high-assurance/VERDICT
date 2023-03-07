@@ -192,7 +192,7 @@ public class App {
 
         Option replayMemory =
                 Option.builder()
-                        .desc("Replay attacker memory")
+                        .desc("Bounded replay attacker memory")
                         .longOpt("replay_memory")
                         .hasArg()
                         .argName("Memory")
@@ -208,7 +208,7 @@ public class App {
         options.addOption("C", false, "Component-level Blame Assignment");
         options.addOption("G", false, "Global Blame Assignment");
         options.addOption("ATG", false, "Automatic Test-case Generation");
-        options.addOption("BRA", false, "Replay Attacker");
+        options.addOption("BRA", false, "Bounded Replay Attacker");
 
         return options;
     }
@@ -258,7 +258,7 @@ public class App {
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-MA] [-BA [-C] [-G]] <threats>");
-        helpLine("  --replay_memory <memory depth> Replay attacker memory");
+        helpLine("  --replay_memory <memory depth> Bounded replay attacker memory");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
@@ -904,12 +904,13 @@ public class App {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
             instrumentor.instrument(
-                    vdmModel,
-                    threats,
-                    blameAssignment,
-                    componentLevel,
-                    boundedReplayAttacker,
-                    replayMemory);
+                vdmModel,
+                threats,
+                blameAssignment,
+                componentLevel,
+                boundedReplayAttacker,
+                replayMemory
+            );
             sample.stop(Metrics.timer("Timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");
