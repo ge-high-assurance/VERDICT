@@ -147,6 +147,11 @@ public class CRVHandler extends AbstractHandler {
         if (CRVSettingsPanel.testCaseGeneration) {
             command.arg("-ATG");
         }
+        if (CRVSettingsPanel.isBoundedReplayAttacker) {
+            command.arg("-BRA");
+            command.arg("--replay_memory");
+            command.arg(Integer.toString(CRVSettingsPanel.replayMemory));
+        }
 
         int code = command.runJarOrImage();
         return code == 0;

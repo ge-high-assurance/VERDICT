@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 
 /** Author: Paul Meng Date: Jun 12, 2019 */
 public class CRVSettingsPanel extends ApplicationWindow {
@@ -36,6 +37,8 @@ public class CRVSettingsPanel extends ApplicationWindow {
     public static boolean blame = false;
     public static boolean merit = false;
     public static boolean isNone = true;
+    public static boolean isBoundedReplayAttacker = false;
+    public static int replayMemory = 0;
 
     private static final String LS = "-LS";
     private static final String NI = "-NI";
@@ -99,9 +102,9 @@ public class CRVSettingsPanel extends ApplicationWindow {
         //		atgCheckBox.setSelection(testCaseGeneration);
 
         // The "Enabled Threat Models" section: all the threats
-        Label threatModelsLabel = new Label(mainComposite, SWT.NONE);
-        threatModelsLabel.setText("Threat Models");
-        threatModelsLabel.setFont(boldFont);
+        Label attackTypesLabel = new Label(mainComposite, SWT.NONE);
+        attackTypesLabel.setText("Attack Types");
+        attackTypesLabel.setFont(boldFont);
 
         Group selectionButtonGroup = new Group(mainComposite, SWT.NONE);
         selectionButtonGroup.setLayout(new RowLayout(SWT.VERTICAL));
@@ -202,6 +205,36 @@ public class CRVSettingsPanel extends ApplicationWindow {
                         selectedThreats.clear();
                     }
                 });
+
+        Label threatModelsLabel = new Label(mainComposite, SWT.NONE);
+        threatModelsLabel.setText("Threat Models");
+        threatModelsLabel.setFont(boldFont);
+
+        Group threatModelGroup = new Group(mainComposite, SWT.NONE);
+        threatModelGroup.setLayout(new RowLayout(SWT.VERTICAL));
+
+        Button sa = new Button(threatModelGroup, SWT.RADIO);
+        sa.setText("Standard Attacker");
+        sa.setSelection(!isBoundedReplayAttacker);
+
+        Button bra = new Button(threatModelGroup, SWT.RADIO);
+        bra.setText("Bounded Replay Attacker");
+        bra.setSelection(isBoundedReplayAttacker);
+
+        if (isBoundedReplayAttacker) {
+            Group replayAttackerMemGroup = new Group(mainComposite, SWT.NONE);
+            replayAttackerMemGroup.setText("Memory");
+            replayAttackerMemGroup.setLayout(new RowLayout(SWT.VERTICAL));
+
+            Spinner sp = new Spinner(replayAttackerMemGroup, SWT.BORDER);
+            sp.setSelection(replayMemory);
+            sp.setMinimum(0);
+            sp.setMaximum(100);
+            sp.setIncrement(1);
+            // sp.setText("Replay Memory");
+
+            replayAttackerMemGroup.setEnabled(bra.getSelection());
+        }
 
         // The Post-Analysis options
         Label postAnalysisLabel = new Label(mainComposite, SWT.NONE);
@@ -490,6 +523,44 @@ public class CRVSettingsPanel extends ApplicationWindow {
                     }
                 });
 
+        bra.addSelectionListener(
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        if (bra.getSelection()) {
+                            Group replayAttackerMemGroup = new Group(mainComposite, SWT.NONE);
+                            replayAttackerMemGroup.setLayout(new RowLayout(SWT.VERTICAL));
+                            replayAttackerMemGroup.setText("Memory");
+
+                            Spinner sp = new Spinner(replayAttackerMemGroup, SWT.BORDER);
+                            sp.setSelection(replayMemory);
+                            sp.setMinimum(0);
+                            sp.setMaximum(100);
+                            sp.setIncrement(1);
+
+                            replayAttackerMemGroup.setEnabled(bra.getSelection());
+
+                            postAnalysisLabel.moveBelow(replayAttackerMemGroup);
+                            postAnalysisGroup.moveBelow(postAnalysisLabel);
+                            closeButtons.moveBelow(postAnalysisGroup);
+                        } else {
+                            // remove the blame-assignments-options-group by iterating
+                            // through the parent's children i.e.the "composite" control's children
+                            for (Control control : mainComposite.getChildren()) {
+                                if (control instanceof Group) {
+                                    Group group = (Group) control;
+                                    if (group.getText() == "Memory") {
+                                        group.dispose();
+                                    }
+                                }
+                            }
+                        }
+                        // Set the preferred size
+                        Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                        getShell().setSize(bestSize);
+                    }
+                });
+
         cancel.addSelectionListener(
                 new SelectionAdapter() {
                     @Override
@@ -548,8 +619,10 @@ public class CRVSettingsPanel extends ApplicationWindow {
                         isBlameAssignment = blameButton.getSelection();
                         isMeritAssignment = meritButton.getSelection();
                         isNone = noneButton.getSelection();
+                        isBoundedReplayAttacker = bra.getSelection();
+
                         // if blame/merit assignment radio is selected then iterate
-                        // through the parent's children i.e.the "composite" control's children
+                        // through the parent's children i.e. the "composite" control's children
                         // and get (remember) values of blame/merit assignment options buttons
                         for (Control control : mainComposite.getChildren()) {
                             if (control instanceof Group) {
@@ -602,6 +675,21 @@ public class CRVSettingsPanel extends ApplicationWindow {
                                                         default:
                                                             break;
                                                     }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (group.getText() == "Memory") {
+                                    for (Control groupChild : group.getChildren()) {
+                                        if (groupChild instanceof Composite) {
+                                            Composite subComposite = (Composite) groupChild;
+                                            for (Control subCompositeControl :
+                                                    subComposite.getChildren()) {
+                                                if (subCompositeControl instanceof Spinner) {
+                                                    Spinner spinner = (Spinner) subCompositeControl;
+                                                    replayMemory = spinner.getSelection();
                                                 }
                                             }
                                         }

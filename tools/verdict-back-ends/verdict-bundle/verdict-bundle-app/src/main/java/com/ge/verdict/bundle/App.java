@@ -190,6 +190,16 @@ public class App {
             options.addOption(opt, false, "");
         }
 
+        Option replayMemory =
+                Option.builder()
+                        .desc("Replay attacker memory")
+                        .longOpt("replay_memory")
+                        .hasArg()
+                        .argName("Memory")
+                        .build();
+
+        options.addOption(replayMemory);
+
         options.addOption("MA", false, "Merit Assignment");
         options.addOption("OI", false, "One IVC");
         options.addOption("LC", false, "All MIVC");
@@ -198,6 +208,7 @@ public class App {
         options.addOption("C", false, "Component-level Blame Assignment");
         options.addOption("G", false, "Global Blame Assignment");
         options.addOption("ATG", false, "Automatic Test-case Generation");
+        options.addOption("BRA", false, "Replay Attacker");
 
         return options;
     }
@@ -247,6 +258,7 @@ public class App {
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-MA] [-BA [-C] [-G]] <threats>");
+        helpLine("  --replay_memory <memory depth> Replay attacker memory");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
@@ -363,6 +375,13 @@ public class App {
             boolean allMIVC = opts.hasOption("LC");
             boolean oneMIVC = opts.hasOption("OC");
             boolean atg = opts.hasOption("ATG");
+            boolean boundedReplayAttacker = opts.hasOption("BRA");
+            int replayMemory;
+            if (opts.hasOption("replay_memory")) {
+                replayMemory = Integer.parseInt(opts.getOptionValue("replay_memory"));
+            } else {
+                replayMemory = 0;
+            }
 
             String[] crvOpts = opts.getOptionValues("crv");
             String outputPath = crvOpts[0];
@@ -379,6 +398,8 @@ public class App {
                     componentLevel,
                     globalOptimization,
                     atg,
+                    boundedReplayAttacker,
+                    replayMemory,
                     meritAssignment,
                     oneIVC,
                     allMIVC,
@@ -832,6 +853,8 @@ public class App {
             boolean componentLevel,
             boolean globalOptimization,
             boolean atg,
+            boolean boundedReplayAttacker,
+            int replayMemory,
             boolean meritAssignment,
             boolean oneIVC,
             boolean allMIVC,
@@ -880,7 +903,13 @@ public class App {
             // Instrument loaded model
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
-            instrumentor.instrument(vdmModel, threats, blameAssignment, componentLevel);
+            instrumentor.instrument(
+                    vdmModel,
+                    threats,
+                    blameAssignment,
+                    componentLevel,
+                    boundedReplayAttacker,
+                    replayMemory);
             sample.stop(Metrics.timer("Timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");

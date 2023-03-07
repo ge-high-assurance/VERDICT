@@ -92,8 +92,21 @@ public class VDMInstrumentor {
                         .collect(Collectors.toList());
         boolean blameAssignment = cmdLine.hasOption("B");
         boolean componentLevel = cmdLine.hasOption("C");
+        boolean boundedReplayAttacker = cmdLine.hasOption("BRA");
+        int replayMemory;
+        if (cmdLine.hasOption("replay_memory")) {
+            replayMemory = Integer.parseInt(cmdLine.getOptionValue("replay_memory"));
+        } else {
+            replayMemory = 0;
+        }
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        retrieve_component_and_channels(
+                vdm_model,
+                threats,
+                blameAssignment,
+                componentLevel,
+                boundedReplayAttacker,
+                replayMemory);
 
         return instrumented_model;
     }
@@ -102,16 +115,24 @@ public class VDMInstrumentor {
             Model vdm_model,
             List<String> threats,
             boolean blameAssignment,
-            boolean componentLevel) {
+            boolean componentLevel,
+            boolean boundedReplayAttacker,
+            int replayMemory) {
         Model instrumented_model = null;
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        retrieve_component_and_channels(
+                vdm_model,
+                threats,
+                blameAssignment,
+                componentLevel,
+                boundedReplayAttacker,
+                replayMemory);
 
         return instrumented_model;
     }
 
     public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment) {
-        return instrument(vdm_model, threats, blameAssignment, false);
+        return instrument(vdm_model, threats, blameAssignment, false, false, 0);
     }
 
     protected String getComponentID(
@@ -276,7 +297,9 @@ public class VDMInstrumentor {
             Model vdm_model,
             List<String> threats,
             boolean blame_assignment,
-            boolean component_level) {
+            boolean component_level,
+            boolean bounded_replay_attacker,
+            int replay_memory) {
 
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
@@ -406,7 +429,13 @@ public class VDMInstrumentor {
 
                     blockImpl = getBlockID(cmpID);
 
-                    String constant = instrument_link(cmpID, connection, blockImpl);
+                    String constant =
+                            instrument_link(
+                                    cmpID,
+                                    connection,
+                                    blockImpl,
+                                    bounded_replay_attacker,
+                                    replay_memory);
 
                     global_constants.add(constant);
 
@@ -430,7 +459,13 @@ public class VDMInstrumentor {
 
                     blockImpl = retrieve_block(connection);
 
-                    String constant = instrument_link(cmpID, connection, blockImpl);
+                    String constant =
+                            instrument_link(
+                                    cmpID,
+                                    connection,
+                                    blockImpl,
+                                    bounded_replay_attacker,
+                                    replay_memory);
 
                     global_constants.add(constant);
 
@@ -1599,7 +1634,12 @@ public class VDMInstrumentor {
     //
     // }
 
-    public String instrument_link(String compID, Connection connection, BlockImpl blockImpl) {
+    public String instrument_link(
+            String compID,
+            Connection connection,
+            BlockImpl blockImpl,
+            boolean boundedReplayAttacker,
+            int replayMemory) {
         // instrument_link(connection);
         //        System.out.println("Instrumented Link ***" + connection.getName());
         // Default Block Implementation
@@ -1759,20 +1799,136 @@ public class VDMInstrumentor {
         Expression callExpr = new Expression();
         callExpr.setCall(nodeCall);
 
+        /*
         ContractItem true_guarantee_item = new ContractItem();
         // true_guarantee_item.setName("true");
         Expression true_expr = new Expression();
         Boolean true_lit = Boolean.TRUE;
         true_expr.setBoolLiteral(true_lit);
         true_guarantee_item.setExpression(true_expr);
+        */
 
-        ContractSpec contractSpec = new ContractSpec();
-        contractSpec.getGuarantee().add(true_guarantee_item);
+        // Replay attacker
+        if (boundedReplayAttacker) {
+            ContractItem replay_guarantee_item = new ContractItem();
+            ContractSpec contractSpec = new ContractSpec();
+            SymbolDefinition first_var = new SymbolDefinition();
+            SymbolDefinition replay_var = new SymbolDefinition();
+            BinaryOperation equal_op = new BinaryOperation();
+            BinaryOperation equal_op2 = new BinaryOperation();
+            BinaryOperation or_op = new BinaryOperation();
+            BinaryOperation arrow_op = new BinaryOperation();
+            IfThenElse cond_op = new IfThenElse();
+            Expression replay_expr = new Expression();
+            Expression replay_expr2 = new Expression();
+            Expression equal_expr = new Expression();
+            Expression equal_expr2 = new Expression();
+            Expression dest_expr = new Expression();
+            Expression dest_expr2 = new Expression();
+            Expression src_expr = new Expression();
+            Expression or_expr = new Expression();
+            Expression arrow_expr = new Expression();
+            Expression cond_expr = new Expression();
+            Expression pre_expr = new Expression();
+            Expression pre_expr2 = new Expression();
+            Expression pre_expr3 = new Expression();
+
+            // Set up basic replay attacker
+            // Input and output variables
+            src_expr.setIdentifier(instrumented_port_src.getName() + "_instrumented");
+            dest_expr.setIdentifier(instrumented_port_dest.getName());
+            dest_expr2.setIdentifier(instrumented_port_dest.getName() + ".event");
+
+            // replay = input -> pre input
+            pre_expr.setPre(dest_expr);
+            arrow_op.setLhsOperand(dest_expr);
+            arrow_op.setRhsOperand(pre_expr);
+            arrow_expr.setArrow(arrow_op);
+            replay_var.setName("replay0");
+            replay_var.setIsConstant(false);
+            replay_var.setDefinition(arrow_expr);
+            replay_var.setDataType(instrumented_port_src.getType());
+            contractSpec.getSymbol().add(replay_var);
+
+            // (output = input) or (output = replay)
+            equal_op.setLhsOperand(src_expr);
+            equal_op.setRhsOperand(dest_expr);
+            equal_expr.setEqual(equal_op);
+            or_op.setLhsOperand(equal_expr);
+            equal_op2.setLhsOperand(src_expr);
+            replay_expr.setIdentifier("replay0");
+            equal_op2.setRhsOperand(replay_expr);
+            equal_expr2.setEqual(equal_op2);
+            or_op.setRhsOperand(equal_expr2);
+            or_expr.setOr(or_op);
+
+            Expression[] replay_exprs = new Expression[replayMemory + 1];
+            Expression[] pre_exprs = new Expression[replayMemory + 1];
+            BinaryOperation[] neq_ops = new BinaryOperation[replayMemory + 1];
+            Expression[] neq_exprs = new Expression[replayMemory + 1];
+            IfThenElse[] cond_ops = new IfThenElse[replayMemory + 1];
+            Expression[] cond_exprs = new Expression[replayMemory + 1];
+            BinaryOperation[] arrow_ops = new BinaryOperation[replayMemory + 1];
+            Expression[] arrow_exprs = new Expression[replayMemory + 1];
+            SymbolDefinition[] replay_vars = new SymbolDefinition[replayMemory + 1];
+            BinaryOperation[] equal_ops = new BinaryOperation[replayMemory + 1];
+            Expression[] equal_exprs = new Expression[replayMemory + 1];
+            BinaryOperation[] or_ops = new BinaryOperation[replayMemory + 1];
+            Expression[] or_exprs = new Expression[replayMemory + 1];
+
+            // Initialize
+            for (int i = 0; i <= replayMemory; i++) {
+                replay_exprs[i] = new Expression();
+                pre_exprs[i] = new Expression();
+                neq_ops[i] = new BinaryOperation();
+                neq_exprs[i] = new Expression();
+                cond_ops[i] = new IfThenElse();
+                cond_exprs[i] = new Expression();
+                arrow_ops[i] = new BinaryOperation();
+                arrow_exprs[i] = new Expression();
+                replay_vars[i] = new SymbolDefinition();
+                equal_ops[i] = new BinaryOperation();
+                equal_exprs[i] = new Expression();
+                or_ops[i] = new BinaryOperation();
+                or_exprs[i] = new Expression();
+            }
+
+            replay_exprs[0].setIdentifier("replay0");
+            pre_exprs[0].setPre(replay_exprs[0]);
+            or_exprs[0] = or_expr;
+
+            // Add replay attacker memory
+            for (int i = 1; i <= replayMemory; i++) {
+                // Add extra replay equation
+                // replayN = msg -> pre replayN-1
+                replay_exprs[i].setIdentifier("replay" + Integer.toString(i));
+                pre_exprs[i].setPre(replay_exprs[i]);
+                arrow_ops[i].setLhsOperand(dest_expr);
+                arrow_ops[i].setRhsOperand(pre_exprs[i - 1]);
+                arrow_exprs[i].setArrow(arrow_ops[i]);
+                replay_vars[i].setName("replay" + Integer.toString(i));
+                replay_vars[i].setIsConstant(false);
+                replay_vars[i].setDefinition(arrow_exprs[i]);
+                replay_vars[i].setDataType(instrumented_port_src.getType());
+                contractSpec.getSymbol().add(replay_vars[i]);
+
+                // Add to guarantee
+                // or_expr or (out = replayN)
+                equal_ops[i].setLhsOperand(src_expr);
+                equal_ops[i].setRhsOperand(replay_exprs[i]);
+                equal_exprs[i].setEqual(equal_ops[i]);
+                or_ops[i].setLhsOperand(or_exprs[i - 1]);
+                or_ops[i].setRhsOperand(equal_exprs[i]);
+                or_exprs[i].setOr(or_ops[i]);
+            }
+
+            replay_guarantee_item.setExpression(or_exprs[replayMemory]);
+            contractSpec.getGuarantee().add(replay_guarantee_item);
+            instrumented_cmp.setContract(contractSpec);
+        }
 
         // ---------------------------------------------
-
         ComponentImpl instrument_compImpl = new ComponentImpl();
-
         instrument_compImpl.setId(instrumented_cmp.getId() + "_dot_impl");
         instrument_compImpl.setName(instrumented_cmp.getName() + "_dot_Impl");
         instrument_compImpl.setType(instrumented_cmp);
