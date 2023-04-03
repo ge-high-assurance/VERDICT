@@ -209,6 +209,7 @@ public class App {
         options.addOption("G", false, "Global Blame Assignment");
         options.addOption("ATG", false, "Automatic Test-case Generation");
         options.addOption("BRA", false, "Bounded Replay Attacker");
+        options.addOption("URA", false, "Bounded Replay Attacker");
 
         return options;
     }
@@ -375,7 +376,14 @@ public class App {
             boolean allMIVC = opts.hasOption("LC");
             boolean oneMIVC = opts.hasOption("OC");
             boolean atg = opts.hasOption("ATG");
-            boolean boundedReplayAttacker = opts.hasOption("BRA");
+            String threatModel;
+            if (opts.hasOption("BRA")) {
+                threatModel = "BoundedReplayAttacker";
+            } else if (opts.hasOption("URA")) {
+                threatModel = "UnboundedReplayAttacker";
+            } else {
+                threatModel = "StandardAttacker";
+            }
             int replayMemory;
             if (opts.hasOption("replay_memory")) {
                 replayMemory = Integer.parseInt(opts.getOptionValue("replay_memory"));
@@ -398,7 +406,7 @@ public class App {
                     componentLevel,
                     globalOptimization,
                     atg,
-                    boundedReplayAttacker,
+                    threatModel,
                     replayMemory,
                     meritAssignment,
                     oneIVC,
@@ -853,7 +861,7 @@ public class App {
             boolean componentLevel,
             boolean globalOptimization,
             boolean atg,
-            boolean boundedReplayAttacker,
+            String threatModel,
             int replayMemory,
             boolean meritAssignment,
             boolean oneIVC,
@@ -904,13 +912,7 @@ public class App {
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
             instrumentor.instrument(
-                vdmModel,
-                threats,
-                blameAssignment,
-                componentLevel,
-                boundedReplayAttacker,
-                replayMemory
-            );
+                    vdmModel, threats, blameAssignment, componentLevel, threatModel, replayMemory);
             sample.stop(Metrics.timer("Timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");
@@ -978,6 +980,8 @@ public class App {
 
         boolean mustSet = meritAssignment && (oneMIVC || allMIVC);
 
+        String func_cong_val = Boolean.toString(threatModel.equals("UnboundedReplayAttacker"));
+
         Timer.Sample kind2Sample = Timer.start(Metrics.globalRegistry);
         try {
             ExecuteStreamHandler redirect =
@@ -998,7 +1002,9 @@ public class App {
                         "--print_mcs_legacy",
                         "true",
                         "--mcs_approximate",
-                        Boolean.toString(!globalOptimization));
+                        Boolean.toString(!globalOptimization),
+                        "--enforce_func_congruence",
+                        func_cong_val);
             } else {
                 Binary.invokeBin(
                         kind2Bin,
@@ -1017,7 +1023,9 @@ public class App {
                         "--ivc_category",
                         "contracts",
                         "--ivc_must_set",
-                        Boolean.toString(mustSet));
+                        Boolean.toString(mustSet),
+                        "--enforce_func_congruence",
+                        func_cong_val);
             }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes

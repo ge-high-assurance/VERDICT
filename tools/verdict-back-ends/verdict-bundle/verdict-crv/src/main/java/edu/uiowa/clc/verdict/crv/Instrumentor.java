@@ -167,7 +167,16 @@ public class Instrumentor extends VDMInstrumentor {
                         .collect(Collectors.toList());
         boolean blameAssignment = cmdLine.hasOption("B");
         boolean componentLevel = cmdLine.hasOption("C");
-        boolean boundedReplayAttacker = cmdLine.hasOption("BRA");
+
+        String threatModel;
+        if (cmdLine.hasOption("BRA")) {
+            threatModel = "BoundedReplayAttacker";
+        } else if (cmdLine.hasOption("URA")) {
+            threatModel = "UnboundedReplayAttacker";
+        } else {
+            threatModel = "StandardAttacker";
+        }
+
         int replayMemory;
         if (cmdLine.hasOption("replay_memory")) {
             replayMemory = Integer.parseInt(cmdLine.getOptionValue("replay_memory"));
@@ -176,12 +185,7 @@ public class Instrumentor extends VDMInstrumentor {
         }
 
         retrieve_component_and_channels(
-                vdm_model,
-                threats,
-                blameAssignment,
-                componentLevel,
-                boundedReplayAttacker,
-                replayMemory);
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return vdm_model;
     }
@@ -191,23 +195,18 @@ public class Instrumentor extends VDMInstrumentor {
             List<String> threats,
             boolean blameAssignment,
             boolean componentLevel,
-            boolean boundedReplayAttacker,
+            String threatModel,
             int replayMemory) {
         Model instrumented_model = null;
 
         retrieve_component_and_channels(
-                vdm_model,
-                threats,
-                blameAssignment,
-                componentLevel,
-                boundedReplayAttacker,
-                replayMemory);
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return instrumented_model;
     }
 
     public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment) {
-        return instrument(vdm_model, threats, blameAssignment, false, false, 0);
+        return instrument(vdm_model, threats, blameAssignment, false, "StandardAttacker", 0);
     }
 
     // Instrument Link for all outgoing edges

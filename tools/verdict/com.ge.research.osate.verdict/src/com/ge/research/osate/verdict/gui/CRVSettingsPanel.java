@@ -37,7 +37,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
     public static boolean blame = false;
     public static boolean merit = false;
     public static boolean isNone = true;
-    public static boolean isBoundedReplayAttacker = false;
+    public static String threatModel = "StandardAttacker";
     public static int replayMemory = 0;
 
     private static final String LS = "-LS";
@@ -215,23 +215,26 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
         Button sa = new Button(threatModelGroup, SWT.RADIO);
         sa.setText("Standard Attacker");
-        sa.setSelection(!isBoundedReplayAttacker);
+        sa.setSelection(threatModel.equals("StandardAttacker"));
 
         Button bra = new Button(threatModelGroup, SWT.RADIO);
         bra.setText("Bounded Replay Attacker");
-        bra.setSelection(isBoundedReplayAttacker);
+        bra.setSelection(threatModel.equals("BoundedReplayAttacker"));
 
-        if (isBoundedReplayAttacker) {
+        Button ura = new Button(threatModelGroup, SWT.RADIO);
+        ura.setText("Unbounded Replay Attacker");
+        ura.setSelection(threatModel.equals("UnboundedReplayAttacker"));
+
+        if (threatModel.equals("BoundedReplayAttacker")) {
             Group replayAttackerMemGroup = new Group(mainComposite, SWT.NONE);
             replayAttackerMemGroup.setText("Memory");
             replayAttackerMemGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
             Spinner sp = new Spinner(replayAttackerMemGroup, SWT.BORDER);
             sp.setSelection(replayMemory);
-            sp.setMinimum(0);
+            sp.setMinimum(1);
             sp.setMaximum(100);
             sp.setIncrement(1);
-            // sp.setText("Replay Memory");
 
             replayAttackerMemGroup.setEnabled(bra.getSelection());
         }
@@ -534,7 +537,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
                             Spinner sp = new Spinner(replayAttackerMemGroup, SWT.BORDER);
                             sp.setSelection(replayMemory);
-                            sp.setMinimum(0);
+                            sp.setMinimum(1);
                             sp.setMaximum(100);
                             sp.setIncrement(1);
 
@@ -619,7 +622,14 @@ public class CRVSettingsPanel extends ApplicationWindow {
                         isBlameAssignment = blameButton.getSelection();
                         isMeritAssignment = meritButton.getSelection();
                         isNone = noneButton.getSelection();
-                        isBoundedReplayAttacker = bra.getSelection();
+
+                        if (bra.getSelection()) {
+                            threatModel = "BoundedReplayAttacker";
+                        } else if (ura.getSelection()) {
+                            threatModel = "UnboundedReplayAttacker";
+                        } else {
+                            threatModel = "StandardAttacker";
+                        }
 
                         // if blame/merit assignment radio is selected then iterate
                         // through the parent's children i.e. the "composite" control's children
@@ -683,15 +693,9 @@ public class CRVSettingsPanel extends ApplicationWindow {
 
                                 if (group.getText() == "Memory") {
                                     for (Control groupChild : group.getChildren()) {
-                                        if (groupChild instanceof Composite) {
-                                            Composite subComposite = (Composite) groupChild;
-                                            for (Control subCompositeControl :
-                                                    subComposite.getChildren()) {
-                                                if (subCompositeControl instanceof Spinner) {
-                                                    Spinner spinner = (Spinner) subCompositeControl;
-                                                    replayMemory = spinner.getSelection();
-                                                }
-                                            }
+                                        if (groupChild instanceof Spinner) {
+                                            Spinner spinner = (Spinner) groupChild;
+                                            replayMemory = spinner.getSelection();
                                         }
                                     }
                                 }
