@@ -211,3 +211,7 @@ tools/verdict-back-ends/STEM/Graphs/
 tools/verdict-back-ends/STEM/GSN/
 tools/verdict-back-ends/STEM/gsn/
 tools/verdict-back-ends/STEM/Output/
+
+# VS Code stuff
+*.metals
+*.vscode
