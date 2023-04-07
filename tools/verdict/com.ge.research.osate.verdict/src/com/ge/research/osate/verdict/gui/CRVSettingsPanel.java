@@ -509,7 +509,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
                             closeButtons.moveBelow(
                                     oneAllGroup); // move save and cancel buttons to the bottom
                         } else {
-                            // remove the blame-assignments-options-group by iterating
+                            // remove the merit-assignments-options-group by iterating
                             // through the parent's children i.e.the "composite" control's children
                             for (Control control : mainComposite.getChildren()) {
                                 if (control instanceof Group) {
@@ -547,7 +547,7 @@ public class CRVSettingsPanel extends ApplicationWindow {
                             postAnalysisGroup.moveBelow(postAnalysisLabel);
                             closeButtons.moveBelow(postAnalysisGroup);
                         } else {
-                            // remove the blame-assignments-options-group by iterating
+                            // remove the replay-attacker-mem-group by iterating
                             // through the parent's children i.e.the "composite" control's children
                             for (Control control : mainComposite.getChildren()) {
                                 if (control instanceof Group) {

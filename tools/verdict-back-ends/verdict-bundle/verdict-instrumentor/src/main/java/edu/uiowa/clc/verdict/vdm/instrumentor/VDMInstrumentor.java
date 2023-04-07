@@ -1749,6 +1749,7 @@ public class VDMInstrumentor {
         }
 
         ComponentType instrumented_cmp = new ComponentType();
+        ComponentType instrumented_cmp2 = new ComponentType();
 
         // R.H.S
         ConnectionEnd src = connection.getSource();
@@ -1816,6 +1817,8 @@ public class VDMInstrumentor {
         // Setting Component IDs
         instrumented_cmp.setId(instrument_cmp_Id);
         instrumented_cmp.setName(instrument_cmp_Id);
+        instrumented_cmp2.setId(instrument_cmp_Id);
+        instrumented_cmp2.setName(instrument_cmp_Id);
 
         // output port
         Port instrumented_port_dest = new Port();
@@ -1834,6 +1837,7 @@ public class VDMInstrumentor {
         }
 
         instrumented_cmp.getPort().add(instrumented_port_dest);
+        instrumented_cmp2.getPort().add(instrumented_port_dest);
 
         // Input port
         Port instrumented_port_src = new Port();
@@ -1872,8 +1876,9 @@ public class VDMInstrumentor {
         instrumented_port_src.setType(dest_port.getType());
 
         instrumented_cmp.getPort().add(instrumented_port_src);
+        instrumented_cmp2.getPort().add(instrumented_port_src);
 
-        vdm_model.getComponentType().add(instrumented_cmp);
+        vdm_model.getComponentType().add(instrumented_cmp2);
 
         // Modify connection.
 
@@ -1889,7 +1894,7 @@ public class VDMInstrumentor {
         // -----------------------------------------
         // Adding Auxiliary Node.
         NodeCall nodeCall = new NodeCall();
-        nodeCall.setNodeId(instrumented_cmp.getId());
+        nodeCall.setNodeId(instrumented_cmp2.getId());
         Expression callExpr = new Expression();
         callExpr.setCall(nodeCall);
 
@@ -2003,7 +2008,7 @@ public class VDMInstrumentor {
 
             replay_guarantee_item.setExpression(or_exprs[replayMemory - 1]);
             contractSpec.getGuarantee().add(replay_guarantee_item);
-            instrumented_cmp.setContract(contractSpec);
+            instrumented_cmp2.setContract(contractSpec);
         } else if (threatModel.equals("UnboundedReplayAttacker")) {
             // Add function recording values at each timestep
             Node value_fn = new Node();
@@ -2011,7 +2016,7 @@ public class VDMInstrumentor {
             NodeParameter value_out = new NodeParameter();
             DataType time_in_ty = new DataType();
 
-            value_fn.setName(instrumented_cmp.getName() + "_fn");
+            value_fn.setName(instrumented_cmp2.getName() + "_fn");
             value_fn.setIsFunction(true);
             value_fn.setIsImported(true);
             time_in_ty.setPlainType(PlainType.fromValue("int"));
@@ -2054,9 +2059,9 @@ public class VDMInstrumentor {
             time_expr.setCall(time_call);
             index_expr.setCall(index_call);
 
-            fn_call1.setNodeId(instrumented_cmp.getId() + "_fn");
+            fn_call1.setNodeId(instrumented_cmp2.getId() + "_fn");
             fn_call1.getArgument().add(time_expr);
-            fn_call2.setNodeId(instrumented_cmp.getId() + "_fn");
+            fn_call2.setNodeId(instrumented_cmp2.getId() + "_fn");
             fn_call2.getArgument().add(index_expr);
             fn_call_expr1.setCall(fn_call1);
             fn_call_expr2.setCall(fn_call2);
@@ -2072,13 +2077,13 @@ public class VDMInstrumentor {
             output_item.setExpression(output_guarantee);
             contractSpec.getGuarantee().add(fn_time_item);
             contractSpec.getGuarantee().add(output_item);
-            instrumented_cmp.setContract(contractSpec);
+            instrumented_cmp2.setContract(contractSpec);
         }
 
         // ---------------------------------------------
         ComponentImpl instrument_compImpl = new ComponentImpl();
-        instrument_compImpl.setId(instrumented_cmp.getId() + "_dot_impl");
-        instrument_compImpl.setName(instrumented_cmp.getName() + "_dot_Impl");
+        instrument_compImpl.setId(instrumented_cmp2.getId() + "_dot_impl");
+        instrument_compImpl.setName(instrumented_cmp2.getName() + "_dot_Impl");
         instrument_compImpl.setType(instrumented_cmp);
 
         IfThenElse ifelse = new IfThenElse();
