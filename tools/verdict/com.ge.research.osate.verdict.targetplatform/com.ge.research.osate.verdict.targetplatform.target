@@ -16,7 +16,7 @@
       includeSource="true" type="InstallableUnit">
       <unit id="org.eclipse.elk.feature.feature.group" version="0.0.0" />
       <repository
-        location="https://download.eclipse.org/elk/updates/releases/0.7.1" />
+        location="https://download.eclipse.org/elk/updates/releases/0.8.1" />
     </location>
     <location includeAllPlatforms="false"
       includeConfigurePhase="true" includeMode="planner"
@@ -74,7 +74,7 @@
       includeSource="true" type="InstallableUnit">
       <unit id="org.yakindu.base.xtext.utils.jface" version="0.0.0" />
       <repository
-        location="https://updates.yakindu.com/statecharts/releases/3.5.9" />
+        location="https://updates.yakindu.com/statecharts/releases/3.5.13" />
     </location>
   </locations>
 </target>

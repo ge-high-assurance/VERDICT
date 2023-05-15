@@ -26,9 +26,9 @@ plugin version via an update site URL.
 
 ## Set up your build environment
 
-You will need [Java 11](https://adoptium.net/) to build all of our
-Java program sources.  Java 8 is too old and no longer supported by
-Maven's Eclipse Tycho build system.
+You will need [Java 17](https://adoptium.net/) to build all of our
+Java program sources.  Maven's Eclipse Tycho build system no longer
+supports Java 11 so Java 17 is required to build VERDICT.
 
 You also will need [Apache Maven](https://maven.apache.org) to build
 all of our Java program sources.  Your operating system may have

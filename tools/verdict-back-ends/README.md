@@ -39,10 +39,10 @@ VERDICT plugin to run the back-end programs using the Docker image.
 
 ## Set up your build environment
 
-You will need both [Java 11](https://adoptium.net/) and [Apache
+You will need both [Java 17](https://adoptium.net/) and [Apache
 Maven](https://maven.apache.org) to build our Java program sources.
-You cannot build our plugin source code with Java 8; Java 8 is too old
-and no longer supported by Maven's Eclipse Tycho build system.
+You cannot build our plugin source code with Java 11; Maven's Eclipse
+Tycho build system no longer supports Java 11.
 
 The traditional way to install Maven is to download the latest Maven
 distribution from Apache's website, unpack the Maven distribution
