@@ -13,7 +13,7 @@ RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     graphviz \
     libzmq5 \
-    openjdk-11-jre-headless \
+    openjdk-17-jre-headless \
     z3 \
  && rm -rf /var/lib/apt/lists/* \
  && adduser --disabled-password --gecos VERDICT verdict
@@ -28,6 +28,6 @@ COPY verdict-bundle/verdict-bundle-app/target/verdict-bundle-app-*-capsule.jar /
 
 USER verdict
 WORKDIR /data
-# Java 11 LTS has better memory heuristics, but needs --add-open arguments
+# Java 17 LTS needs --add-open arguments
 ENTRYPOINT ["java", "-Xmx1536m", "--add-opens", "java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "/app/verdict.jar"]
 ENV GraphVizPath=/usr/bin

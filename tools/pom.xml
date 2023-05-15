@@ -3,13 +3,13 @@
      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- Define ourselves -->
+  <!-- Define our GAV coordinates -->
   <groupId>com.ge.verdict</groupId>
   <artifactId>tools</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <!-- Build all modules in one place -->
+  <!-- Build our modules -->
   <modules>
     <module>verdict</module>
     <module>verdict-back-ends</module>
@@ -26,15 +26,18 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <!-- Versions of dependencies -->
+    <!-- Versions of plugins/dependencies -->
+    <!-- Need version.antlr to match logicng -->
     <version.antlr>4.9.3</version.antlr>
     <version.asm>9.5</version.asm>
     <version.micrometer>1.11.0</version.micrometer>
-    <version.sadl>3.5.0-SNAPSHOT</version.sadl>
-    <version.slf4j>2.0.7</version.slf4j>
+    <version.sadl>3.6.0-SNAPSHOT</version.sadl>
+    <!-- Need version.slf4j to match Eclipse and SADL -->
+    <version.slf4j>1.7.36</version.slf4j>
     <version.surefire>3.1.2</version.surefire>
-    <version.tycho>2.7.5</version.tycho>
+    <version.tycho>3.0.4</version.tycho>
     <version.verdict>${project.version}</version.verdict>
+    <!-- No need for version.xtext to match VERDICT target platform -->
     <version.xtext>2.31.0</version.xtext>
   </properties>
 
@@ -169,13 +172,6 @@
         <groupId>edu.uiowa.cs.clc</groupId>
         <artifactId>kind2-java-api</artifactId>
         <version>0.3.4</version>
-        <!-- Exclude to avoid vulnerabilities -->
-        <exclusions>
-          <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>guru.nidi</groupId>
