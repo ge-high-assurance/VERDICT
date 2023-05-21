@@ -190,6 +190,16 @@ public class App {
             options.addOption(opt, false, "");
         }
 
+        Option replayMemory =
+                Option.builder()
+                        .desc("Bounded replay attacker memory")
+                        .longOpt("replay_memory")
+                        .hasArg()
+                        .argName("Memory")
+                        .build();
+
+        options.addOption(replayMemory);
+
         options.addOption("MA", false, "Merit Assignment");
         options.addOption("OI", false, "One IVC");
         options.addOption("LC", false, "All MIVC");
@@ -198,6 +208,8 @@ public class App {
         options.addOption("C", false, "Component-level Blame Assignment");
         options.addOption("G", false, "Global Blame Assignment");
         options.addOption("ATG", false, "Automatic Test-case Generation");
+        options.addOption("BRA", false, "Bounded Replay Attacker");
+        options.addOption("URA", false, "Bounded Replay Attacker");
 
         return options;
     }
@@ -247,6 +259,7 @@ public class App {
         helpLine();
         helpLine("Toolchain: CRV (Cyber Resiliency Verifier)");
         helpLine("  --crv <out> <kind2 bin> [-ATG] [-MA] [-BA [-C] [-G]] <threats>");
+        helpLine("  --replay_memory <memory depth> Bounded replay attacker memory");
         helpLine("      <out> ................ CRV output file (.xml or .json)");
         helpLine("      <kind2 bin> .......... Kind2 binary");
         helpLine("      -ATG ................. automatic test-case generation (ATG)");
@@ -363,6 +376,20 @@ public class App {
             boolean allMIVC = opts.hasOption("LC");
             boolean oneMIVC = opts.hasOption("OC");
             boolean atg = opts.hasOption("ATG");
+            String threatModel;
+            if (opts.hasOption("BRA")) {
+                threatModel = "BoundedReplayAttacker";
+            } else if (opts.hasOption("URA")) {
+                threatModel = "UnboundedReplayAttacker";
+            } else {
+                threatModel = "StandardAttacker";
+            }
+            int replayMemory;
+            if (opts.hasOption("replay_memory")) {
+                replayMemory = Integer.parseInt(opts.getOptionValue("replay_memory"));
+            } else {
+                replayMemory = 0;
+            }
 
             String[] crvOpts = opts.getOptionValues("crv");
             String outputPath = crvOpts[0];
@@ -379,6 +406,8 @@ public class App {
                     componentLevel,
                     globalOptimization,
                     atg,
+                    threatModel,
+                    replayMemory,
                     meritAssignment,
                     oneIVC,
                     allMIVC,
@@ -832,6 +861,8 @@ public class App {
             boolean componentLevel,
             boolean globalOptimization,
             boolean atg,
+            String threatModel,
+            int replayMemory,
             boolean meritAssignment,
             boolean oneIVC,
             boolean allMIVC,
@@ -880,7 +911,8 @@ public class App {
             // Instrument loaded model
             Timer.Sample sample = Timer.start(Metrics.globalRegistry);
             instrumentor = new Instrumentor(vdmModel);
-            instrumentor.instrument(vdmModel, threats, blameAssignment, componentLevel);
+            instrumentor.instrument(
+                    vdmModel, threats, blameAssignment, componentLevel, threatModel, replayMemory);
             sample.stop(Metrics.timer("Timer.crv.instrumentor", "model", modelName));
         } else {
             log("No threats selected, no instrumentation necessary");
@@ -948,6 +980,8 @@ public class App {
 
         boolean mustSet = meritAssignment && (oneMIVC || allMIVC);
 
+        String func_cong_val = Boolean.toString(threatModel.equals("UnboundedReplayAttacker"));
+
         Timer.Sample kind2Sample = Timer.start(Metrics.globalRegistry);
         try {
             ExecuteStreamHandler redirect =
@@ -968,7 +1002,9 @@ public class App {
                         "--print_mcs_legacy",
                         "true",
                         "--mcs_approximate",
-                        Boolean.toString(!globalOptimization));
+                        Boolean.toString(!globalOptimization),
+                        "--enforce_func_congruence",
+                        func_cong_val);
             } else {
                 Binary.invokeBin(
                         kind2Bin,
@@ -987,7 +1023,9 @@ public class App {
                         "--ivc_category",
                         "contracts",
                         "--ivc_must_set",
-                        Boolean.toString(mustSet));
+                        Boolean.toString(mustSet),
+                        "--enforce_func_congruence",
+                        func_cong_val);
             }
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes

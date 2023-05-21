@@ -168,7 +168,24 @@ public class Instrumentor extends VDMInstrumentor {
         boolean blameAssignment = cmdLine.hasOption("B");
         boolean componentLevel = cmdLine.hasOption("C");
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        String threatModel;
+        if (cmdLine.hasOption("BRA")) {
+            threatModel = "BoundedReplayAttacker";
+        } else if (cmdLine.hasOption("URA")) {
+            threatModel = "UnboundedReplayAttacker";
+        } else {
+            threatModel = "StandardAttacker";
+        }
+
+        int replayMemory;
+        if (cmdLine.hasOption("replay_memory")) {
+            replayMemory = Integer.parseInt(cmdLine.getOptionValue("replay_memory"));
+        } else {
+            replayMemory = 0;
+        }
+
+        retrieve_component_and_channels(
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return vdm_model;
     }
@@ -177,16 +194,19 @@ public class Instrumentor extends VDMInstrumentor {
             Model vdm_model,
             List<String> threats,
             boolean blameAssignment,
-            boolean componentLevel) {
+            boolean componentLevel,
+            String threatModel,
+            int replayMemory) {
         Model instrumented_model = null;
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        retrieve_component_and_channels(
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return instrumented_model;
     }
 
     public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment) {
-        return instrument(vdm_model, threats, blameAssignment, false);
+        return instrument(vdm_model, threats, blameAssignment, false, "StandardAttacker", 0);
     }
 
     // Instrument Link for all outgoing edges

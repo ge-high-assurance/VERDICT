@@ -32,10 +32,12 @@ import verdict.vdm.vdm_lustre.ContractSpec;
 import verdict.vdm.vdm_lustre.Expression;
 import verdict.vdm.vdm_lustre.IfThenElse;
 import verdict.vdm.vdm_lustre.LustreProgram;
+import verdict.vdm.vdm_lustre.Node;
 import verdict.vdm.vdm_lustre.NodeBody;
 import verdict.vdm.vdm_lustre.NodeCall;
 import verdict.vdm.vdm_lustre.NodeEquation;
 import verdict.vdm.vdm_lustre.NodeEquationLHS;
+import verdict.vdm.vdm_lustre.NodeParameter;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_model.BlockImpl;
 import verdict.vdm.vdm_model.CompInstancePort;
@@ -92,8 +94,23 @@ public class VDMInstrumentor {
                         .collect(Collectors.toList());
         boolean blameAssignment = cmdLine.hasOption("B");
         boolean componentLevel = cmdLine.hasOption("C");
+        String threatModel;
+        if (cmdLine.hasOption("BRA")) {
+            threatModel = "BoundedReplayAttacker";
+        } else if (cmdLine.hasOption("URA")) {
+            threatModel = "UnboundedReplayAttacker";
+        } else {
+            threatModel = "StandardAttacker";
+        }
+        int replayMemory;
+        if (cmdLine.hasOption("replay_memory")) {
+            replayMemory = Integer.parseInt(cmdLine.getOptionValue("replay_memory"));
+        } else {
+            replayMemory = 0;
+        }
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        retrieve_component_and_channels(
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return instrumented_model;
     }
@@ -102,16 +119,19 @@ public class VDMInstrumentor {
             Model vdm_model,
             List<String> threats,
             boolean blameAssignment,
-            boolean componentLevel) {
+            boolean componentLevel,
+            String threatModel,
+            int replayMemory) {
         Model instrumented_model = null;
 
-        retrieve_component_and_channels(vdm_model, threats, blameAssignment, componentLevel);
+        retrieve_component_and_channels(
+                vdm_model, threats, blameAssignment, componentLevel, threatModel, replayMemory);
 
         return instrumented_model;
     }
 
     public Model instrument(Model vdm_model, List<String> threats, boolean blameAssignment) {
-        return instrument(vdm_model, threats, blameAssignment, false);
+        return instrument(vdm_model, threats, blameAssignment, false, "StandardAttacker", 0);
     }
 
     protected String getComponentID(
@@ -276,7 +296,9 @@ public class VDMInstrumentor {
             Model vdm_model,
             List<String> threats,
             boolean blame_assignment,
-            boolean component_level) {
+            boolean component_level,
+            String threat_model,
+            int replay_memory) {
 
         HashSet<ComponentType> vdm_components = new HashSet<ComponentType>();
         HashSet<Connection> vdm_links = new HashSet<Connection>();
@@ -334,6 +356,96 @@ public class VDMInstrumentor {
             System.out.println("Benign");
             vdm_components.clear();
             vdm_links.clear();
+        }
+
+        if (threat_model.equals("UnboundedReplayAttacker")) {
+            // Add time() and instr_index() nodes
+            Node time_node = new Node();
+            Node index_node = new Node();
+            NodeBody time_body = new NodeBody();
+            NodeParameter time_out = new NodeParameter();
+            NodeParameter index_out = new NodeParameter();
+            NodeParameter index_in = new NodeParameter();
+            DataType time_out_ty = new DataType();
+            DataType index_out_ty = new DataType();
+            DataType index_in_ty = new DataType();
+            NodeEquation time_eqn = new NodeEquation();
+            NodeEquationLHS time_eqn_lhs = new NodeEquationLHS();
+            NodeCall time_call = new NodeCall();
+            Expression time_eqn_rhs = new Expression();
+            BinaryOperation arrow_op = new BinaryOperation();
+            Expression out = new Expression();
+            Expression pre_expr = new Expression();
+            Expression one = new Expression();
+            Expression zero = new Expression();
+            Expression add_expr = new Expression();
+            Expression leq_expr1 = new Expression();
+            Expression leq_expr2 = new Expression();
+            Expression time_expr = new Expression();
+            Expression idx_expr = new Expression();
+            Expression and_expr = new Expression();
+            BinaryOperation add_op = new BinaryOperation();
+            BinaryOperation leq_op1 = new BinaryOperation();
+            BinaryOperation leq_op2 = new BinaryOperation();
+            BinaryOperation and_op = new BinaryOperation();
+            ContractSpec index_contract = new ContractSpec();
+            ContractItem index_guarantee = new ContractItem();
+
+            out.setIdentifier("out");
+            pre_expr.setPre(out);
+            one.setIdentifier("1");
+            zero.setIdentifier("0");
+            add_op.setLhsOperand(pre_expr);
+            add_op.setRhsOperand(one);
+            add_expr.setPlus(add_op);
+            arrow_op.setLhsOperand(zero);
+            arrow_op.setRhsOperand(add_expr);
+            time_eqn_lhs.getIdentifier().add("out");
+            time_eqn.setLhs(time_eqn_lhs);
+            time_eqn_rhs.setArrow(arrow_op);
+            time_eqn.setRhs(time_eqn_rhs);
+            time_body.getEquation().add(time_eqn);
+            time_out_ty.setPlainType(PlainType.fromValue("int"));
+            time_out.setName("out");
+            time_out.setIsConstant(false);
+            time_out.setDataType(time_out_ty);
+            time_node.setBody(time_body);
+            time_node.setIsFunction(false);
+            time_node.setIsImported(false);
+            time_node.setName("time");
+            time_node.getOutputParameter().add(time_out);
+            idx_expr.setIdentifier("idx");
+            time_call.setNodeId("time");
+            time_expr.setCall(time_call);
+            leq_op1.setLhsOperand(zero);
+            leq_op1.setRhsOperand(idx_expr);
+            leq_op2.setLhsOperand(idx_expr);
+            leq_op2.setRhsOperand(time_expr);
+            leq_expr1.setLessThanOrEqualTo(leq_op1);
+            leq_expr2.setLessThanOrEqualTo(leq_op2);
+            and_op.setLhsOperand(leq_expr1);
+            and_op.setRhsOperand(leq_expr2);
+            and_expr.setAnd(and_op);
+            index_guarantee.setExpression(and_expr);
+            index_contract.getGuarantee().add(index_guarantee);
+            index_node.setContract(index_contract);
+            index_out_ty.setPlainType(PlainType.fromValue("int"));
+            index_in_ty.setPlainType(PlainType.fromValue("int"));
+            index_in.setName("id");
+            index_in.setDataType(index_in_ty);
+            index_in.setIsConstant(false);
+            index_node.getInputParameter().add(index_in);
+            index_out.setName("idx");
+            index_out.setDataType(index_out_ty);
+            index_out.setIsConstant(false);
+            index_node.getOutputParameter().add(index_out);
+            index_node.setBody(null);
+            index_node.setIsFunction(false);
+            index_node.setIsImported(true);
+            index_node.setName("instr_index");
+
+            vdm_model.getDataflowCode().getNodeDeclaration().add(time_node);
+            vdm_model.getDataflowCode().getNodeDeclaration().add(index_node);
         }
 
         //        int component_index = 1;
@@ -394,6 +506,7 @@ public class VDMInstrumentor {
 
             //            System.out.println("Selected Links:");
 
+            int linkID = 0;
             for (Connection connection : vdm_links) {
                 //                System.out.println("(" + connection_index++ + ") " +
                 // connection.getName());
@@ -406,7 +519,14 @@ public class VDMInstrumentor {
 
                     blockImpl = getBlockID(cmpID);
 
-                    String constant = instrument_link(cmpID, connection, blockImpl);
+                    String constant =
+                            instrument_link(
+                                    cmpID,
+                                    connection,
+                                    blockImpl,
+                                    threat_model,
+                                    replay_memory,
+                                    linkID);
 
                     global_constants.add(constant);
 
@@ -430,7 +550,14 @@ public class VDMInstrumentor {
 
                     blockImpl = retrieve_block(connection);
 
-                    String constant = instrument_link(cmpID, connection, blockImpl);
+                    String constant =
+                            instrument_link(
+                                    cmpID,
+                                    connection,
+                                    blockImpl,
+                                    threat_model,
+                                    replay_memory,
+                                    linkID++);
 
                     global_constants.add(constant);
 
@@ -1599,7 +1726,13 @@ public class VDMInstrumentor {
     //
     // }
 
-    public String instrument_link(String compID, Connection connection, BlockImpl blockImpl) {
+    public String instrument_link(
+            String compID,
+            Connection connection,
+            BlockImpl blockImpl,
+            String threatModel,
+            int replayMemory,
+            int linkID) {
         // instrument_link(connection);
         //        System.out.println("Instrumented Link ***" + connection.getName());
         // Default Block Implementation
@@ -1615,6 +1748,7 @@ public class VDMInstrumentor {
         }
 
         ComponentType instrumented_cmp = new ComponentType();
+        ComponentType instrumented_cmp2 = new ComponentType();
 
         // R.H.S
         ConnectionEnd src = connection.getSource();
@@ -1682,6 +1816,8 @@ public class VDMInstrumentor {
         // Setting Component IDs
         instrumented_cmp.setId(instrument_cmp_Id);
         instrumented_cmp.setName(instrument_cmp_Id);
+        instrumented_cmp2.setId(instrument_cmp_Id);
+        instrumented_cmp2.setName(instrument_cmp_Id);
 
         // output port
         Port instrumented_port_dest = new Port();
@@ -1700,6 +1836,7 @@ public class VDMInstrumentor {
         }
 
         instrumented_cmp.getPort().add(instrumented_port_dest);
+        instrumented_cmp2.getPort().add(instrumented_port_dest);
 
         // Input port
         Port instrumented_port_src = new Port();
@@ -1738,8 +1875,9 @@ public class VDMInstrumentor {
         instrumented_port_src.setType(dest_port.getType());
 
         instrumented_cmp.getPort().add(instrumented_port_src);
+        instrumented_cmp2.getPort().add(instrumented_port_src);
 
-        vdm_model.getComponentType().add(instrumented_cmp);
+        vdm_model.getComponentType().add(instrumented_cmp2);
 
         // Modify connection.
 
@@ -1755,26 +1893,196 @@ public class VDMInstrumentor {
         // -----------------------------------------
         // Adding Auxiliary Node.
         NodeCall nodeCall = new NodeCall();
-        nodeCall.setNodeId(instrumented_cmp.getId());
+        nodeCall.setNodeId(instrumented_cmp2.getId());
         Expression callExpr = new Expression();
         callExpr.setCall(nodeCall);
 
-        ContractItem true_guarantee_item = new ContractItem();
-        // true_guarantee_item.setName("true");
-        Expression true_expr = new Expression();
-        Boolean true_lit = Boolean.TRUE;
-        true_expr.setBoolLiteral(true_lit);
-        true_guarantee_item.setExpression(true_expr);
+        // Bounded replay attacker
+        if (threatModel.equals("BoundedReplayAttacker")) {
+            ContractItem replay_guarantee_item = new ContractItem();
+            ContractSpec contractSpec = new ContractSpec();
+            SymbolDefinition replay_var = new SymbolDefinition();
+            BinaryOperation equal_op = new BinaryOperation();
+            BinaryOperation equal_op2 = new BinaryOperation();
+            BinaryOperation or_op = new BinaryOperation();
+            BinaryOperation arrow_op = new BinaryOperation();
+            Expression replay_expr = new Expression();
+            Expression equal_expr = new Expression();
+            Expression equal_expr2 = new Expression();
+            Expression dest_expr = new Expression();
+            Expression dest_expr2 = new Expression();
+            Expression src_expr = new Expression();
+            Expression or_expr = new Expression();
+            Expression arrow_expr = new Expression();
+            Expression pre_expr = new Expression();
 
-        ContractSpec contractSpec = new ContractSpec();
-        contractSpec.getGuarantee().add(true_guarantee_item);
+            // Set up bounded replay attacker
+            // Input and output variables
+            src_expr.setIdentifier(instrumented_port_src.getName() + "_instrumented");
+            dest_expr.setIdentifier(instrumented_port_dest.getName());
+            dest_expr2.setIdentifier(instrumented_port_dest.getName() + ".event");
+
+            // replay = input -> pre input
+            pre_expr.setPre(dest_expr);
+            arrow_op.setLhsOperand(dest_expr);
+            arrow_op.setRhsOperand(pre_expr);
+            arrow_expr.setArrow(arrow_op);
+            replay_var.setName("replay0");
+            replay_var.setIsConstant(false);
+            replay_var.setDefinition(arrow_expr);
+            replay_var.setDataType(instrumented_port_src.getType());
+            contractSpec.getSymbol().add(replay_var);
+
+            // (output = input) or (output = replay)
+            equal_op.setLhsOperand(src_expr);
+            equal_op.setRhsOperand(dest_expr);
+            equal_expr.setEqual(equal_op);
+            or_op.setLhsOperand(equal_expr);
+            equal_op2.setLhsOperand(src_expr);
+            replay_expr.setIdentifier("replay0");
+            equal_op2.setRhsOperand(replay_expr);
+            equal_expr2.setEqual(equal_op2);
+            or_op.setRhsOperand(equal_expr2);
+            or_expr.setOr(or_op);
+
+            Expression[] replay_exprs = new Expression[replayMemory];
+            Expression[] pre_exprs = new Expression[replayMemory];
+            BinaryOperation[] neq_ops = new BinaryOperation[replayMemory];
+            Expression[] neq_exprs = new Expression[replayMemory];
+            IfThenElse[] cond_ops = new IfThenElse[replayMemory];
+            Expression[] cond_exprs = new Expression[replayMemory];
+            BinaryOperation[] arrow_ops = new BinaryOperation[replayMemory];
+            Expression[] arrow_exprs = new Expression[replayMemory];
+            SymbolDefinition[] replay_vars = new SymbolDefinition[replayMemory];
+            BinaryOperation[] equal_ops = new BinaryOperation[replayMemory];
+            Expression[] equal_exprs = new Expression[replayMemory];
+            BinaryOperation[] or_ops = new BinaryOperation[replayMemory];
+            Expression[] or_exprs = new Expression[replayMemory];
+
+            // Initialize
+            for (int i = 0; i < replayMemory; i++) {
+                replay_exprs[i] = new Expression();
+                pre_exprs[i] = new Expression();
+                neq_ops[i] = new BinaryOperation();
+                neq_exprs[i] = new Expression();
+                cond_ops[i] = new IfThenElse();
+                cond_exprs[i] = new Expression();
+                arrow_ops[i] = new BinaryOperation();
+                arrow_exprs[i] = new Expression();
+                replay_vars[i] = new SymbolDefinition();
+                equal_ops[i] = new BinaryOperation();
+                equal_exprs[i] = new Expression();
+                or_ops[i] = new BinaryOperation();
+                or_exprs[i] = new Expression();
+            }
+
+            replay_exprs[0].setIdentifier("replay0");
+            pre_exprs[0].setPre(replay_exprs[0]);
+            or_exprs[0] = or_expr;
+
+            // Add bounded replay attacker memory
+            for (int i = 1; i < replayMemory; i++) {
+                // Add extra replay equation
+                // replayN = msg -> pre replayN-1
+                replay_exprs[i].setIdentifier("replay" + Integer.toString(i));
+                pre_exprs[i].setPre(replay_exprs[i]);
+                arrow_ops[i].setLhsOperand(dest_expr);
+                arrow_ops[i].setRhsOperand(pre_exprs[i - 1]);
+                arrow_exprs[i].setArrow(arrow_ops[i]);
+                replay_vars[i].setName("replay" + Integer.toString(i));
+                replay_vars[i].setIsConstant(false);
+                replay_vars[i].setDefinition(arrow_exprs[i]);
+                replay_vars[i].setDataType(instrumented_port_src.getType());
+                contractSpec.getSymbol().add(replay_vars[i]);
+
+                // Add to guarantee
+                // or_expr or (out = replayN)
+                equal_ops[i].setLhsOperand(src_expr);
+                equal_ops[i].setRhsOperand(replay_exprs[i]);
+                equal_exprs[i].setEqual(equal_ops[i]);
+                or_ops[i].setLhsOperand(or_exprs[i - 1]);
+                or_ops[i].setRhsOperand(equal_exprs[i]);
+                or_exprs[i].setOr(or_ops[i]);
+            }
+
+            replay_guarantee_item.setExpression(or_exprs[replayMemory - 1]);
+            contractSpec.getGuarantee().add(replay_guarantee_item);
+            instrumented_cmp2.setContract(contractSpec);
+        } else if (threatModel.equals("UnboundedReplayAttacker")) {
+            // Add function recording values at each timestep
+            Node value_fn = new Node();
+            NodeParameter time_in = new NodeParameter();
+            NodeParameter value_out = new NodeParameter();
+            DataType time_in_ty = new DataType();
+
+            value_fn.setName(instrumented_cmp2.getName() + "_fn");
+            value_fn.setIsFunction(true);
+            value_fn.setIsImported(true);
+            time_in_ty.setPlainType(PlainType.fromValue("int"));
+            time_in.setName("time");
+            time_in.setIsConstant(false);
+            time_in.setDataType(time_in_ty);
+            value_out.setName("value");
+            value_out.setIsConstant(false);
+            value_out.setDataType(instrumented_port_src.getType());
+            value_fn.getInputParameter().add(time_in);
+            value_fn.getOutputParameter().add(value_out);
+            vdm_model.getDataflowCode().getNodeDeclaration().add(value_fn);
+
+            Expression src_expr = new Expression();
+            Expression dest_expr = new Expression();
+            Expression time_expr = new Expression();
+            Expression index_expr = new Expression();
+            BinaryOperation equal_op1 = new BinaryOperation();
+            BinaryOperation equal_op2 = new BinaryOperation();
+            Expression fn_call_expr1 = new Expression();
+            Expression fn_call_expr2 = new Expression();
+            Expression fn_time_guarantee = new Expression();
+            Expression output_guarantee = new Expression();
+            Expression id_expr = new Expression();
+            NodeCall time_call = new NodeCall();
+            NodeCall index_call = new NodeCall();
+            NodeCall fn_call1 = new NodeCall();
+            NodeCall fn_call2 = new NodeCall();
+            ContractSpec contractSpec = new ContractSpec();
+            ContractItem fn_time_item = new ContractItem();
+            ContractItem output_item = new ContractItem();
+
+            src_expr.setIdentifier(instrumented_port_src.getName() + "_instrumented");
+            dest_expr.setIdentifier(instrumented_port_dest.getName());
+
+            time_call.setNodeId("time");
+            index_call.setNodeId("instr_index");
+            id_expr.setIdentifier(Integer.toString(linkID));
+            index_call.getArgument().add(id_expr);
+            time_expr.setCall(time_call);
+            index_expr.setCall(index_call);
+
+            fn_call1.setNodeId(instrumented_cmp2.getId() + "_fn");
+            fn_call1.getArgument().add(time_expr);
+            fn_call2.setNodeId(instrumented_cmp2.getId() + "_fn");
+            fn_call2.getArgument().add(index_expr);
+            fn_call_expr1.setCall(fn_call1);
+            fn_call_expr2.setCall(fn_call2);
+
+            equal_op1.setLhsOperand(fn_call_expr1);
+            equal_op1.setRhsOperand(dest_expr);
+            equal_op2.setLhsOperand(src_expr);
+            equal_op2.setRhsOperand(fn_call_expr2);
+            fn_time_guarantee.setEqual(equal_op1);
+            output_guarantee.setEqual(equal_op2);
+
+            fn_time_item.setExpression(fn_time_guarantee);
+            output_item.setExpression(output_guarantee);
+            contractSpec.getGuarantee().add(fn_time_item);
+            contractSpec.getGuarantee().add(output_item);
+            instrumented_cmp2.setContract(contractSpec);
+        }
 
         // ---------------------------------------------
-
         ComponentImpl instrument_compImpl = new ComponentImpl();
-
-        instrument_compImpl.setId(instrumented_cmp.getId() + "_dot_impl");
-        instrument_compImpl.setName(instrumented_cmp.getName() + "_dot_Impl");
+        instrument_compImpl.setId(instrumented_cmp2.getId() + "_dot_impl");
+        instrument_compImpl.setName(instrumented_cmp2.getName() + "_dot_Impl");
         instrument_compImpl.setType(instrumented_cmp);
 
         IfThenElse ifelse = new IfThenElse();
