@@ -414,7 +414,6 @@ public class VDMInstrumentor {
             time_node.setIsImported(false);
             time_node.setName("time");
             time_node.getOutputParameter().add(time_out);
-
             idx_expr.setIdentifier("idx");
             time_call.setNodeId("time");
             time_expr.setCall(time_call);

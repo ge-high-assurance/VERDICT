@@ -235,7 +235,6 @@ public class VDM2Lustre {
         }
 
         // + Contract (Optional)
-        // !! Instrumentation
         ContractSpec contractSpec = componentType.getContract();
 
         if (is_implemented == false && contractSpec == null) {
