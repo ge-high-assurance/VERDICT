@@ -1,6 +1,10 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.bundle;
 
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
+import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -13,9 +17,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 /** Unpack and invoke binaries from the resources directory. Used for kind2, etc. */
 public class Binary {

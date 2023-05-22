@@ -12,9 +12,7 @@ import edu.uiowa.cs.clc.kind2.lustre.Program;
 import edu.uiowa.cs.clc.kind2.lustre.ProgramBuilder;
 import edu.uiowa.cs.clc.kind2.lustre.Type;
 import edu.uiowa.cs.clc.kind2.lustre.TypeUtil;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_data.RecordField;
@@ -36,6 +34,10 @@ import verdict.vdm.vdm_lustre.NodeProperty;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_lustre.VariableDeclaration;
 import verdict.vdm.vdm_model.Model;
+
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class VDMLustre2Kind2 {
     /**

@@ -13,6 +13,14 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.RatNum;
 import com.microsoft.z3.Status;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.apache.commons.math3.util.ArithmeticUtils;
+import org.logicng.datastructures.Assignment;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.solvers.MaxSATSolver;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -25,12 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.apache.commons.math3.fraction.Fraction;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.logicng.datastructures.Assignment;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.solvers.MaxSATSolver;
 
 /** Perform synthesis. */
 public class VerdictSynthesis {

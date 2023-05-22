@@ -5,13 +5,15 @@ import com.ge.research.osate.verdict.dsl.linking.VerdictQualifiedNameProvider;
 import com.ge.research.osate.verdict.dsl.ui.VerdictUiModule;
 import com.ge.research.osate.verdict.dsl.ui.internal.VerdictActivator;
 import com.google.inject.Injector;
-import java.util.List;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.nodemodel.INode;
 import org.osate.annexsupport.AnnexLinkingService;
+
+import java.util.List;
 
 /**
  * Linking. Osate extension point.

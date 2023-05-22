@@ -13,11 +13,13 @@ import edu.uiowa.clc.verdict.util.LOGGY;
 import edu.uiowa.clc.verdict.util.SummaryProcessor;
 import edu.uiowa.clc.verdict.util.VerdictProperty;
 import edu.uiowa.clc.verdict.util.WeakAssumption;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

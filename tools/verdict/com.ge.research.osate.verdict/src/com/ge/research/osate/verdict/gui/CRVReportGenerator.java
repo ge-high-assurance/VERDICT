@@ -1,8 +1,9 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.List;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+
+import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

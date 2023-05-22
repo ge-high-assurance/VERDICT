@@ -5,9 +5,7 @@ import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.gui.CRVReportGenerator;
 import com.ge.research.osate.verdict.gui.CRVSettingsPanel;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -16,7 +14,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.intro.IIntroPart;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Paul Meng Date: Jun 12, 2019

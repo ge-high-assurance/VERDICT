@@ -15,6 +15,7 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

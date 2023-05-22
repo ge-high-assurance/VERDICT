@@ -4,9 +4,11 @@ import com.ge.verdict.attackdefensecollector.CutSetGenerator.Cache;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
-import java.util.Objects;
+
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
+
+import java.util.Objects;
 
 /**
  * Represents the situation where an attack is dependent on the implementation of a defense. This

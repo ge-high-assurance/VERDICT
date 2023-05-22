@@ -1,11 +1,13 @@
 package com.ge.research.osate.verdict.gui;
 
 import com.ge.research.osate.verdict.gui.PathAttributes.ComponentData;
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

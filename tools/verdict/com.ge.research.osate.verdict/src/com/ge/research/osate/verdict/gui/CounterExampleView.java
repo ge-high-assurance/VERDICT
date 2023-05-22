@@ -1,7 +1,5 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -14,6 +12,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

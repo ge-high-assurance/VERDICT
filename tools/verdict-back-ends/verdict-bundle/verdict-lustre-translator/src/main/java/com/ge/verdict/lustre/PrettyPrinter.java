@@ -9,13 +9,6 @@
 
 package com.ge.verdict.lustre;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import verdict.vdm.vdm_data.ArrayType;
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.EnumType;
@@ -46,6 +39,14 @@ import verdict.vdm.vdm_lustre.RecordLiteral;
 import verdict.vdm.vdm_lustre.RecordProjection;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_lustre.VariableDeclaration;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class PrettyPrinter {
 

@@ -16,6 +16,17 @@ import com.ge.verdict.attackdefensecollector.model.PortConcern;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.ge.verdict.vdm.VdmTranslator;
+
+import verdict.vdm.vdm_data.GenericAttribute;
+import verdict.vdm.vdm_model.CIAPort;
+import verdict.vdm.vdm_model.ComponentImpl;
+import verdict.vdm.vdm_model.ComponentInstance;
+import verdict.vdm.vdm_model.ComponentType;
+import verdict.vdm.vdm_model.Connection;
+import verdict.vdm.vdm_model.Mission;
+import verdict.vdm.vdm_model.Model;
+import verdict.vdm.vdm_model.Severity;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,15 +40,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import verdict.vdm.vdm_data.GenericAttribute;
-import verdict.vdm.vdm_model.CIAPort;
-import verdict.vdm.vdm_model.ComponentImpl;
-import verdict.vdm.vdm_model.ComponentInstance;
-import verdict.vdm.vdm_model.ComponentType;
-import verdict.vdm.vdm_model.Connection;
-import verdict.vdm.vdm_model.Mission;
-import verdict.vdm.vdm_model.Model;
-import verdict.vdm.vdm_model.Severity;
 
 /**
  * Main class of the attack-defense collector implementation.

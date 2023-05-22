@@ -11,6 +11,10 @@
 
 package edu.uiowa.clc.verdict.util;
 
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
+import org.apache.tools.ant.taskdefs.PumpStreamHandler;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,9 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.tools.ant.taskdefs.Execute;
-import org.apache.tools.ant.taskdefs.ExecuteStreamHandler;
-import org.apache.tools.ant.taskdefs.PumpStreamHandler;
 
 public class Exec {
 

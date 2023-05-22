@@ -1,14 +1,16 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.lustre;
 
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
+import verdict.vdm.vdm_model.Model;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import verdict.vdm.vdm_model.Model;
 
 public class VerdictLustreTranslatorIT {
 

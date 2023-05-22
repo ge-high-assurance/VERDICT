@@ -14,11 +14,7 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyReqConditionLogic;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+
 import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.Classifier;
@@ -29,6 +25,12 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.SystemType;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /** Utilities for validating cyber properties. */
 public class VerdictUtil {

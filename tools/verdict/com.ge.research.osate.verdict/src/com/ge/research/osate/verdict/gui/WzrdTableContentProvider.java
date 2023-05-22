@@ -1,8 +1,9 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.List;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+
+import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

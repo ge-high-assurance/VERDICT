@@ -10,6 +10,7 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;

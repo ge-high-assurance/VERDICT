@@ -37,15 +37,7 @@ import com.rockwellcollins.atc.agree.agree.impl.AssignStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.ConstStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.EqStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -85,6 +77,7 @@ import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
+
 import verdict.vdm.vdm_data.EnumType;
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.RecordType;
@@ -109,6 +102,16 @@ import verdict.vdm.vdm_lustre.VariableDeclaration;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Vidhya Tekken Valapil

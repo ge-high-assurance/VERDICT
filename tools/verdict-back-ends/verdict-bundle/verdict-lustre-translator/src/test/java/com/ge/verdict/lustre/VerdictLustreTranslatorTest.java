@@ -3,12 +3,15 @@ package com.ge.verdict.lustre;
 
 import com.ge.verdict.vdm.VdmTest;
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
-import java.io.IOException;
+
 import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.io.IOException;
 
 public class VerdictLustreTranslatorTest {
 

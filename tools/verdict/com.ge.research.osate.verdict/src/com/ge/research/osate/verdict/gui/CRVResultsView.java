@@ -1,8 +1,5 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -26,6 +23,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

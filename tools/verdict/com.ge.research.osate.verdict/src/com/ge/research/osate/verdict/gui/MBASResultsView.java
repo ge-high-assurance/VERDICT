@@ -1,9 +1,5 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.SWT;
@@ -31,6 +27,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 // this class creates the MBAS Result viewer-tab in OSATE

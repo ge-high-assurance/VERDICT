@@ -4,6 +4,7 @@
 package com.ge.research.osate.verdict.dsl.ui;
 
 import com.ge.research.osate.verdict.dsl.ui.contentassist.VerdictTemplateProposalProvider;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.xtext.ui.editor.contentassist.ITemplateProposalProvider;
 

@@ -31,13 +31,7 @@ import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictPackage;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictThreatModels;
 import com.google.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
@@ -54,6 +48,14 @@ import org.osate.aadl2.SubcomponentType;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.SystemType;
 import org.osate.xtext.aadl2.properties.validation.PropertiesJavaValidator;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class contains custom validation rules.

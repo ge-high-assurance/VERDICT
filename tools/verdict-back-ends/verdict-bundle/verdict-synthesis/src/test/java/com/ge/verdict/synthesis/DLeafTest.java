@@ -1,6 +1,7 @@
 package com.ge.verdict.synthesis;
 
 import com.ge.verdict.synthesis.dtree.DLeaf;
+
 import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

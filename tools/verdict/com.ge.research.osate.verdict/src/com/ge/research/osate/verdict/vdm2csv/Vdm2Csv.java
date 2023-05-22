@@ -2,13 +2,7 @@ package com.ge.research.osate.verdict.vdm2csv;
 
 import com.ge.research.osate.verdict.aadl2csv.Table;
 import com.ge.verdict.vdm.DefenseProperties;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIA;
 import verdict.vdm.vdm_model.CIAPort;
@@ -24,6 +18,14 @@ import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.SafetyRelExpr;
 import verdict.vdm.vdm_model.SafetyReqExpr;
 import verdict.vdm.vdm_model.Severity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Vidhya Tekken Valapil

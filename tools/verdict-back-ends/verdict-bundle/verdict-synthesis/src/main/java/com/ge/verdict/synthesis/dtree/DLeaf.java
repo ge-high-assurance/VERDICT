@@ -6,14 +6,16 @@ import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.RatNum;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.math3.fraction.Fraction;
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.formulas.Variable;
 
 /**
  * Represents a leaf of the defense tree. Encapsulates a reference to a ComponentDefense that is

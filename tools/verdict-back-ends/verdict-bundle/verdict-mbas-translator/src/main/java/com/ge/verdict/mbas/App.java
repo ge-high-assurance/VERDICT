@@ -1,11 +1,13 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.mbas;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.net.URISyntaxException;
 
 public class App {
 

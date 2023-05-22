@@ -6,11 +6,14 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.transform.stream.StreamSource;
+
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.ObjectFactory;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.transform.stream.StreamSource;
 
 /** Translate a Verdict data model to or from an XML file. */
 public class VdmTranslator {

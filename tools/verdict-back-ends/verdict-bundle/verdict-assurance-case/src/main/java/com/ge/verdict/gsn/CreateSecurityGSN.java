@@ -1,13 +1,16 @@
 package com.ge.verdict.gsn;
 
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import verdict.vdm.vdm_model.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
 import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-import verdict.vdm.vdm_model.*;
 
 /**
  * This class has been designed for handling security assurance cases along with general assurance

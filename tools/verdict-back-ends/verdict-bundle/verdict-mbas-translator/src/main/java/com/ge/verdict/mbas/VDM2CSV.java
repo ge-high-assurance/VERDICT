@@ -2,8 +2,10 @@
 package com.ge.verdict.mbas;
 
 import com.ge.verdict.vdm.VdmTranslator;
-import java.io.File;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
 
 /** Convert parsed VDM XML to CSV files for input to MBAS (STEM and Soteria++). */
 public class VDM2CSV extends VdmTranslator {

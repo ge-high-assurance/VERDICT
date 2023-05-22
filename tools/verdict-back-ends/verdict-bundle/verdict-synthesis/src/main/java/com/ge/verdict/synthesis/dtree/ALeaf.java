@@ -3,10 +3,12 @@ package com.ge.verdict.synthesis.dtree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import java.util.Objects;
-import java.util.Optional;
+
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A raw attack leaf in a defense tree. Each aleaf should have a corresponding dleaf, and if such a

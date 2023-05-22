@@ -5,10 +5,12 @@ import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.CIA;
-import java.util.Locale;
-import java.util.Objects;
+
 import org.logicng.formulas.FormulaFactory;
 import org.logicng.formulas.Variable;
+
+import java.util.Locale;
+import java.util.Objects;
 
 /** An attack on a system, a fundamental unit of the attack-defense tree. */
 public class Attack extends ADTree {

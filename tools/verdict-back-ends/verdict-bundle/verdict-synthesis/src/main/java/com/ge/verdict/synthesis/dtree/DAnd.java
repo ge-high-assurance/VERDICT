@@ -2,14 +2,16 @@ package com.ge.verdict.synthesis.dtree;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
+
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
 
 /**
  * A conjunction of defense tree nodes, indicating that all one of its children must be satisfied.

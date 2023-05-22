@@ -19,14 +19,16 @@ import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.apache.commons.math3.fraction.Fraction;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
 
 public class DTreeConstructorTest {
     @Test

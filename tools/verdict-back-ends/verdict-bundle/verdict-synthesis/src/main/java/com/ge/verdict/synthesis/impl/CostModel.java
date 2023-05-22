@@ -3,6 +3,14 @@ package com.ge.verdict.synthesis.impl;
 import com.ge.verdict.synthesis.ICostModel;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
+
+import org.apache.commons.math3.fraction.Fraction;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,15 +18,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.math3.fraction.Fraction;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Represents a cost model loaded from XML. Allows for efficiently looking up the cost of any

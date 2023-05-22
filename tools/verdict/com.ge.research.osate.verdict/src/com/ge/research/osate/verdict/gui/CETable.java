@@ -1,9 +1,10 @@
 package com.ge.research.osate.verdict.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

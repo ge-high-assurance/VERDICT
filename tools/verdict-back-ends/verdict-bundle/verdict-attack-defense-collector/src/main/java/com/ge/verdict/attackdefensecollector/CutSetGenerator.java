@@ -6,10 +6,7 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
 import org.logicng.formulas.And;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
@@ -18,6 +15,11 @@ import org.logicng.formulas.Not;
 import org.logicng.formulas.Or;
 import org.logicng.formulas.Variable;
 import org.logicng.transformations.dnf.DNFFactorization;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Generate cut sets. Not currently used. */
 public class CutSetGenerator {

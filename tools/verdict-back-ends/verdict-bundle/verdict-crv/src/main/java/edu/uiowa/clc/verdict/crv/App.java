@@ -11,21 +11,25 @@ package edu.uiowa.clc.verdict.crv;
 
 import com.ge.verdict.lustre.VerdictLustreTranslator;
 import com.ge.verdict.vdm.VdmTranslator;
+
 import edu.uiowa.clc.verdict.blm.BlameAssignment;
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
 import edu.uiowa.clc.verdict.util.Exec;
 import edu.uiowa.clc.verdict.util.LOGGY;
 import edu.uiowa.clc.verdict.util.XMLProcessor;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 // Coordinate All processes.
 // 0. IML2VDM - Disabled.

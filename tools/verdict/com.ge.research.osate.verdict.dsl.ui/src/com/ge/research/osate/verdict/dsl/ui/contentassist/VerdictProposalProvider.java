@@ -11,15 +11,17 @@ import com.ge.research.osate.verdict.dsl.type.VerdictVariable;
 import com.ge.research.osate.verdict.dsl.verdict.ThreatEqualContains;
 import com.ge.research.osate.verdict.dsl.verdict.Var;
 import com.google.inject.Inject;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
 import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist on how to

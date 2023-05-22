@@ -13,14 +13,11 @@
 package edu.uiowa.clc.verdict.crv;
 
 import edu.uiowa.clc.verdict.vdm.instrumentor.VDMInstrumentor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.BlockImpl;
 import verdict.vdm.vdm_model.CompInstancePort;
@@ -32,6 +29,12 @@ import verdict.vdm.vdm_model.ConnectionEnd;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // Accepts options of instrumentation and perform the operation.
 // Also supports PostProcessing Kind2 Results by

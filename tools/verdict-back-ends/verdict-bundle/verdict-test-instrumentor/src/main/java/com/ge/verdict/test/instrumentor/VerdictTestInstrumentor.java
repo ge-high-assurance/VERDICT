@@ -1,16 +1,17 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.test.instrumentor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import verdict.vdm.vdm_lustre.ContractItem;
 import verdict.vdm.vdm_lustre.Expression;
 import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentInstance;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class VerdictTestInstrumentor {
     private Model model;

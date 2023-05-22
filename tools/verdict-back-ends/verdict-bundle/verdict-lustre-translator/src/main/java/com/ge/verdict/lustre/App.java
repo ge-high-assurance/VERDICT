@@ -2,11 +2,14 @@
 package com.ge.verdict.lustre;
 
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
-import java.io.File;
-import java.net.URISyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.net.URISyntaxException;
 
 public class App {
 

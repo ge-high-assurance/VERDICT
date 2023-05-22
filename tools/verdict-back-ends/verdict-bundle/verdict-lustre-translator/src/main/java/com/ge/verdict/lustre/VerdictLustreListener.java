@@ -1,13 +1,8 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.lustre;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
 import verdict.vdm.vdm_data.ArrayType;
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.EnumType;
@@ -44,6 +39,13 @@ import verdict.vdm.vdm_lustre.RecordProjection;
 import verdict.vdm.vdm_lustre.SymbolDefinition;
 import verdict.vdm.vdm_lustre.VariableDeclaration;
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Extract a Verdict data model from a Lustre parse tree. */
 public class VerdictLustreListener extends LustreBaseListener {

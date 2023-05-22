@@ -2,6 +2,7 @@ package com.ge.research.osate.verdict.dsl.serializer;
 
 import com.ge.research.osate.verdict.dsl.services.VerdictGrammarAccess;
 import com.google.inject.Inject;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.serializer.ISerializationContext;
 import org.eclipse.xtext.serializer.impl.Serializer;

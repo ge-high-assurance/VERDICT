@@ -9,13 +9,14 @@
 
 package edu.uiowa.clc.verdict.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Vector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // Reads Kind2 XML output & Generate VerdictProperties.
 // PropertyID

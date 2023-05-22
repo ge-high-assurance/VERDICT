@@ -1,15 +1,16 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.stem;
 
+import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Collectors;
-import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /** Runs unit tests on a VerdictStem object. */
 public class VerdictStemTest {

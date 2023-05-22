@@ -9,20 +9,8 @@
 
 package edu.uiowa.clc.verdict.vdm.instrumentor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
+
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_lustre.BinaryOperation;
@@ -49,6 +37,20 @@ import verdict.vdm.vdm_model.ConnectionEnd;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class VDMInstrumentor {
 

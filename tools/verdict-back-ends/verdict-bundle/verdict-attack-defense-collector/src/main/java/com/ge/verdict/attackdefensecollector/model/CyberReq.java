@@ -1,6 +1,7 @@
 package com.ge.verdict.attackdefensecollector.model;
 
 import com.ge.verdict.attackdefensecollector.Prob;
+
 import java.util.ArrayList;
 import java.util.List;
 

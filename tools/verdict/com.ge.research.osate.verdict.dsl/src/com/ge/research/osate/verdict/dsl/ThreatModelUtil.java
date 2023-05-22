@@ -16,13 +16,7 @@ import com.ge.research.osate.verdict.dsl.verdict.ThreatStatement;
 import com.ge.research.osate.verdict.dsl.verdict.Var;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractLibrary;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictThreatModels;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -37,6 +31,14 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.MetaclassReference;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /** Utilities for validating threat models. Contains most of the type checker code. */
 public class ThreatModelUtil {

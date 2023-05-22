@@ -1,13 +1,15 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.vdm;
 
-import java.io.File;
-import java.io.IOException;
 import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlunit.assertj.XmlAssert;
+
 import verdict.vdm.vdm_model.Model;
+
+import java.io.File;
+import java.io.IOException;
 
 public class VdmTranslatorTest {
 

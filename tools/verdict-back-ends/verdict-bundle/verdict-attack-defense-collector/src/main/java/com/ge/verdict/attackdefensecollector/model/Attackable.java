@@ -3,6 +3,7 @@ package com.ge.verdict.attackdefensecollector.model;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
