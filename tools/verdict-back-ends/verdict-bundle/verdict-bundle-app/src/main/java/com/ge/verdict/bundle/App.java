@@ -1036,12 +1036,13 @@ public class App {
         } catch (Binary.ExecutionException e) {
             // Kind2 does some weird things with exit codes
             if (e.getCode().isPresent()) {
+                // The switch below uses the exit code convention followed by Kind 2 v1.9.0 and later
                 switch (e.getCode().get()) {
-                    case 20:
+                    case 0: // Former convention: 20
                         // Success
                         log("All properties are valid");
                         break;
-                    case 10:
+                    case 40: // Former convention: 10
                         if (atg) {
                             // Some properties invalid, but those might just be the ATG negative
                             // properties
@@ -1051,12 +1052,32 @@ public class App {
                             log("Some properties are invalid");
                         }
                         break;
-                    case 2:
-                        log("Kind2 terminated with an error");
+                    case 1: // Former convention: 2
+                        log("Kind2 terminated with a general error");
                         XMLProcessor.parseLog(new File(outputPath));
                         // Terminate the process?
                         break;
-                    case 0:
+                    case 2:
+                        log("Kind2 terminated with an error: incorrect command-line argument");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
+                    case 3:
+                        log("Kind2 terminated with a parse error");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
+                    case 4:
+                        log("Kind2 could not find an SMT solver on the PATH");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
+                    case 5:
+                        log("Kind2 detected an unknown or unsupported version of an SMT solver");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        // Terminate the process?
+                        break;
+                    case 30: // Former convention: 0
                         log("Kind2 timed out");
                         break;
                     default:
