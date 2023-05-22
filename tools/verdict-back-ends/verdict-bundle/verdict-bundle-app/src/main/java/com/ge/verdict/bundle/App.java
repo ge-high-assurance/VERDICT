@@ -1034,9 +1034,8 @@ public class App {
                         func_cong_val);
             }
         } catch (Binary.ExecutionException e) {
-            // Kind2 does some weird things with exit codes
+            // The SWITCH below uses the exit code convention followed by Kind 2 v1.9.0 and later
             if (e.getCode().isPresent()) {
-                // The switch below uses the exit code convention followed by Kind 2 v1.9.0 and later
                 switch (e.getCode().get()) {
                     case 0: // Former convention: 20
                         // Success
@@ -1046,40 +1045,40 @@ public class App {
                         if (atg) {
                             // Some properties invalid, but those might just be the ATG negative
                             // properties
-                            log("Kind2 finished");
+                            log("Kind 2 finished");
                         } else {
                             // Some properties invalid
                             log("Some properties are invalid");
                         }
                         break;
-                    case 1: // Former convention: 2
-                        log("Kind2 terminated with a general error");
-                        XMLProcessor.parseLog(new File(outputPath));
-                        // Terminate the process?
-                        break;
-                    case 2:
-                        log("Kind2 terminated with an error: incorrect command-line argument");
-                        XMLProcessor.parseLog(new File(outputPath));
-                        // Terminate the process?
-                        break;
-                    case 3:
-                        log("Kind2 terminated with a parse error");
-                        XMLProcessor.parseLog(new File(outputPath));
-                        // Terminate the process?
-                        break;
-                    case 4:
-                        log("Kind2 could not find an SMT solver on the PATH");
-                        XMLProcessor.parseLog(new File(outputPath));
-                        // Terminate the process?
-                        break;
-                    case 5:
-                        log("Kind2 detected an unknown or unsupported version of an SMT solver");
-                        XMLProcessor.parseLog(new File(outputPath));
-                        // Terminate the process?
-                        break;
                     case 30: // Former convention: 0
-                        log("Kind2 timed out");
+                        log("Kind 2 timed out");
                         break;
+                    case 1: // Former convention: 2
+                        logError("Kind 2 terminated with a general error");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        System.exit(2);
+                    case 2:
+                        logError("Kind 2 received an invalid command-line argument");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        System.exit(2);
+                    case 3:
+                        logError("Kind 2 terminated with a parse error");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        System.exit(2);
+                    case 4:
+                        logError("Kind 2 could not find an SMT solver on the PATH");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        System.exit(2);
+                    case 5:
+                        logError("Kind 2 detected an unknown or unsupported SMT solver version");
+                        XMLProcessor.parseLog(new File(outputPath));
+                        System.exit(2);
+                    case 10:
+                    case 20:
+                        logError(
+                                "Detected an old version of Kind 2. Please update kind2 binary to v1.9.0 or later");
+                        System.exit(2);
                     default:
                         throw new VerdictRunException("Failed to execute kind2", e);
                 }
