@@ -152,7 +152,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push verdict image
-      uses: docker/build-push-action@v4.0.0
+      uses: docker/build-push-action@v4.1.0
       with:
         context: tools/verdict-back-ends
         file: tools/verdict-back-ends/Dockerfile
