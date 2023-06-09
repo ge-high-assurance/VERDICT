@@ -1,7 +1,6 @@
 package com.ge.research.osate.verdict.handlers;
 
 import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;

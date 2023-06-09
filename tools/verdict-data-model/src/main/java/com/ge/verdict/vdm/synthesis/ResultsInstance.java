@@ -1,12 +1,5 @@
 package com.ge.verdict.vdm.synthesis;
 
-import org.apache.commons.math3.fraction.Fraction;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -14,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -23,6 +15,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.math3.fraction.Fraction;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * The result of the synthesis operation. This class is serializable and deserializable to XML. It
@@ -32,14 +30,19 @@ import javax.xml.transform.stream.StreamResult;
 public class ResultsInstance {
     /** Whether synthesis was performed with partial solutions enabled. */
     public final boolean partialSolution;
+
     /** Whether synthesis was performed with merit assignment. */
     public final boolean meritAssignment;
+
     /** Whether the input to synthesis was SAT. */
     public final boolean inputSat;
+
     /** The total input cost (zero if not using partial solutions). */
     public final Fraction inputCost;
+
     /** The total output cost of all recommended items. */
     public final Fraction outputCost;
+
     /** The list of recommendations. */
     public final List<Item> items;
 
@@ -64,16 +67,21 @@ public class ResultsInstance {
     public static class Item {
         /** The component/connection to which a recommendation applies. */
         public final String component;
+
         /** The defense property to which a recommendation applies. */
         public final String defenseProperty;
+
         /** The DAL of this component-defense pair in the synthesis input. */
         public final int inputDal;
+
         /** The recommended output DAL of this component-defense pair. */
         public final int outputDal;
+
         /**
          * The cost corresponding to the DAL of this component-defense pair in the synthesis input.
          */
         public final Fraction inputCost;
+
         /** The cost corresponding to the recommended output DAL of this component-defense pair. */
         public final Fraction outputCost;
 

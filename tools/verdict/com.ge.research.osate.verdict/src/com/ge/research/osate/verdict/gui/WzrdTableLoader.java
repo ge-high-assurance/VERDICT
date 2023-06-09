@@ -13,14 +13,12 @@ import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberRelImpl;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberReqConditionLogicImpl;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberReqImpl;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.serializer.ISerializer;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
 import org.osate.aadl2.impl.SystemTypeImpl;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 // this class loads the Wizard Table contents with the existing Annex-statements in the .aadl script
@@ -38,6 +36,7 @@ public class WzrdTableLoader {
     // instance is a component or a system
     private DrpDnLists
             drpdn; // contains the drop-down list contents and information/header of the available
+
     // INPorts/OUTPorts
 
     public WzrdTableLoader(SystemTypeImpl sys, Boolean sysLevel, DrpDnLists list) {

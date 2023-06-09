@@ -1,18 +1,14 @@
 package com.ge.verdict.gsn;
 
 import com.ge.verdict.vdm.VdmTranslator;
-
-import org.xml.sax.SAXException;
-
-import verdict.vdm.vdm_model.CyberReq;
-import verdict.vdm.vdm_model.Model;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
+import verdict.vdm.vdm_model.CyberReq;
+import verdict.vdm.vdm_model.Model;
 
 /**
  * This class is an interface for generating security assurance cases It is still under development

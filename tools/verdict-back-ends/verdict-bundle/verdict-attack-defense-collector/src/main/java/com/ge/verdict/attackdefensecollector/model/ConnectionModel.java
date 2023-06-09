@@ -8,7 +8,6 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,16 +21,22 @@ import java.util.Set;
 public class ConnectionModel {
     /** The name of the connection. */
     private String name;
+
     /** The source system. */
     private SystemModel source;
+
     /** The destination system. */
     private SystemModel dest;
+
     /** The name of the port on the source system. */
     private String sourcePort;
+
     /** The name of the port on the destination system. */
     private String destPort;
+
     /** Holds attacks and defenses. */
     private Attackable attackable;
+
     /** All attributes set for this connection. */
     private Map<String, String> attributes;
 

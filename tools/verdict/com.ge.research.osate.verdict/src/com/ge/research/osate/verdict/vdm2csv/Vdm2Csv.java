@@ -2,7 +2,13 @@ package com.ge.research.osate.verdict.vdm2csv;
 
 import com.ge.research.osate.verdict.aadl2csv.Table;
 import com.ge.verdict.vdm.DefenseProperties;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import verdict.vdm.vdm_data.GenericAttribute;
 import verdict.vdm.vdm_model.CIA;
 import verdict.vdm.vdm_model.CIAPort;
@@ -19,14 +25,6 @@ import verdict.vdm.vdm_model.SafetyRelExpr;
 import verdict.vdm.vdm_model.SafetyReqExpr;
 import verdict.vdm.vdm_model.Severity;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Vidhya Tekken Valapil
  */
@@ -36,6 +34,7 @@ public class Vdm2Csv {
     public Vdm2Csv() {
         this(false);
     }
+
     /**
      * If synthesis is enabled, then fools STEM by setting DAL 9 on all MBAA/MBAS defense
      * properties. --code synonymous to code by William in the previous aadl2csvtranslator
@@ -45,6 +44,7 @@ public class Vdm2Csv {
     public Vdm2Csv(boolean synthesis) {
         this.synthesis = synthesis;
     }
+
     /**
      * @param VDM
      * @param stem directory
@@ -158,6 +158,7 @@ public class Vdm2Csv {
         scnCompPropsTable.toCsvFile(new File(soteriaDir, "ScnCompProps.csv"));
         scnConnTable.toCsvFile(new File(soteriaDir, "ScnConnections.csv"));
     }
+
     /**
      * Parse the VDM and populate corresponding tables
      *
@@ -489,6 +490,7 @@ public class Vdm2Csv {
         }
         scnConnTable.capRow();
     }
+
     // Assumption: component implementation containing the connection is same as the component
     // implementation where the actual_connection_binding property was defined
     private Table updateBusBindingsTable(

@@ -9,6 +9,14 @@
 
 package edu.uiowa.clc.verdict.lustre;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import verdict.vdm.vdm_data.DataType;
 import verdict.vdm.vdm_data.PlainType;
 import verdict.vdm.vdm_data.RecordField;
@@ -44,15 +52,6 @@ import verdict.vdm.vdm_model.ConnectionEnd;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 import verdict.vdm.vdm_model.PortMode;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class VDM2Lustre {
 

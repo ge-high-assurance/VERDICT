@@ -2,7 +2,6 @@ package com.ge.verdict.attackdefensecollector;
 
 import com.ge.verdict.attackdefensecollector.AttackDefenseCollector.Result;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

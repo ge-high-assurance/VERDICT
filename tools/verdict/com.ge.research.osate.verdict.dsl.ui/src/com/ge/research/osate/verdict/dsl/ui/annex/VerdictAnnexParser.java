@@ -8,7 +8,6 @@ import com.ge.research.osate.verdict.dsl.verdict.VerdictContractLibrary;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;

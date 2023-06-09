@@ -3,7 +3,6 @@ package com.ge.verdict.attackdefensecollector.model;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,11 +16,13 @@ public final class Attackable {
 
     /** Attacks that apply to this attackable. */
     private List<Attack> attacks;
+
     /** Defenses that apply to attacks that apply to this attackable. */
     private List<Defense> defenses;
 
     /** Map from attack name/CIA pairs to attacks for this attackable. */
     private Map<Pair<String, CIA>, Attack> attackMap;
+
     /** Map from attack name/CIA pairs to defenses for this attackable. */
     private Map<Pair<String, CIA>, Defense> defenseMap;
 

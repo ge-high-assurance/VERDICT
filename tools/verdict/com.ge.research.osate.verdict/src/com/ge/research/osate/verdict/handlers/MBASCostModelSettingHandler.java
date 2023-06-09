@@ -1,15 +1,13 @@
 package com.ge.research.osate.verdict.handlers;
 
 import com.ge.research.osate.verdict.gui.MBASCostModelView;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.emf.ecore.EObject;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MBASCostModelSettingHandler extends AbstractHandler {
     private static MBASCostModelView mbasCostsModelWindow;

@@ -6,16 +6,14 @@ import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.RatNum;
-
-import org.apache.commons.math3.fraction.Fraction;
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.formulas.Variable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.math3.fraction.Fraction;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /**
  * Represents a leaf of the defense tree. Encapsulates a reference to a ComponentDefense that is
@@ -28,6 +26,7 @@ import java.util.Optional;
 public class DLeaf implements DTree {
     /** The unique component-defense pair. */
     public final ComponentDefense componentDefense;
+
     /** The target DAL of this leaf. */
     public final int targetDal;
 
@@ -40,17 +39,22 @@ public class DLeaf implements DTree {
     public static final class ComponentDefense {
         /** The unique ID used for encoding to SMT. */
         public final int id;
+
         /** The component. */
         public final String component;
+
         /** The defense property. */
         public final String defenseProperty;
+
         /** The DAL of the current implementation, 0 if no implemented property. */
         public final int implDal;
+
         /** This is purely informative, but should not distinguish different leaves. */
         public final String attack;
 
         /** The raw fractional costs (indexed by DAL). */
         private final Fraction[] costs;
+
         /** Reverse-lookup of the raw fractional costs. */
         private Map<Fraction, Integer> rawCostToDal;
 
@@ -58,6 +62,7 @@ public class DLeaf implements DTree {
          * Normalized costs lookup table, used only in the single-requirement version of synthesis.
          */
         private Map<Integer, Integer> dalToNormCost;
+
         /**
          * Reverse of normalized costs lookup table, used only in the single-requirement version of
          * synthesis.
@@ -237,8 +242,10 @@ public class DLeaf implements DTree {
         /** the map from component/defense to constructed component-defense pairs */
         private final Map<Pair<String, String>, ComponentDefense> componentDefenseMap =
                 new LinkedHashMap<>();
+
         /** use incremental IDs to produce unique SMT names */
         private int idCounter = 0;
+
         /** the map from IDs to constructed component-defense pairs */
         private final Map<Integer, ComponentDefense> idMap = new HashMap<>();
 

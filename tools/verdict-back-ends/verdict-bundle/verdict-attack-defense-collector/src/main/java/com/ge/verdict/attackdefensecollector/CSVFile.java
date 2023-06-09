@@ -42,6 +42,7 @@ public class CSVFile {
 
     /** Mapping from column headers to data storage index. */
     private Map<String, Integer> headerPos;
+
     /**
      * CSV data. Cells in a row are ordered based on the ordering of columns provided to the
      * constructor. These are the same indices which may be accessed through headerPos.

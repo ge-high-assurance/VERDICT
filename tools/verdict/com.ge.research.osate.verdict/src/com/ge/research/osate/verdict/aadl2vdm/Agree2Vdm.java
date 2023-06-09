@@ -37,7 +37,15 @@ import com.rockwellcollins.atc.agree.agree.impl.AssignStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.ConstStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.EqStatementImpl;
 import com.rockwellcollins.atc.agree.agree.impl.NodeEqImpl;
-
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -77,7 +85,6 @@ import org.osate.aadl2.impl.NamedValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.pluginsupport.PluginSupportUtil;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
-
 import verdict.vdm.vdm_data.EnumType;
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.RecordType;
@@ -103,16 +110,6 @@ import verdict.vdm.vdm_model.ComponentImpl;
 import verdict.vdm.vdm_model.ComponentType;
 import verdict.vdm.vdm_model.Model;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Vidhya Tekken Valapil
  */
@@ -136,6 +133,7 @@ public class Agree2Vdm {
         m = populateVDMFromAadlAgreeObjects(objectsFromAllFiles, m);
         return m;
     }
+
     /**
      * Method to parse the AADL files in the project 1. load all AADL files in the directory and the
      * imported contributed AADL files as Resources 2. get contents from the loaded resources and
@@ -198,6 +196,7 @@ public class Agree2Vdm {
         }
         return objects;
     }
+
     /**
      * @param objects a List of AADL objects,
      * @param model an empty VDM model to populate
@@ -472,6 +471,7 @@ public class Agree2Vdm {
         contractItem.setExpression(vdmlustrExpr);
         return contractItem;
     }
+
     // method to map agree statements of the type EqStatement
     // that have the form: 'eq' Arg (',' Arg)* '=' Expr ';'
     // and create corresponding "SymbolDefinition" for the "ContractSpec" in the vdm model
@@ -717,6 +717,7 @@ public class Agree2Vdm {
             model.getTypeDeclaration().add(dataTypeVdm);
         }
     }
+
     /**
      * @param vdm dataType,
      * @param list of property associations this method checks if the property indicates if it is an
@@ -873,6 +874,7 @@ public class Agree2Vdm {
             model.setDataflowCode(lustreProgram);
         }
     }
+
     // method to translate expression in Agree to expression in vdm
     private Expression getVdmExpressionFromAgreeExpression(
             Expr agreeExpr, HashSet<String> dataTypeDecl, HashSet<String> nodeDecl, Model model) {

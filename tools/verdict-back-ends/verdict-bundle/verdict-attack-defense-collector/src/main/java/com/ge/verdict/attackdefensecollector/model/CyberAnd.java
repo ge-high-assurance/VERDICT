@@ -2,7 +2,6 @@ package com.ge.verdict.attackdefensecollector.model;
 
 import com.ge.verdict.attackdefensecollector.adtree.ADAnd;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;

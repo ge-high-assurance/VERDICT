@@ -6,20 +6,17 @@ import com.ge.research.osate.verdict.gui.AssuranceCaseSettingsPanel;
 import com.ge.research.osate.verdict.gui.BundlePreferences;
 import com.ge.research.osate.verdict.vdm2csv.Vdm2Csv;
 import com.ge.verdict.vdm.VdmTranslator;
-
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.intro.IIntroPart;
-
-import verdict.vdm.vdm_model.Model;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.intro.IIntroPart;
+import verdict.vdm.vdm_model.Model;
 
 /**
  * @author Saswata Paul
@@ -35,24 +32,28 @@ public class GSNHandler extends AbstractHandler {
     protected class ListTuple {
         protected List<String> allReqs;
         protected List<String> cyberReqs;
+
         /**
          * @return the allReqs
          */
         protected List<String> getAllReqs() {
             return allReqs;
         }
+
         /**
          * @param allReqs the allReqs to set
          */
         protected void setAllReqs(List<String> allReqs) {
             this.allReqs = allReqs;
         }
+
         /**
          * @return the cyberReqs
          */
         protected List<String> getCyberReqs() {
             return cyberReqs;
         }
+
         /**
          * @param cyberReqs the cyberReqs to set
          */

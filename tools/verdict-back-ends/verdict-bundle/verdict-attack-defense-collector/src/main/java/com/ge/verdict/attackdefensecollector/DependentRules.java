@@ -6,7 +6,6 @@ import com.ge.verdict.attackdefensecollector.adtree.DefenseCondition;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.ConnectionModel;
 import com.ge.verdict.attackdefensecollector.model.SystemModel;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,14 @@
 package com.ge.research.osate.verdict.gui;
 
 import com.ge.verdict.vdm.DefenseProperties;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.resource.ResourceLocator;
@@ -44,15 +51,6 @@ import org.osate.aadl2.Connection;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.Subcomponent;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class MBASCostModelView extends ApplicationWindow {
     private Font font;

@@ -1,5 +1,7 @@
 package com.ge.research.osate.verdict.gui;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,9 +21,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /** Author: Paul Meng Date: Jun 12, 2019 */
 public class CRVSettingsPanel extends ApplicationWindow {

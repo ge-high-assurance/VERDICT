@@ -5,23 +5,25 @@ import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
 import com.ge.verdict.attackdefensecollector.model.CIA;
-
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.formulas.Variable;
-
 import java.util.Locale;
 import java.util.Objects;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /** An attack on a system, a fundamental unit of the attack-defense tree. */
 public class Attack extends ADTree {
     /** The attackable to which the attack applies. */
     private Attackable attackable;
+
     /** The name of the attack. */
     private String attackName;
+
     /** The description of the attack. */
     private String attackDescription;
+
     /** The probability of attack success. */
     private Prob prob;
+
     /** The CIA concern affected by the attack. */
     private CIA cia;
 

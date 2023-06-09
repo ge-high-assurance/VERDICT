@@ -6,7 +6,11 @@ import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberMissionImpl;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberRelImpl;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberReqImpl;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -36,12 +40,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
 import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.aadl2.impl.SystemTypeImpl;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

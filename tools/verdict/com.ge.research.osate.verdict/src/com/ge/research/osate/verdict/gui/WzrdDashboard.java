@@ -3,7 +3,8 @@ package com.ge.research.osate.verdict.gui;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -33,9 +34,6 @@ import org.osate.aadl2.DataPort;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
 import org.osate.aadl2.impl.SystemImplementationImpl;
 import org.osate.aadl2.impl.SystemTypeImpl;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

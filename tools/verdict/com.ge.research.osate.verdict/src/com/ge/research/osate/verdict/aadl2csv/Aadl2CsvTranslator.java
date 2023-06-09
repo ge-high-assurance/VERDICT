@@ -20,7 +20,16 @@ import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.verdict.vdm.DefenseProperties;
 import com.google.inject.Injector;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -89,17 +98,6 @@ import org.osate.aadl2.impl.ReferenceValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Paul Meng
@@ -975,6 +973,7 @@ public class Aadl2CsvTranslator {
         }
         return table;
     }
+
     /**
      * Build the mission table.
      *
@@ -1428,6 +1427,7 @@ public class Aadl2CsvTranslator {
             }
         }
     }
+
     /** Extract ports cia from cyber relations */
     void extractPortCIAFromCyberRel(
             LExpr expr, List<String> allPortNames, List<String> allPortCIAs) {
@@ -1446,6 +1446,7 @@ public class Aadl2CsvTranslator {
             throw new RuntimeException("MBAA expect expressions in cyber relations to be DNF.");
         }
     }
+
     /** Auxiliary functions */
     private void extractPortsFromCyberRel(
             LOr expr, List<String> allPortNames, List<String> allPortCIAs) {
@@ -1528,6 +1529,7 @@ public class Aadl2CsvTranslator {
             throw new RuntimeException("MBAA expect expressions in safety relations to be DNF.");
         }
     }
+
     /** Auxiliary functions */
     private void extractPortsAndEventsFromSafetyRel(
             SLOr expr, List<String> allPortsEventsNames, List<String> allPortsIAEventsHappens) {

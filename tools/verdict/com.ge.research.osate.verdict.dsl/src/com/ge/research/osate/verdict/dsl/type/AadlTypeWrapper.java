@@ -1,5 +1,11 @@
 package com.ge.research.osate.verdict.dsl.type;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.osate.aadl2.Aadl2Factory;
 import org.osate.aadl2.AadlBoolean;
 import org.osate.aadl2.AadlInteger;
@@ -10,13 +16,6 @@ import org.osate.aadl2.ListType;
 import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.PropertyType;
 import org.osate.aadl2.RecordType;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * A type that is loaded from the type of a property, wrapping an existing PropertyType. Used in

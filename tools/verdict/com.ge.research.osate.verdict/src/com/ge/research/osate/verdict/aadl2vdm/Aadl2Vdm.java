@@ -21,7 +21,16 @@ import com.ge.research.osate.verdict.dsl.verdict.SafetyReq;
 import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.google.inject.Injector;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.xml.namespace.QName;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -104,30 +113,18 @@ import org.osate.aadl2.impl.ReferenceValueImpl;
 import org.osate.aadl2.impl.StringLiteralImpl;
 import org.osate.aadl2.properties.PropertyAcc;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
-
 import verdict.vdm.vdm_data.RecordField;
 import verdict.vdm.vdm_data.RecordType;
 import verdict.vdm.vdm_data.TypeDeclaration;
 import verdict.vdm.vdm_model.Model;
 import verdict.vdm.vdm_model.Port;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.namespace.QName;
-
 /**
  * @author Saswata Paul
  */
 public class Aadl2Vdm {
     Map<String, Map<String, String>> compQnameToPropVal = new HashMap<>();
+
     /**
      * The execute() method creates a new Model object and returns it
      *
@@ -4443,6 +4440,7 @@ public class Aadl2Vdm {
 
         return event;
     }
+
     /**
      * Creates a new Vdm Port object and returns Populates only "name" and "mode" for now
      *
@@ -4539,6 +4537,7 @@ public class Aadl2Vdm {
         }
         return newPort;
     }
+
     /**
      * @author Vidhya Tekken Valapil Creates a new Vdm Port object and returns Populates "name",
      *     "mode" and "type"
@@ -4625,6 +4624,7 @@ public class Aadl2Vdm {
         newPort.setType(dtype);
         return newPort;
     }
+
     /**
      * @author Vidhya Tekken Valapil Creates a new Vdm Port object and returns Populates "name",
      *     "mode" and "type"
@@ -4649,6 +4649,7 @@ public class Aadl2Vdm {
         newPort.setType(dtype);
         return newPort;
     }
+
     /**
      * @author Vidhya Tekken Valapil Creates a new Vdm Port object and returns Populates "name",
      *     "mode" and "type"
@@ -4667,6 +4668,7 @@ public class Aadl2Vdm {
         newPort.setEvent(true);
         return newPort;
     }
+
     /**
      * @author Vidhya Tekken Valapil Creates a new Vdm Port object and returns Populates "name",
      *     "mode" and "type"
@@ -5192,6 +5194,7 @@ public class Aadl2Vdm {
         }
         return full;
     }
+
     /**
      * @author Vidhya Tekken Valapil Obtain data type information and return vdm-data-type
      */
@@ -5221,6 +5224,7 @@ public class Aadl2Vdm {
         }
         return dtype;
     }
+
     /**
      * @author Vidhya Tekken Valapil Fetch data implementation type information and return
      *     vdm-data-type
@@ -5232,6 +5236,7 @@ public class Aadl2Vdm {
         defineDataImplementationType(dataImplementation, model, dataTypeDecl);
         return dtype;
     }
+
     /**
      * @author Vidhya Tekken Valapil Fetch names of objects and return the list of names
      */

@@ -1,10 +1,9 @@
 package com.ge.verdict.gsn;
 
-import org.davidmoten.text.utils.WordWrap;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.davidmoten.text.utils.WordWrap;
 
 /**
  * @author Saswata Paul

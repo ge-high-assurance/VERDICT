@@ -1,12 +1,10 @@
 package com.ge.verdict.synthesis;
 
 import com.ge.verdict.synthesis.impl.CostModel;
-
+import java.io.File;
 import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import java.io.File;
 
 public class CostModelTest {
 

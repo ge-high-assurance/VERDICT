@@ -1,18 +1,16 @@
 package com.ge.research.osate.verdict.gui;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 
@@ -22,6 +20,7 @@ public class CRVReadXMLFile {
     ModelSet mustSet = new ModelSet();
     List<Set<ModelNode>> aIvcsList = new ArrayList<>();
     List<Set<ModelNode>> mIvcsList = new ArrayList<>();
+
     // List<IVCNode> ivc = new ArrayList<IVCNode>();
 
     public CRVReadXMLFile(String fileName1, String fileName2) {

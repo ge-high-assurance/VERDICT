@@ -1,16 +1,14 @@
 package com.ge.research.osate.verdict.dsl.ui.contentassist;
 
 import com.ge.research.osate.verdict.dsl.VerdictUtil;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.xtext.ui.editor.templates.AbstractTemplateVariableResolver;
 import org.eclipse.xtext.ui.editor.templates.XtextTemplateContext;
 import org.osate.aadl2.DirectionType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Custom variable resolution for templates. Required because Osate does not support annex

@@ -14,8 +14,10 @@ import java.util.Optional;
 public class CyberRel {
     /** The name of the cyber relation. */
     private String name;
+
     /** The optional input expression. */
     private Optional<CyberExpr> input;
+
     /** The output port concern. */
     private PortConcern output;
 

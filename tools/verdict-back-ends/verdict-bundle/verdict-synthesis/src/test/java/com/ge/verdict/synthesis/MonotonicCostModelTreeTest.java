@@ -3,10 +3,6 @@ package com.ge.verdict.synthesis;
 import static org.apache.commons.math3.fraction.Fraction.ZERO;
 
 import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 public class MonotonicCostModelTreeTest {
 

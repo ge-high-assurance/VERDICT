@@ -4,15 +4,13 @@ import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Pair;
 import com.ge.verdict.attackdefensecollector.Prob;
-
-import org.logicng.formulas.FormulaFactory;
-import org.logicng.formulas.Variable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import org.logicng.formulas.FormulaFactory;
+import org.logicng.formulas.Variable;
 
 /**
  * A defense to an attack on a system, a fundamental unit of the attack-defense tree.
@@ -28,6 +26,7 @@ import java.util.Optional;
 public class Defense extends ADTree {
     /** The attack defended by this defense. */
     private Attack attack;
+
     /** The DNF of defense leaves (see DefenseLeaf below). */
     private List<List<DefenseLeaf>> defenseDnf;
 

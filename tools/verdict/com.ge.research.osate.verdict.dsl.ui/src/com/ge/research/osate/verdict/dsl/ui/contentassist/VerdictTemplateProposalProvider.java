@@ -1,7 +1,6 @@
 package com.ge.research.osate.verdict.dsl.ui.contentassist;
 
 import com.google.inject.Inject;
-
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;

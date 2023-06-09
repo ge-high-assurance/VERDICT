@@ -12,12 +12,9 @@
 package edu.uiowa.clc.verdict.crv;
 
 import com.ge.verdict.lustre.VerdictLustreTranslator;
-
 import edu.uiowa.clc.verdict.lustre.VDM2Lustre;
-
-import verdict.vdm.vdm_model.Model;
-
 import java.io.File;
+import verdict.vdm.vdm_model.Model;
 
 // Accepts VDMDataModel (preferably in memory) and Translates into Lustre code/file.
 public class VDMLustreTranslator {

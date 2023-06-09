@@ -10,7 +10,6 @@ import com.ge.research.osate.verdict.dsl.verdict.LPort;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.google.inject.Inject;
-
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
 

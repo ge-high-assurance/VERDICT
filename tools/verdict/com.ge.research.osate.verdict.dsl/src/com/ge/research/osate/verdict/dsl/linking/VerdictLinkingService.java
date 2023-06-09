@@ -1,11 +1,10 @@
 package com.ge.research.osate.verdict.dsl.linking;
 
+import java.util.List;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.nodemodel.INode;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
-
-import java.util.List;
 
 /**
  * Note: This is not currently being used at all because it causes Osate to crash. It is disabled in

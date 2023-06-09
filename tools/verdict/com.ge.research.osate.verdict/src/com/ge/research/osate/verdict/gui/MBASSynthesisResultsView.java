@@ -1,7 +1,8 @@
 package com.ge.research.osate.verdict.gui;
 
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -19,9 +20,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MBASSynthesisResultsView extends ViewPart {
     public static final String ID = "com.ge.research.osate.verdict.gui.mbasSynthesisResultsView";

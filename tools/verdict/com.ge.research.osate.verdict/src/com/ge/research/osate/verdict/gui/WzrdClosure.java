@@ -4,7 +4,16 @@ import com.ge.research.osate.verdict.dsl.parser.antlr.VerdictParser;
 import com.ge.research.osate.verdict.dsl.ui.VerdictUiModule;
 import com.ge.research.osate.verdict.dsl.ui.internal.VerdictActivator;
 import com.google.inject.Injector;
-
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -22,17 +31,6 @@ import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
 import org.eclipse.xtext.util.ITextRegion;
 import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
 import org.osate.aadl2.impl.SystemTypeImpl;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 // this class performs multiple activities when user click "Save & Close" button in Wizard

@@ -1,5 +1,6 @@
 package com.ge.research.osate.verdict.dsl.ui.contentassist;
 
+import java.lang.reflect.Field;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -13,8 +14,6 @@ import org.eclipse.jface.text.templates.TemplateTranslator;
 import org.eclipse.xtext.scoping.IScopeProvider;
 import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ui.editor.templates.XtextTemplateContext;
-
-import java.lang.reflect.Field;
 
 /**
  * Custom context for templates. Required because Osate does not support annex templates.

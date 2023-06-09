@@ -4,11 +4,9 @@ import com.ge.verdict.attackdefensecollector.CutSetGenerator.Cache;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
 import com.ge.verdict.attackdefensecollector.model.Attackable;
-
+import java.util.Objects;
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
-
-import java.util.Objects;
 
 /**
  * Represents the situation where an attack is dependent on the implementation of a defense. This
@@ -18,8 +16,10 @@ import java.util.Objects;
 public class DefenseCondition extends ADTree {
     /** The attackable (component/defense) to which this defense condition applies. */
     private Attackable attackable;
+
     /** The defense property which, when implemented, triggers this defense condition. */
     private String defenseProperty;
+
     /** The minimum implemented DAL to trigger this defense condition. */
     private int minImplDal;
 

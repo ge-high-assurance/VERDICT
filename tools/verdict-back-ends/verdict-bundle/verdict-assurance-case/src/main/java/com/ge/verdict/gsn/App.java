@@ -1,10 +1,8 @@
 package com.ge.verdict.gsn;
 
-import org.xml.sax.SAXException;
-
 import java.io.*;
-
 import javax.xml.parsers.*;
+import org.xml.sax.SAXException;
 
 /**
  * @author Saswata Paul

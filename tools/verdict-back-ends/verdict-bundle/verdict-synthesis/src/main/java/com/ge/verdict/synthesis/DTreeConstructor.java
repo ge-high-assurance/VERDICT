@@ -15,7 +15,6 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DNot;
 import com.ge.verdict.synthesis.dtree.DOr;
 import com.ge.verdict.synthesis.dtree.DTree;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -88,22 +87,28 @@ public class DTreeConstructor {
 
     /** the cost model */
     private final ICostModel costModel;
+
     /**
      * the dleaf factory, used to make sure there is only ever one instance of a given
      * component-defense pair
      */
     private final DLeaf.Factory factory;
+
     /** the target DAL for the requirement */
     private final int targetDal;
+
     /** whether to use partial solutions */
     private final boolean usePartialSolution;
+
     /** whether we are performing merit assignment */
     private final boolean meritAssignment;
 
     /** all defenses that have been found */
     private final Set<Defense> defenses;
+
     /** map from attacks to raw attack leaves */
     private final Map<Attack, Set<ALeaf>> attackALeafMap;
+
     /** all defense conditions that have been found */
     private final List<DCondition> dconditions;
 

@@ -3,10 +3,8 @@ package com.ge.verdict.synthesis.impl;
 import static com.ge.verdict.synthesis.ICostModel.parseCost;
 
 import com.ge.verdict.synthesis.ICostModel;
-
-import org.apache.commons.math3.fraction.Fraction;
-
 import java.util.Optional;
+import org.apache.commons.math3.fraction.Fraction;
 
 /** Builder pattern ensuring node order for a {@link MonotonicCostModelTree} */
 class MonotonicCostModelTreeBuilder {

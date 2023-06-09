@@ -1,7 +1,14 @@
 package com.ge.research.osate.verdict.handlers;
 
 import com.google.inject.Injector;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,15 +38,6 @@ import org.eclipse.xtext.ui.editor.model.XtextDocument;
 import org.eclipse.xtext.ui.editor.model.XtextDocumentProvider;
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 import org.osate.xtext.aadl2.ui.internal.Aadl2Activator;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 /**
  * @author Paul Meng Date: Jun 12, 2019

@@ -7,12 +7,6 @@ import com.amihaiemil.docker.Images;
 import com.amihaiemil.docker.TcpDocker;
 import com.amihaiemil.docker.UnexpectedResponseException;
 import com.amihaiemil.docker.UnixDocker;
-
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -24,9 +18,12 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import javax.json.Json;
 import javax.json.JsonObject;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
 /** Collects all arguments and then runs verdict-bundle via java or docker. */
 public class VerdictBundleCommand {

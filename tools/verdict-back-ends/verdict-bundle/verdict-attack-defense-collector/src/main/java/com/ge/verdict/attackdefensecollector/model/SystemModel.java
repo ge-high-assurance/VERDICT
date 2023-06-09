@@ -10,7 +10,6 @@ import com.ge.verdict.attackdefensecollector.adtree.ADOr;
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.ge.verdict.attackdefensecollector.adtree.Defense;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,26 +28,35 @@ import java.util.Set;
 public class SystemModel {
     /** System name. */
     private String name;
+
     /** Connections flowing to an input port of this system. */
     private List<ConnectionModel> connectionsIncoming;
+
     /** Connections flowing from an output port of this system. */
     private List<ConnectionModel> connectionsOutgoing;
+
     /** Cyber relations within this system. */
     private List<CyberRel> cyberRels;
+
     /** Cyber requirements within this system. */
     private List<CyberReq> cyberReqs;
+
     /**
      * Connections flowing from an input port of this system to the input port of a subcomponent.
      */
     private List<ConnectionModel> connectionsIncomingInternal;
+
     /**
      * Connections flowing from the output port of a subcomponent to an output port of this system.
      */
     private List<ConnectionModel> connectionsOutgoingInternal;
+
     /** Holds attacks and defenses. */
     private Attackable attackable;
+
     /** Map from cyber requirement names to cyber requirements for this system. */
     private Map<String, CyberReq> cyberReqMap;
+
     /** All attributes set for this system. */
     private Map<String, String> attributes;
 
@@ -194,12 +202,16 @@ public class SystemModel {
 
     /** Map from output port concerns to cyber relations with those output port concerns. */
     private Map<PortConcern, List<CyberRel>> outputConcernToCyberRel;
+
     /** Map from destination ports to outgoing internal connections with those destination ports. */
     private Map<String, List<ConnectionModel>> destPortToOutgoingInternalConnection;
+
     /** Map from source ports to incoming internal connections with those source ports. */
     private Map<String, List<ConnectionModel>> sourcePortToIncomingInternalConnection;
+
     /** Map from input ports to incoming connections with those destination ports. */
     private Map<String, List<ConnectionModel>> inputPortToIncomingConnection;
+
     /** Map from attacks to defenses that defend against those attacks. */
     private Map<Attack, Defense> attackToDefense;
 

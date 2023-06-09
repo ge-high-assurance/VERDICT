@@ -4,7 +4,6 @@ import com.ge.research.osate.verdict.dsl.serializer.VerdictSerializer;
 import com.ge.research.osate.verdict.dsl.ui.VerdictUiModule;
 import com.ge.research.osate.verdict.dsl.ui.internal.VerdictActivator;
 import com.google.inject.Injector;
-
 import org.eclipse.xtext.serializer.ISerializer;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;

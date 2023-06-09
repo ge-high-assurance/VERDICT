@@ -3,7 +3,6 @@ package com.ge.verdict.attackdefensecollector.adtree;
 import com.ge.verdict.attackdefensecollector.CutSetGenerator;
 import com.ge.verdict.attackdefensecollector.IndentedStringBuilder;
 import com.ge.verdict.attackdefensecollector.Prob;
-
 import org.logicng.formulas.Formula;
 import org.logicng.formulas.FormulaFactory;
 

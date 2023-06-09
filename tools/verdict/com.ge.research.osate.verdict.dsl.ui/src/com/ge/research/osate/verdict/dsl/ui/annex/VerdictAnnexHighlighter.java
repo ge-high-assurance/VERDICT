@@ -1,5 +1,7 @@
 package com.ge.research.osate.verdict.dsl.ui.annex;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EnumLiteralDeclaration;
 import org.eclipse.xtext.Keyword;
@@ -12,9 +14,6 @@ import org.osate.annexsupport.AnnexHighlighter;
 import org.osate.annexsupport.AnnexHighlighterPositionAcceptor;
 import org.osate.annexsupport.AnnexUtil;
 import org.osate.annexsupport.ParseResultHolder;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Perform syntax highlighting/coloring; Osate extension point.

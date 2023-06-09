@@ -34,6 +34,7 @@ public class WzrdTableRow implements Serializable, Cloneable {
     // provide feature to edit this fields)
     private String external =
             null; // contains the external field of (existing) cyber property (Note: Wizard doesn't
+
     // provide feature to edit this fields)
 
     public String getThirdElement() {

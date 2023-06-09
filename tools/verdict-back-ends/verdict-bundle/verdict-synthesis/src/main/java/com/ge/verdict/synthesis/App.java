@@ -7,7 +7,6 @@ import com.ge.verdict.synthesis.dtree.DLeaf;
 import com.ge.verdict.synthesis.dtree.DTree;
 import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

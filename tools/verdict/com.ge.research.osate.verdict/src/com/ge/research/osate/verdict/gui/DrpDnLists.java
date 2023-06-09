@@ -1,10 +1,9 @@
 package com.ge.research.osate.verdict.gui;
 
-import org.osate.aadl2.DataPort;
-import org.osate.aadl2.impl.SystemTypeImpl;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.osate.aadl2.DataPort;
+import org.osate.aadl2.impl.SystemTypeImpl;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

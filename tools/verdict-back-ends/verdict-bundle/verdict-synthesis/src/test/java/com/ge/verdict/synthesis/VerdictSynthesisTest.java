@@ -14,17 +14,14 @@ import com.ge.verdict.synthesis.impl.MonotonicCostModelTree;
 import com.ge.verdict.synthesis.util.Pair;
 import com.ge.verdict.synthesis.util.Triple;
 import com.ge.verdict.vdm.synthesis.ResultsInstance;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.math3.fraction.Fraction;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class VerdictSynthesisTest {
     private <T> String stringOfIterable(Iterable<T> it) {

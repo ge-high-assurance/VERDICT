@@ -4,15 +4,6 @@ import com.ge.research.osate.verdict.dsl.verdict.Statement;
 import com.ge.research.osate.verdict.dsl.verdict.Verdict;
 import com.ge.research.osate.verdict.dsl.verdict.VerdictContractSubclause;
 import com.ge.research.osate.verdict.dsl.verdict.impl.CyberMissionImpl;
-
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
-import org.eclipse.xtext.util.ITextRegion;
-import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
-import org.osate.aadl2.impl.SystemTypeImpl;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,6 +14,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
+import org.eclipse.xtext.util.ITextRegion;
+import org.osate.aadl2.impl.DefaultAnnexSubclauseImpl;
+import org.osate.aadl2.impl.SystemTypeImpl;
 
 /** Author: Soumya Talukder Date: Jul 18, 2019 */
 

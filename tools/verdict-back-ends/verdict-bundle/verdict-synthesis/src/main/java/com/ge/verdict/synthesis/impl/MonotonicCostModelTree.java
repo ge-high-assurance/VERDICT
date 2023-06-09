@@ -3,12 +3,6 @@ package com.ge.verdict.synthesis.impl;
 import static javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION;
 
 import com.ge.verdict.synthesis.ICostModel;
-
-import org.apache.commons.math3.fraction.Fraction;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -16,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +18,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.math3.fraction.Fraction;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * A cost model composite tree for cost lookup based on component, defense, dal Supports discrete

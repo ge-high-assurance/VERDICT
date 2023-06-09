@@ -1,7 +1,6 @@
 package com.ge.verdict.attackdefensecollector.model;
 
 import com.ge.verdict.attackdefensecollector.adtree.ADTree;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -13,6 +12,7 @@ import java.util.function.Function;
 public class PortConcern extends CyberExpr {
     /** The name of the port. */
     private String portName;
+
     /** The CIA concern for the port. */
     private CIA cia;
 

@@ -1,7 +1,6 @@
 package com.ge.verdict.attackdefensecollector.model;
 
 import com.ge.verdict.attackdefensecollector.Prob;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +15,13 @@ import java.util.List;
 public class CyberReq {
     /** The name of the cyber requirement. */
     private String name;
+
     /** The name of the mission to which this cyber requirement belongs. */
     private String mission;
+
     /** The severity (probability target) of this cyber requirement. */
     private int severityDal;
+
     /** The condition cyber expression. */
     private CyberExpr condition;
 

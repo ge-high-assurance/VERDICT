@@ -3,12 +3,10 @@ package com.ge.verdict.synthesis.dtree;
 import com.ge.verdict.attackdefensecollector.adtree.Attack;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-
-import org.logicng.formulas.Formula;
-import org.logicng.formulas.FormulaFactory;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.logicng.formulas.Formula;
+import org.logicng.formulas.FormulaFactory;
 
 /**
  * A raw attack leaf in a defense tree. Each aleaf should have a corresponding dleaf, and if such a
@@ -20,6 +18,7 @@ import java.util.Optional;
 public class ALeaf implements DTree {
     /** the encapsulated attack-defense tree attack node */
     private Attack attack;
+
     /** is set to true when a corresponding dleaf is found */
     private boolean mitigated;
 

@@ -30,6 +30,7 @@ public class Prob {
      * (catastrophic, which is 1e-09).
      */
     private static final int SCALE = 10;
+
     /** Used for formatting probabilities in scientific-notation. */
     private static final DecimalFormat formatter;
 

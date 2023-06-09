@@ -1,13 +1,12 @@
 /* See LICENSE in project directory */
 package com.ge.verdict.lustre;
 
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 
 /** Include the source filename and source line in parser error messages. */
 public class LustreErrorListener extends BaseErrorListener {

@@ -1,13 +1,12 @@
 package com.ge.verdict.synthesis;
 
-import org.apache.commons.math3.fraction.Fraction;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.math3.fraction.Fraction;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public interface ICostModel {
 

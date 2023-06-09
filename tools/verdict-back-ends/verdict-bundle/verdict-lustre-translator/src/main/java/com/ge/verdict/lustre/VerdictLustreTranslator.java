@@ -2,22 +2,18 @@
 package com.ge.verdict.lustre;
 
 import com.ge.verdict.vdm.VdmTranslator;
-
 import edu.uiowa.clc.verdict.lustre.VDMLustre2Kind2;
-
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-import verdict.vdm.vdm_model.Model;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import verdict.vdm.vdm_model.Model;
 
 /** Translate a Verdict data model to or from a Lustre file. */
 public class VerdictLustreTranslator extends VdmTranslator {
