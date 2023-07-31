@@ -35,7 +35,7 @@
     <!-- Need version.slf4j to match Eclipse and SADL -->
     <version.slf4j>1.7.36</version.slf4j>
     <version.surefire>3.1.2</version.surefire>
-    <version.tycho>3.0.5</version.tycho>
+    <version.tycho>4.0.1</version.tycho>
     <version.verdict>${project.version}</version.verdict>
     <!-- No need for version.xtext to match VERDICT target platform -->
     <version.xtext>2.31.0</version.xtext>
