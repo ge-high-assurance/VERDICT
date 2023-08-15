@@ -257,10 +257,10 @@ OSATE sources, you can import our VERDICT plugin sources into it as
 well.  You will not need to use our VERDICT plugin's target platform
 to make some build errors go away; OSATE's target platform will be a
 superset of our target platform except for the following features
-(AGREE 2.5.2 and Xtext Antlr SDK) which you will have to install into
-your OSATE development IDE from their own update sites:
+(AGREE and Xtext Antlr SDK) which you will have to install into your
+OSATE development IDE from their own update sites:
 
-- [com.rockwellcollins.atc.agree.feature](https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master/agree_2.5.2)
+- [com.rockwellcollins.atc.agree.feature](https://loonwerks.github.io/AGREE-Updates/releases/2.9.1)
 - [de.itemis.xtext.antlr.sdk](http://download.itemis.com/updates/releases/2.1.1)
 
 # Additional notes
