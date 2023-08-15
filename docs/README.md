@@ -65,7 +65,7 @@ safer, you can install AGREE in OSATE first before installing VERDICT
 by applying the following URL in OSATE's "Install New Software..."
 dialog:
 
-<https://raw.githubusercontent.com/loonwerks/AGREE-Updates/master>
+<https://loonwerks.github.io/AGREE-Updates>
 
 The above URL will install an AGREE plugin matching your OSATE version
 automatically, allowing you to use all of AGREE's functionality or
