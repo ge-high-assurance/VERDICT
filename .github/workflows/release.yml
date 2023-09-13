@@ -43,7 +43,7 @@ jobs:
     - name: Extract kind2 Linux binary
       if: runner.os == 'Linux'
       id: extract
-      uses: shrink/actions-docker-extract@v2.1.0
+      uses: shrink/actions-docker-extract@v3.0.0
       with:
         image: kind2/kind2:dev
         path: /kind2
