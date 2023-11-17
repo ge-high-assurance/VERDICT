@@ -1,30 +1,33 @@
-# Runs whenever a pull request is created, modified, or reopened
-
 name: VERDICT Integration Workflow
+
+# Runs whenever a pull request is created, reopened, or modified
 
 on:
   pull_request:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 
-# Builds VERDICT source with Java and Maven
-# Caches Maven dependencies
+# Runs integration workflow as a CI check:
+# - Builds VERDICT source and runs unit tests
 
 jobs:
   integration:
+    container:
+      image: maven:${{ matrix.maven-version }}
+      volumes:
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         distribution: [ temurin ]
         java-version: [ 17 ]
+        maven-version: [ 3.9.5 ]
         os: [ ubuntu-22.04 ]
 
     steps:
     - name: Check out VERDICT source
       uses: actions/checkout@v4.1.1
-
-    - name: Set up GraphViz
-      uses: ts-graphviz/setup-graphviz@v1
 
     - name: Set up Java and Maven
       uses: actions/setup-java@v3.13.0
@@ -37,5 +40,3 @@ jobs:
       run: |
         mvn -B install -f tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
         mvn -B package -f tools/pom.xml -Dtycho.localArtifacts=ignore
-      env:
-        GraphVizPath: /usr/bin
