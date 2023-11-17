@@ -1,6 +1,6 @@
-# Runs whenever the main branch is changed (except for tags)
-
 name: VERDICT Main Workflow
+
+# Runs whenever the main branch is changed (except for tags)
 
 on:
   push:
@@ -8,19 +8,26 @@ on:
     tags-ignore: [ '*' ]
   workflow_dispatch:
 
-# Builds soteria_pp native binary
-# Builds VERDICT source with Java and Maven
-# Pushes verdict-dev image to Docker Hub
-# Updates verdict-dev in VERDICT-update-sites
+# Runs main workflow and uploads build artifacts:
+# - Builds soteria_pp native binary
+# - Builds VERDICT source and runs unit tests
+# - Pushes verdict-dev image to Docker Hub
+# - Updates verdict-dev in VERDICT-update-sites
 
 jobs:
   main:
+    container:
+      image: maven:${{ matrix.maven-version }}
+      volumes:
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         distribution: [ temurin ]
         java-version: [ 17 ]
+        maven-version: [ 3.9.5 ]
         ocaml-compiler: [ 4.09.1 ]
         os: [ macos-12, ubuntu-22.04 ]
 
@@ -41,10 +48,6 @@ jobs:
 
     # Run rest of steps only on Linux - macOS isn't needed
 
-    - name: Set up GraphViz
-      if: runner.os == 'Linux'
-      uses: ts-graphviz/setup-graphviz@v1
-
     - name: Set up Java and Maven
       if: runner.os == 'Linux'
       uses: actions/setup-java@v3.13.0
@@ -58,12 +61,6 @@ jobs:
       run: |
         mvn -B install -f tools/verdict-back-ends/verdict-bundle/z3-native-libs/pom.xml
         mvn -B package -f tools/pom.xml -Dtycho.localArtifacts=ignore
-      env:
-        GraphVizPath: /usr/bin
-
-    - name: Set up Docker Buildx
-      if: runner.os == 'Linux'
-      uses: docker/setup-buildx-action@v3.0.0
 
     - name: Login to Docker Hub
       if: runner.os == 'Linux'
@@ -71,6 +68,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Set up Docker Buildx
+      if: runner.os == 'Linux'
+      uses: docker/setup-buildx-action@v3.0.0
 
     - name: Build and push verdict-dev image
       if: runner.os == 'Linux'
