@@ -37,7 +37,7 @@ jobs:
       run: brew install zmq
 
     - name: Set up OCaml
-      uses: ocaml/setup-ocaml@v2.1.7
+      uses: ocaml/setup-ocaml@v2.1.8
       with:
         ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
