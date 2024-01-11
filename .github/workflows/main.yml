@@ -75,7 +75,7 @@ jobs:
         mvn -B package -f tools/pom.xml -Dtycho.localArtifacts=ignore
 
     - name: Download soteria_pp
-      uses: actions/download-artifact@v4.1.0
+      uses: actions/download-artifact@v4.1.1
       with:
         name: ${{ runner.os }}-binaries
         path: tools/verdict-back-ends/soteria_pp/bin
