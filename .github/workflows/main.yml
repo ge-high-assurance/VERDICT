@@ -38,7 +38,7 @@ jobs:
         opam exec make
 
     - name: Upload soteria_pp
-      uses: actions/upload-artifact@v4.2.0
+      uses: actions/upload-artifact@v4.3.0
       with:
         name: ${{ runner.os }}-binaries
         path: tools/verdict-back-ends/soteria_pp/bin/soteria_pp
