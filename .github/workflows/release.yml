@@ -151,7 +151,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3.0.0
+      uses: docker/setup-buildx-action@v3.1.0
 
     - name: Build and push verdict image
       uses: docker/build-push-action@v5.1.0
