@@ -30,7 +30,7 @@
     <!-- Need version.antlr to match logicng -->
     <version.antlr>4.9.3</version.antlr>
     <version.asm>9.6</version.asm>
-    <version.micrometer>1.12.3</version.micrometer>
+    <version.micrometer>1.12.4</version.micrometer>
     <version.sadl>3.6.0-SNAPSHOT</version.sadl>
     <!-- Need version.slf4j to match Eclipse and SADL -->
     <version.slf4j>1.7.36</version.slf4j>
