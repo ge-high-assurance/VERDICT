@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - name: Check out VERDICT source
-      uses: actions/checkout@v4.1.3
+      uses: actions/checkout@v4.1.4
 
     - name: Set up OCaml
       uses: ocaml/setup-ocaml@v2.2.8
@@ -60,7 +60,7 @@ jobs:
 
     steps:
     - name: Check out VERDICT source
-      uses: actions/checkout@v4.1.3
+      uses: actions/checkout@v4.1.4
 
     - name: Set up Java and Maven
       uses: actions/setup-java@v4.2.1
@@ -100,7 +100,7 @@ jobs:
         tags: gehighassurance/verdict-dev:latest
 
     - name: Check out VERDICT-update-sites
-      uses: actions/checkout@v4.1.3
+      uses: actions/checkout@v4.1.4
       with:
         repository: ge-high-assurance/VERDICT-update-sites
         token: ${{ secrets.CI_PAT }}
