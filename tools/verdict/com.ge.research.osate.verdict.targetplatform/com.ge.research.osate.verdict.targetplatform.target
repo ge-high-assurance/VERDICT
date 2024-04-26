@@ -52,7 +52,7 @@
       <unit id="org.osate.plugins.feature.feature.group"
         version="0.0.0" />
       <repository
-        location="https://osate-build.sei.cmu.edu/download/osate/stable/2.10.2/updates" />
+        location="https://osate-build.sei.cmu.edu/download/osate/stable/2.10.2-vfinal/updates" />
     </location>
     <location includeAllPlatforms="false"
       includeConfigurePhase="true" includeMode="planner"
