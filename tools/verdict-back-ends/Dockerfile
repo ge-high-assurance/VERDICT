@@ -11,6 +11,7 @@ FROM ubuntu:24.04
 
 RUN apt-get update -qq \
  && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
+    adduser \
     graphviz \
     libzmq5 \
     openjdk-17-jre-headless \
