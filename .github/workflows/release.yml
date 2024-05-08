@@ -138,7 +138,7 @@ jobs:
         cp -a extern/nix/soteria_pp tools/verdict-back-ends/soteria_pp/bin
 
     - name: Upload extern.zip and README.md to release page
-      uses: softprops/action-gh-release@v2.0.4
+      uses: softprops/action-gh-release@v2.0.5
       with:
         files: |
           extern.zip
