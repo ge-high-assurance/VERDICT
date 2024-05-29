@@ -38,7 +38,7 @@
     <version.tycho>4.0.8</version.tycho>
     <version.verdict>${project.version}</version.verdict>
     <!-- No need for version.xtext to match VERDICT target platform -->
-    <version.xtext>2.34.0</version.xtext>
+    <version.xtext>2.35.0</version.xtext>
   </properties>
 
   <!-- Set all dependency versions in one place -->
